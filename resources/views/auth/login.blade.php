@@ -9,12 +9,18 @@
     <div class="col-12 p-0">    
       <div class="login-card login-dark">
         <div>
-          <div><a class="logo" href="{{ route('login') }}"><img class="img-fluid for-light m-auto" src="{{ asset('admiro/assets/images/logo/logo1.png') }}" alt="looginpage"><img class="img-fluid for-dark" src="{{ asset('admiro/assets/images/logo/logo-dark.png') }}" alt="logo"></a></div>
+          <div class="text-center"><a class="logo" href="{{ route('login') }}"><img class="img-fluid for-dark d-block m-auto" src="{{ asset('admiro/assets/images/logo/zaya wellness logo white.svg') }}" alt="logo" style="max-height: 60px;"></a></div>
           <div class="login-main"> 
             <form class="theme-form" method="POST" action="{{ route('login') }}">
                 @csrf
               <h2 class="text-center">Sign in to account</h2>
               <p class="text-center">Enter your email &amp; password to login</p>
+              
+              @if(session('error'))
+                <div class="alert alert-danger text-center py-2" role="alert">
+                    {{ session('error') }}
+                </div>
+              @endif
               <div class="form-group">
                 <label class="col-form-label">Email Address</label>
                 <input class="form-control @error('email') is-invalid @enderror" type="email" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus placeholder="Test@gmail.com">

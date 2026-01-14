@@ -22,13 +22,15 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-{{ isset($showFormInline) && $showFormInline ? '8' : '12' }}">
             <div class="card">
                 <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
                     <h3>{{ $pageTitle }} List</h3>
+                    @if(!isset($showFormInline) || !$showFormInline)
                     <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createModal">
                         <i class="fa-solid fa-plus"></i> Create {{ $entityName }}
                     </button>
+                    @endif
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -50,6 +52,35 @@
                 </div>
             </div>
         </div>
+        @if(isset($showFormInline) && $showFormInline)
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-header pb-0 card-no-border">
+                    <h3>Create {{ $entityName }}</h3>
+                </div>
+                <div class="card-body">
+                    <form id="createFormInline">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label" for="name">Name</label>
+                            <input class="form-control" id="name" type="text" name="name" placeholder="Enter name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="email">Email</label>
+                            <input class="form-control" id="email" type="email" name="email" placeholder="Enter email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="password">Password</label>
+                            <input class="form-control" id="password" type="password" name="password" placeholder="Enter password" required>
+                        </div>
+                        <div class="text-end">
+                            <button class="btn btn-primary" type="button" id="saveBtnInline">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 </div>
 
@@ -106,26 +137,33 @@
 
         $('#saveBtn').click(function(e) {
             e.preventDefault();
-            $(this).html('Sending..');
-            
+            submitForm($('#createForm'), $(this), '#createModal');
+        });
+
+        $('#saveBtnInline').click(function(e) {
+            e.preventDefault();
+            submitForm($('#createFormInline'), $(this), null);
+        });
+
+        function submitForm(form, btn, modalId) {
+            btn.html('Sending..');
             $.ajax({
-                data: $('#createForm').serialize(),
+                data: form.serialize(),
                 url: "{{ route($routePrefix . '.store') }}",
                 type: "POST",
                 dataType: 'json',
                 success: function(data) {
-                    $('#createForm').trigger("reset");
-                    $('#createModal').modal('hide');
+                    form.trigger("reset");
+                    if(modalId) $(modalId).modal('hide');
                     table.draw();
-                    $('#saveBtn').html('Save');
-                    // Optional: Show success message
+                    btn.html('Save');
                 },
                 error: function(data) {
                     console.log('Error:', data);
-                    $('#saveBtn').html('Save');
+                    btn.html('Save');
                 }
             });
-        });
+        }
         
         // Handle Delete
         $('body').on('click', '.deleteUser', function () {
@@ -133,7 +171,7 @@
             if(confirm("Are you sure you want to delete this user?")) {
                 $.ajax({
                     type: "DELETE",
-                    url: "{{ url('admin/users/' . $urlSegment) }}" + '/' + user_id,
+                    url: "{{ url('admin/' . $urlSegment) }}" + '/' + user_id,
                     data: {
                         _token: '{{ csrf_token() }}'
                     },

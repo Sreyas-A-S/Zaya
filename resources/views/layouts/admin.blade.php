@@ -9,8 +9,8 @@
     <meta name="author" content="pixelstrap"/>
     <title>@yield('title', 'Admiro - Premium Admin Template')</title>
     <!-- Favicon icon-->
-    <link rel="icon" href="{{ asset('admiro/assets/images/favicon.png') }}" type="image/x-icon"/>
-    <link rel="shortcut icon" href="{{ asset('admiro/assets/images/favicon.png') }}" type="image/x-icon"/>
+    <link rel="icon" href="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" type="image/svg+xml"/>
+    <link rel="shortcut icon" href="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" type="image/svg+xml"/>
     <!-- Google font-->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
@@ -41,8 +41,15 @@
     <!-- tap on tap ends-->
     <!-- loader-->
     <div class="loader-wrapper">
-      <div class="loader"><span></span><span></span><span></span><span></span><span></span></div>
+        <img src="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" alt="loader" style="width: 80px; animation: pulse 1.5s infinite ease-in-out;">
     </div>
+    <style>
+      @keyframes pulse {
+        0% { transform: scale(0.9); opacity: 0.7; }
+        50% { transform: scale(1.1); opacity: 1; }
+        100% { transform: scale(0.9); opacity: 0.7; }
+      }
+    </style>
     <div class="page-wrapper compact-wrapper" id="pageWrapper"> 
       
       @include('partials.navbar')
@@ -88,11 +95,11 @@
     <!-- data_table-->
     <script src="{{ asset('admiro/assets/js/js-datatables/datatables/jquery.dataTables.min.js') }}"></script>
     <!-- page_datatable-->
-    <script src="{{ asset('admiro/assets/js/js-datatables/datatables/datatable.custom.js') }}"></script>
+    {{-- <script src="{{ asset('admiro/assets/js/js-datatables/datatables/datatable.custom.js') }}"></script> --}}
     <!-- page_datatable1-->
-    <script src="{{ asset('admiro/assets/js/js-datatables/datatables/datatable.custom1.js') }}"></script>
+    {{-- <script src="{{ asset('admiro/assets/js/js-datatables/datatables/datatable.custom1.js') }}"></script> --}}
     <!-- page_datatable-->
-    <script src="{{ asset('admiro/assets/js/datatable/datatables/datatable.custom.js') }}"></script>
+    {{-- <script src="{{ asset('admiro/assets/js/datatable/datatables/datatable.custom.js') }}"></script> --}}
     <!-- theme_customizer-->
     <script src="{{ asset('admiro/assets/js/theme-customizer/customizer.js') }}"></script>
     <!-- tilt-->

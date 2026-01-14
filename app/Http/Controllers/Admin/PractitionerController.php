@@ -4,120 +4,204 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\PractitionerProfile;
+use App\Models\Practitioner;
 use App\Models\PractitionerQualification;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class PractitionerController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = User::where('role', 'practitioner')->latest()->get();
-            return Datatables::of($data)
-                    ->addIndexColumn()
-                    ->addColumn('action', function($row){
-                        // Update edit link to point to new edit page (not yet created but route will likely be the same resource structure)
-                        $editUrl = route('admin.users.practitioners.edit', $row->id);
-                        $btn = '<a href="'.$editUrl.'" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editUser">Edit</a>';
-                        $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-danger btn-sm deleteUser">Delete</a>';
-                        return $btn;
-                    })
-                    ->rawColumns(['action'])
-                    ->make(true);
+            $data = User::where('role', 'practitioner')
+                ->leftJoin('practitioners', 'users.id', '=', 'practitioners.user_id')
+                ->select([
+                    'users.id',
+                    'users.name',
+                    'users.email',
+                    'practitioners.gender',
+                    'practitioners.phone',
+                    'practitioners.nationality',
+                    'practitioners.status'
+                ])
+                ->latest('users.created_at')
+                ->get();
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->editColumn('status', function ($row) {
+                    $badgeClass = $row->status == 'approved' ? 'bg-success' : ($row->status == 'pending' ? 'bg-warning' : 'bg-danger');
+                    return '<span class="badge ' . $badgeClass . '">' . ucfirst($row->status ?? 'pending') . '</span>';
+                })
+                ->addColumn('action', function ($row) {
+                    $btn = '<div class="d-flex align-items-center gap-3">';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-info viewPractitioner" title="View"><i class="iconly-Show icli" style="font-size: 20px;"></i></a>';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editPractitioner" title="Edit"><i class="iconly-Edit-Square icli" style="font-size: 20px;"></i></a>';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-danger deletePractitioner" title="Delete"><i class="iconly-Delete icli" style="font-size: 20px;"></i></a>';
+                    $btn .= '</div>';
+                    return $btn;
+                })
+                ->rawColumns(['status', 'action'])
+                ->make(true);
         }
 
-        return view('admin.users.practitioners.index');
-    }
-
-    public function create()
-    {
-        return view('admin.users.practitioners.create');
+        return view('admin.practitioners.index');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
+        $validatedData = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'declaration_agreed' => 'required',
-            'consent_agreed' => 'required',
+            'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
+            'dob' => 'nullable|date',
+            'nationality' => 'nullable|string|max:255',
+            'residential_address' => 'nullable|string',
+            'zip_code' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20',
+            'website_url' => 'nullable|url|max:255',
+            'consultations' => 'nullable|array',
+            'body_therapies' => 'nullable|array',
+            'other_modalities' => 'nullable|array',
+            'additional_courses' => 'nullable|string',
+            'languages_spoken' => 'nullable|array',
+            'can_translate_english' => 'boolean',
+            'profile_bio' => 'nullable|string',
+            // Documents
+            'doc_cover_letter' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+            'doc_certificates' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'doc_experience' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'doc_registration' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'doc_ethics' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'doc_contract' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'doc_id_proof' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
         ]);
 
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-
-            // Create User
             $user = User::create([
-                'name' => $request->first_name . ' ' . $request->last_name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => 'practitioner'
+                'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make(Str::random(10)),
+                'role' => 'practitioner',
             ]);
 
-            // Handle File Uploads
             $filePaths = [];
-            $docFields = [
-                'doc_cover_letter', 'doc_certificates', 'doc_experience', 
-                'doc_registration', 'doc_ethics', 'doc_contract', 'doc_id_proof'
-            ];
-
+            $docFields = ['doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 'doc_contract', 'doc_id_proof'];
             foreach ($docFields as $field) {
                 if ($request->hasFile($field)) {
                     $filePaths[$field] = $request->file($field)->store('practitioner_docs', 'public');
                 }
             }
 
-            // Create Profile
-            $profileData = array_merge($request->only([
-                'first_name', 'last_name', 'sex', 'dob', 'nationality',
-                'residential_address', 'zip_code', 'phone', 'website_url',
-                'consultations', 'body_therapies', 'other_modalities',
-                'additional_education', 'languages_spoken', 'can_translate_english',
-                'profile_bio', 'signature', 'signed_date'
-            ]), $filePaths);
-            
-            // Handle Checkboxes being arrays or boolean
-            $profileData['declaration_agreed'] = $request->has('declaration_agreed');
-            $profileData['consent_agreed'] = $request->has('consent_agreed');
+            $user->practitioner()->create(array_merge($validatedData, $filePaths));
 
-            $profile = $user->practitionerProfile()->create($profileData);
-
-            // Create Qualifications
+            // Qualifications logic (if any)
             if ($request->has('qualifications')) {
                 foreach ($request->qualifications as $qual) {
-                    if (!empty($qual['institute_name'])) { // Basic validation check
-                        $profile->qualifications()->create($qual);
+                    if (!empty($qual['institute_name'])) {
+                        $user->practitioner->qualifications()->create($qual);
                     }
                 }
             }
 
             DB::commit();
-
-            return redirect()->route('admin.users.practitioners.index')->with('success', 'Practitioner created successfully.');
-
+            return response()->json(['success' => 'Practitioner registered successfully!']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error creating practitioner: ' . $e->getMessage())->withInput();
+            return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
         }
     }
 
-    public function edit($id)
+    public function show(Request $request, $id)
     {
-        // Placeholder for edit, returns create view for now (empty) or error
-        // Real implementation would pass $user and $profile to the view
-        $user = User::with('practitionerProfile.qualifications')->findOrFail($id);
-        return view('admin.users.practitioners.edit', compact('user'));
+        $user = User::with('practitioner.qualifications')->findOrFail($id);
+        if ($request->ajax()) {
+            return response()->json(['user' => $user, 'practitioner' => $user->practitioner]);
+        }
+        return redirect()->route('admin.practitioners.index');
+    }
+
+    public function edit(Request $request, $id)
+    {
+        $user = User::with('practitioner.qualifications')->findOrFail($id);
+        if ($request->ajax()) {
+            return response()->json(['user' => $user, 'practitioner' => $user->practitioner]);
+        }
+        return redirect()->route('admin.practitioners.index');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $practitioner = $user->practitioner;
+
+        $validatedData = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
+            'dob' => 'nullable|date',
+            'nationality' => 'nullable|string|max:255',
+            'residential_address' => 'nullable|string',
+            'zip_code' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20',
+            'website_url' => 'nullable|url|max:255',
+            'consultations' => 'nullable|array',
+            'body_therapies' => 'nullable|array',
+            'other_modalities' => 'nullable|array',
+            'additional_courses' => 'nullable|string',
+            'languages_spoken' => 'nullable|array',
+            'can_translate_english' => 'boolean',
+            'profile_bio' => 'nullable|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $user->update([
+                'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+                'email' => $validatedData['email'],
+            ]);
+
+            $filePaths = [];
+            $docFields = ['doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 'doc_contract', 'doc_id_proof'];
+            foreach ($docFields as $field) {
+                if ($request->hasFile($field)) {
+                    $filePaths[$field] = $request->file($field)->store('practitioner_docs', 'public');
+                }
+            }
+
+            $practitioner->update(array_merge($validatedData, $filePaths));
+
+            // Qualifications update logic
+            if ($request->has('qualifications')) {
+                $practitioner->qualifications()->delete();
+                foreach ($request->qualifications as $qual) {
+                    if (!empty($qual['institute_name'])) {
+                        $practitioner->qualifications()->create($qual);
+                    }
+                }
+            }
+
+            DB::commit();
+            return response()->json(['success' => 'Practitioner updated successfully!']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+        }
     }
 
     public function destroy($id)
     {
-        User::find($id)->delete();
-        return response()->json(['success'=>'Practitioner deleted successfully.']);
+        $user = User::findOrFail($id);
+        $user->delete();
+        return response()->json(['success' => 'Practitioner deleted successfully.']);
     }
 }

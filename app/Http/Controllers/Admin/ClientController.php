@@ -28,7 +28,7 @@ class ClientController extends Controller
         return view('admin.users.index', [
             'pageTitle' => 'Clients',
             'entityName' => 'Client',
-            'routePrefix' => 'admin.users.clients',
+            'routePrefix' => 'admin.clients',
             'urlSegment' => 'clients'
         ]);
     }

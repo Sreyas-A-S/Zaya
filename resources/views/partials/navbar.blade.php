@@ -1,8 +1,20 @@
 <header class="page-header row">
-    <div class="logo-wrapper d-flex align-items-center col-auto"><a href="{{ route('admin.dashboard') }}"><img class="light-logo img-fluid" src="{{ asset('admiro/assets/images/logo/logo1.png') }}" alt="logo"/><img class="dark-logo img-fluid" src="{{ asset('admiro/assets/images/logo/logo-dark.png') }}" alt="logo"/></a><a class="close-btn toggle-sidebar" href="javascript:void(0)">
-        <svg class="svg-color">
-            <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Category') }}"></use>
-        </svg></a></div>
+    <div class="logo-wrapper d-flex align-items-center col-auto">
+        <a href="{{ route('admin.dashboard') }}">
+            <img class="light-logo img-fluid" src="{{ asset('admiro/assets/images/logo/zaya wellness logo white.png') }}" alt="logo" style="max-height: 40px;"/>
+            <img class="dark-logo img-fluid" src="{{ asset('admiro/assets/images/logo/zaya wellness logo white.svg') }}" alt="logo" style="max-height: 40px;"/>
+        </a>
+        <a class="close-btn toggle-sidebar" href="javascript:void(0)">
+            <svg class="svg-color">
+                <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Category') }}"></use>
+            </svg>
+        </a>
+    </div>
+    <div class="logo-icon-wrapper col-auto px-0">
+        <a href="{{ route('admin.dashboard') }}">
+            <img class="img-fluid" src="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" alt="logo" style="max-height: 30px;"/>
+        </a>
+    </div>
     <div class="page-main-header col">
         <div class="header-left">
         <form class="form-inline search-full col" action="#" method="get">
@@ -222,8 +234,8 @@
             <div class="user-wrap">
                 <div class="user-img"><img src="{{ asset('admiro/assets/images/profile.png') }}" alt="user"/></div>
                 <div class="user-content">
-                <h6>Ava Davis</h6>
-                <p class="mb-0">Admin<i class="fa-solid fa-chevron-down"></i></p>
+                <h6>{{ auth()->user()->name ?? 'Guest' }}</h6>
+                <p class="mb-0 text-capitalize">{{ auth()->user()->role ?? 'User' }}<i class="fa-solid fa-chevron-down"></i></p>
                 </div>
             </div>
             <div class="custom-menu overflow-hidden">

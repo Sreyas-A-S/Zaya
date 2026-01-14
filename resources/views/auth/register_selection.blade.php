@@ -8,10 +8,10 @@
         <div class="col-12 col-md-8 col-lg-6 p-0">
             <div class="card login-dark">
                 <div class="card-body text-center">
-                    <div>
+                    <div class="text-center">
                         <a class="logo" href="{{ route('login') }}">
-                            <img class="img-fluid for-light m-auto mb-4" src="{{ asset('admiro/assets/images/logo/logo1.png') }}" alt="logo">
-                            <img class="img-fluid for-dark m-auto mb-4" src="{{ asset('admiro/assets/images/logo/logo-dark.png') }}" alt="logo">
+                            <img class="img-fluid for-light m-auto mb-4 d-block" src="{{ asset('admiro/assets/images/logo/zaya wellness logo white.svg') }}" alt="logo" style="max-height: 60px;">
+                            <img class="img-fluid for-dark m-auto mb-4 d-block" src="{{ asset('admiro/assets/images/logo/zaya wellness logo white.svg') }}" alt="logo" style="max-height: 60px;">
                         </a>
                     </div>
                     <h2 class="mb-4">Join Us As</h2>

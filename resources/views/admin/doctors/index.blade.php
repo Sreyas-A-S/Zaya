@@ -1,0 +1,1085 @@
+@extends('layouts.admin')
+
+@section('title', 'Doctors Management')
+
+@section('content')
+<div class="container-fluid">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3>Doctors Management</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="iconly-Home icli svg-color"></i></a></li>
+                    <li class="breadcrumb-item">Doctors</li>
+                    <li class="breadcrumb-item active">List</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
+                    <h3>Doctors List</h3>
+                    <button type="button" class="btn btn-primary" onclick="openCreateModal()">
+                        <i class="fa-solid fa-plus me-2"></i>Register New Doctor
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display" id="doctors-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>AYUSH No.</th>
+                                    <th>Experience</th>
+                                    <th>City/State</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{-- Data will be populated via AJAX --}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Modal (Create/Edit) -->
+<div class="modal fade" id="doctor-form-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="form-modal-title">Register New Doctor</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" style="max-height: 80vh; overflow-y: auto;">
+                <div class="horizontal-wizard-wrapper">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <!-- Stepper Indicator -->
+                            <div class="stepper-horizontal mb-5" id="doctor-stepper">
+                                <div class="stepper-item active" data-step="1">
+                                    <div class="step-counter">1</div>
+                                    <div class="step-name">Personal & Medical</div>
+                                </div>
+                                <div class="stepper-item" data-step="2">
+                                    <div class="step-counter">2</div>
+                                    <div class="step-name">Education</div>
+                                </div>
+                                <div class="stepper-item" data-step="3">
+                                    <div class="step-counter">3</div>
+                                    <div class="step-name">Expertise</div>
+                                </div>
+                                <div class="stepper-item" data-step="4">
+                                    <div class="step-counter">4</div>
+                                    <div class="step-name">Setup & KYC</div>
+                                </div>
+                                <div class="stepper-item" data-step="5">
+                                    <div class="step-counter">5</div>
+                                    <div class="step-name">Profile & Consent</div>
+                                </div>
+                            </div>
+
+                            <form id="doctor-form" method="POST" enctype="multipart/form-data" class="theme-form">
+                                @csrf
+                                <input type="hidden" name="_method" id="form-method" value="POST">
+                                <input type="hidden" name="doctor_id" id="doctor_id">
+
+                                <!-- Step 1: Personal & Medical -->
+                                <div class="step-content" id="step1">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <h5 class="f-w-600 mb-3">A. Personal Details</h5>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" name="full_name" required placeholder="Enter full name">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Gender</label>
+                                            <select class="form-select" name="gender" required>
+                                                <option value="" selected disabled>Select Gender</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Date of Birth</label>
+                                            <input type="date" class="form-control" name="dob" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Mobile Number</label>
+                                            <input type="text" class="form-control" name="mobile_number" required placeholder="Enter mobile number">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Email ID</label>
+                                            <input type="email" class="form-control" name="email" required placeholder="Enter email id">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">City, State</label>
+                                            <input type="text" class="form-control" name="city_state" required placeholder="e.g. Mumbai, Maharashtra">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Profile Photo <span class="file-keep-note d-none text-muted">(Leave blank to keep current)</span></label>
+                                            <input type="file" class="form-control" name="profile_photo" required>
+                                            <div id="current-profile-photo" class="mt-2 d-none"></div>
+                                        </div>
+
+                                        <div class="col-12 mt-4">
+                                            <h5 class="f-w-600 mb-3">B. Medical Registration</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">AYUSH Registration Number</label>
+                                            <input type="text" class="form-control" name="ayush_reg_no" required placeholder="Enter registration number">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">State Ayurveda Council Name</label>
+                                            <input type="text" class="form-control" name="state_council" required placeholder="Enter council name">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Registration Certificate (Upload) <span class="file-keep-note d-none text-muted">(Leave blank to keep)</span></label>
+                                            <input type="file" class="form-control" name="reg_certificate">
+                                            <div id="current-reg-cert" class="mt-2 d-none"></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Digital Signature (Upload) <span class="file-keep-note d-none text-muted">(Leave blank to keep)</span></label>
+                                            <input type="file" class="form-control" name="digital_signature">
+                                            <div id="current-signature" class="mt-2 d-none"></div>
+                                        </div>
+                                        <div class="col-12 wizard-footer text-end mt-4 pt-3 border-top">
+                                            <button type="button" class="btn btn-primary next-step" data-next="2">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 2: Education & Experience -->
+                                <div class="step-content d-none" id="step2">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <h5 class="f-w-600 mb-3">C. Qualifications & Experience</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Primary Qualification</label>
+                                            <select class="form-select" name="primary_qualification" id="primary_qualification" required>
+                                                <option value="bams">BAMS</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                            <input type="text" class="form-control mt-2 d-none" name="primary_qualification_other" id="primary_qualification_other" placeholder="Specify Other Qualification">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Post Graduation (If any)</label>
+                                            <select class="form-select" name="post_graduation" id="post_graduation">
+                                                <option value="">None</option>
+                                                <option value="md_ayurveda">MD Ayurveda</option>
+                                                <option value="ms_ayurveda">MS Ayurveda</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                            <input type="text" class="form-control mt-2 d-none" name="post_graduation_other" id="post_graduation_other" placeholder="Specify Other PG">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Specialization (Select multiple if applicable)</label>
+                                            <div class="row">
+                                                @foreach($specializations as $spec)
+                                                <div class="col-md-3">
+                                                    <div class="form-check checkbox-primary">
+                                                        <input class="form-check-input spec-checkbox" type="checkbox" name="specialization[]" value="{{ $spec->name }}" id="spec_{{ $spec->id }}">
+                                                        <label class="form-check-label" for="spec_{{ $spec->id }}">{{ $spec->name }}</label>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Degree Certificates (Upload multiple) <span class="file-keep-note d-none text-muted">(Upload to replace/add)</span></label>
+                                            <input type="file" class="form-control" name="degree_certificates[]" multiple>
+                                            <div id="current-degree-certs" class="mt-2 d-none"></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Total Years of Experience</label>
+                                            <input type="number" class="form-control" name="years_of_experience" required placeholder="e.g. 5">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Current Workplace / Clinic Name</label>
+                                            <input type="text" class="form-control" name="current_workplace" required placeholder="Enter clinic name">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Clinic Address</label>
+                                            <textarea class="form-control" name="clinic_address" rows="2" required placeholder="Enter full address"></textarea>
+                                        </div>
+                                        <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
+                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="1"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
+                                            <button type="button" class="btn btn-primary next-step" data-next="3">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 3: Expertise & Skills -->
+                                <div class="step-content d-none" id="step3">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <h5 class="f-w-600 mb-3">D. Ayurveda Consultation Expertise</h5>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                @foreach($expertises as $skill)
+                                                <div class="col-md-4">
+                                                    <div class="form-check checkbox-primary">
+                                                        <input class="form-check-input skill-checkbox" type="checkbox" name="consultation_expertise[]" value="{{ $skill->name }}" id="skill_{{ $skill->id }}">
+                                                        <label class="form-check-label" for="skill_{{ $skill->id }}">{{ $skill->name }}</label>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 mt-4">
+                                            <h5 class="f-w-600 mb-3">E. Health Conditions Treated</h5>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                @foreach($healthConditions as $cond)
+                                                <div class="col-md-3">
+                                                    <div class="form-check checkbox-primary">
+                                                        <input class="form-check-input cond-checkbox" type="checkbox" name="health_conditions[]" value="{{ $cond->name }}" id="cond_{{ $cond->id }}">
+                                                        <label class="form-check-label" for="cond_{{ $cond->id }}">{{ $cond->name }}</label>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 mt-4">
+                                            <h5 class="f-w-600 mb-3">F. Therapy Skills</h5>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-check mb-3 checkbox-primary">
+                                                <input class="form-check-input" type="checkbox" name="panchakarma_consultation" value="1" id="panchakarma_consultation">
+                                                <label class="form-check-label" for="panchakarma_consultation">I am trained to perform/supervise Panchakarma Procedures</label>
+                                            </div>
+                                            <label class="form-label f-w-500">Panchakarma Procedures Expertise</label>
+                                            <div class="row mb-3">
+                                                @foreach(['Vamana', 'Virechana', 'Basti', 'Nasya', 'Raktamokshana'] as $proc)
+                                                <div class="col-md-2">
+                                                    <div class="form-check checkbox-primary">
+                                                        <input class="form-check-input proc-checkbox" type="checkbox" name="panchakarma_procedures[]" value="{{ $proc }}" id="proc_{{ $loop->index }}">
+                                                        <label class="form-check-label" for="proc_{{ $loop->index }}">{{ $proc }}</label>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                            <label class="form-label f-w-500">External Therapies</label>
+                                            <div class="row">
+                                                @foreach($externalTherapies as $ther)
+                                                <div class="col-md-4">
+                                                    <div class="form-check checkbox-primary">
+                                                        <input class="form-check-input ther-checkbox" type="checkbox" name="external_therapies[]" value="{{ $ther->name }}" id="ther_{{ $ther->id }}">
+                                                        <label class="form-check-label" for="ther_{{ $ther->id }}">{{ $ther->name }}</label>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
+                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="2"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
+                                            <button type="button" class="btn btn-primary next-step" data-next="4">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 4: Setup & KYC -->
+                                <div class="step-content d-none" id="step4">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <h5 class="f-w-600 mb-3">G. Consultation Setup</h5>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Preferred Mode of Consultation</label>
+                                            <div class="form-check checkbox-primary">
+                                                <input class="form-check-input mode-checkbox" type="checkbox" name="consultation_modes[]" value="Video" id="mode_video">
+                                                <label class="form-check-label" for="mode_video">Consultation Mode (Video)</label>
+                                            </div>
+                                            <div class="form-check checkbox-primary">
+                                                <input class="form-check-input mode-checkbox" type="checkbox" name="consultation_modes[]" value="Audio" id="mode_audio">
+                                                <label class="form-check-label" for="mode_audio">Consultation Mode (Audio)</label>
+                                            </div>
+                                            <div class="form-check checkbox-primary">
+                                                <input class="form-check-input mode-checkbox" type="checkbox" name="consultation_modes[]" value="Chat" id="mode_chat">
+                                                <label class="form-check-label" for="mode_chat">Consultation Mode (Chat)</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Languages Spoken (Comma separated)</label>
+                                            <input type="text" class="form-control" name="languages_spoken" placeholder="e.g. English, Hindi, Marathi" required>
+                                        </div>
+
+                                        <div class="col-12 mt-4">
+                                            <h5 class="f-w-600 mb-3">H. KYC & Payment Details</h5>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">PAN Card Number</label>
+                                            <input type="text" class="form-control" name="pan_number" required placeholder="Enter PAN number">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Upload PAN Card <span class="file-keep-note d-none text-muted">(Leave blank to keep)</span></label>
+                                            <input type="file" class="form-control" name="pan_upload">
+                                            <div id="current-pan" class="mt-2 d-none"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Upload Aadhaar (Optional)</label>
+                                            <input type="file" class="form-control" name="aadhaar_upload">
+                                            <div id="current-aadhaar" class="mt-2 d-none"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Bank Account Holder Name</label>
+                                            <input type="text" class="form-control" name="bank_account_holder" required placeholder="Enter holder name">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Bank Name</label>
+                                            <input type="text" class="form-control" name="bank_name" required placeholder="Enter bank name">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Account Number</label>
+                                            <input type="text" class="form-control" name="account_number" required placeholder="Enter account number">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">IFSC Code</label>
+                                            <input type="text" class="form-control" name="ifsc_code" required placeholder="Enter IFSC code">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Upload Cancelled Cheque/Passbook <span class="file-keep-note d-none text-muted">(Leave blank to keep)</span></label>
+                                            <input type="file" class="form-control" name="cancelled_cheque">
+                                            <div id="current-cheque" class="mt-2 d-none"></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">UPI ID (Optional)</label>
+                                            <input type="text" class="form-control" name="upi_id" placeholder="Enter UPI id">
+                                        </div>
+                                        <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
+                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="3"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
+                                            <button type="button" class="btn btn-primary next-step" data-next="5">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 5: Profile & Consent -->
+                                <div class="step-content d-none" id="step5">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <h5 class="f-w-600 mb-3">I. Platform Profile</h5>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Short Professional Bio (50-150 words)</label>
+                                            <textarea class="form-control" name="short_bio" rows="3" required placeholder="Enter short bio..."></textarea>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Key Expertise</label>
+                                            <textarea class="form-control" name="key_expertise" rows="2" required placeholder="Enter key expertise..."></textarea>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Services Offered</label>
+                                            <textarea class="form-control" name="services_offered" rows="2" required placeholder="Enter services offered..."></textarea>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Awards & Recognitions (Optional)</label>
+                                            <textarea class="form-control" name="awards_recognitions" rows="2" placeholder="Enter awards..."></textarea>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Website (Optional)</label>
+                                            <input type="url" class="form-control" name="website" placeholder="https://example.com">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Instagram Link (Optional)</label>
+                                            <input type="url" class="form-control" name="instagram">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">YouTube Link (Optional)</label>
+                                            <input type="url" class="form-control" name="youtube">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">LinkedIn Link (Optional)</label>
+                                            <input type="url" class="form-control" name="linkedin">
+                                        </div>
+
+                                        <div class="col-12 mt-4">
+                                            <h5 class="f-w-600 mb-3">J. Declaration & Consent</h5>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-check checkbox-primary mb-2">
+                                                <input class="form-check-input" type="checkbox" name="ayush_confirmation" value="1" required id="ayush_confirmation">
+                                                <label class="form-check-label" for="ayush_confirmation">I confirm I am a registered AYUSH Practitioner.</label>
+                                            </div>
+                                            <div class="form-check checkbox-primary mb-2">
+                                                <input class="form-check-input" type="checkbox" name="guidelines_agreement" value="1" required id="guidelines_agreement">
+                                                <label class="form-check-label" for="guidelines_agreement">I agree to follow ZAYA Wellness Consultation Guidelines.</label>
+                                            </div>
+                                            <div class="form-check checkbox-primary mb-2">
+                                                <input class="form-check-input" type="checkbox" name="document_consent" value="1" required id="document_consent">
+                                                <label class="form-check-label" for="document_consent">I consent to the verification of my documents.</label>
+                                            </div>
+                                            <div class="form-check checkbox-primary mb-2">
+                                                <input class="form-check-input" type="checkbox" name="policies_agreement" value="1" required id="policies_agreement">
+                                                <label class="form-check-label" for="policies_agreement">I agree to the Platform Policies & Terms.</label>
+                                            </div>
+                                            <div class="form-check checkbox-primary mb-2">
+                                                <input class="form-check-input" type="checkbox" name="prescription_understanding" value="1" required id="prescription_understanding">
+                                                <label class="form-check-label" for="prescription_understanding">I understand I am responsible for my prescriptions.</label>
+                                            </div>
+                                            <div class="form-check checkbox-primary mb-2">
+                                                <input class="form-check-input" type="checkbox" name="confidentiality_consent" value="1" required id="confidentiality_consent">
+                                                <label class="form-check-label" for="confidentiality_consent">I agree to maintain patient data confidentiality.</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 wizard-footer d-flex justify-content-between mt-5 pt-3 border-top">
+                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="4"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
+                                            <button type="submit" class="btn btn-success" id="submit-btn"><i class="fa-solid fa-check-circle me-2"></i> Complete Registration</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Modal -->
+<div class="modal fade" id="doctor-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Doctor Details</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" id="view-modal-content">
+                <!-- Content loaded via JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="doctor-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Delete icli text-danger mb-3" style="font-size: 50px;"></i>
+                <h5>Are you sure?</h5>
+                <p>This action cannot be undone. All data related to this doctor will be permanently removed.</p>
+                <input type="hidden" id="delete-doctor-id">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Confirmation Modal -->
+<div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Status Change</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="fa-solid fa-circle-info text-primary mb-3" style="font-size: 50px;"></i>
+                <h5>Update Status?</h5>
+                <p id="status-confirmation-text">Are you sure you want to change the status of this doctor?</p>
+                <input type="hidden" id="status-doctor-id">
+                <input type="hidden" id="status-new-value">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+    <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto" id="toast-title">Notification</strong>
+            <small>Just now</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+@endsection
+
+@section('scripts')
+<style>
+    /* Stepper Styling */
+    .stepper-horizontal {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-bottom: 40px;
+    }
+
+    .stepper-horizontal::before {
+        content: "";
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #f4f4f4;
+        z-index: 0;
+    }
+
+    .stepper-horizontal .stepper-item {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        cursor: pointer;
+    }
+
+    .stepper-horizontal .step-counter {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+        color: #999;
+    }
+
+    .stepper-horizontal .step-name {
+        font-size: 12px;
+        font-weight: 500;
+        color: #999;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .stepper-horizontal .stepper-item.active .step-counter {
+        border-color: var(--theme-default);
+        background: var(--theme-default);
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(var(--theme-default-rgb), 0.2);
+    }
+
+    .stepper-horizontal .stepper-item.active .step-name {
+        color: var(--theme-default);
+        font-weight: 600;
+    }
+
+    .stepper-horizontal .stepper-item.completed .step-counter {
+        border-color: #51bb25;
+        background: #51bb25;
+        color: #fff;
+    }
+
+    .stepper-horizontal .stepper-item.completed .step-name {
+        color: #51bb25;
+    }
+</style>
+
+<script>
+    let table;
+    let toastInstance;
+
+    function showToast(message, type = 'success') {
+        const toastEl = document.getElementById('liveToast');
+        const titleEl = document.getElementById('toast-title');
+        const messageEl = document.getElementById('toast-message');
+
+        if (!toastInstance) {
+            toastInstance = new bootstrap.Toast(toastEl);
+        }
+
+        toastEl.classList.remove('bg-success', 'bg-danger', 'text-white');
+        if (type === 'success') {
+            toastEl.classList.add('bg-success', 'text-white');
+            titleEl.innerText = 'Success';
+        } else {
+            toastEl.classList.add('bg-danger', 'text-white');
+            titleEl.innerText = 'Error';
+        }
+
+        messageEl.innerText = message;
+        toastInstance.show();
+    }
+
+    $(document).ready(function() {
+        table = $('#doctors-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('admin.doctors.index') }}",
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'name',
+                    name: 'users.name'
+                },
+                {
+                    data: 'email',
+                    name: 'users.email'
+                },
+                {
+                    data: 'ayush_registration_number',
+                    name: 'doctors.ayush_registration_number'
+                },
+                {
+                    data: 'years_of_experience',
+                    name: 'doctors.years_of_experience'
+                },
+                {
+                    data: 'city_state',
+                    name: 'doctors.city_state'
+                },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center'
+                },
+            ]
+        });
+
+        initFormNavigation();
+    });
+
+    function initFormNavigation() {
+        $('.next-step').on('click', function() {
+            var currentStepDiv = $(this).closest('.step-content');
+            var inputs = currentStepDiv.find('input[required], select[required], textarea[required]');
+            var valid = true;
+            inputs.each(function() {
+                if (!this.checkValidity()) {
+                    this.reportValidity();
+                    valid = false;
+                    return false;
+                }
+            });
+            if (!valid) return;
+            updateStep($(this).data('next'));
+        });
+
+        $('.prev-step').on('click', function() {
+            updateStep($(this).data('prev'));
+        });
+
+        $('.stepper-item').on('click', function() {
+            updateStep($(this).data('step'));
+        });
+
+        $('#primary_qualification').change(function() {
+            $('#primary_qualification_other').toggleClass('d-none', $(this).val() !== 'other').prop('required', $(this).val() === 'other');
+        });
+
+        $('#post_graduation').change(function() {
+            $('#post_graduation_other').toggleClass('d-none', $(this).val() !== 'other').prop('required', $(this).val() === 'other');
+        });
+    }
+
+    function updateStep(step) {
+        $('.step-content').addClass('d-none');
+        $('#step' + step).removeClass('d-none');
+        $('.stepper-item').each(function() {
+            const s = parseInt($(this).data('step'));
+            if (s < step) $(this).addClass('completed').removeClass('active');
+            else if (s === step) $(this).addClass('active').removeClass('completed');
+            else $(this).removeClass('active completed');
+        });
+        $('#doctor-form-modal .modal-body').scrollTop(0);
+    }
+
+    function openCreateModal() {
+        $('#doctor-form')[0].reset();
+        $('#doctor_id').val('');
+        $('#form-method').val('POST');
+        $('#form-modal-title').text('Register New Doctor');
+        $('#submit-btn').html('Complete Registration <i class="fa fa-check-circle ms-1"></i>');
+        $('.file-keep-note').addClass('d-none');
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').remove();
+        $('[id^="current-"]').addClass('d-none').html('');
+
+        // Uncheck all checkboxes
+        $('.spec-checkbox, .skill-checkbox, .cond-checkbox, .proc-checkbox, .ther-checkbox, .mode-checkbox').prop('checked', false);
+        $('#panchakarma_consultation').prop('checked', false);
+
+        // Reset required fields that might have been changed in edit
+        $('input[name="profile_photo"], input[name="reg_certificate"], input[name="pan_upload"], input[name="cancelled_cheque"]').prop('required', true);
+
+        updateStep(1);
+        $('#doctor-form-modal').modal('show');
+    }
+
+    function editDoctor(id) {
+        $('#doctor-form')[0].reset();
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').remove();
+
+        $.get("{{ url('admin/doctors') }}/" + id + "/edit", function(data) {
+            const doctor = data.doctor;
+            const profile = data.profile;
+
+            $('#doctor_id').val(doctor.id);
+            $('#form-method').val('PUT');
+            $('#form-modal-title').text('Edit Doctor Details');
+            $('#submit-btn').html('Update Doctor <i class="fa fa-check-circle ms-1"></i>');
+            $('.file-keep-note').removeClass('d-none');
+
+            // Fill basics
+            $('[name="full_name"]').val(profile.full_name);
+            $('[name="gender"]').val(profile.gender);
+            $('[name="dob"]').val(profile.dob ? profile.dob.substring(0, 10) : '');
+            $('[name="mobile_number"]').val(profile.phone);
+            $('[name="email"]').val(doctor.email);
+            $('[name="city_state"]').val(profile.city_state);
+            $('[name="ayush_reg_no"]').val(profile.ayush_registration_number);
+            $('[name="state_council"]').val(profile.state_ayurveda_council_name);
+            $('[name="years_of_experience"]').val(profile.years_of_experience);
+            $('[name="current_workplace"]').val(profile.current_workplace_clinic_name);
+            $('[name="clinic_address"]').val(profile.clinic_address);
+            $('[name="pan_number"]').val(profile.pan_number);
+            $('[name="bank_account_holder"]').val(profile.bank_account_holder_name);
+            $('[name="bank_name"]').val(profile.bank_name);
+            $('[name="account_number"]').val(profile.account_number);
+            $('[name="ifsc_code"]').val(profile.ifsc_code);
+            $('[name="upi_id"]').val(profile.upi_id);
+            $('[name="short_bio"]').val(profile.short_doctor_bio);
+            $('[name="key_expertise"]').val(profile.key_expertise);
+            $('[name="services_offered"]').val(profile.services_offered);
+            $('[name="awards_recognitions"]').val(profile.awards_recognitions);
+
+            // Qualifications
+            $('[name="primary_qualification"]').val(profile.primary_qualification).trigger('change');
+            $('[name="primary_qualification_other"]').val(profile.primary_qualification_other);
+            $('[name="post_graduation"]').val(profile.post_graduation || '').trigger('change');
+            $('[name="post_graduation_other"]').val(profile.post_graduation_other);
+
+            // JSON fields
+            function checkBoxes(selector, values) {
+                if (!values) return;
+                $(selector).each(function() {
+                    $(this).prop('checked', values.includes($(this).val()));
+                });
+            }
+
+            checkBoxes('.spec-checkbox', profile.specialization || []);
+            checkBoxes('.skill-checkbox', profile.consultation_expertise || []);
+            checkBoxes('.cond-checkbox', profile.health_conditions_treated || []);
+            checkBoxes('.proc-checkbox', profile.panchakarma_procedures || []);
+            checkBoxes('.ther-checkbox', profile.external_therapies || []);
+            checkBoxes('.mode-checkbox', profile.consultation_modes || []);
+
+            $('#panchakarma_consultation').prop('checked', !!profile.panchakarma_consultation);
+            $('[name="languages_spoken"]').val((profile.languages_spoken || []).join(', '));
+
+            const social = profile.social_links || {};
+            $('[name="website"]').val(social.website || '');
+            $('[name="instagram"]').val(social.instagram || '');
+            $('[name="youtube"]').val(social.youtube || '');
+            $('[name="linkedin"]').val(social.linkedin || '');
+
+            // Consents
+            $('#ayush_confirmation, #guidelines_agreement, #document_consent, #policies_agreement, #prescription_understanding, #confidentiality_consent').prop('checked', true);
+
+            // Files display
+            if (profile.profile_photo_path) $('#current-profile-photo').removeClass('d-none').html(`<small><a href="/storage/${profile.profile_photo_path}" target="_blank">View Photo</a></small>`);
+            if (profile.reg_certificate_path) $('#current-reg-cert').removeClass('d-none').html(`<small><a href="/storage/${profile.reg_certificate_path}" target="_blank">View Certificate</a></small>`);
+            if (profile.digital_signature_path) $('#current-signature').removeClass('d-none').html(`<small><a href="/storage/${profile.digital_signature_path}" target="_blank">View Signature</a></small>`);
+            if (profile.pan_path) $('#current-pan').removeClass('d-none').html(`<small><a href="/storage/${profile.pan_path}" target="_blank">View PAN</a></small>`);
+            if (profile.aadhaar_path) $('#current-aadhaar').removeClass('d-none').html(`<small><a href="/storage/${profile.aadhaar_path}" target="_blank">View Aadhaar</a></small>`);
+            if (profile.cancelled_cheque_path) $('#current-cheque').removeClass('d-none').html(`<small><a href="/storage/${profile.cancelled_cheque_path}" target="_blank">View Cheque</a></small>`);
+
+            // Remove required for files in edit
+            $('input[name="profile_photo"], input[name="reg_certificate"], input[name="pan_upload"], input[name="cancelled_cheque"]').prop('required', false);
+
+            updateStep(1);
+            $('#doctor-form-modal').modal('show');
+        });
+    }
+
+    function viewDoctor(id) {
+        $.get("{{ url('admin/doctors') }}/" + id, function(data) {
+            const d = data.doctor;
+            const p = data.profile;
+
+            const renderBadges = (arr) => {
+                if (!arr || !Array.isArray(arr) || arr.length === 0) return '<span class="text-muted">None</span>';
+                return arr.map(item => `<span class="badge bg-light text-dark border me-1 mb-1">${item}</span>`).join('');
+            };
+
+            const social = p.social_links || {};
+
+            let html = `
+                <div class="row">
+                    <!-- Left Sidebar Profile -->
+                    <div class="col-md-4 border-end">
+                        <div class="text-center mb-4">
+                            <div class="position-relative d-inline-block">
+                                <img src="${p.profile_photo_path ? '/storage/' + p.profile_photo_path : '/admiro/assets/images/user/user.png'}" 
+                                     class="img-fluid rounded-circle mb-3 shadow-sm" 
+                                     style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #fff;">
+                                <span class="position-absolute bottom-0 end-0 badge rounded-pill ${p.status === 'approved' ? 'bg-success' : (p.status === 'pending' ? 'bg-warning' : 'bg-danger')}" style="transform: translate(-10%, -10%);">
+                                    ${p.status ? p.status.toUpperCase() : 'PENDING'}
+                                </span>
+                            </div>
+                            <h4 class="mb-1">${p.full_name}</h4>
+                            <p class="text-muted mb-2"><i class="fa-solid fa-envelope me-1"></i> ${d.email}</p>
+                            <p class="text-muted"><i class="fa-solid fa-phone me-1"></i> ${p.phone || 'N/A'}</p>
+                            
+                            <div class="d-flex justify-content-center gap-2 mt-2">
+                                ${social.website ? `<a href="${social.website}" target="_blank" class="btn btn-outline-primary btn-xs"><i class="fa-solid fa-globe"></i></a>` : ''}
+                                ${social.instagram ? `<a href="${social.instagram}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-instagram"></i></a>` : ''}
+                                ${social.linkedin ? `<a href="${social.linkedin}" target="_blank" class="btn btn-outline-info btn-xs"><i class="fa-brands fa-linkedin"></i></a>` : ''}
+                                ${social.youtube ? `<a href="${social.youtube}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-youtube"></i></a>` : ''}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="mb-3">
+                            <h6 class="f-w-600">Short Bio</h6>
+                            <p class="small text-muted">${p.short_doctor_bio || 'No bio provided.'}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="f-w-600">Languages</h6>
+                            <div>${renderBadges(p.languages_spoken)}</div>
+                        </div>
+                    </div>
+
+                    <!-- Right Main Content Tabs -->
+                    <div class="col-md-8">
+                        <ul class="nav nav-tabs border-tab nav-primary mb-3" id="doctorViewTab" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" id="professional-tab" data-bs-toggle="tab" href="#v-professional" role="tab" aria-selected="true"><i class="fa-solid fa-user-md me-2"></i>Professional</a></li>
+                            <li class="nav-item"><a class="nav-link" id="expertise-tab" data-bs-toggle="tab" href="#v-expertise" role="tab" aria-selected="false"><i class="fa-solid fa-star me-2"></i>Expertise</a></li>
+                            <li class="nav-item"><a class="nav-link" id="kyc-tab" data-bs-toggle="tab" href="#v-kyc" role="tab" aria-selected="false"><i class="fa-solid fa-id-card me-2"></i>KYC & Bank</a></li>
+                        </ul>
+                        <div class="tab-content" id="doctorViewTabContent">
+                            <!-- Professional Tab -->
+                            <div class="tab-pane fade show active" id="v-professional" role="tabpanel">
+                                <div class="row g-3">
+                                    <div class="col-12"><h6 class="text-primary border-bottom pb-2">Medical Registration</h6></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">AYUSH Number</label><p class="f-w-600">${p.ayush_registration_number || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">State Council</label><p class="f-w-600">${p.state_ayurveda_council_name || 'N/A'}</p></div>
+                                    
+                                    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Qualifications & Experience</h6></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Primary Qualification</label><p class="f-w-600">${p.primary_qualification || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Post Graduation</label><p class="f-w-600">${p.post_graduation || 'None'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Experience</label><p class="f-w-600">${p.years_of_experience || 0} Years</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Current Workplace</label><p class="f-w-600">${p.current_workplace_clinic_name || 'N/A'}</p></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Specializations</label><div>${renderBadges(p.specialization)}</div></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Clinic Address</label><p class="f-w-600">${p.clinic_address || 'N/A'}</p></div>
+                                </div>
+                            </div>
+
+                            <!-- Expertise Tab -->
+                            <div class="tab-pane fade" id="v-expertise" role="tabpanel">
+                                <div class="row g-3">
+                                    <div class="col-12"><h6 class="text-primary border-bottom pb-2">Consultation Expertise</h6><div>${renderBadges(p.consultation_expertise)}</div></div>
+                                    <div class="col-12"><h6 class="text-primary border-bottom pb-2">Health Conditions Treated</h6><div>${renderBadges(p.health_conditions_treated)}</div></div>
+                                    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Therapy & Panchakarma</h6></div>
+                                    <div class="col-sm-12"><label class="small text-muted mb-0">Panchakarma Consultation</label><p class="f-w-600">${p.panchakarma_consultation ? 'Yes (Trained)' : 'No'}</p></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Panchakarma Procedures</label><div>${renderBadges(p.panchakarma_procedures)}</div></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">External Therapies</label><div>${renderBadges(p.external_therapies)}</div></div>
+                                    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Consultation Setup</h6><label class="small text-muted mb-0">Modes Offered</label><div>${renderBadges(p.consultation_modes)}</div></div>
+                                </div>
+                            </div>
+
+                            <!-- KYC Tab -->
+                            <div class="tab-pane fade" id="v-kyc" role="tabpanel">
+                                <div class="row g-3">
+                                    <div class="col-12"><h6 class="text-primary border-bottom pb-2">Identification</h6></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">PAN Number</label><p class="f-w-600">${p.pan_number || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">UPI ID</label><p class="f-w-600">${p.upi_id || 'N/A'}</p></div>
+                                    
+                                    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Bank Details</h6></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Account Holder</label><p class="f-w-600">${p.bank_account_holder_name || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Bank Name</label><p class="f-w-600">${p.bank_name || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Account Number</label><p class="f-w-600">${p.account_number || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">IFSC Code</label><p class="f-w-600">${p.ifsc_code || 'N/A'}</p></div>
+                                    
+                                    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Documents Status</h6>
+                                        <div class="d-flex flex-wrap gap-2 pt-1">
+                                            ${p.reg_certificate_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> Reg Certificate</span>` : '<span class="badge badge-light-danger">Missing Reg Cert</span>'}
+                                            ${p.pan_upload_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> PAN Upload</span>` : '<span class="badge badge-light-danger">Missing PAN</span>'}
+                                            ${p.cancelled_cheque_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> Bank Proof</span>` : '<span class="badge badge-light-danger">Missing Bank Proof</span>'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            $('#view-modal-content').html(html);
+            $('#doctor-view-modal').modal('show');
+        });
+    }
+
+    $('#doctor-form').on('submit', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const doctor_id = $('#doctor_id').val();
+        const url = doctor_id ? "{{ url('admin/doctors') }}/" + doctor_id : "{{ route('admin.doctors.store') }}";
+        const formData = new FormData(this);
+
+        $('#submit-btn').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').remove();
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                $('#doctor-form-modal').modal('hide');
+                table.draw();
+                showToast(response.success || 'Success');
+            },
+            error: function(xhr) {
+                $('#submit-btn').prop('disabled', false).html($('#doctor_id').val() ? 'Update Doctor <i class="fa fa-check-circle ms-1"></i>' : 'Complete Registration <i class="fa fa-check-circle ms-1"></i>');
+                if (xhr.status === 422) {
+                    const errors = xhr.responseJSON.errors;
+                    let firstErrorStep = null;
+                    $.each(errors, function(key, value) {
+                        let input = form.find(`[name="${key}"]`);
+                        if (input.length === 0) input = form.find(`[name="${key}[]"]`);
+                        if (input.length > 0) {
+                            input.addClass('is-invalid');
+                            if (input.next('.invalid-feedback').length === 0) input.after(`<div class="invalid-feedback">${value[0]}</div>`);
+                            const stepId = input.closest('.step-content').attr('id').replace('step', '');
+                            if (!firstErrorStep) firstErrorStep = stepId;
+                        }
+                    });
+                    if (firstErrorStep) updateStep(firstErrorStep);
+                    showToast('Please check the form for errors.', 'error');
+                } else {
+                    showToast('Something went wrong.', 'error');
+                }
+            }
+        });
+    });
+
+        $('body').on('click', '.viewDoctor', function() { viewDoctor($(this).data('id')); });
+
+        $('body').on('click', '.editDoctor', function() { editDoctor($(this).data('id')); });
+
+        
+
+        // Handle Status Change Click
+        $('body').on('click', '.toggle-status', function() {
+            const $this = $(this);
+            const id = $this.data('id');
+            const currentStatus = $this.data('status');
+            const newStatus = currentStatus === 'active' ? 0 : 1; 
+            const newStatusText = currentStatus === 'active' ? 'Inactive' : 'Active';
+
+            $('#status-doctor-id').val(id);
+            $('#status-new-value').val(newStatus);
+            $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
+            $('#status-confirmation-modal').modal('show');
+        });
+
+        // Handle Confirm Status Change
+        $('#confirm-status-btn').on('click', function() {
+            const id = $('#status-doctor-id').val();
+            const newStatus = $('#status-new-value').val();
+            const btn = $(this);
+
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
+
+            $.ajax({
+                url: "{{ url('admin/doctors') }}/" + id + "/status",
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    status: newStatus
+                },
+                success: function(response) {
+                    $('#status-confirmation-modal').modal('hide');
+                    showToast(response.success);
+                    table.draw(false);
+                },
+                error: function() {
+                    showToast('Failed to update status.', 'error');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).text('Confirm Change');
+                }
+            });
+        });
+
+    
+
+        // Handle Delete Modal
+    $('body').on('click', '.deleteDoctor', function() {
+        const id = $(this).data("id");
+        $('#delete-doctor-id').val(id);
+        $('#doctor-delete-modal').modal('show');
+    });
+
+    $('#confirm-delete-btn').on('click', function() {
+        const id = $('#delete-doctor-id').val();
+        const btn = $(this);
+
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Deleting...');
+
+        $.ajax({
+            type: "DELETE",
+            url: "{{ url('admin/doctors') }}/" + id,
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(data) {
+                $('#doctor-delete-modal').modal('hide');
+                table.draw();
+                showToast(data.success);
+            },
+            error: function() {
+                showToast('Error deleting doctor', 'error');
+            },
+            complete: function() {
+                btn.prop('disabled', false).text('Delete Now');
+            }
+        });
+    });
+</script>
+@endsection

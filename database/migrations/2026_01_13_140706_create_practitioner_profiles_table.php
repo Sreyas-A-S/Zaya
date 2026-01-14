@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('practitioner_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('status')->default('pending');
             
             // A. Personal Information
             $table->string('first_name');
@@ -43,6 +44,7 @@ return new class extends Migration
             
             // G. Required Document Uploads (File paths)
             $table->string('doc_cover_letter')->nullable();
+            $table->text('cover_letter_text')->nullable();
             $table->string('doc_certificates')->nullable();
             $table->string('doc_experience')->nullable();
             $table->string('doc_registration')->nullable();

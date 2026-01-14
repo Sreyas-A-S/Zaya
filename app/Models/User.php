@@ -47,8 +47,16 @@ class User extends Authenticatable
         ];
 
     }
-    public function practitionerProfile()
+    public function doctor()
     {
-        return $this->hasOne(PractitionerProfile::class);
+        return $this->hasOne(Doctor::class);
+    }
+    public function practitioner()
+    {
+        return $this->hasOne(Practitioner::class);
+    }
+    public function patient()
+    {
+        return $this->hasOne(Patient::class);
     }
 }

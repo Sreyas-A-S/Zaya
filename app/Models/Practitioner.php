@@ -5,21 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PractitionerProfile extends Model
+class Practitioner extends Model
 {
     use HasFactory;
 
+    protected $table = 'practitioners';
     protected $guarded = [];
 
     protected $casts = [
         'consultations' => 'array',
         'body_therapies' => 'array',
         'other_modalities' => 'array',
-        'can_translate_english' => 'boolean',
-        'declaration_agreed' => 'boolean',
-        'consent_agreed' => 'boolean',
-        'signed_date' => 'date',
+        'languages_spoken' => 'array',
         'dob' => 'date',
+        'can_translate_english' => 'boolean',
     ];
 
     public function user()
@@ -29,6 +28,6 @@ class PractitionerProfile extends Model
 
     public function qualifications()
     {
-        return $this->hasMany(PractitionerQualification::class);
+        return $this->hasMany(PractitionerQualification::class, 'practitioner_id');
     }
 }

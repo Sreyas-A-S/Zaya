@@ -9,7 +9,7 @@
     <div class="col-12 p-0">    
       <div class="login-card login-dark">
         <div>
-          <div><a class="logo text-center" href="{{ route('login') }}"><img class="img-fluid for-light m-auto" src="{{ asset('admiro/assets/images/logo/logo1.png') }}" alt="looginpage"><img class="img-fluid for-dark" src="{{ asset('admiro/assets/images/logo/logo-dark.png') }}" alt="logo"></a></div>
+          <div class="text-center"><a class="logo" href="{{ route('login') }}"><img class="img-fluid for-light m-auto d-block" src="{{ asset('admiro/assets/images/logo/zaya wellness logo white.svg') }}" alt="looginpage" style="max-height: 60px;"><img class="img-fluid for-dark d-block m-auto" src="{{ asset('admiro/assets/images/logo/zaya wellness logo white.svg') }}" alt="logo" style="max-height: 60px;"></a></div>
           <div class="login-main"> 
             <form class="theme-form" method="POST" action="{{ route('register') }}">
                 @csrf

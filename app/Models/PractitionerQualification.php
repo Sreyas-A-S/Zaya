@@ -13,6 +13,6 @@ class PractitionerQualification extends Model
 
     public function profile()
     {
-        return $this->belongsTo(PractitionerProfile::class);
+        return $this->belongsTo(PractitionerProfile::class, 'practitioner_profile_id');
     }
 }
