@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\PractitionerProfile;
+use App\Models\Practitioner;
+use App\Models\User;
 use App\Models\PractitionerQualification;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
@@ -11,6 +12,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\DB;
+use App\Models\WellnessConsultation;
+use App\Models\BodyTherapy;
+use App\Models\PractitionerModality;
 
 class RegisterController extends Controller
 {
@@ -41,7 +45,11 @@ class RegisterController extends Controller
 
         if ($type === 'practitioner') {
             $languages = \App\Models\Language::all();
-            return view('auth.register_practitioner', compact('languages'));
+            $wellnessConsultations = WellnessConsultation::where('status', 1)->get();
+            $bodyTherapies = BodyTherapy::where('status', 1)->get();
+            $practitionerModalities = PractitionerModality::where('status', 1)->get();
+
+            return view('auth.register_practitioner', compact('languages', 'wellnessConsultations', 'bodyTherapies', 'practitionerModalities'));
         }
 
         if ($type === 'patient') {
@@ -82,9 +90,8 @@ class RegisterController extends Controller
             }
 
             return $request->wantsJson()
-                        ? new \Illuminate\Http\JsonResponse([], 201)
-                        : redirect($this->redirectPath());
-
+                ? new \Illuminate\Http\JsonResponse([], 201)
+                : redirect($this->redirectPath());
         } catch (\Exception $e) {
             DB::rollBack();
             // Log error if needed
@@ -95,14 +102,21 @@ class RegisterController extends Controller
     protected function createPatientProfile($user, $request)
     {
         $profileData = $request->only([
-            'dob', 'age', 'gender', 'occupation', 'address', 
-            'mobile_country_code', 'mobile_number',
-            'consultation_preferences', 'languages_spoken', 
-            'referral_type', 'referrer_name'
+            'dob',
+            'age',
+            'gender',
+            'occupation',
+            'address',
+            'mobile_country_code',
+            'mobile_number',
+            'consultation_preferences',
+            'languages_spoken',
+            'referral_type',
+            'referrer_name'
         ]);
-        
+
         $profileData['client_id'] = \App\Models\PatientProfile::generateClientId();
-        
+
         $user->patientProfile()->create($profileData);
     }
 
@@ -111,8 +125,13 @@ class RegisterController extends Controller
         // Handle File Uploads
         $filePaths = [];
         $docFields = [
-            'doc_cover_letter', 'doc_certificates', 'doc_experience', 
-            'doc_contract', 'doc_id_proof'
+            'doc_cover_letter',
+            'doc_certificates',
+            'doc_experience',
+            'doc_registration',
+            'doc_ethics',
+            'doc_contract',
+            'doc_id_proof'
         ];
 
         foreach ($docFields as $field) {
@@ -121,25 +140,33 @@ class RegisterController extends Controller
             }
         }
 
+        if ($request->hasFile('profile_photo')) {
+            $filePaths['profile_photo_path'] = $request->file('profile_photo')->store('practitioner_photos', 'public');
+        }
+
         // Create Profile
         $profileData = array_merge($request->only([
-            'sex', 'dob', 'nationality',
-            'residential_address', 'zip_code', 'phone', 'website_url',
-            'consultations', 'body_therapies', 'other_modalities',
+            'gender',
+            'dob',
+            'nationality',
+            'residential_address',
+            'zip_code',
+            'phone',
+            'website_url',
+            'consultations',
+            'body_therapies',
+            'other_modalities',
             'can_translate_english',
-            'profile_bio', 'signature', 'signed_date', 'cover_letter_text'
+            'profile_bio',
+            'cover_letter_text'
         ]), $filePaths);
-        
-        // Handle array inputs for text fields
-        $profileData['additional_education'] = $request->has('additional_courses') ? json_encode(array_filter($request->additional_courses)) : null;
-        $profileData['languages_spoken'] = $request->has('languages') ? json_encode(array_filter($request->languages)) : null;
 
-        $profileData['declaration_agreed'] = $request->has('declaration_agreed');
-        $profileData['consent_agreed'] = true; // Implicit consent
-        $profileData['first_name'] = $request->name; 
+        $profileData['first_name'] = $request->name;
         $profileData['last_name'] = $request->last_name;
+        $profileData['additional_courses'] = $request->has('additional_courses') ? implode(', ', array_filter($request->additional_courses)) : null;
+        $profileData['languages_spoken'] = $request->has('languages') ? array_values(array_filter($request->languages)) : null;
 
-        $profile = $user->practitionerProfile()->create($profileData);
+        $profile = $user->practitioner()->create($profileData);
 
         // Create Qualifications
         if ($request->has('qualifications')) {
@@ -161,9 +188,17 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
+            'last_name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', 'string', 'in:practitioner,client'],
+            'role' => ['required', 'string', 'in:practitioner,patient'],
+            'profile_photo' => ['nullable', 'image', 'max:2048'],
+            'gender' => ['nullable', 'string', 'in:male,female,other'],
+            'dob' => ['nullable', 'date'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'nationality' => ['nullable', 'string', 'max:255'],
+            'zip_code' => ['nullable', 'string', 'max:20'],
+            'website_url' => ['nullable', 'url', 'max:255'],
         ]);
     }
 

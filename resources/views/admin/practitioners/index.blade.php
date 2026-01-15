@@ -36,6 +36,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Profile</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Gender</th>
@@ -99,7 +100,23 @@
                                 <!-- Step 1: Personal Information -->
                                 <div class="step-content" id="step1">
                                     <div class="row g-3">
-                                        <div class="col-12"><h6 class="f-w-600 mb-3">A. Personal Information</h6></div>
+                                        <div class="col-12">
+                                            <h5 class="f-w-600 mb-3">A. Personal Details</h5>
+                                        </div>
+                                        <div class="col-md-12 text-center mb-4">
+                                            <div class="avatar-upload">
+                                                <div class="avatar-edit">
+                                                    <input type='file' id="imageUpload" name="profile_photo" accept=".png, .jpg, .jpeg" required />
+                                                    <label for="imageUpload"><i class="iconly-Edit icli"></i></label>
+                                                </div>
+                                                <div class="avatar-preview">
+                                                    <div id="imagePreview" style="background-image: url('{{ asset('admiro/assets/images/user/user.png') }}');">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <label class="form-label mt-2">Profile Photo <span class="text-danger">*</span></label>
+                                            <div id="current-profile-photo" class="d-none"></div>
+                                        </div>
                                         <div class="col-md-4">
                                             <label class="form-label">First Name</label>
                                             <input type="text" class="form-control" name="first_name" required>
@@ -153,44 +170,58 @@
                                 <!-- Step 2: Practice Details -->
                                 <div class="step-content d-none" id="step2">
                                     <div class="row g-3">
-                                        <div class="col-12"><h6 class="f-w-600 mb-3">B. Professional Practice Details</h6></div>
+                                        <div class="col-12">
+                                            <h6 class="f-w-600 mb-3">B. Professional Practice Details</h6>
+                                        </div>
                                         <div class="col-12">
                                             <label class="form-label f-w-500">Ayurvedic Wellness Consultations</label>
                                             <div class="row g-2">
-                                                @foreach(['Ayurveda Nutrition Advisor', 'Ayurveda Educator', 'Ayurveda Consultant Advisor', 'Lifestyle Advice'] as $item)
+                                                @foreach($wellnessConsultations as $item)
                                                 <div class="col-md-6">
                                                     <div class="form-check checkbox-primary">
-                                                        <input class="form-check-input cons-checkbox" type="checkbox" name="consultations[]" value="{{ $item }}" id="cons_{{ $loop->index }}">
-                                                        <label class="form-check-label" for="cons_{{ $loop->index }}">{{ $item }}</label>
+                                                        <input class="form-check-input cons-checkbox" type="checkbox" name="consultations[]" value="{{ $item->name }}" id="cons_{{ $item->id }}">
+                                                        <label class="form-check-label" for="cons_{{ $item->id }}">{{ $item->name }}</label>
                                                     </div>
                                                 </div>
                                                 @endforeach
+                                            </div>
+                                            <div class="input-group mt-2" style="max-width: 300px;">
+                                                <input type="text" class="form-control form-control-sm new-master-data-input" placeholder="Add new consultation..." data-type="wellness_consultations">
+                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
                                             </div>
                                         </div>
                                         <div class="col-12 mt-3">
                                             <label class="form-label f-w-500">Massage and Body Therapies</label>
                                             <div class="row g-2">
-                                                @foreach(['Abhyanga', 'Pindasweda', 'Udwarthanam', 'Sirodhara', 'Full Body Dhara', 'Lepam', 'Pain Management', 'Face & Beauty Care', 'Marma Therapy', 'Others'] as $item)
+                                                @foreach($bodyTherapies as $item)
                                                 <div class="col-md-4">
                                                     <div class="form-check checkbox-primary">
-                                                        <input class="form-check-input body-checkbox" type="checkbox" name="body_therapies[]" value="{{ $item }}" id="body_{{ $loop->index }}">
-                                                        <label class="form-check-label" for="body_{{ $loop->index }}">{{ $item }}</label>
+                                                        <input class="form-check-input body-checkbox" type="checkbox" name="body_therapies[]" value="{{ $item->name }}" id="body_{{ $item->id }}">
+                                                        <label class="form-check-label" for="body_{{ $item->id }}">{{ $item->name }}</label>
                                                     </div>
                                                 </div>
                                                 @endforeach
+                                            </div>
+                                            <div class="input-group mt-2" style="max-width: 300px;">
+                                                <input type="text" class="form-control form-control-sm new-master-data-input" placeholder="Add new therapy..." data-type="body_therapies">
+                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
                                             </div>
                                         </div>
                                         <div class="col-12 mt-3">
                                             <label class="form-label f-w-500">Other Modalities</label>
                                             <div class="row g-2">
-                                                @foreach(['Yoga Sessions', 'Yoga Therapy', 'Ayurvedic Cooking'] as $item)
+                                                @foreach($practitionerModalities as $item)
                                                 <div class="col-md-4">
                                                     <div class="form-check checkbox-primary">
-                                                        <input class="form-check-input mod-checkbox" type="checkbox" name="other_modalities[]" value="{{ $item }}" id="mod_{{ $loop->index }}">
-                                                        <label class="form-check-label" for="mod_{{ $loop->index }}">{{ $item }}</label>
+                                                        <input class="form-check-input mod-checkbox" type="checkbox" name="other_modalities[]" value="{{ $item->name }}" id="mod_{{ $item->id }}">
+                                                        <label class="form-check-label" for="mod_{{ $item->id }}">{{ $item->name }}</label>
                                                     </div>
                                                 </div>
                                                 @endforeach
+                                            </div>
+                                            <div class="input-group mt-2" style="max-width: 300px;">
+                                                <input type="text" class="form-control form-control-sm new-master-data-input" placeholder="Add new modality..." data-type="practitioner_modalities">
+                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
                                             </div>
                                         </div>
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
@@ -250,7 +281,9 @@
                                 <!-- Step 4: Additional Info & Bio -->
                                 <div class="step-content d-none" id="step4">
                                     <div class="row g-3">
-                                        <div class="col-12"><h6 class="f-w-600 mb-3">D. Additional Information</h6></div>
+                                        <div class="col-12">
+                                            <h6 class="f-w-600 mb-3">D. Additional Information</h6>
+                                        </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Additional Courses</label>
                                             <textarea class="form-control" name="additional_courses" rows="2"></textarea>
@@ -266,7 +299,9 @@
                                                 <label class="form-check-label" for="translate_switch">Yes / No</label>
                                             </div>
                                         </div>
-                                        <div class="col-12 mt-3"><h6 class="f-w-600">E. Website Profile</h6></div>
+                                        <div class="col-12 mt-3">
+                                            <h6 class="f-w-600">E. Website Profile</h6>
+                                        </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Profile Bio</label>
                                             <textarea class="form-control" name="profile_bio" rows="4" placeholder="Briefly describe your professional journey..."></textarea>
@@ -281,26 +316,28 @@
                                 <!-- Step 5: Documents -->
                                 <div class="step-content d-none" id="step5">
                                     <div class="row g-3">
-                                        <div class="col-12"><h6 class="f-w-600 mb-3">F. Required Documents</h6></div>
+                                        <div class="col-12">
+                                            <h6 class="f-w-600 mb-3">F. Required Documents</h6>
+                                        </div>
                                         @php
-                                            $docs = [
-                                                'doc_cover_letter' => 'Cover Letter',
-                                                'doc_certificates' => 'Educational Certificates',
-                                                'doc_experience' => 'Experience Certificate',
-                                                'doc_registration' => 'Signed Registration Form',
-                                                'doc_ethics' => 'Signed Code of Ethics',
-                                                'doc_contract' => 'Signed ZAYA Contract',
-                                                'doc_id_proof' => 'Valid ID / Passport'
-                                            ];
+                                        $docs = [
+                                        'doc_cover_letter' => 'Cover Letter',
+                                        'doc_certificates' => 'Educational Certificates',
+                                        'doc_experience' => 'Experience Certificate',
+                                        'doc_registration' => 'Signed Registration Form',
+                                        'doc_ethics' => 'Signed Code of Ethics',
+                                        'doc_contract' => 'Signed ZAYA Contract',
+                                        'doc_id_proof' => 'Valid ID / Passport'
+                                        ];
                                         @endphp
                                         @foreach($docs as $name => $label)
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold">{{ $label }}</label>
-                                            <input type="file" class="form-control form-control-sm" name="{{ $name }}">
+                                            <input type="file" class="form-control form-control-sm" name="{{ $name }}" required>
                                             <div id="current-{{ $name }}" class="mt-1 d-none small"></div>
                                         </div>
                                         @endforeach
-                                        
+
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-5 pt-3 border-top">
                                             <button type="button" class="btn btn-outline-dark prev-step" data-prev="4"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
                                             <button type="submit" class="btn btn-success" id="submit-btn"><i class="fa-solid fa-check-circle me-2"></i> Complete Registration</button>
@@ -363,28 +400,237 @@
     </div>
 </div>
 
+<!-- Call Confirmation Modal -->
+<div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Call</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
+                <h5>Make a Call?</h5>
+                <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
+                <h4 class="text-primary" id="call-number"></h4>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Confirmation Modal -->
+<div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Status Change</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Info-Square icli text-primary mb-3" style="font-size: 50px;"></i>
+                <h5>Update Status?</h5>
+                <p id="status-confirmation-text">Are you sure you want to change the status of this practitioner?</p>
+                <input type="hidden" id="status-practitioner-id">
+                <input type="hidden" id="status-new-value">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cropper Modal -->
+<div class="modal fade" id="crop-modal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crop Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="img-container" style="height: 400px; width: 100%; overflow: hidden;">
+                    <img id="image-to-crop" src="#" alt="Picture" style="display: block; max-width: 100%; max-height: 100%;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="crop-btn">Crop & Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
+
+
 @section('scripts')
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <style>
     /* Stepper Styling */
-    .stepper-horizontal { display: flex; justify-content: space-between; position: relative; margin-bottom: 40px; }
-    .stepper-horizontal::before { content: ""; position: absolute; top: 20px; left: 0; right: 0; height: 2px; background: #f4f4f4; z-index: 0; }
-    .stepper-horizontal .stepper-item { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; flex: 1; cursor: pointer; }
-    .stepper-horizontal .step-counter { width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 2px solid #f4f4f4; display: flex; justify-content: center; align-items: center; font-weight: 600; margin-bottom: 10px; transition: all 0.3s ease; color: #999; }
-    .stepper-horizontal .step-name { font-size: 12px; font-weight: 500; color: #999; transition: all 0.3s ease; text-align: center; }
-    .stepper-horizontal .stepper-item.active .step-counter { border-color: var(--theme-default); background: var(--theme-default); color: #fff; box-shadow: 0 4px 10px rgba(var(--theme-default-rgb), 0.2); }
-    .stepper-horizontal .stepper-item.active .step-name { color: var(--theme-default); font-weight: 600; }
-    .stepper-horizontal .stepper-item.completed .step-counter { border-color: #51bb25; background: #51bb25; color: #fff; }
-    .stepper-horizontal .stepper-item.completed .step-name { color: #51bb25; }
-    .btn-xs { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
-    .remove-qual { position: absolute; top: 5px; right: 5px; cursor: pointer; color: #dc3545; }
+    .stepper-horizontal {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-bottom: 40px;
+    }
+
+    /* Avatar Upload Styling */
+    .avatar-upload {
+        position: relative;
+        max-width: 150px;
+        margin: 0 auto;
+    }
+
+    .avatar-upload .avatar-edit {
+        position: absolute;
+        right: 12px;
+        z-index: 1;
+        top: 10px;
+    }
+
+    .avatar-upload .avatar-edit input {
+        display: none;
+    }
+
+    .avatar-upload .avatar-edit label {
+        display: inline-block;
+        width: 34px;
+        height: 34px;
+        margin-bottom: 0;
+        border-radius: 100%;
+        background: #FFFFFF;
+        border: 1px solid transparent;
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+        cursor: pointer;
+        font-weight: normal;
+        transition: all .2s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .avatar-upload .avatar-edit label:hover {
+        background: #f1f1f1;
+        border-color: #d6d6d6;
+    }
+
+    .avatar-upload .avatar-edit label i {
+        color: #757575;
+        font-size: 16px;
+    }
+
+    .avatar-preview {
+        width: 150px;
+        height: 150px;
+        position: relative;
+        border-radius: 100%;
+        border: 4px solid #F8F8F8;
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    .avatar-preview>div {
+        width: 100%;
+        height: 100%;
+        border-radius: 100%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .stepper-horizontal::before {
+        content: "";
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #f4f4f4;
+        z-index: 0;
+    }
+
+    .stepper-horizontal .stepper-item {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        cursor: pointer;
+    }
+
+    .stepper-horizontal .step-counter {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+        color: #999;
+    }
+
+    .stepper-horizontal .step-name {
+        font-size: 12px;
+        font-weight: 500;
+        color: #999;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .stepper-horizontal .stepper-item.active .step-counter {
+        border-color: var(--theme-default);
+        background: var(--theme-default);
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(var(--theme-default-rgb), 0.2);
+    }
+
+    .stepper-horizontal .stepper-item.active .step-name {
+        color: var(--theme-default);
+        font-weight: 600;
+    }
+
+    .stepper-horizontal .stepper-item.completed .step-counter {
+        border-color: #51bb25;
+        background: #51bb25;
+        color: #fff;
+    }
+
+    .stepper-horizontal .stepper-item.completed .step-name {
+        color: #51bb25;
+    }
+
+    .btn-xs {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .remove-qual {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        cursor: pointer;
+        color: #dc3545;
+    }
 </style>
 
 <script>
     let table;
     let toastInstance;
     let qualCount = 1;
+    let cropper;
+    let croppedFile;
 
     function showToast(message, type = 'success') {
         const toastEl = document.getElementById('liveToast');
@@ -392,8 +638,13 @@
         const messageEl = document.getElementById('toast-message');
         if (!toastInstance) toastInstance = new bootstrap.Toast(toastEl);
         toastEl.classList.remove('bg-success', 'bg-danger', 'text-white');
-        if (type === 'success') { toastEl.classList.add('bg-success', 'text-white'); titleEl.innerText = 'Success'; }
-        else { toastEl.classList.add('bg-danger', 'text-white'); titleEl.innerText = 'Error'; }
+        if (type === 'success') {
+            toastEl.classList.add('bg-success', 'text-white');
+            titleEl.innerText = 'Success';
+        } else {
+            toastEl.classList.add('bg-danger', 'text-white');
+            titleEl.innerText = 'Error';
+        }
         messageEl.innerText = message;
         toastInstance.show();
     }
@@ -403,25 +654,107 @@
             processing: true,
             serverSide: true,
             ajax: "{{ route('admin.practitioners.index') }}",
-            columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'name', name: 'users.name' },
-                { data: 'email', name: 'users.email' },
-                { data: 'gender', name: 'practitioners.gender' },
-                { data: 'phone', name: 'practitioners.phone' },
-                { data: 'nationality', name: 'practitioners.nationality' },
-                { data: 'status', name: 'status' },
-                { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' },
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'profile_photo',
+                    name: 'profile_photo',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'name',
+                    name: 'users.name'
+                },
+                {
+                    data: 'email',
+                    name: 'users.email'
+                },
+                {
+                    data: 'gender',
+                    name: 'practitioners.gender'
+                },
+                {
+                    data: 'phone',
+                    name: 'practitioners.phone'
+                },
+                {
+                    data: 'nationality',
+                    name: 'practitioners.nationality'
+                },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center'
+                },
             ]
         });
 
         initFormNavigation();
+
+        // Cropper initialization
+        const image = document.getElementById('image-to-crop');
+        const cropModal = new bootstrap.Modal(document.getElementById('crop-modal'));
+
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    image.src = event.target.result;
+                    cropModal.show();
+                };
+                reader.readAsDataURL(files[0]);
+            }
+        });
+
+        document.getElementById('crop-modal').addEventListener('shown.bs.modal', function() {
+            if (cropper) {
+                cropper.destroy();
+            }
+            cropper = new Cropper(image, {
+                aspectRatio: 1,
+                viewMode: 1,
+                autoCropArea: 0.8,
+                responsive: true,
+                background: false,
+                zoomable: true,
+                scalable: true,
+            });
+        });
+
+        document.getElementById('crop-btn').addEventListener('click', function() {
+            if (cropper) {
+                cropper.getCroppedCanvas({
+                    width: 200,
+                    height: 200,
+                }).toBlob((blob) => {
+                    croppedFile = new File([blob], "profile_photo.jpg", {
+                        type: "image/jpeg"
+                    });
+                    const imageUrl = URL.createObjectURL(blob);
+                    $('#imagePreview').css('background-image', 'url(' + imageUrl + ')');
+                    cropModal.hide();
+                    $('input[name="profile_photo"]').prop('required', false); // Mark as not required if image is cropped
+                }, 'image/jpeg');
+            }
+        });
     });
 
     function initFormNavigation() {
         $('.next-step').on('click', function() {
             var currentStepDiv = $(this).closest('.step-content');
-            var inputs = currentStepDiv.find('input[required], select[required], textarea[required]');
+            var inputs = currentStepDiv.find('input[required], select[required], textarea[required]').not(':hidden');
             var valid = true;
             inputs.each(function() {
                 if (!this.checkValidity()) {
@@ -499,6 +832,16 @@
         $('#qualifications-container').empty();
         addQualificationRow();
         $('[id^="current-"]').addClass('d-none').html('');
+
+        // Reset required documents
+        $('input[name="doc_cover_letter"], input[name="doc_certificates"], input[name="doc_experience"], input[name="doc_registration"], input[name="doc_ethics"], input[name="doc_contract"], input[name="doc_id_proof"]').prop('required', true);
+
+        // Reset profile photo required and preview
+        $('input[name="profile_photo"]').prop('required', true);
+        $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+        $('#imageUpload').val('');
+        croppedFile = null;
+
         updateStep(1);
         $('#practitioner-form-modal').modal('show');
     }
@@ -511,7 +854,20 @@
             $('#practitioner_id').val(u.id);
             $('#form-method').val('PUT');
             $('#form-modal-title').text('Edit Practitioner');
-            
+
+            // Profile Photo
+            if (p.profile_photo_path) {
+                $('#imagePreview').css('background-image', 'url(/storage/' + p.profile_photo_path + ')');
+                $('#current-profile-photo').removeClass('d-none').html(`<a href="/storage/${p.profile_photo_path}" target="_blank" class="text-primary">View Current Photo</a>`);
+                $('input[name="profile_photo"]').prop('required', false);
+            } else {
+                $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+                $('#current-profile-photo').addClass('d-none').html('');
+                $('input[name="profile_photo"]').prop('required', true);
+            }
+            $('#imageUpload').val(''); // Clear file input
+            croppedFile = null;
+
             $('[name="first_name"]').val(p.first_name);
             $('[name="last_name"]').val(p.last_name);
             $('[name="email"]').val(u.email);
@@ -528,7 +884,9 @@
             $('#translate_switch').prop('checked', !!p.can_translate_english);
 
             const check = (selector, vals) => {
-                $(selector).each(function() { $(this).prop('checked', (vals || []).includes($(this).val())); });
+                $(selector).each(function() {
+                    $(this).prop('checked', (vals || []).includes($(this).val()));
+                });
             };
             check('.cons-checkbox', p.consultations);
             check('.body-checkbox', p.body_therapies);
@@ -546,11 +904,85 @@
             $('[id^="current-"]').addClass('d-none').html('');
             const docs = ['doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 'doc_contract', 'doc_id_proof'];
             docs.forEach(d => {
-                if (p[d]) $(`#current-${d}`).removeClass('d-none').html(`<a href="/storage/${p[d]}" target="_blank" class="text-primary">View Current</a>`);
+                if (p[d]) {
+                    $(`#current-${d}`).removeClass('d-none').html(`<a href="/storage/${p[d]}" target="_blank" class="text-primary">View Current</a>`);
+                    $(`input[name="${d}"]`).prop('required', false); // Mark as not required if document exists
+                } else {
+                    $(`input[name="${d}"]`).prop('required', true);
+                }
             });
 
             updateStep(1);
             $('#practitioner-form-modal').modal('show');
+        });
+    });
+
+    // Status Toggle Handler (Triggers Modal)
+    $('body').on('click', '.toggle-status', function() {
+        var id = $(this).data('id');
+        var currentStatus = $(this).data('status');
+        var newStatus = (currentStatus === 'active') ? 'inactive' : 'active';
+        var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
+
+        $('#status-practitioner-id').val(id);
+        $('#status-new-value').val(newStatus);
+        $('#status-confirmation-text').text(`Are you sure you want to change the status of this practitioner to ${newStatusText}?`);
+        $('#status-confirmation-modal').modal('show');
+    });
+
+    // Handle Call Modal
+    $('body').on('click', '.call-phone', function() {
+        const phone = $(this).data('phone');
+        const name = $(this).data('name');
+
+        $('#call-name').text(name);
+        $('#call-number').text(phone);
+        $('#confirm-call-btn').attr('href', 'tel:' + phone);
+        $('#call-confirmation-modal').modal('show');
+    });
+
+    // Handle Confirm Status Change
+    $('#confirm-status-btn').on('click', function() {
+        var id = $('#status-practitioner-id').val();
+        var newStatus = $('#status-new-value').val();
+        var btn = $(this);
+
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
+
+        $.ajax({
+            url: "{{ url('admin/practitioners') }}/" + id + "/status",
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                status: newStatus
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#status-confirmation-modal').modal('hide');
+                    table.draw(false);
+                    if (typeof showToast === 'function') {
+                        showToast(response.success);
+                    } else {
+                        alert(response.success);
+                    }
+                } else if (response.error) {
+                    if (typeof showToast === 'function') {
+                        showToast(response.error, 'error');
+                    } else {
+                        alert(response.error);
+                    }
+                }
+            },
+            error: function(xhr) {
+                if (typeof showToast === 'function') {
+                    showToast('Error updating status', 'error');
+                } else {
+                    alert('Error updating status');
+                }
+            },
+            complete: function() {
+                btn.prop('disabled', false).html('Confirm Change');
+            }
         });
     });
 
@@ -559,8 +991,12 @@
         const id = $('#practitioner_id').val();
         const url = id ? "{{ url('admin/practitioners') }}/" + id : "{{ route('admin.practitioners.store') }}";
         const formData = new FormData(this);
+
+        if (croppedFile) {
+            formData.set('profile_photo', croppedFile, 'profile_photo.jpg');
+        }
         const btn = $('#submit-btn');
-        
+
         btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Saving...');
 
         $.ajax({
@@ -587,7 +1023,7 @@
             const u = data.user;
             const p = data.practitioner;
             const badges = (arr) => (arr || []).map(i => `<span class="badge bg-light text-dark border me-1 mb-1">${i}</span>`).join('');
-            
+
             let qualsHtml = (p.qualifications || []).map(q => `
                 <div class="col-12 mb-2 p-2 border rounded bg-light small">
                     <strong>${q.training_diploma_title || 'Training'}</strong> at ${q.institute_name || 'N/A'}<br>
@@ -599,7 +1035,7 @@
                 <div class="row">
                     <div class="col-md-4 border-end">
                         <div class="text-center mb-3">
-                            <img src="/admiro/assets/images/user/user.png" class="img-fluid rounded-circle mb-2" style="width: 100px;">
+                            <img src="${p.profile_photo_path ? '/storage/' + p.profile_photo_path : '/admiro/assets/images/user/user.png'}" class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;">
                             <h5>${u.name}</h5>
                             <span class="badge bg-success">${p.status.toUpperCase()}</span>
                         </div>
@@ -654,15 +1090,84 @@
         $.ajax({
             type: "DELETE",
             url: "{{ url('admin/practitioners') }}/" + id,
-            data: { _token: '{{ csrf_token() }}' },
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
             success: function(data) {
                 $('#practitioner-delete-modal').modal('hide');
                 table.draw();
                 showToast(data.success);
             },
-            error: function() { showToast('Error deleting practitioner', 'error'); },
-            complete: function() { btn.prop('disabled', false).text('Delete Now'); }
+            error: function() {
+                showToast('Error deleting practitioner', 'error');
+            },
+            complete: function() {
+                btn.prop('disabled', false).text('Delete Now');
+            }
         });
+    });
+
+    // Master Data Quick Add
+    $(document).on('click', '.add-master-data-btn', function() {
+        let btn = $(this);
+        let input = btn.siblings('.new-master-data-input');
+        let type = input.data('type');
+        let value = input.val().trim();
+        let container = btn.closest('.col-12').find('.row').first(); // The row containing checkboxes
+
+        if (!value) {
+            return;
+        }
+
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+        $.ajax({
+            url: "{{ url('admin/master-data') }}/" + type,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                name: value,
+                status: 1
+            },
+            success: function(response) {
+                if (response.success) {
+                    let checkboxName = '';
+                    if (type === 'wellness_consultations') checkboxName = 'consultations[]';
+                    else if (type === 'body_therapies') checkboxName = 'body_therapies[]';
+                    else if (type === 'practitioner_modalities') checkboxName = 'other_modalities[]';
+
+                    let newId = response.data.id;
+                    let newName = response.data.name;
+                    let colClass = (type === 'wellness_consultations') ? 'col-md-6' : 'col-md-4';
+
+                    let newCheckbox = `
+                        <div class="${colClass}">
+                            <div class="form-check checkbox-primary">
+                                <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${type}_${newId}" checked>
+                                <label class="form-check-label" for="${type}_${newId}">${newName}</label>
+                            </div>
+                        </div>
+                    `;
+
+                    container.append(newCheckbox);
+                    input.val('');
+                }
+            },
+            error: function(xhr) {
+                // Silently fail
+            },
+            complete: function() {
+                btn.prop('disabled', false).html('<i class="fa fa-plus"></i>');
+            }
+        });
+    });
+
+    // Allow enter key to trigger add
+    $(document).on('keypress', '.new-master-data-input', function(e) {
+        if (e.which == 13) {
+            e.preventDefault();
+            $(this).siblings('.add-master-data-btn').click();
+        }
     });
 </script>
 @endsection

@@ -11,8 +11,8 @@ class PractitionerQualification extends Model
 
     protected $guarded = [];
 
-    public function profile()
+    public function practitioner()
     {
-        return $this->belongsTo(PractitionerProfile::class, 'practitioner_profile_id');
+        return $this->belongsTo(Practitioner::class, 'practitioner_id');
     }
 }

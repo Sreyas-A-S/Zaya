@@ -1,8 +1,8 @@
 <header class="page-header row">
     <div class="logo-wrapper d-flex align-items-center col-auto">
         <a href="{{ route('admin.dashboard') }}">
-            <img class="light-logo img-fluid" src="{{ asset('admiro/assets/images/logo/zaya wellness logo white.png') }}" alt="logo" style="max-height: 40px;"/>
-            <img class="dark-logo img-fluid" src="{{ asset('admiro/assets/images/logo/zaya wellness logo white.svg') }}" alt="logo" style="max-height: 40px;"/>
+            <img class="light-logo img-fluid" src="{{ asset('admiro/assets/images/logo/zaya-logo-admin.svg') }}" alt="logo" style="max-height: 40px;"/>
+            <img class="dark-logo img-fluid" src="{{ asset('admiro/assets/images/logo/zaya-logo-admin.svg') }}" alt="logo" style="max-height: 40px;"/>
         </a>
         <a class="close-btn toggle-sidebar" href="javascript:void(0)">
             <svg class="svg-color">
@@ -10,11 +10,11 @@
             </svg>
         </a>
     </div>
-    <div class="logo-icon-wrapper col-auto px-0">
+    <!-- <div class="logo-icon-wrapper col-auto px-0">
         <a href="{{ route('admin.dashboard') }}">
-            <img class="img-fluid" src="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" alt="logo" style="max-height: 30px;"/>
+            <img class="img-fluid" src="{{ asset('admiro/assets/images/logo/zaya-logo-admin.svg') }}" alt="logo" style="max-height: 30px;"/>
         </a>
-    </div>
+    </div> -->
     <div class="page-main-header col">
         <div class="header-left">
         <form class="form-inline search-full col" action="#" method="get">

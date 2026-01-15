@@ -27,7 +27,7 @@
                 <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
                     <h3>Doctors List</h3>
                     <button type="button" class="btn btn-primary" onclick="openCreateModal()">
-                        <i class="fa-solid fa-plus me-2"></i>Register New Doctor
+                        <i class="iconly-Add-User icli me-2"></i>Register New Doctor
                     </button>
                 </div>
                 <div class="card-body">
@@ -36,10 +36,11 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Profile</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>AYUSH No.</th>
-                                    <th>Experience</th>
+                                    <th>Contact</th>
                                     <th>City/State</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -103,9 +104,19 @@
                                         <div class="col-12">
                                             <h5 class="f-w-600 mb-3">A. Personal Details</h5>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Full Name</label>
-                                            <input type="text" class="form-control" name="full_name" required placeholder="Enter full name">
+                                        <div class="col-md-12 text-center mb-4">
+                                            <div class="avatar-upload">
+                                                <div class="avatar-edit">
+                                                    <input type='file' id="imageUpload" name="profile_photo" accept=".png, .jpg, .jpeg" />
+                                                    <label for="imageUpload"><i class="iconly-Edit icli"></i></label>
+                                                </div>
+                                                <div class="avatar-preview">
+                                                    <div id="imagePreview" style="background-image: url('{{ asset('admiro/assets/images/user/user.png') }}');">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <label class="form-label mt-2">Profile Photo <span class="text-danger">*</span></label>
+                                            <div id="current-profile-photo" class="d-none"></div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Gender</label>
@@ -132,10 +143,10 @@
                                             <label class="form-label">City, State</label>
                                             <input type="text" class="form-control" name="city_state" required placeholder="e.g. Mumbai, Maharashtra">
                                         </div>
+
                                         <div class="col-md-4">
-                                            <label class="form-label">Profile Photo <span class="file-keep-note d-none text-muted">(Leave blank to keep current)</span></label>
-                                            <input type="file" class="form-control" name="profile_photo" required>
-                                            <div id="current-profile-photo" class="mt-2 d-none"></div>
+                                            <label class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" name="full_name" required placeholder="Enter full name">
                                         </div>
 
                                         <div class="col-12 mt-4">
@@ -160,7 +171,7 @@
                                             <div id="current-signature" class="mt-2 d-none"></div>
                                         </div>
                                         <div class="col-12 wizard-footer text-end mt-4 pt-3 border-top">
-                                            <button type="button" class="btn btn-primary next-step" data-next="2">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                            <button type="button" class="btn btn-primary next-step" data-next="2">Next Step <i class="iconly-Arrow-Right icli ms-2"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -201,6 +212,10 @@
                                                 </div>
                                                 @endforeach
                                             </div>
+                                            <div class="input-group mt-2" style="max-width: 300px;">
+                                                <input type="text" class="form-control form-control-sm new-master-data-input" placeholder="Type new specialization..." data-type="specializations">
+                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
+                                            </div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Degree Certificates (Upload multiple) <span class="file-keep-note d-none text-muted">(Upload to replace/add)</span></label>
@@ -220,8 +235,8 @@
                                             <textarea class="form-control" name="clinic_address" rows="2" required placeholder="Enter full address"></textarea>
                                         </div>
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
-                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="1"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
-                                            <button type="button" class="btn btn-primary next-step" data-next="3">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="1"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
+                                            <button type="button" class="btn btn-primary next-step" data-next="3">Next Step <i class="iconly-Arrow-Right icli ms-2"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -243,6 +258,10 @@
                                                 </div>
                                                 @endforeach
                                             </div>
+                                            <div class="input-group mt-2" style="max-width: 300px;">
+                                                <input type="text" class="form-control form-control-sm new-master-data-input" placeholder="Type new expertise..." data-type="expertises">
+                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
+                                            </div>
                                         </div>
 
                                         <div class="col-12 mt-4">
@@ -258,6 +277,10 @@
                                                     </div>
                                                 </div>
                                                 @endforeach
+                                            </div>
+                                            <div class="input-group mt-2" style="max-width: 300px;">
+                                                <input type="text" class="form-control form-control-sm new-master-data-input" placeholder="Type new condition..." data-type="conditions">
+                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
                                             </div>
                                         </div>
 
@@ -291,10 +314,14 @@
                                                 </div>
                                                 @endforeach
                                             </div>
+                                            <div class="input-group mt-2" style="max-width: 300px;">
+                                                <input type="text" class="form-control form-control-sm new-master-data-input" placeholder="Type new therapy..." data-type="therapies">
+                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
+                                            </div>
                                         </div>
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
-                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="2"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
-                                            <button type="button" class="btn btn-primary next-step" data-next="4">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="2"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
+                                            <button type="button" class="btn btn-primary next-step" data-next="4">Next Step <i class="iconly-Arrow-Right icli ms-2"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -368,8 +395,8 @@
                                             <input type="text" class="form-control" name="upi_id" placeholder="Enter UPI id">
                                         </div>
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
-                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="3"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
-                                            <button type="button" class="btn btn-primary next-step" data-next="5">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="3"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
+                                            <button type="button" class="btn btn-primary next-step" data-next="5">Next Step <i class="iconly-Arrow-Right icli ms-2"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -444,8 +471,8 @@
                                         </div>
 
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-5 pt-3 border-top">
-                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="4"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
-                                            <button type="submit" class="btn btn-success" id="submit-btn"><i class="fa-solid fa-check-circle me-2"></i> Complete Registration</button>
+                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="4"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
+                                            <button type="submit" class="btn btn-success" id="submit-btn"><i class="iconly-Tick-Square icli me-2"></i> Complete Registration</button>
                                         </div>
                                     </div>
                                 </div>
@@ -504,7 +531,7 @@
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center p-4">
-                <i class="fa-solid fa-circle-info text-primary mb-3" style="font-size: 50px;"></i>
+                <i class="iconly-Info-Square icli text-primary mb-3" style="font-size: 50px;"></i>
                 <h5>Update Status?</h5>
                 <p id="status-confirmation-text">Are you sure you want to change the status of this doctor?</p>
                 <input type="hidden" id="status-doctor-id">
@@ -513,6 +540,28 @@
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call Confirmation Modal -->
+<div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Call</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
+                <h5>Make a Call?</h5>
+                <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
+                <h4 class="text-primary" id="call-number"></h4>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
             </div>
         </div>
     </div>
@@ -530,9 +579,36 @@
     </div>
 </div>
 
+<!-- Cropper Modal -->
+<div class="modal fade" id="crop-modal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crop Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="img-container" style="height: 400px; width: 100%; overflow: hidden;">
+                    <img id="image-to-crop" src="#" alt="Picture" style="display: block; max-width: 100%; max-height: 100%;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="crop-btn">Crop & Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @endsection
 
+
+
+
 @section('scripts')
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <style>
     /* Stepper Styling */
     .stepper-horizontal {
@@ -540,6 +616,69 @@
         justify-content: space-between;
         position: relative;
         margin-bottom: 40px;
+    }
+
+    /* Avatar Upload Styling */
+    .avatar-upload {
+        position: relative;
+        max-width: 150px;
+        margin: 0 auto;
+    }
+
+    .avatar-upload .avatar-edit {
+        position: absolute;
+        right: 12px;
+        z-index: 1;
+        top: 10px;
+    }
+
+    .avatar-upload .avatar-edit input {
+        display: none;
+    }
+
+    .avatar-upload .avatar-edit label {
+        display: inline-block;
+        width: 34px;
+        height: 34px;
+        margin-bottom: 0;
+        border-radius: 100%;
+        background: #FFFFFF;
+        border: 1px solid transparent;
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+        cursor: pointer;
+        font-weight: normal;
+        transition: all .2s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .avatar-upload .avatar-edit label:hover {
+        background: #f1f1f1;
+        border-color: #d6d6d6;
+    }
+
+    .avatar-upload .avatar-edit label i {
+        color: #757575;
+        font-size: 16px;
+    }
+
+    .avatar-preview {
+        width: 150px;
+        height: 150px;
+        position: relative;
+        border-radius: 100%;
+        border: 4px solid #F8F8F8;
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    .avatar-preview>div {
+        width: 100%;
+        height: 100%;
+        border-radius: 100%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
     }
 
     .stepper-horizontal::before {
@@ -647,6 +786,12 @@
                     searchable: false
                 },
                 {
+                    data: 'profile_photo',
+                    name: 'profile_photo',
+                    orderable: false,
+                    searchable: false
+                },
+                {
                     data: 'name',
                     name: 'users.name'
                 },
@@ -659,8 +804,8 @@
                     name: 'doctors.ayush_registration_number'
                 },
                 {
-                    data: 'years_of_experience',
-                    name: 'doctors.years_of_experience'
+                    data: 'phone',
+                    name: 'doctors.phone'
                 },
                 {
                     data: 'city_state',
@@ -686,7 +831,7 @@
     function initFormNavigation() {
         $('.next-step').on('click', function() {
             var currentStepDiv = $(this).closest('.step-content');
-            var inputs = currentStepDiv.find('input[required], select[required], textarea[required]');
+            var inputs = currentStepDiv.find('input[required], select[required], textarea[required]').not(':hidden');
             var valid = true;
             inputs.each(function() {
                 if (!this.checkValidity()) {
@@ -744,7 +889,12 @@
         $('#panchakarma_consultation').prop('checked', false);
 
         // Reset required fields that might have been changed in edit
-        $('input[name="profile_photo"], input[name="reg_certificate"], input[name="pan_upload"], input[name="cancelled_cheque"]').prop('required', true);
+        $('input[name="profile_photo"]').prop('required', true); // Profile photo is always required for create
+        $('input[name="reg_certificate"], input[name="pan_upload"], input[name="cancelled_cheque"]').prop('required', true);
+
+        // Reset profile photo preview
+        $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+        $('#imageUpload').val(''); // Clear file input
 
         updateStep(1);
         $('#doctor-form-modal').modal('show');
@@ -833,6 +983,14 @@
             $('input[name="profile_photo"], input[name="reg_certificate"], input[name="pan_upload"], input[name="cancelled_cheque"]').prop('required', false);
 
             updateStep(1);
+            // Set Profile Photo Preview
+            if (profile.profile_photo_path) {
+                $('#imagePreview').css('background-image', 'url(/storage/' + profile.profile_photo_path + ')');
+            } else {
+                $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+            }
+            // Also store input for "keep current" login if needed (handled by backend if null)
+
             $('#doctor-form-modal').modal('show');
         });
     }
@@ -959,6 +1117,10 @@
         const url = doctor_id ? "{{ url('admin/doctors') }}/" + doctor_id : "{{ route('admin.doctors.store') }}";
         const formData = new FormData(this);
 
+        if (croppedFile) {
+            formData.set('profile_photo', croppedFile, 'profile_photo.png');
+        }
+
         $('#submit-btn').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
         $('.is-invalid').removeClass('is-invalid');
         $('.invalid-feedback').remove();
@@ -998,58 +1160,121 @@
         });
     });
 
-        $('body').on('click', '.viewDoctor', function() { viewDoctor($(this).data('id')); });
+    // Cropper & Avatar Upload
+    var cropper;
+    var croppedFile = null;
 
-        $('body').on('click', '.editDoctor', function() { editDoctor($(this).data('id')); });
+    $("body").on("change", "#imageUpload", function(e) {
+        if (this.files && this.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#image-to-crop').attr('src', e.target.result);
+                $('#crop-modal').modal('show');
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
 
-        
-
-        // Handle Status Change Click
-        $('body').on('click', '.toggle-status', function() {
-            const $this = $(this);
-            const id = $this.data('id');
-            const currentStatus = $this.data('status');
-            const newStatus = currentStatus === 'active' ? 0 : 1; 
-            const newStatusText = currentStatus === 'active' ? 'Inactive' : 'Active';
-
-            $('#status-doctor-id').val(id);
-            $('#status-new-value').val(newStatus);
-            $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
-            $('#status-confirmation-modal').modal('show');
+    $('#crop-modal').on('shown.bs.modal', function() {
+        if (cropper) {
+            cropper.destroy();
+        }
+        var image = document.getElementById('image-to-crop');
+        cropper = new Cropper(image, {
+            aspectRatio: 1,
+            viewMode: 1,
+            minContainerWidth: 400,
+            minContainerHeight: 400
         });
+    }).on('hidden.bs.modal', function() {
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        $('#imageUpload').val(''); // Reset file input if cancelled
+    });
 
-        // Handle Confirm Status Change
-        $('#confirm-status-btn').on('click', function() {
-            const id = $('#status-doctor-id').val();
-            const newStatus = $('#status-new-value').val();
-            const btn = $(this);
-
-            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
-
-            $.ajax({
-                url: "{{ url('admin/doctors') }}/" + id + "/status",
-                type: 'POST',
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    status: newStatus
-                },
-                success: function(response) {
-                    $('#status-confirmation-modal').modal('hide');
-                    showToast(response.success);
-                    table.draw(false);
-                },
-                error: function() {
-                    showToast('Failed to update status.', 'error');
-                },
-                complete: function() {
-                    btn.prop('disabled', false).text('Confirm Change');
-                }
+    $('#crop-btn').click(function() {
+        if (cropper) {
+            var canvas = cropper.getCroppedCanvas({
+                width: 300,
+                height: 300
             });
+
+            // Set preview
+            $('#imagePreview').css('background-image', 'url(' + canvas.toDataURL() + ')');
+            $('#imagePreview').hide();
+            $('#imagePreview').fadeIn(650);
+
+            // Convert canvas to blob for upload
+            canvas.toBlob(function(blob) {
+                croppedFile = blob;
+                $('#crop-modal').modal('hide');
+            });
+        }
+    });
+
+    $('#doctor-form-modal').on('hidden.bs.modal', function() {
+        croppedFile = null;
+    });
+
+
+    $('body').on('click', '.viewDoctor', function() {
+        viewDoctor($(this).data('id'));
+    });
+
+    $('body').on('click', '.editDoctor', function() {
+        editDoctor($(this).data('id'));
+    });
+
+
+
+    // Handle Status Change Click
+    $('body').on('click', '.toggle-status', function() {
+        const $this = $(this);
+        const id = $this.data('id');
+        const currentStatus = $this.data('status');
+        const newStatus = currentStatus === 'active' ? 0 : 1;
+        const newStatusText = currentStatus === 'active' ? 'Inactive' : 'Active';
+
+        $('#status-doctor-id').val(id);
+        $('#status-new-value').val(newStatus);
+        $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
+        $('#status-confirmation-modal').modal('show');
+    });
+
+    // Handle Confirm Status Change
+    $('#confirm-status-btn').on('click', function() {
+        const id = $('#status-doctor-id').val();
+        const newStatus = $('#status-new-value').val();
+        const btn = $(this);
+
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
+
+        $.ajax({
+            url: "{{ url('admin/doctors') }}/" + id + "/status",
+            type: 'POST',
+            data: {
+                _token: "{{ csrf_token() }}",
+                status: newStatus
+            },
+            success: function(response) {
+                $('#status-confirmation-modal').modal('hide');
+                showToast(response.success);
+                table.draw(false);
+            },
+            error: function() {
+                showToast('Failed to update status.', 'error');
+            },
+            complete: function() {
+                btn.prop('disabled', false).text('Confirm Change');
+            }
         });
+    });
 
-    
 
-        // Handle Delete Modal
+
+    // Handle Delete Modal
     $('body').on('click', '.deleteDoctor', function() {
         const id = $(this).data("id");
         $('#delete-doctor-id').val(id);
@@ -1080,6 +1305,85 @@
                 btn.prop('disabled', false).text('Delete Now');
             }
         });
+    });
+
+    // Master Data Quick Add
+    $(document).on('click', '.add-master-data-btn', function() {
+        let btn = $(this);
+        let input = btn.siblings('.new-master-data-input');
+        let type = input.data('type');
+        let value = input.val().trim();
+        let container = btn.closest('.col-md-12').find('.row').first(); // The row containing checkboxes
+
+        if (!value) {
+            return;
+        }
+
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+        $.ajax({
+            url: "{{ url('admin/master-data') }}/" + type,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                name: value,
+                status: 1
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Determine checkbox name based on type
+                    let checkboxName = '';
+                    if (type === 'specializations') checkboxName = 'specialization[]';
+                    else if (type === 'expertises') checkboxName = 'consultation_expertise[]';
+                    else if (type === 'conditions') checkboxName = 'health_conditions[]';
+                    else if (type === 'therapies') checkboxName = 'external_therapies[]';
+
+                    let newId = response.data.id;
+                    let newName = response.data.name;
+
+                    let colClass = (type === 'specializations' || type === 'conditions') ? 'col-md-3' : 'col-md-4';
+
+                    let newCheckbox = `
+                        <div class="${colClass}">
+                            <div class="form-check checkbox-primary">
+                                <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${type}_${newId}" checked>
+                                <label class="form-check-label" for="${type}_${newId}">${newName}</label>
+                            </div>
+                        </div>
+                    `;
+
+                    container.append(newCheckbox);
+                    input.val('');
+                } else {
+                    alert('Failed to add item: ' + (response.error || 'Unknown error'));
+                }
+            },
+            error: function(xhr) {
+                alert('Error: ' + xhr.responseText);
+            },
+            complete: function() {
+                btn.prop('disabled', false).html('<i class="fa fa-plus"></i>');
+            }
+        });
+    });
+
+    // Handle Call Modal
+    $('body').on('click', '.call-phone', function() {
+        const phone = $(this).data('phone');
+        const name = $(this).data('name');
+
+        $('#call-name').text(name);
+        $('#call-number').text(phone);
+        $('#confirm-call-btn').attr('href', 'tel:' + phone);
+        $('#call-confirmation-modal').modal('show');
+    });
+
+    // Allow enter key to trigger add
+    $(document).on('keypress', '.new-master-data-input', function(e) {
+        if (e.which == 13) {
+            e.preventDefault();
+            $(this).siblings('.add-master-data-btn').click();
+        }
     });
 </script>
 @endsection

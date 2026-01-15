@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Practitioner;
 use App\Models\PractitionerQualification;
+use App\Models\WellnessConsultation;
+use App\Models\BodyTherapy;
+use App\Models\PractitionerModality;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
@@ -28,6 +31,7 @@ class PractitionerController extends Controller
                     'practitioners.gender',
                     'practitioners.phone',
                     'practitioners.nationality',
+                    'practitioners.profile_photo_path',
                     'practitioners.status'
                 ])
                 ->latest('users.created_at')
@@ -36,8 +40,17 @@ class PractitionerController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->editColumn('status', function ($row) {
-                    $badgeClass = $row->status == 'approved' ? 'bg-success' : ($row->status == 'pending' ? 'bg-warning' : 'bg-danger');
-                    return '<span class="badge ' . $badgeClass . '">' . ucfirst($row->status ?? 'pending') . '</span>';
+                    $status = $row->status == 'active' ? 'active' : 'inactive'; // normalize
+                    $badgeClass = $status == 'active' ? 'badge-success' : 'badge-danger';
+                    return '<span class="badge ' . $badgeClass . ' toggle-status cursor-pointer" data-id="' . $row->id . '" data-status="' . $status . '">' . ucfirst($status) . '</span>';
+                })
+                ->editColumn('profile_photo', function ($row) {
+                    $url = $row->profile_photo_path ? asset('storage/' . $row->profile_photo_path) : asset('admiro/assets/images/user/user.png');
+                    return '<img src="' . $url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
+                })
+                ->editColumn('phone', function ($row) {
+                    if (!$row->phone) return 'N/A';
+                    return '<a href="javascript:void(0);" class="text-primary fw-bold call-phone" data-phone="' . $row->phone . '" data-name="' . $row->name . '"><i class="iconly-Call icli me-1"></i>' . $row->phone . '</a>';
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-3">';
@@ -47,19 +60,23 @@ class PractitionerController extends Controller
                     $btn .= '</div>';
                     return $btn;
                 })
-                ->rawColumns(['status', 'action'])
+                ->rawColumns(['status', 'phone', 'profile_photo', 'action'])
                 ->make(true);
         }
 
-        return view('admin.practitioners.index');
+        $wellnessConsultations = WellnessConsultation::where('status', 1)->get();
+        $bodyTherapies = BodyTherapy::where('status', 1)->get();
+        $practitionerModalities = PractitionerModality::where('status', 1)->get();
+
+        return view('admin.practitioners.index', compact('wellnessConsultations', 'bodyTherapies', 'practitionerModalities'));
     }
 
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
+            'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
             'nationality' => 'nullable|string|max:255',
@@ -93,15 +110,20 @@ class PractitionerController extends Controller
                 'role' => 'practitioner',
             ]);
 
-            $filePaths = [];
+            $practitionerData = $validatedData;
+
+            if ($request->hasFile('profile_photo')) {
+                $practitionerData['profile_photo_path'] = $request->file('profile_photo')->store('practitioner_photos', 'public');
+            }
+
             $docFields = ['doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 'doc_contract', 'doc_id_proof'];
             foreach ($docFields as $field) {
                 if ($request->hasFile($field)) {
-                    $filePaths[$field] = $request->file($field)->store('practitioner_docs', 'public');
+                    $practitionerData[$field] = $request->file($field)->store('practitioner_docs', 'public');
                 }
             }
 
-            $user->practitioner()->create(array_merge($validatedData, $filePaths));
+            $practitioner = $user->practitioner()->create($practitionerData);
 
             // Qualifications logic (if any)
             if ($request->has('qualifications')) {
@@ -147,6 +169,7 @@ class PractitionerController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
             'nationality' => 'nullable|string|max:255',
@@ -169,6 +192,14 @@ class PractitionerController extends Controller
                 'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
                 'email' => $validatedData['email'],
             ]);
+
+            if ($request->hasFile('profile_photo')) {
+                // Delete old photo if exists
+                if ($practitioner->profile_photo_path) {
+                    Storage::disk('public')->delete($practitioner->profile_photo_path);
+                }
+                $validatedData['profile_photo_path'] = $request->file('profile_photo')->store('practitioner_photos', 'public');
+            }
 
             $filePaths = [];
             $docFields = ['doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 'doc_contract', 'doc_id_proof'];
@@ -203,5 +234,19 @@ class PractitionerController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
         return response()->json(['success' => 'Practitioner deleted successfully.']);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        if (!auth()->user() || auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $practitioner = Practitioner::where('user_id', $id)->firstOrFail();
+        $practitioner->update([
+            'status' => $request->status
+        ]);
+
+        return response()->json(['success' => 'Status updated successfully!']);
     }
 }

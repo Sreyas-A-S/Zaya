@@ -21,9 +21,12 @@ Route::get('register/selection', function () {
 Route::get('register/{type}', [RegisterController::class, 'showRegistrationForm'])->name('register.form');
 Route::post('register', [RegisterController::class, 'register'])->name('register');
 
-Route::get('register', function() {
+Route::get('register', function () {
     return redirect()->route('register.selection');
 });
+
+// Public Master Data Quick Add (for registration forms)
+Route::post('master-data/quick-add/{type}', [MasterDataController::class, 'store'])->name('master-data.quick-add');
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,6 +38,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::resource('doctors', App\Http\Controllers\Admin\DoctorController::class);
     Route::post('doctors/{id}/status', [App\Http\Controllers\Admin\DoctorController::class, 'updateStatus'])->name('doctors.status');
     Route::resource('practitioners', App\Http\Controllers\Admin\PractitionerController::class);
+    Route::post('practitioners/{id}/status', [App\Http\Controllers\Admin\PractitionerController::class, 'updateStatus'])->name('practitioners.status');
     Route::resource('clients', App\Http\Controllers\Admin\ClientController::class);
     Route::resource('roles', App\Http\Controllers\Admin\RoleController::class);
     Route::get('roles/{role}/permissions', [App\Http\Controllers\Admin\RoleController::class, 'showPermissions'])->name('roles.permissions');

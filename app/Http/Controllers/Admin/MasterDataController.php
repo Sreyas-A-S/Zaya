@@ -8,6 +8,9 @@ use App\Models\Specialization;
 use App\Models\AyurvedaExpertise;
 use App\Models\HealthCondition;
 use App\Models\ExternalTherapy;
+use App\Models\WellnessConsultation;
+use App\Models\BodyTherapy;
+use App\Models\PractitionerModality;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Str;
 
@@ -18,6 +21,9 @@ class MasterDataController extends Controller
         'expertises' => AyurvedaExpertise::class,
         'conditions' => HealthCondition::class,
         'therapies' => ExternalTherapy::class,
+        'wellness_consultations' => WellnessConsultation::class,
+        'body_therapies' => BodyTherapy::class,
+        'practitioner_modalities' => PractitionerModality::class,
     ];
 
     protected $titles = [
@@ -25,6 +31,9 @@ class MasterDataController extends Controller
         'expertises' => 'Ayurveda Expertises',
         'conditions' => 'Health Conditions',
         'therapies' => 'External Therapies',
+        'wellness_consultations' => 'Ayurvedic Wellness Consultations',
+        'body_therapies' => 'Massage & Body Therapies',
+        'practitioner_modalities' => 'Other Modalities',
     ];
 
     public function index(Request $request, $type)
@@ -71,12 +80,12 @@ class MasterDataController extends Controller
         ]);
 
         $model = $this->types[$type];
-        $model::create([
+        $item = $model::create([
             'name' => $request->name,
             'status' => $request->status,
         ]);
 
-        return response()->json(['success' => 'Item created successfully!']);
+        return response()->json(['success' => 'Item created successfully!', 'data' => $item]);
     }
 
     public function update(Request $request, $type, $id)
