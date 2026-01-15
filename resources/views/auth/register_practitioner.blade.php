@@ -625,26 +625,29 @@
         }
 
         // Validation for hidden inputs
-        function validateStep(step) {
+        function validateStep(step, checkHidden = false) {
             let valid = true;
             let inputs;
 
             // Special handling for Step 1 (Personal Info) - check Profile Photo
             if (step === 1) {
                 // Check if profile photo is uploaded (either original or cropped)
-                if (!$('input[name="profile_photo"]').val() && !croppedFile) {
-                    // Optionally, add a visual cue for the user
-                    // For now, we'll just prevent moving forward
-                    // console.log("Profile photo is required.");
-                    // valid = false;
-                    // return false;
-                }
+                // Profile photo is usually required but handled via JS
             }
 
-            inputs = $(`#step${step}`).find('input[required], select[required], textarea[required]').not(':hidden');
+            if (checkHidden) {
+                inputs = $(`#step${step}`).find('input[required], select[required], textarea[required]');
+            } else {
+                inputs = $(`#step${step}`).find('input[required], select[required], textarea[required]').not(':hidden');
+            }
 
             inputs.each(function() {
                 if (!this.checkValidity()) {
+                    // Update step UI so the bubble can be shown
+                    if (currentStep !== step) {
+                        currentStep = step;
+                        updateStep(step);
+                    }
                     this.reportValidity();
                     valid = false;
                     return false;
@@ -672,6 +675,16 @@
             const step = parseInt($(this).data('step'));
             currentStep = step;
             updateStep(currentStep);
+        });
+
+        // Form Submission Validation
+        $('#practitionerRegForm').on('submit', function(e) {
+            for (let i = 1; i <= totalSteps; i++) {
+                if (!validateStep(i, true)) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
         });
 
         // Dynamic Fields Logic
