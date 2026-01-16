@@ -45,19 +45,20 @@ class ClientController extends Controller
                     return '<img src="' . $url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
                 })
                 ->editColumn('phone', function ($row) {
-                    return $row->phone ?? 'N/A';
+                    return $row->phone ? '<a href="tel:' . $row->phone . '" class="text-primary">' . $row->phone . '</a>' : 'N/A';
                 })
                 ->addColumn('client_id', function ($row) {
                     return $row->client_id ?? 'N/A';
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-3">';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-secondary viewClient" title="View"><i class="iconly-Show icli" style="font-size: 20px;"></i></a>';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editClient" title="Edit"><i class="iconly-Edit-Square icli" style="font-size: 20px;"></i></a>';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-danger deleteClient" title="Delete"><i class="iconly-Delete icli" style="font-size: 20px;"></i></a>';
                     $btn .= '</div>';
                     return $btn;
                 })
-                ->rawColumns(['profile_photo', 'action'])
+                ->rawColumns(['profile_photo', 'action', 'phone'])
                 ->make(true);
         }
 

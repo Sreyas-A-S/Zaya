@@ -599,6 +599,65 @@
         // Expose to window for the button onclick
         window.openCreateModal = openCreateModal;
 
+        $(document).on('click', '.viewClient', function() {
+            let id = $(this).data('id');
+            // Reset form first
+            $('#client-form')[0].reset();
+            $('#client-form-modal input, #client-form-modal select, #client-form-modal textarea').prop('disabled', true);
+            $('#submit-btn').addClass('d-none');
+            $('#form-modal-title').text('View Client Details');
+            $('.pref-checkbox').prop('checked', false).prop('disabled', true);
+            if (languageChoices) languageChoices.disable();
+
+            $.get("{{ url('admin/clients') }}/" + id + "/edit", function(data) {
+                $('#client_id_hidden').val(data.id);
+                $('input[name="name"]').val(data.name);
+                $('input[name="email"]').val(data.email);
+
+                if (data.patient.profile_photo_path) {
+                    $('#imagePreview').css('background-image', 'url(/storage/' + data.patient.profile_photo_path + ')');
+                } else {
+                    $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+                }
+
+                $('input[name="phone"]').val(data.patient.phone);
+                $('input[name="mobile_country_code"]').val(data.patient.mobile_country_code);
+                $('textarea[name="address"]').val(data.patient.address);
+                $('input[name="dob"]').val(data.patient.dob);
+                $('input[name="occupation"]').val(data.patient.occupation);
+                $('select[name="gender"]').val(data.patient.gender);
+                $('select[name="referral_type"]').val(data.patient.referral_type);
+                $('input[name="referrer_name"]').val(data.patient.referrer_name);
+
+                if (data.patient.dob) {
+                    $('#age_display').val(calculateAge(data.patient.dob));
+                }
+
+                if (data.patient.consultation_preferences) {
+                    data.patient.consultation_preferences.forEach(function(val) {
+                        $(`input[name="consultation_preferences[]"][value="${val}"]`).prop('checked', true);
+                    });
+                }
+
+                if (data.patient.languages_spoken) {
+                    languageChoices.setChoiceByValue(data.patient.languages_spoken);
+                }
+
+                $('#referrer_name_div').removeClass('d-none'); // Show by default in view mode if value exists
+                if (!data.patient.referrer_name) $('#referrer_name_div').addClass('d-none');
+
+                new bootstrap.Modal(document.getElementById('client-form-modal')).show();
+            });
+        });
+
+        // Re-enable fields when modal is closed/hidden to prevent issues with other modes
+        $('#client-form-modal').on('hidden.bs.modal', function() {
+            $('#client-form-modal input, #client-form-modal select, #client-form-modal textarea').prop('disabled', false);
+            $('#submit-btn').removeClass('d-none');
+            $('.pref-checkbox').prop('disabled', false);
+            if (languageChoices) languageChoices.enable();
+        });
+
         $('#confirm-delete-btn').click(function() {
             let id = $('#delete-client-id').val();
             $.ajax({
