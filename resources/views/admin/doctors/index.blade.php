@@ -140,6 +140,15 @@
                                             <input type="email" class="form-control" name="email" required placeholder="Enter email id">
                                         </div>
                                         <div class="col-md-4">
+                                            <label class="form-label">Password <span class="small text-muted" id="password-hint">(Required for new)</span></label>
+                                            <input type="password" class="form-control" name="password" id="password-input">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Confirm Password</label>
+                                            <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input">
+                                            <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
+                                        </div>
+                                        <div class="col-md-4">
                                             <label class="form-label">City, State</label>
                                             <input type="text" class="form-control" name="city_state" required placeholder="e.g. Mumbai, Maharashtra">
                                         </div>
@@ -348,8 +357,12 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Languages Spoken (Comma separated)</label>
-                                            <input type="text" class="form-control" name="languages_spoken" placeholder="e.g. English, Hindi, Marathi" required>
+                                            <label class="form-label">Languages Spoken</label>
+                                            <select class="form-select" id="languages_select" name="languages_spoken[]" multiple>
+                                                @foreach($languages as $lang)
+                                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
 
                                         <div class="col-12 mt-4">
@@ -608,7 +621,9 @@
 
 @section('scripts')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <style>
     /* Stepper Styling */
     .stepper-horizontal {
@@ -751,6 +766,7 @@
 <script>
     let table;
     let toastInstance;
+    let languageChoices;
 
     function showToast(message, type = 'success') {
         const toastEl = document.getElementById('liveToast');
@@ -772,6 +788,19 @@
 
         messageEl.innerText = message;
         toastInstance.show();
+    }
+
+    function validatePasswordMatch() {
+        const password = $('#password-input').val();
+        const confirmPassword = $('#password-confirm-input').val();
+
+        if (confirmPassword && password !== confirmPassword) {
+            $('#password-confirm-input').addClass('is-invalid');
+            $('#submit-btn').prop('disabled', true);
+        } else {
+            $('#password-confirm-input').removeClass('is-invalid');
+            $('#submit-btn').prop('disabled', false);
+        }
     }
 
     $(document).ready(function() {
@@ -825,7 +854,22 @@
             ]
         });
 
+
+        // Initialize Choices.js
+        const langSelect = document.getElementById('languages_select');
+        if (langSelect) {
+            languageChoices = new Choices(langSelect, {
+                removeItemButton: true,
+                searchEnabled: true,
+                placeholder: true,
+                placeholderValue: 'Select Languages',
+                itemSelectText: '',
+            });
+        }
+
         initFormNavigation();
+
+        $('#password-input, #password-confirm-input').on('input', validatePasswordMatch);
     });
 
     function initFormNavigation() {
@@ -883,6 +927,18 @@
         $('.is-invalid').removeClass('is-invalid');
         $('.invalid-feedback').remove();
         $('[id^="current-"]').addClass('d-none').html('');
+
+        // Reset Choices.js
+        if (languageChoices) {
+            languageChoices.removeActiveItems();
+        }
+
+        // Password Logic
+        $('#password-hint').text('(Required for new)');
+        $('#password-input').attr('required', 'required');
+        $('#password-confirm-input').attr('required', 'required');
+        $('#password-confirm-input').removeClass('is-invalid');
+        $('#submit-btn').prop('disabled', false);
 
         // Uncheck all checkboxes
         $('.spec-checkbox, .skill-checkbox, .cond-checkbox, .proc-checkbox, .ther-checkbox, .mode-checkbox').prop('checked', false);
@@ -960,7 +1016,13 @@
             checkBoxes('.mode-checkbox', profile.consultation_modes || []);
 
             $('#panchakarma_consultation').prop('checked', !!profile.panchakarma_consultation);
-            $('[name="languages_spoken"]').val((profile.languages_spoken || []).join(', '));
+
+            // Handle Languages Spoken (Choices.js)
+            if (profile.languages_spoken) {
+                languageChoices.setChoiceByValue(profile.languages_spoken);
+            } else {
+                languageChoices.removeActiveItems();
+            }
 
             const social = profile.social_links || {};
             $('[name="website"]').val(social.website || '');
@@ -981,6 +1043,12 @@
 
             // Remove required for files in edit
             $('input[name="profile_photo"], input[name="reg_certificate"], input[name="pan_upload"], input[name="cancelled_cheque"]').prop('required', false);
+
+            // Password Logic
+            $('#password-hint').text('(Leave blank to keep current)');
+            $('#password-input').removeAttr('required').val('');
+            $('#password-confirm-input').removeAttr('required').val('').removeClass('is-invalid');
+            $('#submit-btn').prop('disabled', false);
 
             updateStep(1);
             // Set Profile Photo Preview

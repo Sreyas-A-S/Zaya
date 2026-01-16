@@ -11,6 +11,7 @@ use App\Models\ExternalTherapy;
 use App\Models\WellnessConsultation;
 use App\Models\BodyTherapy;
 use App\Models\PractitionerModality;
+use App\Models\ClientConsultationPreference;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Str;
 
@@ -24,6 +25,7 @@ class MasterDataController extends Controller
         'wellness_consultations' => WellnessConsultation::class,
         'body_therapies' => BodyTherapy::class,
         'practitioner_modalities' => PractitionerModality::class,
+        'client_consultation_preferences' => ClientConsultationPreference::class,
     ];
 
     protected $titles = [
@@ -34,6 +36,7 @@ class MasterDataController extends Controller
         'wellness_consultations' => 'Ayurvedic Wellness Consultations',
         'body_therapies' => 'Massage & Body Therapies',
         'practitioner_modalities' => 'Other Modalities',
+        'client_consultation_preferences' => 'Client Settings', // Client Consultation Preferences
     ];
 
     public function index(Request $request, $type)

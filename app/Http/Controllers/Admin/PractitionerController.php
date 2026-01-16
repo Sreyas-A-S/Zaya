@@ -67,8 +67,9 @@ class PractitionerController extends Controller
         $wellnessConsultations = WellnessConsultation::where('status', 1)->get();
         $bodyTherapies = BodyTherapy::where('status', 1)->get();
         $practitionerModalities = PractitionerModality::where('status', 1)->get();
+        $languages = \App\Models\Language::all();
 
-        return view('admin.practitioners.index', compact('wellnessConsultations', 'bodyTherapies', 'practitionerModalities'));
+        return view('admin.practitioners.index', compact('wellnessConsultations', 'bodyTherapies', 'practitionerModalities', 'languages'));
     }
 
     public function store(Request $request)
@@ -76,6 +77,7 @@ class PractitionerController extends Controller
         $validatedData = $request->validate([
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
@@ -106,7 +108,7 @@ class PractitionerController extends Controller
             $user = User::create([
                 'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
                 'email' => $validatedData['email'],
-                'password' => Hash::make(Str::random(10)),
+                'password' => Hash::make($validatedData['password']),
                 'role' => 'practitioner',
             ]);
 
@@ -169,6 +171,7 @@ class PractitionerController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => 'nullable|string|min:6|confirmed',
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
@@ -192,6 +195,11 @@ class PractitionerController extends Controller
                 'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
                 'email' => $validatedData['email'],
             ]);
+
+            if (!empty($validatedData['password'])) {
+                $user->password = Hash::make($validatedData['password']);
+                $user->save();
+            }
 
             if ($request->hasFile('profile_photo')) {
                 // Delete old photo if exists

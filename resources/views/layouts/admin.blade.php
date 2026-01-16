@@ -5,10 +5,10 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Admiro admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities." />
-  <meta name="keywords" content="admin template, Admiro admin template, best javascript admin, dashboard template, bootstrap admin template, responsive admin template, web app" />
-  <meta name="author" content="pixelstrap" />
-  <title>@yield('title', 'Admiro - Premium Admin Template')</title>
+  <meta name="description" content="Zaya Wellness is a comprehensive holistic health and wellness platform that connects practitioners with patients for meaningful healthcare experiences." />
+  <meta name="keywords" content="holistic health, wellness, Ayurveda, yoga, Zaya Wellness, healthcare platform" />
+  <meta name="author" content="Zaya Wellness" />
+  <title>@yield('title', 'Zaya Wellness - Holistic Health & Wellness Platform')</title>
   <!-- Favicon icon-->
   <link rel="icon" href="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" type="image/svg+xml" />
   <link rel="shortcut icon" href="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" type="image/svg+xml" />

@@ -1,4 +1,15 @@
 <aside class="page-sidebar">
+    <div class="logo-wrapper d-flex align-items-center col-auto d-lg-none p-3">
+        <a href="{{ route('admin.dashboard') }}">
+            <img class="light-logo img-fluid" src="{{ asset('admiro/assets/images/logo/zaya-logo-admin.svg') }}" alt="logo" style="max-height: 50px;" />
+           
+        </a>
+        <a class="close-btn toggle-sidebar ms-auto" href="javascript:void(0)">
+            <svg class="svg-color">
+                <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Category') }}"></use>
+            </svg>
+        </a>
+    </div>
 
 
     <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
@@ -65,6 +76,16 @@
                             <li><a href="{{ route('admin.master-data.index', 'wellness_consultations') }}">Wellness Consultations</a></li>
                             <li><a href="{{ route('admin.master-data.index', 'body_therapies') }}">Massage & Body Therapies</a></li>
                             <li><a href="{{ route('admin.master-data.index', 'practitioner_modalities') }}">Other Modalities</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a class="submenu-title mt-2 fw-bold text-primary d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                            Client Settings
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.master-data.index', 'client_consultation_preferences') }}">Consultation Preferences</a></li>
                         </ul>
                     </li>
                 </ul>

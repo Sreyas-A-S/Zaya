@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             LanguageSeeder::class,
             DoctorMasterDataSeeder::class,
             PractitionerMasterDataSeeder::class,
+            ClientConsultationPreferenceSeeder::class,
+            ClientSeeder::class,
         ]);
 
         User::updateOrCreate(

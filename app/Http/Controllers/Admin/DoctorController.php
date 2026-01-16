@@ -86,8 +86,10 @@ class DoctorController extends Controller
         $expertises = AyurvedaExpertise::where('status', true)->get();
         $healthConditions = HealthCondition::where('status', true)->get();
         $externalTherapies = ExternalTherapy::where('status', true)->get();
+        $externalTherapies = ExternalTherapy::where('status', true)->get();
+        $languages = \App\Models\Language::all();
 
-        return view('admin.doctors.index', compact('specializations', 'expertises', 'healthConditions', 'externalTherapies'));
+        return view('admin.doctors.index', compact('specializations', 'expertises', 'healthConditions', 'externalTherapies', 'languages'));
     }
 
     /**
@@ -109,6 +111,7 @@ class DoctorController extends Controller
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
             'mobile_number' => 'required|string|max:20',
+            'password' => 'required|string|min:6|confirmed',
             'profile_photo' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // B. Medical Registration
@@ -148,7 +151,8 @@ class DoctorController extends Controller
             // G. Consultation Setup
             'consultation_modes' => 'nullable|array',
             'consultation_modes.*' => 'string|max:255',
-            'languages_spoken' => 'required|string|max:255',
+            'languages_spoken' => 'nullable|array',
+            'languages_spoken.*' => 'string|max:255',
 
             // H. KYC & Payment Details
             'pan_number' => 'required|string|max:10',
@@ -183,7 +187,7 @@ class DoctorController extends Controller
         $user = User::create([
             'name' => $validatedData['full_name'],
             'email' => $validatedData['email'],
-            'password' => Hash::make(Str::random(10)),
+            'password' => Hash::make($validatedData['password']),
             'role' => 'doctor',
         ]);
 
@@ -296,6 +300,7 @@ class DoctorController extends Controller
             'dob' => 'required|date',
             'mobile_number' => 'required|string|max:20',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => 'nullable|string|min:6|confirmed',
             'city_state' => 'required|string|max:255',
             'profile_photo' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
 
@@ -336,7 +341,8 @@ class DoctorController extends Controller
             // G. Consultation Setup
             'consultation_modes' => 'nullable|array',
             'consultation_modes.*' => 'string|max:255',
-            'languages_spoken' => 'required|string|max:255',
+            'languages_spoken' => 'nullable|array',
+            'languages_spoken.*' => 'string|max:255',
 
             // H. KYC & Payment Details
             'pan_number' => 'required|string|max:10',
@@ -364,6 +370,11 @@ class DoctorController extends Controller
             'name' => $validatedData['full_name'],
             'email' => $validatedData['email'],
         ]);
+
+        if (!empty($validatedData['password'])) {
+            $user->password = Hash::make($validatedData['password']);
+            $user->save();
+        }
 
         $profilePhotoPath = $request->hasFile('profile_photo') ? $request->file('profile_photo')->store('doctor_documents/profile_photos', 'public') : $profile->profile_photo_path;
         $regCertificatePath = $request->hasFile('reg_certificate') ? $request->file('reg_certificate')->store('doctor_documents/registration_certificates', 'public') : $profile->reg_certificate_path;

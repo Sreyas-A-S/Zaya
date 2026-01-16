@@ -95,6 +95,7 @@
             <div class="modal-body">
                 <form id="createForm">
                     @csrf
+                    <input type="hidden" name="user_id" id="user_id">
                     <div class="mb-3">
                         <label class="form-label" for="name">Name</label>
                         <input class="form-control" id="name" type="text" name="name" placeholder="Enter name" required>
@@ -126,59 +127,108 @@
             processing: true,
             serverSide: true,
             ajax: "{{ route($routePrefix . '.index') }}",
-            columns: [
-                { data: 'id', name: 'id' },
-                { data: 'name', name: 'name' },
-                { data: 'email', name: 'email' },
-                { data: 'created_at', name: 'created_at' },
-                { data: 'action', name: 'action', orderable: false, searchable: false },
+            columns: [{
+                    data: 'id',
+                    name: 'id'
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'email',
+                    name: 'email'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },
             ]
         });
 
         $('#saveBtn').click(function(e) {
             e.preventDefault();
-            submitForm($('#createForm'), $(this), '#createModal');
+            var id = $('#user_id').val();
+            var url = id ? "{{ url('admin/' . $urlSegment) }}/" + id : "{{ route($routePrefix . '.store') }}";
+            var type = id ? "PUT" : "POST";
+            submitForm($('#createForm'), $(this), '#createModal', url, type);
         });
 
         $('#saveBtnInline').click(function(e) {
             e.preventDefault();
-            submitForm($('#createFormInline'), $(this), null);
+            submitForm($('#createFormInline'), $(this), null, "{{ route($routePrefix . '.store') }}", "POST");
         });
 
-        function submitForm(form, btn, modalId) {
+        function submitForm(form, btn, modalId, url, type) {
             btn.html('Sending..');
             $.ajax({
                 data: form.serialize(),
-                url: "{{ route($routePrefix . '.store') }}",
-                type: "POST",
+                url: url,
+                type: type,
                 dataType: 'json',
                 success: function(data) {
                     form.trigger("reset");
-                    if(modalId) $(modalId).modal('hide');
+                    $('#user_id').val(''); // Clear ID after success
+                    if (modalId) $(modalId).modal('hide');
                     table.draw();
                     btn.html('Save');
                 },
                 error: function(data) {
                     console.log('Error:', data);
                     btn.html('Save');
+                    // Add error handling alert here if needed
+                    alert('Something went wrong!');
                 }
             });
         }
-        
+
+        // Handle Edit
+        $('body').on('click', '.editUser', function() {
+            var user_id = $(this).data('id');
+            $.get("{{ url('admin/' . $urlSegment) }}" + '/' + user_id + '/edit', function(data) {
+                $('#createModalLabel').html("Edit {{ $entityName }}");
+                $('#user_id').val(data.id);
+                $('#createModal #name').val(data.name);
+                $('#createModal #email').val(data.email);
+                $('#createModal #password').val(''); // Clear password field
+                $('#createModal').modal('show');
+            })
+        });
+
+        // Reset modal on close or create click
+        $('#createModal').on('hidden.bs.modal', function() {
+            $('#createForm').trigger("reset");
+            $('#user_id').val('');
+            $('#createModalLabel').html("Create {{ $entityName }}");
+        });
+
+        // Handle Create Button Click specifically if needed (Bootstrap handles modal toggle, but we want to reset)
+        $('button[data-bs-target="#createModal"]').click(function() {
+            $('#createForm').trigger("reset");
+            $('#user_id').val('');
+            $('#createModalLabel').html("Create {{ $entityName }}");
+        });
+
         // Handle Delete
-        $('body').on('click', '.deleteUser', function () {
+        $('body').on('click', '.deleteUser', function() {
             var user_id = $(this).data("id");
-            if(confirm("Are you sure you want to delete this user?")) {
+            if (confirm("Are you sure you want to delete this user?")) {
                 $.ajax({
                     type: "DELETE",
                     url: "{{ url('admin/' . $urlSegment) }}" + '/' + user_id,
                     data: {
                         _token: '{{ csrf_token() }}'
                     },
-                    success: function (data) {
+                    success: function(data) {
                         table.draw();
                     },
-                    error: function (data) {
+                    error: function(data) {
                         console.log('Error:', data);
                     }
                 });

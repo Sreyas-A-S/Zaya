@@ -129,6 +129,15 @@
                                             <label class="form-label">Email Address</label>
                                             <input type="email" class="form-control" name="email" required>
                                         </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Password <span class="small text-muted" id="password-hint">(New Only)</span></label>
+                                            <input type="password" class="form-control" name="password" id="password-input">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Confirm Password</label>
+                                            <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input">
+                                            <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
+                                        </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Sex</label>
                                             <select class="form-select" name="gender">
@@ -289,8 +298,12 @@
                                             <textarea class="form-control" name="additional_courses" rows="2"></textarea>
                                         </div>
                                         <div class="col-md-8">
-                                            <label class="form-label">Languages Spoken (Comma separated)</label>
-                                            <input type="text" class="form-control" name="languages_spoken_input" placeholder="e.g. English, Hindi">
+                                            <label class="form-label">Languages Spoken</label>
+                                            <select class="form-select" id="languages_select" name="languages_spoken[]" multiple>
+                                                @foreach($languages as $lang)
+                                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Able to Translate English?</label>
@@ -472,7 +485,9 @@
 
 @section('scripts')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <style>
     /* Stepper Styling */
     .stepper-horizontal {
@@ -628,6 +643,7 @@
 <script>
     let table;
     let toastInstance;
+    let languageChoices;
     let qualCount = 1;
     let cropper;
     let croppedFile;
@@ -647,6 +663,19 @@
         }
         messageEl.innerText = message;
         toastInstance.show();
+    }
+
+    function validatePasswordMatch() {
+        const password = $('#password-input').val();
+        const confirmPassword = $('#password-confirm-input').val();
+
+        if (confirmPassword && password !== confirmPassword) {
+            $('#password-confirm-input').addClass('is-invalid');
+            $('#submit-btn').prop('disabled', true);
+        } else {
+            $('#password-confirm-input').removeClass('is-invalid');
+            $('#submit-btn').prop('disabled', false);
+        }
     }
 
     $(document).ready(function() {
@@ -700,7 +729,23 @@
             ]
         });
 
+
+
+        // Initialize Choices.js
+        const langSelect = document.getElementById('languages_select');
+        if (langSelect) {
+            languageChoices = new Choices(langSelect, {
+                removeItemButton: true,
+                searchEnabled: true,
+                placeholder: true,
+                placeholderValue: 'Select Languages',
+                itemSelectText: '',
+            });
+        }
+
         initFormNavigation();
+
+        $('#password-input, #password-confirm-input').on('input', validatePasswordMatch);
 
         // Cropper initialization
         const image = document.getElementById('image-to-crop');
@@ -827,11 +872,24 @@
         $('#practitioner-form')[0].reset();
         $('#practitioner_id').val('');
         $('#form-method').val('POST');
+
+        // Reset Choices.js
+        if (languageChoices) {
+            languageChoices.removeActiveItems();
+        }
+
         $('#form-modal-title').text('Register New Practitioner');
         $('.cons-checkbox, .body-checkbox, .mod-checkbox').prop('checked', false);
         $('#qualifications-container').empty();
         addQualificationRow();
         $('[id^="current-"]').addClass('d-none').html('');
+
+        // Password Logic
+        $('#password-hint').text('(Required for new)');
+        $('#password-input').attr('required', 'required');
+        $('#password-confirm-input').attr('required', 'required');
+        $('#password-confirm-input').removeClass('is-invalid');
+        $('#submit-btn').prop('disabled', false);
 
         // Reset required documents
         $('input[name="doc_cover_letter"], input[name="doc_certificates"], input[name="doc_experience"], input[name="doc_registration"], input[name="doc_ethics"], input[name="doc_contract"], input[name="doc_id_proof"]').prop('required', true);
@@ -880,7 +938,13 @@
             $('[name="website_url"]').val(p.website_url);
             $('[name="additional_courses"]').val(p.additional_courses);
             $('[name="profile_bio"]').val(p.profile_bio);
-            $('[name="languages_spoken_input"]').val((p.languages_spoken || []).join(', '));
+
+            if (p.languages_spoken) {
+                languageChoices.setChoiceByValue(p.languages_spoken);
+            } else {
+                languageChoices.removeActiveItems();
+            }
+
             $('#translate_switch').prop('checked', !!p.can_translate_english);
 
             const check = (selector, vals) => {
@@ -911,6 +975,12 @@
                     $(`input[name="${d}"]`).prop('required', true);
                 }
             });
+
+            // Password Logic
+            $('#password-hint').text('(Leave blank to keep current)');
+            $('#password-input').removeAttr('required').val('');
+            $('#password-confirm-input').removeAttr('required').val('').removeClass('is-invalid');
+            $('#submit-btn').prop('disabled', false);
 
             updateStep(1);
             $('#practitioner-form-modal').modal('show');
