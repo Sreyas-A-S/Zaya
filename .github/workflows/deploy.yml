@@ -91,18 +91,11 @@ jobs:
 
 
 
-      - name: Clear Config and Generate Swagger Docs
+      - name: Clear Config and (Optional) Swagger
         run: |
           php artisan config:clear
-          # Ensure correct versions before generating Swagger docs
-          echo "PHP Version:"
-          php -v
-          echo "Composer Version:"
-          composer -v
-          echo "l5-swagger and swagger-php versions:"
-          composer show darkaonline/l5-swagger
-          composer show zircote/swagger-php
-          php artisan l5-swagger:generate
+          echo "Skipping Swagger generation in CI"
+
 
       - name: 🕒 Wait for MySQL to be Ready
         run: |
