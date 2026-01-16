@@ -131,7 +131,7 @@
   <!-- page_datatable-->
   {{-- <script src="{{ asset('admiro/assets/js/datatable/datatables/datatable.custom.js') }}"></script> --}}
   <!-- theme_customizer-->
-  <script src="{{ asset('admiro/assets/js/theme-customizer/customizer.js') }}"></script>
+  <!-- <script src="{{ asset('admiro/assets/js/theme-customizer/customizer.js') }}"></script> -->
   <!-- tilt-->
   <script src="{{ asset('admiro/assets/js/animation/tilt/tilt.jquery.js') }}"></script>
   <!-- page_tilt-->
