@@ -73,7 +73,7 @@
                         class="h-[90%] object-contain group-hover:scale-105 transition-transform duration-500">
                 </div>
                 <h3 class="text-xl font-sans font-bold text-primary mb-1">Sarath Sasankan</h3>
-                <p class="text-gray-500 font-serif italic text-sm">Founder</p>
+                <p class="text-gray-500 font-serif italic text-sm">Founder & Managing Director</p>
             </div>
 
             <!-- Member 2 -->
@@ -84,7 +84,7 @@
                         class="h-[90%] object-contain group-hover:scale-105 transition-transform duration-500">
                 </div>
                 <h3 class="text-xl font-sans font-bold text-primary mb-1">Dr. Yadun M R</h3>
-                <p class="text-gray-500 font-serif italic text-sm">Founder</p>
+                <p class="text-gray-500 font-serif italic text-sm">Founder & Director -Operations</p>
             </div>
 
             <!-- Member 3 -->
@@ -95,7 +95,7 @@
                         class="h-[90%] object-contain group-hover:scale-105 transition-transform duration-500">
                 </div>
                 <h3 class="text-xl font-sans font-bold text-primary mb-1">Dr. Parvathi S</h3>
-                <p class="text-gray-500 font-serif italic text-sm">Co-Founder</p>
+                <p class="text-gray-500 font-serif italic text-sm">Co founder & Head - Client Services</p>
             </div>
 
             <!-- Member 4 -->
@@ -106,17 +106,17 @@
                         class="h-[90%] object-contain group-hover:scale-105 transition-transform duration-500">
                 </div>
                 <h3 class="text-xl font-sans font-bold text-primary mb-1">Arun Lekshmy</h3>
-                <p class="text-gray-500 font-serif italic text-sm">Co-Founder</p>
+                <p class="text-gray-500 font-serif italic text-sm">Co- founder & Marketing Head</p>
             </div>
 
             <!-- Member 5 -->
             <div class="group flex flex-col items-center">
                 <div
                     class="w-full h-[350px] bg-[#EAF9F2] mb-6 flex items-end justify-center overflow-hidden rounded-sm">
-                    <img src="{{ asset('frontend/assets/team/saneejja.png') }}" alt="Saneejia"
+                    <img src="{{ asset('frontend/assets/team/saneejja.png') }}" alt="Saneejjaa"
                         class="h-[90%] object-contain group-hover:scale-105 transition-transform duration-500">
                 </div>
-                <h3 class="text-xl font-sans font-bold text-primary mb-1">Saneejia</h3>
+                <h3 class="text-xl font-sans font-bold text-primary mb-1">Saneejjaa</h3>
                 <p class="text-gray-500 font-serif italic text-sm">Operations Manager</p>
             </div>
 
