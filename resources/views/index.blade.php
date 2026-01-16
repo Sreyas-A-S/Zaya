@@ -46,7 +46,7 @@
                 Traditional Ayurveda for Modern Wellness
             </p>
 
-            <a href="./about-us.html"
+            <a href="{{ route('about-us') }}"
                 class="bg-white text-primary px-6 py-3 rounded-full text-lg font-medium border border-white hover:bg-primary hover:text-white transition-all shadow-lg hover:shadow-xl">Discover
                 Our Story</a>
         </div>
