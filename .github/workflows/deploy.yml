@@ -37,7 +37,7 @@ jobs:
           coverage: none
 
       - name: 📦 Install Composer Dependencies
-        run: composer install --optimize-autoloader --no-dev
+        run: composer install --optimize-autoloader
 
       - name: Create .env file from secrets
         run: |
