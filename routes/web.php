@@ -30,6 +30,7 @@ Route::get('register', function () {
 Route::post('master-data/quick-add/{type}', [MasterDataController::class, 'store'])->name('master-data.quick-add');
 
 Route::get('/', [WebController::class, 'index'])->name('index');
+Route::get('/index', [WebController::class, 'index'])->name('index');
 Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-soon');
 Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 
