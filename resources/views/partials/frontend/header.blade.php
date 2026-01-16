@@ -10,7 +10,7 @@
             <!-- Left Nav (Desktop) -->
             <nav
                 class="hidden md:flex items-center gap-6 lg:gap-12 text-lg lg:text-xl font-medium flex-1 justify-start text-primary">
-                <a href="#" class="hover:text-secondary transition-colors">Home</a>
+                <a href="{{ route('index') }}" class="hover:text-secondary transition-colors">Home</a>
                 <a href="#practitioner" class="hover:text-secondary transition-colors">Practitioner</a>
                 <a href="#services" class="hover:text-secondary transition-colors">Services</a>
             </nav>
