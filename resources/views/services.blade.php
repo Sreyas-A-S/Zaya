@@ -127,7 +127,7 @@
         <div class="container mx-auto">
             <!-- Header Row -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-13 gap-6">
-                <h2 class="text-4xl md:text-5xl font-serif text-primary">Ayurveda & Panchakarma</h2>
+                <h2 class="text-4xl lg:text-5xl font-serif text-primary">Ayurveda & Panchakarma</h2>
                 <a href="#" class="bg-secondary text-white px-8 py-3 rounded-full hover:bg-primary transition-colors">
                     Book a Session
                 </a>
@@ -136,7 +136,7 @@
             <!-- Content Row -->
             <div class="grid grid-cols-1 lg:grid-cols-7 gap-12">
                 <!-- Left Content -->
-                <div class="col-span-4 flex gap-12 justify-center items-center">
+                <div class="lg:col-span-4 flex flex-col md:flex-row gap-12 justify-center items-center">
                     <div class="w-full">
                         <p class="text-gray-600 leading-relaxed text-lg">
                             Rooted in 5,000 years of tradition, our Ayurveda sessions offer personalized detoxification and
@@ -163,7 +163,7 @@
                 </div>
 
                 <!-- Right Image -->
-                <div class="col-span-3 overflow-hidden h-[300px]">
+                <div class="lg:col-span-3 overflow-hidden h-[200px] md:h-[300px]">
                     <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma.png') }}" alt="Ayurveda & Panchakarma"
                         class="w-full h-full object-cover">
                 </div>
@@ -176,7 +176,7 @@
         <div class="container mx-auto">
             <!-- Header Row -->
             <div class="flex flex-col md:flex-row-reverse justify-between items-start md:items-center mb-13 gap-6">
-                <h2 class="text-4xl md:text-5xl font-serif text-primary">Yoga Therapy</h2>
+                <h2 class="text-4xl lg:text-5xl font-serif text-primary">Yoga Therapy</h2>
                 <a href="#" class="bg-secondary text-white px-8 py-3 rounded-full hover:bg-primary transition-colors">
                     Book a Session
                 </a>
@@ -185,12 +185,12 @@
             <!-- Content Row -->
             <div class="grid grid-cols-1 lg:grid-cols-7 gap-12">
                 <!-- Right Image -->
-                <div class="col-span-3 overflow-hidden h-[300px]">
+                <div class="lg:col-span-3 overflow-hidden h-[200px] md:h-[300px]">
                     <img src="{{ asset('frontend/assets/yoga-therapy.png') }}" alt="Yoga Therapy"
                         class="w-full h-full object-cover">
                 </div>
                 <!-- Left Content -->
-                <div class="col-span-4 flex md:flex-row-reverse gap-12 justify-center items-center">
+                <div class="lg:col-span-4 flex flex-col md:flex-row-reverse gap-12 justify-center items-center">
                     <div class="w-full">
                         <p class="text-gray-600 leading-relaxed text-lg">
                             Yoga Therapy goes beyond flexibility. It is a clinical approach to healing that combines
@@ -224,7 +224,7 @@
         <div class="container mx-auto">
             <!-- Header Row -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-13 gap-6">
-                <h2 class="text-4xl md:text-5xl font-serif text-primary">Mindfulness Counselling</h2>
+                <h2 class="text-4xl lg:text-5xl font-serif text-primary">Mindfulness Counselling</h2>
                 <a href="#" class="bg-secondary text-white px-8 py-3 rounded-full hover:bg-primary transition-colors">
                     Book a Session
                 </a>
@@ -233,7 +233,7 @@
             <!-- Content Row -->
             <div class="grid grid-cols-1 lg:grid-cols-7 gap-12">
                 <!-- Left Content -->
-                <div class="col-span-4 flex gap-12 justify-center items-center">
+                <div class="lg:col-span-4 flex flex-col md:flex-row gap-12 justify-center items-center">
                     <div class="w-full">
                         <p class="text-gray-600 leading-relaxed text-lg">
                             Cultivate a non-judgmental awareness of the present moment. Our sessions bridge traditional
@@ -259,7 +259,7 @@
                 </div>
 
                 <!-- Right Image -->
-                <div class="col-span-3 overflow-hidden h-[300px]">
+                <div class="lg:col-span-3 overflow-hidden h-[300px]">
                     <img src="{{ asset('frontend/assets/mindfulness-counselling.png') }}" alt="Mindfulness Counselling"
                         class="w-full h-full object-cover">
                 </div>
@@ -272,7 +272,7 @@
         <div class="container mx-auto">
             <!-- Header Row -->
             <div class="flex flex-col md:flex-row-reverse justify-between items-start md:items-center mb-13 gap-6">
-                <h2 class="text-4xl md:text-5xl font-serif text-primary">Spiritual Guidance</h2>
+                <h2 class="text-4xl lg:text-5xl font-serif text-primary">Spiritual Guidance</h2>
                 <a href="#" class="bg-secondary text-white px-8 py-3 rounded-full hover:bg-primary transition-colors">
                     Book a Session
                 </a>
@@ -281,12 +281,12 @@
             <!-- Content Row -->
             <div class="grid grid-cols-1 lg:grid-cols-7 gap-12">
                 <!-- Right Image -->
-                <div class="col-span-3 overflow-hidden h-[300px]">
+                <div class="lg:col-span-3 overflow-hidden h-[200px] md:h-[300px]">
                     <img src="{{ asset('frontend/assets/spiritual-guidance.png') }}" alt="Spiritual Guidance"
                         class="w-full h-full object-cover">
                 </div>
                 <!-- Left Content -->
-                <div class="col-span-4 flex md:flex-row-reverse gap-12 justify-center items-center">
+                <div class="lg:col-span-4 flex flex-col md:flex-row-reverse gap-12 justify-center items-center">
                     <div class="w-full">
                         <p class="text-gray-600 leading-relaxed text-lg">
                             Explore the deeper aspects of your existence. These sessions provide a safe space for inner inquiry, connecting with your purpose, and exploring spiritual practices tailored to your unique path.
