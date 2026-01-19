@@ -29,6 +29,9 @@
             <a href="#"
                 class="hidden md:block bg-primary text-white px-6 py-2.5 rounded-full text-lg font-medium hover:bg-secondary transition-all shadow-lg hover:shadow-xl">Book
                 a Consultation</a>
+            <a href="#"
+                class="hidden md:block text-2xl text-secondary   hover:text-primary transition-colors"><i
+                    class="ri-translate-2"></i></a>
         </div>
 
         <!-- Mobile Placeholder for Right Sizing -->
