@@ -7,15 +7,23 @@ use Illuminate\Http\Request;
 class WebController extends Controller
 {
     //
-    public function index() {
+    public function index()
+    {
         return view('index');
     }
 
-    public function comingSoon() {
+    public function comingSoon()
+    {
         return view('coming-soon');
     }
 
-    public function aboutUs() {
+    public function aboutUs()
+    {
         return view('about');
+    }
+
+    public function services()
+    {
+        return view('services');
     }
 }
