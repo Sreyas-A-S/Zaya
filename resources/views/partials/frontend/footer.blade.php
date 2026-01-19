@@ -1,14 +1,14 @@
     <!-- Footer -->
-    <footer class="mt-[140px] lg:mt-[200px]">
+    <footer class="mt-10 lg:mt-20">
         <div class="relative z-1">
             <!-- Decorative Images -->
             <img src="{{ asset('frontend/assets/leaf-03.png') }}" alt="Leaf Image"
-                class="absolute bottom-full translate-y-[70px] left-0 w-30 md:w-[160px] opacity-80 pointer-events-none -z-10">
+                class="absolute bottom-full translate-y-[70px] left-0 w-30 md:w-[100px] opacity-80 pointer-events-none z-10">
             <img src="{{ asset('frontend/assets/tulsi-image.png') }}" alt="Tulsi Image"
                 class="absolute bottom-full translate-y-[80px] right-0 w-30 md:w-[163px] opacity-80 pointer-events-none z-10">
 
         </div>
-        <div class="p-4">
+        <div class="p-4 relative z-10">
             <div class="container-fluid bg-[#F2F2F2] pl-10 pr-10 pt-16 pb-8 rounded-xl">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     <!-- Column 1 -->
