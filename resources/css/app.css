@@ -11,7 +11,8 @@
     --color-secondary: #2E4B3C;
     --color-accent: #F8E0BB;
     --color-surface: #FFF7EF;
-    
+    --color-light-gold: #FFFABF;
+    --color-light-green: #FEFFF3;
     --font-serif: 'Playfair Display', serif;
     --font-sans: 'Roboto', sans-serif;
 }
@@ -21,7 +22,12 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
-h1,h2,h3,h4,h5,h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: 'Playfair Display', serif;
 }
 
@@ -42,7 +48,8 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #A69076; /* Muted Gold/Brown */
+    background: #A69076;
+    /* Muted Gold/Brown */
     border-radius: 4px;
 }
 

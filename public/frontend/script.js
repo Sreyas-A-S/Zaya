@@ -5,14 +5,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Toggle Mobile Menu
     mobileMenuBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-        // Simple animation logic if needed, or rely on CSS transitions
+        // Toggle animation classes
+        if (mobileMenu.classList.contains('max-h-0')) {
+            // Open
+            mobileMenu.classList.remove('max-h-0', 'opacity-0', 'invisible', '-translate-y-4');
+            mobileMenu.classList.add('max-h-[80vh]', 'opacity-100', 'visible', 'translate-y-0');
+
+            // Wait for transition to finish before allowing scroll
+            setTimeout(() => {
+                mobileMenu.classList.remove('overflow-hidden');
+                mobileMenu.classList.add('overflow-y-auto');
+            }, 300);
+        } else {
+            // Close
+            mobileMenu.classList.remove('overflow-y-auto');
+            mobileMenu.classList.add('overflow-hidden');
+
+            mobileMenu.classList.add('max-h-0', 'opacity-0', 'invisible', '-translate-y-4');
+            mobileMenu.classList.remove('max-h-[80vh]', 'opacity-100', 'visible', 'translate-y-0');
+        }
     });
 
     // Close mobile menu when clicking a link
     mobileMenu.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
+            mobileMenu.classList.remove('overflow-y-auto');
+            mobileMenu.classList.add('overflow-hidden');
+
+            mobileMenu.classList.add('max-h-0', 'opacity-0', 'invisible', '-translate-y-4');
+            mobileMenu.classList.remove('max-h-[80vh]', 'opacity-100', 'visible', 'translate-y-0');
         });
     });
 
@@ -20,11 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
             header.classList.add('glass-nav');
-            header.classList.remove('bg-white', 'py-6');
-            header.classList.add('bg-white/90', 'py-3');
+            // header.classList.remove('bg-white/60');
         } else {
-            header.classList.remove('glass-nav', 'bg-white/90', 'py-3');
-            header.classList.add('bg-white', 'py-6');
+            header.classList.remove('glass-nav');
+            // header.classList.add('bg-white/60');
         }
     });
 
@@ -60,10 +80,14 @@ document.addEventListener('DOMContentLoaded', () => {
             pauseOnMouseEnter: true,
             pauseOnFocus: true,
         },
+        navigation: {
+            nextEl: '.next-practitioner',
+            prevEl: '.prev-practitioner',
+        },
         breakpoints: {
             512: {
                 slidesPerView: 2.3,
-                centeredSlides: false,
+                centeredSlides: true,
             },
             768: {
                 slidesPerView: 3.3,
@@ -74,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 centeredSlides: false,
             },
             1440: {
-                slidesPerView: 5.3,
+                slidesPerView: 4.3,
                 centeredSlides: false,
             },
             1920: {
