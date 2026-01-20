@@ -22,10 +22,10 @@
                     class="absolute top-full left-0 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden">
                     <a href="{{ route('about-us') }}"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">Who
-                        we are</a>
+                        we are?</a>
                     <a href="#"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">What
-                        we do</a>
+                        we do?</a>
                     <a href="#"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Our
                         Team</a>
@@ -86,8 +86,8 @@
         <div class="flex flex-col gap-2">
             <span class="text-lg font-medium text-secondary">About Us</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
-                <a href="{{ route('about-us') }}" class="text-gray-600 text-sm">Who we are</a>
-                <a href="#" class="text-gray-600 text-sm">What we do</a>
+                <a href="{{ route('about-us') }}" class="text-gray-600 text-sm">Who we are?</a>
+                <a href="#" class="text-gray-600 text-sm">What we do?</a>
                 <a href="#" class="text-gray-600 text-sm">Our Team</a>
             </div>
         </div>
@@ -95,9 +95,9 @@
         <div class="flex flex-col gap-2">
             <span class="text-lg font-medium text-secondary">Services</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
-                <a href="{{ route('services') }}" class="text-gray-600 text-sm">All Services</a>
-                <a href="#" class="text-gray-600 text-sm">Yoga Therapy</a>
-                <a href="#" class="text-gray-600 text-sm">Naturopathy</a>
+                <a href="{{ route('services') }}" class="text-gray-600 text-sm">Ayurveda</a>
+                <a href="#" class="text-gray-600 text-sm">Yoga</a>
+                <a href="#" class="text-gray-600 text-sm">Counselling</a>
             </div>
         </div>
 
