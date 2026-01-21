@@ -62,4 +62,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(MindfulnessCounsellor::class);
     }
+    public function translator()
+    {
+        return $this->hasOne(Translator::class);
+    }
 }

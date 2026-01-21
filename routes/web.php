@@ -43,9 +43,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::resource('practitioners', App\Http\Controllers\Admin\PractitionerController::class);
     Route::post('practitioners/{id}/status', [App\Http\Controllers\Admin\PractitionerController::class, 'updateStatus'])->name('practitioners.status');
 
-    Route::resource('mindfulness-practitioners', App\Http\Controllers\Admin\MindfulnessPractitionerController::class);
-    Route::post('mindfulness-practitioners/{id}/status', [App\Http\Controllers\Admin\MindfulnessPractitionerController::class, 'updateStatus'])->name('mindfulness-practitioners.status');
+    Route::resource('mindfulness-practitioners', App\Http\Controllers\Admin\MindfulnessCounsellorController::class);
+    Route::post('mindfulness-practitioners/{id}/status', [App\Http\Controllers\Admin\MindfulnessCounsellorController::class, 'updateStatus'])->name('mindfulness-practitioners.status');
     Route::resource('clients', App\Http\Controllers\Admin\ClientController::class);
+    Route::resource('translators', App\Http\Controllers\Admin\TranslatorController::class);
+    Route::post('translators/{id}/status', [App\Http\Controllers\Admin\TranslatorController::class, 'updateStatus'])->name('translators.status');
     Route::resource('roles', App\Http\Controllers\Admin\RoleController::class);
     Route::get('roles/{role}/permissions', [App\Http\Controllers\Admin\RoleController::class, 'showPermissions'])->name('roles.permissions');
     Route::post('roles/{role}/permissions', [App\Http\Controllers\Admin\RoleController::class, 'updatePermissions'])->name('roles.permissions.update');

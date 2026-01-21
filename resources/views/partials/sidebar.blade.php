@@ -43,6 +43,7 @@
                     <li> <a href="{{ route('admin.practitioners.index') }}">Practitioners</a></li>
                     <li> <a href="{{ route('admin.mindfulness-practitioners.index') }}">Mindfulness Counsellors</a></li>
                     <li> <a href="{{ route('admin.clients.index') }}">Clients</a></li>
+                    <li> <a href="{{ route('admin.translators.index') }}">Translators</a></li>
                 </ul>
             </li>
 
@@ -98,6 +99,17 @@
                         <ul class="according-submenu ps-3" style="display: none;">
                             <li><a href="{{ route('admin.master-data.index', 'mindfulness_services') }}">Services Offered</a></li>
                             <li><a href="{{ route('admin.master-data.index', 'client_concerns') }}">Client Concerns</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a class="submenu-title mt-2 fw-bold text-primary d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                            Translator Settings
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.master-data.index', 'translator_services') }}">Services Offered</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'translator_specializations') }}">Specializations</a></li>
                         </ul>
                     </li>
                 </ul>

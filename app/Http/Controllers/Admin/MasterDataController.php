@@ -28,6 +28,8 @@ class MasterDataController extends Controller
         'client_consultation_preferences' => ClientConsultationPreference::class,
         'mindfulness_services' => \App\Models\MindfulnessService::class,
         'client_concerns' => \App\Models\ClientConcern::class,
+        'translator_services' => \App\Models\TranslatorService::class,
+        'translator_specializations' => \App\Models\TranslatorSpecialization::class,
     ];
 
     protected $titles = [
@@ -41,6 +43,8 @@ class MasterDataController extends Controller
         'client_consultation_preferences' => 'Client Settings', // Client Consultation Preferences
         'mindfulness_services' => 'Mindfulness Services Offered',
         'client_concerns' => 'Client Concerns Supported',
+        'translator_services' => 'Translator Services',
+        'translator_specializations' => 'Translator Specializations',
     ];
 
     public function index(Request $request, $type)

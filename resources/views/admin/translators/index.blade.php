@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
-@section('title', 'Mindfulness Counsellors')
+@section('title', 'Translators')
 
 @section('content')
 <div class="container-fluid">
     <div class="page-title">
         <div class="row">
             <div class="col-sm-6">
-                <h3>Mindfulness Counsellors</h3>
+                <h3>Translators</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="fa-solid fa-house"></i></a></li>
-                    <li class="breadcrumb-item">Practitioners</li>
-                    <li class="breadcrumb-item active">Mindfulness Counsellors</li>
+                    <li class="breadcrumb-item">Users</li>
+                    <li class="breadcrumb-item active">Translators</li>
                 </ol>
             </div>
         </div>
@@ -25,14 +25,14 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
-                    <h3>Counsellors List</h3>
+                    <h3>Translators List</h3>
                     <button type="button" class="btn btn-primary" onclick="openCreateModal()">
                         <i class="fa-solid fa-plus me-2"></i>Register New
                     </button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="display" id="practitioners-table">
+                        <table class="display" id="translators-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -40,7 +40,8 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    <th>Gender</th>
+                                    <th>Native Lang</th>
+                                    <th>Type</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -56,11 +57,11 @@
 </div>
 
 <!-- Create/Edit Modal -->
-<div class="modal fade" id="practitioner-form-modal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="translator-form-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="form-modal-title">Register Mindfulness Practitioner</h5>
+                <h5 class="modal-title" id="form-modal-title">Register Translator</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4" style="max-height: 80vh; overflow-y: auto;">
@@ -68,37 +69,37 @@
                     <div class="row g-3">
                         <div class="col-12">
                             <!-- Stepper -->
-                            <div class="stepper-horizontal mb-5" id="practitioner-stepper">
+                            <div class="stepper-horizontal mb-5" id="translator-stepper">
                                 <div class="stepper-item active" data-step="1">
                                     <div class="step-counter">1</div>
                                     <div class="step-name text-nowrap">Personal Details</div>
                                 </div>
                                 <div class="stepper-item" data-step="2">
                                     <div class="step-counter">2</div>
-                                    <div class="step-name text-nowrap">Professional Identity</div>
+                                    <div class="step-name text-nowrap">Language Details</div>
                                 </div>
                                 <div class="stepper-item" data-step="3">
                                     <div class="step-counter">3</div>
-                                    <div class="step-name text-nowrap">Qualifications</div>
+                                    <div class="step-name text-nowrap">Professional Details</div>
                                 </div>
                                 <div class="stepper-item" data-step="4">
                                     <div class="step-counter">4</div>
-                                    <div class="step-name text-nowrap">Expertise</div>
+                                    <div class="step-name text-nowrap">Qualifications</div>
                                 </div>
                                 <div class="stepper-item" data-step="5">
                                     <div class="step-counter">5</div>
-                                    <div class="step-name text-nowrap">Consultation & ID</div>
+                                    <div class="step-name text-nowrap">Services</div>
                                 </div>
                                 <div class="stepper-item" data-step="6">
                                     <div class="step-counter">6</div>
-                                    <div class="step-name text-nowrap">Profile</div>
+                                    <div class="step-name text-nowrap">Identity & Payment</div>
                                 </div>
                             </div>
 
-                            <form id="practitioner-form" method="POST" enctype="multipart/form-data" class="theme-form">
+                            <form id="translator-form" method="POST" enctype="multipart/form-data" class="theme-form">
                                 @csrf
                                 <input type="hidden" name="_method" id="form-method" value="POST">
-                                <input type="hidden" name="practitioner_id" id="practitioner_id">
+                                <input type="hidden" name="translator_id" id="translator_id">
 
                                 <!-- Step 1: Personal Details -->
                                 <div class="step-content" id="step-1">
@@ -124,6 +125,10 @@
                                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
                                             <input class="form-control" type="email" name="email" required>
                                         </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="phone" required>
+                                        </div>
                                         <div class="col-md-4 password-field">
                                             <label class="form-label">Password <span class="text-danger">*</span></label>
                                             <input class="form-control" type="password" name="password">
@@ -131,10 +136,6 @@
                                         <div class="col-md-4 password-field">
                                             <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                             <input class="form-control" type="password" name="password_confirmation">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="phone" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Gender</label>
@@ -156,19 +157,54 @@
                                     </div>
                                 </div>
 
-                                <!-- Step 2: Professional Identity -->
+                                <!-- Step 2: Language Details -->
                                 <div class="step-content d-none" id="step-2">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label">Counsellor Type</label>
-                                            <select class="form-select" name="practitioner_type">
-                                                <option value="" selected disabled>Select Type</option>
-                                                <option value="Mindfulness Coach">Mindfulness Coach</option>
-                                                <option value="Meditation Teacher">Meditation Teacher</option>
-                                                <option value="Breathwork Facilitator">Breathwork Facilitator</option>
-                                                <option value="Yoga + Mindfulness Instructor">Yoga + Mindfulness Instructor</option>
-                                                <option value="Stress Management Coach">Stress Management Coach</option>
-                                                <option value="Other">Other</option>
+                                            <label class="form-label">Native Language</label>
+                                            <select class="form-select" name="native_language">
+                                                <option value="">Select</option>
+                                                @foreach($languages as $lang)
+                                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Source Languages</label>
+                                            <select class="form-select" id="source_languages_select" name="source_languages[]" multiple>
+                                                @foreach($languages as $lang)
+                                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Target Languages</label>
+                                            <select class="form-select" id="target_languages_select" name="target_languages[]" multiple>
+                                                @foreach($languages as $lang)
+                                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Additional Languages</label>
+                                            <select class="form-select" id="additional_languages_select" name="additional_languages[]" multiple>
+                                                @foreach($languages as $lang)
+                                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 3: Professional Details -->
+                                <div class="step-content d-none" id="step-3">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Translator Type</label>
+                                            <select class="form-select" name="translator_type">
+                                                <option value="Freelance">Freelance</option>
+                                                <option value="Agency">Agency</option>
+                                                <option value="In-house">In-house</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
@@ -176,44 +212,65 @@
                                             <input class="form-control" type="number" name="years_of_experience">
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Current Workplace / Organization</label>
-                                            <input class="form-control" type="text" name="current_workplace">
+                                            <label class="form-label fw-bold">Fields of Specialization</label>
+                                            <div class="row">
+                                                @foreach($specializations as $spec)
+                                                <div class="col-md-4">
+                                                    <div class="form-check checkbox-secondary">
+                                                        <input class="form-check-input" type="checkbox" name="fields_of_specialization[]" value="{{ $spec->name }}" id="spec_{{ $spec->id }}">
+                                                        <label class="form-check-label" for="spec_{{ $spec->id }}">{{ $spec->name }}</label>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                                <div class="col-12 mt-2">
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" class="form-control new-master-data-input" data-type="translator_specializations" placeholder="Add New Specialization">
+                                                        <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <!-- Website / Social Media Links handled as simple inputs for simplicity -->
-                                        <!-- Or basic dynamic list via JS later if needed. -->
+                                        <div class="col-md-12">
+                                            <label class="form-label">Previous Clients / Projects</label>
+                                            <textarea class="form-control" name="previous_clients_projects" rows="2"></textarea>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Portfolio / Sample Work Link</label>
+                                            <input class="form-control" type="url" name="portfolio_link">
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Step 3: Qualifications -->
-                                <div class="step-content d-none" id="step-3">
+                                <!-- Step 4: Qualifications -->
+                                <div class="step-content d-none" id="step-4">
                                     <div class="row g-3">
                                         <div class="col-md-12">
-                                            <label class="form-label">Highest Education</label>
+                                            <label class="form-label">Highest Education Qualification</label>
                                             <input class="form-control" type="text" name="highest_education">
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Mindfulness Training Details</label>
-                                            <textarea class="form-control" name="mindfulness_training_details" rows="3"></textarea>
+                                            <label class="form-label">Translation Certification Details</label>
+                                            <textarea class="form-control" name="certification_details" rows="2"></textarea>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <label class="form-label">Upload Certificates (Multiple)</label>
                                             <input class="form-control" type="file" name="certificates[]" multiple>
                                         </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Additional Certifications (Optional)</label>
-                                            <textarea class="form-control" name="additional_certifications" rows="2"></textarea>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Upload Sample Work (Multiple)</label>
+                                            <input class="form-control" type="file" name="sample_work[]" multiple>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Step 4: Areas of Expertise -->
-                                <div class="step-content d-none" id="step-4">
+                                <!-- Step 5: Services Offered -->
+                                <div class="step-content d-none" id="step-5">
                                     <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Services Offered</label>
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-bold">Select Services Offered</label>
                                             <div class="row">
                                                 @foreach($servicesOffered as $service)
-                                                <div class="col-12">
+                                                <div class="col-md-6">
                                                     <div class="form-check checkbox-primary">
                                                         <input class="form-check-input" type="checkbox" name="services_offered[]" value="{{ $service->name }}" id="service_{{ $service->id }}">
                                                         <label class="form-check-label" for="service_{{ $service->id }}">{{ $service->name }}</label>
@@ -222,26 +279,7 @@
                                                 @endforeach
                                                 <div class="col-12 mt-2">
                                                     <div class="input-group input-group-sm">
-                                                        <input type="text" class="form-control new-master-data-input" data-type="mindfulness_services" placeholder="Add New Service">
-                                                        <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Client Concerns Supported</label>
-                                            <div class="row">
-                                                @foreach($clientConcerns as $concern)
-                                                <div class="col-12">
-                                                    <div class="form-check checkbox-secondary">
-                                                        <input class="form-check-input" type="checkbox" name="client_concerns[]" value="{{ $concern->name }}" id="concern_{{ $concern->id }}">
-                                                        <label class="form-check-label" for="concern_{{ $concern->id }}">{{ $concern->name }}</label>
-                                                    </div>
-                                                </div>
-                                                @endforeach
-                                                <div class="col-12 mt-2">
-                                                    <div class="input-group input-group-sm">
-                                                        <input type="text" class="form-control new-master-data-input" data-type="client_concerns" placeholder="Add New Concern">
+                                                        <input type="text" class="form-control new-master-data-input" data-type="translator_services" placeholder="Add New Service">
                                                         <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
                                                     </div>
                                                 </div>
@@ -250,30 +288,9 @@
                                     </div>
                                 </div>
 
-                                <!-- Step 5: Consultation Setup & Identity -->
-                                <div class="step-content d-none" id="step-5">
+                                <!-- Step 6: Identity & Payment -->
+                                <div class="step-content d-none" id="step-6">
                                     <div class="row g-3">
-                                        <div class="col-md-12">
-                                            <label class="form-label fw-bold">Consultation Modes</label>
-                                            <div class="d-flex gap-3 flex-wrap">
-                                                @foreach($consultationModes as $mode)
-                                                <div class="form-check checkbox-info">
-                                                    <input class="form-check-input" type="checkbox" name="consultation_modes[]" value="{{ $mode }}" id="mode_{{ $loop->index }}">
-                                                    <label class="form-check-label" for="mode_{{ $loop->index }}">{{ $mode }}</label>
-                                                </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label fw-bold">Languages Spoken</label>
-                                            <select class="form-select" id="languages_select" name="languages_spoken[]" multiple>
-                                                @foreach($languages as $lang)
-                                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <hr>
-                                        <h6 class="text-primary">Identity & Payment</h6>
                                         <div class="col-md-6">
                                             <label class="form-label">Government ID Type</label>
                                             <input class="form-control" type="text" name="gov_id_type">
@@ -283,12 +300,8 @@
                                             <input class="form-control" type="file" name="gov_id_upload">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">PAN Number</label>
+                                            <label class="form-label">PAN Number (optional)</label>
                                             <input class="form-control" type="text" name="pan_number">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Upload Cancelled Cheque</label>
-                                            <input class="form-control" type="file" name="cancelled_cheque">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Bank Holder Name</label>
@@ -307,26 +320,16 @@
                                             <input class="form-control" type="text" name="ifsc_code">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">UPI ID</label>
+                                            <label class="form-label">SWIFT Code</label>
+                                            <input class="form-control" type="text" name="swift_code">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">UPI ID (optional)</label>
                                             <input class="form-control" type="text" name="upi_id">
                                         </div>
-                                    </div>
-                                </div>
-
-                                <!-- Step 6: Platform Profile -->
-                                <div class="step-content d-none" id="step-6">
-                                    <div class="row g-3">
-                                        <div class="col-md-12">
-                                            <label class="form-label">Short Bio</label>
-                                            <textarea class="form-control" name="short_bio" rows="4"></textarea>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Coaching Style / Approach</label>
-                                            <textarea class="form-control" name="coaching_style" rows="3"></textarea>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Who you work best with (Target Audience)</label>
-                                            <textarea class="form-control" name="target_audience" rows="2"></textarea>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Cancelled Cheque / Passbook Upload</label>
+                                            <input class="form-control" type="file" name="cancelled_cheque">
                                         </div>
                                     </div>
                                 </div>
@@ -349,11 +352,11 @@
 </div>
 
 <!-- View Modal -->
-<div class="modal fade" id="practitioner-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="translator-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Practitioner Details</h5>
+                <h5 class="modal-title">Translator Details</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="view-modal-content">
@@ -364,16 +367,16 @@
 </div>
 
 <!-- Delete Modal -->
-<div class="modal fade" id="practitioner-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="translator-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Delete Practitioner</h5>
+                <h5 class="modal-title">Delete Translator</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this practitioner? This action cannot be undone.</p>
-                <input type="hidden" id="delete-practitioner-id">
+                <p>Are you sure you want to delete this translator? This action cannot be undone.</p>
+                <input type="hidden" id="delete-translator-id">
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
@@ -393,7 +396,7 @@
             </div>
             <div class="modal-body">
                 <p id="status-confirmation-msg">Are you sure you want to change the status?</p>
-                <input type="hidden" id="status-practitioner-id">
+                <input type="hidden" id="status-translator-id">
                 <input type="hidden" id="status-new-value">
             </div>
             <div class="modal-footer">
@@ -413,13 +416,14 @@
     let table;
     let currentStep = 1;
     const totalSteps = 6;
+    let sourceLangChoices, targetLangChoices, addLangChoices;
 
     $(document).ready(function() {
         // DataTable
-        table = $('#practitioners-table').DataTable({
+        table = $('#translators-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('admin.mindfulness-practitioners.index') }}",
+            ajax: "{{ route('admin.translators.index') }}",
             columns: [{
                     data: 'id',
                     name: 'id'
@@ -440,15 +444,19 @@
                 },
                 {
                     data: 'phone',
-                    name: 'mindfulness_counsellors.phone'
+                    name: 'translators.phone'
                 },
                 {
-                    data: 'gender',
-                    name: 'mindfulness_counsellors.gender'
+                    data: 'native_language',
+                    name: 'translators.native_language'
+                },
+                {
+                    data: 'translator_type',
+                    name: 'translators.translator_type'
                 },
                 {
                     data: 'status',
-                    name: 'mindfulness_counsellors.status'
+                    name: 'translators.status'
                 },
                 {
                     data: 'action',
@@ -460,12 +468,22 @@
         });
 
         // Initialize Choices.js
-        if (document.getElementById('languages_select')) {
-            languageChoices = new Choices('#languages_select', {
+        if (document.getElementById('source_languages_select')) {
+            sourceLangChoices = new Choices('#source_languages_select', {
                 removeItemButton: true,
-                searchEnabled: true,
-                shouldSort: false,
-                placeholderValue: 'Select Languages',
+                placeholderValue: 'Select Source Languages',
+            });
+        }
+        if (document.getElementById('target_languages_select')) {
+            targetLangChoices = new Choices('#target_languages_select', {
+                removeItemButton: true,
+                placeholderValue: 'Select Target Languages',
+            });
+        }
+        if (document.getElementById('additional_languages_select')) {
+            addLangChoices = new Choices('#additional_languages_select', {
+                removeItemButton: true,
+                placeholderValue: 'Select Additional Languages',
             });
         }
 
@@ -479,12 +497,68 @@
             }
         });
 
-        // Stepper Click
+        $('#prev-btn').click(function() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepper();
+            }
+        });
+
         $('.stepper-item').click(function() {
+            // Optional: Add validation before jumping
             let step = $(this).data('step');
             currentStep = step;
             updateStepper();
         });
+
+        function updateStepper() {
+            $('.step-content').addClass('d-none');
+            $('#step-' + currentStep).removeClass('d-none');
+
+            $('.stepper-item').removeClass('active completed');
+            for (let i = 1; i <= totalSteps; i++) {
+                if (i === currentStep) {
+                    $('.stepper-item[data-step="' + i + '"]').addClass('active');
+                } else if (i < currentStep) {
+                    $('.stepper-item[data-step="' + i + '"]').addClass('completed');
+                }
+            }
+
+            // Scroll to top of stepper
+            document.getElementById('translator-stepper').scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            if (currentStep === 1) {
+                $('#prev-btn').hide();
+            } else {
+                $('#prev-btn').show();
+            }
+
+            if (currentStep === totalSteps) {
+                $('#next-btn').hide();
+                $('#submit-btn').show();
+            } else {
+                $('#next-btn').show();
+                $('#submit-btn').hide();
+            }
+        }
+
+        function validateStep(step) {
+            let isValid = true;
+            let $step = $('#step-' + step);
+            // Basic required validation for visible inputs in current step
+            $step.find('input[required], select[required]').each(function() {
+                if (!$(this).val()) {
+                    isValid = false;
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+            return isValid;
+        }
 
         // Image Preview
         $("#imageUpload").change(function() {
@@ -503,23 +577,45 @@
             }
         }
 
+        function openCreateModal() {
+            $('#translator-form')[0].reset();
+            $('#translator_id').val('');
+            $('#form-method').val('POST');
+            $('#form-modal-title').text('Register Translator');
+            $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+
+            // Show password fields
+            $('.password-field').show();
+            $('input[name="password"]').attr('required', 'required');
+            $('input[name="password_confirmation"]').attr('required', 'required');
+
+            // Reset Choices
+            if (sourceLangChoices) sourceLangChoices.removeActiveItems();
+            if (targetLangChoices) targetLangChoices.removeActiveItems();
+            if (addLangChoices) addLangChoices.removeActiveItems();
+
+            currentStep = 1;
+            updateStepper();
+            $('#translator-form-modal').modal('show');
+        }
+        window.openCreateModal = openCreateModal; // Expose to global scope for button click
+
         // Master Data Quick Add
         $(document).on('click', '.add-master-data-btn', function() {
             let btn = $(this);
             let input = btn.siblings('.new-master-data-input');
             let type = input.data('type');
             let value = input.val().trim();
-            // The row containing checkboxes is the first .row element BEFORE the input's container
-            let container = btn.closest('.col-12').siblings('.col-12').find('.form-check').closest('.row');
-            // Actually, looking at the HTML structure I added:
-            // <div class="col-12">... checkboxes ...</div>
-            // <div class="col-12 mt-2">... input ...</div>
-            // This structure is within a .col-md-6. So container is:
-            container = btn.closest('.col-md-6').find('.row').first();
-
-            if (!value) {
-                return;
+            // Container logic similar to previous implementation
+            // Assuming structure: <div class="col-12/md-x"> <div class="row"> ...checkboxes... <div class="col-12 mt-2">...input...</div> </div> </div>
+            let container = null;
+            if (type === 'translator_specializations') {
+                container = btn.closest('.row').find('.col-md-4').parent();
+            } else {
+                container = btn.closest('.row').find('.col-md-6').parent();
             }
+
+            if (!value) return;
 
             btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
 
@@ -533,38 +629,28 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        let checkboxName = '';
-                        let idPrefix = '';
-                        if (type === 'mindfulness_services') {
-                            checkboxName = 'services_offered[]';
-                            idPrefix = 'service_';
-                        } else if (type === 'client_concerns') {
-                            checkboxName = 'client_concerns[]';
-                            idPrefix = 'concern_';
-                        }
-
+                        let checkboxName = type === 'translator_services' ? 'services_offered[]' : 'fields_of_specialization[]';
+                        let idPrefix = type === 'translator_services' ? 'service_' : 'spec_';
+                        let colClass = type === 'translator_services' ? 'col-md-6' : 'col-md-4';
                         let newId = response.data.id;
                         let newName = response.data.name;
 
                         let html = `
-                            <div class="col-12">
-                                <div class="form-check checkbox-${type === 'mindfulness_services' ? 'primary' : 'secondary'}">
+                            <div class="${colClass}">
+                                <div class="form-check checkbox-${type === 'translator_services' ? 'primary' : 'secondary'}">
                                     <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
                                     <label class="form-check-label" for="${idPrefix}${newId}">${newName}</label>
                                 </div>
                             </div>
                         `;
-                        container.append(html);
+                        // Insert before the input container (col-12 mt-2)
+                        btn.closest('.col-12').before(html);
                         input.val('');
-                        if (typeof showToast === 'function') {
-                            showToast(response.success);
-                        }
+                        if (typeof showToast === 'function') showToast(response.success);
                     }
                 },
                 error: function(xhr) {
-                    if (typeof showToast === 'function') {
-                        showToast('Error: ' + (xhr.responseJSON?.error || 'Could not add item'), 'error');
-                    }
+                    if (typeof showToast === 'function') showToast('Error adding item', 'error');
                 },
                 complete: function() {
                     btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
@@ -572,23 +658,11 @@
             });
         });
 
-
-        $('#prev-btn').click(function() {
-            if (currentStep > 1) {
-                currentStep--;
-                updateStepper();
-            }
-        });
-
-
-
-
-
         // Form Submit
-        $('#practitioner-form').on('submit', function(e) {
+        $('#translator-form').on('submit', function(e) {
             e.preventDefault();
-            let id = $('#practitioner_id').val();
-            let url = id ? "{{ url('admin/mindfulness-practitioners') }}/" + id : "{{ route('admin.mindfulness-practitioners.store') }}";
+            let id = $('#translator_id').val();
+            let url = id ? "{{ url('admin/translators') }}/" + id : "{{ route('admin.translators.store') }}";
             let formData = new FormData(this);
 
             let btn = $('#submit-btn');
@@ -601,20 +675,14 @@
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    $('#practitioner-form-modal').modal('hide');
+                    $('#translator-form-modal').modal('hide');
                     table.draw();
-                    if (typeof showToast === 'function') {
-                        showToast(response.success);
-                    } else {
-                        alert(response.success);
-                    }
+                    if (typeof showToast === 'function') showToast(response.success);
                 },
                 error: function(xhr) {
-                    if (typeof showToast === 'function') {
-                        showToast('Error: ' + (xhr.responseJSON.error || 'Unknown error'), 'error');
-                    } else {
-                        alert('Error: ' + (xhr.responseJSON.error || 'Unknown error'));
-                    }
+                    let msg = xhr.responseJSON ? xhr.responseJSON.error || xhr.responseJSON.message : 'Error occurred';
+                    if (typeof showToast === 'function') showToast(msg, 'error');
+                    else alert(msg);
                 },
                 complete: function() {
                     btn.prop('disabled', false).html('Submit');
@@ -623,150 +691,146 @@
         });
 
         // Edit
-        $('body').on('click', '.editPractitioner', function() {
+        $('body').on('click', '.editTranslator', function() {
             let id = $(this).data('id');
-            $('#practitioner-form')[0].reset();
-            $('#practitioner_id').val(id);
+            openCreateModal(); // Reset form first
+            $('#translator_id').val(id);
             $('#form-method').val('PUT');
-            $('#form-modal-title').text('Edit Counsellor');
+            $('#form-modal-title').text('Edit Translator');
 
-            // Password fields specific logic
             $('.password-field').hide();
             $('input[name="password"]').removeAttr('required');
             $('input[name="password_confirmation"]').removeAttr('required');
 
-            $.get("{{ url('admin/mindfulness-practitioners') }}/" + id + "/edit", function(response) {
+            $.get("{{ url('admin/translators') }}/" + id + "/edit", function(response) {
                 let u = response.user;
-                let p = response.practitioner;
+                let t = response.translator;
 
-                // Populate fields
                 $('input[name="full_name"]').val(u.name);
                 $('input[name="email"]').val(u.email);
-                $('input[name="phone"]').val(p.phone);
-                $('select[name="gender"]').val(p.gender);
-                // ... Populate other fields mapping
-                // For checkboxes and arrays, it is more complex. I will just do basic ones and basic mapping for now.
-                // In production, proper mapping for checkboxes is needed.
-                // Assuming p.services_offered is array
-                if (p.services_offered) {
-                    p.services_offered.forEach(v => {
-                        $(`input[name="services_offered[]"][value="${v}"]`).prop('checked', true);
+                $('input[name="phone"]').val(t.phone);
+                $('input[name="dob"]').val(t.dob); // Ensure date format matches YYYY-MM-DD
+                $('textarea[name="address"]').val(t.address);
+                $('select[name="gender"]').val(t.gender);
+
+                if (t.profile_photo_path) {
+                    $('#imagePreview').css('background-image', 'url(/storage/' + t.profile_photo_path + ')');
+                }
+
+                $('select[name="native_language"]').val(t.native_language);
+
+                // Set Choices
+                if (sourceLangChoices && t.source_languages) sourceLangChoices.setChoiceByValue(t.source_languages);
+                if (targetLangChoices && t.target_languages) targetLangChoices.setChoiceByValue(t.target_languages);
+                if (addLangChoices && t.additional_languages) addLangChoices.setChoiceByValue(t.additional_languages);
+
+                $('select[name="translator_type"]').val(t.translator_type);
+                $('input[name="years_of_experience"]').val(t.years_of_experience);
+
+                // Checkboxes
+                if (t.fields_of_specialization) {
+                    t.fields_of_specialization.forEach(val => {
+                        $(`input[name="fields_of_specialization[]"][value="${val}"]`).prop('checked', true);
                     });
                 }
 
-                // Reset stepper to 1
-                currentStep = 1;
-                updateStepper();
-                $('#practitioner-form-modal').modal('show');
+                $('textarea[name="previous_clients_projects"]').val(t.previous_clients_projects);
+                $('input[name="portfolio_link"]').val(t.portfolio_link);
+
+                $('input[name="highest_education"]').val(t.highest_education);
+                $('textarea[name="certification_details"]').val(t.certification_details);
+
+                if (t.services_offered) {
+                    t.services_offered.forEach(val => {
+                        $(`input[name="services_offered[]"][value="${val}"]`).prop('checked', true);
+                    });
+                }
+
+                $('input[name="gov_id_type"]').val(t.gov_id_type);
+                $('input[name="pan_number"]').val(t.pan_number);
+                $('input[name="bank_holder_name"]').val(t.bank_holder_name);
+                $('input[name="bank_name"]').val(t.bank_name);
+                $('input[name="account_number"]').val(t.account_number);
+                $('input[name="ifsc_code"]').val(t.ifsc_code);
+                $('input[name="swift_code"]').val(t.swift_code);
+                $('input[name="upi_id"]').val(t.upi_id);
             });
         });
 
         // Delete
-        $('body').on('click', '.deletePractitioner', function() {
-            $('#delete-practitioner-id').val($(this).data('id'));
-            $('#practitioner-delete-modal').modal('show');
+        $('body').on('click', '.deleteTranslator', function() {
+            $('#delete-translator-id').val($(this).data('id'));
+            $('#translator-delete-modal').modal('show');
         });
 
         $('#confirm-delete-btn').click(function() {
-            let id = $('#delete-practitioner-id').val();
+            let id = $('#delete-translator-id').val();
             $.ajax({
-                url: "{{ url('admin/mindfulness-practitioners') }}/" + id,
+                url: "{{ url('admin/translators') }}/" + id,
                 type: 'DELETE',
                 data: {
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(res) {
-                    $('#practitioner-delete-modal').modal('hide');
+                    $('#translator-delete-modal').modal('hide');
                     table.draw();
-                    if (typeof showToast === 'function') {
-                        showToast(res.success);
-                    } else {
-                        alert(res.success);
-                    }
+                    if (typeof showToast === 'function') showToast(res.success);
                 }
             });
         });
 
         // View
-        $('body').on('click', '.viewPractitioner', function() {
+        $('body').on('click', '.viewTranslator', function() {
             let id = $(this).data('id');
-            $.get("{{ url('admin/mindfulness-practitioners') }}/" + id, function(response) {
+            $.get("{{ url('admin/translators') }}/" + id, function(response) {
                 let u = response.user;
-                let p = response.practitioner;
+                let t = response.translator;
 
                 let html = `
                     <div class="row g-3">
                         <div class="col-md-4 text-center">
-                            <img src="${p.profile_photo_path ? '/storage/' + p.profile_photo_path : '{{ asset('admiro/assets/images/user/user.png') }}'}" 
+                            <img src="${t.profile_photo_path ? '/storage/' + t.profile_photo_path : '{{ asset('admiro/assets/images/user/user.png') }}'}" 
                                  class="rounded-circle img-thumbnail mb-3" style="width: 120px; height: 120px; object-fit: cover;">
                             <h5>${u.name}</h5>
                             <p class="text-muted mb-1">${u.email}</p>
-                            <span class="badge ${p.status === 'active' ? 'bg-success' : 'bg-warning'}">${p.status.toUpperCase()}</span>
+                            <span class="badge ${t.status === 'active' ? 'bg-success' : 'bg-warning'}">${t.status.toUpperCase()}</span>
                         </div>
                         <div class="col-md-8">
-                            <h6 class="border-bottom pb-2 mb-3">Professional Details</h6>
-                            <div class="row mb-2">
-                                <div class="col-4 fw-bold">Practitioner Type:</div>
-                                <div class="col-8">${p.practitioner_type || 'N/A'}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4 fw-bold">Experience:</div>
-                                <div class="col-8">${p.years_of_experience || '0'} Years</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4 fw-bold">Workplace:</div>
-                                <div class="col-8">${p.current_workplace || 'N/A'}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4 fw-bold">Education:</div>
-                                <div class="col-8">${p.highest_education || 'N/A'}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-12 mt-4">
-                            <h6 class="border-bottom pb-2 mb-3">Practice Infomation</h6>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <strong>Services:</strong><br>
-                                    ${p.services_offered ? p.services_offered.join(', ') : 'None'}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>Languages:</strong><br>
-                                    ${p.languages_spoken ? p.languages_spoken.join(', ') : 'None'}
-                                </div>
-                            </div>
+                            <h6 class="border-bottom pb-2 mb-3">Professional Info</h6>
+                            <p><strong>Type:</strong> ${t.translator_type || 'N/A'}</p>
+                            <p><strong>Native Language:</strong> ${t.native_language || 'N/A'}</p>
+                            <p><strong>Source Languages:</strong> ${t.source_languages ? t.source_languages.join(', ') : 'N/A'}</p>
+                            <p><strong>Target Languages:</strong> ${t.target_languages ? t.target_languages.join(', ') : 'N/A'}</p>
+                            <p><strong>Specializations:</strong> ${t.fields_of_specialization ? t.fields_of_specialization.join(', ') : 'N/A'}</p>
                         </div>
                     </div>
                 `;
                 $('#view-modal-content').html(html);
-                $('#practitioner-view-modal').modal('show');
+                $('#translator-view-modal').modal('show');
             });
         });
 
-
-        // Status Toggle Handler (Triggers Modal)
+        // Status Toggle
         $('body').on('click', '.toggle-status', function() {
             var id = $(this).data('id');
             var currentStatus = $(this).data('status');
             var newStatus = (currentStatus === 'active') ? 'inactive' : 'active';
             var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
 
-            $('#status-practitioner-id').val(id);
+            $('#status-translator-id').val(id);
             $('#status-new-value').val(newStatus);
             $('#status-confirmation-msg').text(`Are you sure you want to change the status to ${newStatusText}?`);
             $('#status-confirmation-modal').modal('show');
         });
 
-        // Handle Confirm Status Change
         $('#confirm-status-btn').on('click', function() {
-            var id = $('#status-practitioner-id').val();
+            var id = $('#status-translator-id').val();
             var newStatus = $('#status-new-value').val();
             var btn = $(this);
-
             btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
 
             $.ajax({
-                url: "{{ url('admin/mindfulness-practitioners') }}/" + id + "/status",
+                url: "{{ url('admin/translators') }}/" + id + "/status",
                 type: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',
@@ -775,18 +839,7 @@
                 success: function(response) {
                     $('#status-confirmation-modal').modal('hide');
                     table.draw(false);
-                    if (typeof showToast === 'function') {
-                        showToast(response.success);
-                    } else {
-                        alert(response.success);
-                    }
-                },
-                error: function(xhr) {
-                    if (typeof showToast === 'function') {
-                        showToast('Error: ' + (xhr.responseJSON.error || 'Unknown error'), 'error');
-                    } else {
-                        alert('Error: ' + (xhr.responseJSON.error || 'Unknown error'));
-                    }
+                    if (typeof showToast === 'function') showToast(response.success);
                 },
                 complete: function() {
                     btn.prop('disabled', false).html('Confirm Change');
@@ -794,69 +847,16 @@
             });
         });
     });
-
-    function updateStepper() {
-        $('.step-content').addClass('d-none');
-        $('#step-' + currentStep).removeClass('d-none');
-
-        $('.stepper-item').removeClass('active completed');
-        for (let i = 1; i <= totalSteps; i++) {
-            if (i === currentStep) {
-                $('.stepper-item[data-step="' + i + '"]').addClass('active');
-            } else if (i < currentStep) {
-                $('.stepper-item[data-step="' + i + '"]').addClass('completed');
-            }
-        }
-
-        if (currentStep === 1) $('#prev-btn').hide();
-        else $('#prev-btn').show();
-
-        if (currentStep === totalSteps) {
-            $('#next-btn').hide();
-            $('#submit-btn').show();
-        } else {
-            $('#next-btn').show();
-            $('#submit-btn').hide();
-        }
-    }
-
-    function validateStep(step) {
-        // Simple validation
-        let valid = true;
-        $('#step-' + step + ' input[required], #step-' + step + ' select[required]').each(function() {
-            if (!$(this).val()) {
-                $(this).addClass('is-invalid');
-                valid = false;
-            } else {
-                $(this).removeClass('is-invalid');
-            }
-        });
-        // Password validation for step 1 create mode
-        if (step === 1 && !$('#practitioner_id').val()) {
-            let pwd = $('input[name="password"]').val();
-            let conf = $('input[name="password_confirmation"]').val();
-            if (!pwd || pwd !== conf) {
-                $('input[name="password_confirmation"]').addClass('is-invalid');
-                valid = false;
-            }
-        }
-        return valid;
-    }
-
-    function openCreateModal() {
-        $('#practitioner-form')[0].reset();
-        $('#practitioner_id').val('');
-        $('#form-method').val('POST');
-        $('#form-modal-title').text('Register Mindfulness Practitioner');
-        $('.password-field').show();
-        $('input[name="password"]').attr('required', true);
-
-        currentStep = 1;
-        updateStepper();
-        $('#practitioner-form-modal').modal('show');
-    }
 </script>
 <style>
+    /* Stepper Styling */
+    .stepper-horizontal {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-bottom: 40px;
+    }
+
     /* Avatar Upload Styling */
     .avatar-upload {
         position: relative;
@@ -920,12 +920,6 @@
         background-position: center;
     }
 
-    .stepper-horizontal {
-        position: relative;
-        display: flex;
-        justify-content: space-between;
-    }
-
     .stepper-horizontal::before {
         content: "";
         position: absolute;
@@ -964,30 +958,32 @@
 
     .stepper-horizontal .step-name {
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 500;
         color: #999;
+        transition: all 0.3s ease;
         text-align: center;
     }
 
-    .stepper-item.active .step-counter {
-        background: #2b2b2b;
-        border-color: #2b2b2b;
+    .stepper-horizontal .stepper-item.active .step-counter {
+        border-color: var(--theme-default);
+        background: var(--theme-default);
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(var(--theme-default-rgb), 0.2);
+    }
+
+    .stepper-horizontal .stepper-item.active .step-name {
+        color: var(--theme-default);
+        font-weight: 600;
+    }
+
+    .stepper-horizontal .stepper-item.completed .step-counter {
+        border-color: #51bb25;
+        background: #51bb25;
         color: #fff;
     }
 
-    .stepper-item.completed .step-counter {
-        background: #10b981;
-        border-color: #10b981;
-        color: #fff;
-    }
-
-    .stepper-item.active .step-name,
-    .stepper-item.completed .step-name {
-        color: #333;
-    }
-
-    .d-none {
-        display: none !important;
+    .stepper-horizontal .stepper-item.completed .step-name {
+        color: #51bb25;
     }
 </style>
 @endsection

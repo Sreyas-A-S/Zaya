@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\MindfulnessCounsellor;
+use App\Models\Translator;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
@@ -12,22 +12,22 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
-class MindfulnessCounsellorController extends Controller
+class TranslatorController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = User::where('role', 'mindfulness_counsellor')
-                ->leftJoin('mindfulness_counsellors', 'users.id', '=', 'mindfulness_counsellors.user_id')
+            $data = User::where('role', 'translator')
+                ->leftJoin('translators', 'users.id', '=', 'translators.user_id')
                 ->select([
                     'users.id',
                     'users.name',
                     'users.email',
-                    'mindfulness_counsellors.gender',
-                    'mindfulness_counsellors.phone',
-                    'mindfulness_counsellors.current_workplace',
-                    'mindfulness_counsellors.profile_photo_path',
-                    'mindfulness_counsellors.status'
+                    'translators.native_language',
+                    'translators.phone',
+                    'translators.translator_type',
+                    'translators.profile_photo_path',
+                    'translators.status'
                 ])
                 ->latest('users.created_at')
                 ->get();
@@ -52,9 +52,9 @@ class MindfulnessCounsellorController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-3">';
-                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-info viewPractitioner" title="View"><i class="iconly-Show icli" style="font-size: 20px;"></i></a>';
-                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editPractitioner" title="Edit"><i class="iconly-Edit-Square icli" style="font-size: 20px;"></i></a>';
-                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-danger deletePractitioner" title="Delete"><i class="iconly-Delete icli" style="font-size: 20px;"></i></a>';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-info viewTranslator" title="View"><i class="iconly-Show icli" style="font-size: 20px;"></i></a>';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editTranslator" title="Edit"><i class="iconly-Edit-Square icli" style="font-size: 20px;"></i></a>';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-danger deleteTranslator" title="Delete"><i class="iconly-Delete icli" style="font-size: 20px;"></i></a>';
                     $btn .= '</div>';
                     return $btn;
                 })
@@ -62,14 +62,11 @@ class MindfulnessCounsellorController extends Controller
                 ->make(true);
         }
 
-        $servicesOffered = \App\Models\MindfulnessService::where('status', 1)->get();
-        $clientConcerns = \App\Models\ClientConcern::where('status', 1)->get();
-
-        $consultationModes = ["Video", "Audio", "Chat", "Group Session"];
-
         $languages = \App\Models\Language::all();
+        $servicesOffered = \App\Models\TranslatorService::where('status', 1)->get();
+        $specializations = \App\Models\TranslatorSpecialization::where('status', 1)->get();
 
-        return view('admin.mindfulness_counsellors.index', compact('servicesOffered', 'clientConcerns', 'consultationModes', 'languages'));
+        return view('admin.translators.index', compact('languages', 'servicesOffered', 'specializations'));
     }
 
     public function store(Request $request)
@@ -84,22 +81,25 @@ class MindfulnessCounsellorController extends Controller
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
 
-            'practitioner_type' => 'nullable|string',
+            'native_language' => 'nullable|string',
+            'source_languages' => 'nullable|array',
+            'target_languages' => 'nullable|array',
+            'additional_languages' => 'nullable|array',
+
+            'translator_type' => 'nullable|string',
             'years_of_experience' => 'nullable|integer',
-            'current_workplace' => 'nullable|string',
-            'website_social_links' => 'nullable|array',
+            'fields_of_specialization' => 'nullable|array',
+            'previous_clients_projects' => 'nullable|string',
+            'portfolio_link' => 'nullable|url',
 
             'highest_education' => 'nullable|string',
-            'mindfulness_training_details' => 'nullable|string',
-            'additional_certifications' => 'nullable|string',
+            'certification_details' => 'nullable|string',
             'certificates' => 'nullable|array',
             'certificates.*' => 'file|max:2048',
+            'sample_work' => 'nullable|array',
+            'sample_work.*' => 'file|max:4096',
 
             'services_offered' => 'nullable|array',
-            'client_concerns' => 'nullable|array',
-            'consultation_modes' => 'nullable|array',
-
-            'languages_spoken' => 'nullable|array',
 
             'gov_id_type' => 'nullable|string',
             'gov_id_upload' => 'nullable|file|max:2048',
@@ -108,12 +108,9 @@ class MindfulnessCounsellorController extends Controller
             'bank_name' => 'nullable|string',
             'account_number' => 'nullable|string',
             'ifsc_code' => 'nullable|string',
+            'swift_code' => 'nullable|string',
             'upi_id' => 'nullable|string',
             'cancelled_cheque' => 'nullable|file|max:2048',
-
-            'short_bio' => 'nullable|string',
-            'coaching_style' => 'nullable|string',
-            'target_audience' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -122,36 +119,51 @@ class MindfulnessCounsellorController extends Controller
                 'name' => $validatedData['full_name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
-                'role' => 'mindfulness_counsellor',
+                'role' => 'translator',
             ]);
 
-            $practitionerData = $validatedData;
-            unset($practitionerData['email'], $practitionerData['password'], $practitionerData['certificates'], $practitionerData['gov_id_upload'], $practitionerData['cancelled_cheque']);
+            $translatorData = $validatedData;
+            unset(
+                $translatorData['email'],
+                $translatorData['password'],
+                $translatorData['certificates'],
+                $translatorData['sample_work'],
+                $translatorData['gov_id_upload'],
+                $translatorData['cancelled_cheque']
+            );
 
             if ($request->hasFile('profile_photo')) {
-                $practitionerData['profile_photo_path'] = $request->file('profile_photo')->store('mindfulness_photos', 'public');
+                $translatorData['profile_photo_path'] = $request->file('profile_photo')->store('translator_photos', 'public');
             }
 
             if ($request->hasFile('certificates')) {
                 $paths = [];
                 foreach ($request->file('certificates') as $file) {
-                    $paths[] = $file->store('mindfulness_docs', 'public');
+                    $paths[] = $file->store('translator_docs', 'public');
                 }
-                $practitionerData['certificates_path'] = $paths;
+                $translatorData['certificates_path'] = $paths;
+            }
+
+            if ($request->hasFile('sample_work')) {
+                $paths = [];
+                foreach ($request->file('sample_work') as $file) {
+                    $paths[] = $file->store('translator_docs', 'public');
+                }
+                $translatorData['sample_work_path'] = $paths;
             }
 
             if ($request->hasFile('gov_id_upload')) {
-                $practitionerData['gov_id_upload_path'] = $request->file('gov_id_upload')->store('mindfulness_docs', 'public');
+                $translatorData['gov_id_upload_path'] = $request->file('gov_id_upload')->store('translator_docs', 'public');
             }
 
             if ($request->hasFile('cancelled_cheque')) {
-                $practitionerData['cancelled_cheque_path'] = $request->file('cancelled_cheque')->store('mindfulness_docs', 'public');
+                $translatorData['cancelled_cheque_path'] = $request->file('cancelled_cheque')->store('translator_docs', 'public');
             }
 
-            $user->mindfulnessCounsellor()->create($practitionerData);
+            $user->translator()->create($translatorData);
 
             DB::commit();
-            return response()->json(['success' => 'Mindfulness Practitioner registered successfully!']);
+            return response()->json(['success' => 'Translator registered successfully!']);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
@@ -160,26 +172,26 @@ class MindfulnessCounsellorController extends Controller
 
     public function show(Request $request, $id)
     {
-        $user = User::with('mindfulnessCounsellor')->findOrFail($id);
+        $user = User::with('translator')->findOrFail($id);
         if ($request->ajax()) {
-            return response()->json(['user' => $user, 'practitioner' => $user->mindfulnessCounsellor]);
+            return response()->json(['user' => $user, 'translator' => $user->translator]);
         }
-        return redirect()->route('admin.mindfulness_counsellors.index');
+        return redirect()->route('admin.translators.index');
     }
 
     public function edit(Request $request, $id)
     {
-        $user = User::with('mindfulnessCounsellor')->findOrFail($id);
+        $user = User::with('translator')->findOrFail($id);
         if ($request->ajax()) {
-            return response()->json(['user' => $user, 'practitioner' => $user->mindfulnessCounsellor]);
+            return response()->json(['user' => $user, 'translator' => $user->translator]);
         }
-        return redirect()->route('admin.mindfulness_counsellors.index');
+        return redirect()->route('admin.translators.index');
     }
 
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $practitioner = $user->mindfulnessCounsellor;
+        $translator = $user->translator;
 
         $validatedData = $request->validate([
             'full_name' => 'required|string|max:255',
@@ -191,21 +203,25 @@ class MindfulnessCounsellorController extends Controller
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
 
-            'practitioner_type' => 'nullable|string',
+            'native_language' => 'nullable|string',
+            'source_languages' => 'nullable|array',
+            'target_languages' => 'nullable|array',
+            'additional_languages' => 'nullable|array',
+
+            'translator_type' => 'nullable|string',
             'years_of_experience' => 'nullable|integer',
-            'current_workplace' => 'nullable|string',
-            'website_social_links' => 'nullable|array',
+            'fields_of_specialization' => 'nullable|array',
+            'previous_clients_projects' => 'nullable|string',
+            'portfolio_link' => 'nullable|url',
 
             'highest_education' => 'nullable|string',
-            'mindfulness_training_details' => 'nullable|string',
-            'additional_certifications' => 'nullable|string',
+            'certification_details' => 'nullable|string',
             'certificates' => 'nullable|array',
-            'certificates.*' => 'file|max:2048', // If uploading new ones
+            'certificates.*' => 'file|max:2048',
+            'sample_work' => 'nullable|array',
+            'sample_work.*' => 'file|max:4096',
 
             'services_offered' => 'nullable|array',
-            'client_concerns' => 'nullable|array',
-            'consultation_modes' => 'nullable|array',
-            'languages_spoken' => 'nullable|array',
 
             'gov_id_type' => 'nullable|string',
             'gov_id_upload' => 'nullable|file|max:2048',
@@ -214,12 +230,9 @@ class MindfulnessCounsellorController extends Controller
             'bank_name' => 'nullable|string',
             'account_number' => 'nullable|string',
             'ifsc_code' => 'nullable|string',
+            'swift_code' => 'nullable|string',
             'upi_id' => 'nullable|string',
             'cancelled_cheque' => 'nullable|file|max:2048',
-
-            'short_bio' => 'nullable|string',
-            'coaching_style' => 'nullable|string',
-            'target_audience' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -234,50 +247,64 @@ class MindfulnessCounsellorController extends Controller
                 $user->save();
             }
 
-            $practitionerData = $validatedData;
-            unset($practitionerData['email'], $practitionerData['password'], $practitionerData['certificates'], $practitionerData['gov_id_upload'], $practitionerData['cancelled_cheque']);
+            $translatorData = $validatedData;
+            unset(
+                $translatorData['email'],
+                $translatorData['password'],
+                $translatorData['certificates'],
+                $translatorData['sample_work'],
+                $translatorData['gov_id_upload'],
+                $translatorData['cancelled_cheque']
+            );
 
             if ($request->hasFile('profile_photo')) {
-                if ($practitioner->profile_photo_path) {
-                    Storage::disk('public')->delete($practitioner->profile_photo_path);
+                if ($translator->profile_photo_path) {
+                    Storage::disk('public')->delete($translator->profile_photo_path);
                 }
-                $practitionerData['profile_photo_path'] = $request->file('profile_photo')->store('mindfulness_photos', 'public');
+                $translatorData['profile_photo_path'] = $request->file('profile_photo')->store('translator_photos', 'public');
             }
 
             if ($request->hasFile('certificates')) {
-                // Check if need to delete old ones? Maybe append?
-                // For simplicity, replacing or appending. Let's assume replace if uploaded.
-                // Ideally we'd have a way to keep old ones, but form usually sends all or new.
-                // Let's assume we replace the list if new files are uploaded.
-                if ($practitioner->certificates_path) {
-                    // Logic to delete old files if replacing
-                    // foreach($practitioner->certificates_path as $path) Storage::disk('public')->delete($path);
+                // Logic to replace or append could be complex. Replacing here for simplicity as per previous pattern.
+                if ($translator->certificates_path) {
+                    // foreach($translator->certificates_path as $path) Storage::disk('public')->delete($path);
                 }
                 $paths = [];
                 foreach ($request->file('certificates') as $file) {
-                    $paths[] = $file->store('mindfulness_docs', 'public');
+                    $paths[] = $file->store('translator_docs', 'public');
                 }
-                $practitionerData['certificates_path'] = $paths;
+                $translatorData['certificates_path'] = $paths;
+            }
+
+            if ($request->hasFile('sample_work')) {
+                if ($translator->sample_work_path) {
+                    // foreach($translator->sample_work_path as $path) Storage::disk('public')->delete($path);
+                }
+                $paths = [];
+                foreach ($request->file('sample_work') as $file) {
+                    $paths[] = $file->store('translator_docs', 'public');
+                }
+                $translatorData['sample_work_path'] = $paths;
             }
 
             if ($request->hasFile('gov_id_upload')) {
-                if ($practitioner->gov_id_upload_path) {
-                    Storage::disk('public')->delete($practitioner->gov_id_upload_path);
+                if ($translator->gov_id_upload_path) {
+                    Storage::disk('public')->delete($translator->gov_id_upload_path);
                 }
-                $practitionerData['gov_id_upload_path'] = $request->file('gov_id_upload')->store('mindfulness_docs', 'public');
+                $translatorData['gov_id_upload_path'] = $request->file('gov_id_upload')->store('translator_docs', 'public');
             }
 
             if ($request->hasFile('cancelled_cheque')) {
-                if ($practitioner->cancelled_cheque_path) {
-                    Storage::disk('public')->delete($practitioner->cancelled_cheque_path);
+                if ($translator->cancelled_cheque_path) {
+                    Storage::disk('public')->delete($translator->cancelled_cheque_path);
                 }
-                $practitionerData['cancelled_cheque_path'] = $request->file('cancelled_cheque')->store('mindfulness_docs', 'public');
+                $translatorData['cancelled_cheque_path'] = $request->file('cancelled_cheque')->store('translator_docs', 'public');
             }
 
-            $practitioner->update($practitionerData);
+            $translator->update($translatorData);
 
             DB::commit();
-            return response()->json(['success' => 'Mindfulness Practitioner updated successfully!']);
+            return response()->json(['success' => 'Translator updated successfully!']);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
@@ -288,7 +315,7 @@ class MindfulnessCounsellorController extends Controller
     {
         $user = User::findOrFail($id);
         $user->delete();
-        return response()->json(['success' => 'Practitioner deleted successfully.']);
+        return response()->json(['success' => 'Translator deleted successfully.']);
     }
 
     public function updateStatus(Request $request, $id)
@@ -297,8 +324,8 @@ class MindfulnessCounsellorController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $practitioner = MindfulnessCounsellor::where('user_id', $id)->firstOrFail();
-        $practitioner->update([
+        $translator = Translator::where('user_id', $id)->firstOrFail();
+        $translator->update([
             'status' => $request->status
         ]);
 
