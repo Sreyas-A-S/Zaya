@@ -35,12 +35,15 @@ Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-s
 Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
-    // Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('dashboard');
+    Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('dashboard');
 
     Route::resource('doctors', App\Http\Controllers\Admin\DoctorController::class);
     Route::post('doctors/{id}/status', [App\Http\Controllers\Admin\DoctorController::class, 'updateStatus'])->name('doctors.status');
     Route::resource('practitioners', App\Http\Controllers\Admin\PractitionerController::class);
     Route::post('practitioners/{id}/status', [App\Http\Controllers\Admin\PractitionerController::class, 'updateStatus'])->name('practitioners.status');
+
+    Route::resource('mindfulness-practitioners', App\Http\Controllers\Admin\MindfulnessPractitionerController::class);
+    Route::post('mindfulness-practitioners/{id}/status', [App\Http\Controllers\Admin\MindfulnessPractitionerController::class, 'updateStatus'])->name('mindfulness-practitioners.status');
     Route::resource('clients', App\Http\Controllers\Admin\ClientController::class);
     Route::resource('roles', App\Http\Controllers\Admin\RoleController::class);
     Route::get('roles/{role}/permissions', [App\Http\Controllers\Admin\RoleController::class, 'showPermissions'])->name('roles.permissions');

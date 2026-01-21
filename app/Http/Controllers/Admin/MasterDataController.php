@@ -26,6 +26,8 @@ class MasterDataController extends Controller
         'body_therapies' => BodyTherapy::class,
         'practitioner_modalities' => PractitionerModality::class,
         'client_consultation_preferences' => ClientConsultationPreference::class,
+        'mindfulness_services' => \App\Models\MindfulnessService::class,
+        'client_concerns' => \App\Models\ClientConcern::class,
     ];
 
     protected $titles = [
@@ -37,6 +39,8 @@ class MasterDataController extends Controller
         'body_therapies' => 'Massage & Body Therapies',
         'practitioner_modalities' => 'Other Modalities',
         'client_consultation_preferences' => 'Client Settings', // Client Consultation Preferences
+        'mindfulness_services' => 'Mindfulness Services Offered',
+        'client_concerns' => 'Client Concerns Supported',
     ];
 
     public function index(Request $request, $type)

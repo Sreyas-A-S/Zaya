@@ -68,7 +68,7 @@
 
                 <div
                     class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
-                    <p>&copy; 2026 Zaya Wellness. All rights reserved.</p>
+                    <p>&copy; 2024 Zaya Wellness. All rights reserved.</p>
                     <div class="flex gap-4">
                         <a href="#" class="hover:text-primary">Privacy Policy</a>
                         <a href="#" class="hover:text-primary">Terms of Service</a>
