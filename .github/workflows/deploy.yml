@@ -129,7 +129,7 @@ jobs:
           server-dir: /
           exclude: |
             vendor/**
-            public/**
+            public/admiro/** 
             .env
             storage/**
             .git/**

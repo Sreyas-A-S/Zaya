@@ -91,10 +91,10 @@
             <div class="group flex flex-col items-center">
                 <div
                     class="w-full h-[350px] bg-[#EAF9F2] mb-6 flex items-end justify-center overflow-hidden rounded-sm">
-                    <img src="{{ asset('frontend/assets/team/dr-parvathi-s.png') }}" alt="Dr. Parvathi S"
+                    <img src="{{ asset('frontend/assets/team/dr-parvathi-s.png') }}" alt="Dr. Parvathy S"
                         class="h-[90%] object-contain group-hover:scale-105 transition-transform duration-500">
                 </div>
-                <h3 class="text-xl font-sans font-bold text-primary mb-1">Dr. Parvathi S</h3>
+                <h3 class="text-xl font-sans font-bold text-primary mb-1">Dr. Parvathy S</h3>
                 <p class="text-gray-500 font-serif italic text-sm">Co founder & Head - Client Services</p>
             </div>
 
