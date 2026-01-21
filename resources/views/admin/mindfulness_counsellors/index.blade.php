@@ -696,43 +696,105 @@
 
                 let html = `
                     <div class="row g-3">
-                        <div class="col-md-4 text-center">
+                        <div class="col-md-3 text-center border-end">
                             <img src="${p.profile_photo_path ? '/storage/' + p.profile_photo_path : '{{ asset('admiro/assets/images/user/user.png') }}'}" 
                                  class="rounded-circle img-thumbnail mb-3" style="width: 120px; height: 120px; object-fit: cover;">
                             <h5>${u.name}</h5>
                             <p class="text-muted mb-1">${u.email}</p>
-                            <span class="badge ${p.status === 'active' ? 'bg-success' : 'bg-warning'}">${p.status.toUpperCase()}</span>
+                            <p class="text-muted mb-1">${p.phone || 'N/A'}</p>
+                            <span class="badge ${p.status === 'active' ? 'bg-success' : 'bg-warning'} mb-3">${p.status.toUpperCase()}</span>
                         </div>
-                        <div class="col-md-8">
-                            <h6 class="border-bottom pb-2 mb-3">Professional Details</h6>
-                            <div class="row mb-2">
-                                <div class="col-4 fw-bold">Practitioner Type:</div>
-                                <div class="col-8">${p.practitioner_type || 'N/A'}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4 fw-bold">Experience:</div>
-                                <div class="col-8">${p.years_of_experience || '0'} Years</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4 fw-bold">Workplace:</div>
-                                <div class="col-8">${p.current_workplace || 'N/A'}</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-4 fw-bold">Education:</div>
-                                <div class="col-8">${p.highest_education || 'N/A'}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-12 mt-4">
-                            <h6 class="border-bottom pb-2 mb-3">Practice Infomation</h6>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <strong>Services:</strong><br>
-                                    ${p.services_offered ? p.services_offered.join(', ') : 'None'}
+                        <div class="col-md-9">
+                            <ul class="nav nav-tabs nav-primary" id="practouchTab" role="tablist">
+                                <li class="nav-item"><a class="nav-link active" id="personal-tab" data-bs-toggle="tab" href="#personal" role="tab">Personal</a></li>
+                                <li class="nav-item"><a class="nav-link" id="qual-tab" data-bs-toggle="tab" href="#qual" role="tab">Qualifications</a></li>
+                                <li class="nav-item"><a class="nav-link" id="practice-tab" data-bs-toggle="tab" href="#practice" role="tab">Practice</a></li>
+                                <li class="nav-item"><a class="nav-link" id="pro-tab" data-bs-toggle="tab" href="#pro" role="tab">Professional</a></li>
+                                <li class="nav-item"><a class="nav-link" id="ident-tab" data-bs-toggle="tab" href="#ident" role="tab">Identity</a></li>
+                            </ul>
+                            <div class="tab-content mt-3" id="practouchTabContent">
+                                <!-- Personal Info -->
+                                <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                                    <div class="row g-2">
+                                        <div class="col-md-6"><strong>Gender:</strong> ${p.gender || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>Date of Birth:</strong> ${p.dob || 'N/A'}</div>
+                                        <div class="col-md-12"><strong>Address:</strong> ${p.address || 'N/A'}</div>
+                                    </div>
+                                    <h6 class="mt-3 mb-2 border-top pt-2">Bio & Socials</h6>
+                                    <p class="small text-muted mb-1"><strong>Short Bio:</strong> ${p.short_bio || 'N/A'}</p>
+                                    <div class="mt-2">
+                                        <strong>Social / Website:</strong> 
+                                        ${p.website_social_links ? (Array.isArray(p.website_social_links) ? p.website_social_links.join(', ') : Object.entries(p.website_social_links).map(([k, v]) => v ? `${k}: ${v}` : '').filter(Boolean).join(', ')) : 'N/A'}
+                                    </div>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>Languages:</strong><br>
-                                    ${p.languages_spoken ? p.languages_spoken.join(', ') : 'None'}
+
+                                <!-- Qualifications -->
+                                <div class="tab-pane fade" id="qual" role="tabpanel">
+                                    <div class="row g-2">
+                                        <div class="col-md-12"><strong>Highest Education:</strong> ${p.highest_education || 'N/A'}</div>
+                                        <div class="col-md-12"><strong>Training Details:</strong> ${p.mindfulness_training_details || 'N/A'}</div>
+                                        <div class="col-md-12"><strong>Additional Certs:</strong> ${p.additional_certifications || 'N/A'}</div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <strong>Certificates Uploaded:</strong> 
+                                        ${p.certificates_path ? p.certificates_path.map((path, index) => `<a href="/storage/${path}" target="_blank" class="badge bg-secondary text-white me-1">View Cert ${index+1}</a>`).join('') : 'None'}
+                                    </div>
+                                </div>
+
+                                <!-- Practice Details -->
+                                <div class="tab-pane fade" id="practice" role="tabpanel">
+                                    <div class="mb-3">
+                                        <strong>Services Offered:</strong><br>
+                                        ${p.services_offered ? p.services_offered.map(s => `<span class="badge bg-light text-dark border me-1">${s}</span>`).join('') : 'None'}
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Client Concerns:</strong><br>
+                                        ${p.client_concerns ? p.client_concerns.map(c => `<span class="badge bg-light text-dark border me-1">${c}</span>`).join('') : 'None'}
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Consultation Modes:</strong><br>
+                                        ${p.consultation_modes ? p.consultation_modes.join(', ') : 'None'}
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Languages Spoken:</strong><br>
+                                        ${p.languages_spoken ? p.languages_spoken.join(', ') : 'None'}
+                                    </div>
+                                </div>
+
+                                <!-- Professional -->
+                                <div class="tab-pane fade" id="pro" role="tabpanel">
+                                    <div class="row g-2">
+                                        <div class="col-md-6"><strong>Practitioner Type:</strong> ${p.practitioner_type || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>Experience:</strong> ${p.years_of_experience || '0'} Years</div>
+                                        <div class="col-md-12"><strong>Current Workplace:</strong> ${p.current_workplace || 'N/A'}</div>
+                                        <div class="col-md-12 mt-2"><strong>Coaching Style:</strong> ${p.coaching_style || 'N/A'}</div>
+                                        <div class="col-md-12 mt-2"><strong>Target Audience:</strong> ${p.target_audience || 'N/A'}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Identity & Banking -->
+                                <div class="tab-pane fade" id="ident" role="tabpanel">
+                                    <h6 class="mb-2">Identity Proof</h6>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6"><strong>ID Type:</strong> ${p.gov_id_type || 'N/A'}</div>
+                                        <div class="col-md-6">
+                                            <strong>Document:</strong> 
+                                            ${p.gov_id_upload_path ? `<a href="/storage/${p.gov_id_upload_path}" target="_blank" class="text-primary">View ID</a>` : 'Not Uploaded'}
+                                        </div>
+                                        <div class="col-md-6"><strong>PAN Number:</strong> ${p.pan_number || 'N/A'}</div>
+                                    </div>
+                                    <h6 class="mb-2 border-top pt-2">Banking Details</h6>
+                                    <div class="row">
+                                        <div class="col-md-6"><strong>Bank Name:</strong> ${p.bank_name || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>Holder Name:</strong> ${p.bank_holder_name || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>Acc Number:</strong> ${p.account_number || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>IFSC:</strong> ${p.ifsc_code || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>UPI ID:</strong> ${p.upi_id || 'N/A'}</div>
+                                        <div class="col-md-12 mt-1">
+                                            <strong>Cancelled Cheque:</strong> 
+                                            ${p.cancelled_cheque_path ? `<a href="/storage/${p.cancelled_cheque_path}" target="_blank" class="text-primary">View Document</a>` : 'Not Uploaded'}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -788,20 +788,93 @@
 
                 let html = `
                     <div class="row g-3">
-                        <div class="col-md-4 text-center">
+                        <div class="col-md-3 text-center border-end">
                             <img src="${t.profile_photo_path ? '/storage/' + t.profile_photo_path : '{{ asset('admiro/assets/images/user/user.png') }}'}" 
                                  class="rounded-circle img-thumbnail mb-3" style="width: 120px; height: 120px; object-fit: cover;">
                             <h5>${u.name}</h5>
                             <p class="text-muted mb-1">${u.email}</p>
-                            <span class="badge ${t.status === 'active' ? 'bg-success' : 'bg-warning'}">${t.status.toUpperCase()}</span>
+                            <p class="text-muted mb-1">${t.phone || 'N/A'}</p>
+                            <span class="badge ${t.status === 'active' ? 'bg-success' : 'bg-warning'} mb-3">${t.status.toUpperCase()}</span>
                         </div>
-                        <div class="col-md-8">
-                            <h6 class="border-bottom pb-2 mb-3">Professional Info</h6>
-                            <p><strong>Type:</strong> ${t.translator_type || 'N/A'}</p>
-                            <p><strong>Native Language:</strong> ${t.native_language || 'N/A'}</p>
-                            <p><strong>Source Languages:</strong> ${t.source_languages ? t.source_languages.join(', ') : 'N/A'}</p>
-                            <p><strong>Target Languages:</strong> ${t.target_languages ? t.target_languages.join(', ') : 'N/A'}</p>
-                            <p><strong>Specializations:</strong> ${t.fields_of_specialization ? t.fields_of_specialization.join(', ') : 'N/A'}</p>
+                        <div class="col-md-9">
+                            <ul class="nav nav-tabs nav-primary" id="viewTab" role="tablist">
+                                <li class="nav-item"><a class="nav-link active" id="personal-tab" data-bs-toggle="tab" href="#personal" role="tab">Personal</a></li>
+                                <li class="nav-item"><a class="nav-link" id="language-tab" data-bs-toggle="tab" href="#language" role="tab">Languages</a></li>
+                                <li class="nav-item"><a class="nav-link" id="pro-tab" data-bs-toggle="tab" href="#pro" role="tab">Professional</a></li>
+                                <li class="nav-item"><a class="nav-link" id="payment-tab" data-bs-toggle="tab" href="#payment" role="tab">Identity & Payment</a></li>
+                            </ul>
+                            <div class="tab-content mt-3" id="viewTabContent">
+                                <!-- Personal & Qualifications -->
+                                <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                                    <h6 class="mb-2">Personal Details</h6>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6"><strong>Gender:</strong> ${t.gender || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>Date of Birth:</strong> ${t.dob || 'N/A'}</div>
+                                        <div class="col-md-12 mt-1"><strong>Address:</strong> ${t.address || 'N/A'}</div>
+                                    </div>
+                                    <h6 class="mb-2 border-top pt-2">Qualifications</h6>
+                                    <div class="row">
+                                        <div class="col-md-6"><strong>Highest Education:</strong> ${t.highest_education || 'N/A'}</div>
+                                        <div class="col-md-12 mt-1"><strong>Certification Details:</strong> ${t.certification_details || 'N/A'}</div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <strong>Certificates:</strong> 
+                                        ${t.certificates_path ? t.certificates_path.map((path, index) => `<a href="/storage/${path}" target="_blank" class="badge bg-info text-dark me-1">View Cert ${index+1}</a>`).join('') : 'None'}
+                                    </div>
+                                    <div class="mt-2">
+                                        <strong>Sample Work:</strong> 
+                                        ${t.sample_work_path ? t.sample_work_path.map((path, index) => `<a href="/storage/${path}" target="_blank" class="badge bg-secondary text-white me-1">View Sample ${index+1}</a>`).join('') : 'None'}
+                                    </div>
+                                </div>
+
+                                <!-- Languages -->
+                                <div class="tab-pane fade" id="language" role="tabpanel">
+                                    <div class="row g-2">
+                                        <div class="col-md-12"><strong>Native Language:</strong> ${t.native_language || 'N/A'}</div>
+                                        <div class="col-md-12"><strong>Source Languages:</strong> ${t.source_languages ? t.source_languages.join(', ') : 'None'}</div>
+                                        <div class="col-md-12"><strong>Target Languages:</strong> ${t.target_languages ? t.target_languages.join(', ') : 'None'}</div>
+                                        <div class="col-md-12"><strong>Additional Languages:</strong> ${t.additional_languages ? t.additional_languages.join(', ') : 'None'}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Professional -->
+                                <div class="tab-pane fade" id="pro" role="tabpanel">
+                                    <div class="row g-2">
+                                        <div class="col-md-6"><strong>Type:</strong> ${t.translator_type || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>Experience:</strong> ${t.years_of_experience || '0'} Years</div>
+                                        <div class="col-md-12"><strong>Specializations:</strong> ${t.fields_of_specialization ? t.fields_of_specialization.join(', ') : 'None'}</div>
+                                        <div class="col-md-12"><strong>Services Offered:</strong> ${t.services_offered ? t.services_offered.join(', ') : 'None'}</div>
+                                        <div class="col-md-12"><strong>Portfolio Link:</strong> ${t.portfolio_link ? `<a href="${t.portfolio_link}" target="_blank">${t.portfolio_link}</a>` : 'N/A'}</div>
+                                        <div class="col-md-12"><strong>Previous Clients/Projects:</strong> <p class="small text-muted">${t.previous_clients_projects || 'N/A'}</p></div>
+                                    </div>
+                                </div>
+
+                                <!-- Identity & Payment -->
+                                <div class="tab-pane fade" id="payment" role="tabpanel">
+                                    <h6 class="mb-2">Identity</h6>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6"><strong>ID Type:</strong> ${t.gov_id_type || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>PAN:</strong> ${t.pan_number || 'N/A'}</div>
+                                        <div class="col-md-12 mt-1">
+                                            <strong>ID Proof:</strong> 
+                                            ${t.gov_id_upload_path ? `<a href="/storage/${t.gov_id_upload_path}" target="_blank" class="text-primary">View Document</a>` : 'Not Uploaded'}
+                                        </div>
+                                    </div>
+                                    <h6 class="mb-2 border-top pt-2">Banking Details</h6>
+                                    <div class="row">
+                                        <div class="col-md-6"><strong>Bank Name:</strong> ${t.bank_name || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>Account Holder:</strong> ${t.bank_holder_name || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>Account No:</strong> ${t.account_number || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>IFSC:</strong> ${t.ifsc_code || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>SWIFT:</strong> ${t.swift_code || 'N/A'}</div>
+                                        <div class="col-md-6"><strong>UPI ID:</strong> ${t.upi_id || 'N/A'}</div>
+                                        <div class="col-md-12 mt-1">
+                                            <strong>Cancelled Cheque:</strong> 
+                                            ${t.cancelled_cheque_path ? `<a href="/storage/${t.cancelled_cheque_path}" target="_blank" class="text-primary">View Document</a>` : 'Not Uploaded'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
