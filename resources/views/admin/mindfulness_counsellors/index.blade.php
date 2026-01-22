@@ -931,7 +931,7 @@
         $('body').on('click', '.toggle-status', function() {
             var id = $(this).data('id');
             var currentStatus = $(this).data('status');
-            var newStatus = (currentStatus === 'active') ? 'inactive' : 'active';
+            var newStatus = (currentStatus === 'active') ? 0 : 1;
             var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
 
             $('#status-practitioner-id').val(id);
@@ -966,9 +966,9 @@
                 },
                 error: function(xhr) {
                     if (typeof showToast === 'function') {
-                        showToast('Error: ' + (xhr.responseJSON.error || 'Unknown error'), 'error');
+                        showToast('Error: ' + (xhr.responseJSON?.error || 'Unknown error'), 'error');
                     } else {
-                        alert('Error: ' + (xhr.responseJSON.error || 'Unknown error'));
+                        alert('Error: ' + (xhr.responseJSON?.error || 'Unknown error'));
                     }
                 },
                 complete: function() {
@@ -1038,7 +1038,23 @@
         updateStepper();
         $('#practitioner-form-modal').modal('show');
     }
-</script>
+
+            // Handle Call Modal
+            $('body').on('click', '.call-phone', function() {
+                const phone = $(this).data('phone');
+                const name = $(this).data('name');
+    
+                $('#call-name').text(name);
+                $('#call-number').text(phone);
+                $('#confirm-call-btn').attr('href', 'tel:' + phone);
+                
+                var modalEl = document.getElementById('call-confirmation-modal');
+                var modal = bootstrap.Modal.getInstance(modalEl);
+                if (!modal) {
+                    modal = new bootstrap.Modal(modalEl);
+                }
+                modal.show();
+            });</script>
 <style>
     /* Avatar Upload Styling */
     .avatar-upload {
@@ -1172,5 +1188,26 @@
     .d-none {
         display: none !important;
     }
-</style>
+<!-- Call Confirmation Modal -->
+<div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Call</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
+                <h5>Make a Call?</h5>
+                <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
+                <h4 class="text-primary" id="call-number"></h4>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection

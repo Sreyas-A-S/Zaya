@@ -231,11 +231,17 @@
                                                 @foreach($areasOfExpertise as $area)
                                                 <div class="col-12">
                                                     <div class="form-check checkbox-primary">
-                                                        <input class="form-check-input" type="checkbox" name="areas_of_expertise[]" value="{{ $area }}" id="area_{{ $loop->index }}">
-                                                        <label class="form-check-label" for="area_{{ $loop->index }}">{{ $area }}</label>
+                                                        <input class="form-check-input" type="checkbox" name="areas_of_expertise[]" value="{{ $area->name }}" id="area_{{ $area->id }}">
+                                                        <label class="form-check-label" for="area_{{ $area->id }}">{{ $area->name }}</label>
                                                     </div>
                                                 </div>
                                                 @endforeach
+                                                <div class="col-12 mt-2">
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" class="form-control new-master-data-input" data-type="yoga_expertises" placeholder="Add New Expertise">
+                                                        <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -354,6 +360,29 @@
     </div>
 </div>
 
+<!-- Status Confirmation Modal -->
+<div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Status Change</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Info-Square icli text-primary mb-3" style="font-size: 50px;"></i>
+                <h5>Update Status?</h5>
+                <p id="status-confirmation-text">Are you sure you want to change the status?</p>
+                <input type="hidden" id="status-therapist-id">
+                <input type="hidden" id="status-new-value">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Delete Modal -->
 <div class="modal fade" id="therapist-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -369,6 +398,26 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
                 <button class="btn btn-danger" type="button" id="confirm-delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+<!-- Call Confirmation Modal -->
+<div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Call</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
+                <h5>Make a Call?</h5>
+                <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
+                <h4 class="text-primary" id="call-number"></h4>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
             </div>
         </div>
     </div>
@@ -545,6 +594,69 @@
                 }
                 reader.readAsDataURL(this.files[0]);
             }
+        });
+
+        // Master Data Quick Add
+        $(document).on('click', '.add-master-data-btn', function() {
+            let btn = $(this);
+            let input = btn.siblings('.new-master-data-input');
+            let type = input.data('type');
+            let value = input.val().trim();
+
+            // Container: .col-12 mt-2 -> previous .foreach -> div.row
+            // The structure is:
+            // <div class="col-md-6">
+            //    <label>...</label>
+            //    <div class="row">
+            //       ... checkboxes ...
+            //       <div class="col-12 mt-2">...input...</div>
+            //    </div>
+            // </div>
+            let container = input.closest('.row');
+
+            if (!value) return;
+
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+            $.ajax({
+                url: "{{ url('admin/master-data') }}/" + type,
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    name: value,
+                    status: 1
+                },
+                success: function(response) {
+                    if (response.success) {
+                        let checkboxName = 'areas_of_expertise[]';
+                        let idPrefix = 'area_';
+
+                        let newId = response.data.id;
+                        let newName = response.data.name;
+
+                        let html = `
+                            <div class="col-12">
+                                <div class="form-check checkbox-primary">
+                                    <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
+                                    <label class="form-check-label" for="${idPrefix}${newId}">${newName}</label>
+                                </div>
+                            </div>
+                        `;
+                        // Insert before the input container
+                        input.closest('.col-12').before(html);
+                        input.val('');
+                        if (typeof showToast === 'function') showToast(response.success);
+                    }
+                },
+                error: function(xhr) {
+                    if (typeof showToast === 'function') {
+                        showToast('Error: ' + (xhr.responseJSON?.error || 'Could not add item'), 'error');
+                    }
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
+                }
+            });
         });
 
         // Form Submit
@@ -853,6 +965,73 @@
                 $('#view-modal-content').html(html);
                 $('#therapist-view-modal').modal('show');
             });
+        });
+
+        // Status Toggle Handler (Triggers Modal)
+        $('body').on('click', '.toggle-status', function() {
+            var id = $(this).data('id');
+            var currentStatus = $(this).data('status');
+            var newStatus = (currentStatus === 'active') ? 0 : 1;
+            var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
+
+            $('#status-therapist-id').val(id);
+            $('#status-new-value').val(newStatus);
+            $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
+            $('#status-confirmation-modal').modal('show');
+        });
+
+        // Handle Confirm Status Change
+        $('#confirm-status-btn').on('click', function() {
+            var id = $('#status-therapist-id').val();
+            var newStatus = $('#status-new-value').val();
+            var btn = $(this);
+
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
+
+            $.ajax({
+                url: "{{ url('admin/yoga-therapists') }}/" + id + "/status",
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    status: newStatus
+                },
+                success: function(response) {
+                    $('#status-confirmation-modal').modal('hide');
+                    table.draw(false);
+                    if (typeof showToast === 'function') {
+                        showToast(response.success);
+                    } else {
+                        alert(response.success);
+                    }
+                },
+                error: function(xhr) {
+                    if (typeof showToast === 'function') {
+                        showToast('Error updating status', 'error');
+                    } else {
+                        alert('Error updating status');
+                    }
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html('Confirm Change');
+                }
+            });
+        });
+
+        // Handle Call Modal
+        $('body').on('click', '.call-phone', function() {
+            const phone = $(this).data('phone');
+            const name = $(this).data('name');
+
+            $('#call-name').text(name);
+            $('#call-number').text(phone);
+            $('#confirm-call-btn').attr('href', 'tel:' + phone);
+            
+            var modalEl = document.getElementById('call-confirmation-modal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (!modal) {
+                modal = new bootstrap.Modal(modalEl);
+            }
+            modal.show();
         });
 
     });

@@ -902,7 +902,71 @@
 
         updateStep(1);
         $('#practitioner-form-modal').modal('show');
+        updateStep(1);
+        $('#practitioner-form-modal').modal('show');
     }
+
+    // Master Data Quick Add
+    $(document).on('click', '.add-master-data-btn', function() {
+        let btn = $(this);
+        let input = btn.siblings('.new-master-data-input');
+        let type = input.data('type');
+        let value = input.val().trim();
+        let container = input.closest('.col-12').find('.row');
+
+        if (!value) return;
+
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+        $.ajax({
+            url: "{{ url('admin/master-data') }}/" + type,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                name: value,
+                status: 1
+            },
+            success: function(response) {
+                if (response.success) {
+                    let checkboxName = '';
+                    let idPrefix = '';
+                    if (type === 'wellness_consultations') {
+                        checkboxName = 'consultations[]';
+                        idPrefix = 'cons_';
+                    } else if (type === 'body_therapies') {
+                        checkboxName = 'body_therapies[]';
+                        idPrefix = 'body_';
+                    } else if (type === 'practitioner_modalities') {
+                        checkboxName = 'other_modalities[]';
+                        idPrefix = 'mod_';
+                    }
+
+                    let newId = response.data.id;
+                    let newName = response.data.name;
+
+                    let html = `
+                        <div class="col-md-${type === 'wellness_consultations' ? '6' : '4'}">
+                            <div class="form-check checkbox-primary">
+                                <input class="form-check-input ${idPrefix}checkbox" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
+                                <label class="form-check-label" for="${idPrefix}${newId}">${newName}</label>
+                            </div>
+                        </div>
+                    `;
+                    container.append(html);
+                    input.val('');
+                    if (typeof showToast === 'function') showToast(response.success);
+                }
+            },
+            error: function(xhr) {
+                if (typeof showToast === 'function') {
+                    showToast('Error: ' + (xhr.responseJSON?.error || 'Could not add item'), 'error');
+                }
+            },
+            complete: function() {
+                btn.prop('disabled', false).html('<i class="fa fa-plus"></i>');
+            }
+        });
+    });
 
     $('body').on('click', '.editPractitioner', function() {
         const id = $(this).data('id');
@@ -991,7 +1055,7 @@
     $('body').on('click', '.toggle-status', function() {
         var id = $(this).data('id');
         var currentStatus = $(this).data('status');
-        var newStatus = (currentStatus === 'active') ? 'inactive' : 'active';
+        var newStatus = (currentStatus === 'active') ? 0 : 1;
         var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
 
         $('#status-practitioner-id').val(id);
@@ -1008,7 +1072,13 @@
         $('#call-name').text(name);
         $('#call-number').text(phone);
         $('#confirm-call-btn').attr('href', 'tel:' + phone);
-        $('#call-confirmation-modal').modal('show');
+        
+        var modalEl = document.getElementById('call-confirmation-modal');
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (!modal) {
+            modal = new bootstrap.Modal(modalEl);
+        }
+        modal.show();
     });
 
     // Handle Confirm Status Change

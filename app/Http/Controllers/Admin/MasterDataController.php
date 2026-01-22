@@ -30,6 +30,7 @@ class MasterDataController extends Controller
         'client_concerns' => \App\Models\ClientConcern::class,
         'translator_services' => \App\Models\TranslatorService::class,
         'translator_specializations' => \App\Models\TranslatorSpecialization::class,
+        'yoga_expertises' => \App\Models\YogaExpertise::class,
     ];
 
     protected $titles = [
@@ -45,6 +46,7 @@ class MasterDataController extends Controller
         'client_concerns' => 'Client Concerns Supported',
         'translator_services' => 'Translator Services',
         'translator_specializations' => 'Translator Specializations',
+        'yoga_expertises' => 'Yoga Expertises',
     ];
 
     public function index(Request $request, $type)

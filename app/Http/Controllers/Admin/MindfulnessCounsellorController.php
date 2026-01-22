@@ -35,12 +35,19 @@ class MindfulnessCounsellorController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->editColumn('status', function ($row) {
-                    $status = $row->status == 'active' ? 'active' : 'pending';
-                    $badgeClass = $status == 'active' ? 'bg-success' : 'bg-warning';
-                    if (auth()->user() && auth()->user()->role === 'admin') {
-                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '">' . ucfirst($status) . '</span>';
+                    $badgeClass = 'bg-danger';
+                    if ($row->status == 'active') {
+                        $badgeClass = 'bg-success';
+                    } elseif ($row->status == 'pending') {
+                        $badgeClass = 'bg-warning';
                     }
-                    return '<span class="badge ' . $badgeClass . '">' . ucfirst($status) . '</span>';
+
+                    $statusText = ucfirst($row->status ?? 'inactive');
+
+                    if (auth()->user() && auth()->user()->role === 'admin') {
+                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '">' . $statusText . '</span>';
+                    }
+                    return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
                 })
                 ->editColumn('profile_photo', function ($row) {
                     $url = $row->profile_photo_path ? asset('storage/' . $row->profile_photo_path) : asset('admiro/assets/images/user/user.png');
@@ -48,7 +55,7 @@ class MindfulnessCounsellorController extends Controller
                 })
                 ->editColumn('phone', function ($row) {
                     if (!$row->phone) return 'N/A';
-                    return '<a href="tel:' . $row->phone . '" class="text-primary fw-bold"><i class="iconly-Call icli me-1"></i>' . $row->phone . '</a>';
+                    return '<a href="javascript:void(0);" class="text-primary fw-bold call-phone" data-phone="' . $row->phone . '" data-name="' . $row->name . '"><i class="iconly-Call icli me-1"></i>' . $row->phone . '</a>';
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-3">';
@@ -299,7 +306,7 @@ class MindfulnessCounsellorController extends Controller
 
         $practitioner = MindfulnessCounsellor::where('user_id', $id)->firstOrFail();
         $practitioner->update([
-            'status' => $request->status
+            'status' => $request->status ? 'active' : 'inactive'
         ]);
 
         return response()->json(['success' => 'Status updated successfully!']);

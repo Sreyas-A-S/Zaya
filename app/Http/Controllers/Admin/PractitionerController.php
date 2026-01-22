@@ -40,9 +40,20 @@ class PractitionerController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->editColumn('status', function ($row) {
-                    $status = $row->status == 'active' ? 'active' : 'inactive'; // normalize
-                    $badgeClass = $status == 'active' ? 'badge-success' : 'badge-danger';
-                    return '<span class="badge ' . $badgeClass . ' toggle-status cursor-pointer" data-id="' . $row->id . '" data-status="' . $status . '">' . ucfirst($status) . '</span>';
+                    $badgeClass = 'bg-danger';
+                    if ($row->status == 'active') {
+                        $badgeClass = 'bg-success';
+                    } elseif ($row->status == 'pending') {
+                        $badgeClass = 'bg-warning';
+                    }
+
+                    $statusText = ucfirst($row->status ?? 'inactive');
+
+                    if (auth()->user() && auth()->user()->role === 'admin') {
+                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
+                    }
+
+                    return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
                 })
                 ->editColumn('profile_photo', function ($row) {
                     $url = $row->profile_photo_path ? asset('storage/' . $row->profile_photo_path) : asset('admiro/assets/images/user/user.png');
@@ -252,7 +263,7 @@ class PractitionerController extends Controller
 
         $practitioner = Practitioner::where('user_id', $id)->firstOrFail();
         $practitioner->update([
-            'status' => $request->status
+            'status' => $request->status ? 'active' : 'inactive'
         ]);
 
         return response()->json(['success' => 'Status updated successfully!']);

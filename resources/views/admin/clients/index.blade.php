@@ -214,6 +214,12 @@
                                     </div>
                                 </div>
                                 @endforeach
+                                <div class="col-12 mt-2">
+                                    <div class="input-group input-group-sm" style="max-width: 300px;">
+                                        <input type="text" class="form-control new-master-data-input" data-type="client_consultation_preferences" placeholder="Add New Preference">
+                                        <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -272,6 +278,28 @@
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call Confirmation Modal -->
+<div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Call</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
+                <h5>Make a Call?</h5>
+                <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
+                <h4 class="text-primary" id="call-number"></h4>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
             </div>
         </div>
     </div>
@@ -676,6 +704,61 @@
                 }
             });
         });
+        // Master Data Quick Add
+        $(document).on('click', '.add-master-data-btn', function() {
+            let btn = $(this);
+            let input = btn.siblings('.new-master-data-input');
+            let type = input.data('type');
+            let value = input.val().trim();
+            // Container layout structure is:
+            // div.row -> (foreach col-md-6) -> col-12 input
+            let container = input.closest('.row');
+
+            if (!value) return;
+
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+            $.ajax({
+                url: "{{ url('admin/master-data') }}/" + type,
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    name: value,
+                    status: 1
+                },
+                success: function(response) {
+                    if (response.success) {
+                        let newId = response.data.id;
+                        let newName = response.data.name;
+
+                        let checkboxName = 'consultation_preferences[]';
+                        let idPrefix = 'pref_';
+
+                        let html = `
+                            <div class="col-md-6">
+                                <div class="form-check checkbox-primary mb-2">
+                                    <input class="form-check-input pref-checkbox" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
+                                    <label class="form-check-label" for="${idPrefix}${newId}">${newName}</label>
+                                </div>
+                            </div>
+                        `;
+                        // Append before the input container (which is col-12)
+                        input.closest('.col-12').before(html);
+                        input.val('');
+                        if (typeof showToast === 'function') showToast(response.success);
+                    }
+                },
+                error: function(xhr) {
+                    if (typeof showToast === 'function') {
+                        showToast('Error: ' + (xhr.responseJSON?.error || 'Could not add item'), 'error');
+                    }
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
+                }
+            });
+        });
+
         // Cropper Logic
         $("body").on("change", "#imageUpload", function(e) {
             if (this.files && this.files[0]) {
@@ -721,6 +804,23 @@
                     $('#crop-modal').modal('hide');
                 });
             }
+        });
+
+        // Handle Call Modal
+        $('body').on('click', '.call-phone', function() {
+            const phone = $(this).data('phone');
+            const name = $(this).data('name');
+
+            $('#call-name').text(name);
+            $('#call-number').text(phone);
+            $('#confirm-call-btn').attr('href', 'tel:' + phone);
+            
+            var modalEl = document.getElementById('call-confirmation-modal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (!modal) {
+                modal = new bootstrap.Modal(modalEl);
+            }
+            modal.show();
         });
     });
 </script>

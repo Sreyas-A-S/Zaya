@@ -405,6 +405,26 @@
             </div>
         </div>
     </div>
+<!-- Call Confirmation Modal -->
+<div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Call</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
+                <h5>Make a Call?</h5>
+                <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
+                <h4 class="text-primary" id="call-number"></h4>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection
@@ -585,6 +605,69 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
+        // Master Data Quick Add
+        $(document).on('click', '.add-master-data-btn', function() {
+            let btn = $(this);
+            let input = btn.siblings('.new-master-data-input');
+            let type = input.data('type');
+            let value = input.val().trim();
+            // Container layout structure is:
+            // col-md-12 -> label -> div.row -> (foreach cols) -> col-12 input
+            // So closest(.row) is the one we want to append to.
+            let container = input.closest('.row');
+
+            if (!value) return;
+
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+            $.ajax({
+                url: "{{ url('admin/master-data') }}/" + type,
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    name: value,
+                    status: 1
+                },
+                success: function(response) {
+                    if (response.success) {
+                        let checkboxName = '';
+                        let idPrefix = '';
+                        if (type === 'translator_specializations') {
+                            checkboxName = 'fields_of_specialization[]';
+                            idPrefix = 'spec_';
+                        } else if (type === 'translator_services') {
+                            checkboxName = 'services_offered[]';
+                            idPrefix = 'service_';
+                        }
+
+                        let newId = response.data.id;
+                        let newName = response.data.name;
+
+                        let html = `
+                            <div class="col-md-4">
+                                <div class="form-check checkbox-${type === 'translator_specializations' ? 'secondary' : 'primary'}">
+                                    <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
+                                    <label class="form-check-label" for="${idPrefix}${newId}">${newName}</label>
+                                </div>
+                            </div>
+                        `;
+                        // Insert before the input container (which is col-12)
+                        input.closest('.col-12').before(html);
+                        input.val('');
+                        if (typeof showToast === 'function') showToast(response.success);
+                    }
+                },
+                error: function(xhr) {
+                    if (typeof showToast === 'function') {
+                        showToast('Error: ' + (xhr.responseJSON?.error || 'Could not add item'), 'error');
+                    }
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
+                }
+            });
+        });
 
         function openCreateModal() {
             $('#translator-form')[0].reset();
@@ -769,7 +852,12 @@
         // Delete
         $('body').on('click', '.deleteTranslator', function() {
             $('#delete-translator-id').val($(this).data('id'));
-            $('#translator-delete-modal').modal('show');
+            var modalEl = document.getElementById('translator-delete-modal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (!modal) {
+                modal = new bootstrap.Modal(modalEl);
+            }
+            modal.show();
         });
 
         $('#confirm-delete-btn').click(function() {
@@ -781,7 +869,11 @@
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(res) {
-                    $('#translator-delete-modal').modal('hide');
+                    var modalEl = document.getElementById('translator-delete-modal');
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) {
+                        modal.hide();
+                    }
                     table.draw();
                     if (typeof showToast === 'function') showToast(res.success);
                 }
@@ -1014,7 +1106,12 @@
                     </div>
                 `;
                 $('#view-modal-content').html(html);
-                $('#translator-view-modal').modal('show');
+                var modalEl = document.getElementById('translator-view-modal');
+                var modal = bootstrap.Modal.getInstance(modalEl);
+                if (!modal) {
+                    modal = new bootstrap.Modal(modalEl);
+                }
+                modal.show();
             });
         });
 
@@ -1022,13 +1119,19 @@
         $('body').on('click', '.toggle-status', function() {
             var id = $(this).data('id');
             var currentStatus = $(this).data('status');
-            var newStatus = (currentStatus === 'active') ? 'inactive' : 'active';
+            var newStatus = (currentStatus === 'active') ? 0 : 1;
             var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
 
             $('#status-translator-id').val(id);
             $('#status-new-value').val(newStatus);
             $('#status-confirmation-msg').text(`Are you sure you want to change the status to ${newStatusText}?`);
-            $('#status-confirmation-modal').modal('show');
+            
+            var modalEl = document.getElementById('status-confirmation-modal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (!modal) {
+                modal = new bootstrap.Modal(modalEl);
+            }
+            modal.show();
         });
 
         $('#confirm-status-btn').on('click', function() {
@@ -1045,7 +1148,11 @@
                     status: newStatus
                 },
                 success: function(response) {
-                    $('#status-confirmation-modal').modal('hide');
+                    var modalEl = document.getElementById('status-confirmation-modal');
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) {
+                        modal.hide();
+                    }
                     table.draw(false);
                     if (typeof showToast === 'function') showToast(response.success);
                 },
@@ -1053,6 +1160,23 @@
                     btn.prop('disabled', false).html('Confirm Change');
                 }
             });
+        });
+
+        // Handle Call Modal
+        $('body').on('click', '.call-phone', function() {
+            const phone = $(this).data('phone');
+            const name = $(this).data('name');
+
+            $('#call-name').text(name);
+            $('#call-number').text(phone);
+            $('#confirm-call-btn').attr('href', 'tel:' + phone);
+            
+            var modalEl = document.getElementById('call-confirmation-modal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (!modal) {
+                modal = new bootstrap.Modal(modalEl);
+            }
+            modal.show();
         });
     });
 </script>

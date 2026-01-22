@@ -45,7 +45,8 @@ class ClientController extends Controller
                     return '<img src="' . $url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
                 })
                 ->editColumn('phone', function ($row) {
-                    return $row->phone ? '<a href="tel:' . $row->phone . '" class="text-primary">' . $row->phone . '</a>' : 'N/A';
+                    if (!$row->phone) return 'N/A';
+                    return '<a href="javascript:void(0);" class="text-primary fw-bold call-phone" data-phone="' . $row->phone . '" data-name="' . $row->name . '"><i class="iconly-Call icli me-1"></i>' . $row->phone . '</a>';
                 })
                 ->addColumn('client_id', function ($row) {
                     return $row->client_id ?? 'N/A';
