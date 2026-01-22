@@ -66,4 +66,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(Translator::class);
     }
+    public function yogaTherapist()
+    {
+        return $this->hasOne(YogaTherapist::class);
+    }
 }

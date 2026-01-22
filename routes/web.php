@@ -4,6 +4,10 @@ use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\PractitionerController;
 use App\Http\Controllers\Admin\MasterDataController;
+use App\Http\Controllers\Admin\MindfulnessCounsellorController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\TranslatorController;
+use App\Http\Controllers\Admin\YogaTherapistController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\WebController;
 use Illuminate\Support\Facades\Route;
@@ -36,21 +40,25 @@ Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
-    Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('dashboard');
+    Route::get('/', [AdminController::class, 'index'])->name('dashboard');
 
-    Route::resource('doctors', App\Http\Controllers\Admin\DoctorController::class);
-    Route::post('doctors/{id}/status', [App\Http\Controllers\Admin\DoctorController::class, 'updateStatus'])->name('doctors.status');
-    Route::resource('practitioners', App\Http\Controllers\Admin\PractitionerController::class);
-    Route::post('practitioners/{id}/status', [App\Http\Controllers\Admin\PractitionerController::class, 'updateStatus'])->name('practitioners.status');
+    Route::resource('doctors', DoctorController::class);
+    Route::post('doctors/{id}/status', [DoctorController::class, 'updateStatus'])->name('doctors.status');
+    Route::resource('practitioners', PractitionerController::class);
+    Route::post('practitioners/{id}/status', [PractitionerController::class, 'updateStatus'])->name('practitioners.status');
 
-    Route::resource('mindfulness-practitioners', App\Http\Controllers\Admin\MindfulnessCounsellorController::class);
-    Route::post('mindfulness-practitioners/{id}/status', [App\Http\Controllers\Admin\MindfulnessCounsellorController::class, 'updateStatus'])->name('mindfulness-practitioners.status');
-    Route::resource('clients', App\Http\Controllers\Admin\ClientController::class);
-    Route::resource('translators', App\Http\Controllers\Admin\TranslatorController::class);
-    Route::post('translators/{id}/status', [App\Http\Controllers\Admin\TranslatorController::class, 'updateStatus'])->name('translators.status');
-    Route::resource('roles', App\Http\Controllers\Admin\RoleController::class);
-    Route::get('roles/{role}/permissions', [App\Http\Controllers\Admin\RoleController::class, 'showPermissions'])->name('roles.permissions');
-    Route::post('roles/{role}/permissions', [App\Http\Controllers\Admin\RoleController::class, 'updatePermissions'])->name('roles.permissions.update');
+    Route::resource('mindfulness-practitioners', MindfulnessCounsellorController::class);
+    Route::post('mindfulness-practitioners/{id}/status', [MindfulnessCounsellorController::class, 'updateStatus'])->name('mindfulness-practitioners.status');
+
+    Route::resource('yoga-therapists', YogaTherapistController::class);
+    Route::post('yoga-therapists/{id}/status', [YogaTherapistController::class, 'updateStatus'])->name('yoga-therapists.status');
+
+    Route::resource('clients', ClientController::class);
+    Route::resource('translators', TranslatorController::class);
+    Route::post('translators/{id}/status', [TranslatorController::class, 'updateStatus'])->name('translators.status');
+    Route::resource('roles', RoleController::class);
+    Route::get('roles/{role}/permissions', [RoleController::class, 'showPermissions'])->name('roles.permissions');
+    Route::post('roles/{role}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.permissions.update');
 
     // Master Data
     Route::get('master-data/{type}', [MasterDataController::class, 'index'])->name('master-data.index');

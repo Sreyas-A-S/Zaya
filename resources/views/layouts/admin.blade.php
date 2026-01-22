@@ -138,6 +138,21 @@
   <script src="{{ asset('admiro/assets/js/animation/tilt/tilt-custom.js') }}"></script>
   <!-- dashboard_1-->
   <script src="{{ asset('admiro/assets/js/dashboard/dashboard_1.js') }}"></script>
+  <script>
+    window.showToast = function(message, type = 'success') {
+      const toastId = type === 'success' ? 'liveToast' : 'errorToast';
+      const toastEl = document.getElementById(toastId);
+      if (!toastEl) return;
+
+      // Set message
+      const toastBody = toastEl.querySelector('.toast-body');
+      if (toastBody) toastBody.textContent = message;
+
+      // Show toast
+      const toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    };
+  </script>
   <!-- custom script -->
   <script src="{{ asset('admiro/assets/js/script.js') }}"></script>
   @yield('scripts')

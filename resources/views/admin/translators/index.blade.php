@@ -562,9 +562,16 @@
             return isValid;
         }
 
-        // Image Preview
+        // Image Preview and Validation
         $("#imageUpload").change(function() {
-            readURL(this);
+            if (this.files && this.files[0]) {
+                if (this.files[0].size > 2 * 1024 * 1024) { // 2MB
+                    alert('Profile photo size must be less than 2MB');
+                    $(this).val(''); // Clear input
+                    return;
+                }
+                readURL(this);
+            }
         });
 
         function readURL(input) {

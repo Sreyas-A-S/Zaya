@@ -42,6 +42,7 @@
                     <li> <a href="{{ route('admin.doctors.index') }}">Doctors</a></li>
                     <li> <a href="{{ route('admin.practitioners.index') }}">Practitioners</a></li>
                     <li> <a href="{{ route('admin.mindfulness-practitioners.index') }}">Mindfulness Counsellors</a></li>
+                    <li> <a href="{{ route('admin.yoga-therapists.index') }}">Yoga Therapists</a></li>
                     <li> <a href="{{ route('admin.clients.index') }}">Clients</a></li>
                     <li> <a href="{{ route('admin.translators.index') }}">Translators</a></li>
                 </ul>
