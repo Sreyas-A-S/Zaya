@@ -711,7 +711,7 @@
                 $('input[name="full_name"]').val(u.name);
                 $('input[name="email"]').val(u.email);
                 $('input[name="phone"]').val(t.phone);
-                $('input[name="dob"]').val(t.dob); // Ensure date format matches YYYY-MM-DD
+                $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
                 $('textarea[name="address"]').val(t.address);
                 $('select[name="gender"]').val(t.gender);
 
@@ -788,91 +788,217 @@
                 let u = response.user;
                 let t = response.translator;
 
+                const formatDate = (dateString) => {
+                    if (!dateString) return 'N/A';
+                    const date = new Date(dateString);
+                    if (isNaN(date.getTime())) return dateString;
+                    return date.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                };
+
+                const defaultProfile = "{{ asset('admiro/assets/images/user/user.png') }}";
+
                 let html = `
-                    <div class="row g-3">
-                        <div class="col-md-3 text-center border-end">
-                            <img src="${t.profile_photo_path ? '/storage/' + t.profile_photo_path : '{{ asset('admiro/assets/images/user/user.png') }}'}" 
-                                 class="rounded-circle img-thumbnail mb-3" style="width: 120px; height: 120px; object-fit: cover;">
-                            <h5>${u.name}</h5>
-                            <p class="text-muted mb-1">${u.email}</p>
-                            <p class="text-muted mb-1">${t.phone || 'N/A'}</p>
-                            <span class="badge ${t.status === 'active' ? 'bg-success' : 'bg-warning'} mb-3">${t.status.toUpperCase()}</span>
+                    <div class="row g-4">
+                        <div class="col-md-3 text-center border-end pe-3">
+                            <div class="position-relative d-inline-block mb-3">
+                                <img src="${t.profile_photo_path ? '/storage/' + t.profile_photo_path : defaultProfile}" 
+                                     class="rounded-circle shadow-sm img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
+                                <div class="mt-2">
+                                     <span class="badge rounded-pill ${t.status === 'active' ? 'bg-success' : 'bg-warning'} border border-white">
+                                        ${(t.status || 'N/A').toUpperCase()}
+                                    </span>
+                                </div>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-1 text-break">${u.name}</h5>
+                            <p class="text-muted small mb-2 text-break">${u.email}</p>
+                            <p class="text-muted small mb-3"><i class="fa fa-phone me-1"></i> ${t.phone || 'N/A'}</p>
+                            
                         </div>
-                        <div class="col-md-9">
-                            <ul class="nav nav-tabs nav-primary" id="viewTab" role="tablist">
+                        <div class="col-md-9 ps-3">
+                            <ul class="nav nav-tabs nav-primary nav-fill" id="viewTab" role="tablist">
                                 <li class="nav-item"><a class="nav-link active" id="personal-tab" data-bs-toggle="tab" href="#personal" role="tab">Personal</a></li>
                                 <li class="nav-item"><a class="nav-link" id="language-tab" data-bs-toggle="tab" href="#language" role="tab">Languages</a></li>
                                 <li class="nav-item"><a class="nav-link" id="pro-tab" data-bs-toggle="tab" href="#pro" role="tab">Professional</a></li>
                                 <li class="nav-item"><a class="nav-link" id="payment-tab" data-bs-toggle="tab" href="#payment" role="tab">Identity & Payment</a></li>
                             </ul>
-                            <div class="tab-content mt-3" id="viewTabContent">
+                            <div class="tab-content mt-4" id="viewTabContent">
                                 <!-- Personal & Qualifications -->
                                 <div class="tab-pane fade show active" id="personal" role="tabpanel">
-                                    <h6 class="mb-2">Personal Details</h6>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6"><strong>Gender:</strong> ${t.gender || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>Date of Birth:</strong> ${t.dob || 'N/A'}</div>
-                                        <div class="col-md-12 mt-1"><strong>Address:</strong> ${t.address || 'N/A'}</div>
+                                    <h6 class="text-primary fw-bold mb-3">Personal Information</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Gender</p>
+                                            <p class="fw-medium">${t.gender ? t.gender.charAt(0).toUpperCase() + t.gender.slice(1) : 'N/A'}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Date of Birth</p>
+                                            <p class="fw-medium">${formatDate(t.dob)}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p class="text-muted small mb-1">Address</p>
+                                            <p class="fw-medium text-break">${t.address || 'N/A'}</p>
+                                        </div>
                                     </div>
-                                    <h6 class="mb-2 border-top pt-2">Qualifications</h6>
-                                    <div class="row">
-                                        <div class="col-md-6"><strong>Highest Education:</strong> ${t.highest_education || 'N/A'}</div>
-                                        <div class="col-md-12 mt-1"><strong>Certification Details:</strong> ${t.certification_details || 'N/A'}</div>
-                                    </div>
-                                    <div class="mt-2">
-                                        <strong>Certificates:</strong> 
-                                        ${t.certificates_path ? t.certificates_path.map((path, index) => `<a href="/storage/${path}" target="_blank" class="badge bg-info text-dark me-1">View Cert ${index+1}</a>`).join('') : 'None'}
-                                    </div>
-                                    <div class="mt-2">
-                                        <strong>Sample Work:</strong> 
-                                        ${t.sample_work_path ? t.sample_work_path.map((path, index) => `<a href="/storage/${path}" target="_blank" class="badge bg-secondary text-white me-1">View Sample ${index+1}</a>`).join('') : 'None'}
+                                    
+                                    <h6 class="text-primary fw-bold mb-3 border-top pt-3">Qualifications</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Highest Education</p>
+                                            <p class="fw-medium">${t.highest_education || 'N/A'}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p class="text-muted small mb-1">Certification Details</p>
+                                            <p class="fw-medium text-break">${t.certification_details || 'N/A'}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p class="text-muted small mb-2">Attached Documents</p>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                ${t.certificates_path ? t.certificates_path.map((path, index) => 
+                                                    `<a href="/storage/${path}" target="_blank" class="badge bg-light-primary text-primary border border-primary p-2 text-decoration-none">
+                                                        <i class="fa fa-certificate me-1"></i> Certificate ${index+1}
+                                                    </a>`).join('') : '<span class="text-muted small">None</span>'}
+                                                ${t.sample_work_path ? t.sample_work_path.map((path, index) => 
+                                                    `<a href="/storage/${path}" target="_blank" class="badge bg-light-secondary text-secondary border border-secondary p-2 text-decoration-none">
+                                                        <i class="fa fa-file-text me-1"></i> Sample ${index+1}
+                                                    </a>`).join('') : ''}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Languages -->
                                 <div class="tab-pane fade" id="language" role="tabpanel">
-                                    <div class="row g-2">
-                                        <div class="col-md-12"><strong>Native Language:</strong> ${t.native_language || 'N/A'}</div>
-                                        <div class="col-md-12"><strong>Source Languages:</strong> ${t.source_languages ? t.source_languages.join(', ') : 'None'}</div>
-                                        <div class="col-md-12"><strong>Target Languages:</strong> ${t.target_languages ? t.target_languages.join(', ') : 'None'}</div>
-                                        <div class="col-md-12"><strong>Additional Languages:</strong> ${t.additional_languages ? t.additional_languages.join(', ') : 'None'}</div>
+                                    <h6 class="text-primary fw-bold mb-3">Language Skills</h6>
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <div class="card bg-light border-0">
+                                                <div class="card-body">
+                                                    <h6 class="text-dark fw-bold mb-2">Native Language</h6>
+                                                    <span class="badge bg-success p-2">${t.native_language || 'N/A'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Source Languages</p>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                ${t.source_languages ? t.source_languages.map(l => `<span class="badge bg-secondary">${l}</span>`).join('') : 'None'}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Target Languages</p>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                ${t.target_languages ? t.target_languages.map(l => `<span class="badge bg-primary">${l}</span>`).join('') : 'None'}
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <p class="text-muted small mb-1">Additional Languages</p>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                ${t.additional_languages ? t.additional_languages.map(l => `<span class="badge bg-info text-dark">${l}</span>`).join('') : 'None'}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Professional -->
                                 <div class="tab-pane fade" id="pro" role="tabpanel">
-                                    <div class="row g-2">
-                                        <div class="col-md-6"><strong>Type:</strong> ${t.translator_type || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>Experience:</strong> ${t.years_of_experience || '0'} Years</div>
-                                        <div class="col-md-12"><strong>Specializations:</strong> ${t.fields_of_specialization ? t.fields_of_specialization.join(', ') : 'None'}</div>
-                                        <div class="col-md-12"><strong>Services Offered:</strong> ${t.services_offered ? t.services_offered.join(', ') : 'None'}</div>
-                                        <div class="col-md-12"><strong>Portfolio Link:</strong> ${t.portfolio_link ? `<a href="${t.portfolio_link}" target="_blank">${t.portfolio_link}</a>` : 'N/A'}</div>
-                                        <div class="col-md-12"><strong>Previous Clients/Projects:</strong> <p class="small text-muted">${t.previous_clients_projects || 'N/A'}</p></div>
+                                    <h6 class="text-primary fw-bold mb-3">Professional Profile</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="p-3 border rounded bg-light">
+                                                <p class="text-muted small mb-1">Translator Type</p>
+                                                <p class="fw-bold h6 mb-0">${t.translator_type || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                             <div class="p-3 border rounded bg-light">
+                                                <p class="text-muted small mb-1">Experience</p>
+                                                <p class="fw-bold h6 mb-0">${t.years_of_experience || '0'} Years</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-4">
+                                            <p class="text-muted small mb-2">Fields of Specialization</p>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                ${t.fields_of_specialization ? t.fields_of_specialization.map(s => `<span class="badge rounded-pill bg-light text-dark border">${s}</span>`).join('') : 'None'}
+                                            </div>
+                                        </div>
+                                         <div class="col-12">
+                                            <p class="text-muted small mb-2">Services Offered</p>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                ${t.services_offered ? t.services_offered.map(s => `<span class="badge rounded-pill bg-light text-dark border">${s}</span>`).join('') : 'None'}
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <p class="text-muted small mb-1">Portfolio</p>
+                                            ${t.portfolio_link ? `<a href="${t.portfolio_link}" target="_blank" class="d-inline-flex align-items-center text-primary text-break"><i class="fa fa-link me-2"></i> ${t.portfolio_link}</a>` : 'N/A'}
+                                        </div>
+                                        <div class="col-12">
+                                            <p class="text-muted small mb-1">Client History</p>
+                                            <p class="text-dark bg-light p-3 rounded small text-break">${t.previous_clients_projects || 'N/A'}</p>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Identity & Payment -->
                                 <div class="tab-pane fade" id="payment" role="tabpanel">
-                                    <h6 class="mb-2">Identity</h6>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6"><strong>ID Type:</strong> ${t.gov_id_type || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>PAN:</strong> ${t.pan_number || 'N/A'}</div>
-                                        <div class="col-md-12 mt-1">
-                                            <strong>ID Proof:</strong> 
-                                            ${t.gov_id_upload_path ? `<a href="/storage/${t.gov_id_upload_path}" target="_blank" class="text-primary">View Document</a>` : 'Not Uploaded'}
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <h6 class="text-primary fw-bold mb-3">Identity Verification</h6>
+                                            <div class="card bg-light border-0">
+                                                <div class="card-body">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <p class="text-muted small mb-1">Government ID Type</p>
+                                                            <p class="fw-medium">${t.gov_id_type || 'N/A'}</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p class="text-muted small mb-1">PAN Number</p>
+                                                            <p class="fw-medium">${t.pan_number || 'N/A'}</p>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <p class="text-muted small mb-2">Uploaded Document</p>
+                                                            ${t.gov_id_upload_path ? `<a href="/storage/${t.gov_id_upload_path}" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-eye me-2"></i> View ID Proof</a>` : '<span class="badge bg-warning text-dark">Not Uploaded</span>'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <h6 class="mb-2 border-top pt-2">Banking Details</h6>
-                                    <div class="row">
-                                        <div class="col-md-6"><strong>Bank Name:</strong> ${t.bank_name || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>Account Holder:</strong> ${t.bank_holder_name || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>Account No:</strong> ${t.account_number || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>IFSC:</strong> ${t.ifsc_code || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>SWIFT:</strong> ${t.swift_code || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>UPI ID:</strong> ${t.upi_id || 'N/A'}</div>
-                                        <div class="col-md-12 mt-1">
-                                            <strong>Cancelled Cheque:</strong> 
-                                            ${t.cancelled_cheque_path ? `<a href="/storage/${t.cancelled_cheque_path}" target="_blank" class="text-primary">View Document</a>` : 'Not Uploaded'}
+                                        
+                                        <div class="col-12">
+                                            <h6 class="text-primary fw-bold mb-3 border-top pt-3">Banking Information</h6>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <p class="text-muted small mb-1">Bank Name</p>
+                                                    <p class="fw-medium">${t.bank_name || 'N/A'}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p class="text-muted small mb-1">Account Holder</p>
+                                                    <p class="fw-medium">${t.bank_holder_name || 'N/A'}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p class="text-muted small mb-1">Account Number</p>
+                                                    <p class="fw-medium font-monospace">${t.account_number || 'N/A'}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p class="text-muted small mb-1">IFSC Code</p>
+                                                    <p class="fw-medium font-monospace">${t.ifsc_code || 'N/A'}</p>
+                                                </div>
+                                                 <div class="col-md-6">
+                                                    <p class="text-muted small mb-1">SWIFT Code</p>
+                                                    <p class="fw-medium">${t.swift_code || 'N/A'}</p>
+                                                </div>
+                                                 <div class="col-md-6">
+                                                    <p class="text-muted small mb-1">UPI ID</p>
+                                                    <p class="fw-medium">${t.upi_id || 'N/A'}</p>
+                                                </div>
+                                                <div class="col-12">
+                                                    <p class="text-muted small mb-2">Cancelled Cheque/Passbook</p>
+                                                     ${t.cancelled_cheque_path ? `<a href="/storage/${t.cancelled_cheque_path}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa fa-file-image-o me-2"></i> View Document</a>` : '<span class="badge bg-warning text-dark">Not Uploaded</span>'}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

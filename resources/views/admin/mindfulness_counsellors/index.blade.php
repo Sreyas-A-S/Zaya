@@ -646,6 +646,8 @@
                 $('input[name="email"]').val(u.email);
                 $('input[name="phone"]').val(p.phone);
                 $('select[name="gender"]').val(p.gender);
+                $('input[name="dob"]').val(p.dob ? p.dob.substring(0, 10) : '');
+                $('textarea[name="address"]').val(p.address);
                 // ... Populate other fields mapping
                 // For checkboxes and arrays, it is more complex. I will just do basic ones and basic mapping for now.
                 // In production, proper mapping for checkboxes is needed.
@@ -696,105 +698,215 @@
                 let u = response.user;
                 let p = response.practitioner;
 
+                const formatDate = (dateString) => {
+                    if (!dateString) return 'N/A';
+                    const date = new Date(dateString);
+                    if (isNaN(date.getTime())) return dateString;
+                    return date.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                };
+
+                const defaultProfile = "{{ asset('admiro/assets/images/user/user.png') }}";
+
                 let html = `
-                    <div class="row g-3">
-                        <div class="col-md-3 text-center border-end">
-                            <img src="${p.profile_photo_path ? '/storage/' + p.profile_photo_path : '{{ asset('admiro/assets/images/user/user.png') }}'}" 
-                                 class="rounded-circle img-thumbnail mb-3" style="width: 120px; height: 120px; object-fit: cover;">
-                            <h5>${u.name}</h5>
-                            <p class="text-muted mb-1">${u.email}</p>
-                            <p class="text-muted mb-1">${p.phone || 'N/A'}</p>
-                            <span class="badge ${p.status === 'active' ? 'bg-success' : 'bg-warning'} mb-3">${p.status.toUpperCase()}</span>
+                    <div class="row g-4">
+                        <div class="col-md-3 text-center border-end pe-3">
+                            <div class="position-relative d-inline-block mb-3">
+                                <img src="${p.profile_photo_path ? '/storage/' + p.profile_photo_path : defaultProfile}" 
+                                     class="rounded-circle shadow-sm img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
+                                <div class="mt-2">
+                                    <span class="badge rounded-pill ${p.status === 'active' ? 'bg-success' : 'bg-warning'} border border-white">
+                                        ${(p.status || 'N/A').toUpperCase()}
+                                    </span>
+                                </div>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-1 text-break">${u.name}</h5>
+                            <p class="text-muted small mb-2 text-break">${u.email}</p>
+                            <p class="text-muted small mb-3"><i class="fa fa-phone me-1"></i> ${p.phone || 'N/A'}</p>
                         </div>
-                        <div class="col-md-9">
-                            <ul class="nav nav-tabs nav-primary" id="practouchTab" role="tablist">
+                        <div class="col-md-9 ps-3">
+                            <ul class="nav nav-tabs nav-primary nav-fill" id="practouchTab" role="tablist">
                                 <li class="nav-item"><a class="nav-link active" id="personal-tab" data-bs-toggle="tab" href="#personal" role="tab">Personal</a></li>
-                                <li class="nav-item"><a class="nav-link" id="qual-tab" data-bs-toggle="tab" href="#qual" role="tab">Qualifications</a></li>
-                                <li class="nav-item"><a class="nav-link" id="practice-tab" data-bs-toggle="tab" href="#practice" role="tab">Practice</a></li>
                                 <li class="nav-item"><a class="nav-link" id="pro-tab" data-bs-toggle="tab" href="#pro" role="tab">Professional</a></li>
-                                <li class="nav-item"><a class="nav-link" id="ident-tab" data-bs-toggle="tab" href="#ident" role="tab">Identity</a></li>
+                                <li class="nav-item"><a class="nav-link" id="practice-tab" data-bs-toggle="tab" href="#practice" role="tab">Practice</a></li>
+                                <li class="nav-item"><a class="nav-link" id="qual-tab" data-bs-toggle="tab" href="#qual" role="tab">Qualifications</a></li>
+                                <li class="nav-item"><a class="nav-link" id="ident-tab" data-bs-toggle="tab" href="#ident" role="tab">Identity & Payment</a></li>
                             </ul>
-                            <div class="tab-content mt-3" id="practouchTabContent">
+                            <div class="tab-content mt-4" id="practouchTabContent">
                                 <!-- Personal Info -->
                                 <div class="tab-pane fade show active" id="personal" role="tabpanel">
-                                    <div class="row g-2">
-                                        <div class="col-md-6"><strong>Gender:</strong> ${p.gender || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>Date of Birth:</strong> ${p.dob || 'N/A'}</div>
-                                        <div class="col-md-12"><strong>Address:</strong> ${p.address || 'N/A'}</div>
-                                    </div>
-                                    <h6 class="mt-3 mb-2 border-top pt-2">Bio & Socials</h6>
-                                    <p class="small text-muted mb-1"><strong>Short Bio:</strong> ${p.short_bio || 'N/A'}</p>
-                                    <div class="mt-2">
-                                        <strong>Social / Website:</strong> 
-                                        ${p.website_social_links ? (Array.isArray(p.website_social_links) ? p.website_social_links.join(', ') : Object.entries(p.website_social_links).map(([k, v]) => v ? `${k}: ${v}` : '').filter(Boolean).join(', ')) : 'N/A'}
-                                    </div>
-                                </div>
-
-                                <!-- Qualifications -->
-                                <div class="tab-pane fade" id="qual" role="tabpanel">
-                                    <div class="row g-2">
-                                        <div class="col-md-12"><strong>Highest Education:</strong> ${p.highest_education || 'N/A'}</div>
-                                        <div class="col-md-12"><strong>Training Details:</strong> ${p.mindfulness_training_details || 'N/A'}</div>
-                                        <div class="col-md-12"><strong>Additional Certs:</strong> ${p.additional_certifications || 'N/A'}</div>
-                                    </div>
-                                    <div class="mt-3">
-                                        <strong>Certificates Uploaded:</strong> 
-                                        ${p.certificates_path ? p.certificates_path.map((path, index) => `<a href="/storage/${path}" target="_blank" class="badge bg-secondary text-white me-1">View Cert ${index+1}</a>`).join('') : 'None'}
-                                    </div>
-                                </div>
-
-                                <!-- Practice Details -->
-                                <div class="tab-pane fade" id="practice" role="tabpanel">
-                                    <div class="mb-3">
-                                        <strong>Services Offered:</strong><br>
-                                        ${p.services_offered ? p.services_offered.map(s => `<span class="badge bg-light text-dark border me-1">${s}</span>`).join('') : 'None'}
-                                    </div>
-                                    <div class="mb-3">
-                                        <strong>Client Concerns:</strong><br>
-                                        ${p.client_concerns ? p.client_concerns.map(c => `<span class="badge bg-light text-dark border me-1">${c}</span>`).join('') : 'None'}
-                                    </div>
-                                    <div class="mb-3">
-                                        <strong>Consultation Modes:</strong><br>
-                                        ${p.consultation_modes ? p.consultation_modes.join(', ') : 'None'}
-                                    </div>
-                                    <div class="mb-3">
-                                        <strong>Languages Spoken:</strong><br>
-                                        ${p.languages_spoken ? p.languages_spoken.join(', ') : 'None'}
+                                    <h6 class="text-primary fw-bold mb-3">Bio & Contact</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Gender</p>
+                                            <p class="fw-medium">${p.gender || 'N/A'}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Date of Birth</p>
+                                            <p class="fw-medium">${formatDate(p.dob)}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p class="text-muted small mb-1">Address</p>
+                                            <p class="fw-medium text-break">${p.address || 'N/A'}</p>
+                                        </div>
+                                         <div class="col-md-12">
+                                            <p class="text-muted small mb-1">Short Bio</p>
+                                            <p class="text-dark bg-light p-3 rounded small text-break">${p.short_bio || 'N/A'}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <p class="text-muted small mb-1">Social / Website</p>
+                                            <p class="fw-medium text-break">
+                                                ${p.website_social_links ? (Array.isArray(p.website_social_links) ? p.website_social_links.join(', ') : Object.entries(p.website_social_links).map(([k, v]) => v ? `${k}: ${v}` : '').filter(Boolean).join(', ')) : 'N/A'}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Professional -->
                                 <div class="tab-pane fade" id="pro" role="tabpanel">
-                                    <div class="row g-2">
-                                        <div class="col-md-6"><strong>Practitioner Type:</strong> ${p.practitioner_type || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>Experience:</strong> ${p.years_of_experience || '0'} Years</div>
-                                        <div class="col-md-12"><strong>Current Workplace:</strong> ${p.current_workplace || 'N/A'}</div>
-                                        <div class="col-md-12 mt-2"><strong>Coaching Style:</strong> ${p.coaching_style || 'N/A'}</div>
-                                        <div class="col-md-12 mt-2"><strong>Target Audience:</strong> ${p.target_audience || 'N/A'}</div>
+                                    <h6 class="text-primary fw-bold mb-3">Professional Profile</h6>
+                                     <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="p-3 border rounded bg-light">
+                                                <p class="text-muted small mb-1">Practitioner Type</p>
+                                                <p class="fw-bold h6 mb-0">${p.practitioner_type || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                             <div class="p-3 border rounded bg-light">
+                                                <p class="text-muted small mb-1">Experience</p>
+                                                <p class="fw-bold h6 mb-0">${p.years_of_experience || '0'} Years</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <p class="text-muted small mb-1">Current Workplace</p>
+                                            <p class="fw-medium">${p.current_workplace || 'N/A'}</p>
+                                        </div>
+                                        <div class="col-12">
+                                            <p class="text-muted small mb-1">Coaching Style</p>
+                                            <p class="text-dark bg-light p-3 rounded small text-break">${p.coaching_style || 'N/A'}</p>
+                                        </div>
+                                         <div class="col-12">
+                                            <p class="text-muted small mb-1">Target Audience</p>
+                                            <p class="text-dark bg-light p-3 rounded small text-break">${p.target_audience || 'N/A'}</p>
+                                        </div>
+                                     </div>
+                                </div>
+
+                                <!-- Practice Details -->
+                                <div class="tab-pane fade" id="practice" role="tabpanel">
+                                    <h6 class="text-primary fw-bold mb-3">Practice Details</h6>
+                                    <div class="mb-4">
+                                        <p class="text-muted small mb-2">Services Offered</p>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            ${p.services_offered ? p.services_offered.map(s => `<span class="badge rounded-pill bg-light text-dark border">${s}</span>`).join('') : 'None'}
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <p class="text-muted small mb-2">Client Concerns Handled</p>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            ${p.client_concerns ? p.client_concerns.map(c => `<span class="badge rounded-pill bg-light text-dark border">${c}</span>`).join('') : 'None'}
+                                        </div>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                             <p class="text-muted small mb-2">Consultation Modes</p>
+                                             <div class="d-flex flex-wrap gap-1">
+                                                ${p.consultation_modes ? p.consultation_modes.map(m => `<span class="badge bg-info text-dark">${m}</span>`).join('') : 'None'}
+                                             </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                             <p class="text-muted small mb-2">Languages Spoken</p>
+                                             <div class="d-flex flex-wrap gap-1">
+                                                ${p.languages_spoken ? p.languages_spoken.map(l => `<span class="badge bg-secondary">${l}</span>`).join('') : 'None'}
+                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Qualifications -->
+                                <div class="tab-pane fade" id="qual" role="tabpanel">
+                                    <h6 class="text-primary fw-bold mb-3">Education & Training</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Highest Education</p>
+                                            <p class="fw-medium">${p.highest_education || 'N/A'}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                             <p class="text-muted small mb-1">Training Details</p>
+                                             <p class="fw-medium text-break">${p.mindfulness_training_details || 'N/A'}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                             <p class="text-muted small mb-1">Additional Certifications</p>
+                                             <p class="fw-medium text-break">${p.additional_certifications || 'N/A'}</p>
+                                        </div>
+                                        <div class="col-12 font-monospace mt-3">
+                                            <p class="text-muted small mb-2">Certificates</p>
+                                             <div class="d-flex flex-wrap gap-2">
+                                                ${p.certificates_path ? p.certificates_path.map((path, index) => 
+                                                    `<a href="/storage/${path}" target="_blank" class="badge bg-light-primary text-primary border border-primary p-2 text-decoration-none">
+                                                        <i class="fa fa-certificate me-1"></i> Cert ${index+1}
+                                                    </a>`).join('') : 'None'}
+                                             </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Identity & Banking -->
                                 <div class="tab-pane fade" id="ident" role="tabpanel">
-                                    <h6 class="mb-2">Identity Proof</h6>
-                                    <div class="row mb-3">
-                                        <div class="col-md-6"><strong>ID Type:</strong> ${p.gov_id_type || 'N/A'}</div>
-                                        <div class="col-md-6">
-                                            <strong>Document:</strong> 
-                                            ${p.gov_id_upload_path ? `<a href="/storage/${p.gov_id_upload_path}" target="_blank" class="text-primary">View ID</a>` : 'Not Uploaded'}
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <h6 class="text-primary fw-bold mb-3">Identity Proof</h6>
+                                             <div class="card bg-light border-0">
+                                                <div class="card-body">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <p class="text-muted small mb-1">ID Type</p>
+                                                            <p class="fw-medium">${p.gov_id_type || 'N/A'}</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p class="text-muted small mb-1">PAN Number</p>
+                                                            <p class="fw-medium">${p.pan_number || 'N/A'}</p>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <p class="text-muted small mb-2">Uploaded Document</p>
+                                                            ${p.gov_id_upload_path ? `<a href="/storage/${p.gov_id_upload_path}" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-eye me-2"></i> View ID</a>` : '<span class="badge bg-warning text-dark">Not Uploaded</span>'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                             </div>
                                         </div>
-                                        <div class="col-md-6"><strong>PAN Number:</strong> ${p.pan_number || 'N/A'}</div>
-                                    </div>
-                                    <h6 class="mb-2 border-top pt-2">Banking Details</h6>
-                                    <div class="row">
-                                        <div class="col-md-6"><strong>Bank Name:</strong> ${p.bank_name || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>Holder Name:</strong> ${p.bank_holder_name || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>Acc Number:</strong> ${p.account_number || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>IFSC:</strong> ${p.ifsc_code || 'N/A'}</div>
-                                        <div class="col-md-6"><strong>UPI ID:</strong> ${p.upi_id || 'N/A'}</div>
-                                        <div class="col-md-12 mt-1">
-                                            <strong>Cancelled Cheque:</strong> 
-                                            ${p.cancelled_cheque_path ? `<a href="/storage/${p.cancelled_cheque_path}" target="_blank" class="text-primary">View Document</a>` : 'Not Uploaded'}
+                                        <div class="col-12">
+                                            <h6 class="text-primary fw-bold mb-3 border-top pt-3">Banking Details</h6>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <p class="text-muted small mb-1">Bank Name</p>
+                                                    <p class="fw-medium">${p.bank_name || 'N/A'}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p class="text-muted small mb-1">Holder Name</p>
+                                                    <p class="fw-medium">${p.bank_holder_name || 'N/A'}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p class="text-muted small mb-1">Acc Number</p>
+                                                    <p class="fw-medium font-monospace">${p.account_number || 'N/A'}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p class="text-muted small mb-1">IFSC</p>
+                                                    <p class="fw-medium font-monospace">${p.ifsc_code || 'N/A'}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p class="text-muted small mb-1">UPI ID</p>
+                                                    <p class="fw-medium">${p.upi_id || 'N/A'}</p>
+                                                </div>
+                                                <div class="col-12">
+                                                    <p class="text-muted small mb-2">Cancelled Cheque</p>
+                                                    ${p.cancelled_cheque_path ? `<a href="/storage/${p.cancelled_cheque_path}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa fa-file-image-o me-2"></i> View Document</a>` : 'Not Uploaded'}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
