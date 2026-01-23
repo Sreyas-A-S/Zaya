@@ -1237,6 +1237,7 @@
 
     $("body").on("change", "#imageUpload", function(e) {
         if (this.files && this.files[0]) {
+            croppedFile = null; // Reset previous crop
             var reader = new FileReader();
             reader.onload = function(e) {
                 $('#image-to-crop').attr('src', e.target.result);
@@ -1262,7 +1263,9 @@
             cropper.destroy();
             cropper = null;
         }
-        $('#imageUpload').val(''); // Reset file input if cancelled
+        if (!croppedFile) {
+            $('#imageUpload').val(''); // Reset file input ONLY if cancelled/no crop confirmed
+        }
     });
 
     $('#crop-btn').click(function() {
@@ -1530,4 +1533,20 @@
     </div>
 </div>
 
+
+<style>
+    /* Fix for browser validation on hidden file input */
+    .avatar-upload .avatar-edit input {
+        display: block !important;
+        width: 1px !important;
+        height: 1px !important;
+        opacity: 0 !important;
+        position: absolute !important;
+        left: 50% !important;
+        bottom: 0 !important;
+        transform: translateX(-50%);
+        pointer-events: none;
+        /* Let clicks pass through to label */
+    }
+</style>
 @endsection

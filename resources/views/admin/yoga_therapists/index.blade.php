@@ -1258,4 +1258,20 @@
         </div>
     </div>
 
+
+    <style>
+        /* Fix for browser validation on hidden file input */
+        .avatar-upload .avatar-edit input {
+            display: block !important;
+            width: 1px !important;
+            height: 1px !important;
+            opacity: 0 !important;
+            position: absolute !important;
+            left: 50% !important;
+            bottom: 0 !important;
+            transform: translateX(-50%);
+            pointer-events: none;
+            /* Let clicks pass through to label */
+        }
+    </style>
     @endsection

@@ -756,12 +756,23 @@
         document.getElementById('imageUpload').addEventListener('change', function(e) {
             const files = e.target.files;
             if (files && files.length > 0) {
+                croppedFile = null; // Reset previous crop
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     image.src = event.target.result;
                     cropModal.show();
                 };
                 reader.readAsDataURL(files[0]);
+            }
+        });
+
+        document.getElementById('crop-modal').addEventListener('hidden.bs.modal', function() {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            if (!croppedFile) {
+                document.getElementById('imageUpload').value = '';
             }
         });
 
@@ -1417,4 +1428,20 @@
     </div>
 </div>
 
+
+<style>
+    /* Fix for browser validation on hidden file input */
+    .avatar-upload .avatar-edit input {
+        display: block !important;
+        width: 1px !important;
+        height: 1px !important;
+        opacity: 0 !important;
+        position: absolute !important;
+        left: 50% !important;
+        bottom: 0 !important;
+        transform: translateX(-50%);
+        pointer-events: none;
+        /* Let clicks pass through to label */
+    }
+</style>
 @endsection
