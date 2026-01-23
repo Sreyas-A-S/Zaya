@@ -36,11 +36,11 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Profile</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    <th>Native Lang</th>
+                                    <th>Source Langs</th>
+                                    <th>Target Langs</th>
                                     <th>Type</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -216,9 +216,10 @@
                                             <div class="row">
                                                 @foreach($specializations as $spec)
                                                 <div class="col-md-4">
-                                                    <div class="form-check checkbox-secondary">
+                                                    <div class="form-check checkbox-secondary d-flex align-items-center">
                                                         <input class="form-check-input" type="checkbox" name="fields_of_specialization[]" value="{{ $spec->name }}" id="spec_{{ $spec->id }}">
-                                                        <label class="form-check-label" for="spec_{{ $spec->id }}">{{ $spec->name }}</label>
+                                                        <label class="form-check-label flex-grow-1 mb-0" for="spec_{{ $spec->id }}">{{ $spec->name }}</label>
+                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $spec->id }}" data-type="translator_specializations"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -271,9 +272,10 @@
                                             <div class="row">
                                                 @foreach($servicesOffered as $service)
                                                 <div class="col-md-6">
-                                                    <div class="form-check checkbox-primary">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center">
                                                         <input class="form-check-input" type="checkbox" name="services_offered[]" value="{{ $service->name }}" id="service_{{ $service->id }}">
-                                                        <label class="form-check-label" for="service_{{ $service->id }}">{{ $service->name }}</label>
+                                                        <label class="form-check-label flex-grow-1 mb-0" for="service_{{ $service->id }}">{{ $service->name }}</label>
+                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $service->id }}" data-type="translator_services"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -405,502 +407,497 @@
             </div>
         </div>
     </div>
-<!-- Call Confirmation Modal -->
-<div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Call</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-4">
-                <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
-                <h5>Make a Call?</h5>
-                <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
-                <h4 class="text-primary" id="call-number"></h4>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+    <!-- Call Confirmation Modal -->
+    <div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Call</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
+                    <h5>Make a Call?</h5>
+                    <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
+                    <h4 class="text-primary" id="call-number"></h4>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@endsection
+    @endsection
 
-@section('scripts')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-<script>
-    let table;
-    let currentStep = 1;
-    const totalSteps = 6;
-    let sourceLangChoices, targetLangChoices, addLangChoices;
+    @section('scripts')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        let table;
+        let currentStep = 1;
+        const totalSteps = 6;
+        let sourceLangChoices, targetLangChoices, addLangChoices;
 
-    $(document).ready(function() {
-        // DataTable
-        table = $('#translators-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('admin.translators.index') }}",
-            columns: [{
-                    data: null,
-                    render: function(data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
+        $(document).ready(function() {
+            // DataTable
+            table = $('#translators-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('admin.translators.index') }}",
+                columns: [{
+                        data: null,
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    {
+                        data: 'name',
+                        name: 'users.name',
+                        render: function(data, type, row) {
+                            return '<div class="d-flex align-items-center gap-2">' +
+                                '<div>' + row.profile_photo + '</div>' +
+                                '<div>' + data + '</div>' +
+                                '</div>';
+                        }
+                    },
+                    {
+                        data: 'email',
+                        name: 'users.email'
+                    },
+                    {
+                        data: 'phone',
+                        name: 'translators.phone'
+                    },
+                    {
+                        data: 'source_languages',
+                        name: 'source_languages',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'target_languages',
+                        name: 'target_languages',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'translator_type',
+                        name: 'translators.translator_type'
+                    },
+                    {
+                        data: 'status',
+                        name: 'translators.status'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },
+                ]
+            });
+
+            // Initialize Choices.js
+            if (document.getElementById('source_languages_select')) {
+                sourceLangChoices = new Choices('#source_languages_select', {
+                    removeItemButton: true,
+                    placeholderValue: 'Select Source Languages',
+                });
+            }
+            if (document.getElementById('target_languages_select')) {
+                targetLangChoices = new Choices('#target_languages_select', {
+                    removeItemButton: true,
+                    placeholderValue: 'Select Target Languages',
+                });
+            }
+            if (document.getElementById('additional_languages_select')) {
+                addLangChoices = new Choices('#additional_languages_select', {
+                    removeItemButton: true,
+                    placeholderValue: 'Select Additional Languages',
+                });
+            }
+
+            // Stepper Logic
+            $('#next-btn').click(function() {
+                if (validateStep(currentStep)) {
+                    if (currentStep < totalSteps) {
+                        currentStep++;
+                        updateStepper();
                     }
-                },
-                {
-                    data: 'profile_photo',
-                    name: 'profile_photo',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'name',
-                    name: 'users.name'
-                },
-                {
-                    data: 'email',
-                    name: 'users.email'
-                },
-                {
-                    data: 'phone',
-                    name: 'translators.phone'
-                },
-                {
-                    data: 'native_language',
-                    name: 'translators.native_language'
-                },
-                {
-                    data: 'translator_type',
-                    name: 'translators.translator_type'
-                },
-                {
-                    data: 'status',
-                    name: 'translators.status'
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                },
-            ]
-        });
+                }
+            });
 
-        // Initialize Choices.js
-        if (document.getElementById('source_languages_select')) {
-            sourceLangChoices = new Choices('#source_languages_select', {
-                removeItemButton: true,
-                placeholderValue: 'Select Source Languages',
-            });
-        }
-        if (document.getElementById('target_languages_select')) {
-            targetLangChoices = new Choices('#target_languages_select', {
-                removeItemButton: true,
-                placeholderValue: 'Select Target Languages',
-            });
-        }
-        if (document.getElementById('additional_languages_select')) {
-            addLangChoices = new Choices('#additional_languages_select', {
-                removeItemButton: true,
-                placeholderValue: 'Select Additional Languages',
-            });
-        }
-
-        // Stepper Logic
-        $('#next-btn').click(function() {
-            if (validateStep(currentStep)) {
-                if (currentStep < totalSteps) {
-                    currentStep++;
+            $('#prev-btn').click(function() {
+                if (currentStep > 1) {
+                    currentStep--;
                     updateStepper();
                 }
-            }
-        });
+            });
 
-        $('#prev-btn').click(function() {
-            if (currentStep > 1) {
-                currentStep--;
+            $('.stepper-item').click(function() {
+                // Optional: Add validation before jumping
+                let step = $(this).data('step');
+                currentStep = step;
                 updateStepper();
-            }
-        });
-
-        $('.stepper-item').click(function() {
-            // Optional: Add validation before jumping
-            let step = $(this).data('step');
-            currentStep = step;
-            updateStepper();
-        });
-
-        function updateStepper() {
-            $('.step-content').addClass('d-none');
-            $('#step-' + currentStep).removeClass('d-none');
-
-            $('.stepper-item').removeClass('active completed');
-            for (let i = 1; i <= totalSteps; i++) {
-                if (i === currentStep) {
-                    $('.stepper-item[data-step="' + i + '"]').addClass('active');
-                } else if (i < currentStep) {
-                    $('.stepper-item[data-step="' + i + '"]').addClass('completed');
-                }
-            }
-
-            // Scroll to top of stepper
-            document.getElementById('translator-stepper').scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
             });
 
-            if (currentStep === 1) {
-                $('#prev-btn').hide();
-            } else {
-                $('#prev-btn').show();
-            }
+            function updateStepper() {
+                $('.step-content').addClass('d-none');
+                $('#step-' + currentStep).removeClass('d-none');
 
-            if (currentStep === totalSteps) {
-                $('#next-btn').hide();
-                $('#submit-btn').show();
-            } else {
-                $('#next-btn').show();
-                $('#submit-btn').hide();
-            }
-        }
+                $('.stepper-item').removeClass('active completed');
+                for (let i = 1; i <= totalSteps; i++) {
+                    if (i === currentStep) {
+                        $('.stepper-item[data-step="' + i + '"]').addClass('active');
+                    } else if (i < currentStep) {
+                        $('.stepper-item[data-step="' + i + '"]').addClass('completed');
+                    }
+                }
 
-        function validateStep(step) {
-            let isValid = true;
-            let $step = $('#step-' + step);
-            // Basic required validation for visible inputs in current step
-            $step.find('input[required], select[required]').each(function() {
-                if (!$(this).val()) {
-                    isValid = false;
-                    $(this).addClass('is-invalid');
+                // Scroll to top of stepper
+                document.getElementById('translator-stepper').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                if (currentStep === 1) {
+                    $('#prev-btn').hide();
                 } else {
-                    $(this).removeClass('is-invalid');
+                    $('#prev-btn').show();
+                }
+
+                if (currentStep === totalSteps) {
+                    $('#next-btn').hide();
+                    $('#submit-btn').show();
+                } else {
+                    $('#next-btn').show();
+                    $('#submit-btn').hide();
+                }
+            }
+
+            function validateStep(step) {
+                let isValid = true;
+                let $step = $('#step-' + step);
+                // Basic required validation for visible inputs in current step
+                $step.find('input[required], select[required]').each(function() {
+                    if (!$(this).val()) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+                return isValid;
+            }
+
+            // Image Preview and Validation
+            $("#imageUpload").change(function() {
+                if (this.files && this.files[0]) {
+                    if (this.files[0].size > 2 * 1024 * 1024) { // 2MB
+                        alert('Profile photo size must be less than 2MB');
+                        $(this).val(''); // Clear input
+                        return;
+                    }
+                    readURL(this);
                 }
             });
-            return isValid;
-        }
 
-        // Image Preview and Validation
-        $("#imageUpload").change(function() {
-            if (this.files && this.files[0]) {
-                if (this.files[0].size > 2 * 1024 * 1024) { // 2MB
-                    alert('Profile photo size must be less than 2MB');
-                    $(this).val(''); // Clear input
-                    return;
+            function readURL(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
+                        $('#imagePreview').hide();
+                        $('#imagePreview').fadeIn(650);
+                    }
+                    reader.readAsDataURL(input.files[0]);
                 }
-                readURL(this);
             }
-        });
 
-        function readURL(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
-                    $('#imagePreview').hide();
-                    $('#imagePreview').fadeIn(650);
-                }
-                reader.readAsDataURL(input.files[0]);
+            function openCreateModal() {
+                $('#translator-form')[0].reset();
+                $('#translator_id').val('');
+                $('#form-method').val('POST');
+                $('#form-modal-title').text('Register Translator');
+                $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+
+                // Show password fields
+                $('.password-field').show();
+                $('input[name="password"]').attr('required', 'required');
+                $('input[name="password_confirmation"]').attr('required', 'required');
+
+                // Reset Choices
+                if (sourceLangChoices) sourceLangChoices.removeActiveItems();
+                if (targetLangChoices) targetLangChoices.removeActiveItems();
+                if (addLangChoices) addLangChoices.removeActiveItems();
+
+                currentStep = 1;
+                updateStepper();
+                $('#translator-form-modal').modal('show');
             }
-        }
+            window.openCreateModal = openCreateModal; // Expose to global scope for button click
 
-        // Master Data Quick Add
-        $(document).on('click', '.add-master-data-btn', function() {
-            let btn = $(this);
-            let input = btn.siblings('.new-master-data-input');
-            let type = input.data('type');
-            let value = input.val().trim();
-            // Container layout structure is:
-            // col-md-12 -> label -> div.row -> (foreach cols) -> col-12 input
-            // So closest(.row) is the one we want to append to.
-            let container = input.closest('.row');
+            let deleteMasterBtnRef = null;
 
-            if (!value) return;
+            // Handle Delete Master Data
+            $(document).on('click', '.delete-master-data-btn', function() {
+                deleteMasterBtnRef = $(this);
+                let id = $(this).data('id');
+                let type = $(this).data('type');
 
-            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+                $('#delete-master-id').val(id);
+                $('#delete-master-type').val(type);
+                $('#master-data-delete-modal').modal('show');
+            });
 
-            $.ajax({
-                url: "{{ url('admin/master-data') }}/" + type,
-                method: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    name: value,
-                    status: 1
-                },
-                success: function(response) {
-                    if (response.success) {
-                        let checkboxName = '';
-                        let idPrefix = '';
-                        if (type === 'translator_specializations') {
-                            checkboxName = 'fields_of_specialization[]';
-                            idPrefix = 'spec_';
-                        } else if (type === 'translator_services') {
-                            checkboxName = 'services_offered[]';
-                            idPrefix = 'service_';
+            // Confirm Master Data Delete
+            $('#confirm-master-delete-btn').click(function() {
+                let btn = $(this);
+                let id = $('#delete-master-id').val();
+                let type = $('#delete-master-type').val();
+
+                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+                $.ajax({
+                    url: "{{ url('admin/master-data') }}/" + type + "/" + id,
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#master-data-delete-modal').modal('hide');
+                            if (deleteMasterBtnRef) {
+                                deleteMasterBtnRef.closest('[class^="col-"]').fadeOut(300, function() {
+                                    $(this).remove();
+                                });
+                            }
+                            if (typeof showToast === 'function') showToast('Item deleted successfully');
+                        } else {
+                            alert('Failed to delete item');
                         }
-
-                        let newId = response.data.id;
-                        let newName = response.data.name;
-
-                        let html = `
-                            <div class="col-md-4">
-                                <div class="form-check checkbox-${type === 'translator_specializations' ? 'secondary' : 'primary'}">
-                                    <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
-                                    <label class="form-check-label" for="${idPrefix}${newId}">${newName}</label>
-                                </div>
-                            </div>
-                        `;
-                        // Insert before the input container (which is col-12)
-                        input.closest('.col-12').before(html);
-                        input.val('');
-                        if (typeof showToast === 'function') showToast(response.success);
+                    },
+                    error: function(xhr) {
+                        alert('Error: ' + (xhr.responseJSON?.error || 'Could not delete item'));
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html('Delete Now');
                     }
-                },
-                error: function(xhr) {
-                    if (typeof showToast === 'function') {
-                        showToast('Error: ' + (xhr.responseJSON?.error || 'Could not add item'), 'error');
-                    }
-                },
-                complete: function() {
-                    btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
-                }
+                });
             });
-        });
 
-        function openCreateModal() {
-            $('#translator-form')[0].reset();
-            $('#translator_id').val('');
-            $('#form-method').val('POST');
-            $('#form-modal-title').text('Register Translator');
-            $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+            // Master Data Quick Add
+            $(document).on('click', '.add-master-data-btn', function() {
+                let btn = $(this);
+                let input = btn.siblings('.new-master-data-input');
+                let type = input.data('type');
+                let value = input.val().trim();
+                // Container logic similar to previous implementation
+                // Assuming structure: <div class="col-12/md-x"> <div class="row"> ...checkboxes... <div class="col-12 mt-2">...input...</div> </div> </div>
+                let container = null;
+                if (type === 'translator_specializations') {
+                    container = btn.closest('.row').find('.col-md-4').parent();
+                } else {
+                    container = btn.closest('.row').find('.col-md-6').parent();
+                }
 
-            // Show password fields
-            $('.password-field').show();
-            $('input[name="password"]').attr('required', 'required');
-            $('input[name="password_confirmation"]').attr('required', 'required');
+                if (!value) return;
 
-            // Reset Choices
-            if (sourceLangChoices) sourceLangChoices.removeActiveItems();
-            if (targetLangChoices) targetLangChoices.removeActiveItems();
-            if (addLangChoices) addLangChoices.removeActiveItems();
+                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
 
-            currentStep = 1;
-            updateStepper();
-            $('#translator-form-modal').modal('show');
-        }
-        window.openCreateModal = openCreateModal; // Expose to global scope for button click
+                $.ajax({
+                    url: "{{ url('admin/master-data') }}/" + type,
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        name: value,
+                        status: 1
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            let checkboxName = type === 'translator_services' ? 'services_offered[]' : 'fields_of_specialization[]';
+                            let idPrefix = type === 'translator_services' ? 'service_' : 'spec_';
+                            let colClass = type === 'translator_services' ? 'col-md-6' : 'col-md-4';
+                            let newId = response.data.id;
+                            let newName = response.data.name;
 
-        // Master Data Quick Add
-        $(document).on('click', '.add-master-data-btn', function() {
-            let btn = $(this);
-            let input = btn.siblings('.new-master-data-input');
-            let type = input.data('type');
-            let value = input.val().trim();
-            // Container logic similar to previous implementation
-            // Assuming structure: <div class="col-12/md-x"> <div class="row"> ...checkboxes... <div class="col-12 mt-2">...input...</div> </div> </div>
-            let container = null;
-            if (type === 'translator_specializations') {
-                container = btn.closest('.row').find('.col-md-4').parent();
-            } else {
-                container = btn.closest('.row').find('.col-md-6').parent();
-            }
-
-            if (!value) return;
-
-            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
-
-            $.ajax({
-                url: "{{ url('admin/master-data') }}/" + type,
-                method: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    name: value,
-                    status: 1
-                },
-                success: function(response) {
-                    if (response.success) {
-                        let checkboxName = type === 'translator_services' ? 'services_offered[]' : 'fields_of_specialization[]';
-                        let idPrefix = type === 'translator_services' ? 'service_' : 'spec_';
-                        let colClass = type === 'translator_services' ? 'col-md-6' : 'col-md-4';
-                        let newId = response.data.id;
-                        let newName = response.data.name;
-
-                        let html = `
+                            let html = `
                             <div class="${colClass}">
-                                <div class="form-check checkbox-${type === 'translator_services' ? 'primary' : 'secondary'}">
+                                <div class="form-check checkbox-${type === 'translator_services' ? 'primary' : 'secondary'} d-flex align-items-center">
                                     <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
-                                    <label class="form-check-label" for="${idPrefix}${newId}">${newName}</label>
+                                    <label class="form-check-label flex-grow-1 mb-0" for="${idPrefix}${newId}">${newName}</label>
+                                    <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="${type}"><i class="fa fa-trash"></i></a>
                                 </div>
                             </div>
                         `;
-                        // Insert before the input container (col-12 mt-2)
-                        btn.closest('.col-12').before(html);
-                        input.val('');
+                            // Insert before the input container (col-12 mt-2)
+                            btn.closest('.col-12').before(html);
+                            input.val('');
+                            if (typeof showToast === 'function') showToast(response.success);
+                        }
+                    },
+                    error: function(xhr) {
+                        if (typeof showToast === 'function') showToast('Error adding item', 'error');
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
+                    }
+                });
+            });
+
+            // Form Submit
+            $('#translator-form').on('submit', function(e) {
+                e.preventDefault();
+                let id = $('#translator_id').val();
+                let url = id ? "{{ url('admin/translators') }}/" + id : "{{ route('admin.translators.store') }}";
+                let formData = new FormData(this);
+
+                let btn = $('#submit-btn');
+                btn.prop('disabled', true).html('Saving...');
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        $('#translator-form-modal').modal('hide');
+                        table.draw();
                         if (typeof showToast === 'function') showToast(response.success);
+                    },
+                    error: function(xhr) {
+                        let msg = xhr.responseJSON ? xhr.responseJSON.error || xhr.responseJSON.message : 'Error occurred';
+                        if (typeof showToast === 'function') showToast(msg, 'error');
+                        else alert(msg);
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html('Submit');
                     }
-                },
-                error: function(xhr) {
-                    if (typeof showToast === 'function') showToast('Error adding item', 'error');
-                },
-                complete: function() {
-                    btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
-                }
+                });
             });
-        });
 
-        // Form Submit
-        $('#translator-form').on('submit', function(e) {
-            e.preventDefault();
-            let id = $('#translator_id').val();
-            let url = id ? "{{ url('admin/translators') }}/" + id : "{{ route('admin.translators.store') }}";
-            let formData = new FormData(this);
+            // Edit
+            $('body').on('click', '.editTranslator', function() {
+                let id = $(this).data('id');
+                openCreateModal(); // Reset form first
+                $('#translator_id').val(id);
+                $('#form-method').val('PUT');
+                $('#form-modal-title').text('Edit Translator');
 
-            let btn = $('#submit-btn');
-            btn.prop('disabled', true).html('Saving...');
+                $('.password-field').hide();
+                $('input[name="password"]').removeAttr('required');
+                $('input[name="password_confirmation"]').removeAttr('required');
 
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    $('#translator-form-modal').modal('hide');
-                    table.draw();
-                    if (typeof showToast === 'function') showToast(response.success);
-                },
-                error: function(xhr) {
-                    let msg = xhr.responseJSON ? xhr.responseJSON.error || xhr.responseJSON.message : 'Error occurred';
-                    if (typeof showToast === 'function') showToast(msg, 'error');
-                    else alert(msg);
-                },
-                complete: function() {
-                    btn.prop('disabled', false).html('Submit');
-                }
-            });
-        });
+                $.get("{{ url('admin/translators') }}/" + id + "/edit", function(response) {
+                    let u = response.user;
+                    let t = response.translator;
 
-        // Edit
-        $('body').on('click', '.editTranslator', function() {
-            let id = $(this).data('id');
-            openCreateModal(); // Reset form first
-            $('#translator_id').val(id);
-            $('#form-method').val('PUT');
-            $('#form-modal-title').text('Edit Translator');
+                    $('input[name="full_name"]').val(u.name);
+                    $('input[name="email"]').val(u.email);
+                    $('input[name="phone"]').val(t.phone);
+                    $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
+                    $('textarea[name="address"]').val(t.address);
+                    $('select[name="gender"]').val(t.gender);
 
-            $('.password-field').hide();
-            $('input[name="password"]').removeAttr('required');
-            $('input[name="password_confirmation"]').removeAttr('required');
-
-            $.get("{{ url('admin/translators') }}/" + id + "/edit", function(response) {
-                let u = response.user;
-                let t = response.translator;
-
-                $('input[name="full_name"]').val(u.name);
-                $('input[name="email"]').val(u.email);
-                $('input[name="phone"]').val(t.phone);
-                $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
-                $('textarea[name="address"]').val(t.address);
-                $('select[name="gender"]').val(t.gender);
-
-                if (t.profile_photo_path) {
-                    $('#imagePreview').css('background-image', 'url(/storage/' + t.profile_photo_path + ')');
-                }
-
-                $('select[name="native_language"]').val(t.native_language);
-
-                // Set Choices
-                if (sourceLangChoices && t.source_languages) sourceLangChoices.setChoiceByValue(t.source_languages);
-                if (targetLangChoices && t.target_languages) targetLangChoices.setChoiceByValue(t.target_languages);
-                if (addLangChoices && t.additional_languages) addLangChoices.setChoiceByValue(t.additional_languages);
-
-                $('select[name="translator_type"]').val(t.translator_type);
-                $('input[name="years_of_experience"]').val(t.years_of_experience);
-
-                // Checkboxes
-                if (t.fields_of_specialization) {
-                    t.fields_of_specialization.forEach(val => {
-                        $(`input[name="fields_of_specialization[]"][value="${val}"]`).prop('checked', true);
-                    });
-                }
-
-                $('textarea[name="previous_clients_projects"]').val(t.previous_clients_projects);
-                $('input[name="portfolio_link"]').val(t.portfolio_link);
-
-                $('input[name="highest_education"]').val(t.highest_education);
-                $('textarea[name="certification_details"]').val(t.certification_details);
-
-                if (t.services_offered) {
-                    t.services_offered.forEach(val => {
-                        $(`input[name="services_offered[]"][value="${val}"]`).prop('checked', true);
-                    });
-                }
-
-                $('input[name="gov_id_type"]').val(t.gov_id_type);
-                $('input[name="pan_number"]').val(t.pan_number);
-                $('input[name="bank_holder_name"]').val(t.bank_holder_name);
-                $('input[name="bank_name"]').val(t.bank_name);
-                $('input[name="account_number"]').val(t.account_number);
-                $('input[name="ifsc_code"]').val(t.ifsc_code);
-                $('input[name="swift_code"]').val(t.swift_code);
-                $('input[name="upi_id"]').val(t.upi_id);
-            });
-        });
-
-        // Delete
-        $('body').on('click', '.deleteTranslator', function() {
-            $('#delete-translator-id').val($(this).data('id'));
-            var modalEl = document.getElementById('translator-delete-modal');
-            var modal = bootstrap.Modal.getInstance(modalEl);
-            if (!modal) {
-                modal = new bootstrap.Modal(modalEl);
-            }
-            modal.show();
-        });
-
-        $('#confirm-delete-btn').click(function() {
-            let id = $('#delete-translator-id').val();
-            $.ajax({
-                url: "{{ url('admin/translators') }}/" + id,
-                type: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(res) {
-                    var modalEl = document.getElementById('translator-delete-modal');
-                    var modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) {
-                        modal.hide();
+                    if (t.profile_photo_path) {
+                        $('#imagePreview').css('background-image', 'url(/storage/' + t.profile_photo_path + ')');
                     }
-                    table.draw();
-                    if (typeof showToast === 'function') showToast(res.success);
-                }
+
+                    $('select[name="native_language"]').val(t.native_language);
+
+                    // Set Choices
+                    if (sourceLangChoices && t.source_languages) sourceLangChoices.setChoiceByValue(t.source_languages);
+                    if (targetLangChoices && t.target_languages) targetLangChoices.setChoiceByValue(t.target_languages);
+                    if (addLangChoices && t.additional_languages) addLangChoices.setChoiceByValue(t.additional_languages);
+
+                    $('select[name="translator_type"]').val(t.translator_type);
+                    $('input[name="years_of_experience"]').val(t.years_of_experience);
+
+                    // Checkboxes
+                    if (t.fields_of_specialization) {
+                        t.fields_of_specialization.forEach(val => {
+                            $(`input[name="fields_of_specialization[]"][value="${val}"]`).prop('checked', true);
+                        });
+                    }
+
+                    $('textarea[name="previous_clients_projects"]').val(t.previous_clients_projects);
+                    $('input[name="portfolio_link"]').val(t.portfolio_link);
+
+                    $('input[name="highest_education"]').val(t.highest_education);
+                    $('textarea[name="certification_details"]').val(t.certification_details);
+
+                    if (t.services_offered) {
+                        t.services_offered.forEach(val => {
+                            $(`input[name="services_offered[]"][value="${val}"]`).prop('checked', true);
+                        });
+                    }
+
+                    $('input[name="gov_id_type"]').val(t.gov_id_type);
+                    $('input[name="pan_number"]').val(t.pan_number);
+                    $('input[name="bank_holder_name"]').val(t.bank_holder_name);
+                    $('input[name="bank_name"]').val(t.bank_name);
+                    $('input[name="account_number"]').val(t.account_number);
+                    $('input[name="ifsc_code"]').val(t.ifsc_code);
+                    $('input[name="swift_code"]').val(t.swift_code);
+                    $('input[name="upi_id"]').val(t.upi_id);
+                });
             });
-        });
 
-        // View
-        $('body').on('click', '.viewTranslator', function() {
-            let id = $(this).data('id');
-            $.get("{{ url('admin/translators') }}/" + id, function(response) {
-                let u = response.user;
-                let t = response.translator;
+            // Delete
+            $('body').on('click', '.deleteTranslator', function() {
+                $('#delete-translator-id').val($(this).data('id'));
+                var modalEl = document.getElementById('translator-delete-modal');
+                var modal = bootstrap.Modal.getInstance(modalEl);
+                if (!modal) {
+                    modal = new bootstrap.Modal(modalEl);
+                }
+                modal.show();
+            });
 
-                const formatDate = (dateString) => {
-                    if (!dateString) return 'N/A';
-                    const date = new Date(dateString);
-                    if (isNaN(date.getTime())) return dateString;
-                    return date.toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                    });
-                };
+            $('#confirm-delete-btn').click(function() {
+                let id = $('#delete-translator-id').val();
+                $.ajax({
+                    url: "{{ url('admin/translators') }}/" + id,
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(res) {
+                        var modalEl = document.getElementById('translator-delete-modal');
+                        var modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) {
+                            modal.hide();
+                        }
+                        table.draw();
+                        if (typeof showToast === 'function') showToast(res.success);
+                    }
+                });
+            });
 
-                const defaultProfile = "{{ asset('admiro/assets/images/user/user.png') }}";
+            // View
+            $('body').on('click', '.viewTranslator', function() {
+                let id = $(this).data('id');
+                $.get("{{ url('admin/translators') }}/" + id, function(response) {
+                    let u = response.user;
+                    let t = response.translator;
 
-                let html = `
+                    const formatDate = (dateString) => {
+                        if (!dateString) return 'N/A';
+                        const date = new Date(dateString);
+                        if (isNaN(date.getTime())) return dateString;
+                        return date.toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        });
+                    };
+
+                    const defaultProfile = "{{ asset('admiro/assets/images/user/user.png') }}";
+
+                    let html = `
                     <div class="row g-4">
                         <div class="col-md-3 text-center border-end pe-3">
                             <div class="position-relative d-inline-block mb-3">
@@ -1105,217 +1102,255 @@
                         </div>
                     </div>
                 `;
-                $('#view-modal-content').html(html);
-                var modalEl = document.getElementById('translator-view-modal');
+                    $('#view-modal-content').html(html);
+                    var modalEl = document.getElementById('translator-view-modal');
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (!modal) {
+                        modal = new bootstrap.Modal(modalEl);
+                    }
+                    modal.show();
+                });
+            });
+
+            // Status Toggle
+            $('body').on('click', '.toggle-status', function() {
+                var id = $(this).data('id');
+                var currentStatus = $(this).data('status');
+                var newStatus = (currentStatus === 'active') ? 0 : 1;
+                var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
+
+                $('#status-translator-id').val(id);
+                $('#status-new-value').val(newStatus);
+                $('#status-confirmation-msg').text(`Are you sure you want to change the status to ${newStatusText}?`);
+
+                var modalEl = document.getElementById('status-confirmation-modal');
                 var modal = bootstrap.Modal.getInstance(modalEl);
                 if (!modal) {
                     modal = new bootstrap.Modal(modalEl);
                 }
                 modal.show();
             });
-        });
 
-        // Status Toggle
-        $('body').on('click', '.toggle-status', function() {
-            var id = $(this).data('id');
-            var currentStatus = $(this).data('status');
-            var newStatus = (currentStatus === 'active') ? 0 : 1;
-            var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
+            $('#confirm-status-btn').on('click', function() {
+                var id = $('#status-translator-id').val();
+                var newStatus = $('#status-new-value').val();
+                var btn = $(this);
+                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
 
-            $('#status-translator-id').val(id);
-            $('#status-new-value').val(newStatus);
-            $('#status-confirmation-msg').text(`Are you sure you want to change the status to ${newStatusText}?`);
-            
-            var modalEl = document.getElementById('status-confirmation-modal');
-            var modal = bootstrap.Modal.getInstance(modalEl);
-            if (!modal) {
-                modal = new bootstrap.Modal(modalEl);
-            }
-            modal.show();
-        });
-
-        $('#confirm-status-btn').on('click', function() {
-            var id = $('#status-translator-id').val();
-            var newStatus = $('#status-new-value').val();
-            var btn = $(this);
-            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
-
-            $.ajax({
-                url: "{{ url('admin/translators') }}/" + id + "/status",
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    status: newStatus
-                },
-                success: function(response) {
-                    var modalEl = document.getElementById('status-confirmation-modal');
-                    var modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) {
-                        modal.hide();
+                $.ajax({
+                    url: "{{ url('admin/translators') }}/" + id + "/status",
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        status: newStatus
+                    },
+                    success: function(response) {
+                        var modalEl = document.getElementById('status-confirmation-modal');
+                        var modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) {
+                            modal.hide();
+                        }
+                        table.draw(false);
+                        if (typeof showToast === 'function') showToast(response.success);
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html('Confirm Change');
                     }
-                    table.draw(false);
-                    if (typeof showToast === 'function') showToast(response.success);
-                },
-                complete: function() {
-                    btn.prop('disabled', false).html('Confirm Change');
-                }
+                });
+            });
+
+            // Handle Call Modal
+            $('body').on('click', '.call-phone', function() {
+                const phone = $(this).data('phone');
+                const name = $(this).data('name');
+
+                $('#call-name-translator').text(name);
+                $('#call-number-translator').text(phone);
+                $('#confirm-call-btn-translator').attr('href', 'tel:' + phone);
+                $('#call-confirmation-modal-translator').modal('show');
             });
         });
+    </script>
+    <style>
+        /* Stepper Styling */
+        .stepper-horizontal {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 40px;
+        }
 
-        // Handle Call Modal
-        $('body').on('click', '.call-phone', function() {
-            const phone = $(this).data('phone');
-            const name = $(this).data('name');
+        /* Avatar Upload Styling */
+        .avatar-upload {
+            position: relative;
+            max-width: 150px;
+            margin: 0 auto;
+        }
 
-            $('#call-name').text(name);
-            $('#call-number').text(phone);
-            $('#confirm-call-btn').attr('href', 'tel:' + phone);
-            
-            var modalEl = document.getElementById('call-confirmation-modal');
-            var modal = bootstrap.Modal.getInstance(modalEl);
-            if (!modal) {
-                modal = new bootstrap.Modal(modalEl);
-            }
-            modal.show();
-        });
-    });
-</script>
-<style>
-    /* Stepper Styling */
-    .stepper-horizontal {
-        display: flex;
-        justify-content: space-between;
-        position: relative;
-        margin-bottom: 40px;
-    }
+        .avatar-upload .avatar-edit {
+            position: absolute;
+            right: 12px;
+            z-index: 1;
+            top: 10px;
+        }
 
-    /* Avatar Upload Styling */
-    .avatar-upload {
-        position: relative;
-        max-width: 150px;
-        margin: 0 auto;
-    }
+        .avatar-upload .avatar-edit input {
+            display: none;
+        }
 
-    .avatar-upload .avatar-edit {
-        position: absolute;
-        right: 12px;
-        z-index: 1;
-        top: 10px;
-    }
+        .avatar-upload .avatar-edit label {
+            display: inline-block;
+            width: 34px;
+            height: 34px;
+            margin-bottom: 0;
+            border-radius: 100%;
+            background: #FFFFFF;
+            border: 1px solid transparent;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+            font-weight: normal;
+            transition: all .2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .avatar-upload .avatar-edit input {
-        display: none;
-    }
+        .avatar-upload .avatar-edit label:hover {
+            background: #f1f1f1;
+            border-color: #d6d6d6;
+        }
 
-    .avatar-upload .avatar-edit label {
-        display: inline-block;
-        width: 34px;
-        height: 34px;
-        margin-bottom: 0;
-        border-radius: 100%;
-        background: #FFFFFF;
-        border: 1px solid transparent;
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
-        cursor: pointer;
-        font-weight: normal;
-        transition: all .2s ease-in-out;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+        .avatar-upload .avatar-edit label i {
+            color: #757575;
+            font-size: 16px;
+        }
 
-    .avatar-upload .avatar-edit label:hover {
-        background: #f1f1f1;
-        border-color: #d6d6d6;
-    }
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            border-radius: 100%;
+            border: 4px solid #F8F8F8;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        }
 
-    .avatar-upload .avatar-edit label i {
-        color: #757575;
-        font-size: 16px;
-    }
+        .avatar-preview>div {
+            width: 100%;
+            height: 100%;
+            border-radius: 100%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
 
-    .avatar-preview {
-        width: 150px;
-        height: 150px;
-        position: relative;
-        border-radius: 100%;
-        border: 4px solid #F8F8F8;
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-    }
+        .stepper-horizontal::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #f4f4f4;
+            z-index: 0;
+        }
 
-    .avatar-preview>div {
-        width: 100%;
-        height: 100%;
-        border-radius: 100%;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
+        .stepper-horizontal .stepper-item {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            cursor: pointer;
+        }
 
-    .stepper-horizontal::before {
-        content: "";
-        position: absolute;
-        top: 20px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: #f4f4f4;
-        z-index: 0;
-    }
+        .stepper-horizontal .step-counter {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            color: #999;
+        }
 
-    .stepper-horizontal .stepper-item {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
-        cursor: pointer;
-    }
+        .stepper-horizontal .step-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #999;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
 
-    .stepper-horizontal .step-counter {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #fff;
-        border: 2px solid #f4f4f4;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-weight: 600;
-        margin-bottom: 10px;
-        transition: all 0.3s ease;
-        color: #999;
-    }
+        .stepper-horizontal .stepper-item.active .step-counter {
+            border-color: var(--theme-default);
+            background: var(--theme-default);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(var(--theme-default-rgb), 0.2);
+        }
 
-    .stepper-horizontal .step-name {
-        font-size: 12px;
-        font-weight: 500;
-        color: #999;
-        transition: all 0.3s ease;
-        text-align: center;
-    }
+        .stepper-horizontal .stepper-item.active .step-name {
+            color: var(--theme-default);
+            font-weight: 600;
+        }
 
-    .stepper-horizontal .stepper-item.active .step-counter {
-        border-color: var(--theme-default);
-        background: var(--theme-default);
-        color: #fff;
-        box-shadow: 0 4px 10px rgba(var(--theme-default-rgb), 0.2);
-    }
+        .stepper-horizontal .stepper-item.completed .step-counter {
+            border-color: #51bb25;
+            background: #51bb25;
+            color: #fff;
+        }
 
-    .stepper-horizontal .stepper-item.active .step-name {
-        color: var(--theme-default);
-        font-weight: 600;
-    }
+        .stepper-horizontal .stepper-item.completed .step-name {
+            color: #51bb25;
+        }
+    </style>
+    <!-- Call Confirmation Modal -->
+    <div class="modal fade" id="call-confirmation-modal-translator" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Call</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
+                    <h5>Make a Call?</h5>
+                    <p>Do you want to call <span id="call-name-translator" class="fw-bold"></span>?</p>
+                    <h4 class="text-primary" id="call-number-translator"></h4>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirm-call-btn-translator" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Master Data Delete Modal -->
+    <div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                    <h5>Are you sure?</h5>
+                    <p class="text-muted">Do you want to delete this specific item? This action is permanent.</p>
+                    <input type="hidden" id="delete-master-id">
+                    <input type="hidden" id="delete-master-type">
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    .stepper-horizontal .stepper-item.completed .step-counter {
-        border-color: #51bb25;
-        background: #51bb25;
-        color: #fff;
-    }
-
-    .stepper-horizontal .stepper-item.completed .step-name {
-        color: #51bb25;
-    }
-</style>
-@endsection
+    @endsection

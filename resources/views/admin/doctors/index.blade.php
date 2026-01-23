@@ -36,7 +36,6 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Profile</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>AYUSH No.</th>
@@ -214,9 +213,10 @@
                                             <div class="row">
                                                 @foreach($specializations as $spec)
                                                 <div class="col-md-3">
-                                                    <div class="form-check checkbox-primary">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center">
                                                         <input class="form-check-input spec-checkbox" type="checkbox" name="specialization[]" value="{{ $spec->name }}" id="spec_{{ $spec->id }}">
-                                                        <label class="form-check-label" for="spec_{{ $spec->id }}">{{ $spec->name }}</label>
+                                                        <label class="form-check-label flex-grow-1 mb-0" for="spec_{{ $spec->id }}">{{ $spec->name }}</label>
+                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $spec->id }}" data-type="specializations"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -260,9 +260,10 @@
                                             <div class="row">
                                                 @foreach($expertises as $skill)
                                                 <div class="col-md-4">
-                                                    <div class="form-check checkbox-primary">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center">
                                                         <input class="form-check-input skill-checkbox" type="checkbox" name="consultation_expertise[]" value="{{ $skill->name }}" id="skill_{{ $skill->id }}">
-                                                        <label class="form-check-label" for="skill_{{ $skill->id }}">{{ $skill->name }}</label>
+                                                        <label class="form-check-label flex-grow-1 mb-0" for="skill_{{ $skill->id }}">{{ $skill->name }}</label>
+                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $skill->id }}" data-type="expertises"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -280,9 +281,10 @@
                                             <div class="row">
                                                 @foreach($healthConditions as $cond)
                                                 <div class="col-md-3">
-                                                    <div class="form-check checkbox-primary">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center">
                                                         <input class="form-check-input cond-checkbox" type="checkbox" name="health_conditions[]" value="{{ $cond->name }}" id="cond_{{ $cond->id }}">
-                                                        <label class="form-check-label" for="cond_{{ $cond->id }}">{{ $cond->name }}</label>
+                                                        <label class="form-check-label flex-grow-1 mb-0" for="cond_{{ $cond->id }}">{{ $cond->name }}</label>
+                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $cond->id }}" data-type="conditions"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -316,9 +318,10 @@
                                             <div class="row">
                                                 @foreach($externalTherapies as $ther)
                                                 <div class="col-md-4">
-                                                    <div class="form-check checkbox-primary">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center">
                                                         <input class="form-check-input ther-checkbox" type="checkbox" name="external_therapies[]" value="{{ $ther->name }}" id="ther_{{ $ther->id }}">
-                                                        <label class="form-check-label" for="ther_{{ $ther->id }}">{{ $ther->name }}</label>
+                                                        <label class="form-check-label flex-grow-1 mb-0" for="ther_{{ $ther->id }}">{{ $ther->name }}</label>
+                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $ther->id }}" data-type="therapies"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -815,14 +818,14 @@
                     searchable: false
                 },
                 {
-                    data: 'profile_photo',
-                    name: 'profile_photo',
-                    orderable: false,
-                    searchable: false
-                },
-                {
                     data: 'name',
-                    name: 'users.name'
+                    name: 'users.name',
+                    render: function(data, type, row) {
+                        return '<div class="d-flex align-items-center gap-2">' +
+                            '<div>' + row.profile_photo + '</div>' +
+                            '<div>' + data + '</div>' +
+                            '</div>';
+                    }
                 },
                 {
                     data: 'email',
@@ -1413,9 +1416,10 @@
 
                     let newCheckbox = `
                         <div class="${colClass}">
-                            <div class="form-check checkbox-primary">
+                            <div class="form-check checkbox-primary d-flex align-items-center">
                                 <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${type}_${newId}" checked>
-                                <label class="form-check-label" for="${type}_${newId}">${newName}</label>
+                                <label class="form-check-label flex-grow-1 mb-0" for="${type}_${newId}">${newName}</label>
+                                <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="${type}"><i class="fa fa-trash"></i></a>
                             </div>
                         </div>
                     `;
@@ -1446,6 +1450,55 @@
         $('#call-confirmation-modal').modal('show');
     });
 
+    let deleteMasterBtnRef = null;
+
+    // Handle Delete Master Data
+    $(document).on('click', '.delete-master-data-btn', function() {
+        deleteMasterBtnRef = $(this);
+        let id = $(this).data('id');
+        let type = $(this).data('type');
+
+        $('#delete-master-id').val(id);
+        $('#delete-master-type').val(type);
+        $('#master-data-delete-modal').modal('show');
+    });
+
+    // Confirm Master Data Delete
+    $(document).on('click', '#confirm-master-delete-btn', function() {
+        let btn = $(this);
+        let id = $('#delete-master-id').val();
+        let type = $('#delete-master-type').val();
+
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+        $.ajax({
+            url: "{{ url('admin/master-data') }}/" + type + "/" + id,
+            type: 'DELETE',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#master-data-delete-modal').modal('hide');
+                    if (deleteMasterBtnRef) {
+                        deleteMasterBtnRef.closest('.col-12, .col-md-3, .col-md-4, .col-md-6').fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                    }
+                    if (typeof showToast === 'function') showToast('Item deleted successfully');
+                } else {
+                    alert('Failed to delete item');
+                }
+            },
+            error: function(xhr) {
+                alert('Error: ' + (xhr.responseJSON?.error || 'Could not delete item'));
+            },
+            complete: function() {
+                btn.prop('disabled', false).html('Delete Now');
+            }
+        });
+    });
+
     // Allow enter key to trigger add
     $(document).on('keypress', '.new-master-data-input', function(e) {
         if (e.which == 13) {
@@ -1454,4 +1507,27 @@
         }
     });
 </script>
+<!-- Master Data Delete Modal -->
+<div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                <h5>Are you sure?</h5>
+                <p class="text-muted">Do you want to delete this specific item? This action is permanent.</p>
+                <input type="hidden" id="delete-master-id">
+                <input type="hidden" id="delete-master-type">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection

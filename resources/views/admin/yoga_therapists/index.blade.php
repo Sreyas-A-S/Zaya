@@ -36,7 +36,6 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Profile</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
@@ -230,9 +229,10 @@
                                             <div class="row" style="max-height: 300px; overflow-y:auto;">
                                                 @foreach($areasOfExpertise as $area)
                                                 <div class="col-12">
-                                                    <div class="form-check checkbox-primary">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center">
                                                         <input class="form-check-input" type="checkbox" name="areas_of_expertise[]" value="{{ $area->name }}" id="area_{{ $area->id }}">
-                                                        <label class="form-check-label" for="area_{{ $area->id }}">{{ $area->name }}</label>
+                                                        <label class="form-check-label flex-grow-1 mb-0" for="area_{{ $area->id }}">{{ $area->name }}</label>
+                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $area->id }}" data-type="yoga_expertises"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -401,426 +401,476 @@
             </div>
         </div>
     </div>
-<!-- Call Confirmation Modal -->
-<div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Call</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-4">
-                <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
-                <h5>Make a Call?</h5>
-                <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
-                <h4 class="text-primary" id="call-number"></h4>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+    <!-- Call Confirmation Modal -->
+    <div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Call</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
+                    <h5>Make a Call?</h5>
+                    <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
+                    <h4 class="text-primary" id="call-number"></h4>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@endsection
+    @endsection
 
-@section('scripts')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-<script>
-    let table;
-    let currentStep = 1;
-    const totalSteps = 6;
+    @section('scripts')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        let table;
+        let currentStep = 1;
+        const totalSteps = 6;
 
-    function openCreateModal() {
-        $('#therapist-form')[0].reset();
-        $('#therapist_id').val('');
-        $('#form-method').val('POST');
-        $('#form-modal-title').text('Register Yoga Therapist');
-        $('.password-field').show();
-        $('input[name="password"]').attr('required', 'required');
-        $('input[name="password_confirmation"]').attr('required', 'required');
-        $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+        function openCreateModal() {
+            $('#therapist-form')[0].reset();
+            $('#therapist_id').val('');
+            $('#form-method').val('POST');
+            $('#form-modal-title').text('Register Yoga Therapist');
+            $('.password-field').show();
+            $('input[name="password"]').attr('required', 'required');
+            $('input[name="password_confirmation"]').attr('required', 'required');
+            $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
 
-        // Reset Steps
-        currentStep = 1;
-        updateStepper();
-        $('#therapist-form-modal').modal('show');
-    }
-
-    function updateStepper() {
-        $('.step-content').addClass('d-none');
-        $('#step-' + currentStep).removeClass('d-none');
-
-        $('.stepper-item').removeClass('active completed');
-        $('.stepper-item').each(function(index) {
-            let step = $(this).data('step');
-            if (step < currentStep) {
-                $(this).addClass('completed');
-            } else if (step === currentStep) {
-                $(this).addClass('active');
-            }
-        });
-
-        if (currentStep === 1) {
-            $('#prev-btn').hide();
-        } else {
-            $('#prev-btn').show();
+            // Reset Steps
+            currentStep = 1;
+            updateStepper();
+            $('#therapist-form-modal').modal('show');
         }
 
-        if (currentStep === totalSteps) {
-            $('#next-btn').hide();
-            $('#submit-btn').show();
-        } else {
-            $('#next-btn').show();
-            $('#submit-btn').hide();
-        }
-    }
+        function updateStepper() {
+            $('.step-content').addClass('d-none');
+            $('#step-' + currentStep).removeClass('d-none');
 
-    function validateStep(step) {
-        let isValid = true;
-        let stepContent = $('#step-' + step);
-        stepContent.find('input[required], select[required], textarea[required]').each(function() {
-            if (!$(this).val()) {
-                isValid = false;
-                $(this).addClass('is-invalid');
-            } else {
-                $(this).removeClass('is-invalid');
-            }
-        });
-        return isValid;
-    }
-
-    $(document).ready(function() {
-        // DataTable
-        table = $('#therapists-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('admin.yoga-therapists.index') }}",
-            columns: [{
-                    data: null,
-                    render: function(data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    }
-                },
-                {
-                    data: 'profile_photo',
-                    name: 'profile_photo',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'name',
-                    name: 'users.name'
-                },
-                {
-                    data: 'email',
-                    name: 'users.email'
-                },
-                {
-                    data: 'phone',
-                    name: 'yoga_therapists.phone'
-                },
-                {
-                    data: 'gender',
-                    name: 'yoga_therapists.gender'
-                },
-                {
-                    data: 'status',
-                    name: 'yoga_therapists.status'
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                },
-            ]
-        });
-
-        // Initialize Choices.js
-        if (document.getElementById('languages_select')) {
-            new Choices('#languages_select', {
-                removeItemButton: true,
-                searchEnabled: true,
-                shouldSort: false,
-                placeholderValue: 'Select Languages',
+            $('.stepper-item').removeClass('active completed');
+            $('.stepper-item').each(function(index) {
+                let step = $(this).data('step');
+                if (step < currentStep) {
+                    $(this).addClass('completed');
+                } else if (step === currentStep) {
+                    $(this).addClass('active');
+                }
             });
+
+            if (currentStep === 1) {
+                $('#prev-btn').hide();
+            } else {
+                $('#prev-btn').show();
+            }
+
+            if (currentStep === totalSteps) {
+                $('#next-btn').hide();
+                $('#submit-btn').show();
+            } else {
+                $('#next-btn').show();
+                $('#submit-btn').hide();
+            }
         }
 
-        // Stepper Logic
-        $('#next-btn').click(function() {
-            if (validateStep(currentStep)) {
-                if (currentStep < totalSteps) {
-                    currentStep++;
+        function validateStep(step) {
+            let isValid = true;
+            let stepContent = $('#step-' + step);
+            stepContent.find('input[required], select[required], textarea[required]').each(function() {
+                if (!$(this).val()) {
+                    isValid = false;
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+            return isValid;
+        }
+
+        $(document).ready(function() {
+            // DataTable
+            table = $('#therapists-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('admin.yoga-therapists.index') }}",
+                columns: [{
+                        data: null,
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    {
+                        data: 'name',
+                        name: 'users.name',
+                        render: function(data, type, row) {
+                            return '<div class="d-flex align-items-center gap-2">' +
+                                '<div>' + row.profile_photo + '</div>' +
+                                '<div>' + data + '</div>' +
+                                '</div>';
+                        }
+                    },
+                    {
+                        data: 'email',
+                        name: 'users.email'
+                    },
+                    {
+                        data: 'phone',
+                        name: 'yoga_therapists.phone'
+                    },
+                    {
+                        data: 'gender',
+                        name: 'yoga_therapists.gender'
+                    },
+                    {
+                        data: 'status',
+                        name: 'yoga_therapists.status'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },
+                ]
+            });
+
+            // Initialize Choices.js
+            if (document.getElementById('languages_select')) {
+                new Choices('#languages_select', {
+                    removeItemButton: true,
+                    searchEnabled: true,
+                    shouldSort: false,
+                    placeholderValue: 'Select Languages',
+                });
+            }
+
+            // Stepper Logic
+            $('#next-btn').click(function() {
+                if (validateStep(currentStep)) {
+                    if (currentStep < totalSteps) {
+                        currentStep++;
+                        updateStepper();
+                    }
+                }
+            });
+
+            $('#prev-btn').click(function() {
+                if (currentStep > 1) {
+                    currentStep--;
                     updateStepper();
                 }
-            }
-        });
+            });
 
-        $('#prev-btn').click(function() {
-            if (currentStep > 1) {
-                currentStep--;
+            $('.stepper-item').click(function() {
+                let step = $(this).data('step');
+                // Allow clicking previous steps or next step if current is valid
+                // Simplification: Allow navigation
+                currentStep = step;
                 updateStepper();
-            }
-        });
+            });
 
-        $('.stepper-item').click(function() {
-            let step = $(this).data('step');
-            // Allow clicking previous steps or next step if current is valid
-            // Simplification: Allow navigation
-            currentStep = step;
-            updateStepper();
-        });
-
-        // Image Preview
-        // Image Preview
-        $("#imageUpload").change(function() {
-            if (this.files && this.files[0]) {
-                if (this.files[0].size > 2 * 1024 * 1024) { // 2MB
-                    if (typeof showToast === 'function') {
-                        showToast('Profile photo size must be less than 2MB', 'error');
-                    } else {
-                        alert('Profile photo size must be less than 2MB');
+            // Image Preview
+            // Image Preview
+            $("#imageUpload").change(function() {
+                if (this.files && this.files[0]) {
+                    if (this.files[0].size > 2 * 1024 * 1024) { // 2MB
+                        if (typeof showToast === 'function') {
+                            showToast('Profile photo size must be less than 2MB', 'error');
+                        } else {
+                            alert('Profile photo size must be less than 2MB');
+                        }
+                        $(this).val(''); // Clear input
+                        return;
                     }
-                    $(this).val(''); // Clear input
-                    return;
+
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
+                    }
+                    reader.readAsDataURL(this.files[0]);
                 }
+            });
 
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
-                }
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
+            // Master Data Quick Add
+            $(document).on('click', '.add-master-data-btn', function() {
+                let btn = $(this);
+                let input = btn.siblings('.new-master-data-input');
+                let type = input.data('type');
+                let value = input.val().trim();
 
-        // Master Data Quick Add
-        $(document).on('click', '.add-master-data-btn', function() {
-            let btn = $(this);
-            let input = btn.siblings('.new-master-data-input');
-            let type = input.data('type');
-            let value = input.val().trim();
+                // Container: .col-12 mt-2 -> previous .foreach -> div.row
+                // The structure is:
+                // <div class="col-md-6">
+                //    <label>...</label>
+                //    <div class="row">
+                //       ... checkboxes ...
+                //       <div class="col-12 mt-2">...input...</div>
+                //    </div>
+                // </div>
+                let container = input.closest('.row');
 
-            // Container: .col-12 mt-2 -> previous .foreach -> div.row
-            // The structure is:
-            // <div class="col-md-6">
-            //    <label>...</label>
-            //    <div class="row">
-            //       ... checkboxes ...
-            //       <div class="col-12 mt-2">...input...</div>
-            //    </div>
-            // </div>
-            let container = input.closest('.row');
+                if (!value) return;
 
-            if (!value) return;
+                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
 
-            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+                $.ajax({
+                    url: "{{ url('admin/master-data') }}/" + type,
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        name: value,
+                        status: 1
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            let checkboxName = 'areas_of_expertise[]';
+                            let idPrefix = 'area_';
 
-            $.ajax({
-                url: "{{ url('admin/master-data') }}/" + type,
-                method: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    name: value,
-                    status: 1
-                },
-                success: function(response) {
-                    if (response.success) {
-                        let checkboxName = 'areas_of_expertise[]';
-                        let idPrefix = 'area_';
+                            let newId = response.data.id;
+                            let newName = response.data.name;
 
-                        let newId = response.data.id;
-                        let newName = response.data.name;
-
-                        let html = `
+                            let html = `
                             <div class="col-12">
-                                <div class="form-check checkbox-primary">
+                                <div class="form-check checkbox-primary d-flex align-items-center">
                                     <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
-                                    <label class="form-check-label" for="${idPrefix}${newId}">${newName}</label>
+                                    <label class="form-check-label flex-grow-1 mb-0" for="${idPrefix}${newId}">${newName}</label>
+                                    <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="yoga_expertises"><i class="fa fa-trash"></i></a>
                                 </div>
                             </div>
                         `;
-                        // Insert before the input container
-                        input.closest('.col-12').before(html);
-                        input.val('');
-                        if (typeof showToast === 'function') showToast(response.success);
+                            // Insert before the input container
+                            input.closest('.col-12').before(html);
+                            input.val('');
+                            if (typeof showToast === 'function') showToast(response.success);
+                        }
+                    },
+                    error: function(xhr) {
+                        if (typeof showToast === 'function') {
+                            showToast('Error: ' + (xhr.responseJSON?.error || 'Could not add item'), 'error');
+                        }
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
                     }
-                },
-                error: function(xhr) {
-                    if (typeof showToast === 'function') {
-                        showToast('Error: ' + (xhr.responseJSON?.error || 'Could not add item'), 'error');
-                    }
-                },
-                complete: function() {
-                    btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
-                }
+                });
             });
-        });
 
-        // Form Submit
-        $('#therapist-form').on('submit', function(e) {
-            e.preventDefault();
-            let id = $('#therapist_id').val();
-            let url = id ? "{{ url('admin/yoga-therapists') }}/" + id : "{{ route('admin.yoga-therapists.store') }}";
-            let formData = new FormData(this);
-            // Append _method PUT if editing
-            if (id) formData.append('_method', 'PUT');
+            let deleteMasterBtnRef = null;
 
-            let btn = $('#submit-btn');
-            btn.prop('disabled', true).html('Saving...');
+            // Handle Delete Master Data
+            $(document).on('click', '.delete-master-data-btn', function() {
+                deleteMasterBtnRef = $(this);
+                let id = $(this).data('id');
+                let type = $(this).data('type');
 
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    $('#therapist-form-modal').modal('hide');
-                    table.draw();
-                    if (typeof showToast === 'function') {
-                        showToast(response.success);
-                    } else {
-                        alert(response.success);
-                    }
-                },
-                error: function(xhr) {
-                    let msg = xhr.responseJSON?.error || 'Unknown error';
-                    if (typeof showToast === 'function') {
-                        showToast('Error: ' + msg, 'error');
-                    } else {
-                        alert('Error: ' + msg);
-                    }
-                },
-                complete: function() {
-                    btn.prop('disabled', false).html('Submit');
-                }
+                $('#delete-master-id').val(id);
+                $('#delete-master-type').val(type);
+                $('#master-data-delete-modal').modal('show');
             });
-        });
 
-        // Edit
-        $('body').on('click', '.editTherapist', function() {
-            let id = $(this).data('id');
-            openCreateModal(); // Reset first
-            $('#therapist_id').val(id);
-            $('#form-method').val('PUT');
-            $('#form-modal-title').text('Edit Yoga Therapist');
-            $('.password-field').hide();
-            $('input[name="password"]').removeAttr('required');
-            $('input[name="password_confirmation"]').removeAttr('required');
+            // Confirm Master Data Delete
+            $('#confirm-master-delete-btn').click(function() {
+                let btn = $(this);
+                let id = $('#delete-master-id').val();
+                let type = $('#delete-master-type').val();
 
-            $.get("{{ url('admin/yoga-therapists') }}/" + id + "/edit", function(response) {
-                let u = response.user;
-                let t = response.therapist;
+                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
 
-                $('input[name="full_name"]').val(u.name);
-                $('input[name="email"]').val(u.email);
-                $('input[name="phone"]').val(t.phone);
-                $('select[name="gender"]').val(t.gender);
-                $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
-                $('textarea[name="address"]').val(t.address);
-
-                if (t.profile_photo_path) {
-                    $('#imagePreview').css('background-image', 'url(/storage/' + t.profile_photo_path + ')');
-                }
-
-                $('select[name="yoga_therapist_type"]').val(t.yoga_therapist_type);
-                $('input[name="years_of_experience"]').val(t.years_of_experience);
-                $('input[name="current_organization"]').val(t.current_organization);
-                $('input[name="workplace_address"]').val(t.workplace_address);
-                // website links handling? Assuming simple input for now or JSON
-
-                $('input[name="registration_number"]').val(t.registration_number);
-                $('input[name="affiliated_body"]').val(t.affiliated_body);
-
-                $('textarea[name="certification_details"]').val(t.certification_details);
-                $('textarea[name="additional_certifications"]').val(t.additional_certifications);
-
-                // Checkboxes
-                if (t.areas_of_expertise) {
-                    t.areas_of_expertise.forEach(v => {
-                        $(`input[name="areas_of_expertise[]"][value="${v}"]`).prop('checked', true);
-                    });
-                }
-                if (t.consultation_modes) {
-                    t.consultation_modes.forEach(v => {
-                        $(`input[name="consultation_modes[]"][value="${v}"]`).prop('checked', true);
-                    });
-                }
-                // Languages - ChoicesJS needs special handling usually, or just select valid options
-                // If using simple select multiple:
-                if (t.languages_spoken) {
-                    let choices = document.getElementById('languages_select').choices;
-                    // This might fail if choices instance not globally accessible or different way to set
-                    // For pure select multiple, val() works if choices not active, but with choices:
-                    // We need to setChoiceByValue
-                    // Check if Choices instance is available
-                    // It seems I didn't save the instance to a variable in this scope. 
-                    // I'll reload form essentially.
-                }
-
-                $('textarea[name="short_bio"]').val(t.short_bio);
-                $('textarea[name="therapy_approach"]').val(t.therapy_approach);
-
-                $('input[name="gov_id_type"]').val(t.gov_id_type);
-                $('input[name="pan_number"]').val(t.pan_number);
-                $('input[name="bank_holder_name"]').val(t.bank_holder_name);
-                $('input[name="bank_name"]').val(t.bank_name);
-                $('input[name="account_number"]').val(t.account_number);
-                $('input[name="ifsc_code"]').val(t.ifsc_code);
-                $('input[name="upi_id"]').val(t.upi_id);
-            });
-        });
-
-        // Delete & Status ... (standard)
-        $('body').on('click', '.deleteTherapist', function() {
-            $('#delete-therapist-id').val($(this).data('id'));
-            $('#therapist-delete-modal').modal('show');
-        });
-
-        $('#confirm-delete-btn').click(function() {
-            let id = $('#delete-therapist-id').val();
-            $.ajax({
-                url: "{{ url('admin/yoga-therapists') }}/" + id,
-                type: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(res) {
-                    $('#therapist-delete-modal').modal('hide');
-                    table.draw();
-                    if (typeof showToast === 'function') {
-                        showToast(res.success);
-                    } else {
-                        alert(res.success);
+                $.ajax({
+                    url: "{{ url('admin/master-data') }}/" + type + "/" + id,
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#master-data-delete-modal').modal('hide');
+                            if (deleteMasterBtnRef) {
+                                deleteMasterBtnRef.closest('[class^="col-"]').fadeOut(300, function() {
+                                    $(this).remove();
+                                });
+                            }
+                            if (typeof showToast === 'function') showToast('Item deleted successfully');
+                        } else {
+                            alert('Failed to delete item');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('Error: ' + (xhr.responseJSON?.error || 'Could not delete item'));
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html('Delete Now');
                     }
-                }
+                });
             });
-        });
 
-        // View Modal Logic (Adapted from previous task)
-        $('body').on('click', '.viewTherapist', function() {
-            let id = $(this).data('id');
-            $.get("{{ url('admin/yoga-therapists') }}/" + id, function(response) {
-                let u = response.user;
-                let t = response.therapist;
+            // Form Submit
+            $('#therapist-form').on('submit', function(e) {
+                e.preventDefault();
+                let id = $('#therapist_id').val();
+                let url = id ? "{{ url('admin/yoga-therapists') }}/" + id : "{{ route('admin.yoga-therapists.store') }}";
+                let formData = new FormData(this);
+                // Append _method PUT if editing
+                if (id) formData.append('_method', 'PUT');
 
-                const formatDate = (dateString) => {
-                    if (!dateString) return 'N/A';
-                    const date = new Date(dateString);
-                    if (isNaN(date.getTime())) return dateString;
-                    return date.toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                    });
-                };
+                let btn = $('#submit-btn');
+                btn.prop('disabled', true).html('Saving...');
 
-                const defaultProfile = "{{ asset('admiro/assets/images/user/user.png') }}";
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        $('#therapist-form-modal').modal('hide');
+                        table.draw();
+                        if (typeof showToast === 'function') {
+                            showToast(response.success);
+                        } else {
+                            alert(response.success);
+                        }
+                    },
+                    error: function(xhr) {
+                        let msg = xhr.responseJSON?.error || 'Unknown error';
+                        if (typeof showToast === 'function') {
+                            showToast('Error: ' + msg, 'error');
+                        } else {
+                            alert('Error: ' + msg);
+                        }
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html('Submit');
+                    }
+                });
+            });
 
-                let html = `
+            // Edit
+            $('body').on('click', '.editTherapist', function() {
+                let id = $(this).data('id');
+                openCreateModal(); // Reset first
+                $('#therapist_id').val(id);
+                $('#form-method').val('PUT');
+                $('#form-modal-title').text('Edit Yoga Therapist');
+                $('.password-field').hide();
+                $('input[name="password"]').removeAttr('required');
+                $('input[name="password_confirmation"]').removeAttr('required');
+
+                $.get("{{ url('admin/yoga-therapists') }}/" + id + "/edit", function(response) {
+                    let u = response.user;
+                    let t = response.therapist;
+
+                    $('input[name="full_name"]').val(u.name);
+                    $('input[name="email"]').val(u.email);
+                    $('input[name="phone"]').val(t.phone);
+                    $('select[name="gender"]').val(t.gender);
+                    $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
+                    $('textarea[name="address"]').val(t.address);
+
+                    if (t.profile_photo_path) {
+                        $('#imagePreview').css('background-image', 'url(/storage/' + t.profile_photo_path + ')');
+                    }
+
+                    $('select[name="yoga_therapist_type"]').val(t.yoga_therapist_type);
+                    $('input[name="years_of_experience"]').val(t.years_of_experience);
+                    $('input[name="current_organization"]').val(t.current_organization);
+                    $('input[name="workplace_address"]').val(t.workplace_address);
+                    // website links handling? Assuming simple input for now or JSON
+
+                    $('input[name="registration_number"]').val(t.registration_number);
+                    $('input[name="affiliated_body"]').val(t.affiliated_body);
+
+                    $('textarea[name="certification_details"]').val(t.certification_details);
+                    $('textarea[name="additional_certifications"]').val(t.additional_certifications);
+
+                    // Checkboxes
+                    if (t.areas_of_expertise) {
+                        t.areas_of_expertise.forEach(v => {
+                            $(`input[name="areas_of_expertise[]"][value="${v}"]`).prop('checked', true);
+                        });
+                    }
+                    if (t.consultation_modes) {
+                        t.consultation_modes.forEach(v => {
+                            $(`input[name="consultation_modes[]"][value="${v}"]`).prop('checked', true);
+                        });
+                    }
+                    // Languages - ChoicesJS needs special handling usually, or just select valid options
+                    // If using simple select multiple:
+                    if (t.languages_spoken) {
+                        let choices = document.getElementById('languages_select').choices;
+                        // This might fail if choices instance not globally accessible or different way to set
+                        // For pure select multiple, val() works if choices not active, but with choices:
+                        // We need to setChoiceByValue
+                        // Check if Choices instance is available
+                        // It seems I didn't save the instance to a variable in this scope. 
+                        // I'll reload form essentially.
+                    }
+
+                    $('textarea[name="short_bio"]').val(t.short_bio);
+                    $('textarea[name="therapy_approach"]').val(t.therapy_approach);
+
+                    $('input[name="gov_id_type"]').val(t.gov_id_type);
+                    $('input[name="pan_number"]').val(t.pan_number);
+                    $('input[name="bank_holder_name"]').val(t.bank_holder_name);
+                    $('input[name="bank_name"]').val(t.bank_name);
+                    $('input[name="account_number"]').val(t.account_number);
+                    $('input[name="ifsc_code"]').val(t.ifsc_code);
+                    $('input[name="upi_id"]').val(t.upi_id);
+                });
+            });
+
+            // Delete & Status ... (standard)
+            $('body').on('click', '.deleteTherapist', function() {
+                $('#delete-therapist-id').val($(this).data('id'));
+                $('#therapist-delete-modal').modal('show');
+            });
+
+            $('#confirm-delete-btn').click(function() {
+                let id = $('#delete-therapist-id').val();
+                $.ajax({
+                    url: "{{ url('admin/yoga-therapists') }}/" + id,
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(res) {
+                        $('#therapist-delete-modal').modal('hide');
+                        table.draw();
+                        if (typeof showToast === 'function') {
+                            showToast(res.success);
+                        } else {
+                            alert(res.success);
+                        }
+                    }
+                });
+            });
+
+            // View Modal Logic (Adapted from previous task)
+            $('body').on('click', '.viewTherapist', function() {
+                let id = $(this).data('id');
+                $.get("{{ url('admin/yoga-therapists') }}/" + id, function(response) {
+                    let u = response.user;
+                    let t = response.therapist;
+
+                    const formatDate = (dateString) => {
+                        if (!dateString) return 'N/A';
+                        const date = new Date(dateString);
+                        if (isNaN(date.getTime())) return dateString;
+                        return date.toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        });
+                    };
+
+                    const defaultProfile = "{{ asset('admiro/assets/images/user/user.png') }}";
+
+                    let html = `
                     <div class="row g-4">
                         <div class="col-md-3 text-center border-end pe-3">
                              <div class="position-relative d-inline-block mb-3">
@@ -962,212 +1012,250 @@
                         </div>
                     </div>
                 `;
-                $('#view-modal-content').html(html);
-                $('#therapist-view-modal').modal('show');
+                    $('#view-modal-content').html(html);
+                    $('#therapist-view-modal').modal('show');
+                });
             });
-        });
 
-        // Status Toggle Handler (Triggers Modal)
-        $('body').on('click', '.toggle-status', function() {
-            var id = $(this).data('id');
-            var currentStatus = $(this).data('status');
-            var newStatus = (currentStatus === 'active') ? 0 : 1;
-            var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
+            // Status Toggle Handler (Triggers Modal)
+            $('body').on('click', '.toggle-status', function() {
+                var id = $(this).data('id');
+                var currentStatus = $(this).data('status');
+                var newStatus = (currentStatus === 'active') ? 0 : 1;
+                var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
 
-            $('#status-therapist-id').val(id);
-            $('#status-new-value').val(newStatus);
-            $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
-            $('#status-confirmation-modal').modal('show');
-        });
-
-        // Handle Confirm Status Change
-        $('#confirm-status-btn').on('click', function() {
-            var id = $('#status-therapist-id').val();
-            var newStatus = $('#status-new-value').val();
-            var btn = $(this);
-
-            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
-
-            $.ajax({
-                url: "{{ url('admin/yoga-therapists') }}/" + id + "/status",
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    status: newStatus
-                },
-                success: function(response) {
-                    $('#status-confirmation-modal').modal('hide');
-                    table.draw(false);
-                    if (typeof showToast === 'function') {
-                        showToast(response.success);
-                    } else {
-                        alert(response.success);
-                    }
-                },
-                error: function(xhr) {
-                    if (typeof showToast === 'function') {
-                        showToast('Error updating status', 'error');
-                    } else {
-                        alert('Error updating status');
-                    }
-                },
-                complete: function() {
-                    btn.prop('disabled', false).html('Confirm Change');
-                }
+                $('#status-therapist-id').val(id);
+                $('#status-new-value').val(newStatus);
+                $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
+                $('#status-confirmation-modal').modal('show');
             });
+
+            // Handle Confirm Status Change
+            $('#confirm-status-btn').on('click', function() {
+                var id = $('#status-therapist-id').val();
+                var newStatus = $('#status-new-value').val();
+                var btn = $(this);
+
+                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
+
+                $.ajax({
+                    url: "{{ url('admin/yoga-therapists') }}/" + id + "/status",
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        status: newStatus
+                    },
+                    success: function(response) {
+                        $('#status-confirmation-modal').modal('hide');
+                        table.draw(false);
+                        if (typeof showToast === 'function') {
+                            showToast(response.success);
+                        } else {
+                            alert(response.success);
+                        }
+                    },
+                    error: function(xhr) {
+                        if (typeof showToast === 'function') {
+                            showToast('Error updating status', 'error');
+                        } else {
+                            alert('Error updating status');
+                        }
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html('Confirm Change');
+                    }
+                });
+            });
+
+            // Handle Call Modal
+            $('body').on('click', '.call-phone', function() {
+                const phone = $(this).data('phone');
+                const name = $(this).data('name');
+
+                $('#call-name-yoga').text(name);
+                $('#call-number-yoga').text(phone);
+                $('#confirm-call-btn-yoga').attr('href', 'tel:' + phone);
+                $('#call-confirmation-modal-yoga').modal('show');
+            });
+
         });
+    </script>
+    <style>
+        /* Avatar Upload Styling */
+        .avatar-upload {
+            position: relative;
+            max-width: 150px;
+            margin: 0 auto;
+        }
 
-        // Handle Call Modal
-        $('body').on('click', '.call-phone', function() {
-            const phone = $(this).data('phone');
-            const name = $(this).data('name');
+        .avatar-upload .avatar-edit {
+            position: absolute;
+            right: 12px;
+            z-index: 1;
+            top: 10px;
+        }
 
-            $('#call-name').text(name);
-            $('#call-number').text(phone);
-            $('#confirm-call-btn').attr('href', 'tel:' + phone);
-            
-            var modalEl = document.getElementById('call-confirmation-modal');
-            var modal = bootstrap.Modal.getInstance(modalEl);
-            if (!modal) {
-                modal = new bootstrap.Modal(modalEl);
-            }
-            modal.show();
-        });
+        .avatar-upload .avatar-edit input {
+            display: none;
+        }
 
-    });
-</script>
-<style>
-    /* Avatar Upload Styling */
-    .avatar-upload {
-        position: relative;
-        max-width: 150px;
-        margin: 0 auto;
-    }
+        .avatar-upload .avatar-edit label {
+            display: inline-block;
+            width: 34px;
+            height: 34px;
+            margin-bottom: 0;
+            border-radius: 100%;
+            background: #FFFFFF;
+            border: 1px solid transparent;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+            font-weight: normal;
+            transition: all .2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .avatar-upload .avatar-edit {
-        position: absolute;
-        right: 12px;
-        z-index: 1;
-        top: 10px;
-    }
+        .avatar-upload .avatar-edit label:hover {
+            background: #f1f1f1;
+            border-color: #d6d6d6;
+        }
 
-    .avatar-upload .avatar-edit input {
-        display: none;
-    }
+        .avatar-upload .avatar-edit label i {
+            color: #757575;
+            font-size: 16px;
+        }
 
-    .avatar-upload .avatar-edit label {
-        display: inline-block;
-        width: 34px;
-        height: 34px;
-        margin-bottom: 0;
-        border-radius: 100%;
-        background: #FFFFFF;
-        border: 1px solid transparent;
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
-        cursor: pointer;
-        font-weight: normal;
-        transition: all .2s ease-in-out;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            border-radius: 100%;
+            border: 4px solid #F8F8F8;
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        }
 
-    .avatar-upload .avatar-edit label:hover {
-        background: #f1f1f1;
-        border-color: #d6d6d6;
-    }
+        .avatar-preview>div {
+            width: 100%;
+            height: 100%;
+            border-radius: 100%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
 
-    .avatar-upload .avatar-edit label i {
-        color: #757575;
-        font-size: 16px;
-    }
+        .stepper-horizontal {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+        }
 
-    .avatar-preview {
-        width: 150px;
-        height: 150px;
-        position: relative;
-        border-radius: 100%;
-        border: 4px solid #F8F8F8;
-        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-    }
+        .stepper-horizontal::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #f4f4f4;
+            z-index: 0;
+        }
 
-    .avatar-preview>div {
-        width: 100%;
-        height: 100%;
-        border-radius: 100%;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
+        .stepper-horizontal .stepper-item {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            cursor: pointer;
+        }
 
-    .stepper-horizontal {
-        position: relative;
-        display: flex;
-        justify-content: space-between;
-    }
+        .stepper-horizontal .step-counter {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            color: #999;
+        }
 
-    .stepper-horizontal::before {
-        content: "";
-        position: absolute;
-        top: 20px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: #f4f4f4;
-        z-index: 0;
-    }
+        .stepper-horizontal .step-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            text-align: center;
+        }
 
-    .stepper-horizontal .stepper-item {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
-        cursor: pointer;
-    }
+        .stepper-item.active .step-counter {
+            background: #2b2b2b;
+            border-color: #2b2b2b;
+            color: #fff;
+        }
 
-    .stepper-horizontal .step-counter {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #fff;
-        border: 2px solid #f4f4f4;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-weight: 600;
-        margin-bottom: 10px;
-        transition: all 0.3s ease;
-        color: #999;
-    }
+        .stepper-item.completed .step-counter {
+            background: #10b981;
+            border-color: #10b981;
+            color: #fff;
+        }
 
-    .stepper-horizontal .step-name {
-        font-size: 12px;
-        font-weight: 600;
-        color: #999;
-        text-align: center;
-    }
+        .stepper-item.active .step-name,
+        .stepper-item.completed .step-name {
+            color: #333;
+        }
 
-    .stepper-item.active .step-counter {
-        background: #2b2b2b;
-        border-color: #2b2b2b;
-        color: #fff;
-    }
+        .d-none {
+            display: none !important;
+        }
+    </style>
+    <!-- Call Confirmation Modal -->
+    <div class="modal fade" id="call-confirmation-modal-yoga" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Call</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
+                    <h5>Make a Call?</h5>
+                    <p>Do you want to call <span id="call-name-yoga" class="fw-bold"></span>?</p>
+                    <h4 class="text-primary" id="call-number-yoga"></h4>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirm-call-btn-yoga" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Master Data Delete Modal -->
+    <div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                    <h5>Are you sure?</h5>
+                    <p class="text-muted">Do you want to delete this specific item? This action is permanent.</p>
+                    <input type="hidden" id="delete-master-id">
+                    <input type="hidden" id="delete-master-type">
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    .stepper-item.completed .step-counter {
-        background: #10b981;
-        border-color: #10b981;
-        color: #fff;
-    }
-
-    .stepper-item.active .step-name,
-    .stepper-item.completed .step-name {
-        color: #333;
-    }
-
-    .d-none {
-        display: none !important;
-    }
-</style>
-@endsection
+    @endsection

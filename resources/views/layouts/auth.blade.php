@@ -5,6 +5,19 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <style>
+    :root {
+      color-scheme: light;
+    }
+  </style>
+  <script>
+    // Force light mode immediately
+    document.documentElement.setAttribute('data-bs-theme', 'light');
+    localStorage.setItem('theme', 'light');
+    localStorage.setItem('layout_version', 'light');
+  </script>
+
   <meta name="description" content="Zaya Wellness is a comprehensive holistic health and wellness platform that connects practitioners with patients for meaningful healthcare experiences.">
   <meta name="keywords" content="holistic health, wellness, Ayurveda, yoga, Zaya Wellness, healthcare platform">
   <meta name="author" content="Zaya Wellness">

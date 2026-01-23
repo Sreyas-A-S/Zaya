@@ -24,6 +24,8 @@ class TranslatorController extends Controller
                     'users.name',
                     'users.email',
                     'translators.native_language',
+                    'translators.source_languages',
+                    'translators.target_languages',
                     'translators.phone',
                     'translators.translator_type',
                     'translators.profile_photo_path',
@@ -34,6 +36,34 @@ class TranslatorController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->editColumn('source_languages', function ($row) {
+                    if (empty($row->source_languages)) return '<span class="text-muted">N/A</span>';
+                    // Check if it's already an array (due to model casting involved in query? No, Query Builder returns stdClass usually, not Models unless 'get' is on Model and hydrated. 
+                    // Eloquent query: User::where...->leftJoin...->select...->get() returns collection of Models or std objects?
+                    // When using Join and Select specific columns, Laravel often returns instances of the Model starting the query (User), but with extra attributes. 
+                    // However, 'casts' on the main model (User) apply to User attributes. 'translators' attributes might simply be strings (JSON) if not carefully handled.
+                    // But wait, $data = User::...->get(); 
+                    // The attributes from joined table are just properties on the User object. They WON'T be auto-cast by the Translator model's $casts because they are on a User instance (or stdClass depending on how Laravel constructs it when bespoke select).
+                    // Actually, usually they come back as strings if they are JSON in DB.
+                    // Safe approach: json_decode if string.
+                    $langs = $row->source_languages;
+                    if (is_string($langs)) $langs = json_decode($langs, true) ?? [];
+                    if (!is_array($langs)) return '<span class="text-muted">N/A</span>';
+
+                    return collect($langs)->map(function ($lang) {
+                        return '<span class="badge badge-light-primary me-1 mb-1">' . $lang . '</span>';
+                    })->implode(' ');
+                })
+                ->editColumn('target_languages', function ($row) {
+                    if (empty($row->target_languages)) return '<span class="text-muted">N/A</span>';
+                    $langs = $row->target_languages;
+                    if (is_string($langs)) $langs = json_decode($langs, true) ?? [];
+                    if (!is_array($langs)) return '<span class="text-muted">N/A</span>';
+
+                    return collect($langs)->map(function ($lang) {
+                        return '<span class="badge badge-light-secondary me-1 mb-1">' . $lang . '</span>';
+                    })->implode(' ');
+                })
                 ->editColumn('status', function ($row) {
                     $badgeClass = 'bg-danger';
                     if ($row->status == 'active') {
@@ -65,7 +95,7 @@ class TranslatorController extends Controller
                     $btn .= '</div>';
                     return $btn;
                 })
-                ->rawColumns(['status', 'phone', 'profile_photo', 'action'])
+                ->rawColumns(['source_languages', 'target_languages', 'status', 'phone', 'profile_photo', 'action'])
                 ->make(true);
         }
 

@@ -102,7 +102,6 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Profile</th>
                                     <th>Client ID</th>
                                     <th>Name</th>
                                     <th>Email</th>
@@ -208,9 +207,10 @@
                             <div class="row">
                                 @foreach($consultationPreferences as $pref)
                                 <div class="col-md-6">
-                                    <div class="form-check checkbox-primary mb-2">
+                                    <div class="form-check checkbox-primary mb-2 d-flex align-items-center">
                                         <input class="form-check-input pref-checkbox" type="checkbox" name="consultation_preferences[]" value="{{ $pref->name }}" id="pref_{{ $pref->id }}">
-                                        <label class="form-check-label" for="pref_{{ $pref->id }}">{{ $pref->name }}</label>
+                                        <label class="form-check-label flex-grow-1 mb-0" for="pref_{{ $pref->id }}">{{ $pref->name }}</label>
+                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $pref->id }}" data-type="client_consultation_preferences"><i class="fa fa-trash"></i></a>
                                     </div>
                                 </div>
                                 @endforeach
@@ -394,19 +394,19 @@
                     searchable: false
                 },
                 {
-                    data: 'profile_photo',
-                    name: 'profile_photo',
-                    orderable: false,
-                    searchable: false
-                },
-                {
                     data: 'client_id',
                     name: 'patients.client_id',
                     defaultContent: 'N/A'
                 },
                 {
                     data: 'name',
-                    name: 'users.name'
+                    name: 'users.name',
+                    render: function(data, type, row) {
+                        return '<div class="d-flex align-items-center gap-2">' +
+                            '<div>' + row.profile_photo + '</div>' +
+                            '<div>' + data + '</div>' +
+                            '</div>';
+                    }
                 },
                 {
                     data: 'email',
@@ -736,9 +736,10 @@
 
                         let html = `
                             <div class="col-md-6">
-                                <div class="form-check checkbox-primary mb-2">
+                                <div class="form-check checkbox-primary mb-2 d-flex align-items-center">
                                     <input class="form-check-input pref-checkbox" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
-                                    <label class="form-check-label" for="${idPrefix}${newId}">${newName}</label>
+                                    <label class="form-check-label flex-grow-1 mb-0" for="${idPrefix}${newId}">${newName}</label>
+                                    <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="client_consultation_preferences"><i class="fa fa-trash"></i></a>
                                 </div>
                             </div>
                         `;
@@ -814,14 +815,103 @@
             $('#call-name').text(name);
             $('#call-number').text(phone);
             $('#confirm-call-btn').attr('href', 'tel:' + phone);
-            
-            var modalEl = document.getElementById('call-confirmation-modal');
-            var modal = bootstrap.Modal.getInstance(modalEl);
-            if (!modal) {
-                modal = new bootstrap.Modal(modalEl);
-            }
-            modal.show();
+
+            $('#call-confirmation-modal').modal('show');
+        });
+
+        let deleteMasterBtnRef = null;
+
+        // Handle Delete Master Data
+        $(document).on('click', '.delete-master-data-btn', function() {
+            deleteMasterBtnRef = $(this);
+            let id = $(this).data('id');
+            let type = $(this).data('type');
+
+            $('#delete-master-id').val(id);
+            $('#delete-master-type').val(type);
+            $('#master-data-delete-modal').modal('show');
+        });
+
+        // Confirm Master Data Delete
+        $('#confirm-master-delete-btn').click(function() {
+            let btn = $(this);
+            let id = $('#delete-master-id').val();
+            let type = $('#delete-master-type').val();
+
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+            $.ajax({
+                url: "{{ url('admin/master-data') }}/" + type + "/" + id,
+                type: 'DELETE',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#master-data-delete-modal').modal('hide');
+                        if (deleteMasterBtnRef) {
+                            deleteMasterBtnRef.closest('[class^="col-"]').fadeOut(300, function() {
+                                $(this).remove();
+                            });
+                        }
+                        if (typeof showToast === 'function') showToast('Item deleted successfully');
+                    } else {
+                        alert('Failed to delete item');
+                    }
+                },
+                error: function(xhr) {
+                    alert('Error: ' + (xhr.responseJSON?.error || 'Could not delete item'));
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html('Delete Now');
+                }
+            });
         });
     });
 </script>
+
+<!-- Call Confirmation Modal -->
+<div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Call</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
+                <h5>Make a Call?</h5>
+                <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
+                <h4 class="text-primary" id="call-number"></h4>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Master Data Delete Modal -->
+<div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                <h5>Are you sure?</h5>
+                <p class="text-muted">Do you want to delete this specific item? This action is permanent.</p>
+                <input type="hidden" id="delete-master-id">
+                <input type="hidden" id="delete-master-type">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection

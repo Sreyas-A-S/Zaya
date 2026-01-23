@@ -36,7 +36,6 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Profile</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
@@ -214,9 +213,10 @@
                                             <div class="row">
                                                 @foreach($servicesOffered as $service)
                                                 <div class="col-12">
-                                                    <div class="form-check checkbox-primary">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center">
                                                         <input class="form-check-input" type="checkbox" name="services_offered[]" value="{{ $service->name }}" id="service_{{ $service->id }}">
-                                                        <label class="form-check-label" for="service_{{ $service->id }}">{{ $service->name }}</label>
+                                                        <label class="form-check-label flex-grow-1 mb-0" for="service_{{ $service->id }}">{{ $service->name }}</label>
+                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $service->id }}" data-type="mindfulness_services"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -233,9 +233,10 @@
                                             <div class="row">
                                                 @foreach($clientConcerns as $concern)
                                                 <div class="col-12">
-                                                    <div class="form-check checkbox-secondary">
+                                                    <div class="form-check checkbox-secondary d-flex align-items-center">
                                                         <input class="form-check-input" type="checkbox" name="client_concerns[]" value="{{ $concern->name }}" id="concern_{{ $concern->id }}">
-                                                        <label class="form-check-label" for="concern_{{ $concern->id }}">{{ $concern->name }}</label>
+                                                        <label class="form-check-label flex-grow-1 mb-0" for="concern_{{ $concern->id }}">{{ $concern->name }}</label>
+                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $concern->id }}" data-type="client_concerns"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -427,14 +428,14 @@
                     }
                 },
                 {
-                    data: 'profile_photo',
-                    name: 'profile_photo',
-                    orderable: false,
-                    searchable: false
-                },
-                {
                     data: 'name',
-                    name: 'users.name'
+                    name: 'users.name',
+                    render: function(data, type, row) {
+                        return '<div class="d-flex align-items-center gap-2">' +
+                            '<div>' + row.profile_photo + '</div>' +
+                            '<div>' + data + '</div>' +
+                            '</div>';
+                    }
                 },
                 {
                     data: 'email',
@@ -557,9 +558,10 @@
 
                         let html = `
                             <div class="col-12">
-                                <div class="form-check checkbox-${type === 'mindfulness_services' ? 'primary' : 'secondary'}">
+                                <div class="form-check checkbox-${type === 'mindfulness_services' ? 'primary' : 'secondary'} d-flex align-items-center">
                                     <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
-                                    <label class="form-check-label" for="${idPrefix}${newId}">${newName}</label>
+                                    <label class="form-check-label flex-grow-1 mb-0" for="${idPrefix}${newId}">${newName}</label>
+                                    <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="${type}"><i class="fa fa-trash"></i></a>
                                 </div>
                             </div>
                         `;
@@ -577,6 +579,55 @@
                 },
                 complete: function() {
                     btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
+                }
+            });
+        });
+
+        let deleteMasterBtnRef = null;
+
+        // Handle Delete Master Data
+        $(document).on('click', '.delete-master-data-btn', function() {
+            deleteMasterBtnRef = $(this);
+            let id = $(this).data('id');
+            let type = $(this).data('type');
+
+            $('#delete-master-id').val(id);
+            $('#delete-master-type').val(type);
+            $('#master-data-delete-modal').modal('show');
+        });
+
+        // Confirm Master Data Delete
+        $('#confirm-master-delete-btn').click(function() {
+            let btn = $(this);
+            let id = $('#delete-master-id').val();
+            let type = $('#delete-master-type').val();
+
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+            $.ajax({
+                url: "{{ url('admin/master-data') }}/" + type + "/" + id,
+                type: 'DELETE',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#master-data-delete-modal').modal('hide');
+                        if (deleteMasterBtnRef) {
+                            deleteMasterBtnRef.closest('[class^="col-"]').fadeOut(300, function() {
+                                $(this).remove();
+                            });
+                        }
+                        if (typeof showToast === 'function') showToast('Item deleted successfully');
+                    } else {
+                        alert('Failed to delete item');
+                    }
+                },
+                error: function(xhr) {
+                    alert('Error: ' + (xhr.responseJSON?.error || 'Could not delete item'));
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html('Delete Now');
                 }
             });
         });
@@ -1039,22 +1090,17 @@
         $('#practitioner-form-modal').modal('show');
     }
 
-            // Handle Call Modal
-            $('body').on('click', '.call-phone', function() {
-                const phone = $(this).data('phone');
-                const name = $(this).data('name');
-    
-                $('#call-name').text(name);
-                $('#call-number').text(phone);
-                $('#confirm-call-btn').attr('href', 'tel:' + phone);
-                
-                var modalEl = document.getElementById('call-confirmation-modal');
-                var modal = bootstrap.Modal.getInstance(modalEl);
-                if (!modal) {
-                    modal = new bootstrap.Modal(modalEl);
-                }
-                modal.show();
-            });</script>
+    // Handle Call Modal
+    $('body').on('click', '.call-phone', function() {
+        const phone = $(this).data('phone');
+        const name = $(this).data('name');
+
+        $('#call-name').text(name);
+        $('#call-number').text(phone);
+        $('#confirm-call-btn').attr('href', 'tel:' + phone);
+        $('#call-confirmation-modal').modal('show');
+    });
+</script>
 <style>
     /* Avatar Upload Styling */
     .avatar-upload {
@@ -1188,6 +1234,7 @@
     .d-none {
         display: none !important;
     }
+</style>
 <!-- Call Confirmation Modal -->
 <div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -1205,6 +1252,28 @@
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                 <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Master Data Delete Modal -->
+<div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                <h5>Are you sure?</h5>
+                <p class="text-muted">Do you want to delete this specific item? This action is permanent.</p>
+                <input type="hidden" id="delete-master-id">
+                <input type="hidden" id="delete-master-type">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
             </div>
         </div>
     </div>
