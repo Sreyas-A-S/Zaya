@@ -6,14 +6,14 @@
     <section class="pt-[144px] md:pt-[150px] pb-20 px-4 md:px-6 bg-white">
         <div class="container mx-auto">
             <div
-                class="bg-[#F4F4F4] rounded-[3rem] px-8 md:px-12 flex flex-col md:flex-row items-center relative gap-8 md:gap-12 overflow-hidden shadow-sm">
+                class="bg-[#F4F4F4] rounded-[30px] px-8 md:px-12 flex flex-col md:flex-row items-center relative gap-8 md:gap-12 overflow-hidden shadow-sm">
 
                 <!-- Left Image (Practitioner) -->
                 <div
-                    class="w-full md:w-5/12 relative h-[400px] md:h-[550px] flex items-end justify-center md:justify-start">
+                    class="w-full md:w-5/12 relative pt-10 flex items-end justify-center md:justify-start">
                     <!-- Cutout Image aligned to bottom -->
                     <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}" alt="Lilly"
-                        class="h-full object-contain object-bottom scale-110 origin-bottom">
+                        class="h-full">
                 </div>
 
                 <!-- Right Content -->
@@ -154,7 +154,7 @@
             <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
                 <!-- Cathy -->
                 <div
-                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow">
+                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100  transition-shadow">
                     <div class="flex items-center gap-4 mb-6">
                         <img src="https://randomuser.me/api/portraits/women/12.jpg"
                             class="w-12 h-12 rounded-full object-cover">
@@ -174,7 +174,7 @@
 
                 <!-- Harry -->
                 <div
-                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow">
+                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100  transition-shadow">
                     <div class="flex items-center gap-4 mb-6">
                         <img src="https://randomuser.me/api/portraits/men/32.jpg"
                             class="w-12 h-12 rounded-full object-cover">
@@ -196,7 +196,7 @@
 
                 <!-- Preethi -->
                 <div
-                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow">
+                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100  transition-shadow">
                     <div class="flex items-center gap-4 mb-6">
                         <img src="https://randomuser.me/api/portraits/women/44.jpg"
                             class="w-12 h-12 rounded-full object-cover">
@@ -218,7 +218,7 @@
 
                 <!-- Smith -->
                 <div
-                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow">
+                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100  transition-shadow">
                     <div class="flex items-center gap-4 mb-6">
                         <img src="https://randomuser.me/api/portraits/men/45.jpg"
                             class="w-12 h-12 rounded-full object-cover">
@@ -240,7 +240,7 @@
 
                 <!-- Isha -->
                 <div
-                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow">
+                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100  transition-shadow">
                     <div class="flex items-center gap-4 mb-6">
                         <img src="https://randomuser.me/api/portraits/women/65.jpg"
                             class="w-12 h-12 rounded-full object-cover">
@@ -260,7 +260,7 @@
 
                 <!-- Richard -->
                 <div
-                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow">
+                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100  transition-shadow">
                     <div class="flex items-center gap-4 mb-6">
                         <img src="https://randomuser.me/api/portraits/men/52.jpg"
                             class="w-12 h-12 rounded-full object-cover">
@@ -279,7 +279,7 @@
 
                 <!-- Diya -->
                 <div
-                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow">
+                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100  transition-shadow">
                     <div class="flex items-center gap-4 mb-6">
                         <img src="https://randomuser.me/api/portraits/women/24.jpg"
                             class="w-12 h-12 rounded-full object-cover">
@@ -298,7 +298,7 @@
 
                 <!-- Meera -->
                 <div
-                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow">
+                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100  transition-shadow">
                     <div class="flex items-center gap-4 mb-6">
                         <img src="https://randomuser.me/api/portraits/women/89.jpg"
                             class="w-12 h-12 rounded-full object-cover">
@@ -317,7 +317,7 @@
 
                 <!-- Jones -->
                 <div
-                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow">
+                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100  transition-shadow">
                     <div class="flex items-center gap-4 mb-6">
                         <img src="https://randomuser.me/api/portraits/men/85.jpg"
                             class="w-12 h-12 rounded-full object-cover">
@@ -336,7 +336,7 @@
 
                 <!-- Lucy -->
                 <div
-                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow">
+                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100  transition-shadow">
                     <div class="flex items-center gap-4 mb-6">
                         <img src="https://randomuser.me/api/portraits/women/62.jpg"
                             class="w-12 h-12 rounded-full object-cover">
@@ -355,7 +355,7 @@
 
                 <!-- Miller -->
                 <div
-                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-lg transition-shadow">
+                    class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100  transition-shadow">
                     <div class="flex items-center gap-4 mb-6">
                         <img src="https://randomuser.me/api/portraits/men/62.jpg"
                             class="w-12 h-12 rounded-full object-cover">
