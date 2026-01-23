@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loop: true,
         centeredSlides: true,
         autoplay: {
-            delay: 1500,
+            delay: 3500,
             pauseOnMouseEnter: true,
             pauseOnFocus: true,
         },
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 centeredSlides: false,
             },
             1440: {
-                slidesPerView: 4.3,
+                slidesPerView: 4.6,
                 centeredSlides: false,
             },
             1920: {
