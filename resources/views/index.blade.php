@@ -76,26 +76,29 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-14">
                 <!-- Service 1 -->
-                <div class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500">
+                <a href="#"
+                    class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500">
                     <div class="h-64 overflow-hidden mb-4 relative">
                         <img src="{{ asset('frontend/assets/service-yoga.png') }}" alt="Yoga Therapy"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                     </div>
                     <h3 class="text-xl font-serif text-secondary mb-1">Yoga Therapy</h3>
-                </div>
+                </a>
 
                 <!-- Service 2 -->
-                <div class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
+                <a href="#"
+                    class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
                     style="transition-delay: 100ms;">
                     <div class="h-64 overflow-hidden mb-4 relative">
                         <img src="{{ asset('frontend/assets/service-naturopathy.png') }}" alt="Naturopathy"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                     </div>
                     <h3 class="text-xl font-serif text-secondary mb-1">Naturopathy</h3>
-                </div>
+                </a>
 
                 <!-- Service 3 -->
-                <div class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
+                <a href="#"
+                    class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
                     style="transition-delay: 200ms;">
                     <div class="h-64 overflow-hidden mb-4 relative">
                         <!-- Reusing Pranic for now or generic -->
@@ -103,57 +106,62 @@
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                     </div>
                     <h3 class="text-xl font-serif text-secondary mb-1">Pranic Healing</h3>
-                </div>
+                </a>
 
                 <!-- Service 4 (Reuse Yoga for Demo) -->
-                <div class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
+                <a href="#"
+                    class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
                     style="transition-delay: 300ms;">
                     <div class="h-64 overflow-hidden mb-4 relative">
                         <img src="{{ asset('frontend/assets/massage-therapy.jpg') }}" alt="Massage Therapy"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                     </div>
                     <h3 class="text-xl font-serif text-secondary mb-1">Massage Therapy</h3>
-                </div>
+                </a>
 
                 <!-- Service 4 (Reuse Yoga for Demo) -->
-                <div class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
+                <a href="#"
+                    class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
                     style="transition-delay: 300ms;">
                     <div class="h-64 overflow-hidden mb-4 relative">
                         <img src="{{ asset('frontend/assets/hypnotherapy.jpg') }}" alt="Massage Therapy"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                     </div>
                     <h3 class="text-xl font-serif text-secondary mb-1">Hypnotherapy</h3>
-                </div>
+                </a>
 
                 <!-- Service 4 (Reuse Yoga for Demo) -->
-                <div class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
+                <a href="#"
+                    class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
                     style="transition-delay: 300ms;">
                     <div class="h-64 overflow-hidden mb-4 relative">
                         <img src="{{ asset('frontend/assets/graphotherapy.jpg') }}" alt="Massage Therapy"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                     </div>
                     <h3 class="text-xl font-serif text-secondary mb-1">Graphotherapy</h3>
-                </div>
+                </a>
 
                 <!-- Service 4 (Reuse Yoga for Demo) -->
-                <div class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
+                <a href="#"
+                    class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
                     style="transition-delay: 300ms;">
                     <div class="h-64 overflow-hidden mb-4 relative">
                         <img src="{{ asset('frontend/assets/sophrology.jpg') }}" alt="Massage Therapy"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                     </div>
                     <h3 class="text-xl font-serif text-secondary mb-1">Sophrology</h3>
-                </div>
+                </a>
 
                 <!-- Service 4 (Reuse Yoga for Demo) -->
-                <div class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
+                <a href="#"
+                    class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
                     style="transition-delay: 300ms;">
                     <div class="h-64 overflow-hidden mb-4 relative">
                         <img src="{{ asset('frontend/assets/life-coach.jpg') }}" alt="Massage Therapy"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                     </div>
                     <h3 class="text-xl font-serif text-secondary mb-1">Life Coach</h3>
-                </div>
+                </a>
             </div>
 
             <div class="text-center mt-12">
@@ -165,7 +173,7 @@
     </section>
 
     <!-- Practitioner Directory -->
-    <section id="practitioners" class="pb-20"> <!-- Light orange tint form image -->
+    <section id="practitioners" class="pb-20">
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-start mb-16 animate-on-scroll">
                 <h2 class="text-4xl md:text-5xl font-serif font-bold text-primary">Practitioner Directory</h2>
@@ -186,18 +194,76 @@
                     <!-- Card -->
                     <div class="swiper-slide h-auto">
                         <div class="group cursor-pointer">
-                            <div class="h-[380px] mb-6 overflow-hidden relative">
-                                <img src="{{ asset('frontend/assets/zara-practitioner.png') }}" alt="Zara"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-
-                                <!-- Gradient Overlay -->
-                                <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent">
-                                </div>
+                            <div class="h-[400px] mb-6 overflow-hidden relative"
+                                style="background: url('{{ asset('frontend/assets/lilly.png') }}') no-repeat bottom center fixed;background-size: cover;">
 
                                 <!-- Content Overlay -->
                                 <div class="absolute bottom-0 left-0 w-full p-6">
-                                    <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">Zara</h3>
-                                    <p class="text-white/90 text-lg font-normal tracking-wide">Nutrition Consultant</p>
+
+                                    <!-- Blur/gradient layer (BEHIND text) -->
+                                    <div class="absolute left-[-40px] bottom-[-40px] right-[-40px] top-0 blur-xl"
+                                        style="background: url('{{ asset('frontend/assets/lilly.png') }}') no-repeat bottom center fixed;background-size: cover;">
+                                    </div>
+
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent">
+                                    </div>
+
+
+                                    <!-- Text layer (ABOVE blur) -->
+                                    <div class="relative z-10">
+                                        <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">
+                                            Lilly
+                                        </h3>
+                                        <p class="text-white/90 text-lg font-normal tracking-wide">
+                                            Art Therapist
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Rating Badge -->
+                                <div
+                                    class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-sm">
+                                    <i class="ri-star-fill text-secondary text-xs"></i>
+                                    <span class="text-secondary text-xs font-bold">4.7</span>
+                                </div>
+                            </div>
+
+
+                            <!-- Button -->
+                            <div class="text-center">
+                                <button
+                                    class="bg-primary text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-md text-sm">Book
+                                    Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card -->
+                    <div class="swiper-slide h-auto">
+                        <div class="group cursor-pointer">
+                            <div class="h-[400px] mb-6 overflow-hidden relative"
+                                style="background: url('{{ asset('frontend/assets/jane.png') }}') no-repeat bottom center fixed;background-size: cover;">
+
+                                <!-- Content Overlay -->
+                                <div class="absolute bottom-0 left-0 w-full p-6">
+
+                                    <!-- Blur/gradient layer (BEHIND text) -->
+                                    <div class="absolute left-[-40px] bottom-[-40px] right-[-40px] top-0 blur-xl"
+                                        style="background: url('{{ asset('frontend/assets/jane.png') }}') no-repeat bottom center fixed;background-size: cover;">
+                                    </div>
+
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent">
+                                    </div>
+
+
+                                    <!-- Text layer (ABOVE blur) -->
+                                    <div class="relative z-10">
+                                        <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">
+                                            Jane
+                                        </h3>
+                                        <p class="text-white/90 text-lg font-normal tracking-wide">
+                                            Sound Therapist
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <!-- Rating Badge -->
@@ -219,18 +285,30 @@
                     <!-- Card -->
                     <div class="swiper-slide h-auto">
                         <div class="group cursor-pointer">
-                            <div class="h-[380px] mb-6 overflow-hidden relative">
-                                <img src="{{ asset('frontend/assets/jacob-practitioner.png') }}" alt="Jacob"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-
-                                <!-- Gradient Overlay -->
-                                <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent">
-                                </div>
+                            <div class="h-[400px] mb-6 overflow-hidden relative"
+                                style="background: url('{{ asset('frontend/assets/zara.png') }}') no-repeat bottom center fixed;background-size: cover;">
 
                                 <!-- Content Overlay -->
                                 <div class="absolute bottom-0 left-0 w-full p-6">
-                                    <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">Jacob</h3>
-                                    <p class="text-white/90 text-lg font-normal tracking-wide">Clinical Psychologist</p>
+
+                                    <!-- Blur/gradient layer (BEHIND text) -->
+                                    <div class="absolute left-[-40px] bottom-[-40px] right-[-40px] top-0 blur-xl"
+                                        style="background: url('{{ asset('frontend/assets/zara.png') }}') no-repeat bottom center fixed;background-size: cover;">
+                                    </div>
+
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent">
+                                    </div>
+
+
+                                    <!-- Text layer (ABOVE blur) -->
+                                    <div class="relative z-10">
+                                        <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">
+                                            Zara
+                                        </h3>
+                                        <p class="text-white/90 text-lg font-normal tracking-wide">
+                                            Nutrition Consultant
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <!-- Rating Badge -->
@@ -252,18 +330,30 @@
                     <!-- Card -->
                     <div class="swiper-slide h-auto">
                         <div class="group cursor-pointer">
-                            <div class="h-[380px] mb-6 overflow-hidden relative">
-                                <img src="{{ asset('frontend/assets/leslie-practitioner.png') }}" alt="Leslie"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-
-                                <!-- Gradient Overlay -->
-                                <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent">
-                                </div>
+                            <div class="h-[400px] mb-6 overflow-hidden relative"
+                                style="background: url('{{ asset('frontend/assets/jacob.png') }}') no-repeat bottom center fixed;background-size: cover;">
 
                                 <!-- Content Overlay -->
                                 <div class="absolute bottom-0 left-0 w-full p-6">
-                                    <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">Leslie</h3>
-                                    <p class="text-white/90 text-lg font-normal tracking-wide">Art Therapist</p>
+
+                                    <!-- Blur/gradient layer (BEHIND text) -->
+                                    <div class="absolute left-[-40px] bottom-[-40px] right-[-40px] top-0 blur-xl"
+                                        style="background: url('{{ asset('frontend/assets/jacob.png') }}') no-repeat bottom center fixed;background-size: cover;">
+                                    </div>
+
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent">
+                                    </div>
+
+
+                                    <!-- Text layer (ABOVE blur) -->
+                                    <div class="relative z-10">
+                                        <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">
+                                            Jacob
+                                        </h3>
+                                        <p class="text-white/90 text-lg font-normal tracking-wide">
+                                            Clinical Psychologist
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <!-- Rating Badge -->
@@ -285,152 +375,30 @@
                     <!-- Card -->
                     <div class="swiper-slide h-auto">
                         <div class="group cursor-pointer">
-                            <div class="h-[380px] mb-6 overflow-hidden relative">
-                                <img src="{{ asset('frontend/assets/jane-practitioner.png') }}" alt="Jane"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-
-                                <!-- Gradient Overlay -->
-                                <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent">
-                                </div>
+                            <div class="h-[400px] mb-6 overflow-hidden relative"
+                                style="background: url('{{ asset('frontend/assets/jacob-practitioner.png') }}') no-repeat bottom center fixed;background-size: cover;">
 
                                 <!-- Content Overlay -->
                                 <div class="absolute bottom-0 left-0 w-full p-6">
-                                    <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">Jane</h3>
-                                    <p class="text-white/90 text-lg font-normal tracking-wide">Sound Therapist</p>
-                                </div>
 
-                                <!-- Rating Badge -->
-                                <div
-                                    class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-sm">
-                                    <i class="ri-star-fill text-secondary text-xs"></i>
-                                    <span class="text-secondary text-xs font-bold">4.7</span>
-                                </div>
-                            </div>
+                                    <!-- Blur/gradient layer (BEHIND text) -->
+                                    <div class="absolute left-[-40px] bottom-[-40px] right-[-40px] top-0 blur-xl"
+                                        style="background: url('{{ asset('frontend/assets/jacob-practitioner.png') }}') no-repeat bottom center fixed;background-size: cover;">
+                                    </div>
 
-                            <!-- Button -->
-                            <div class="text-center">
-                                <button
-                                    class="bg-primary text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-md text-sm">Book
-                                    Now</button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Card -->
-                    <div class="swiper-slide h-auto">
-                        <div class="group cursor-pointer">
-                            <div class="h-[380px] mb-6 overflow-hidden relative">
-                                <img src="{{ asset('frontend/assets/zara-practitioner.png') }}" alt="Zara"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-
-                                <!-- Gradient Overlay -->
-                                <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent">
-                                </div>
-
-                                <!-- Content Overlay -->
-                                <div class="absolute bottom-0 left-0 w-full p-6">
-                                    <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">Zara</h3>
-                                    <p class="text-white/90 text-lg font-normal tracking-wide">Nutrition Consultant</p>
-                                </div>
-
-                                <!-- Rating Badge -->
-                                <div
-                                    class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-sm">
-                                    <i class="ri-star-fill text-secondary text-xs"></i>
-                                    <span class="text-secondary text-xs font-bold">4.7</span>
-                                </div>
-                            </div>
-
-                            <!-- Button -->
-                            <div class="text-center">
-                                <button
-                                    class="bg-primary text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-md text-sm">Book
-                                    Now</button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Card -->
-                    <div class="swiper-slide h-auto">
-                        <div class="group cursor-pointer">
-                            <div class="h-[380px] mb-6 overflow-hidden relative">
-                                <img src="{{ asset('frontend/assets/jacob-practitioner.png') }}" alt="Jacob"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-
-                                <!-- Gradient Overlay -->
-                                <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent">
-                                </div>
-
-                                <!-- Content Overlay -->
-                                <div class="absolute bottom-0 left-0 w-full p-6">
-                                    <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">Jacob</h3>
-                                    <p class="text-white/90 text-lg font-normal tracking-wide">Clinical Psychologist</p>
-                                </div>
-
-                                <!-- Rating Badge -->
-                                <div
-                                    class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-sm">
-                                    <i class="ri-star-fill text-secondary text-xs"></i>
-                                    <span class="text-secondary text-xs font-bold">4.7</span>
-                                </div>
-                            </div>
-
-                            <!-- Button -->
-                            <div class="text-center">
-                                <button
-                                    class="bg-primary text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-md text-sm">Book
-                                    Now</button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Card -->
-                    <div class="swiper-slide h-auto">
-                        <div class="group cursor-pointer">
-                            <div class="h-[380px] mb-6 overflow-hidden relative">
-                                <img src="{{ asset('frontend/assets/leslie-practitioner.png') }}" alt="Leslie"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-
-                                <!-- Gradient Overlay -->
-                                <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent">
-                                </div>
-
-                                <!-- Content Overlay -->
-                                <div class="absolute bottom-0 left-0 w-full p-6">
-                                    <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">Leslie</h3>
-                                    <p class="text-white/90 text-lg font-normal tracking-wide">Art Therapist</p>
-                                </div>
-
-                                <!-- Rating Badge -->
-                                <div
-                                    class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-sm">
-                                    <i class="ri-star-fill text-secondary text-xs"></i>
-                                    <span class="text-secondary text-xs font-bold">4.7</span>
-                                </div>
-                            </div>
-
-                            <!-- Button -->
-                            <div class="text-center">
-                                <button
-                                    class="bg-primary text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-md text-sm">Book
-                                    Now</button>
-                            </div>
-                        </div>
-                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent">
+                                    </div>
 
 
-                    <!-- Card -->
-                    <div class="swiper-slide h-auto">
-                        <div class="group cursor-pointer">
-                            <div class="h-[380px] mb-6 overflow-hidden relative">
-                                <img src="{{ asset('frontend/assets/jane-practitioner.png') }}" alt="Jane"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-
-                                <!-- Gradient Overlay -->
-                                <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent">
-                                </div>
-
-                                <!-- Content Overlay -->
-                                <div class="absolute bottom-0 left-0 w-full p-6">
-                                    <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">Jane</h3>
-                                    <p class="text-white/90 text-lg font-normal tracking-wide">Sound Therapist</p>
+                                    <!-- Text layer (ABOVE blur) -->
+                                    <div class="relative z-10">
+                                        <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">
+                                            Jacob Thomas
+                                        </h3>
+                                        <p class="text-white/90 text-lg font-normal tracking-wide">
+                                            Clinical Psychologist
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <!-- Rating Badge -->
@@ -454,7 +422,7 @@
         </div>
         <div class="container mx-auto">
             <!-- Custom Nav Arrows -->
-            <div class="flex justify-center items-center gap-8 mt-8 mb-8">
+            <div class="flex justify-center items-center gap-8">
                 <button
                     class="prev-practitioner w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300">
                     <i class="ri-arrow-left-line text-xl"></i>
