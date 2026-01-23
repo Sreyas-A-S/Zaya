@@ -111,6 +111,7 @@ class DoctorController extends Controller
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
             'mobile_number' => 'required|string|max:20',
+            'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
             'profile_photo' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
 
