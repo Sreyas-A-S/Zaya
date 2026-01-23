@@ -26,4 +26,9 @@ class WebController extends Controller
     {
         return view('services');
     }
+
+    public function practitionerDetail()
+    {
+        return view('practitioner-detail');
+    }
 }

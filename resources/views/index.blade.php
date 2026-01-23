@@ -194,7 +194,7 @@
                     <!-- Card -->
                     <div class="swiper-slide h-auto">
                         <div class="group cursor-pointer">
-                            <div class="h-[400px] mb-6 overflow-hidden relative"
+                            <a href="{{ route('practitioner-detail') }}" class="h-[400px] mb-6 overflow-hidden relative block"
                                 style="background: url('{{ asset('frontend/assets/lilly.png') }}') no-repeat bottom center fixed;background-size: cover;">
 
                                 <!-- Content Overlay -->
@@ -226,7 +226,7 @@
                                     <i class="ri-star-fill text-secondary text-xs"></i>
                                     <span class="text-secondary text-xs font-bold">4.7</span>
                                 </div>
-                            </div>
+                            </a>
 
 
                             <!-- Button -->
@@ -240,7 +240,7 @@
                     <!-- Card -->
                     <div class="swiper-slide h-auto">
                         <div class="group cursor-pointer">
-                            <div class="h-[400px] mb-6 overflow-hidden relative"
+                            <a href="{{ route('practitioner-detail') }}" class="h-[400px] mb-6 overflow-hidden relative block"
                                 style="background: url('{{ asset('frontend/assets/jane.png') }}') no-repeat bottom center fixed;background-size: cover;">
 
                                 <!-- Content Overlay -->
@@ -272,7 +272,7 @@
                                     <i class="ri-star-fill text-secondary text-xs"></i>
                                     <span class="text-secondary text-xs font-bold">4.7</span>
                                 </div>
-                            </div>
+                            </a>
 
                             <!-- Button -->
                             <div class="text-center">
@@ -285,7 +285,7 @@
                     <!-- Card -->
                     <div class="swiper-slide h-auto">
                         <div class="group cursor-pointer">
-                            <div class="h-[400px] mb-6 overflow-hidden relative"
+                            <a href="{{ route('practitioner-detail') }}" class="h-[400px] mb-6 overflow-hidden relative block"
                                 style="background: url('{{ asset('frontend/assets/zara.png') }}') no-repeat bottom center fixed;background-size: cover;">
 
                                 <!-- Content Overlay -->
@@ -317,7 +317,7 @@
                                     <i class="ri-star-fill text-secondary text-xs"></i>
                                     <span class="text-secondary text-xs font-bold">4.7</span>
                                 </div>
-                            </div>
+                            </a>
 
                             <!-- Button -->
                             <div class="text-center">
@@ -330,7 +330,7 @@
                     <!-- Card -->
                     <div class="swiper-slide h-auto">
                         <div class="group cursor-pointer">
-                            <div class="h-[400px] mb-6 overflow-hidden relative"
+                            <a href="{{ route('practitioner-detail') }}" class="h-[400px] mb-6 overflow-hidden relative block"
                                 style="background: url('{{ asset('frontend/assets/jacob.png') }}') no-repeat bottom center fixed;background-size: cover;">
 
                                 <!-- Content Overlay -->
@@ -362,7 +362,7 @@
                                     <i class="ri-star-fill text-secondary text-xs"></i>
                                     <span class="text-secondary text-xs font-bold">4.7</span>
                                 </div>
-                            </div>
+                            </a>
 
                             <!-- Button -->
                             <div class="text-center">
@@ -375,7 +375,52 @@
                     <!-- Card -->
                     <div class="swiper-slide h-auto">
                         <div class="group cursor-pointer">
-                            <div class="h-[400px] mb-6 overflow-hidden relative"
+                            <a href="{{ route('practitioner-detail') }}" class="h-[400px] mb-6 overflow-hidden relative block"
+                                style="background: url('{{ asset('frontend/assets/leslie-practitioner.png') }}') no-repeat bottom center fixed;background-size: cover;">
+
+                                <!-- Content Overlay -->
+                                <div class="absolute bottom-0 left-0 w-full p-6">
+
+                                    <!-- Blur/gradient layer (BEHIND text) -->
+                                    <div class="absolute left-[-40px] bottom-[-40px] right-[-40px] top-0 blur-xl"
+                                        style="background: url('{{ asset('frontend/assets/leslie-practitioner.png') }}') no-repeat bottom center fixed;background-size: cover;">
+                                    </div>
+
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent">
+                                    </div>
+
+
+                                    <!-- Text layer (ABOVE blur) -->
+                                    <div class="relative z-10">
+                                        <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">
+                                            Leslie
+                                        </h3>
+                                        <p class="text-white/90 text-lg font-normal tracking-wide">
+                                            Therapist
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Rating Badge -->
+                                <div
+                                    class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-sm">
+                                    <i class="ri-star-fill text-secondary text-xs"></i>
+                                    <span class="text-secondary text-xs font-bold">4.7</span>
+                                </div>
+                            </a>
+
+                            <!-- Button -->
+                            <div class="text-center">
+                                <button
+                                    class="bg-primary text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-md text-sm">Book
+                                    Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card -->
+                    <div class="swiper-slide h-auto">
+                        <div class="group cursor-pointer">
+                            <a href="{{ route('practitioner-detail') }}" class="h-[400px] mb-6 overflow-hidden relative block"
                                 style="background: url('{{ asset('frontend/assets/jacob-practitioner.png') }}') no-repeat bottom center fixed;background-size: cover;">
 
                                 <!-- Content Overlay -->
@@ -407,7 +452,7 @@
                                     <i class="ri-star-fill text-secondary text-xs"></i>
                                     <span class="text-secondary text-xs font-bold">4.7</span>
                                 </div>
-                            </div>
+                            </a>
 
                             <!-- Button -->
                             <div class="text-center">
@@ -417,6 +462,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -424,11 +470,11 @@
             <!-- Custom Nav Arrows -->
             <div class="flex justify-center items-center gap-8">
                 <button
-                    class="prev-practitioner w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300">
+                    class="prev-practitioner w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer">
                     <i class="ri-arrow-left-line text-xl"></i>
                 </button>
                 <button
-                    class="next-practitioner w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300">
+                    class="next-practitioner w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer">
                     <i class="ri-arrow-right-line text-xl"></i>
                 </button>
             </div>
