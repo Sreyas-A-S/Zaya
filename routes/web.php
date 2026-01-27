@@ -39,6 +39,7 @@ Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-s
 Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
 Route::get('/practitioner-detail', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
+Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');

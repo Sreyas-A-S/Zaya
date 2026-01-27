@@ -61,7 +61,7 @@
 
         <!-- Right Actions (Desktop) -->
         <div class="flex items-center gap-6 lg:gap-8 justify-end flex-1">
-            <a href="#"
+            <a href="{{ route('zaya-login') }}"
                 class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors">Login</a>
 
             <a href="#"
@@ -102,7 +102,7 @@
         </div>
 
         <a href="#" class="text-lg font-medium text-secondary border-b border-gray-50 pb-2">Contact Us</a>
-        <a href="#" class="text-lg font-medium text-secondary pb-2">Login</a>
+        <a href="{{ route('zaya-login') }}" class="text-lg font-medium text-secondary pb-2">Login</a>
 
         <div class="pt-2">
             <a href="#"

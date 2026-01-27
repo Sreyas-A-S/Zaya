@@ -31,4 +31,9 @@ class WebController extends Controller
     {
         return view('practitioner-detail');
     }
+
+    public function zayaLogin()
+    {
+        return view('zaya-login');
+    }
 }
