@@ -165,9 +165,9 @@
             </div>
 
             <div class="text-center mt-12">
-                <button
+                <a href="{{ route('services') }}"
                     class="border border-secondary hover:border-primary text-secondary hover:bg-primary hover:text-white px-8 py-3 rounded-full transition-all text-md">Browse
-                    All Services</button>
+                    All Services</a>
             </div>
         </div>
     </section>
