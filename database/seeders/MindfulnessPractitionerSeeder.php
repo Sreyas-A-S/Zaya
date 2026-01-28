@@ -78,7 +78,12 @@ class MindfulnessPractitionerSeeder extends Seeder
                 'gender' => $faker->randomElement(['male', 'female']),
                 'dob' => $faker->date(),
                 'phone' => $faker->mobileNumber,
-                'address' => $faker->address,
+                'address_line_1' => $faker->streetAddress,
+                'address_line_2' => $faker->streetName,
+                'city' => $faker->city,
+                'state' => $faker->state,
+                'zip_code' => $faker->postcode,
+                'country' => 'India',
                 // 'profile_photo_path' => null, // Left empty or add a placeholder path if needed
 
                 'practitioner_type' => 'Mindfulness Coach',

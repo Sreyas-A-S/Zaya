@@ -1048,7 +1048,7 @@
                                         </div>
                                         <div class="col-md-12">
                                             <p class="text-muted small mb-1">Address</p>
-                                            <p class="fw-medium text-break">${t.address || 'N/A'}</p>
+                                            <p class="fw-medium text-break">${[t.address_line_1, t.address_line_2, t.city, t.state, t.zip_code, t.country].filter(Boolean).join(', ') || 'N/A'}</p>
                                         </div>
                                     </div>
                                     

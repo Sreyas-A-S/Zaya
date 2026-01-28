@@ -39,7 +39,11 @@ class PractitionerSeeder extends Seeder
                 'gender' => $faker->randomElement(['male', 'female']),
                 'dob' => $faker->date('Y-m-d', '-25 years'),
                 'nationality' => 'Indian',
-                'residential_address' => $faker->address(),
+                'address_line_1' => $faker->streetAddress(),
+                'address_line_2' => $faker->streetName(),
+                'city' => $faker->city(),
+                'state' => 'Maharashtra',
+                'country' => 'India',
                 'zip_code' => $faker->postcode(),
                 'phone' => $faker->phoneNumber(),
                 'social_links' => [

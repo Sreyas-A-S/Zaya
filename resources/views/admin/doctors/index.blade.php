@@ -1268,7 +1268,7 @@
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Experience</label><p class="f-w-600">${p.years_of_experience || 0} Years</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Current Workplace</label><p class="f-w-600">${p.current_workplace_clinic_name || 'N/A'}</p></div>
                                     <div class="col-12"><label class="small text-muted mb-0">Specializations</label><div>${renderBadges(p.specialization)}</div></div>
-                                    <div class="col-12"><label class="small text-muted mb-0">Clinic Address</label><p class="f-w-600">${p.clinic_address || 'N/A'}</p></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Clinic Address</label><p class="f-w-600">${[p.address_line_1, p.address_line_2, p.city, p.state, p.zip_code, p.country].filter(Boolean).join(', ') || 'N/A'}</p></div>
                                 </div>
                             </div>
 

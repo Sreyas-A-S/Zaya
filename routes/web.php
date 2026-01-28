@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\MindfulnessPractitionerController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TranslatorController;
 use App\Http\Controllers\Admin\YogaTherapistController;
+
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\WebController;
 use Illuminate\Support\Facades\Route;

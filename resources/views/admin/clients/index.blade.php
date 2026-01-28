@@ -793,7 +793,12 @@
 
             $('input[name="phone"]').val(data.patient.phone);
             $('input[name="mobile_country_code"]').val(data.patient.mobile_country_code);
-            $('textarea[name="address"]').val(data.patient.address);
+            $('input[name="address_line_1"]').val(data.patient.address_line_1);
+            $('input[name="address_line_2"]').val(data.patient.address_line_2);
+            $('input[name="city"]').val(data.patient.city);
+            $('input[name="state"]').val(data.patient.state);
+            $('input[name="zip_code"]').val(data.patient.zip_code);
+            $('select[name="country"]').val(data.patient.country);
             $('input[name="dob"]').val(data.patient.dob);
             $('input[name="occupation"]').val(data.patient.occupation);
             $('select[name="gender"]').val(data.patient.gender);

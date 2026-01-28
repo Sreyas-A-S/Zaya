@@ -15,6 +15,7 @@ return new class extends Migration
             'doctors',
             'practitioners',
             'mindfulness_practitioners',
+            'mindfulness_counsellors',
             'yoga_therapists',
             'patients',
             'translators'

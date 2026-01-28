@@ -902,7 +902,7 @@
                                         </div>
                                         <div class="col-md-12">
                                             <p class="text-muted small mb-1">Address</p>
-                                            <p class="fw-medium text-break">${p.address || 'N/A'}</p>
+                                            <p class="fw-medium text-break">${[p.address_line_1, p.address_line_2, p.city, p.state, p.zip_code, p.country].filter(Boolean).join(', ') || 'N/A'}</p>
                                         </div>
                                          <div class="col-md-12">
                                             <p class="text-muted small mb-1">Short Bio</p>
