@@ -1138,13 +1138,24 @@
             $('#languages_capabilities_container').empty(); // Clear existing rows
             if (languageChoices) {
                 languageChoices.removeActiveItems(); // Clear Choices.js selection
-                if (p.languages_spoken && Object.keys(p.languages_spoken).length > 0) {
+                if (p.languages_spoken) {
                     const selectedLanguages = [];
-                    $.each(p.languages_spoken, function(langName, capabilities) {
-                        selectedLanguages.push(langName);
-                        addLanguageCapabilityRow(langName, langName, capabilities);
-                    });
-                    languageChoices.setChoiceByValue(selectedLanguages);
+                    if (Array.isArray(p.languages_spoken)) {
+                        $.each(p.languages_spoken, function(index, value) {
+                            if (typeof value === 'string') {
+                                selectedLanguages.push(value);
+                                addLanguageCapabilityRow(value, value, {});
+                            }
+                        });
+                    } else {
+                        $.each(p.languages_spoken, function(langName, capabilities) {
+                            selectedLanguages.push(langName);
+                            addLanguageCapabilityRow(langName, langName, capabilities);
+                        });
+                    }
+                    if (selectedLanguages.length > 0) {
+                        languageChoices.setChoiceByValue(selectedLanguages);
+                    }
                 }
             }
 

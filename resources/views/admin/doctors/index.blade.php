@@ -870,8 +870,11 @@
                     name: 'doctors.phone'
                 },
                 {
-                    data: 'city_state',
-                    name: 'doctors.city_state'
+                    data: 'city',
+                    name: 'doctors.city',
+                    render: function(data, type, row) {
+                        return [row.city, row.state].filter(Boolean).join(', ');
+                    }
                 },
                 {
                     data: 'status',

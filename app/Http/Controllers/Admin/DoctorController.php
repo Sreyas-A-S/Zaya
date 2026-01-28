@@ -35,7 +35,8 @@ class DoctorController extends Controller
                     'doctors.ayush_registration_number',
                     'doctors.phone',
                     'doctors.profile_photo_path',
-                    'doctors.city_state',
+                    'doctors.city',
+                    'doctors.state',
                     'doctors.status'
                 ])
                 ->latest('users.created_at')
@@ -229,7 +230,7 @@ class DoctorController extends Controller
             'gender' => $validatedData['gender'],
             'dob' => $validatedData['dob'],
             'phone' => $validatedData['mobile_number'],
-            'city_state' => $validatedData['city_state'],
+
             'profile_photo_path' => $profilePhotoPath,
             'ayush_registration_number' => $validatedData['ayush_reg_no'],
             'state_ayurveda_council_name' => $validatedData['state_council'],

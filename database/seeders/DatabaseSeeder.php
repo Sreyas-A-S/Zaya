@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             ClientSeeder::class,
             MindfulnessPractitionerSeeder::class,
             TranslatorSeeder::class,
+            YogaTherapistSeeder::class,
         ]);
 
         User::updateOrCreate(
