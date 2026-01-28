@@ -378,10 +378,10 @@
             </div>
             <div class="text-center">
                 <div
-                    class="absolute bottom-0 left-0 w-full h-[200px] bg-white blur-xl flex items-end justify-center pb-8 z-10 pointer-events-none">
+                    class="absolute bottom-[-50px] left-0 w-full h-[200px] bg-white blur-xl flex items-end justify-center pb-8 z-10 pointer-events-none">
                 </div>
                 <button
-                    class="border cursor-pointer border-gray-400 text-gray-600 px-10 py-3 rounded-full hover:bg-black hover:text-white transition-all duration-300 font-medium bg-white shadow-sm pointer-events-auto relative z-20">Load
+                    class="border cursor-pointer border-secondary text-secondary px-10 py-3 rounded-full hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 font-medium bg-white shadow-sm pointer-events-auto relative z-20">Load
                     More</button>
             </div>
         </div>
