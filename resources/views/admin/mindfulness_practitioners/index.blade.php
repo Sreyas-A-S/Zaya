@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
-@section('title', 'Mindfulness Counsellors')
+@section('title', 'Mindfulness Practitioners')
 
 @section('content')
 <div class="container-fluid">
     <div class="page-title">
         <div class="row">
             <div class="col-sm-6">
-                <h3>Mindfulness Counsellors</h3>
+                <h3>Mindfulness Practitioners</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="fa-solid fa-house"></i></a></li>
                     <li class="breadcrumb-item">Practitioners</li>
-                    <li class="breadcrumb-item active">Mindfulness Counsellors</li>
+                    <li class="breadcrumb-item active">Mindfulness Practitioners</li>
                 </ol>
             </div>
         </div>
@@ -25,7 +25,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
-                    <h3>Counsellors List</h3>
+                    <h3>Practitioners List</h3>
                     <button type="button" class="btn btn-primary" onclick="openCreateModal()">
                         <i class="fa-solid fa-plus me-2"></i>Register New
                     </button>
@@ -116,8 +116,12 @@
                                             <label class="form-label mt-2">Profile Photo</label>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="full_name" required>
+                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="first_name" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="last_name" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
@@ -149,8 +153,31 @@
                                             <input class="form-control" type="date" name="dob">
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Address</label>
-                                            <textarea class="form-control" name="address" rows="2"></textarea>
+                                            <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Address Line 2</label>
+                                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">City <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="city" required placeholder="City">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">State <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="state" required placeholder="State">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Zip Code <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Country <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="country" required>
+                                                <option value="India" selected>India</option>
+                                                <option value="Other">Other</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -159,9 +186,8 @@
                                 <div class="step-content d-none" id="step-2">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label">Counsellor Type</label>
-                                            <select class="form-select" name="practitioner_type">
-                                                <option value="" selected disabled>Select Type</option>
+                                            <label class="form-label">Practitioner Type <span class="small text-muted">(Select Multiple)</span></label>
+                                            <select class="form-select multiple-select" name="practitioner_type[]" multiple>
                                                 <option value="Mindfulness Coach">Mindfulness Coach</option>
                                                 <option value="Meditation Teacher">Meditation Teacher</option>
                                                 <option value="Breathwork Facilitator">Breathwork Facilitator</option>
@@ -178,8 +204,22 @@
                                             <label class="form-label">Current Workplace / Organization</label>
                                             <input class="form-control" type="text" name="current_workplace">
                                         </div>
-                                        <!-- Website / Social Media Links handled as simple inputs for simplicity -->
-                                        <!-- Or basic dynamic list via JS later if needed. -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Website (Optional)</label>
+                                            <input class="form-control" type="url" name="website_social_links[website]" placeholder="https://">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Instagram (Optional)</label>
+                                            <input class="form-control" type="url" name="website_social_links[instagram]" placeholder="https://instagram.com/">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">LinkedIn (Optional)</label>
+                                            <input class="form-control" type="url" name="website_social_links[linkedin]" placeholder="https://linkedin.com/in/">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">YouTube (Optional)</label>
+                                            <input class="form-control" type="url" name="website_social_links[youtube]" placeholder="https://youtube.com/@">
+                                        </div>
                                     </div>
                                 </div>
 
@@ -267,11 +307,12 @@
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label fw-bold">Languages Spoken</label>
-                                            <select class="form-select" id="languages_select" name="languages_spoken[]" multiple>
+                                            <select class="form-select" id="languages_select" multiple>
                                                 @foreach($languages as $lang)
                                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
                                                 @endforeach
                                             </select>
+                                            <div id="languages_capabilities_container"></div>
                                         </div>
                                         <hr>
                                         <h6 class="text-primary">Identity & Payment</h6>
@@ -354,7 +395,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Mindfulness Counsellor Details</h5>
+                <h5 class="modal-title">Mindfulness Practitioner Details</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="view-modal-content">
@@ -443,15 +484,15 @@
                 },
                 {
                     data: 'phone',
-                    name: 'mindfulness_counsellors.phone'
+                    name: 'mindfulness_practitioners.phone'
                 },
                 {
                     data: 'gender',
-                    name: 'mindfulness_counsellors.gender'
+                    name: 'mindfulness_practitioners.gender'
                 },
                 {
                     data: 'status',
-                    name: 'mindfulness_counsellors.status'
+                    name: 'mindfulness_practitioners.status'
                 },
                 {
                     data: 'action',
@@ -463,14 +504,35 @@
         });
 
         // Initialize Choices.js
+        let languageChoices = null;
         if (document.getElementById('languages_select')) {
             languageChoices = new Choices('#languages_select', {
                 removeItemButton: true,
                 searchEnabled: true,
                 shouldSort: false,
                 placeholderValue: 'Select Languages',
+                itemSelectText: '',
+            });
+
+            document.getElementById('languages_select').addEventListener('addItem', function(event) {
+                addLanguageCapabilityRow(event.detail.value, event.detail.label);
+            });
+
+            document.getElementById('languages_select').addEventListener('removeItem', function(event) {
+                $(`#lang-row-${event.detail.value.replace(/\s+/g, '_')}`).remove();
             });
         }
+        window.languageChoices = languageChoices;
+
+        let practitionerTypeChoices = null;
+        if (document.querySelector('.multiple-select')) {
+            practitionerTypeChoices = new Choices('.multiple-select', {
+                removeItemButton: true,
+                placeholderValue: 'Select Type',
+                itemSelectText: '',
+            });
+        }
+        window.practitionerTypeChoices = practitionerTypeChoices;
 
         // Stepper Logic
         $('#next-btn').click(function() {
@@ -688,7 +750,7 @@
             $('#practitioner-form')[0].reset();
             $('#practitioner_id').val(id);
             $('#form-method').val('PUT');
-            $('#form-modal-title').text('Edit Counsellor');
+            $('#form-modal-title').text('Edit Practitioner');
 
             // Password fields specific logic
             $('.password-field').hide();
@@ -700,13 +762,22 @@
                 let p = response.practitioner;
 
                 // Populate fields
-                $('input[name="full_name"]').val(u.name);
+                $('input[name="first_name"]').val(p.first_name);
+                $('input[name="last_name"]').val(p.last_name);
                 $('input[name="email"]').val(u.email);
                 $('input[name="phone"]').val(p.phone);
                 $('select[name="gender"]').val(p.gender);
                 $('input[name="dob"]').val(p.dob ? p.dob.substring(0, 10) : '');
-                $('textarea[name="address"]').val(p.address);
-                // ... Populate other fields mapping
+                $('input[name="address_line_1"]').val(p.address_line_1);
+                $('input[name="address_line_2"]').val(p.address_line_2);
+                $('input[name="city"]').val(p.city);
+                $('input[name="state"]').val(p.state);
+                $('input[name="zip_code"]').val(p.zip_code);
+                $('select[name="country"]').val(p.country || 'India');
+
+                if (window.practitionerTypeChoices) {
+                    window.practitionerTypeChoices.setChoiceByValue(p.practitioner_type || []);
+                }
                 // For checkboxes and arrays, it is more complex. I will just do basic ones and basic mapping for now.
                 // In production, proper mapping for checkboxes is needed.
                 // Assuming p.services_offered is array
@@ -714,6 +785,29 @@
                     p.services_offered.forEach(v => {
                         $(`input[name="services_offered[]"][value="${v}"]`).prop('checked', true);
                     });
+                }
+
+                // Handle Languages Spoken (Choices.js)
+                $('#languages_capabilities_container').empty();
+                if (p.languages_spoken) {
+                    const langs = Array.isArray(p.languages_spoken) ? p.languages_spoken : [];
+
+                    if (langs.length > 0 && typeof langs[0] === 'string') {
+                        // Old format: just an array of language names
+                        window.languageChoices.setChoiceByValue(langs);
+                        langs.forEach(lang => addLanguageCapabilityRow(lang, lang));
+                    } else {
+                        // New format: array of objects {language: '...', read: true, ...}
+                        const langValues = [];
+                        $.each(p.languages_spoken, function(key, caps) {
+                            const langName = caps.language || key; // Fallback to key if language property is missing
+                            langValues.push(langName);
+                            addLanguageCapabilityRow(langName, langName, caps);
+                        });
+                        window.languageChoices.setChoiceByValue(langValues);
+                    }
+                } else {
+                    window.languageChoices.removeActiveItems();
                 }
 
                 // Reset stepper to 1
@@ -781,7 +875,7 @@
                                     </span>
                                 </div>
                             </div>
-                            <h5 class="fw-bold text-dark mb-1 text-break">${u.name}</h5>
+                            <h5 class="fw-bold text-dark mb-1 text-break">${p.first_name} ${p.last_name}</h5>
                             <p class="text-muted small mb-2 text-break">${u.email}</p>
                             <p class="text-muted small mb-3"><i class="fa fa-phone me-1"></i> ${p.phone || 'N/A'}</p>
                         </div>
@@ -816,9 +910,12 @@
                                         </div>
                                         <div class="col-md-12">
                                             <p class="text-muted small mb-1">Social / Website</p>
-                                            <p class="fw-medium text-break">
-                                                ${p.website_social_links ? (Array.isArray(p.website_social_links) ? p.website_social_links.join(', ') : Object.entries(p.website_social_links).map(([k, v]) => v ? `${k}: ${v}` : '').filter(Boolean).join(', ')) : 'N/A'}
-                                            </p>
+                                            <div class="d-flex flex-wrap gap-2 mt-1">
+                                                ${p.website_social_links && p.website_social_links.website ? `<a href="${p.website_social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs"><i class="fa-solid fa-globe"></i></a>` : ''}
+                                                ${p.website_social_links && p.website_social_links.instagram ? `<a href="${p.website_social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-instagram"></i></a>` : ''}
+                                                ${p.website_social_links && p.website_social_links.linkedin ? `<a href="${p.website_social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs"><i class="fa-brands fa-linkedin"></i></a>` : ''}
+                                                ${p.website_social_links && p.website_social_links.youtube ? `<a href="${p.website_social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-youtube"></i></a>` : ''}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -879,7 +976,7 @@
                                         <div class="col-md-6">
                                              <p class="text-muted small mb-2">Languages Spoken</p>
                                              <div class="d-flex flex-wrap gap-1">
-                                                ${p.languages_spoken ? p.languages_spoken.map(l => `<span class="badge bg-secondary">${l}</span>`).join('') : 'None'}
+                                                ${renderBadges(p.languages_spoken)}
                                              </div>
                                         </div>
                                     </div>
@@ -1053,6 +1150,63 @@
             $('#submit-btn').hide();
         }
     }
+
+    function addLanguageCapabilityRow(value, label, caps = null) {
+        if ($(`#lang-row-${value.replace(/\s+/g, '_')}`).length > 0) return;
+
+        const isRead = caps && caps.read ? 'checked' : '';
+        const isWrite = caps && caps.write ? 'checked' : '';
+        const isSpeak = caps && caps.speak ? 'checked' : '';
+
+        const html = `
+                    <div class="language-capability-row" id="lang-row-${value.replace(/\s+/g, '_')}">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <span class="language-capability-title">${label}</span>
+                                <input type="hidden" name="languages_spoken[${value}][language]" value="${value}">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="d-flex gap-3 capability-checkboxes">
+                                    <div class="form-check checkbox-primary mb-0">
+                                        <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][read]" value="1" id="read_${value.replace(/\s+/g, '_')}" ${isRead}>
+                                        <label class="form-check-label small" for="read_${value.replace(/\s+/g, '_')}">Read</label>
+                                    </div>
+                                    <div class="form-check checkbox-primary mb-0">
+                                        <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][write]" value="1" id="write_${value.replace(/\s+/g, '_')}" ${isWrite}>
+                                        <label class="form-check-label small" for="write_${value.replace(/\s+/g, '_')}">Write</label>
+                                    </div>
+                                    <div class="form-check checkbox-primary mb-0">
+                                        <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][speak]" value="1" id="speak_${value.replace(/\s+/g, '_')}" ${isSpeak}>
+                                        <label class="form-check-label small" for="speak_${value.replace(/\s+/g, '_')}">Speak</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        $('#languages_capabilities_container').append(html);
+    }
+
+    const renderBadges = (arr) => {
+        if (!arr || (Array.isArray(arr) && arr.length === 0)) return '<span class="text-muted">None</span>';
+
+        if (Array.isArray(arr) && (arr.length === 0 || typeof arr[0] === 'string')) {
+            return arr.map(item => `<span class="badge bg-light text-dark border me-1 mb-1">${item}</span>`).join('');
+        }
+
+        let badgeHtml = '';
+        $.each(arr, function(key, caps) {
+            const langName = caps.language || key;
+            let capsList = [];
+            if (caps.read) capsList.push('Read');
+            if (caps.write) capsList.push('Write');
+            if (caps.speak) capsList.push('Speak');
+
+            const capsStr = capsList.length > 0 ? ` (${capsList.join(', ')})` : '';
+            badgeHtml += `<span class="badge bg-light text-dark border me-1 mb-1">${langName}${capsStr}</span>`;
+        });
+        return badgeHtml || '<span class="text-muted">None</span>';
+    };
 
     function validateStep(step) {
         // Simple validation
@@ -1293,6 +1447,32 @@
         transform: translateX(-50%);
         pointer-events: none;
         /* Let clicks pass through to label */
+    }
+
+    .language-capability-row {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-top: 10px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .language-capability-row:hover {
+        background: #f1f3f5;
+        border-color: #dee2e6;
+    }
+
+    .language-capability-title {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+
+    .capability-checkboxes .form-check-input {
+        width: 1.1em;
+        height: 1.1em;
+        margin-top: 0.2em;
     }
 </style>
 @endsection

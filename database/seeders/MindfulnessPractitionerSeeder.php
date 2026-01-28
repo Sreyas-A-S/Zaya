@@ -5,11 +5,11 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\MindfulnessCounsellor;
+use App\Models\MindfulnessPractitioner;
 use Illuminate\Support\Facades\Hash;
 use Faker\Factory as Faker;
 
-class MindfulnessCounsellorSeeder extends Seeder
+class MindfulnessPractitionerSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -66,13 +66,15 @@ class MindfulnessCounsellorSeeder extends Seeder
                 'name' => "$firstName $lastName",
                 'email' => $email,
                 'password' => Hash::make('password'),
-                'role' => 'mindfulness_counsellor',
+                'role' => 'mindfulness_practitioner',
             ]);
 
-            MindfulnessCounsellor::create([
+            MindfulnessPractitioner::create([
                 'user_id' => $user->id,
                 'status' => $faker->randomElement(['active', 'pending']),
-                'full_name' => "$firstName $lastName",
+                // 'full_name' removed as per new schema, handled by User
+                'first_name' => $firstName,
+                'last_name' => $lastName,
                 'gender' => $faker->randomElement(['male', 'female']),
                 'dob' => $faker->date(),
                 'phone' => $faker->mobileNumber,
@@ -82,7 +84,12 @@ class MindfulnessCounsellorSeeder extends Seeder
                 'practitioner_type' => 'Mindfulness Coach',
                 'years_of_experience' => $faker->numberBetween(1, 15),
                 'current_workplace' => $faker->company,
-                'website_social_links' => ['linkedin' => $faker->url, 'instagram' => ''],
+                'website_social_links' => [
+                    'website' => $faker->url,
+                    'instagram' => 'https://instagram.com/' . $firstName,
+                    'linkedin' => 'https://linkedin.com/in/' . $firstName,
+                    'youtube' => 'https://youtube.com/@' . $firstName,
+                ],
 
                 'highest_education' => 'Masters in Psychology',
                 'mindfulness_training_details' => 'Certified Mindfulness Teacher Training, 200 Hours',

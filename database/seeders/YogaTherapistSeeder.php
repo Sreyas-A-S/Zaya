@@ -35,7 +35,12 @@ class YogaTherapistSeeder extends Seeder
                 'years_of_experience' => 12,
                 'current_organization' => 'Prana Wellness Center',
                 'workplace_address' => '45, Indiranagar, Bangalore',
-                'website_social_links' => ['website' => 'www.priyayoga.com', 'instagram' => '@priya_yoga'],
+                'website_social_links' => [
+                    'website' => 'https://www.priyayoga.com',
+                    'instagram' => 'https://instagram.com/priya_yoga',
+                    'linkedin' => 'https://linkedin.com/in/priya_yoga',
+                    'youtube' => 'https://youtube.com/@priya_yoga',
+                ],
 
                 'certification_details' => 'IAYT Certified, MSc into Yoga Therapy from SVYASA.',
                 'certificates_path' => ['sample_cert_1.pdf'],
@@ -95,7 +100,12 @@ class YogaTherapistSeeder extends Seeder
                 'years_of_experience' => $faker->numberBetween(1, 25),
                 'current_organization' => $faker->company,
                 'workplace_address' => $faker->address,
-                'website_social_links' => ['website' => $faker->url],
+                'website_social_links' => [
+                    'website' => $faker->url,
+                    'instagram' => 'https://instagram.com/' . $firstName,
+                    'linkedin' => 'https://linkedin.com/in/' . $firstName,
+                    'youtube' => 'https://youtube.com/@' . $firstName,
+                ],
 
                 'certification_details' => $faker->sentence(6),
                 'certificates_path' => null,

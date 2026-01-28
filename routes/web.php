@@ -4,7 +4,7 @@ use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\PractitionerController;
 use App\Http\Controllers\Admin\MasterDataController;
-use App\Http\Controllers\Admin\MindfulnessCounsellorController;
+use App\Http\Controllers\Admin\MindfulnessPractitionerController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TranslatorController;
 use App\Http\Controllers\Admin\YogaTherapistController;
@@ -48,8 +48,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::resource('practitioners', PractitionerController::class);
     Route::post('practitioners/{id}/status', [PractitionerController::class, 'updateStatus'])->name('practitioners.status');
 
-    Route::resource('mindfulness-practitioners', MindfulnessCounsellorController::class);
-    Route::post('mindfulness-practitioners/{id}/status', [MindfulnessCounsellorController::class, 'updateStatus'])->name('mindfulness-practitioners.status');
+    Route::resource('mindfulness-practitioners', MindfulnessPractitionerController::class);
+    Route::post('mindfulness-practitioners/{id}/status', [MindfulnessPractitionerController::class, 'updateStatus'])->name('mindfulness-practitioners.status');
 
     Route::resource('yoga-therapists', YogaTherapistController::class);
     Route::post('yoga-therapists/{id}/status', [YogaTherapistController::class, 'updateStatus'])->name('yoga-therapists.status');

@@ -21,6 +21,8 @@ class ClientController extends Controller
                 ->leftJoin('patients', 'users.id', '=', 'patients.user_id')
                 ->select([
                     'users.id',
+                    'users.first_name',
+                    'users.last_name',
                     'users.name',
                     'users.email',
                     'users.created_at',
@@ -76,14 +78,19 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed', // Required for new clients
             'dob' => 'nullable|date',
             'gender' => 'nullable|string',
             'occupation' => 'nullable|string',
-            'address' => 'nullable|string',
-            'city_state' => 'nullable|string',
+            'address_line_1' => 'required|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:20',
+            'country' => 'required|string|max:255',
             'mobile_country_code' => 'nullable|string',
             'phone' => 'nullable|string|max:20',
             'consultation_preferences' => 'nullable|array',
@@ -94,7 +101,9 @@ class ClientController extends Controller
         ]);
 
         $user = User::create([
-            'name' => $validatedData['name'],
+            'first_name' => $validatedData['first_name'],
+            'last_name' => $validatedData['last_name'],
+            'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'role' => 'client'
@@ -110,8 +119,12 @@ class ClientController extends Controller
             'age' => $age,
             'gender' => $validatedData['gender'],
             'occupation' => $validatedData['occupation'],
-            'address' => $validatedData['address'],
-            'city_state' => $validatedData['city_state'],
+            'address_line_1' => $validatedData['address_line_1'],
+            'address_line_2' => $validatedData['address_line_2'],
+            'city' => $validatedData['city'],
+            'state' => $validatedData['state'],
+            'zip_code' => $validatedData['zip_code'],
+            'country' => $validatedData['country'],
             'mobile_country_code' => $validatedData['mobile_country_code'],
             'phone' => $validatedData['phone'],
             'client_id' => $clientId,
@@ -136,14 +149,19 @@ class ClientController extends Controller
         $user = User::findOrFail($id);
 
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => 'nullable|string|min:6|confirmed',
             'dob' => 'nullable|date',
             'gender' => 'nullable|string',
             'occupation' => 'nullable|string',
-            'address' => 'nullable|string',
-            'city_state' => 'nullable|string',
+            'address_line_1' => 'required|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:20',
+            'country' => 'required|string|max:255',
             'mobile_country_code' => 'nullable|string',
             'phone' => 'nullable|string|max:20',
             'consultation_preferences' => 'nullable|array',
@@ -153,7 +171,9 @@ class ClientController extends Controller
             'profile_photo' => 'nullable|image|max:2048',
         ]);
 
-        $user->name = $validatedData['name'];
+        $user->first_name = $validatedData['first_name'];
+        $user->last_name = $validatedData['last_name'];
+        $user->name = $validatedData['first_name'] . ' ' . $validatedData['last_name'];
         $user->email = $validatedData['email'];
         if (!empty($validatedData['password'])) {
             $user->password = Hash::make($validatedData['password']);
@@ -167,8 +187,12 @@ class ClientController extends Controller
             'age' => $age,
             'gender' => $validatedData['gender'],
             'occupation' => $validatedData['occupation'],
-            'address' => $validatedData['address'],
-            'city_state' => $validatedData['city_state'],
+            'address_line_1' => $validatedData['address_line_1'],
+            'address_line_2' => $validatedData['address_line_2'],
+            'city' => $validatedData['city'],
+            'state' => $validatedData['state'],
+            'zip_code' => $validatedData['zip_code'],
+            'country' => $validatedData['country'],
             'mobile_country_code' => $validatedData['mobile_country_code'],
             'phone' => $validatedData['phone'],
             'consultation_preferences' => $validatedData['consultation_preferences'],

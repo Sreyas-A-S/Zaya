@@ -118,8 +118,12 @@
                                             <label class="form-label mt-2">Profile Photo</label>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="full_name" required>
+                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="first_name" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="last_name" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
@@ -151,8 +155,31 @@
                                             <input class="form-control" type="date" name="dob">
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Address</label>
-                                            <textarea class="form-control" name="address" rows="2"></textarea>
+                                            <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Address Line 2</label>
+                                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">City <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="city" required placeholder="City">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">State <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="state" required placeholder="State">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Zip Code <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Country <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="country" required>
+                                                <option value="India" selected>India</option>
+                                                <option value="Other">Other</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -171,27 +198,30 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Source Languages</label>
-                                            <select class="form-select" id="source_languages_select" name="source_languages[]" multiple>
+                                            <select class="form-select" id="source_languages_select" multiple>
                                                 @foreach($languages as $lang)
                                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
                                                 @endforeach
                                             </select>
+                                            <div id="source_languages_capabilities_container"></div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Target Languages</label>
-                                            <select class="form-select" id="target_languages_select" name="target_languages[]" multiple>
+                                            <select class="form-select" id="target_languages_select" multiple>
                                                 @foreach($languages as $lang)
                                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
                                                 @endforeach
                                             </select>
+                                            <div id="target_languages_capabilities_container"></div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Additional Languages</label>
-                                            <select class="form-select" id="additional_languages_select" name="additional_languages[]" multiple>
+                                            <select class="form-select" id="additional_languages_select" multiple>
                                                 @foreach($languages as $lang)
                                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
                                                 @endforeach
                                             </select>
+                                            <div id="additional_languages_capabilities_container"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -500,24 +530,40 @@
             });
 
             // Initialize Choices.js
-            if (document.getElementById('source_languages_select')) {
-                sourceLangChoices = new Choices('#source_languages_select', {
+            const sourceSelect = document.getElementById('source_languages_select');
+            const targetSelect = document.getElementById('target_languages_select');
+            const additionalSelect = document.getElementById('additional_languages_select');
+
+            function initChoices(element, fieldName) {
+                if (!element) return null; // Handle cases where element might not exist
+
+                const choices = new Choices(element, {
                     removeItemButton: true,
-                    placeholderValue: 'Select Source Languages',
+                    searchEnabled: true,
+                    placeholderValue: 'Select Languages',
+                    itemSelectText: '',
                 });
-            }
-            if (document.getElementById('target_languages_select')) {
-                targetLangChoices = new Choices('#target_languages_select', {
-                    removeItemButton: true,
-                    placeholderValue: 'Select Target Languages',
+
+                element.addEventListener('addItem', function(event) {
+                    addLanguageCapabilityRow(event.detail.value, event.detail.label, fieldName);
                 });
-            }
-            if (document.getElementById('additional_languages_select')) {
-                addLangChoices = new Choices('#additional_languages_select', {
-                    removeItemButton: true,
-                    placeholderValue: 'Select Additional Languages',
+
+                element.addEventListener('removeItem', function(event) {
+                    $(`#lang-row-${fieldName}-${event.detail.value.replace(/\s+/g, '_')}`).remove();
                 });
+
+                return choices;
             }
+
+            const sourceChoices = initChoices(sourceSelect, 'source_languages');
+            const targetChoices = initChoices(targetSelect, 'target_languages');
+            const additionalChoices = initChoices(additionalSelect, 'additional_languages');
+
+            window.translatorChoices = {
+                source: sourceChoices,
+                target: targetChoices,
+                additional: additionalChoices
+            };
 
             // Stepper Logic
             $('#next-btn').click(function() {
@@ -577,6 +623,43 @@
                 }
             }
 
+            function addLanguageCapabilityRow(value, label, fieldName, caps = null) {
+                const rowId = `lang-row-${fieldName}-${value.replace(/\s+/g, '_')}`;
+                if ($(`#${rowId}`).length > 0) return;
+
+                const isRead = caps && caps.read ? 'checked' : '';
+                const isWrite = caps && caps.write ? 'checked' : '';
+                const isSpeak = caps && caps.speak ? 'checked' : '';
+
+                const html = `
+                    <div class="language-capability-row" id="${rowId}">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <span class="language-capability-title">${label}</span>
+                                <input type="hidden" name="${fieldName}[${value}][language]" value="${value}">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="d-flex gap-3 capability-checkboxes">
+                                    <div class="form-check checkbox-primary mb-0">
+                                        <input class="form-check-input" type="checkbox" name="${fieldName}[${value}][read]" value="1" id="read_${fieldName}_${value.replace(/\s+/g, '_')}" ${isRead}>
+                                        <label class="form-check-label small" for="read_${fieldName}_${value.replace(/\s+/g, '_')}">Read</label>
+                                    </div>
+                                    <div class="form-check checkbox-primary mb-0">
+                                        <input class="form-check-input" type="checkbox" name="${fieldName}[${value}][write]" value="1" id="write_${fieldName}_${value.replace(/\s+/g, '_')}" ${isWrite}>
+                                        <label class="form-check-label small" for="write_${fieldName}_${value.replace(/\s+/g, '_')}">Write</label>
+                                    </div>
+                                    <div class="form-check checkbox-primary mb-0">
+                                        <input class="form-check-input" type="checkbox" name="${fieldName}[${value}][speak]" value="1" id="speak_${fieldName}_${value.replace(/\s+/g, '_')}" ${isSpeak}>
+                                        <label class="form-check-label small" for="speak_${fieldName}_${value.replace(/\s+/g, '_')}">Speak</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $(`#${fieldName}_capabilities_container`).append(html);
+            }
+
             function validateStep(step) {
                 let isValid = true;
                 let $step = $('#step-' + step);
@@ -629,9 +712,12 @@
                 $('input[name="password_confirmation"]').attr('required', 'required');
 
                 // Reset Choices
-                if (sourceLangChoices) sourceLangChoices.removeActiveItems();
-                if (targetLangChoices) targetLangChoices.removeActiveItems();
-                if (addLangChoices) addLangChoices.removeActiveItems();
+                if (window.translatorChoices) {
+                    window.translatorChoices.source.removeActiveItems();
+                    window.translatorChoices.target.removeActiveItems();
+                    window.translatorChoices.additional.removeActiveItems();
+                }
+                $('#source_languages_capabilities_container, #target_languages_capabilities_container, #additional_languages_capabilities_container').empty();
 
                 currentStep = 1;
                 updateStepper();
@@ -795,11 +881,17 @@
                     let u = response.user;
                     let t = response.translator;
 
-                    $('input[name="full_name"]').val(u.name);
+                    $('input[name="first_name"]').val(t.first_name);
+                    $('input[name="last_name"]').val(t.last_name);
                     $('input[name="email"]').val(u.email);
                     $('input[name="phone"]').val(t.phone);
                     $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
-                    $('textarea[name="address"]').val(t.address);
+                    $('input[name="address_line_1"]').val(t.address_line_1);
+                    $('input[name="address_line_2"]').val(t.address_line_2);
+                    $('input[name="city"]').val(t.city);
+                    $('input[name="state"]').val(t.state);
+                    $('input[name="zip_code"]').val(t.zip_code);
+                    $('select[name="country"]').val(t.country || 'India');
                     $('select[name="gender"]').val(t.gender);
 
                     if (t.profile_photo_path) {
@@ -808,10 +900,30 @@
 
                     $('select[name="native_language"]').val(t.native_language);
 
-                    // Set Choices
-                    if (sourceLangChoices && t.source_languages) sourceLangChoices.setChoiceByValue(t.source_languages);
-                    if (targetLangChoices && t.target_languages) targetLangChoices.setChoiceByValue(t.target_languages);
-                    if (addLangChoices && t.additional_languages) addLangChoices.setChoiceByValue(t.additional_languages);
+                    // Handle Languages
+                    const handleLangs = (field, containerId, choicesInstance) => {
+                        $(`#${containerId}`).empty();
+                        if (t[field]) {
+                            const langs = Array.isArray(t[field]) ? t[field] : [];
+                            if (langs.length > 0 && typeof langs[0] === 'string') {
+                                choicesInstance.setChoiceByValue(langs);
+                            } else {
+                                const langValues = [];
+                                $.each(t[field], function(key, caps) {
+                                    const langName = caps.language || key;
+                                    langValues.push(langName);
+                                    addLanguageCapabilityRow(langName, langName, field, caps);
+                                });
+                                choicesInstance.setChoiceByValue(langValues);
+                            }
+                        } else {
+                            choicesInstance.removeActiveItems();
+                        }
+                    };
+
+                    handleLangs('source_languages', 'source_languages_capabilities_container', window.translatorChoices.source);
+                    handleLangs('target_languages', 'target_languages_capabilities_container', window.translatorChoices.target);
+                    handleLangs('additional_languages', 'additional_languages_capabilities_container', window.translatorChoices.additional);
 
                     $('select[name="translator_type"]').val(t.translator_type);
                     $('input[name="years_of_experience"]').val(t.years_of_experience);
@@ -909,7 +1021,7 @@
                                     </span>
                                 </div>
                             </div>
-                            <h5 class="fw-bold text-dark mb-1 text-break">${u.name}</h5>
+                            <h5 class="fw-bold text-dark mb-1 text-break">${t.first_name} ${t.last_name}</h5>
                             <p class="text-muted small mb-2 text-break">${u.email}</p>
                             <p class="text-muted small mb-3"><i class="fa fa-phone me-1"></i> ${t.phone || 'N/A'}</p>
                             
@@ -1307,6 +1419,33 @@
 
         .stepper-horizontal .stepper-item.completed .step-name {
             color: #51bb25;
+        }
+    </style>
+    <style>
+        .language-capability-row {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .language-capability-row:hover {
+            background: #f1f3f5;
+            border-color: #dee2e6;
+        }
+
+        .language-capability-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .capability-checkboxes .form-check-input {
+            width: 1.1em;
+            height: 1.1em;
+            margin-top: 0.2em;
         }
     </style>
     <!-- Call Confirmation Modal -->

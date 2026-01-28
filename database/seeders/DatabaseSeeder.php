@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             PractitionerMasterDataSeeder::class,
             ClientConsultationPreferenceSeeder::class,
             ClientSeeder::class,
-            MindfulnessCounsellorSeeder::class,
+            MindfulnessPractitionerSeeder::class,
             TranslatorSeeder::class,
         ]);
 

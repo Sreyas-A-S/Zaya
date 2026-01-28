@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\MindfulnessCounsellor;
+use App\Models\MindfulnessPractitioner;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
@@ -12,22 +12,22 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
-class MindfulnessCounsellorController extends Controller
+class MindfulnessPractitionerController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = User::where('role', 'mindfulness_counsellor')
-                ->leftJoin('mindfulness_counsellors', 'users.id', '=', 'mindfulness_counsellors.user_id')
+            $data = User::where('role', 'mindfulness_practitioner')
+                ->leftJoin('mindfulness_practitioners', 'users.id', '=', 'mindfulness_practitioners.user_id')
                 ->select([
                     'users.id',
                     'users.name',
                     'users.email',
-                    'mindfulness_counsellors.gender',
-                    'mindfulness_counsellors.phone',
-                    'mindfulness_counsellors.current_workplace',
-                    'mindfulness_counsellors.profile_photo_path',
-                    'mindfulness_counsellors.status'
+                    'mindfulness_practitioners.gender',
+                    'mindfulness_practitioners.phone',
+                    'mindfulness_practitioners.current_workplace',
+                    'mindfulness_practitioners.profile_photo_path',
+                    'mindfulness_practitioners.status'
                 ])
                 ->latest('users.created_at')
                 ->get();
@@ -76,22 +76,29 @@ class MindfulnessCounsellorController extends Controller
 
         $languages = \App\Models\Language::all();
 
-        return view('admin.mindfulness_counsellors.index', compact('servicesOffered', 'clientConcerns', 'consultationModes', 'languages'));
+        return view('admin.mindfulness_practitioners.index', compact('servicesOffered', 'clientConcerns', 'consultationModes', 'languages'));
     }
 
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'full_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
             'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
+            'address_line_1' => 'required|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:20',
+            'country' => 'required|string|max:255',
 
-            'practitioner_type' => 'nullable|string',
+            'practitioner_type' => 'nullable|array',
+            'practitioner_type.*' => 'string',
             'years_of_experience' => 'nullable|integer',
             'current_workplace' => 'nullable|string',
             'website_social_links' => 'nullable|array',
@@ -126,10 +133,12 @@ class MindfulnessCounsellorController extends Controller
         DB::beginTransaction();
         try {
             $user = User::create([
-                'name' => $validatedData['full_name'],
+                'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
-                'role' => 'mindfulness_counsellor',
+                'role' => 'mindfulness_practitioner',
             ]);
 
             $practitionerData = $validatedData;
@@ -155,7 +164,7 @@ class MindfulnessCounsellorController extends Controller
                 $practitionerData['cancelled_cheque_path'] = $request->file('cancelled_cheque')->store('mindfulness_docs', 'public');
             }
 
-            $user->mindfulnessCounsellor()->create($practitionerData);
+            $user->mindfulnessPractitioner()->create($practitionerData);
 
             DB::commit();
             return response()->json(['success' => 'Mindfulness Practitioner registered successfully!']);
@@ -167,38 +176,45 @@ class MindfulnessCounsellorController extends Controller
 
     public function show(Request $request, $id)
     {
-        $user = User::with('mindfulnessCounsellor')->findOrFail($id);
+        $user = User::with('mindfulnessPractitioner')->findOrFail($id);
         if ($request->ajax()) {
-            return response()->json(['user' => $user, 'practitioner' => $user->mindfulnessCounsellor]);
+            return response()->json(['user' => $user, 'practitioner' => $user->mindfulnessPractitioner]);
         }
-        return redirect()->route('admin.mindfulness_counsellors.index');
+        return redirect()->route('admin.mindfulness_practitioners.index');
     }
 
     public function edit(Request $request, $id)
     {
-        $user = User::with('mindfulnessCounsellor')->findOrFail($id);
+        $user = User::with('mindfulnessPractitioner')->findOrFail($id);
         if ($request->ajax()) {
-            return response()->json(['user' => $user, 'practitioner' => $user->mindfulnessCounsellor]);
+            return response()->json(['user' => $user, 'practitioner' => $user->mindfulnessPractitioner]);
         }
-        return redirect()->route('admin.mindfulness_counsellors.index');
+        return redirect()->route('admin.mindfulness_practitioners.index');
     }
 
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $practitioner = $user->mindfulnessCounsellor;
+        $practitioner = $user->mindfulnessPractitioner;
 
         $validatedData = $request->validate([
-            'full_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => 'nullable|string|min:6|confirmed',
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
             'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
+            'address_line_1' => 'required|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:20',
+            'country' => 'required|string|max:255',
 
-            'practitioner_type' => 'nullable|string',
+            'practitioner_type' => 'nullable|array',
+            'practitioner_type.*' => 'string',
             'years_of_experience' => 'nullable|integer',
             'current_workplace' => 'nullable|string',
             'website_social_links' => 'nullable|array',
@@ -232,7 +248,9 @@ class MindfulnessCounsellorController extends Controller
         DB::beginTransaction();
         try {
             $user->update([
-                'name' => $validatedData['full_name'],
+                'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
                 'email' => $validatedData['email'],
             ]);
 
@@ -304,7 +322,7 @@ class MindfulnessCounsellorController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $practitioner = MindfulnessCounsellor::where('user_id', $id)->firstOrFail();
+        $practitioner = MindfulnessPractitioner::where('user_id', $id)->firstOrFail();
         $practitioner->update([
             'status' => $request->status ? 'active' : 'inactive'
         ]);

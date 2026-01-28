@@ -42,7 +42,12 @@ class PractitionerSeeder extends Seeder
                 'residential_address' => $faker->address(),
                 'zip_code' => $faker->postcode(),
                 'phone' => $faker->phoneNumber(),
-                'website_url' => $faker->url(),
+                'social_links' => [
+                    'website' => $faker->url(),
+                    'instagram' => 'https://instagram.com/' . $firstName,
+                    'linkedin' => 'https://linkedin.com/in/' . $firstName,
+                    'youtube' => 'https://youtube.com/@' . $firstName,
+                ],
                 'consultations' => $faker->randomElements($consultationsList, 2),
                 'body_therapies' => $faker->randomElements($therapiesList, 3),
                 'other_modalities' => $faker->randomElements($modalitiesList, 1),

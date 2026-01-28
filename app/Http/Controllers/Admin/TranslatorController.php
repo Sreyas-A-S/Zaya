@@ -109,14 +109,20 @@ class TranslatorController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'full_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
             'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
+            'address_line_1' => 'required|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:20',
+            'country' => 'required|string|max:255',
 
             'native_language' => 'nullable|string',
             'source_languages' => 'nullable|array',
@@ -153,7 +159,9 @@ class TranslatorController extends Controller
         DB::beginTransaction();
         try {
             $user = User::create([
-                'name' => $validatedData['full_name'],
+                'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
                 'role' => 'translator',
@@ -231,14 +239,20 @@ class TranslatorController extends Controller
         $translator = $user->translator;
 
         $validatedData = $request->validate([
-            'full_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => 'nullable|string|min:6|confirmed',
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
             'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
+            'address_line_1' => 'required|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:20',
+            'country' => 'required|string|max:255',
 
             'native_language' => 'nullable|string',
             'source_languages' => 'nullable|array',
@@ -275,7 +289,9 @@ class TranslatorController extends Controller
         DB::beginTransaction();
         try {
             $user->update([
-                'name' => $validatedData['full_name'],
+                'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
                 'email' => $validatedData['email'],
             ]);
 

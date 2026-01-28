@@ -118,6 +118,15 @@
                                             <div id="current-profile-photo" class="d-none"></div>
                                         </div>
                                         <div class="col-md-4">
+                                            <label class="form-label">First Name</label>
+                                            <input type="text" class="form-control" name="first_name" required placeholder="Enter first name">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" name="last_name" required placeholder="Enter last name">
+                                        </div>
+
+                                        <div class="col-md-4">
                                             <label class="form-label">Gender</label>
                                             <select class="form-select" name="gender" required>
                                                 <option value="" selected disabled>Select Gender</option>
@@ -147,15 +156,8 @@
                                             <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input">
                                             <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">City, State</label>
-                                            <input type="text" class="form-control" name="city_state" required placeholder="e.g. Mumbai, Maharashtra">
-                                        </div>
 
-                                        <div class="col-md-4">
-                                            <label class="form-label">Full Name</label>
-                                            <input type="text" class="form-control" name="full_name" required placeholder="Enter full name">
-                                        </div>
+
 
                                         <div class="col-12 mt-4">
                                             <h5 class="f-w-600 mb-3">B. Medical Registration</h5>
@@ -239,9 +241,32 @@
                                             <label class="form-label">Current Workplace / Clinic Name</label>
                                             <input type="text" class="form-control" name="current_workplace" required placeholder="Enter clinic name">
                                         </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Address Line 2</label>
+                                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark">
+                                        </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Clinic Address</label>
-                                            <textarea class="form-control" name="clinic_address" rows="2" required placeholder="Enter full address"></textarea>
+                                            <label class="form-label">City <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="city" required placeholder="City">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">State <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="state" required placeholder="State">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Zip Code <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Country <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="country" required>
+                                                <option value="India" selected>India</option>
+                                                <option value="Other">Other</option>
+                                            </select>
                                         </div>
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
                                             <button type="button" class="btn btn-outline-dark prev-step" data-prev="1"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
@@ -361,11 +386,12 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Languages Spoken</label>
-                                            <select class="form-select" id="languages_select" name="languages_spoken[]" multiple>
+                                            <select class="form-select" id="languages_select" multiple>
                                                 @foreach($languages as $lang)
                                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
                                                 @endforeach
                                             </select>
+                                            <div id="languages_capabilities_container"></div>
                                         </div>
 
                                         <div class="col-12 mt-4">
@@ -483,6 +509,10 @@
                                             <div class="form-check checkbox-primary mb-2">
                                                 <input class="form-check-input" type="checkbox" name="confidentiality_consent" value="1" required id="confidentiality_consent">
                                                 <label class="form-check-label" for="confidentiality_consent">I agree to maintain patient data confidentiality.</label>
+                                            </div>
+                                            <div class="form-check checkbox-secondary mt-3 pt-2 border-top">
+                                                <input class="form-check-input" type="checkbox" id="check_all_consent">
+                                                <label class="form-check-label fw-bold" for="check_all_consent">Check All Declaration & Consent</label>
                                             </div>
                                         </div>
 
@@ -868,12 +898,56 @@
                 placeholderValue: 'Select Languages',
                 itemSelectText: '',
             });
+
+            langSelect.addEventListener('addItem', function(event) {
+                addLanguageCapabilityRow(event.detail.value, event.detail.label);
+            });
+
+            langSelect.addEventListener('removeItem', function(event) {
+                $(`#lang-row-${event.detail.value.replace(/\s+/g, '_')}`).remove();
+            });
         }
 
         initFormNavigation();
 
         $('#password-input, #password-confirm-input').on('input', validatePasswordMatch);
     });
+
+    function addLanguageCapabilityRow(value, label, caps = null) {
+        if ($(`#lang-row-${value.replace(/\s+/g, '_')}`).length > 0) return;
+
+        const isRead = caps && caps.read ? 'checked' : '';
+        const isWrite = caps && caps.write ? 'checked' : '';
+        const isSpeak = caps && caps.speak ? 'checked' : '';
+
+        const html = `
+            <div class="language-capability-row" id="lang-row-${value.replace(/\s+/g, '_')}">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <span class="language-capability-title">${label}</span>
+                        <input type="hidden" name="languages_spoken[${value}][language]" value="${value}">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="d-flex gap-3 capability-checkboxes">
+                            <div class="form-check checkbox-primary mb-0">
+                                <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][read]" value="1" id="read_${value}" ${isRead}>
+                                <label class="form-check-label small" for="read_${value}">Read</label>
+                            </div>
+                            <div class="form-check checkbox-primary mb-0">
+                                <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][write]" value="1" id="write_${value}" ${isWrite}>
+                                <label class="form-check-label small" for="write_${value}">Write</label>
+                            </div>
+                            <div class="form-check checkbox-primary mb-0">
+                                <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][speak]" value="1" id="speak_${value}" ${isSpeak}>
+                                <label class="form-check-label small" for="speak_${value}">Speak</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        $('#languages_capabilities_container').append(html);
+    }
 
     function initFormNavigation() {
         $('.next-step').on('click', function() {
@@ -906,6 +980,22 @@
         $('#post_graduation').change(function() {
             $('#post_graduation_other').toggleClass('d-none', $(this).val() !== 'other').prop('required', $(this).val() === 'other');
         });
+
+        // Check All Declaration & Consent
+        $('#check_all_consent').on('change', function() {
+            const isChecked = $(this).is(':checked');
+            $('#ayush_confirmation, #guidelines_agreement, #document_consent, #policies_agreement, #prescription_understanding, #confidentiality_consent').prop('checked', isChecked);
+        });
+
+        $('#ayush_confirmation, #guidelines_agreement, #document_consent, #policies_agreement, #prescription_understanding, #confidentiality_consent').on('change', function() {
+            const allChecked = $('#ayush_confirmation').is(':checked') &&
+                $('#guidelines_agreement').is(':checked') &&
+                $('#document_consent').is(':checked') &&
+                $('#policies_agreement').is(':checked') &&
+                $('#prescription_understanding').is(':checked') &&
+                $('#confidentiality_consent').is(':checked');
+            $('#check_all_consent').prop('checked', allChecked);
+        });
     }
 
     function updateStep(step) {
@@ -935,6 +1025,7 @@
         if (languageChoices) {
             languageChoices.removeActiveItems();
         }
+        $('#languages_capabilities_container').empty();
 
         // Password Logic
         $('#password-hint').text('(Required for new)');
@@ -946,6 +1037,7 @@
         // Uncheck all checkboxes
         $('.spec-checkbox, .skill-checkbox, .cond-checkbox, .proc-checkbox, .ther-checkbox, .mode-checkbox').prop('checked', false);
         $('#panchakarma_consultation').prop('checked', false);
+        $('#check_all_consent').prop('checked', false);
 
         // Reset required fields that might have been changed in edit
         $('input[name="profile_photo"]').prop('required', true); // Profile photo is always required for create
@@ -975,17 +1067,25 @@
             $('.file-keep-note').removeClass('d-none');
 
             // Fill basics
-            $('[name="full_name"]').val(profile.full_name);
+            $('[name="first_name"]').val(profile.first_name);
+            $('[name="last_name"]').val(profile.last_name);
             $('[name="gender"]').val(profile.gender);
             $('[name="dob"]').val(profile.dob ? profile.dob.substring(0, 10) : '');
             $('[name="mobile_number"]').val(profile.phone);
             $('[name="email"]').val(doctor.email);
-            $('[name="city_state"]').val(profile.city_state);
             $('[name="ayush_reg_no"]').val(profile.ayush_registration_number);
             $('[name="state_council"]').val(profile.state_ayurveda_council_name);
             $('[name="years_of_experience"]').val(profile.years_of_experience);
             $('[name="current_workplace"]').val(profile.current_workplace_clinic_name);
-            $('[name="clinic_address"]').val(profile.clinic_address);
+
+            // Address mapping
+            $('[name="address_line_1"]').val(profile.address_line_1);
+            $('[name="address_line_2"]').val(profile.address_line_2);
+            $('[name="city"]').val(profile.city);
+            $('[name="state"]').val(profile.state);
+            $('[name="zip_code"]').val(profile.zip_code);
+            $('[name="country"]').val(profile.country || 'India');
+
             $('[name="pan_number"]').val(profile.pan_number);
             $('[name="bank_account_holder"]').val(profile.bank_account_holder_name);
             $('[name="bank_name"]').val(profile.bank_name);
@@ -1021,8 +1121,23 @@
             $('#panchakarma_consultation').prop('checked', !!profile.panchakarma_consultation);
 
             // Handle Languages Spoken (Choices.js)
+            $('#languages_capabilities_container').empty();
             if (profile.languages_spoken) {
-                languageChoices.setChoiceByValue(profile.languages_spoken);
+                const langs = Array.isArray(profile.languages_spoken) ? profile.languages_spoken : [];
+
+                // If the data is stored as objects with capabilities
+                if (langs.length > 0 && typeof langs[0] === 'string') {
+                    languageChoices.setChoiceByValue(langs);
+                } else {
+                    // It's an object/array of objects
+                    const langValues = [];
+                    $.each(profile.languages_spoken, function(key, caps) {
+                        const langName = caps.language || key;
+                        langValues.push(langName);
+                        addLanguageCapabilityRow(langName, langName, caps);
+                    });
+                    languageChoices.setChoiceByValue(langValues);
+                }
             } else {
                 languageChoices.removeActiveItems();
             }
@@ -1035,6 +1150,7 @@
 
             // Consents
             $('#ayush_confirmation, #guidelines_agreement, #document_consent, #policies_agreement, #prescription_understanding, #confidentiality_consent').prop('checked', true);
+            $('#check_all_consent').prop('checked', true);
 
             // Files display
             if (profile.profile_photo_path) $('#current-profile-photo').removeClass('d-none').html(`<small><a href="/storage/${profile.profile_photo_path}" target="_blank">View Photo</a></small>`);
@@ -1072,8 +1188,26 @@
             const p = data.profile;
 
             const renderBadges = (arr) => {
-                if (!arr || !Array.isArray(arr) || arr.length === 0) return '<span class="text-muted">None</span>';
-                return arr.map(item => `<span class="badge bg-light text-dark border me-1 mb-1">${item}</span>`).join('');
+                if (!arr || (Array.isArray(arr) && arr.length === 0)) return '<span class="text-muted">None</span>';
+
+                // Check if it's the old style (array of strings) or new style (object/array of objects)
+                if (Array.isArray(arr) && (arr.length === 0 || typeof arr[0] === 'string')) {
+                    return arr.map(item => `<span class="badge bg-light text-dark border me-1 mb-1">${item}</span>`).join('');
+                }
+
+                // New style
+                let badgeHtml = '';
+                $.each(arr, function(key, caps) {
+                    const langName = caps.language || key;
+                    let capsList = [];
+                    if (caps.read) capsList.push('Read');
+                    if (caps.write) capsList.push('Write');
+                    if (caps.speak) capsList.push('Speak');
+
+                    const capsStr = capsList.length > 0 ? ` (${capsList.join(', ')})` : '';
+                    badgeHtml += `<span class="badge bg-light text-dark border me-1 mb-1">${langName}${capsStr}</span>`;
+                });
+                return badgeHtml || '<span class="text-muted">None</span>';
             };
 
             const social = p.social_links || {};
@@ -1091,7 +1225,7 @@
                                     ${p.status ? p.status.toUpperCase() : 'PENDING'}
                                 </span>
                             </div>
-                            <h4 class="mb-1">${p.full_name}</h4>
+                            <h4 class="mb-1">${p.first_name} ${p.last_name}</h4>
                             <p class="text-muted mb-2"><i class="fa-solid fa-envelope me-1"></i> ${d.email}</p>
                             <p class="text-muted"><i class="fa-solid fa-phone me-1"></i> ${p.phone || 'N/A'}</p>
                             
@@ -1547,6 +1681,32 @@
         transform: translateX(-50%);
         pointer-events: none;
         /* Let clicks pass through to label */
+    }
+
+    .language-capability-row {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-top: 10px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .language-capability-row:hover {
+        background: #f1f3f5;
+        border-color: #dee2e6;
+    }
+
+    .language-capability-title {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+
+    .capability-checkboxes .form-check-input {
+        width: 1.1em;
+        height: 1.1em;
+        margin-top: 0.2em;
     }
 </style>
 @endsection

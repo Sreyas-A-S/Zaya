@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class MindfulnessCounsellor extends Model
+class MindfulnessPractitioner extends Model
 {
     use HasFactory;
 
-    protected $table = 'mindfulness_counsellors';
+    protected $table = 'mindfulness_practitioners';
 
     protected $guarded = ['id'];
 
@@ -21,6 +21,7 @@ class MindfulnessCounsellor extends Model
         'client_concerns' => 'array',
         'consultation_modes' => 'array',
         'languages_spoken' => 'array',
+        'practitioner_type' => 'array',
     ];
 
     public function user()

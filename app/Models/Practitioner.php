@@ -19,6 +19,7 @@ class Practitioner extends Model
         'languages_spoken' => 'array',
         'dob' => 'date',
         'can_translate_english' => 'boolean',
+        'social_links' => 'array',
     ];
 
     public function user()

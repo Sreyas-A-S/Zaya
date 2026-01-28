@@ -157,18 +157,37 @@
                                             <label class="form-label">Phone Number</label>
                                             <input type="text" class="form-control" name="phone">
                                         </div>
-                                        <div class="col-md-8">
-                                            <label class="form-label">Residential Address</label>
-                                            <input type="text" class="form-control" name="residential_address">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">ZIP / Postal Code</label>
-                                            <input type="text" class="form-control" name="zip_code">
+                                        <div class="col-12 mt-3">
+                                            <h6 class="f-w-600 mb-3">Address Information</h6>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Website (Optional)</label>
-                                            <input type="url" class="form-control" name="website_url">
+                                            <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street">
                                         </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Address Line 2</label>
+                                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">City <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="city" required placeholder="City">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">State <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="state" required placeholder="State">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Zip Code <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Country <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="country" required>
+                                                <option value="India" selected>India</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+
                                         <div class="col-12 wizard-footer text-end mt-4 pt-3 border-top">
                                             <button type="button" class="btn btn-primary next-step" data-next="2">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
                                         </div>
@@ -293,7 +312,23 @@
                                 <div class="step-content d-none" id="step4">
                                     <div class="row g-3">
                                         <div class="col-12">
-                                            <h6 class="f-w-600 mb-3">D. Additional Information</h6>
+                                            <h6 class="f-w-600 mb-3">D. Additional Information & Socials</h6>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Website</label>
+                                            <input type="url" class="form-control" name="social_links[website]" placeholder="https://">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Instagram</label>
+                                            <input type="url" class="form-control" name="social_links[instagram]" placeholder="https://">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">LinkedIn</label>
+                                            <input type="url" class="form-control" name="social_links[linkedin]" placeholder="https://">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">YouTube</label>
+                                            <input type="url" class="form-control" name="social_links[youtube]" placeholder="https://">
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Additional Courses</label>
@@ -301,11 +336,12 @@
                                         </div>
                                         <div class="col-md-8">
                                             <label class="form-label">Languages Spoken</label>
-                                            <select class="form-select" id="languages_select" name="languages_spoken[]" multiple>
+                                            <select class="form-select" id="languages_select" multiple>
                                                 @foreach($languages as $lang)
                                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
                                                 @endforeach
                                             </select>
+                                            <div id="languages_capabilities_container"></div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Able to Translate English?</label>
@@ -640,6 +676,33 @@
         cursor: pointer;
         color: #dc3545;
     }
+
+    /* Custom CSS for language capability rows */
+    .language-capability-row {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-top: 10px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .language-capability-row:hover {
+        background: #f1f3f5;
+        border-color: #dee2e6;
+    }
+
+    .language-capability-title {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+
+    .capability-checkboxes .form-check-input {
+        width: 1.1em;
+        height: 1.1em;
+        margin-top: 0.2em;
+    }
 </style>
 
 <script>
@@ -742,6 +805,14 @@
                 placeholder: true,
                 placeholderValue: 'Select Languages',
                 itemSelectText: '',
+            });
+
+            langSelect.addEventListener('addItem', function(event) {
+                addLanguageCapabilityRow(event.detail.value, event.detail.label);
+            });
+
+            langSelect.addEventListener('removeItem', function(event) {
+                $(`#lang-row-${event.detail.value.replace(/\s+/g, '_')}`).remove();
             });
         }
 
@@ -881,6 +952,47 @@
         qualCount++;
     }
 
+    function addLanguageCapabilityRow(value, label, capabilities = {}) {
+        const safeValue = value.replace(/\s+/g, '_'); // Replace spaces for ID
+        const existingRow = $(`#lang-row-${safeValue}`);
+        if (existingRow.length) {
+            // If row already exists, update its checkboxes
+            existingRow.find(`input[name="languages_spoken[${value}][read]"]`).prop('checked', capabilities.read || false);
+            existingRow.find(`input[name="languages_spoken[${value}][write]"]`).prop('checked', capabilities.write || false);
+            existingRow.find(`input[name="languages_spoken[${value}][speak]"]`).prop('checked', capabilities.speak || false);
+            return;
+        }
+
+        const html = `
+            <div class="language-capability-row" id="lang-row-${safeValue}">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="language-capability-title">${label}</span>
+                </div>
+                <div class="row capability-checkboxes">
+                    <div class="col-4">
+                        <div class="form-check checkbox-primary">
+                            <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][read]" id="lang-${safeValue}-read" ${capabilities.read ? 'checked' : ''}>
+                            <label class="form-check-label" for="lang-${safeValue}-read">Read</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-check checkbox-primary">
+                            <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][write]" id="lang-${safeValue}-write" ${capabilities.write ? 'checked' : ''}>
+                            <label class="form-check-label" for="lang-${safeValue}-write">Write</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-check checkbox-primary">
+                            <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][speak]" id="lang-${safeValue}-speak" ${capabilities.speak ? 'checked' : ''}>
+                            <label class="form-check-label" for="lang-${safeValue}-speak">Speak</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        $('#languages_capabilities_container').append(html);
+    }
+
     function openCreateModal() {
         $('#practitioner-form')[0].reset();
         $('#practitioner_id').val('');
@@ -890,6 +1002,7 @@
         if (languageChoices) {
             languageChoices.removeActiveItems();
         }
+        $('#languages_capabilities_container').empty(); // Clear language capability rows
 
         $('#form-modal-title').text('Register New Practitioner');
         $('.cons-checkbox, .body-checkbox, .mod-checkbox').prop('checked', false);
@@ -913,8 +1026,6 @@
         $('#imageUpload').val('');
         croppedFile = null;
 
-        updateStep(1);
-        $('#practitioner-form-modal').modal('show');
         updateStep(1);
         $('#practitioner-form-modal').modal('show');
     }
@@ -1010,16 +1121,31 @@
             $('[name="dob"]').val(p.dob ? p.dob.substring(0, 10) : '');
             $('[name="nationality"]').val(p.nationality);
             $('[name="phone"]').val(p.phone);
-            $('[name="residential_address"]').val(p.residential_address);
+            $('[name="address_line_1"]').val(p.address_line_1);
+            $('[name="address_line_2"]').val(p.address_line_2);
+            $('[name="city"]').val(p.city);
+            $('[name="state"]').val(p.state);
             $('[name="zip_code"]').val(p.zip_code);
-            $('[name="website_url"]').val(p.website_url);
+            $('[name="country"]').val(p.country || 'India');
+            $('[name="social_links[website]"]').val(p.social_links?.website || '');
+            $('[name="social_links[instagram]"]').val(p.social_links?.instagram || '');
+            $('[name="social_links[linkedin]"]').val(p.social_links?.linkedin || '');
+            $('[name="social_links[youtube]"]').val(p.social_links?.youtube || '');
             $('[name="additional_courses"]').val(p.additional_courses);
             $('[name="profile_bio"]').val(p.profile_bio);
 
-            if (p.languages_spoken) {
-                languageChoices.setChoiceByValue(p.languages_spoken);
-            } else {
-                languageChoices.removeActiveItems();
+            // Languages Spoken and Capabilities
+            $('#languages_capabilities_container').empty(); // Clear existing rows
+            if (languageChoices) {
+                languageChoices.removeActiveItems(); // Clear Choices.js selection
+                if (p.languages_spoken && Object.keys(p.languages_spoken).length > 0) {
+                    const selectedLanguages = [];
+                    $.each(p.languages_spoken, function(langName, capabilities) {
+                        selectedLanguages.push(langName);
+                        addLanguageCapabilityRow(langName, langName, capabilities);
+                    });
+                    languageChoices.setChoiceByValue(selectedLanguages);
+                }
             }
 
             $('#translate_switch').prop('checked', !!p.can_translate_english);
@@ -1198,6 +1324,12 @@
                             <p class="mb-1"><strong>Nationality:</strong> ${p.nationality || 'N/A'}</p>
                             <p class="mb-1"><strong>Gender:</strong> ${p.gender || 'N/A'}</p>
                             <p class="mb-1"><strong>DOB:</strong> ${p.dob ? new Date(p.dob).toLocaleDateString() : 'N/A'}</p>
+                            <div class="d-flex justify-content-center gap-2 mt-3">
+                                ${p.social_links && p.social_links.website ? `<a href="${p.social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs"><i class="fa-solid fa-globe"></i></a>` : ''}
+                                ${p.social_links && p.social_links.instagram ? `<a href="${p.social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-instagram"></i></a>` : ''}
+                                ${p.social_links && p.social_links.linkedin ? `<a href="${p.social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs"><i class="fa-brands fa-linkedin"></i></a>` : ''}
+                                ${p.social_links && p.social_links.youtube ? `<a href="${p.social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-youtube"></i></a>` : ''}
+                            </div>
                         </div>
                         <hr>
                         <h6>Languages</h6>

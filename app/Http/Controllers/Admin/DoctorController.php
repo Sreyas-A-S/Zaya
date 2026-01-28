@@ -107,7 +107,8 @@ class DoctorController extends Controller
     {
         $validatedData = $request->validate([
             // A. Personal Details
-            'full_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
             'mobile_number' => 'required|string|max:20',
@@ -132,7 +133,12 @@ class DoctorController extends Controller
             'degree_certificates.*' => 'file|mimes:pdf,jpeg,png,jpg|max:2048',
             'years_of_experience' => 'required|integer|min:0',
             'current_workplace' => 'required|string|max:255',
-            'clinic_address' => 'required|string|max:500',
+            'address_line_1' => 'required|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:20',
+            'country' => 'required|string|max:255',
 
             // D. Ayurveda Consultation Expertise
             'consultation_expertise' => 'nullable|array',
@@ -153,7 +159,7 @@ class DoctorController extends Controller
             'consultation_modes' => 'nullable|array',
             'consultation_modes.*' => 'string|max:255',
             'languages_spoken' => 'nullable|array',
-            'languages_spoken.*' => 'string|max:255',
+            'languages_spoken.*' => 'nullable|array',
 
             // H. KYC & Payment Details
             'pan_number' => 'required|string|max:10',
@@ -186,7 +192,9 @@ class DoctorController extends Controller
         ]);
 
         $user = User::create([
-            'name' => $validatedData['full_name'],
+            'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+            'first_name' => $validatedData['first_name'],
+            'last_name' => $validatedData['last_name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'role' => 'doctor',
@@ -213,10 +221,11 @@ class DoctorController extends Controller
             'linkedin' => $validatedData['linkedin'] ?? null,
         ];
 
-        $languagesSpoken = explode(',', $validatedData['languages_spoken']);
+        $languagesSpoken = $validatedData['languages_spoken'] ?? [];
 
         $user->doctor()->create([
-            'full_name' => $validatedData['full_name'],
+            'first_name' => $validatedData['first_name'],
+            'last_name' => $validatedData['last_name'],
             'gender' => $validatedData['gender'],
             'dob' => $validatedData['dob'],
             'phone' => $validatedData['mobile_number'],
@@ -234,7 +243,12 @@ class DoctorController extends Controller
             'degree_certificates_path' => $degreeCertificatesPaths,
             'years_of_experience' => $validatedData['years_of_experience'],
             'current_workplace_clinic_name' => $validatedData['current_workplace'],
-            'clinic_address' => $validatedData['clinic_address'],
+            'address_line_1' => $validatedData['address_line_1'],
+            'address_line_2' => $validatedData['address_line_2'],
+            'city' => $validatedData['city'],
+            'state' => $validatedData['state'],
+            'zip_code' => $validatedData['zip_code'],
+            'country' => $validatedData['country'],
             'consultation_expertise' => $validatedData['consultation_expertise'] ?? [],
             'health_conditions_treated' => $validatedData['health_conditions'] ?? [],
             'panchakarma_consultation' => $request->has('panchakarma_consultation'),
@@ -296,13 +310,13 @@ class DoctorController extends Controller
 
         $validatedData = $request->validate([
             // A. Personal Details
-            'full_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
             'mobile_number' => 'required|string|max:20',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => 'nullable|string|min:6|confirmed',
-            'city_state' => 'required|string|max:255',
             'profile_photo' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // B. Medical Registration
@@ -322,7 +336,12 @@ class DoctorController extends Controller
             'degree_certificates.*' => 'file|mimes:pdf,jpeg,png,jpg|max:2048',
             'years_of_experience' => 'required|integer|min:0',
             'current_workplace' => 'required|string|max:255',
-            'clinic_address' => 'required|string|max:500',
+            'address_line_1' => 'required|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'zip_code' => 'required|string|max:20',
+            'country' => 'required|string|max:255',
 
             // D. Ayurveda Consultation Expertise
             'consultation_expertise' => 'nullable|array',
@@ -343,7 +362,7 @@ class DoctorController extends Controller
             'consultation_modes' => 'nullable|array',
             'consultation_modes.*' => 'string|max:255',
             'languages_spoken' => 'nullable|array',
-            'languages_spoken.*' => 'string|max:255',
+            'languages_spoken.*' => 'nullable|array',
 
             // H. KYC & Payment Details
             'pan_number' => 'required|string|max:10',
@@ -368,7 +387,9 @@ class DoctorController extends Controller
         ]);
 
         $user->update([
-            'name' => $validatedData['full_name'],
+            'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+            'first_name' => $validatedData['first_name'],
+            'last_name' => $validatedData['last_name'],
             'email' => $validatedData['email'],
         ]);
 
@@ -400,14 +421,14 @@ class DoctorController extends Controller
             'linkedin' => $validatedData['linkedin'] ?? null,
         ];
 
-        $languagesSpoken = explode(',', $validatedData['languages_spoken']);
+        $languagesSpoken = $request->input('languages_spoken', []);
 
         $profile->update([
-            'full_name' => $validatedData['full_name'],
+            'first_name' => $validatedData['first_name'],
+            'last_name' => $validatedData['last_name'],
             'gender' => $validatedData['gender'],
             'dob' => $validatedData['dob'],
             'phone' => $validatedData['mobile_number'],
-            'city_state' => $validatedData['city_state'],
             'profile_photo_path' => $profilePhotoPath,
             'ayush_registration_number' => $validatedData['ayush_reg_no'],
             'state_ayurveda_council_name' => $validatedData['state_council'],
@@ -421,7 +442,12 @@ class DoctorController extends Controller
             'degree_certificates_path' => $degreeCertificatesPaths,
             'years_of_experience' => $validatedData['years_of_experience'],
             'current_workplace_clinic_name' => $validatedData['current_workplace'],
-            'clinic_address' => $validatedData['clinic_address'],
+            'address_line_1' => $validatedData['address_line_1'],
+            'address_line_2' => $validatedData['address_line_2'],
+            'city' => $validatedData['city'],
+            'state' => $validatedData['state'],
+            'zip_code' => $validatedData['zip_code'],
+            'country' => $validatedData['country'],
             'consultation_expertise' => $validatedData['consultation_expertise'] ?? [],
             'health_conditions_treated' => $validatedData['health_conditions'] ?? [],
             'panchakarma_consultation' => $request->has('panchakarma_consultation'),

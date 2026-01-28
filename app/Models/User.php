@@ -19,6 +19,8 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
         'role',
@@ -58,9 +60,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Patient::class);
     }
-    public function mindfulnessCounsellor()
+    public function mindfulnessPractitioner()
     {
-        return $this->hasOne(MindfulnessCounsellor::class);
+        return $this->hasOne(MindfulnessPractitioner::class);
     }
     public function translator()
     {
