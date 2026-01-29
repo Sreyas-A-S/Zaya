@@ -1,15 +1,11 @@
 @extends('layouts.app')
 
-@section('content')
+@section('content') 
 
-    <!-- Service Detail Section -->
     <section class="pt-[144px] md:pt-[150px] pb-20 px-4 md:px-6 bg-white">
         <div class="container mx-auto">
             <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
-
-                <!-- Left Content Area -->
-                <div class="w-full lg:w-2/3">
-                    <!-- Service Image Slider -->
+                <div class="w-full lg:w-2/3"> 
                     <div class="w-full h-[300px] md:h-[400px] rounded-[20px] overflow-hidden mb-8 shadow-lg relative">
                         <div class="swiper serviceImageSwiper h-full">
                             <div class="swiper-wrapper">

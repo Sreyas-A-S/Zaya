@@ -77,19 +77,6 @@
         <div class="container mx-auto">
             <div class="mx-auto">
                 <div class="flex flex-col md:flex-row gap-6">
-                    <!-- Search Box -->
-                    <div
-                        class="flex-1 relative flex items-center border border-[#D4A58E] rounded-full p-2 bg-white shadow-sm hover:shadow-md transition-shadow h-[72px]">
-                        <div class="pl-6 pr-4 text-[#C5896B]">
-                            <i class="ri-search-line text-2xl"></i>
-                        </div>
-                        <input type="text" placeholder="Search"
-                            class="flex-1 outline-none text-[#A67B5B] text-lg bg-transparent placeholder-[#C5896B] font-sans h-full">
-                        <button
-                            class="bg-[#C5896B] hover:bg-[#B07459] cursor-pointer text-white w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-md">
-                            <i class="ri-search-line text-xl"></i>
-                        </button>
-                    </div>
 
                     <!-- Category Custom Dropdown -->
                     <div class="flex-1 relative" id="category-dropdown">
@@ -122,6 +109,21 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Search Box -->
+                    <div
+                        class="flex-1 relative flex items-center border border-[#D4A58E] rounded-full p-2 bg-white shadow-sm hover:shadow-md transition-shadow h-[72px]">
+                        <div class="pl-6 pr-4 text-[#C5896B]">
+                            <i class="ri-search-line text-2xl"></i>
+                        </div>
+                        <input type="text" placeholder="Search"
+                            class="flex-1 outline-none text-[#A67B5B] text-lg bg-transparent placeholder-[#C5896B] font-sans h-full">
+                        <button
+                            class="bg-[#C5896B] hover:bg-[#B07459] cursor-pointer text-white w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-md">
+                            <i class="ri-search-line text-xl"></i>
+                        </button>
+                    </div>
+
                 </div>
             </div>
         </div>

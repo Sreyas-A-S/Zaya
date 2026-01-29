@@ -56,3 +56,19 @@ h6 {
 ::-webkit-scrollbar-thumb:hover {
     background: #8c7860;
 }
+
+/* Service Image Slider Pagination */
+.serviceImageSwiper .swiper-pagination-bullet {
+    background: rgba(255, 255, 255, 0.6) !important;
+    opacity: 1 !important;
+    width: 10px !important;
+    height: 10px !important;
+    transition: all 0.3s ease !important;
+}
+
+.serviceImageSwiper .swiper-pagination-bullet-active {
+    background: #7BA393 !important;
+    /* Light version of primary color */
+    width: 28px !important;
+    border-radius: 5px !important;
+}
