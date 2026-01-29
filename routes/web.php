@@ -69,3 +69,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::put('master-data/{type}/{id}', [MasterDataController::class, 'update'])->name('master-data.update');
     Route::delete('master-data/{type}/{id}', [MasterDataController::class, 'destroy'])->name('master-data.destroy');
 });
+
+// Route to run artisan optimize
+Route::get('/optimize', function () {
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    \Illuminate\Support\Facades\Artisan::call('optimize');
+    return 'Application optimized successfully!';
+});
