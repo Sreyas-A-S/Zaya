@@ -70,6 +70,23 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 
+    // Hero Background Image Slider
+    new Swiper('.heroSlider', {
+        slidesPerView: 1,
+        spaceBetween: 0,
+        loop: true,
+        speed: 1000,
+        effect: 'fade',
+        fadeEffect: {
+            crossFade: true
+        },
+        autoplay: {
+            delay: 2000,
+            disableOnInteraction: false,
+        },
+    });
+
+
     new Swiper('.practitioner-slider', {
         slidesPerView: 1.5,
         spaceBetween: 40,
