@@ -9,7 +9,12 @@ class WebController extends Controller
     //
     public function index()
     {
-        return view('index');
+        $practitioners = \App\Models\Practitioner::with('user')
+            ->latest()
+            ->take(8)
+            ->get();
+
+        return view('index', compact('practitioners'));
     }
 
     public function comingSoon()

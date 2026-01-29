@@ -201,8 +201,10 @@
                                         <div class="col-md-6">
                                             <label class="form-label">Country <span class="text-danger">*</span></label>
                                             <select class="form-select" name="country" required>
-                                                <option value="India" selected>India</option>
-                                                <option value="Other">Other</option>
+                                                <option value="">Select Country</option>
+                                                @foreach(config('countries') as $country)
+                                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>{{ $country }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -823,7 +825,7 @@
             });
 
             // Master Data Quick Add
-            $(document).on('click', '.add-master-data-btn', function() {
+            $(document).off('click', '.add-master-data-btn').on('click', '.add-master-data-btn', function() {
                 let btn = $(this);
                 let input = btn.siblings('.new-master-data-input');
                 let type = input.data('type');

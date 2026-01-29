@@ -138,8 +138,9 @@
                                             <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label">Sex</label>
+                                            <label class="form-label">Gender</label>
                                             <select class="form-select" name="gender">
+                                                <option value="">Select Gender</option>
                                                 <option value="male">Male</option>
                                                 <option value="female">Female</option>
                                                 <option value="other">Other</option>
@@ -183,8 +184,10 @@
                                         <div class="col-md-6">
                                             <label class="form-label">Country <span class="text-danger">*</span></label>
                                             <select class="form-select" name="country" required>
-                                                <option value="India" selected>India</option>
-                                                <option value="Other">Other</option>
+                                                <option value="">Select Country</option>
+                                                @foreach(config('countries') as $country)
+                                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>{{ $country }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
 
@@ -204,7 +207,7 @@
                                             <label class="form-label f-w-500">Ayurvedic Wellness Consultations</label>
                                             <div class="row g-2">
                                                 @foreach($wellnessConsultations as $item)
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="form-check checkbox-primary d-flex align-items-center">
                                                         <input class="form-check-input cons-checkbox" type="checkbox" name="consultations[]" value="{{ $item->name }}" id="cons_{{ $item->id }}">
                                                         <label class="form-check-label flex-grow-1 mb-0" for="cons_{{ $item->id }}">{{ $item->name }}</label>
@@ -1033,67 +1036,7 @@
         $('#practitioner-form-modal').modal('show');
     }
 
-    // Master Data Quick Add
-    $(document).on('click', '.add-master-data-btn', function() {
-        let btn = $(this);
-        let input = btn.siblings('.new-master-data-input');
-        let type = input.data('type');
-        let value = input.val().trim();
-        let container = input.closest('.col-12').find('.row');
 
-        if (!value) return;
-
-        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
-
-        $.ajax({
-            url: "{{ url('admin/master-data') }}/" + type,
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                name: value,
-                status: 1
-            },
-            success: function(response) {
-                if (response.success) {
-                    let checkboxName = '';
-                    let idPrefix = '';
-                    if (type === 'wellness_consultations') {
-                        checkboxName = 'consultations[]';
-                        idPrefix = 'cons_';
-                    } else if (type === 'body_therapies') {
-                        checkboxName = 'body_therapies[]';
-                        idPrefix = 'body_';
-                    } else if (type === 'practitioner_modalities') {
-                        checkboxName = 'other_modalities[]';
-                        idPrefix = 'mod_';
-                    }
-
-                    let newId = response.data.id;
-                    let newName = response.data.name;
-
-                    let html = `
-                        <div class="col-md-${type === 'wellness_consultations' ? '6' : '4'}">
-                            <div class="form-check checkbox-primary">
-                                <input class="form-check-input ${idPrefix}checkbox" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
-                                <label class="form-check-label" for="${idPrefix}${newId}">${newName}</label>
-                            </div>
-                        </div>
-                    `;
-                    container.append(html);
-                    input.val('');
-                    if (typeof showToast === 'function') showToast(response.success);
-                }
-            },
-            error: function(xhr) {
-                if (typeof showToast === 'function') {
-                    showToast('Error: ' + (xhr.responseJSON?.error || 'Could not add item'), 'error');
-                }
-            },
-            complete: function() {
-                btn.prop('disabled', false).html('<i class="fa fa-plus"></i>');
-            }
-        });
-    });
 
     $('body').on('click', '.editPractitioner', function() {
         const id = $(this).data('id');
@@ -1407,7 +1350,7 @@
     });
 
     // Master Data Quick Add
-    $(document).on('click', '.add-master-data-btn', function() {
+    $(document).off('click', '.add-master-data-btn').on('click', '.add-master-data-btn', function() {
         let btn = $(this);
         let input = btn.siblings('.new-master-data-input');
         let type = input.data('type');
