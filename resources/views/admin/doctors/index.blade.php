@@ -37,12 +37,12 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Name</th>
+                                    <th>Gender</th>
                                     <th>Email</th>
-                                    <th>AYUSH No.</th>
-                                    <th>Contact</th>
-                                    <th>City/State</th>
+                                    <th>Phone number</th>
+                                    <th>Nationality</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -858,23 +858,23 @@
                     }
                 },
                 {
-                    data: 'email',
-                    name: 'users.email'
+                    data: 'gender',
+                    name: 'doctors.gender',
+                    render: function(data) {
+                        return data ? data.charAt(0).toUpperCase() + data.slice(1) : 'N/A';
+                    }
                 },
                 {
-                    data: 'ayush_registration_number',
-                    name: 'doctors.ayush_registration_number'
+                    data: 'email',
+                    name: 'users.email'
                 },
                 {
                     data: 'phone',
                     name: 'doctors.phone'
                 },
                 {
-                    data: 'city',
-                    name: 'doctors.city',
-                    render: function(data, type, row) {
-                        return [row.city, row.state].filter(Boolean).join(', ');
-                    }
+                    data: 'country',
+                    name: 'doctors.country'
                 },
                 {
                     data: 'status',

@@ -37,7 +37,9 @@ class DoctorController extends Controller
                     'doctors.profile_photo_path',
                     'doctors.city',
                     'doctors.state',
-                    'doctors.status'
+                    'doctors.status',
+                    'doctors.gender',
+                    'doctors.country'
                 ])
                 ->latest('users.created_at')
                 ->get();

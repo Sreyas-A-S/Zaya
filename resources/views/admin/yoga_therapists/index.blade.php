@@ -37,11 +37,12 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
                                     <th>Gender</th>
+                                    <th>Email</th>
+                                    <th>Phone number</th>
+                                    <th>Nationality</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -584,6 +585,13 @@
                         }
                     },
                     {
+                        data: 'gender',
+                        name: 'yoga_therapists.gender',
+                        render: function(data) {
+                            return data ? data.charAt(0).toUpperCase() + data.slice(1) : 'N/A';
+                        }
+                    },
+                    {
                         data: 'email',
                         name: 'users.email'
                     },
@@ -592,8 +600,8 @@
                         name: 'yoga_therapists.phone'
                     },
                     {
-                        data: 'gender',
-                        name: 'yoga_therapists.gender'
+                        data: 'country',
+                        name: 'yoga_therapists.country'
                     },
                     {
                         data: 'status',

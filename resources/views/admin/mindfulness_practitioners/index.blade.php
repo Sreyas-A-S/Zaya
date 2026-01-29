@@ -37,11 +37,12 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
                                     <th>Gender</th>
+                                    <th>Email</th>
+                                    <th>Phone number</th>
+                                    <th>Nationality</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -479,6 +480,13 @@
                     }
                 },
                 {
+                    data: 'gender',
+                    name: 'mindfulness_practitioners.gender',
+                    render: function(data) {
+                        return data ? data.charAt(0).toUpperCase() + data.slice(1) : 'N/A';
+                    }
+                },
+                {
                     data: 'email',
                     name: 'users.email'
                 },
@@ -487,8 +495,8 @@
                     name: 'mindfulness_practitioners.phone'
                 },
                 {
-                    data: 'gender',
-                    name: 'mindfulness_practitioners.gender'
+                    data: 'country',
+                    name: 'mindfulness_practitioners.country'
                 },
                 {
                     data: 'status',

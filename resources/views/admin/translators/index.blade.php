@@ -31,17 +31,41 @@
                     </button>
                 </div>
                 <div class="card-body">
+                    <div class="row g-3 mb-4 justify-content-end align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Source Language</label>
+                            <select class="form-select" id="filter_source_lang">
+                                <option value="">All Languages</option>
+                                @foreach($languages as $lang)
+                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Target Language</label>
+                            <select class="form-select" id="filter_target_lang">
+                                <option value="">All Languages</option>
+                                @foreach($languages as $lang)
+                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-secondary" id="reset_filters" title="Reset Filters"><i class="fa fa-refresh"></i></button>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="display" id="translators-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Name</th>
+                                    <th>Gender</th>
                                     <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Source Langs</th>
-                                    <th>Target Langs</th>
-                                    <th>Type</th>
+                                    <th>Phone number</th>
+                                    <th>Nationality</th>
+                                    <th>Source languages</th>
+                                    <th>Target languages</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -475,7 +499,13 @@
             table = $('#translators-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.translators.index') }}",
+                ajax: {
+                    url: "{{ route('admin.translators.index') }}",
+                    data: function(d) {
+                        d.source_lang = $('#filter_source_lang').val();
+                        d.target_lang = $('#filter_target_lang').val();
+                    }
+                },
                 columns: [{
                         data: null,
                         render: function(data, type, row, meta) {
@@ -493,12 +523,23 @@
                         }
                     },
                     {
+                        data: 'gender',
+                        name: 'translators.gender',
+                        render: function(data) {
+                            return data ? data.charAt(0).toUpperCase() + data.slice(1) : 'N/A';
+                        }
+                    },
+                    {
                         data: 'email',
                         name: 'users.email'
                     },
                     {
                         data: 'phone',
                         name: 'translators.phone'
+                    },
+                    {
+                        data: 'country',
+                        name: 'translators.country'
                     },
                     {
                         data: 'source_languages',
@@ -513,10 +554,6 @@
                         searchable: false
                     },
                     {
-                        data: 'translator_type',
-                        name: 'translators.translator_type'
-                    },
-                    {
                         data: 'status',
                         name: 'translators.status'
                     },
@@ -527,6 +564,17 @@
                         searchable: false
                     },
                 ]
+            });
+
+            // Filter Event Listeners
+            $('#filter_source_lang, #filter_target_lang').change(function() {
+                table.draw();
+            });
+
+            $('#reset_filters').click(function() {
+                $('#filter_source_lang').val('');
+                $('#filter_target_lang').val('');
+                table.draw();
             });
 
             // Initialize Choices.js

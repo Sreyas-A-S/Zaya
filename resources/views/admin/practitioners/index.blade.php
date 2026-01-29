@@ -37,12 +37,12 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Name</th>
-                                    <th>Email</th>
                                     <th>Gender</th>
-                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>Phone number</th>
                                     <th>Nationality</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -765,12 +765,15 @@
                     }
                 },
                 {
-                    data: 'email',
-                    name: 'users.email'
+                    data: 'gender',
+                    name: 'practitioners.gender',
+                    render: function(data) {
+                        return data ? data.charAt(0).toUpperCase() + data.slice(1) : 'N/A';
+                    }
                 },
                 {
-                    data: 'gender',
-                    name: 'practitioners.gender'
+                    data: 'email',
+                    name: 'users.email'
                 },
                 {
                     data: 'phone',

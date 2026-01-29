@@ -25,6 +25,7 @@ class YogaTherapistController extends Controller
                     'users.email',
                     'yoga_therapists.gender',
                     'yoga_therapists.phone',
+                    'yoga_therapists.country',
                     'yoga_therapists.current_organization',
                     'yoga_therapists.profile_photo_path',
                     'yoga_therapists.status'

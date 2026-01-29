@@ -25,6 +25,7 @@ class MindfulnessPractitionerController extends Controller
                     'users.email',
                     'mindfulness_practitioners.gender',
                     'mindfulness_practitioners.phone',
+                    'mindfulness_practitioners.country',
                     'mindfulness_practitioners.current_workplace',
                     'mindfulness_practitioners.profile_photo_path',
                     'mindfulness_practitioners.status'

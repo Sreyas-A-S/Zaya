@@ -128,12 +128,13 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Client ID</th>
                                     <th>Name</th>
+                                    <th>Gender</th>
                                     <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Joined Date</th>
-                                    <th>Action</th>
+                                    <th>Phone number</th>
+                                    <th>Nationality</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -469,11 +470,6 @@
                     searchable: false
                 },
                 {
-                    data: 'client_id',
-                    name: 'patients.client_id',
-                    defaultContent: 'N/A'
-                },
-                {
                     data: 'name',
                     name: 'users.name',
                     render: function(data, type, row) {
@@ -481,6 +477,13 @@
                             '<div>' + row.profile_photo + '</div>' +
                             '<div>' + data + '</div>' +
                             '</div>';
+                    }
+                },
+                {
+                    data: 'gender',
+                    name: 'patients.gender',
+                    render: function(data) {
+                        return data ? data.charAt(0).toUpperCase() + data.slice(1) : 'N/A';
                     }
                 },
                 {
@@ -492,8 +495,16 @@
                     name: 'patients.phone'
                 },
                 {
-                    data: 'created_at',
-                    name: 'users.created_at'
+                    data: 'country',
+                    name: 'patients.country'
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function() {
+                        return '<span class="badge bg-success">Active</span>';
+                    }
                 },
                 {
                     data: 'action',

@@ -23,16 +23,29 @@ class TranslatorController extends Controller
                     'users.id',
                     'users.name',
                     'users.email',
+                    'translators.gender',
                     'translators.native_language',
                     'translators.source_languages',
                     'translators.target_languages',
                     'translators.phone',
+                    'translators.country',
                     'translators.translator_type',
                     'translators.profile_photo_path',
                     'translators.status'
                 ])
-                ->latest('users.created_at')
-                ->get();
+                ->latest('users.created_at');
+
+
+            if ($request->filled('source_lang')) {
+                $lang = $request->source_lang;
+                $data->where('translators.source_languages', 'like', '%"' . $lang . '"%');
+            }
+            if ($request->filled('target_lang')) {
+                $lang = $request->target_lang;
+                $data->where('translators.target_languages', 'like', '%"' . $lang . '"%');
+            }
+
+            $data = $data->get();
 
             return DataTables::of($data)
                 ->addIndexColumn()

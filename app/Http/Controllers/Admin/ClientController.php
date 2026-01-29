@@ -34,6 +34,7 @@ class ClientController extends Controller
                     'patients.country',
                     'patients.dob',
                     'patients.age',
+                    'patients.gender',
                     'patients.client_id',
                     'patients.profile_photo_path'
                 ])
