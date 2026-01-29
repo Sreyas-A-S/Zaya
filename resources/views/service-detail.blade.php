@@ -15,33 +15,25 @@
                             <div class="swiper-wrapper">
                                 <div class="swiper-slide">
                                     <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma-01.jpg') }}"
-                                        alt="{{ $service['title'] }}"
-                                        class="w-full h-full object-cover">
+                                        alt="{{ $service['title'] }}" class="w-full h-full object-cover">
                                 </div>
                                 <div class="swiper-slide">
                                     <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma-02.jpg') }}"
-                                        alt="{{ $service['title'] }}"
-                                        class="w-full h-full object-cover">
+                                        alt="{{ $service['title'] }}" class="w-full h-full object-cover">
                                 </div>
                                 <div class="swiper-slide">
                                     <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma-03.jpg') }}"
-                                        alt="{{ $service['title'] }}"
-                                        class="w-full h-full object-cover">
+                                        alt="{{ $service['title'] }}" class="w-full h-full object-cover">
                                 </div>
                                 <div class="swiper-slide">
                                     <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma-04.jpg') }}"
-                                        alt="{{ $service['title'] }}"
-                                        class="w-full h-full object-cover">
+                                        alt="{{ $service['title'] }}" class="w-full h-full object-cover">
                                 </div>
                                 <div class="swiper-slide">
                                     <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma-05.jpg') }}"
-                                        alt="{{ $service['title'] }}"
-                                        class="w-full h-full object-cover">
+                                        alt="{{ $service['title'] }}" class="w-full h-full object-cover">
                                 </div>
                             </div>
-                            <!-- Navigation Arrows -->
-                            <div class="swiper-button-next text-white! w-10! h-10! bg-black/30! rounded-full! after:text-sm! hover:bg-black/50! transition-colors"></div>
-                            <div class="swiper-button-prev text-white! w-10! h-10! bg-black/30! rounded-full! after:text-sm! hover:bg-black/50! transition-colors"></div>
                             <!-- Pagination Dots -->
                             <div class="swiper-pagination bottom-4!"></div>
                         </div>
@@ -141,20 +133,6 @@
                             practitioner committed to a
                             strict Code of Ethics and expert-led care.
                         </p>
-
-                        <!-- Pagination -->
-                        <div class="flex items-center justify-between mt-12 pt-8 border-t border-gray-200">
-                            <a href="#"
-                                class="flex items-center gap-2 text-secondary hover:text-primary transition-colors group">
-                                <i class="ri-arrow-left-line group-hover:-translate-x-1 transition-transform"></i>
-                                <span>Prev</span>
-                            </a>
-                            <a href="#"
-                                class="flex items-center gap-2 bg-secondary text-white px-6 py-2.5 rounded-full hover:bg-primary transition-all">
-                                <span>Next</span>
-                                <i class="ri-arrow-right-line"></i>
-                            </a>
-                        </div>
                     </div>
                 </div>
 
@@ -171,8 +149,7 @@
                         <div class="space-y-10">
                             @foreach($otherServices as $otherService)
                                 <a href="{{ route('service-detail', $otherService['slug']) }}" class="block group">
-                                    <div
-                                        class="bg-white transition-all duration-300 overflow-hidden">
+                                    <div class="bg-white transition-all duration-300 overflow-hidden">
                                         <div class="h-50 overflow-hidden rounded-[16px]">
                                             <img src="{{ asset('frontend/assets/' . $otherService['image']) }}"
                                                 alt="{{ $otherService['title'] }}"
@@ -180,7 +157,7 @@
                                         </div>
                                         <div class="pt-5">
                                             <h4
-                                                class="text-lg font-serif text-secondary mb-2 group-hover:text-primary transition-colors font-bold">
+                                                class="text-xl font-serif text-secondary mb-2 group-hover:text-primary transition-colors font-bold">
                                                 {{ $otherService['title'] }}
                                             </h4>
                                             <p class="text-gray-500 text-sm leading-relaxed line-clamp-2">
@@ -190,6 +167,17 @@
                                     </div>
                                 </a>
                             @endforeach
+                        </div>
+                        <!-- Pagination -->
+                        <div class="flex items-center justify-between mt-12">
+                            <a href="#"
+                                class="flex items-center gap-2 bg-[#EEEEEE] text-[#9F9F9F] px-6 py-2.5 rounded-full hover:bg-primary hover:text-white transition-all border border-[#E6E6E6]">
+                                <span>Prev</span>
+                            </a>
+                            <a href="#"
+                                class="flex items-center gap-2 bg-[#F5F5F5] text-primary px-6 py-2.5 rounded-full hover:bg-primary hover:text-white transition-all border border-primary">
+                                <span>Next</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -202,7 +190,8 @@
     <section class="py-16 bg-white">
         <div class="container mx-auto px-6">
             <div class="text-center max-w-2xl mx-auto">
-                <h2 class="text-3xl md:text-4xl font-serif font-medium text-primary mb-4">Ready to restore your natural rhythm?</h2>
+                <h2 class="text-3xl md:text-4xl font-serif font-medium text-primary mb-4">Ready to restore your natural
+                    rhythm?</h2>
                 <p class="text-gray-500 mb-8">
                     Join a global community committed to authentic, expert-led wellness.
                 </p>
