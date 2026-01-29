@@ -131,4 +131,41 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // Service Detail Image Slider
+    new Swiper('.serviceImageSwiper', {
+        slidesPerView: 1,
+        spaceBetween: 0,
+        loop: true,
+        speed: 600,
+        grabCursor: true,
+        autoplay: {
+            delay: 2000,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+    });
 });
+
+function shareService() {
+    if (navigator.share) {
+        navigator.share({
+            title: document.title || 'ZAYA Wellness',
+            text: 'Check out this wellness service at ZAYA Wellness',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: Copy to clipboard
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            alert('Link copied to clipboard!');
+        });
+    }
+}

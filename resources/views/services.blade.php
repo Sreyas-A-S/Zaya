@@ -169,133 +169,145 @@
             <div class="flex flex-wrap -mx-2 justify-center">
                 <div class="w-full sm:w-1/2 lg:w-1/3 px-4 mb-8">
                     <!-- Service Card 1 -->
-                    <div
-                        class="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group h-full">
-                        <!-- Image -->
-                        <div class="h-64 overflow-hidden">
-                            <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma.png') }}"
-                                alt="Ayurveda & Panchakarma"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                        </div>
-                        <!-- Content -->
-                        <div class="p-8">
-                            <h3 class="text-2xl font-serif text-[#C5896B] mb-3">Ayurveda & Panchakarma</h3>
-                            <p class="text-gray-500 text-sm leading-relaxed mb-4">
-                                Rooted in 5,000 years of tradition, our Ayurveda sessions offer personalized detoxification
-                                and
-                                rejuvenation.
-                            </p>
-                            <div class="flex items-center justify-between mt-auto">
-                                <a href="#" class="text-secondary text-sm font-medium hover:underline">Read More...</a>
-                                <a href="#"
-                                    class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all">Book
-                                    a Session</a>
+                    <a href="{{ route('service-detail', 'ayurveda-panchakarma') }}" class="block h-full">
+                        <div
+                            class="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group h-full cursor-pointer">
+                            <!-- Image -->
+                            <div class="h-64 overflow-hidden">
+                                <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma.png') }}"
+                                    alt="Ayurveda & Panchakarma"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <!-- Content -->
+                            <div class="p-8">
+                                <h3 class="text-2xl font-serif text-[#C5896B] mb-3">Ayurveda & Panchakarma</h3>
+                                <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                                    Rooted in 5,000 years of tradition, our Ayurveda sessions offer personalized
+                                    detoxification
+                                    and
+                                    rejuvenation.
+                                </p>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span class="text-secondary text-sm font-medium hover:underline">Read More...</span>
+                                    <span
+                                        class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all">Book
+                                        a Session</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 <div class="w-full sm:w-1/2 lg:w-1/3 px-4 mb-8">
                     <!-- Service Card 2 -->
-                    <div
-                        class="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group h-full">
-                        <!-- Image -->
-                        <div class="h-64 overflow-hidden">
-                            <img src="{{ asset('frontend/assets/yoga-therapy.png') }}" alt="Yoga Therapy"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                        </div>
-                        <!-- Content -->
-                        <div class="p-8">
-                            <h3 class="text-2xl font-serif text-[#C5896B] mb-3">Yoga Therapy</h3>
-                            <p class="text-gray-500 text-sm leading-relaxed mb-4">
-                                Yoga Therapy goes beyond flexibility. It is a clinical approach to healing that combines
-                                specific asanas, breathwork...
-                            </p>
-                            <div class="flex items-center justify-between mt-auto">
-                                <a href="#" class="text-secondary text-sm font-medium hover:underline">Read More...</a>
-                                <a href="#"
-                                    class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all">Book
-                                    a Session</a>
+                    <a href="{{ route('service-detail', 'yoga-therapy') }}" class="block h-full">
+                        <div
+                            class="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group h-full cursor-pointer">
+                            <!-- Image -->
+                            <div class="h-64 overflow-hidden">
+                                <img src="{{ asset('frontend/assets/yoga-therapy.png') }}" alt="Yoga Therapy"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <!-- Content -->
+                            <div class="p-8">
+                                <h3 class="text-2xl font-serif text-[#C5896B] mb-3">Yoga Therapy</h3>
+                                <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                                    Yoga Therapy goes beyond flexibility. It is a clinical approach to healing that combines
+                                    specific asanas, breathwork...
+                                </p>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span class="text-secondary text-sm font-medium hover:underline">Read More...</span>
+                                    <span
+                                        class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all">Book
+                                        a Session</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 <div class="w-full sm:w-1/2 lg:w-1/3 px-4 mb-8">
                     <!-- Service Card 3 -->
-                    <div
-                        class="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group h-full">
-                        <!-- Image -->
-                        <div class="h-64 overflow-hidden">
-                            <img src="{{ asset('frontend/assets/spiritual-guidance.png') }}"
-                                alt="Spiritual Guidance"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                        </div>
-                        <!-- Content -->
-                        <div class="p-8">
-                            <h3 class="text-2xl font-serif text-[#C5896B] mb-3">Spiritual Guidance</h3>
-                            <p class="text-gray-500 text-sm leading-relaxed mb-4">
-                                Explore the deeper aspects of your existence. These sessions provide a safe space
-                            </p>
-                            <div class="flex items-center justify-between mt-auto">
-                                <a href="#" class="text-secondary text-sm font-medium hover:underline">Read More...</a>
-                                <a href="#"
-                                    class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all">Book
-                                    a Session</a>
+                    <a href="{{ route('service-detail', 'spiritual-guidance') }}" class="block h-full">
+                        <div
+                            class="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group h-full cursor-pointer">
+                            <!-- Image -->
+                            <div class="h-64 overflow-hidden">
+                                <img src="{{ asset('frontend/assets/spiritual-guidance.png') }}" alt="Spiritual Guidance"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <!-- Content -->
+                            <div class="p-8">
+                                <h3 class="text-2xl font-serif text-[#C5896B] mb-3">Spiritual Guidance</h3>
+                                <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                                    Explore the deeper aspects of your existence. These sessions provide a safe space
+                                </p>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span class="text-secondary text-sm font-medium hover:underline">Read More...</span>
+                                    <span
+                                        class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all">Book
+                                        a Session</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 <div class="w-full sm:w-1/2 lg:w-1/3 px-4 mb-8">
                     <!-- Service Card 4 -->
-                    <div
-                        class="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group h-full">
-                        <!-- Image -->
-                        <div class="h-64 overflow-hidden">
-                            <img src="{{ asset('frontend/assets/mindfulness-counselling.png') }}"
-                                alt="Mindfulness Counselling"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                        </div>
-                        <!-- Content -->
-                        <div class="p-8">
-                            <h3 class="text-2xl font-serif text-[#C5896B] mb-3">Mindfulness Counselling</h3>
-                            <p class="text-gray-500 text-sm leading-relaxed mb-4">
-                                Cultivate a non-judgmental awareness of the present moment. Our sessions bridge traditional
-                                psychology...
-                            </p>
-                            <div class="flex items-center justify-between mt-auto">
-                                <a href="#" class="text-secondary text-sm font-medium hover:underline">Read More...</a>
-                                <a href="#"
-                                    class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all">Book
-                                    a Session</a>
+                    <a href="{{ route('service-detail', 'mindfulness-counselling') }}" class="block h-full">
+                        <div
+                            class="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group h-full cursor-pointer">
+                            <!-- Image -->
+                            <div class="h-64 overflow-hidden">
+                                <img src="{{ asset('frontend/assets/mindfulness-counselling.png') }}"
+                                    alt="Mindfulness Counselling"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <!-- Content -->
+                            <div class="p-8">
+                                <h3 class="text-2xl font-serif text-[#C5896B] mb-3">Mindfulness Counselling</h3>
+                                <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                                    Cultivate a non-judgmental awareness of the present moment. Our sessions bridge
+                                    traditional
+                                    psychology...
+                                </p>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span class="text-secondary text-sm font-medium hover:underline">Read More...</span>
+                                    <span
+                                        class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all">Book
+                                        a Session</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 <div class="w-full sm:w-1/2 lg:w-1/3 px-4 mb-8">
-                    <!-- Service Card 4 -->
-                    <div
-                        class="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group h-full">
-                        <!-- Image -->
-                        <div class="h-64 overflow-hidden">
-                            <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma.png') }}"
-                                alt="Ayurveda & Panchakarma"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                        </div>
-                        <!-- Content -->
-                        <div class="p-8">
-                            <h3 class="text-2xl font-serif text-[#C5896B] mb-3">Ayurveda & Panchakarma</h3>
-                            <p class="text-gray-500 text-sm leading-relaxed mb-4">
-                                Rooted in 5,000 years of tradition, our Ayurveda sessions offer personalized detoxification
-                                and
-                                rejuvenation.
-                            </p>
-                            <div class="flex items-center justify-between mt-auto">
-                                <a href="#" class="text-secondary text-sm font-medium hover:underline">Read More...</a>
-                                <a href="#"
-                                    class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all">Book
-                                    a Session</a>
+                    <!-- Service Card 5 -->
+                    <a href="{{ route('service-detail', 'ayurveda-panchakarma') }}" class="block h-full">
+                        <div
+                            class="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group h-full cursor-pointer">
+                            <!-- Image -->
+                            <div class="h-64 overflow-hidden">
+                                <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma.png') }}"
+                                    alt="Ayurveda & Panchakarma"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <!-- Content -->
+                            <div class="p-8">
+                                <h3 class="text-2xl font-serif text-[#C5896B] mb-3">Ayurveda & Panchakarma</h3>
+                                <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                                    Rooted in 5,000 years of tradition, our Ayurveda sessions offer personalized
+                                    detoxification
+                                    and
+                                    rejuvenation.
+                                </p>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span class="text-secondary text-sm font-medium hover:underline">Read More...</span>
+                                    <span
+                                        class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all">Book
+                                        a Session</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
 
