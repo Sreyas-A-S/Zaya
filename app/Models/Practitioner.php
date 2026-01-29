@@ -31,4 +31,13 @@ class Practitioner extends Model
     {
         return $this->hasMany(PractitionerQualification::class, 'practitioner_id');
     }
+    public function reviews()
+    {
+        return $this->hasMany(PractitionerReview::class);
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->where('status', true)->avg('rating') ?? 0;
+    }
 }

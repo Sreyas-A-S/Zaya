@@ -29,11 +29,11 @@
                 <div>
                     <h4 class="font-bold font-sans text-primary mb-6 text-lg">Quick Links</h4>
                     <ul class="space-y-3 text-sm text-secondary">
-                        <li><a href="#" class="hover:text-primary transition-colors">Home</a></li>
+                        <li><a href="{{ route('home') }}" class="hover:text-primary transition-colors">Home</a></li>
                         <li><a href="#" class="hover:text-primary transition-colors">Practitioners</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors">Treatments</a></li>
+                        <li><a href="{{ route('services') }}" class="hover:text-primary transition-colors">Treatments</a></li>
                         <li><a href="#" class="hover:text-primary transition-colors">E-Consultation</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors">Contact</a></li>
+                        <li><a href="{{ route('about-us') }}" class="hover:text-primary transition-colors">Contact</a></li>
                     </ul>
                 </div>
 

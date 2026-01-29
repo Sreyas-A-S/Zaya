@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\MindfulnessPractitionerController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TranslatorController;
 use App\Http\Controllers\Admin\YogaTherapistController;
+use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\ServiceController;
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\WebController;
@@ -40,7 +42,7 @@ Route::get('/index', [WebController::class, 'index'])->name('index');
 Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-soon');
 Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
-Route::get('/practitioner-detail', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
+Route::get('/practitioner/{id}', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
 Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
@@ -64,6 +66,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('roles/{role}/permissions', [RoleController::class, 'showPermissions'])->name('roles.permissions');
     Route::post('roles/{role}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.permissions.update');
 
+    Route::resource('testimonials', TestimonialController::class);
+    Route::post('testimonials/{id}/status', [TestimonialController::class, 'updateStatus'])->name('testimonials.status');
+
+    Route::resource('services', ServiceController::class);
+    Route::post('services/{id}/status', [ServiceController::class, 'updateStatus'])->name('services.status');
+
+    // Reviews
+    Route::get('reviews/practitioners', [\App\Http\Controllers\Admin\PractitionerReviewController::class, 'index'])->name('reviews.practitioners.index');
+    Route::delete('reviews/practitioners/{id}', [\App\Http\Controllers\Admin\PractitionerReviewController::class, 'destroy'])->name('reviews.practitioners.destroy');
+    Route::post('reviews/practitioners/{id}/status', [\App\Http\Controllers\Admin\PractitionerReviewController::class, 'updateStatus'])->name('reviews.practitioners.status');
+
     // Master Data
     Route::get('master-data/{type}', [MasterDataController::class, 'index'])->name('master-data.index');
     Route::post('master-data/{type}', [MasterDataController::class, 'store'])->name('master-data.store');
@@ -76,4 +89,19 @@ Route::get('/optimize', function () {
     Artisan::call('optimize:clear');
     Artisan::call('optimize');
     return 'Application optimized successfully!';
+});
+
+Route::get('/migrate', function () {
+    Artisan::call('migrate', ['--force' => true]);
+    return '<pre>' . Artisan::output() . '</pre>';
+});
+
+Route::get('/storage-link', function () {
+    Artisan::call('storage:link');
+    return 'Storage linked successfully!';
+});
+
+Route::get('/seed', function () {
+    Artisan::call('db:seed', ['--force' => true]);
+    return '<pre>' . Artisan::output() . '</pre>';
 });

@@ -1,9 +1,5 @@
 <aside class="page-sidebar">
     <div class="logo-wrapper d-flex align-items-center col-auto d-lg-none p-3">
-        <a href="{{ route('admin.dashboard') }}">
-            <img class="light-logo img-fluid" src="{{ asset('admiro/assets/images/logo/zaya-logo-admin.svg') }}" alt="logo" style="max-height: 50px;" />
-
-        </a>
         <a class="close-btn toggle-sidebar ms-auto" href="javascript:void(0)">
             <svg class="svg-color">
                 <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Category') }}"></use>
@@ -25,14 +21,14 @@
                     <h5 class="lan-1 f-w-700 sidebar-title">General</h5>
                 </div>
             </li>
-            <li class="sidebar-list"><i class="fa-solid fa-thumbtack"></i><a class="sidebar-link" href="{{ route('admin.dashboard') }}">
+            <li class="sidebar-list"><a class="sidebar-link" href="{{ route('admin.dashboard') }}">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Home-dashboard') }}"></use>
                     </svg>
                     <h6>Dashboard</h6>
                 </a>
             </li>
-            <li class="sidebar-list"> <i class="fa-solid fa-thumbtack"></i><a class="sidebar-link" href="javascript:void(0)">
+            <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Profile') }}"></use>
                     </svg>
@@ -47,8 +43,32 @@
                     <li> <a href="{{ route('admin.translators.index') }}">Translators</a></li>
                 </ul>
             </li>
+            <li class="sidebar-list"> <a class="sidebar-link" href="{{ route('admin.testimonials.index') }}">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Chat') }}"></use>
+                    </svg>
+                    <h6 class="f-w-600">Testimonials</h6>
+                </a>
+            </li>
+            <li class="sidebar-list"> <a class="sidebar-link" href="{{ route('admin.services.index') }}">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Category') }}"></use>
+                    </svg>
+                    <h6 class="f-w-600">Services</h6>
+                </a>
+            </li>
+            <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Star') }}"></use>
+                    </svg>
+                    <h6 class="f-w-600">Reviews</h6><i class="iconly-Arrow-Right-2 icli"> </i>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li> <a href="{{ route('admin.reviews.practitioners.index') }}">Practitioner</a></li>
+                </ul>
+            </li>
 
-            <li class="sidebar-list"> <i class="fa-solid fa-thumbtack"></i><a class="sidebar-link" href="javascript:void(0)">
+            <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Setting') }}"></use>
                     </svg>

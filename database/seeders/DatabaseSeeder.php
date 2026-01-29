@@ -28,6 +28,9 @@ class DatabaseSeeder extends Seeder
             MindfulnessPractitionerSeeder::class,
             TranslatorSeeder::class,
             YogaTherapistSeeder::class,
+            TestimonialSeeder::class,
+            ServiceSeeder::class,
+            PractitionerReviewSeeder::class,
         ]);
 
         User::updateOrCreate(

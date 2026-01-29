@@ -9,12 +9,14 @@ class WebController extends Controller
     //
     public function index()
     {
-        $practitioners = \App\Models\Practitioner::with('user')
+        $practitioners = \App\Models\Practitioner::with(['user', 'reviews'])
             ->latest()
             ->take(8)
             ->get();
+        $testimonials = \App\Models\Testimonial::where('status', true)->latest()->get();
+        $services = \App\Models\Service::where('status', true)->orderBy('order_column')->get();
 
-        return view('index', compact('practitioners'));
+        return view('index', compact('practitioners', 'testimonials', 'services'));
     }
 
     public function comingSoon()
@@ -29,12 +31,14 @@ class WebController extends Controller
 
     public function services()
     {
-        return view('services');
+        $services = \App\Models\Service::where('status', true)->orderBy('order_column')->get();
+        return view('services', compact('services'));
     }
 
-    public function practitionerDetail()
+    public function practitionerDetail($id)
     {
-        return view('practitioner-detail');
+        $practitioner = \App\Models\Practitioner::with(['user', 'reviews'])->findOrFail($id);
+        return view('practitioner-detail', compact('practitioner'));
     }
 
     public function zayaLogin()

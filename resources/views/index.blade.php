@@ -75,93 +75,21 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-14">
-            <!-- Service 1 -->
-            <a href="#"
-                class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500">
-                <div class="h-64 overflow-hidden mb-4 relative">
-                    <img src="{{ asset('frontend/assets/service-yoga.png') }}" alt="Yoga Therapy"
-                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                </div>
-                <h3 class="text-xl font-serif text-secondary mb-1">Yoga Therapy</h3>
-            </a>
-
-            <!-- Service 2 -->
-            <a href="#"
+            @foreach($services as $index => $service)
+            <!-- Service {{ $index + 1 }} -->
+            <a href="{{ $service->link ?? '#' }}"
                 class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
-                style="transition-delay: 100ms;">
+                style="transition-delay: {{ $index * 100 }}ms;">
                 <div class="h-64 overflow-hidden mb-4 relative">
-                    <img src="{{ asset('frontend/assets/service-naturopathy.png') }}" alt="Naturopathy"
+                    @php
+                    $imagePath = $service->image ? (str_starts_with($service->image, 'frontend/') ? asset($service->image) : asset('storage/' . $service->image)) : asset('admiro/assets/images/user/user.png');
+                    @endphp
+                    <img src="{{ $imagePath }}" alt="{{ $service->title }}"
                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                 </div>
-                <h3 class="text-xl font-serif text-secondary mb-1">Naturopathy</h3>
+                <h3 class="text-xl font-serif text-secondary mb-1">{{ $service->title }}</h3>
             </a>
-
-            <!-- Service 3 -->
-            <a href="#"
-                class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
-                style="transition-delay: 200ms;">
-                <div class="h-64 overflow-hidden mb-4 relative">
-                    <!-- Reusing Pranic for now or generic -->
-                    <img src="{{ asset('frontend/assets/service-pranic.png') }}" alt="Pranic Healing"
-                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                </div>
-                <h3 class="text-xl font-serif text-secondary mb-1">Pranic Healing</h3>
-            </a>
-
-            <!-- Service 4 (Reuse Yoga for Demo) -->
-            <a href="#"
-                class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
-                style="transition-delay: 300ms;">
-                <div class="h-64 overflow-hidden mb-4 relative">
-                    <img src="{{ asset('frontend/assets/massage-therapy.jpg') }}" alt="Massage Therapy"
-                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                </div>
-                <h3 class="text-xl font-serif text-secondary mb-1">Massage Therapy</h3>
-            </a>
-
-            <!-- Service 4 (Reuse Yoga for Demo) -->
-            <a href="#"
-                class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
-                style="transition-delay: 300ms;">
-                <div class="h-64 overflow-hidden mb-4 relative">
-                    <img src="{{ asset('frontend/assets/hypnotherapy.jpg') }}" alt="Massage Therapy"
-                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                </div>
-                <h3 class="text-xl font-serif text-secondary mb-1">Hypnotherapy</h3>
-            </a>
-
-            <!-- Service 4 (Reuse Yoga for Demo) -->
-            <a href="#"
-                class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
-                style="transition-delay: 300ms;">
-                <div class="h-64 overflow-hidden mb-4 relative">
-                    <img src="{{ asset('frontend/assets/graphotherapy.jpg') }}" alt="Massage Therapy"
-                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                </div>
-                <h3 class="text-xl font-serif text-secondary mb-1">Graphotherapy</h3>
-            </a>
-
-            <!-- Service 4 (Reuse Yoga for Demo) -->
-            <a href="#"
-                class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
-                style="transition-delay: 300ms;">
-                <div class="h-64 overflow-hidden mb-4 relative">
-                    <img src="{{ asset('frontend/assets/sophrology.jpg') }}" alt="Massage Therapy"
-                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                </div>
-                <h3 class="text-xl font-serif text-secondary mb-1">Sophrology</h3>
-            </a>
-
-            <!-- Service 4 (Reuse Yoga for Demo) -->
-            <a href="#"
-                class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
-                style="transition-delay: 300ms;">
-                <div class="h-64 overflow-hidden mb-4 relative">
-                    <img src="{{ asset('frontend/assets/life-coach.jpg') }}" alt="Massage Therapy"
-                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                </div>
-                <h3 class="text-xl font-serif text-secondary mb-1">Life Coach</h3>
-            </a>
+            @endforeach
         </div>
 
         <div class="text-center mt-12">
@@ -219,7 +147,7 @@
                 @endphp
                 <div class="swiper-slide h-auto">
                     <div class="group cursor-pointer">
-                        <a href="{{ route('practitioner-detail') }}" class="h-[400px] mb-6 overflow-hidden relative block"
+                        <a href="{{ route('practitioner-detail', $details->id) }}" class="h-[400px] mb-6 overflow-hidden relative block"
                             style="background: url('{{ $image }}') no-repeat bottom center fixed;background-size: cover;">
 
                             <!-- Content Overlay -->
@@ -249,7 +177,7 @@
                             <div
                                 class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-sm">
                                 <i class="ri-star-fill text-secondary text-xs"></i>
-                                <span class="text-secondary text-xs font-bold">5.0</span>
+                                <span class="text-secondary text-xs font-bold">{{ number_format($details->average_rating, 1) }}</span>
                             </div>
                         </a>
 
@@ -426,184 +354,30 @@
         <div class="swiper testimonial-slider">
             <div class="swiper-wrapper">
 
-                <!-- Slide 1 -->
+                @foreach($testimonials as $testimonial)
                 <div class="swiper-slide w-auto max-w-[350px]">
                     <div class="p-4">
                         <div class="flex items-center gap-4 mb-6">
-                            <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                            <img src="{{ $testimonial->image ? asset('storage/' . $testimonial->image) : 'https://ui-avatars.com/api/?name=' . urlencode($testimonial->name) }}"
                                 class="w-16 h-16 rounded-full object-cover">
                             <div>
-                                <h4 class="font-bold text-[#A66E58] text-xl font-serif">Hriday</h4>
-                                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Psychotherapy</p>
+                                <h4 class="font-bold text-[#A66E58] text-xl font-serif">{{ $testimonial->name }}</h4>
+                                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">{{ $testimonial->role }}</p>
                             </div>
                         </div>
-                        <p class="text-gray-600 text-sm leading-relaxed mb-6">"They didn't just give me supplements;
-                            they gave me a lifestyle shift. I'll definitely be booking a follow-up."</p>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-6">"{{ $testimonial->message }}"</p>
                         <div class="text-yellow-400 text-lg flex gap-1">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i
-                                class="ri-star-fill"></i><i class="ri-star-half-fill"></i>
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <=$testimonial->rating)
+                                <i class="ri-star-fill"></i>
+                                @else
+                                <i class="ri-star-line"></i>
+                                @endif
+                                @endfor
                         </div>
                     </div>
                 </div>
-
-                <!-- Slide 2 -->
-                <div class="swiper-slide w-auto max-w-[350px]">
-                    <div class="p-4">
-                        <div class="flex items-center gap-4 mb-6">
-                            <img src="https://randomuser.me/api/portraits/women/44.jpg"
-                                class="w-16 h-16 rounded-full object-cover">
-                            <div>
-                                <h4 class="font-bold text-[#A66E58] text-xl font-serif">Diya</h4>
-                                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Naturopathy</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm leading-relaxed mb-6">"They didn't just give me supplements;
-                            they gave me a lifestyle shift. I'll definitely be booking a follow-up."</p>
-                        <div class="text-yellow-400 text-lg flex gap-1">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i
-                                class="ri-star-fill"></i><i class="ri-star-fill"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 3 -->
-                <div class="swiper-slide w-auto max-w-[350px]">
-                    <div class="p-4">
-                        <div class="flex items-center gap-4 mb-6">
-                            <img src="https://randomuser.me/api/portraits/women/68.jpg"
-                                class="w-16 h-16 rounded-full object-cover">
-                            <div>
-                                <h4 class="font-bold text-[#A66E58] text-xl font-serif">Aarohi</h4>
-                                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Yoga</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm leading-relaxed mb-6">"They didn't just give me supplements;
-                            they gave me a lifestyle shift. I'll definitely be booking a follow-up."</p>
-                        <div class="text-yellow-400 text-lg flex gap-1">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i
-                                class="ri-star-fill"></i><i class="ri-star-line"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 4 -->
-                <div class="swiper-slide w-auto max-w-[350px]">
-                    <div class="p-4">
-                        <div class="flex items-center gap-4 mb-6">
-                            <img src="https://randomuser.me/api/portraits/men/45.jpg"
-                                class="w-16 h-16 rounded-full object-cover">
-                            <div>
-                                <h4 class="font-bold text-[#A66E58] text-xl font-serif">Hriday</h4>
-                                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Psychotherapy</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm leading-relaxed mb-6">"They didn't just give me supplements;
-                            they gave me a lifestyle shift. I'll definitely be booking a follow-up."</p>
-                        <div class="text-yellow-400 text-lg flex gap-1">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i
-                                class="ri-star-fill"></i><i class="ri-star-half-fill"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 5 -->
-                <div class="swiper-slide w-auto max-w-[350px]">
-                    <div class="p-4">
-                        <div class="flex items-center gap-4 mb-6">
-                            <img src="https://randomuser.me/api/portraits/women/65.jpg"
-                                class="w-16 h-16 rounded-full object-cover">
-                            <div>
-                                <h4 class="font-bold text-[#A66E58] text-xl font-serif">Diya</h4>
-                                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Naturopathy</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm leading-relaxed mb-6">"They didn't just give me supplements;
-                            they gave me a lifestyle shift. I'll definitely be booking a follow-up."</p>
-                        <div class="text-yellow-400 text-lg flex gap-1">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i
-                                class="ri-star-fill"></i><i class="ri-star-fill"></i>
-                        </div>
-                    </div>
-                </div>
-                <!-- Slide 2 -->
-                <div class="swiper-slide w-auto max-w-[350px]">
-                    <div class="p-4">
-                        <div class="flex items-center gap-4 mb-6">
-                            <img src="https://randomuser.me/api/portraits/women/44.jpg"
-                                class="w-16 h-16 rounded-full object-cover">
-                            <div>
-                                <h4 class="font-bold text-[#A66E58] text-xl font-serif">Diya</h4>
-                                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Naturopathy</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm leading-relaxed mb-6">"They didn't just give me supplements;
-                            they gave me a lifestyle shift. I'll definitely be booking a follow-up."</p>
-                        <div class="text-yellow-400 text-lg flex gap-1">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i
-                                class="ri-star-fill"></i><i class="ri-star-fill"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 3 -->
-                <div class="swiper-slide w-auto max-w-[350px]">
-                    <div class="p-4">
-                        <div class="flex items-center gap-4 mb-6">
-                            <img src="https://randomuser.me/api/portraits/women/68.jpg"
-                                class="w-16 h-16 rounded-full object-cover">
-                            <div>
-                                <h4 class="font-bold text-[#A66E58] text-xl font-serif">Aarohi</h4>
-                                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Yoga</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm leading-relaxed mb-6">"They didn't just give me supplements;
-                            they gave me a lifestyle shift. I'll definitely be booking a follow-up."</p>
-                        <div class="text-yellow-400 text-lg flex gap-1">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i
-                                class="ri-star-fill"></i><i class="ri-star-line"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 4 -->
-                <div class="swiper-slide w-auto max-w-[350px]">
-                    <div class="p-4">
-                        <div class="flex items-center gap-4 mb-6">
-                            <img src="https://randomuser.me/api/portraits/men/45.jpg"
-                                class="w-16 h-16 rounded-full object-cover">
-                            <div>
-                                <h4 class="font-bold text-[#A66E58] text-xl font-serif">Hriday</h4>
-                                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Psychotherapy</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm leading-relaxed mb-6">"They didn't just give me supplements;
-                            they gave me a lifestyle shift. I'll definitely be booking a follow-up."</p>
-                        <div class="text-yellow-400 text-lg flex gap-1">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i
-                                class="ri-star-fill"></i><i class="ri-star-half-fill"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 5 -->
-                <div class="swiper-slide w-auto max-w-[350px]">
-                    <div class="p-4">
-                        <div class="flex items-center gap-4 mb-6">
-                            <img src="https://randomuser.me/api/portraits/women/65.jpg"
-                                class="w-16 h-16 rounded-full object-cover">
-                            <div>
-                                <h4 class="font-bold text-[#A66E58] text-xl font-serif">Diya</h4>
-                                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Naturopathy</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm leading-relaxed mb-6">"They didn't just give me supplements;
-                            they gave me a lifestyle shift. I'll definitely be booking a follow-up."</p>
-                        <div class="text-yellow-400 text-lg flex gap-1">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i
-                                class="ri-star-fill"></i><i class="ri-star-fill"></i>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
 
             </div>
         </div>

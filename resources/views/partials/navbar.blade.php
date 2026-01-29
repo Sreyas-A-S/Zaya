@@ -1,9 +1,5 @@
 <header class="page-header row">
     <div class="logo-wrapper d-flex align-items-center col-auto">
-        <a href="{{ route('admin.dashboard') }}">
-            <img class="light-logo img-fluid" src="{{ asset('admiro/assets/images/logo/zaya-logo-admin.svg') }}" alt="logo" style="max-height: 100px;" />
-            <img class="dark-logo img-fluid" src="{{ asset('admiro/assets/images/logo/zaya-logo-admin.svg') }}" alt="logo" style="max-height: 100px;" />
-        </a>
         <a class="close-btn toggle-sidebar" href="javascript:void(0)">
             <svg class="svg-color">
                 <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Category') }}"></use>
@@ -11,9 +7,6 @@
         </a>
     </div>
     <div class="logo-icon-wrapper col-auto px-0 d-none">
-        <a href="{{ route('admin.dashboard') }}">
-            <img class="img-fluid" src="{{ asset('admiro/assets/images/logo/zaya-logo-admin.svg') }}" alt="logo" style="max-height: 30px;" />
-        </a>
     </div>
     <div class="page-main-header col">
         <div class="header-left">
