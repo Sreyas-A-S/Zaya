@@ -1,8 +1,8 @@
 <aside class="page-sidebar">
     <div class="logo-wrapper d-flex align-items-center gap-2 p-3 d-lg-none">
         <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
-            <img src="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" alt="logo" style="width: 40px;">
-            <h4 class="mb-0 text-white f-w-700">ZAYA</h4>
+            <img src="{{ asset('admiro/assets/images/logo/zaya-logo-admin.svg') }}" alt="logo" style="width: 40px;">
+            <h4 class="mb-0 d-none text-white f-w-700">ZAYA</h4>
         </a>
         <a class="close-btn toggle-sidebar ms-auto" href="javascript:void(0)">
             <svg class="svg-color">
