@@ -176,6 +176,24 @@
     </div>
 </div>
 
+<!-- View Modal -->
+<div class="modal fade" id="testimonial-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Testimonial Details</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" id="view-modal-content">
+                <!-- Content will be loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -447,6 +465,37 @@
                 complete: function() {
                     btn.prop('disabled', false).html('Confirm Change');
                 }
+            });
+        });
+
+        // View Testimonial
+        $('body').on('click', '.viewTestimonial', function() {
+            var id = $(this).data('id');
+            $.get("{{ url('admin/testimonials') }}/" + id + "/edit", function(data) {
+                var imageSrc = data.image ? "/storage/" + data.image : "{{ asset('admiro/assets/images/user/user.png') }}";
+                var stars = '';
+                for (var i = 1; i <= 5; i++) {
+                    stars += '<i class="fa fa-star ' + (i <= data.rating ? 'text-warning' : 'text-muted') + '"></i>';
+                }
+
+                var html = `
+                    <div class="text-center mb-4">
+                        <img src="${imageSrc}" alt="Cient Image" class="img-fluid rounded-circle shadow-sm" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #f8f9fa;">
+                        <h4 class="mt-3 mb-1">${data.name}</h4>
+                        <p class="text-primary fw-600 mb-1">${data.role || '<span class="text-muted">No Role</span>'}</p>
+                        <div class="stars mb-3">${stars}</div>
+                    </div>
+                    <div class="p-4 bg-light rounded shadow-sm">
+                        <label class="fw-bold text-muted small text-uppercase d-block mb-2">Message</label>
+                        <div class="position-relative">
+                            <i class="fa fa-quote-left text-muted opacity-25 position-absolute" style="top: -5px; left: -15px;"></i>
+                            <p class="mb-0 fs-6 text-dark" style="white-space: pre-wrap; line-height: 1.6;">${data.message}</p>
+                            <i class="fa fa-quote-right text-muted opacity-25 position-absolute" style="bottom: -5px; right: -5px;"></i>
+                        </div>
+                    </div>
+                `;
+                $('#view-modal-content').html(html);
+                $('#testimonial-view-modal').modal('show');
             });
         });
     });

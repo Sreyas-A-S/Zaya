@@ -6,9 +6,9 @@
         </div>
         <div class="col-md-6">
         <p class="float-end mb-0">
-            <svg class="svg-color footer-icon">
+            <!-- <svg class="svg-color footer-icon">
             <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#heart') }}"></use>
-            </svg>
+            </svg> -->
         </p>
         </div>
     </div>

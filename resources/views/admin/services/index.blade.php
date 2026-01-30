@@ -154,6 +154,24 @@
     </div>
 </div>
 
+<!-- View Modal -->
+<div class="modal fade" id="service-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Service Details</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" id="view-modal-content">
+                <!-- Content will be loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -403,6 +421,51 @@
                 }
             });
         });
+
+        // View Service
+        $('body').on('click', '.viewService', function() {
+            var id = $(this).data('id');
+            $.get("{{ url('admin/services') }}/" + id + "/edit", function(data) {
+                var imageHtml = '';
+                if (data.image) {
+                    var src = data.image.startsWith('frontend/') ? '/' + data.image : '/storage/' + data.image;
+                    imageHtml = '<div class="text-center mb-4"><img src="' + src + '" alt="Service Image" class="img-fluid rounded shadow-sm" style="max-height: 200px; border: 3px solid #f8f9fa;"></div>';
+                }
+
+                var html = `
+                    ${imageHtml}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded shadow-sm h-100">
+                                <label class="fw-bold text-muted small text-uppercase d-block mb-1">Title</label>
+                                <p class="h5 mb-0">${data.title}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded shadow-sm h-100">
+                                <label class="fw-bold text-muted small text-uppercase d-block mb-1">Order Column</label>
+                                <p class="h5 mb-0">${data.order_column || '0'}</p>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded shadow-sm">
+                                <label class="fw-bold text-muted small text-uppercase d-block mb-1">Link</label>
+                                <p class="mb-0 text-primary">${data.link || '<span class="text-muted">N/A</span>'}</p>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded shadow-sm">
+                                <label class="fw-bold text-muted small text-uppercase d-block mb-1">Description</label>
+                                <p class="mb-0 text-dark" style="white-space: pre-wrap;">${data.description || '<span class="text-muted fst-italic">No description provided.</span>'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $('#view-modal-content').html(html);
+                $('#service-view-modal').modal('show');
+            });
+        });
+
 
         // Toggle Status
         $('body').on('click', '.toggle-status', function() {

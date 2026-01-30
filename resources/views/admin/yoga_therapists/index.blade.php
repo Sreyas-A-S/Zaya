@@ -580,10 +580,7 @@
                         data: 'name',
                         name: 'users.name',
                         render: function(data, type, row) {
-                            return '<div class="d-flex align-items-center gap-2">' +
-                                '<div>' + row.profile_photo + '</div>' +
-                                '<div>' + data + '</div>' +
-                                '</div>';
+                            return data;
                         }
                     },
                     {

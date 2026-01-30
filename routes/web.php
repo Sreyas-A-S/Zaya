@@ -83,6 +83,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('master-data/{type}', [MasterDataController::class, 'store'])->name('master-data.store');
     Route::put('master-data/{type}/{id}', [MasterDataController::class, 'update'])->name('master-data.update');
     Route::delete('master-data/{type}/{id}', [MasterDataController::class, 'destroy'])->name('master-data.destroy');
+
+    // Homepage Settings
+    Route::get('homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'index'])->name('homepage-settings.index');
+    Route::post('homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'update'])->name('homepage-settings.update');
 });
 
 // Route to run artisan optimize

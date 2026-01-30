@@ -15,8 +15,9 @@ class WebController extends Controller
             ->get();
         $testimonials = \App\Models\Testimonial::where('status', true)->latest()->get();
         $services = \App\Models\Service::where('status', true)->orderBy('order_column')->get();
+        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
 
-        return view('index', compact('practitioners', 'testimonials', 'services'));
+        return view('index', compact('practitioners', 'testimonials', 'services', 'settings'));
     }
 
     public function comingSoon()

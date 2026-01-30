@@ -1,5 +1,9 @@
 <aside class="page-sidebar">
-    <div class="logo-wrapper d-flex align-items-center col-auto d-lg-none p-3">
+    <div class="logo-wrapper d-flex align-items-center gap-2 p-3 d-lg-none">
+        <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
+            <img src="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" alt="logo" style="width: 40px;">
+            <h4 class="mb-0 text-white f-w-700">ZAYA</h4>
+        </a>
         <a class="close-btn toggle-sidebar ms-auto" href="javascript:void(0)">
             <svg class="svg-color">
                 <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Category') }}"></use>
@@ -76,9 +80,10 @@
                 </a>
                 <ul class="sidebar-submenu">
                     <li> <a href="{{ route('admin.roles.index') }}">Roles</a></li>
+                    <li> <a href="{{ route('admin.homepage-settings.index') }}">Homepage Settings</a></li>
 
                     <li>
-                        <a class="submenu-title mt-2 fw-bold text-primary d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
                             Doctor Settings
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
@@ -91,7 +96,7 @@
                     </li>
 
                     <li>
-                        <a class="submenu-title mt-2 fw-bold text-primary d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
                             Practitioner Settings
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
@@ -103,7 +108,7 @@
                     </li>
 
                     <li>
-                        <a class="submenu-title mt-2 fw-bold text-primary d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
                             Client Settings
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
@@ -113,7 +118,7 @@
                     </li>
 
                     <li>
-                        <a class="submenu-title mt-2 fw-bold text-primary d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
                             Mindfulness Settings
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
@@ -124,7 +129,7 @@
                     </li>
 
                     <li>
-                        <a class="submenu-title mt-2 fw-bold text-primary d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
                             Translator Settings
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
@@ -135,7 +140,7 @@
                     </li>
 
                     <li>
-                        <a class="submenu-title mt-2 fw-bold text-primary d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
                             Yoga Therapist Settings
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>

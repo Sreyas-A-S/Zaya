@@ -30,6 +30,7 @@ class ServiceController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-2">';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-info viewService" title="View"><i class="iconly-Show icli" style="font-size: 20px;"></i></a>';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editService" title="Edit"><i class="iconly-Edit-Square icli" style="font-size: 20px;"></i></a>';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-danger deleteService" title="Delete"><i class="iconly-Delete icli" style="font-size: 20px;"></i></a>';
                     $btn .= '</div>';
