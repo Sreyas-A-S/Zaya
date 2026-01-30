@@ -347,8 +347,6 @@
             style="transition-delay: 100ms;">
             {{ $settings['testimonials_subtitle'] ?? 'Discover how our personalized Ayurvedic consultations have helped our community find balance, vitality and lasting wellness.' }}
         </p>
-        and lasting wellness.
-        </p>
     </div>
 </section>
 
