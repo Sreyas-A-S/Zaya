@@ -56,15 +56,14 @@
             </div>
 
             <h1 class="text-4xl md:text-5xl lg:text-5xl font-serif font-bold text-white mb-4 leading-tight">
-                Where Indian Wisdom Meets Modern Wellness
+                {{ $settings['hero_title'] ?? 'Where Indian Wisdom Meets Modern Wellness' }}
             </h1>
             <p class="text-lg md:text-xl text-white/90 font-light  mb-8">
-                Personalized wellness guided by experienced practitioners and trusted holistic experts.
+                {{ $settings['hero_subtitle'] ?? 'Personalized wellness guided by experienced practitioners and trusted holistic experts.' }}
             </p>
 
             <a href="{{ route('about-us') }}"
-                class="bg-white text-primary px-6 py-3 rounded-full text-lg font-medium border border-white hover:bg-primary hover:text-white transition-all shadow-lg hover:shadow-xl">Discover
-                Our Story</a>
+                class="bg-white text-primary px-6 py-3 rounded-full text-lg font-medium border border-white hover:bg-primary hover:text-white transition-all shadow-lg hover:shadow-xl">{{ $settings['hero_button_text'] ?? 'Discover Our Story' }}</a>
         </div>
     </div>
 </section>
@@ -83,11 +82,9 @@
         class="absolute top-[20rem] lg:top-36 right-0 z-[0]">
     <div class="container mx-auto px-6">
         <div class="text-center mb-16 animate-on-scroll">
-            <h2 class="text-4xl md:text-6xl font-serif text-primary mb-7 font-bold">Our Services</h2>
-            <h3 class="text-secondary font-serif text-2xl">Holistic Healing for Mind, Body & Soul</h3>
-            <p class="text-gray-500 text-base mt-6 max-w-lg mx-auto">Explore our specialized Ayurvedic treatments,
-                transformative Yoga therapy and professional Mindfulness counseling. Connect with global experts
-                dedicated to your wellness journey.</p>
+            <h2 class="text-4xl md:text-6xl font-serif text-primary mb-7 font-bold">{{ $settings['services_title'] ?? 'Our Services' }}</h2>
+            <h3 class="text-secondary font-serif text-2xl">{{ $settings['services_subtitle'] ?? 'Holistic Healing for Mind, Body & Soul' }}</h3>
+            <p class="text-gray-500 text-base mt-6 max-w-lg mx-auto">{{ $settings['services_description'] ?? 'Explore our specialized Ayurvedic treatments, transformative Yoga therapy and professional Mindfulness counseling. Connect with global experts dedicated to your wellness journey.' }}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-14">
@@ -110,8 +107,7 @@
 
         <div class="text-center mt-12">
             <a href="{{ route('services') }}"
-                class="border border-secondary hover:border-primary text-secondary hover:bg-primary hover:text-white px-8 py-3 rounded-full transition-all text-md">Browse
-                All Services</a>
+                class="border border-secondary hover:border-primary text-secondary hover:bg-primary hover:text-white px-8 py-3 rounded-full transition-all text-md">{{ $settings['services_button_text'] ?? 'Browse All Services' }}</a>
         </div>
     </div>
 </section>
@@ -120,11 +116,11 @@
 <section id="practitioners" class="pb-20">
     <div class="container mx-auto px-6">
         <div class="flex flex-col md:flex-row justify-between items-start mb-16 animate-on-scroll">
-            <h2 class="text-4xl md:text-5xl font-serif font-bold text-primary">Practitioner Directory</h2>
+            <h2 class="text-4xl md:text-5xl font-serif font-bold text-primary">{{ $settings['practitioners_title'] ?? 'Practitioner Directory' }}</h2>
 
             <!-- Search small -->
             <div class="mt-4 md:mt-0 relative w-full md:w-64 xl:w-80">
-                <input type="text" placeholder="Search practitioners..." id="practitioner-search-input"
+                <input type="text" placeholder="{{ $settings['practitioners_search_placeholder'] ?? 'Search practitioners...' }}" id="practitioner-search-input"
                     name="practitioner-search-input"
                     class="w-full pl-7 pr-14 py-5 rounded-full border text-primary border-[#EFC6B6] bg-white focus:outline-none focus:border-primary placeholder-[#CD8162]">
                 <i
@@ -200,11 +196,9 @@
                         </a>
 
 
-                        <!-- Button -->
                         <div class="text-center">
                             <button
-                                class="bg-primary text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-md text-sm">Book
-                                Now</button>
+                                class="bg-primary text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-md text-sm">{{ $settings['practitioners_button_text'] ?? 'Book Now' }}</button>
                         </div>
                     </div>
                 </div>
@@ -231,17 +225,14 @@
 <!-- Join Team Section -->
 <section class="pb-20 md:pb-28 bg-white text-center">
     <div class="container mx-auto px-6 max-w-4xl">
-        <h2 class="text-3xl md:text-5xl font-serif font-bold text-primary mb-6 animate-on-scroll">Let's Embrace
-            Wellness Together</h2>
+        <h2 class="text-3xl md:text-5xl font-serif font-bold text-primary mb-6 animate-on-scroll">{{ $settings['cta_title'] ?? "Let's Embrace Wellness Together" }}</h2>
         <p class="text-gray-500 text-base md:text-lg mb-12 leading-relaxed max-w-2xl mx-auto animate-on-scroll"
             style="transition-delay: 100ms;">
-            Connect with clients seeking authentic wellness. List your services,
-            manage bookings and join a professional community of Ayurvedic
-            and wellness experts.
+            {{ $settings['cta_description'] ?? 'Connect with clients seeking authentic wellness. List your services, manage bookings and join a professional community of Ayurvedic and wellness experts.' }}
         </p>
         <a href="#"
             class="animate-on-scroll border border-secondary text-secondary px-10 py-3 rounded-full hover:bg-secondary hover:text-white transition-all font-medium text-lg">
-            Join Our Team
+            {{ $settings['cta_button_text'] ?? 'Join Our Team' }}
         </a>
     </div>
 </section>
@@ -346,20 +337,19 @@
         class="absolute right-0 top-1/3 -translate-y-1/2 w-24 md:w-32 opacity-80 pointer-events-none">
 
     <div class="container mx-auto px-6 max-w-4xl relative z-10">
-        <h2 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary mb-8 animate-on-scroll">Real
-            Stories of
-            Healing</h2>
+        <h2 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary mb-8 animate-on-scroll">{{ $settings['testimonials_title'] ?? 'Real Stories of Healing' }}</h2>
 
         <div class="mb-8 animate-on-scroll">
             <span class="bg-[#F8E0BB] text-[#2E4B3C] px-8 py-2.5 rounded-full font-medium text-base inline-block">
-                Testimonials
+                {{ $settings['testimonials_badge'] ?? 'Testimonials' }}
             </span>
         </div>
 
         <p class="text-gray-500 text-base md:text-lg leading-relaxed max-w-2xl mx-auto animate-on-scroll"
             style="transition-delay: 100ms;">
-            Discover how our personalized Ayurvedic consultations have helped our community find balance, vitality
-            and lasting wellness.
+            {{ $settings['testimonials_subtitle'] ?? 'Discover how our personalized Ayurvedic consultations have helped our community find balance, vitality and lasting wellness.' }}
+        </p>
+        and lasting wellness.
         </p>
     </div>
 </section>
