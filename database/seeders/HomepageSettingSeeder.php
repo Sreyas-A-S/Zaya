@@ -156,6 +156,54 @@ class HomepageSettingSeeder extends Seeder
                 'type' => 'textarea',
                 'section' => 'blog'
             ],
+            [
+                'key' => 'blog_image_main',
+                'value' => 'frontend/assets/Eucalyptus-Essential-Oil.png',
+                'type' => 'image',
+                'section' => 'blog'
+            ],
+            [
+                'key' => 'blog_post_1_image',
+                'value' => 'frontend/assets/bed-air.png',
+                'type' => 'image',
+                'section' => 'blog'
+            ],
+            [
+                'key' => 'blog_post_1_title',
+                'value' => 'The Art of Resfull Sleep',
+                'type' => 'text',
+                'section' => 'blog'
+            ],
+            [
+                'key' => 'blog_post_1_read_time',
+                'value' => '7 min Read',
+                'type' => 'text',
+                'section' => 'blog'
+            ],
+            [
+                'key' => 'blog_post_2_image',
+                'value' => 'frontend/assets/ayurvedha-medicine.png',
+                'type' => 'image',
+                'section' => 'blog'
+            ],
+            [
+                'key' => 'blog_post_2_title',
+                'value' => 'Morning Rituals for Energy',
+                'type' => 'text',
+                'section' => 'blog'
+            ],
+            [
+                'key' => 'blog_post_2_read_time',
+                'value' => '15 min Read',
+                'type' => 'text',
+                'section' => 'blog'
+            ],
+            [
+                'key' => 'blog_footer_text',
+                'value' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod te',
+                'type' => 'textarea',
+                'section' => 'blog'
+            ],
         ];
 
         foreach ($settings as $setting) {

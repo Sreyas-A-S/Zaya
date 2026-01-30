@@ -252,7 +252,7 @@
             </div>
             <!-- Plant Image (Bottom) -->
             <div class="mt-auto flex justify-end translate-y-12 animate-on-scroll">
-                <img src="{{ asset('frontend/assets/Eucalyptus-Essential-Oil.png') }}" alt="Eucalyptus Essential Oil"
+                <img src="{{ isset($settings['blog_image_main']) ? (Str::startsWith($settings['blog_image_main'], 'frontend/') ? asset($settings['blog_image_main']) : asset('storage/' . $settings['blog_image_main'])) : asset('frontend/assets/Eucalyptus-Essential-Oil.png') }}" alt="Eucalyptus Essential Oil"
                     class="w-2/3 md:w-1/2 lg:w-[80%] object-contain">
             </div>
         </div>
@@ -268,15 +268,14 @@
             <!-- Bed Image Box -->
             <div class="bg-[#DFA6A9] relative group overflow-hidden flex items-center justify-center flex-[4] md:flex-[2] animate-on-scroll"
                 style="transition-delay: 100ms;">
-                <img src="{{ asset('frontend/assets/bed-air.png') }}" alt="Relaxing Bed"
+                <img src="{{ isset($settings['blog_post_1_image']) ? (Str::startsWith($settings['blog_post_1_image'], 'frontend/') ? asset($settings['blog_post_1_image']) : asset('storage/' . $settings['blog_post_1_image'])) : asset('frontend/assets/bed-air.png') }}" alt="Relaxing Bed"
                     class="w-full h-full object-cover drop-shadow-xl scale-110 group-hover:scale-105 transition-transform duration-700">
                 <div
                     class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-between">
                     <div class="flex justify-end">
-                        <span class="bg-gold text-secondary text-xs font-bold px-3 py-1.5 rounded-full">7 min
-                            Read</span>
+                        <span class="bg-gold text-secondary text-xs font-bold px-3 py-1.5 rounded-full">{{ $settings['blog_post_1_read_time'] ?? '7 min Read' }}</span>
                     </div>
-                    <h3 class="text-white font-sans text-lg font-normal">The Art of Resfull Sleep</h3>
+                    <h3 class="text-white font-sans text-lg font-normal">{{ $settings['blog_post_1_title'] ?? 'The Art of Resfull Sleep' }}</h3>
                 </div>
             </div>
         </div>
@@ -286,15 +285,14 @@
             <!-- Medicine Image -->
             <div class="h-64 lg:h-[30%] overflow-hidden relative group cursor-pointer animate-on-scroll"
                 style="transition-delay: 100ms;">
-                <img src="{{ asset('frontend/assets/ayurvedha-medicine.png') }}" alt="Ayurveda Medicine"
+                <img src="{{ isset($settings['blog_post_2_image']) ? (Str::startsWith($settings['blog_post_2_image'], 'frontend/') ? asset($settings['blog_post_2_image']) : asset('storage/' . $settings['blog_post_2_image'])) : asset('frontend/assets/ayurvedha-medicine.png') }}" alt="Ayurveda Medicine"
                     class="w-full h-full object-cover transition-transform duration-700  scale-110 group-hover:scale-105">
                 <div
                     class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-between">
                     <div class="flex justify-end">
-                        <span class="bg-[#F8E0BB] text-[#2E4B3C] text-xs font-bold px-3 py-1.5 rounded-full">12 min
-                            Read</span>
+                        <span class="bg-[#F8E0BB] text-[#2E4B3C] text-xs font-bold px-3 py-1.5 rounded-full">{{ $settings['blog_post_2_read_time'] ?? '15 min Read' }}</span>
                     </div>
-                    <h3 class="text-white font-sans text-lg font-normal">Balancing in Summer</h3>
+                    <h3 class="text-white font-sans text-lg font-normal">{{ $settings['blog_post_2_title'] ?? 'Morning Rituals for Energy' }}</h3>
                 </div>
             </div>
             <!-- Girl Image -->
@@ -323,7 +321,7 @@
             <div class="bg-[#2E4B3C] p-8 lg:p-12 flex items-center justify-center animate-on-scroll"
                 style="transition-delay: 300ms;">
                 <p class="text-white/90 text-sm md:text-base leading-relaxed">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod te
+                    {{ $settings['blog_footer_text'] ?? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod te' }}
                 </p>
             </div>
         </div>

@@ -94,7 +94,7 @@
                                                 <div class="d-flex align-items-center gap-3">
                                                     @if($setting->value)
                                                     <div class="mb-2">
-                                                        <img src="{{ asset('storage/' . $setting->value) }}" alt="Preview" class="img-thumbnail" style="max-height: 100px;">
+                                                        <img src="{{ Str::startsWith($setting->value, 'frontend/') ? asset($setting->value) : asset('storage/' . $setting->value) }}" alt="Preview" class="img-thumbnail" style="max-height: 100px;">
                                                     </div>
                                                     @endif
                                                     <div class="flex-grow-1">
