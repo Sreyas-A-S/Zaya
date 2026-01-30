@@ -130,6 +130,32 @@ class HomepageSettingSeeder extends Seeder
                 'type' => 'textarea',
                 'section' => 'testimonials'
             ],
+
+            // Blog Section
+            [
+                'key' => 'blog_title',
+                'value' => 'Wisdom Journal',
+                'type' => 'text',
+                'section' => 'blog'
+            ],
+            [
+                'key' => 'blog_subtitle',
+                'value' => 'Your Guide to Ayurvedic Mastery',
+                'type' => 'text',
+                'section' => 'blog'
+            ],
+            [
+                'key' => 'blog_button_text',
+                'value' => 'Explore Journal',
+                'type' => 'text',
+                'section' => 'blog'
+            ],
+            [
+                'key' => 'blog_description',
+                'value' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod te',
+                'type' => 'textarea',
+                'section' => 'blog'
+            ],
         ];
 
         foreach ($settings as $setting) {
