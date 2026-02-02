@@ -108,18 +108,39 @@
         }
 
         @keyframes float1 {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(5deg); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(5deg);
+            }
         }
 
         @keyframes float2 {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(-5deg); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(-5deg);
+            }
         }
 
         @keyframes float3 {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-12px) rotate(3deg); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-12px) rotate(3deg);
+            }
         }
 
         /* Input Styles */
@@ -229,17 +250,17 @@
     <!-- Main Content -->
     <div class="flex-1 relative overflow-x-hidden">
         <!-- Floating Leaves -->
-        <img src="{{ asset('frontend/assets/reg-floating-img-01.png') }}" 
-             alt="Decorative Leaf" 
-             class="floating-leaf floating-leaf-2 w-14 md:w-16 lg:w-20 right-4 md:right-12 lg:right-20 top-16 md:top-20">
-        
-        <img src="{{ asset('frontend/assets/reg-floating-img-02.png') }}" 
-             alt="Decorative Leaf" 
-             class="floating-leaf floating-leaf-1 w-16 md:w-20 lg:w-24 -left-2 md:left-0 top-40 md:top-52">
-        
-        <img src="{{ asset('frontend/assets/reg-floating-img-03.png') }}" 
-             alt="Decorative Leaf" 
-             class="floating-leaf floating-leaf-3 w-20 md:w-28 lg:w-36 right-0 bottom-32 md:bottom-40">
+        <img src="{{ asset('frontend/assets/reg-floating-img-01.png') }}"
+            alt="Decorative Leaf"
+            class="floating-leaf floating-leaf-2 w-14 md:w-16 lg:w-20 right-4 md:right-12 lg:right-20 top-16 md:top-20">
+
+        <img src="{{ asset('frontend/assets/reg-floating-img-02.png') }}"
+            alt="Decorative Leaf"
+            class="floating-leaf floating-leaf-1 w-16 md:w-20 lg:w-24 -left-2 md:left-0 top-40 md:top-52">
+
+        <img src="{{ asset('frontend/assets/reg-floating-img-03.png') }}"
+            alt="Decorative Leaf"
+            class="floating-leaf floating-leaf-3 w-20 md:w-28 lg:w-36 right-0 bottom-32 md:bottom-40">
 
         <div class="container mx-auto px-4 py-8 md:py-12 lg:py-16">
             <!-- Header -->
@@ -249,7 +270,7 @@
             </div>
 
             <!-- Registration Form -->
-            <form action="{{ route('register') }}" method="POST" class="max-w-5xl mx-auto">
+            <form action="{{ route('register') }}" method="POST" id="registration-form" class="max-w-5xl mx-auto">
                 @csrf
                 <input type="hidden" name="type" value="patient">
 
@@ -257,26 +278,26 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">First Name</label>
-                        <input type="text" name="first_name" value="{{ old('first_name') }}" 
-                               class="reg-input @error('first_name') border-red-500! @enderror" 
-                               placeholder="Enter First Name" required>
+                        <input type="text" name="first_name" value="{{ old('first_name') }}"
+                            class="reg-input @error('first_name') border-red-500! @enderror"
+                            placeholder="Enter First Name" required>
                         @error('first_name')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Middle Name</label>
-                        <input type="text" name="middle_name" value="{{ old('middle_name') }}" 
-                               class="reg-input" 
-                               placeholder="Enter Middle Name">
+                        <input type="text" name="middle_name" value="{{ old('middle_name') }}"
+                            class="reg-input"
+                            placeholder="Enter Middle Name">
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Last Name</label>
-                        <input type="text" name="last_name" value="{{ old('last_name') }}" 
-                               class="reg-input @error('last_name') border-red-500! @enderror" 
-                               placeholder="Enter Last Name" required>
+                        <input type="text" name="last_name" value="{{ old('last_name') }}"
+                            class="reg-input @error('last_name') border-red-500! @enderror"
+                            placeholder="Enter Last Name" required>
                         @error('last_name')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -286,20 +307,20 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Date of Birth</label>
                         <div class="date-input-wrapper">
-                            <input type="date" name="dob" value="{{ old('dob') }}" 
-                                   id="dob-input"
-                                   class="reg-input @error('dob') border-red-500! @enderror" 
-                                   placeholder="DOB" required>
+                            <input type="date" name="dob" value="{{ old('dob') }}"
+                                id="dob-input"
+                                class="reg-input @error('dob') border-red-500! @enderror"
+                                placeholder="DOB" required>
                         </div>
                         @error('dob')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Age</label>
-                        <input type="number" name="age" id="age-input" value="{{ old('age') }}" 
-                               class="reg-input cursor-not-allowed opacity-70" 
-                               placeholder="Enter Age" disabled>
+                        <input type="number" name="age" id="age-input" value="{{ old('age') }}"
+                            class="reg-input cursor-not-allowed opacity-70"
+                            placeholder="Enter Age" disabled>
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Gender</label>
@@ -318,7 +339,7 @@
                             <input type="hidden" name="gender" id="gender-input" value="{{ old('gender') }}" required>
                         </div>
                         @error('gender')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -327,20 +348,20 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Email</label>
-                        <input type="email" name="email" value="{{ old('email') }}" 
-                               class="reg-input @error('email') border-red-500! @enderror" 
-                               placeholder="Enter Email" required>
+                        <input type="email" name="email" value="{{ old('email') }}"
+                            class="reg-input @error('email') border-red-500! @enderror"
+                            placeholder="Enter Email" required>
                         @error('email')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Mobile No.</label>
-                        <input type="tel" name="mobile" value="{{ old('mobile') }}" 
-                               class="reg-input @error('mobile') border-red-500! @enderror" 
-                               placeholder="Enter Mobile No." required>
+                        <input type="tel" name="mobile" value="{{ old('mobile') }}"
+                            class="reg-input @error('mobile') border-red-500! @enderror"
+                            placeholder="Enter Mobile No." required>
                         @error('mobile')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -349,18 +370,18 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Address line 1</label>
-                        <input type="text" name="address_line_1" value="{{ old('address_line_1') }}" 
-                               class="reg-input @error('address_line_1') border-red-500! @enderror" 
-                               placeholder="Enter Address line 1" required>
+                        <input type="text" name="address_line_1" value="{{ old('address_line_1') }}"
+                            class="reg-input @error('address_line_1') border-red-500! @enderror"
+                            placeholder="Enter Address line 1" required>
                         @error('address_line_1')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Address line 2</label>
-                        <input type="text" name="address_line_2" value="{{ old('address_line_2') }}" 
-                               class="reg-input" 
-                               placeholder="Enter Address line 2">
+                        <input type="text" name="address_line_2" value="{{ old('address_line_2') }}"
+                            class="reg-input"
+                            placeholder="Enter Address line 2">
                     </div>
                 </div>
 
@@ -368,20 +389,20 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">City</label>
-                        <input type="text" name="city" value="{{ old('city') }}" 
-                               class="reg-input @error('city') border-red-500! @enderror" 
-                               placeholder="Enter City" required>
+                        <input type="text" name="city" value="{{ old('city') }}"
+                            class="reg-input @error('city') border-red-500! @enderror"
+                            placeholder="Enter City" required>
                         @error('city')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">State</label>
-                        <input type="text" name="state" value="{{ old('state') }}" 
-                               class="reg-input @error('state') border-red-500! @enderror" 
-                               placeholder="Enter State" required>
+                        <input type="text" name="state" value="{{ old('state') }}"
+                            class="reg-input @error('state') border-red-500! @enderror"
+                            placeholder="Enter State" required>
                         @error('state')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
@@ -391,12 +412,12 @@
                                 <span class="text-lg">🇮🇳</span>
                                 <i class="ri-arrow-down-s-line text-gray-400 text-sm"></i>
                             </span>
-                            <input type="text" name="country" value="{{ old('country', 'India') }}" 
-                                   class="reg-input country-select @error('country') border-red-500! @enderror" 
-                                   placeholder="Select Country" required>
+                            <input type="text" name="country" value="{{ old('country', 'India') }}"
+                                class="reg-input country-select @error('country') border-red-500! @enderror"
+                                placeholder="Select Country" required>
                         </div>
                         @error('country')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -407,25 +428,25 @@
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
                         <div class="relative">
                             <input type="password" name="password" id="password"
-                                   class="reg-input @error('password') border-red-500! @enderror" 
-                                   placeholder="Enter Password" required>
+                                class="reg-input @error('password') border-red-500! @enderror"
+                                placeholder="Enter Password" required>
                             <button type="button" onclick="togglePassword('password')"
-                                    class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                 <i class="ri-eye-line" id="password-icon"></i>
                             </button>
                         </div>
                         @error('password')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Confirm Password</label>
                         <div class="relative">
                             <input type="password" name="password_confirmation" id="password_confirmation"
-                                   class="reg-input" 
-                                   placeholder="Confirm Password" required>
+                                class="reg-input"
+                                placeholder="Confirm Password" required>
                             <button type="button" onclick="togglePassword('password_confirmation')"
-                                    class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                 <i class="ri-eye-line" id="password_confirmation-icon"></i>
                             </button>
                         </div>
@@ -500,11 +521,11 @@
             const today = new Date();
             let age = today.getFullYear() - dob.getFullYear();
             const monthDiff = today.getMonth() - dob.getMonth();
-            
+
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
                 age--;
             }
-            
+
             document.getElementById('age-input').value = age > 0 ? age : '';
         });
 
@@ -512,7 +533,7 @@
         function togglePassword(fieldId) {
             const field = document.getElementById(fieldId);
             const icon = document.getElementById(fieldId + '-icon');
-            
+
             if (field.type === 'password') {
                 field.type = 'text';
                 icon.classList.remove('ri-eye-line');

@@ -29,6 +29,11 @@ class LoginController extends Controller
 
     public function showLoginForm()
     {
+        return view('zaya-login');
+    }
+
+    public function showAdminLoginForm()
+    {
         return view('auth.login');
     }
 }
