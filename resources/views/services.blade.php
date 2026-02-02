@@ -32,7 +32,22 @@
 
         <!-- Full Width Image -->
         <div class="w-full overflow-hidden group">
-            <img src="{{ isset($settings['services_page_image']) ? (Str::startsWith($settings['services_page_image'], 'frontend/') ? asset($settings['services_page_image']) : asset('storage/' . $settings['services_page_image'])) : asset('frontend/assets/services-page-bg.png') }}" alt="Holistic Wellness"
+            @php
+            $bannerImg = asset('frontend/assets/services-page-bg.png');
+            if (isset($settings['services_page_image'])) {
+            $si = $settings['services_page_image'];
+            if (file_exists(public_path($si))) {
+            $bannerImg = asset($si);
+            } elseif (file_exists(public_path('storage/' . $si))) {
+            $bannerImg = asset('storage/' . $si);
+            } elseif (file_exists(storage_path('app/public/' . $si))) {
+            $bannerImg = asset('storage/' . $si);
+            } else {
+            $bannerImg = storage_path($si);
+            }
+            }
+            @endphp
+            <img src="{{ $bannerImg }}" alt="Holistic Wellness"
                 class="w-full h-[400px] object-cover align-top scale-110 transition-all duration-1000 group-hover:scale-125">
         </div>
     </div>
