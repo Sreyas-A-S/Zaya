@@ -1523,7 +1523,7 @@
         let input = btn.siblings('.new-master-data-input');
         let type = input.data('type');
         let value = input.val().trim();
-        let container = btn.closest('.col-md-12').find('.row').first(); // The row containing checkboxes
+        let container = btn.closest('.input-group').prev('.row'); // The row containing checkboxes
 
         if (!value) {
             return;

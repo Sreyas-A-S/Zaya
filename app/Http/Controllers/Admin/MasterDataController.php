@@ -31,6 +31,7 @@ class MasterDataController extends Controller
         'translator_services' => \App\Models\TranslatorService::class,
         'translator_specializations' => \App\Models\TranslatorSpecialization::class,
         'yoga_expertises' => \App\Models\YogaExpertise::class,
+        'service_categories' => \App\Models\ServiceCategory::class,
     ];
 
     protected $titles = [
@@ -47,6 +48,7 @@ class MasterDataController extends Controller
         'translator_services' => 'Translator Services',
         'translator_specializations' => 'Translator Specializations',
         'yoga_expertises' => 'Yoga Expertises',
+        'service_categories' => 'Service Categories',
     ];
 
     public function index(Request $request, $type)
@@ -92,11 +94,17 @@ class MasterDataController extends Controller
             'status' => 'required|boolean',
         ]);
 
-        $model = $this->types[$type];
-        $item = $model::create([
+        $data = [
             'name' => $request->name,
             'status' => $request->status,
-        ]);
+        ];
+
+        if ($request->has('parent_id') && !empty($request->parent_id)) {
+            $data['parent_id'] = $request->parent_id;
+        }
+
+        $model = $this->types[$type];
+        $item = $model::create($data);
 
         return response()->json(['success' => 'Item created successfully!', 'data' => $item]);
     }

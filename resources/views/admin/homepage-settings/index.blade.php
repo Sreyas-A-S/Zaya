@@ -70,7 +70,7 @@
                                 <ul class="nav nav-pills flex-column h-100" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                                     @foreach($settings as $section => $group)
                                     <button class="nav-link {{ $loop->first ? 'active' : '' }} text-start mb-2" id="v-pills-{{ $section }}-tab" data-bs-toggle="pill" data-bs-target="#v-pills-{{ $section }}" type="button" role="tab" aria-controls="v-pills-{{ $section }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}">
-                                        <i class="fa-solid fa-layer-group me-2"></i> {{ ucfirst($section) }} Section
+                                        <i class="fa-solid fa-layer-group me-2"></i> {{ ucwords(str_replace('_', ' ', $section)) }}
                                     </button>
                                     @endforeach
                                 </ul>
@@ -85,10 +85,16 @@
                                                 <label class="form-label fw-bold">{{ str_replace('_', ' ', ucfirst($setting->key)) }}</label>
 
                                                 @if($setting->type === 'text')
-                                                <input type="text" name="{{ $setting->key }}" value="{{ $setting->value }}" class="form-control" placeholder="Enter content...">
+                                                <input type="text" name="{{ $setting->key }}" value="{{ $setting->value }}" class="form-control" placeholder="Enter content..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>
+                                                @if($setting->max_length)
+                                                <div class="text-end text-muted" style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Max: {{ $setting->max_length }}</div>
+                                                @endif
 
                                                 @elseif($setting->type === 'textarea')
-                                                <textarea name="{{ $setting->key }}" class="form-control" rows="4" placeholder="Enter long text...">{{ $setting->value }}</textarea>
+                                                <textarea name="{{ $setting->key }}" class="form-control" rows="4" placeholder="Enter long text..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>{{ $setting->value }}</textarea>
+                                                @if($setting->max_length)
+                                                <div class="text-end text-muted" style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Max: {{ $setting->max_length }}</div>
+                                                @endif
 
                                                 @elseif($setting->type === 'image')
                                                 <div class="d-flex align-items-center gap-3">
@@ -126,6 +132,26 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
+        // Function to activate tab based on hash
+        function activateTabFromHash() {
+            let hash = window.location.hash;
+            if (hash) {
+                // Find button that targets this hash
+                let tabBtn = $(`button[data-bs-target="${hash}"]`);
+                if (tabBtn.length) {
+                    tabBtn.trigger('click');
+                }
+            }
+        }
+
+        // Run on load
+        activateTabFromHash();
+
+        // Run on hash change
+        $(window).on('hashchange', function() {
+            activateTabFromHash();
+        });
+
         $('#homepageSettingsForm').on('submit', function(e) {
             e.preventDefault();
 

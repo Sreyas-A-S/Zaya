@@ -80,7 +80,6 @@
                 </a>
                 <ul class="sidebar-submenu">
                     <li> <a href="{{ route('admin.roles.index') }}">Roles</a></li>
-                    <li> <a href="{{ route('admin.homepage-settings.index') }}">Homepage Settings</a></li>
 
                     <li>
                         <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
@@ -148,6 +147,19 @@
                             <li><a href="{{ route('admin.master-data.index', 'yoga_expertises') }}">Expertise</a></li>
                         </ul>
                     </li>
+                </ul>
+            </li>
+
+            <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Document') }}"></use>
+                    </svg>
+                    <h6 class="f-w-600">Page Settings</h6><i class="iconly-Arrow-Right-2 icli"> </i>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li> <a href="{{ route('admin.homepage-settings.index') }}">Homepage Settings</a></li>
+                    <li class="d-none"> <a href="{{ route('admin.about-settings.index') }}">About Us Settings</a></li>
+                    <li> <a href="{{ route('admin.services-settings.index') }}">Services Page Settings</a></li>
                 </ul>
             </li>
         </ul>

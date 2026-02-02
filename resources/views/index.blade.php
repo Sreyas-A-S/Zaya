@@ -90,7 +90,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-14">
             @foreach($services as $index => $service)
             <!-- Service {{ $index + 1 }} -->
-            <a href="{{ $service->link ?? '#' }}"
+            <a href="{{ $service->slug ? route('service-detail', $service->slug) : '#' }}"
                 class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
                 style="transition-delay: {{ $index * 100 }}ms;">
                 <div class="h-64 overflow-hidden mb-4 relative">

@@ -229,6 +229,7 @@ class DoctorController extends Controller
         $user->doctor()->create([
             'first_name' => $validatedData['first_name'],
             'last_name' => $validatedData['last_name'],
+            'full_name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
             'gender' => $validatedData['gender'],
             'dob' => $validatedData['dob'],
             'phone' => $validatedData['mobile_number'],
@@ -429,6 +430,7 @@ class DoctorController extends Controller
         $profile->update([
             'first_name' => $validatedData['first_name'],
             'last_name' => $validatedData['last_name'],
+            'full_name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
             'gender' => $validatedData['gender'],
             'dob' => $validatedData['dob'],
             'phone' => $validatedData['mobile_number'],

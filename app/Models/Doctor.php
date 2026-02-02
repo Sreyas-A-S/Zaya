@@ -25,7 +25,7 @@ class Doctor extends Model
         'dob' => 'date',
         'panchakarma_consultation' => 'boolean',
         'ayush_registration_confirmed' => 'boolean',
-        'guidelines_agreed' => 'boolean',
+        'ayush_guidelines_agreed' => 'boolean',
         'document_verification_consented' => 'boolean',
         'policies_agreed' => 'boolean',
         'prescription_understanding_agreed' => 'boolean',
