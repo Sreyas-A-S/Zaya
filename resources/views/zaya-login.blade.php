@@ -41,7 +41,7 @@
             <h2 class="text-2xl md:text-3xl font-sans! font-bold text-center mb-2 text-gray-900">Login</h2>
             <p class="text-gray-500 text-center mb-6 md:mb-10 text-md md:text-lg">Welcome Back!</p>
 
-            <form method="POST" action="{{ route('login') }}" class="space-y-6">
+            <form method="POST" action="" class="space-y-6">
                 @csrf
 
                 <div>
