@@ -71,6 +71,11 @@ class WebController extends Controller
         return view('zaya-login');
     }
 
+    public function clientRegister()
+    {
+        return view('client-register');
+    }
+
     public function serviceDetail($slug)
     {
         $service = \App\Models\Service::with('images')->where('slug', $slug)->where('status', true)->firstOrFail();
