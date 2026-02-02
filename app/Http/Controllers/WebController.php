@@ -52,6 +52,11 @@ class WebController extends Controller
         return view('client-register');
     }
 
+    public function practitionerRegister()
+    {
+        return view('practitioner-register');
+    }
+
     public function serviceDetail($slug)
     {
         // Services data array
