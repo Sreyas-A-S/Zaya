@@ -88,7 +88,7 @@
             </div>
 
             <div class="text-center text-gray-600 text-base">
-                Don't have an account? <a href="{{ route('register') }}"
+                Don't have an account? <a href="{{ route('client-register') }}"
                     class="text-[#FF6B6B] font-medium hover:underline ml-1 text-nowrap">Register Now</a>
             </div>
         </div>

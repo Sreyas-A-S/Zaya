@@ -47,6 +47,11 @@ class WebController extends Controller
         return view('zaya-login');
     }
 
+    public function clientRegister()
+    {
+        return view('client-register');
+    }
+
     public function serviceDetail($slug)
     {
         // Services data array

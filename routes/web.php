@@ -44,6 +44,7 @@ Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
 Route::get('/practitioner/{id}', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
 Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login');
+Route::get('/client-register', [WebController::class, 'clientRegister'])->name('client-register');
 Route::get('/service/{slug}', [WebController::class, 'serviceDetail'])->name('service-detail');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
