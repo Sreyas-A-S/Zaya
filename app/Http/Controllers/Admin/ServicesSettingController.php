@@ -44,7 +44,11 @@ class ServicesSettingController extends Controller
         }
 
         if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Services page settings updated successfully.']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Services page settings updated successfully.',
+                'path' => $path ?? null
+            ]);
         }
 
         return redirect()->back()->with('success', 'Services page settings updated successfully.');

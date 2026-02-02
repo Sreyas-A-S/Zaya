@@ -168,6 +168,22 @@
                 }
             });
         });
+
+        // Image Preview only (Upload happens on form submit)
+        $('.image-ajax-input').on('change', function() {
+            const input = this;
+            const key = $(this).data('key');
+            const file = input.files[0];
+
+            if (file) {
+                // Immediate Preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('.preview-' + key).attr('src', e.target.result).parent().removeClass('d-none');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
     });
 </script>
 @endsection

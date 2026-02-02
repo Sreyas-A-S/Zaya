@@ -15,14 +15,20 @@
 
     @elseif($setting->type === 'image')
     <div class="d-flex align-items-center gap-3">
-        @if($setting->value)
-        <div class="mb-2">
-            <img src="{{ Str::startsWith($setting->value, 'frontend/') ? asset($setting->value) : asset('storage/' . $setting->value) }}" alt="Preview" class="img-thumbnail" style="max-height: 100px;">
+        <div class="image-preview-container-{{ $setting->key }}">
+            @if($setting->value)
+            <div class="mb-2">
+                <img src="{{ Str::startsWith($setting->value, 'frontend/') ? asset($setting->value) : asset('storage/' . $setting->value) }}" alt="Preview" class="img-thumbnail preview-{{ $setting->key }}" style="max-height: 100px;">
+            </div>
+            @else
+            <div class="mb-2 d-none">
+                <img src="" alt="Preview" class="img-thumbnail preview-{{ $setting->key }}" style="max-height: 100px;">
+            </div>
+            @endif
         </div>
-        @endif
         <div class="flex-grow-1">
-            <input type="file" name="{{ $setting->key }}" class="form-control">
-            <small class="text-muted">Current: {{ $setting->value }}</small>
+            <input type="file" name="{{ $setting->key }}" id="input-{{ $setting->key }}" class="form-control image-ajax-input" data-key="{{ $setting->key }}">
+            <small class="text-muted">Current: <span class="current-path-{{ $setting->key }}">{{ $setting->value ?? 'None' }}</span></small>
         </div>
     </div>
     @endif
