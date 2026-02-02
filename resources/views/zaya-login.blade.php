@@ -7,17 +7,10 @@
     <title>Login - Zaya Wellness</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <style>
-        .login-bg-overlay {
-            background-image: url('{{ asset(' frontend/assets/login-bg.webp') }}');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-    </style>
 </head>
 
-<body class="bg-white h-screen flex gap-20 overflow-hidden p-5 md:p-10 max-lg:!pb-15 login-bg-overlay">
+<body class="bg-white h-screen flex gap-20 overflow-hidden p-5 md:p-10 max-lg:!pb-15"
+    style="background-image: url('{{ asset('frontend/assets/login-bg.webp') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
     <div class="absolute inset-0 bg-black/50 z-0"></div>
     <!-- Back Link -->
     <a href="{{ route('index') }}"
