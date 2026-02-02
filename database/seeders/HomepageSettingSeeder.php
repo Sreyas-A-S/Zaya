@@ -16,14 +16,14 @@ class HomepageSettingSeeder extends Seeder
             // Hero Section
             [
                 'key' => 'hero_title',
-                'value' => 'ZAYA: Embrace Wellness',
+                'value' => 'Where Indian Wisdom Meets Modern Wellness',
                 'type' => 'text',
                 'section' => 'hero',
                 'max_length' => 50
             ],
             [
                 'key' => 'hero_subtitle',
-                'value' => 'Traditional Ayurveda for Modern Wellness',
+                'value' => 'Personalized wellness guided by experienced practitioners and trusted holistic experts.',
                 'type' => 'text',
                 'section' => 'hero',
                 'max_length' => 100
