@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'wordpress' => [
+        'api_url' => env('WORDPRESS_API_URL', 'http://localhost/blog-zaya/wp-json/wp/v2'),
+    ],
+
 ];
