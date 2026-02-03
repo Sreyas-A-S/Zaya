@@ -20,6 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'first_name',
+        'middle_name',
         'last_name',
         'email',
         'password',
@@ -71,5 +72,34 @@ class User extends Authenticatable
     public function yogaTherapist()
     {
         return $this->hasOne(YogaTherapist::class);
+    }
+
+    /**
+     * Get the role associated with the user based on the 'role' string.
+     * Note: This assumes users.role matches roles.name (case sensitive or needs mapping).
+     */
+    public function roleData()
+    {
+        // Some users might have 'admin' but Role name is 'Super Admin'? 
+        // We'll need a mapping or ensure they match.
+        // For now, let's assume a mapping for common roles if they don't match exactly.
+        $roleName = $this->role;
+        if ($roleName === 'admin') $roleName = 'Super Admin';
+
+        return Role::where('name', $roleName)->first();
+    }
+
+    /**
+     * Check if the user has a specific permission.
+     */
+    public function hasPermission($permissionSlug)
+    {
+        $role = $this->roleData();
+        if (!$role) return false;
+
+        // Super Admin has all permissions
+        if ($role->name === 'Super Admin') return true;
+
+        return $role->permissions()->where('slug', $permissionSlug)->exists();
     }
 }

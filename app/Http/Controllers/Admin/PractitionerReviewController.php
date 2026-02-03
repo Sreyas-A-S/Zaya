@@ -9,6 +9,12 @@ use Yajra\DataTables\DataTables;
 
 class PractitionerReviewController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:practitioner-reviews-view')->only(['index']);
+        $this->middleware('permission:practitioner-reviews-delete')->only('destroy');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {

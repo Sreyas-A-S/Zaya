@@ -243,6 +243,41 @@
         .btn-cancel:hover {
             color: #374151;
         }
+
+        /* Toast Styles */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 9999px;
+            padding: 16px;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: 30px;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .toast.show {
+            visibility: visible;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background-color: #48BB78;
+        }
+
+        .toast.error {
+            background-color: #F56565;
+        }
     </style>
 </head>
 
@@ -269,10 +304,12 @@
                 <h1 class="text-2xl md:text-3xl lg:text-4xl font-sans! font-medium text-gray-900">Client Registration Form</h1>
             </div>
 
-            <!-- Registration Form -->
+            <!-- Toast Container -->
+            <div id="toast-container"></div>
+
             <form action="{{ route('register') }}" method="POST" id="registration-form" class="max-w-5xl mx-auto">
                 @csrf
-                <input type="hidden" name="type" value="patient">
+                <input type="hidden" name="role" value="client">
 
                 <!-- Row 1: Name Fields -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
@@ -319,8 +356,8 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Age</label>
                         <input type="number" name="age" id="age-input" value="{{ old('age') }}"
-                            class="reg-input cursor-not-allowed opacity-70"
-                            placeholder="Enter Age" disabled>
+                            class="reg-input bg-gray-100 cursor-not-allowed"
+                            placeholder="Age" readonly>
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Gender</label>
@@ -407,14 +444,25 @@
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Country</label>
-                        <div class="country-select-wrapper">
+                        <div class="country-select-wrapper custom-select relative" id="country-select-container">
                             <span class="country-flag">
-                                <span class="text-lg">🇮🇳</span>
+                                <span id="current-country-flag" class="text-lg">🇮🇳</span>
                                 <i class="ri-arrow-down-s-line text-gray-400 text-sm"></i>
                             </span>
-                            <input type="text" name="country" value="{{ old('country', 'India') }}"
-                                class="reg-input country-select @error('country') border-red-500! @enderror"
-                                placeholder="Select Country" required>
+                            <input type="text" name="country" id="country-input" value="{{ old('country', 'India') }}"
+                                class="reg-input country-select cursor-pointer"
+                                placeholder="Select Country" required autocomplete="off" onkeyup="filterCountries()">
+
+                            <div class="custom-options" id="country-options" style="max-height: 250px; overflow-y: auto;">
+                                @foreach(config('countries') as $code => $name)
+                                @php
+                                $flag = implode('', array_map(fn($char) => mb_chr(ord($char) + 127397), str_split($code)));
+                                @endphp
+                                <div class="custom-option country-option" data-value="{{ $name }}" data-flag="{{ $flag }}">
+                                    <span class="mr-2">{{ $flag }}</span> {{ $name }}
+                                </div>
+                                @endforeach
+                            </div>
                         </div>
                         @error('country')
                         <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
@@ -450,6 +498,7 @@
                                 <i class="ri-eye-line" id="password_confirmation-icon"></i>
                             </button>
                         </div>
+                        <span id="password-match-error" class="text-red-500 text-xs mt-1 pl-4 block h-4"></span>
                     </div>
                 </div>
             </form>
@@ -461,59 +510,151 @@
         <div class="container mx-auto px-4">
             <div class="max-w-5xl mx-auto flex items-center justify-end gap-4 md:gap-8">
                 <a href="{{ route('zaya-login') }}" class="btn-cancel">Cancel</a>
-                <button type="submit" form="registration-form" class="btn-create" onclick="document.querySelector('form').submit()">Create Account</button>
+                <button type="submit" form="registration-form" class="btn-create">Create Account</button>
             </div>
         </div>
     </footer>
 
     <script>
-        // Custom Gender Select
+        // Custom Select Logic (Generic)
         document.addEventListener('DOMContentLoaded', function() {
-            const genderSelect = document.getElementById('gender-select');
-            const genderInput = document.getElementById('gender-input');
-            const genderSelected = document.getElementById('gender-selected');
-            const trigger = genderSelect.querySelector('.custom-select-trigger');
-            const options = genderSelect.querySelectorAll('.custom-option');
+            function setupCustomSelect(selectId, inputId, selectedId, flagId = null) {
+                const select = document.getElementById(selectId);
+                const input = document.getElementById(inputId);
+                const selectedText = document.getElementById(selectedId);
+                const flagIcon = flagId ? document.getElementById(flagId) : null;
 
-            // Toggle dropdown
-            trigger.addEventListener('click', function() {
-                genderSelect.classList.toggle('open');
-            });
+                if (!select) return;
 
-            // Select option
-            options.forEach(option => {
-                option.addEventListener('click', function() {
+                const trigger = select.querySelector('.custom-select-trigger');
+                const options = select.querySelectorAll('.custom-option');
+
+                // Toggle dropdown
+                trigger.addEventListener('click', function() {
+                    // Close other open selects first
+                    document.querySelectorAll('.custom-select').forEach(s => {
+                        if (s !== select) s.classList.remove('open');
+                    });
+                    select.classList.toggle('open');
+                });
+
+                // Select option
+                options.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const value = this.getAttribute('data-value');
+                        const text = this.innerText; // Gets text including flag if present inline, but we want structured
+                        // Actually for Country, text includes flag. For Gender it doesn't.
+                        // Let's rely on data attributes if possible, or clean text.
+
+                        // For display in trigger:
+                        const displayFlag = this.getAttribute('data-flag');
+                        // Clean text (remove flag if it was in innerText) - simpler to just use textContent and trim?
+                        // The loop has <span class="mr-2">{{ $flag }}</span> {{ $name }}
+                        // So textContent has both. 
+                        // For the input value, use data-value.
+
+                        const displayText = this.childNodes[this.childNodes.length - 1].textContent.trim();
+
+                        input.value = value;
+                        selectedText.textContent = displayText || value; // Fallback
+
+                        if (flagIcon && displayFlag) {
+                            flagIcon.textContent = displayFlag;
+                            selectedText.textContent = value; // Show name only in trigger (flag is in overlay)
+                        } else {
+                            // Normal behavior (e.g. Gender)
+                            input.value = value;
+                            selectedText.textContent = displayText || value;
+                        }
+
+                        trigger.classList.add('has-value');
+
+                        // Remove selected from all, add to current
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+
+                        select.classList.remove('open');
+                    });
+                });
+
+                // Set initial value if exists
+                const initialValue = input.value;
+                if (initialValue) {
+                    const matchingOption = Array.from(options).find(opt => opt.getAttribute('data-value') === initialValue);
+                    if (matchingOption) {
+                        matchingOption.click();
+                    }
+                }
+            }
+
+            // Initialize Gender Select (Still uses generic Logic)
+            setupCustomSelect('gender-select', 'gender-input', 'gender-selected');
+
+            // Country Select Logic (Specific for new structure)
+            const countryInput = document.getElementById('country-input');
+            const countryContainer = document.getElementById('country-select-container');
+            const countryOptionsContainer = document.getElementById('country-options');
+            const currentCountryFlag = document.getElementById('current-country-flag');
+            const countryOptions = document.querySelectorAll('.country-option');
+
+            // Toggle Dropdown
+            function toggleCountryDropdown(e) {
+                e.stopPropagation();
+                // Close others
+                document.querySelectorAll('.custom-select').forEach(s => s.classList.remove('open'));
+
+                countryContainer.classList.toggle('open');
+            }
+
+            countryInput.addEventListener('click', toggleCountryDropdown);
+            countryContainer.querySelector('.country-flag').addEventListener('click', toggleCountryDropdown);
+
+            // Handle Option Click
+            countryOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     const value = this.getAttribute('data-value');
-                    const text = this.textContent;
+                    const flag = this.getAttribute('data-flag');
 
-                    genderInput.value = value;
-                    genderSelected.textContent = text;
-                    trigger.classList.add('has-value');
+                    countryInput.value = value;
+                    currentCountryFlag.textContent = flag;
 
-                    // Remove selected from all, add to current
-                    options.forEach(opt => opt.classList.remove('selected'));
-                    this.classList.add('selected');
-
-                    genderSelect.classList.remove('open');
+                    countryContainer.classList.remove('open');
                 });
             });
 
             // Close on outside click
             document.addEventListener('click', function(e) {
-                if (!genderSelect.contains(e.target)) {
-                    genderSelect.classList.remove('open');
+                if (!e.target.closest('#country-select-container')) {
+                    countryContainer.classList.remove('open');
+                }
+                if (!e.target.closest('.custom-select')) {
+                    document.querySelectorAll('.custom-select').forEach(s => s.classList.remove('open'));
                 }
             });
+        });
 
-            // Set initial value if exists
-            const initialValue = genderInput.value;
-            if (initialValue) {
-                const matchingOption = Array.from(options).find(opt => opt.getAttribute('data-value') === initialValue);
-                if (matchingOption) {
-                    matchingOption.click();
+        // Filter Countries Function
+        function filterCountries() {
+            const input = document.getElementById('country-input');
+            const filter = input.value.toUpperCase();
+            const container = document.getElementById('country-select-container');
+            const options = container.getElementsByClassName('country-option');
+
+            // Open dropdown when typing
+            if (!container.classList.contains('open')) {
+                container.classList.add('open');
+            }
+
+            for (let i = 0; i < options.length; i++) {
+                const txtValue = options[i].textContent || options[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    options[i].style.display = "";
+                } else {
+                    options[i].style.display = "none";
                 }
             }
-        });
+        }
 
         // Calculate Age from DOB
         document.getElementById('dob-input').addEventListener('change', function() {
@@ -544,6 +685,40 @@
                 icon.classList.add('ri-eye-line');
             }
         }
+
+        // Password Match Validation
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('password_confirmation');
+        const matchError = document.getElementById('password-match-error');
+
+        function checkPasswordMatch() {
+            if (confirmPasswordInput.value === '') {
+                matchError.textContent = '';
+                confirmPasswordInput.classList.remove('border-red-500!');
+                return;
+            }
+
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                matchError.textContent = 'Passwords do not match';
+                confirmPasswordInput.classList.add('border-red-500!');
+            } else {
+                matchError.textContent = '';
+                confirmPasswordInput.classList.remove('border-red-500!');
+            }
+        }
+
+        passwordInput.addEventListener('input', checkPasswordMatch);
+        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+
+        // Form Submit Validation
+        const registrationForm = document.getElementById('registration-form');
+        registrationForm.addEventListener('submit', function(e) {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                e.preventDefault();
+                checkPasswordMatch();
+                confirmPasswordInput.focus();
+            }
+        });
     </script>
 </body>
 

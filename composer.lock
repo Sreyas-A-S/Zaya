@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6165318093789f84190198a894e2e1b2",
+    "content-hash": "3931f1d7b84292c19c15d5a4d39638f9",
     "packages": [
         {
             "name": "brick/math",
@@ -3619,6 +3619,56 @@
                 "source": "https://github.com/ramsey/uuid/tree/4.9.2"
             },
             "time": "2025-12-14T04:43:48+00:00"
+        },
+        {
+            "name": "sreyas-a-s/unslay-shell",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Sreyas-A-S/UnSlay-Terminal.git",
+                "reference": "02e38273f6780478dbff64002a3744ce0aecc97a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Sreyas-A-S/UnSlay-Terminal/zipball/02e38273f6780478dbff64002a3744ce0aecc97a",
+                "reference": "02e38273f6780478dbff64002a3744ce0aecc97a",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
+                "php": "^8.0",
+                "symfony/process": "*"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "SreyasAS\\UnSlayShell\\UnSlayShellServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SreyasAS\\UnSlayShell\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sreyas-A-S",
+                    "email": "your-email@example.com"
+                }
+            ],
+            "description": "A Laravel web terminal package with style.",
+            "support": {
+                "issues": "https://github.com/Sreyas-A-S/UnSlay-Terminal/issues",
+                "source": "https://github.com/Sreyas-A-S/UnSlay-Terminal/tree/main"
+            },
+            "time": "2026-01-29T19:04:42+00:00"
         },
         {
             "name": "stella-maris/clock",
@@ -9076,7 +9126,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "sreyas-a-s/unslay-shell": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

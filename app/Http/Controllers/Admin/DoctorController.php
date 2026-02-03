@@ -19,13 +19,22 @@ use Yajra\DataTables\DataTables;
 
 class DoctorController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:doctors-view')->only(['index', 'show']);
+        $this->middleware('permission:doctors-create')->only(['create', 'store']);
+        $this->middleware('permission:doctors-edit')->only(['edit', 'update']);
+        $this->middleware('permission:doctors-delete')->only('destroy');
+        $this->middleware('permission:doctors-update-status')->only('updateStatus');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = User::where('role', 'doctor')
+            $query = User::where('role', 'doctor')
                 ->leftJoin('doctors', 'users.id', '=', 'doctors.user_id')
                 ->select([
                     'users.id',
@@ -41,13 +50,34 @@ class DoctorController extends Controller
                     'doctors.gender',
                     'doctors.country'
                 ])
-                ->latest('users.created_at')
-                ->get();
+                ->orderBy('users.created_at', 'desc'); // Default sort
 
-            return DataTables::of($data)
+            return DataTables::of($query)
                 ->addIndexColumn()
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('search') && !is_null($request->get('search')['value'])) {
+                        $searchValue = $request->get('search')['value'];
+                        $query->where(function ($q) use ($searchValue) {
+                            $q->where('users.name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.email', 'LIKE', "%$searchValue%")
+                                ->orWhere('doctors.phone', 'LIKE', "%$searchValue%")
+                                ->orWhere('doctors.ayush_registration_number', 'LIKE', "%$searchValue%")
+                                ->orWhere('doctors.city', 'LIKE', "%$searchValue%")
+                                ->orWhere('doctors.state', 'LIKE', "%$searchValue%")
+                                ->orWhere('doctors.country', 'LIKE', "%$searchValue%")
+                                ->orWhere('doctors.specialization', 'LIKE', "%$searchValue%")
+                                ->orWhere('doctors.consultation_expertise', 'LIKE', "%$searchValue%")
+                                ->orWhere('doctors.health_conditions_treated', 'LIKE', "%$searchValue%");
+                        });
+                    }
+                })
+                ->orderColumn('name', 'users.name $1')
+                ->orderColumn('email', 'users.email $1')
+                ->orderColumn('phone', 'doctors.phone $1')
+                ->orderColumn('country', 'doctors.country $1')
+                ->orderColumn('status', 'doctors.status $1')
                 ->editColumn('created_at', function ($row) {
-                    return $row->created_at ? $row->created_at->format('Y-m-d H:i') : '';
+                    return $row->created_at ? \Carbon\Carbon::parse($row->created_at)->format('Y-m-d H:i') : '';
                 })
                 ->editColumn('status', function ($row) {
                     $badgeClass = 'bg-danger';
@@ -59,7 +89,7 @@ class DoctorController extends Controller
 
                     $statusText = ucfirst($row->status ?? 'inactive');
 
-                    if (auth()->user() && auth()->user()->role === 'admin') {
+                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
                         return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
                     }
 
@@ -88,7 +118,6 @@ class DoctorController extends Controller
         $specializations = Specialization::where('status', true)->get();
         $expertises = AyurvedaExpertise::where('status', true)->get();
         $healthConditions = HealthCondition::where('status', true)->get();
-        $externalTherapies = ExternalTherapy::where('status', true)->get();
         $externalTherapies = ExternalTherapy::where('status', true)->get();
         $languages = \App\Models\Language::all();
 
@@ -411,11 +440,9 @@ class DoctorController extends Controller
 
         $degreeCertificatesPaths = $profile->degree_certificates_path ?? [];
         if ($request->hasFile('degree_certificates')) {
-            $newPaths = [];
             foreach ($request->file('degree_certificates') as $certificate) {
-                $newPaths[] = $certificate->store('doctor_documents/degree_certificates', 'public');
+                $degreeCertificatesPaths[] = $certificate->store('doctor_documents/degree_certificates', 'public');
             }
-            $degreeCertificatesPaths = $newPaths;
         }
 
         $socialLinks = [
@@ -488,7 +515,7 @@ class DoctorController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -498,5 +525,28 @@ class DoctorController extends Controller
         ]);
 
         return response()->json(['success' => 'Status updated successfully!']);
+    }
+
+    public function deleteCertificate(Request $request, $id)
+    {
+        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $profile = Doctor::where('user_id', $id)->firstOrFail();
+        $path = $request->path;
+
+        $certificates = $profile->degree_certificates_path ?? [];
+        if (($key = array_search($path, $certificates)) !== false) {
+            unset($certificates[$key]);
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+            $profile->degree_certificates_path = array_values($certificates);
+            $profile->save();
+            return response()->json(['success' => 'Certificate deleted successfully!']);
+        }
+
+        return response()->json(['error' => 'Certificate not found in records.'], 404);
     }
 }

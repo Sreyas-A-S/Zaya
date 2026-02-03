@@ -16,6 +16,8 @@ class ClientSeeder extends Seeder
 
         // Sample Client 1
         $user1 = \App\Models\User::create([
+            'first_name' => 'John',
+            'last_name' => 'Client',
             'name' => 'John Client',
             'email' => 'client@zaya.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password'),
@@ -42,10 +44,13 @@ class ClientSeeder extends Seeder
             'referral_type' => 'Social Media',
             'referrer_name' => 'Instagram',
             'profile_photo_path' => null,
+            'status' => 'active',
         ]);
 
         // Sample Client 2
         $user2 = \App\Models\User::create([
+            'first_name' => 'Jane',
+            'last_name' => 'Smith',
             'name' => 'Jane Smith',
             'email' => 'jane@zaya.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password'),
@@ -72,12 +77,18 @@ class ClientSeeder extends Seeder
             'referral_type' => 'Friend or Family',
             'referrer_name' => 'Sarah Connor',
             'profile_photo_path' => null,
+            'status' => 'active',
         ]);
 
         // Loop for more random clients
         for ($i = 0; $i < 5; $i++) {
+            $firstName = $faker->firstName;
+            $lastName = $faker->lastName;
+
             $user = \App\Models\User::create([
-                'name' => $faker->name,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'name' => $firstName . ' ' . $lastName,
                 'email' => $faker->unique()->safeEmail,
                 'password' => \Illuminate\Support\Facades\Hash::make('password'),
                 'role' => 'client',
@@ -106,6 +117,7 @@ class ClientSeeder extends Seeder
                 'referral_type' => $faker->randomElement(['Social Media', 'Website', 'Friend or Family']),
                 'referrer_name' => $faker->name,
                 'profile_photo_path' => null,
+                'status' => 'active',
             ]);
         }
     }

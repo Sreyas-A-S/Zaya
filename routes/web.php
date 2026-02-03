@@ -63,6 +63,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('yoga-therapists/{id}/status', [YogaTherapistController::class, 'updateStatus'])->name('yoga-therapists.status');
 
     Route::resource('clients', ClientController::class);
+    Route::post('clients/{id}/status', [ClientController::class, 'updateStatus'])->name('clients.status');
     Route::resource('translators', TranslatorController::class);
     Route::post('translators/{id}/status', [TranslatorController::class, 'updateStatus'])->name('translators.status');
     Route::resource('roles', RoleController::class);
@@ -75,6 +76,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::resource('services', ServiceController::class);
     Route::post('services/{id}/status', [ServiceController::class, 'updateStatus'])->name('services.status');
     Route::delete('services/image/{id}', [ServiceController::class, 'deleteGalleryImage'])->name('services.delete-image');
+    Route::post('doctors/delete-certificate/{id}', [DoctorController::class, 'deleteCertificate'])->name('doctors.delete-certificate');
 
     // Reviews
     Route::get('reviews/practitioners', [\App\Http\Controllers\Admin\PractitionerReviewController::class, 'index'])->name('reviews.practitioners.index');

@@ -10,15 +10,23 @@ use Yajra\DataTables\DataTables;
 
 class RoleController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:roles-view')->only(['index', 'showPermissions']);
+        $this->middleware('permission:roles-create')->only(['store']);
+        $this->middleware('permission:roles-edit')->only(['update', 'updatePermissions']);
+        $this->middleware('permission:roles-delete')->only('destroy');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
             $data = Role::withCount('permissions')->latest();
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function($row){
+                ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-2">';
-                    $btn .= '<a href="'.route('admin.roles.permissions', $row->id).'" class="text-info" title="Assign Permissions"><i class="fa-solid fa-lock" style="font-size: 18px;"></i></a>';
+                    $btn .= '<a href="' . route('admin.roles.permissions', $row->id) . '" class="text-info" title="Assign Permissions"><i class="fa-solid fa-lock" style="font-size: 18px;"></i></a>';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editRole" title="Edit"><i class="fa-solid fa-pen-to-square" style="font-size: 18px;"></i></a>';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-danger deleteRole" title="Delete"><i class="fa-solid fa-trash" style="font-size: 18px;"></i></a>';
                     $btn .= '</div>';

@@ -36,4 +36,12 @@ class LoginController extends Controller
     {
         return view('auth.login');
     }
+
+    protected function loggedOut(Request $request)
+    {
+        if (str_contains(url()->previous(), '/admin')) {
+            return redirect()->route('admin.login');
+        }
+        return redirect()->route('login');
+    }
 }

@@ -135,7 +135,7 @@
                                                     <label for="imageUpload"><i class="iconly-Edit icli"></i></label>
                                                 </div>
                                                 <div class="avatar-preview">
-                                                    <div id="imagePreview" style="background-image: url('{{ asset('admiro/assets/images/user/user.png') }}');">
+                                                    <div id="imagePreview" class="translator-avatar-preview">
                                                     </div>
                                                 </div>
                                             </div>
@@ -509,7 +509,8 @@
                     }
                 },
                 columns: [{
-                        data: null,
+                        data: 'id',
+                        name: 'users.id',
                         render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
@@ -562,6 +563,9 @@
                         orderable: false,
                         searchable: false
                     },
+                ],
+                order: [
+                    [0, 'desc']
                 ]
             });
 
@@ -1466,6 +1470,10 @@
 
         .stepper-horizontal .stepper-item.completed .step-name {
             color: #51bb25;
+        }
+
+        .translator-avatar-preview {
+            background-image: url('/admiro/assets/images/user/user.png');
         }
     </style>
     <style>

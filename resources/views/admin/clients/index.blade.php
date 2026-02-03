@@ -176,15 +176,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="form-label">First Name</label>
                             <input type="text" class="form-control" name="first_name" required placeholder="Enter first name">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Middle Name</label>
+                            <input type="text" class="form-control" name="middle_name" placeholder="Enter middle name">
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Last Name</label>
                             <input type="text" class="form-control" name="last_name" required placeholder="Enter last name">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label class="form-label">Email Address</label>
                             <input type="email" class="form-control" name="email" required placeholder="Enter email address">
                         </div>
@@ -498,12 +502,8 @@
                     name: 'patients.country'
                 },
                 {
-                    data: null,
-                    orderable: false,
-                    searchable: false,
-                    render: function() {
-                        return '<span class="badge bg-success">Active</span>';
-                    }
+                    data: 'status',
+                    name: 'patients.status'
                 },
                 {
                     data: 'action',
@@ -511,6 +511,9 @@
                     orderable: false,
                     searchable: false
                 }
+            ],
+            order: [
+                [0, 'desc']
             ]
         });
 
@@ -602,6 +605,7 @@
                 $('#form-method').val('PUT');
                 $('#client_id_hidden').val(data.id);
                 $('input[name="first_name"]').val(data.first_name);
+                $('input[name="middle_name"]').val(data.middle_name);
                 $('input[name="last_name"]').val(data.last_name);
                 $('input[name="email"]').val(data.email);
 
@@ -792,6 +796,7 @@
         $.get("{{ url('admin/clients') }}/" + id + "/edit", function(data) {
             $('#client_id_hidden').val(data.id);
             $('input[name="first_name"]').val(data.first_name);
+            $('input[name="middle_name"]').val(data.middle_name);
             $('input[name="last_name"]').val(data.last_name);
             $('input[name="email"]').val(data.email);
 
@@ -1035,6 +1040,49 @@
             }
         });
     });
+
+    // Handle Status Change Click
+    $(document).on('click', '.toggle-status', function() {
+        const $this = $(this);
+        const id = $this.data('id');
+        const currentStatus = $this.data('status');
+        const newStatus = currentStatus === 'active' ? 0 : 1;
+        const newStatusText = currentStatus === 'active' ? 'Inactive' : 'Active';
+
+        $('#status-client-id').val(id);
+        $('#status-new-value').val(newStatus);
+        $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
+        $('#status-confirmation-modal').modal('show');
+    });
+
+    // Handle Confirm Status Change
+    $('#confirm-status-btn').on('click', function() {
+        const id = $('#status-client-id').val();
+        const newStatus = $('#status-new-value').val();
+        const btn = $(this);
+
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
+
+        $.ajax({
+            url: "{{ url('admin/clients') }}/" + id + "/status",
+            type: 'POST',
+            data: {
+                _token: "{{ csrf_token() }}",
+                status: newStatus
+            },
+            success: function(response) {
+                $('#status-confirmation-modal').modal('hide');
+                showToast(response.success);
+                table.draw(false);
+            },
+            error: function() {
+                showToast('Failed to update status.', 'error');
+            },
+            complete: function() {
+                btn.prop('disabled', false).text('Confirm Change');
+            }
+        });
+    });
 </script>
 
 <!-- Call Confirmation Modal -->
@@ -1076,6 +1124,29 @@
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<!-- Status Confirmation Modal -->
+<div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Status Change</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Info-Circle icli text-primary mb-3" style="font-size: 50px;"></i>
+                <h5 id="status-confirmation-text">Are you sure you want to change the status?</h5>
+                <input type="hidden" id="status-client-id">
+                <input type="hidden" id="status-new-value">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
             </div>
         </div>
     </div>

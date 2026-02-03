@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 
 class TestimonialController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:testimonials-view')->only(['index']);
+        $this->middleware('permission:testimonials-create')->only(['store']);
+        $this->middleware('permission:testimonials-edit')->only(['update', 'updateStatus', 'edit']);
+        $this->middleware('permission:testimonials-delete')->only('destroy');
+    }
+
     /**
      * Display a listing of the resource.
      */

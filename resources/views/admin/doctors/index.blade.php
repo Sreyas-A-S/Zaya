@@ -796,6 +796,25 @@
     .stepper-horizontal .stepper-item.completed .step-name {
         color: #51bb25;
     }
+
+    /* Read More functionality for Bio */
+    .bio-content.collapsed {
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .read-more-link {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .read-more-link:hover {
+        text-decoration: underline !important;
+        opacity: 0.8;
+    }
 </style>
 
 <script>
@@ -877,7 +896,7 @@
                 },
                 {
                     data: 'status',
-                    name: 'status'
+                    name: 'doctors.status'
                 },
                 {
                     data: 'action',
@@ -886,7 +905,10 @@
                     searchable: false,
                     className: 'text-center'
                 },
-            ]
+            ],
+            order: [
+                [0, 'desc']
+            ] // Default sort by column 0 (which is the Row Index/ID logically here)
         });
 
 
@@ -1162,6 +1184,24 @@
             if (profile.aadhaar_path) $('#current-aadhaar').removeClass('d-none').html(`<small><a href="/storage/${profile.aadhaar_path}" target="_blank">View Aadhaar</a></small>`);
             if (profile.cancelled_cheque_path) $('#current-cheque').removeClass('d-none').html(`<small><a href="/storage/${profile.cancelled_cheque_path}" target="_blank">View Cheque</a></small>`);
 
+            if (profile.degree_certificates_path && profile.degree_certificates_path.length > 0) {
+                let certsHtml = '<div class="d-flex flex-wrap gap-2 mt-1">';
+                profile.degree_certificates_path.forEach((path, idx) => {
+                    certsHtml += `<div class="position-relative d-inline-block cert-item" id="cert-wrapper-${idx}">
+                        <a href="/storage/${path}" target="_blank" class="badge bg-light-primary text-primary border border-primary text-decoration-none p-2">
+                            <i class="fa fa-file-pdf-o me-1"></i> Degree ${idx + 1}
+                        </a>
+                        <a href="javascript:void(0)" class="text-danger ms-1 delete-cert-btn" onclick="deleteDegreeCertificate('${doctor.id}', '${path}', ${idx})">
+                            <i class="fa fa-times-circle"></i>
+                        </a>
+                    </div>`;
+                });
+                certsHtml += '</div>';
+                $('#current-degree-certs').removeClass('d-none').html(certsHtml);
+            } else {
+                $('#current-degree-certs').addClass('d-none').html('');
+            }
+
             // Remove required for files in edit
             $('input[name="profile_photo"], input[name="reg_certificate"], input[name="pan_upload"], input[name="cancelled_cheque"]').prop('required', false);
 
@@ -1241,7 +1281,10 @@
                         <hr>
                         <div class="mb-3">
                             <h6 class="f-w-600">Short Bio</h6>
-                            <p class="small text-muted">${p.short_doctor_bio || 'No bio provided.'}</p>
+                            <div class="bio-wrapper">
+                                <p class="small text-muted mb-0 bio-content collapsed">${p.short_doctor_bio || 'No bio provided.'}</p>
+                                ${p.short_doctor_bio && p.short_doctor_bio.length > 160 ? '<a href="javascript:void(0)" class="read-more-link small fw-bold mt-1 d-inline-block" style="color: var(--theme-default); text-decoration: none;">Read more...</a>' : ''}
+                            </div>
                         </div>
                         <div class="mb-3">
                             <h6 class="f-w-600">Languages</h6>
@@ -1305,6 +1348,11 @@
                                             ${p.reg_certificate_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> Reg Certificate</span>` : '<span class="badge badge-light-danger">Missing Reg Cert</span>'}
                                             ${p.pan_upload_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> PAN Upload</span>` : '<span class="badge badge-light-danger">Missing PAN</span>'}
                                             ${p.cancelled_cheque_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> Bank Proof</span>` : '<span class="badge badge-light-danger">Missing Bank Proof</span>'}
+                                            ${p.degree_certificates_path && p.degree_certificates_path.length > 0 ? p.degree_certificates_path.map((path, idx) => 
+                                                `<a href="/storage/${path}" target="_blank" class="badge badge-light-info text-decoration-none">
+                                                    <i class="fa-solid fa-file-pdf me-1"></i> Degree ${idx + 1}
+                                                </a>`
+                                            ).join('') : '<span class="badge badge-light-danger">No Degree Files</span>'}
                                         </div>
                                     </div>
                                 </div>
@@ -1589,6 +1637,19 @@
         $('#call-confirmation-modal').modal('show');
     });
 
+    // Handle Bio Read More Toggle
+    $(document).on('click', '.read-more-link', function() {
+        const wrapper = $(this).closest('.bio-wrapper');
+        const content = wrapper.find('.bio-content');
+        if (content.hasClass('collapsed')) {
+            content.removeClass('collapsed');
+            $(this).text('Read less');
+        } else {
+            content.addClass('collapsed');
+            $(this).text('Read more...');
+        }
+    });
+
     let deleteMasterBtnRef = null;
 
     // Handle Delete Master Data
@@ -1645,6 +1706,30 @@
             $(this).siblings('.add-master-data-btn').click();
         }
     });
+
+    window.deleteDegreeCertificate = function(doctorId, path, index) {
+        if (confirm('Are you sure you want to delete this specific certificate?')) {
+            $.ajax({
+                url: "{{ url('admin/doctors/delete-certificate') }}/" + doctorId,
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    path: path
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $(`#cert-wrapper-${index}`).fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                        showToast(response.success);
+                    }
+                },
+                error: function(xhr) {
+                    showToast(xhr.responseJSON?.error || 'Error deleting certificate', 'error');
+                }
+            });
+        }
+    };
 </script>
 <!-- Master Data Delete Modal -->
 <div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
