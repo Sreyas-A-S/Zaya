@@ -11,29 +11,32 @@
         /* Step Indicator Styles */
         .step-indicator {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             gap: 0;
         }
 
+        .step-indicator>.flex {
+            position: relative;
+            z-index: 2;
+        }
+
         .step-circle {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 1rem;
             transition: all 0.3s ease;
-            border: 2px solid #E5E7EB;
-            background: white;
-            color: #9CA3AF;
+            background: #E6E6E6;
+            color: #8B8B8B;
         }
 
         .step-circle.active {
             background: #60E48C;
-            border-color: #60E48C;
             color: white;
         }
 
@@ -44,30 +47,31 @@
         }
 
         .step-line {
-            width: 120px;
-            height: 2px;
-            background: #E5E7EB;
+            width: 140px;
+            height: 0;
             border: none;
+            border-top: 2px dashed #C0C0C0;
             margin: 0;
+            align-self: center;
+            margin-top: -28px;
+            /* Half of circle height + label offset to center with circles */
+            position: relative;
         }
 
         .step-line.active {
-            background: repeating-linear-gradient(90deg,
-                    #F5A623 0px,
-                    #F5A623 8px,
-                    transparent 8px,
-                    transparent 16px);
+            border-top: 2px dashed #60E48C;
         }
 
         .step-line.completed {
-            background: #22C55E;
+            border-color: #22C55E;
         }
 
         .step-label {
             font-size: 0.85rem;
             color: #9CA3AF;
-            margin-top: 8px;
+            margin-top: 10px;
             font-weight: 500;
+            white-space: nowrap;
         }
 
         .step-label.active {

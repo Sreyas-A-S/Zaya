@@ -256,8 +256,8 @@
                     </h2>
                     <h3 class="text-2xl md:text-3xl font-serif text-secondary mb-8">
                         {{ $settings['blog_title'] ?? 'Wisdom Journal' }}</h3>
-                    <button
-                        class="border border-secondary text-secondary px-8 py-3 rounded-full hover:bg-secondary hover:text-white transition-all text-lg">{{ $settings['blog_button_text'] ?? 'Explore Journal' }}</button>
+                    <a href="{{ route('blogs') }}"
+                        class="border border-secondary text-secondary px-8 py-3 rounded-full hover:bg-secondary hover:text-white transition-all text-lg">{{ $settings['blog_button_text'] ?? 'Explore Journal' }}</a>
                 </div>
                 <!-- Plant Image (Bottom) -->
                 <div class="mt-auto flex justify-end translate-y-12 animate-on-scroll">

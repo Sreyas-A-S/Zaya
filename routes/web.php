@@ -48,6 +48,8 @@ Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login
 Route::get('/client-register', [WebController::class, 'clientRegister'])->name('client-register');
 Route::get('/practitioner-register', [WebController::class, 'practitionerRegister'])->name('practitioner-register');
 Route::get('/service/{slug}', [WebController::class, 'serviceDetail'])->name('service-detail');
+Route::get('/blogs', [WebController::class, 'blogs'])->name('blogs');
+Route::get('/blog/{slug}', [WebController::class, 'blogDetail'])->name('blog-detail');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
