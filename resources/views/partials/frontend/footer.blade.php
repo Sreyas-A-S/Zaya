@@ -50,28 +50,36 @@
                         </button>
                     </div>
                     <div class="flex gap-4 mt-6">
-                        <a href="#" class="w-6 h-6 hover:opacity-80 transition-opacity">
+                        @if(!empty($site_settings['website_url']))
+                        <a href="{{ $site_settings['website_url'] }}" target="_blank" class="w-6 h-6 hover:opacity-80 transition-opacity">
                             <img src="{{ asset('frontend/assets/web-icon.svg') }}" alt="Website" class="w-full h-full">
                         </a>
-                        <a href="#" class="w-6 h-6 hover:opacity-80 transition-opacity">
+                        @endif
+                        @if(!empty($site_settings['instagram_url']))
+                        <a href="{{ $site_settings['instagram_url'] }}" target="_blank" class="w-6 h-6 hover:opacity-80 transition-opacity">
                             <img src="{{ asset('frontend/assets/instagram-icon.svg') }}" alt="Instagram"
                                 class="w-full h-full">
                         </a>
-                        <a href="#" class="w-6 h-6 hover:opacity-80 transition-opacity">
+                        @endif
+                        @if(!empty($site_settings['facebook_url']))
+                        <a href="{{ $site_settings['facebook_url'] }}" target="_blank" class="w-6 h-6 hover:opacity-80 transition-opacity">
                             <img src="{{ asset('frontend/assets/facebook-line-icon.svg') }}" alt="Facebook"
                                 class="w-full h-full">
                         </a>
-                        <a href="#" class="w-6 h-6 hover:opacity-80 transition-opacity">
+                        @endif
+                        @if(!empty($site_settings['whatsapp_number']))
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $site_settings['whatsapp_number']) }}" target="_blank" class="w-6 h-6 hover:opacity-80 transition-opacity">
                             <img src="{{ asset('frontend/assets/whatsapp-icon.svg') }}" alt="WhatsApp"
                                 class="w-full h-full">
                         </a>
+                        @endif
                     </div>
                 </div>
             </div>
 
             <div
                 class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
-                <p>&copy; 2024 Zaya Wellness. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} Zaya Wellness. All rights reserved.</p>
                 <div class="flex gap-4">
                     <a href="#" class="hover:text-primary">Privacy Policy</a>
                     <a href="#" class="hover:text-primary">Terms of Service</a>

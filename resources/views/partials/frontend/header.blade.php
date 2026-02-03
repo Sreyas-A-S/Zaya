@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            <!-- Services Dropdown -->
+            <!-- Services Dropdown (Desktop) -->
             <div class="relative group">
                 <button class="flex items-center gap-1 hover:text-primary transition-colors focus:outline-none py-4">
                     Services <i
@@ -40,11 +40,11 @@
                 </button>
                 <div
                     class="absolute top-full left-0 w-56 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden">
-                    <a href="{{ route('services') }}"
+                    <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">Ayurveda</a>
-                    <a href="#"
+                    <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">Yoga</a>
-                    <a href="#"
+                    <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">Counselling</a>
                 </div>
             </div>
@@ -95,9 +95,9 @@
         <div class="flex flex-col gap-2">
             <span class="text-lg font-medium text-secondary">Services</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
-                <a href="{{ route('services') }}" class="text-gray-600 text-sm">Ayurveda</a>
-                <a href="#" class="text-gray-600 text-sm">Yoga</a>
-                <a href="#" class="text-gray-600 text-sm">Counselling</a>
+                <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing" class="text-gray-600 text-sm">Ayurveda</a>
+                <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing" class="text-gray-600 text-sm">Yoga</a>
+                <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing" class="text-gray-600 text-sm">Counselling</a>
             </div>
         </div>
 

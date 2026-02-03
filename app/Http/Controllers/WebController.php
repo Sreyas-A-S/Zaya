@@ -27,13 +27,37 @@ class WebController extends Controller
 
     public function aboutUs()
     {
-        return view('about');
+        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+        return view('about', compact('settings'));
     }
 
-    public function services()
+    public function services(Request $request)
     {
-        $services = \App\Models\Service::where('status', true)->orderBy('order_column')->get();
-        return view('services', compact('services'));
+        $settings = \App\Models\HomepageSetting::where('section', 'services_page')->pluck('value', 'key');
+        $query = \App\Models\Service::where('status', true);
+
+        if ($request->filled('category')) {
+            $categoryName = $request->category;
+            $query->whereHas('categories', function ($q) use ($categoryName) {
+                $q->where('name', $categoryName);
+            });
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%$search%")
+                    ->orWhere('description', 'like', "%$search%");
+            });
+        }
+
+        $services = $query->orderBy('order_column', 'asc')->get();
+
+        if ($request->ajax()) {
+            return view('partials.frontend.services-grid', compact('services'))->render();
+        }
+
+        return view('services', compact('settings', 'services'));
     }
 
     public function practitionerDetail($id)
@@ -59,45 +83,8 @@ class WebController extends Controller
 
     public function serviceDetail($slug)
     {
-        // Services data array
-        $services = [
-            'ayurveda-panchakarma' => [
-                'slug' => 'ayurveda-panchakarma',
-                'title' => 'Ayurveda & Panchakarma',
-                'image' => 'ayurveda-and-panchakarma.png',
-                'description' => 'Rooted in 5,000 years of tradition, our Ayurveda sessions offer personalized detoxification and rejuvenation.',
-            ],
-            'yoga-therapy' => [
-                'slug' => 'yoga-therapy',
-                'title' => 'Yoga Therapy',
-                'image' => 'yoga-therapy.png',
-                'description' => 'Yoga Therapy goes beyond flexibility. It is a clinical approach to healing that combines specific asanas, breathwork...',
-            ],
-            'spiritual-guidance' => [
-                'slug' => 'spiritual-guidance',
-                'title' => 'Spiritual Guidance',
-                'image' => 'spiritual-guidance.png',
-                'description' => 'Connect with Authentic Guides and Spiritual Counselors.',
-            ],
-            'mindfulness-counselling' => [
-                'slug' => 'mindfulness-counselling',
-                'title' => 'Mindfulness Counselling',
-                'image' => 'mindfulness-counselling.png',
-                'description' => 'Evidence-Based Mindfulness for Emotional and Mental Balance.',
-            ],
-        ];
-
-        // Check if service exists
-        if (!isset($services[$slug])) {
-            abort(404);
-        }
-
-        $service = $services[$slug];
-
-        // Get other services (excluding current one)
-        $otherServices = array_filter($services, function ($s) use ($slug) {
-            return $s['slug'] !== $slug;
-        });
+        $service = \App\Models\Service::with('images')->where('slug', $slug)->where('status', true)->firstOrFail();
+        $otherServices = \App\Models\Service::where('slug', '!=', $slug)->where('status', true)->inRandomOrder()->take(4)->get();
 
         return view('service-detail', compact('service', 'otherServices'));
     }

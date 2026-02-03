@@ -7,12 +7,12 @@ use Illuminate\Http\Request;
 use App\Models\HomepageSetting;
 use Illuminate\Support\Facades\Storage;
 
-class HomepageSettingController extends Controller
+class ServicesSettingController extends Controller
 {
     public function index()
     {
-        $settings = HomepageSetting::where('section', '!=', 'about_page')->get()->groupBy('section');
-        return view('admin.homepage-settings.index', compact('settings'));
+        $settings = HomepageSetting::where('section', 'services_page')->get();
+        return view('admin.services-settings.index', compact('settings'));
     }
 
     public function update(Request $request)
@@ -29,12 +29,13 @@ class HomepageSettingController extends Controller
                     }
                     return redirect()->back()->withErrors(["{$key}" => "The {$key} field cannot be longer than {$setting->max_length} characters."]);
                 }
+
                 if ($setting->type === 'image' && $request->hasFile($key)) {
                     // Delete old image if exists
                     if ($setting->value && Storage::disk('public')->exists($setting->value)) {
                         Storage::disk('public')->delete($setting->value);
                     }
-                    $path = $request->file($key)->store('homepage', 'public');
+                    $path = $request->file($key)->store('services', 'public');
                     $setting->update(['value' => $path]);
                 } else {
                     $setting->update(['value' => $value]);
@@ -43,9 +44,13 @@ class HomepageSettingController extends Controller
         }
 
         if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Homepage settings updated successfully.']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Services page settings updated successfully.',
+                'path' => $path ?? null
+            ]);
         }
 
-        return redirect()->back()->with('success', 'Homepage settings updated successfully.');
+        return redirect()->back()->with('success', 'Services page settings updated successfully.');
     }
 }

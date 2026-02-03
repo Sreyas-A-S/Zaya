@@ -6,12 +6,12 @@
 <section class="pt-[144px] md:pt-[150px] pb-20 px-4 md:px-6 bg-white min-h-screen">
     <div class="container mx-auto">
         <!-- Heading -->
-        <h1 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-10 tracking-wide">About Us</h1>
+        <h1 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-10 tracking-wide">{{ $settings['about_title'] ?? 'About Us' }}</h1>
 
         <!-- Banner and Overlay Content -->
         <div class="group relative w-full h-[400px] md:h-[500px] rounded-[30px] overflow-hidden shadow-2xl mb-12">
             <!-- Background Image -->
-            <img src="{{ asset('frontend/assets/about-us-bg.png') }}" alt="Zaya Team Meeting"
+            <img src="{{ isset($settings['about_banner_image']) ? (Str::startsWith($settings['about_banner_image'], 'frontend/') ? asset($settings['about_banner_image']) : asset('storage/' . $settings['about_banner_image'])) : asset('frontend/assets/about-us-bg.png') }}" alt="Zaya Team Meeting"
                 class="w-full h-full object-cover scale-110 transition-all duration-1000 group-hover:scale-125">
 
             <!-- Dark Overlay -->
@@ -22,15 +22,15 @@
                 <div class="flex flex-col md:flex-row md:items-end justify-between w-full gap-6">
                     <div class="max-w-3xl">
                         <h2 class="text-3xl md:text-5xl font-serif font-bold text-white">
-                            The Hearts and Minds <br> Behind ZAYA
+                            {!! nl2br($settings['about_banner_title'] ?? "The Hearts and Minds \n Behind ZAYA") !!}
                         </h2>
                     </div>
 
                     <div>
-                        <button
+                        <a href="#team-section"
                             class="border border-white text-white px-8 py-3 rounded-full hover:bg-primary hover:text-white hover:border-primary transition-all text-lg font-medium whitespace-nowrap">
-                            Meet Our Team
-                        </button>
+                            {{ $settings['about_banner_button_text'] ?? 'Meet Our Team' }}
+                        </a>
                     </div>
                 </div>
             </div>
@@ -39,27 +39,22 @@
         <!-- Description Text -->
         <div class="max-w-4xl mx-auto text-center">
             <p class="text-lg md:text-xl text-black/80 leading-relaxed font-regular !leading-8">
-                ZAYA is more than a platform that is a bridge between traditional Ayurvedic wisdom and modern
-                wellness. Meet the dedicated team working to empower practitioners and provide clients with a
-                seamless path to holistic health.
+                {{ $settings['about_description'] ?? 'ZAYA is more than a platform that is a bridge between traditional Ayurvedic wisdom and modern wellness. Meet the dedicated team working to empower practitioners and provide clients with a seamless path to holistic health.' }}
             </p>
         </div>
     </div>
 </section>
 
 <!-- Team Section -->
-<section class="pt-4 pb-10 bg-white">
+<section id="team-section" class="pt-4 pb-10 bg-white">
     <div class="container-fluid">
         <!-- Section Header -->
         <div class="text-center mb-16 md:mb-24">
             <h2
                 class="text-4xl md:text-6xl font-serif font-bold text-primary mb-4 flex items-center justify-center gap-4">
-                <span>Meet</span>
-                <span class="font-serif italic font-normal text-3xl md:text-5xl lowercase">the</span>
-                <span>Team</span>
+                {{ $settings['about_team_title'] ?? 'Meet the Team' }}
             </h2>
-            <p class="text-gray-500 font-serif text-lg md:text-xl tracking-wide">The Visionaries Behind ZAYA
-                Wellness</p>
+            <p class="text-gray-500 font-serif text-lg md:text-xl tracking-wide">{{ $settings['about_team_subtitle'] ?? 'The Visionaries Behind ZAYA Wellness' }}</p>
         </div>
 
         <!-- Team Grid -->

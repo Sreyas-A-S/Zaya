@@ -109,307 +109,312 @@
                                                     <input type='file' id="imageUpload" name="profile_photo" accept=".png, .jpg, .jpeg" />
                                                     <label for="imageUpload"><i class="iconly-Edit icli"></i></label>
                                                 </div>
+                                                <div class="avatar-preview">
+                                                    <div id="imagePreview" style="background-image: url('{{ asset('admiro/assets/images/user/user.png') }}');">
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <label class="form-label mt-2">Profile Photo</label>
+                                        <div class="col-md-4">
+                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="first_name" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="last_name" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="email" name="email" required>
+                                        </div>
+                                        <div class="col-md-4 password-field">
+                                            <label class="form-label">Password <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="password" name="password">
+                                        </div>
+                                        <div class="col-md-4 password-field">
+                                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="password" name="password_confirmation">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="phone" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Gender</label>
+                                            <select class="form-select" name="gender">
+                                                <option value="">Select Gender</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Date of Birth</label>
+                                            <input class="form-control" type="date" name="dob">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Address Line 2</label>
+                                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">City <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="city" required placeholder="City">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">State <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="state" required placeholder="State">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Zip Code <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Country <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="country" required>
+                                                <option value="">Select Country</option>
+                                                @foreach(config('countries') as $country)
+                                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>{{ $country }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                         </div>
-                        <style>
-                            .language-capability-row {
-                                background: #f8f9fa;
-                                border-radius: 8px;
-                                padding: 10px 15px;
-                                margin-top: 10px;
-                                border: 1px solid #e9ecef;
-                                transition: all 0.3s ease;
-                            }
-
-                            .language-capability-row:hover {
-                                background: #f1f3f5;
-                                border-color: #dee2e6;
-                            }
-
-                            .language-capability-title {
-                                font-weight: 600;
-                                color: #2c3e50;
-                                font-size: 0.95rem;
-                            }
-
-                            .capability-checkboxes .form-check-input {
-                                width: 1.1em;
-                                height: 1.1em;
-                                margin-top: 0.2em;
-                            }
-                        </style>
-                        <div class="col-md-4">
-                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="first_name" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="last_name" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                            <input class="form-control" type="email" name="email" required>
-                        </div>
-                        <div class="col-md-4 password-field">
-                            <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password">
-                        </div>
-                        <div class="col-md-4 password-field">
-                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password_confirmation">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Phone <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="phone" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Gender</label>
-                            <select class="form-select" name="gender">
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Date of Birth</label>
-                            <input class="form-control" type="date" name="dob">
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street">
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Address Line 2</label>
-                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">City <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="city" required placeholder="City">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">State <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="state" required placeholder="State">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Country <span class="text-danger">*</span></label>
-                            <select class="form-select" name="country" required>
-                                <option value="">Select Country</option>
-                                @foreach(config('countries') as $country)
-                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>{{ $country }}</option>
-                                @endforeach
-                            </select>
-                        </div>
                     </div>
-                </div>
+                    <style>
+                        .language-capability-row {
+                            background: #f8f9fa;
+                            border-radius: 8px;
+                            padding: 10px 15px;
+                            margin-top: 10px;
+                            border: 1px solid #e9ecef;
+                            transition: all 0.3s ease;
+                        }
 
-                <!-- Step 2: Professional Identity & Registration -->
-                <div class="step-content d-none" id="step-2">
-                    <div class="row g-3">
-                        <h6 class="text-primary border-bottom pb-2">Professional Details</h6>
-                        <div class="col-md-6">
-                            <label class="form-label">Yoga Therapist Type</label>
-                            <select class="form-select" name="yoga_therapist_type">
-                                <option value="" selected disabled>Select Type</option>
-                                <option value="Certified Yoga Therapist">Certified Yoga Therapist</option>
-                                <option value="Yoga Instructor with Therapy Training">Yoga Instructor with Therapy Training</option>
-                                <option value="Ayurvedic Yoga Therapist">Ayurvedic Yoga Therapist</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Years of Experience</label>
-                            <input class="form-control" type="number" name="years_of_experience">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Current Clinic / Studio / Organization</label>
-                            <input class="form-control" type="text" name="current_organization">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Workplace Address</label>
-                            <input class="form-control" type="text" name="workplace_address">
-                        </div>
-                        <div class="col-md-12">
-                            <div class="col-md-6">
-                                <label class="form-label">Website (Optional)</label>
-                                <input class="form-control" type="url" name="website_social_links[website]" placeholder="https://">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Instagram (Optional)</label>
-                                <input class="form-control" type="url" name="website_social_links[instagram]" placeholder="https://instagram.com/">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">LinkedIn (Optional)</label>
-                                <input class="form-control" type="url" name="website_social_links[linkedin]" placeholder="https://linkedin.com/in/">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">YouTube (Optional)</label>
-                                <input class="form-control" type="url" name="website_social_links[youtube]" placeholder="https://youtube.com/@">
-                            </div>
-                        </div>
+                        .language-capability-row:hover {
+                            background: #f1f3f5;
+                            border-color: #dee2e6;
+                        }
 
-                        <h6 class="text-primary border-bottom pb-2 mt-4">Registration & Affiliation</h6>
-                        <div class="col-md-4">
-                            <label class="form-label">Registration No / Membership ID</label>
-                            <input class="form-control" type="text" name="registration_number">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Affiliated Body</label>
-                            <input class="form-control" type="text" name="affiliated_body">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Upload Registration Proof</label>
-                            <input class="form-control" type="file" name="registration_proof">
-                        </div>
-                    </div>
-                </div>
+                        .language-capability-title {
+                            font-weight: 600;
+                            color: #2c3e50;
+                            font-size: 0.95rem;
+                        }
 
-                <!-- Step 3: Qualifications -->
-                <div class="step-content d-none" id="step-3">
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label">Yoga Therapy Certification Details</label>
-                            <textarea class="form-control" name="certification_details" rows="3"></textarea>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Upload Certificates (Multiple)</label>
-                            <input class="form-control" type="file" name="certificates[]" multiple>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Additional Certifications (Optional)</label>
-                            <textarea class="form-control" name="additional_certifications" rows="2"></textarea>
-                        </div>
-                    </div>
+                        .capability-checkboxes .form-check-input {
+                            width: 1.1em;
+                            height: 1.1em;
+                            margin-top: 0.2em;
+                        }
+                    </style>
                 </div>
-
-                <!-- Step 4: Expertise & Setup -->
-                <div class="step-content d-none" id="step-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Areas of Expertise</label>
-                            <div class="row" style="max-height: 300px; overflow-y:auto;">
-                                @foreach($areasOfExpertise as $area)
-                                <div class="col-12">
-                                    <div class="form-check checkbox-primary d-flex align-items-center">
-                                        <input class="form-check-input" type="checkbox" name="areas_of_expertise[]" value="{{ $area->name }}" id="area_{{ $area->id }}">
-                                        <label class="form-check-label flex-grow-1 mb-0" for="area_{{ $area->id }}">{{ $area->name }}</label>
-                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $area->id }}" data-type="yoga_expertises"><i class="fa fa-trash"></i></a>
-                                    </div>
-                                </div>
-                                @endforeach
-                                <div class="col-12 mt-2">
-                                    <div class="input-group input-group-sm">
-                                        <input type="text" class="form-control new-master-data-input" data-type="yoga_expertises" placeholder="Add New Expertise">
-                                        <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Session Setup</label>
-                            <div class="mb-3">
-                                <label class="form-label">Consultation Modes</label>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    @foreach($consultationModes as $mode)
-                                    <div class="form-check checkbox-info">
-                                        <input class="form-check-input" type="checkbox" name="consultation_modes[]" value="{{ $mode }}" id="mode_{{ $loop->index }}">
-                                        <label class="form-check-label" for="mode_{{ $loop->index }}">{{ $mode }}</label>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Languages Spoken</label>
-                                <select class="form-select" id="languages_select" multiple>
-                                    @foreach($languages as $lang)
-                                    <option value="{{ $lang->name }}">{{ $lang->name }}</option>
-                                    @endforeach
-                                </select>
-                                <div id="languages_capabilities_container"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 5: Profile -->
-                <div class="step-content d-none" id="step-5">
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label">Short Bio</label>
-                            <textarea class="form-control" name="short_bio" rows="4"></textarea>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Therapy Approach / Style</label>
-                            <textarea class="form-control" name="therapy_approach" rows="3"></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 6: Identity & Payment -->
-                <div class="step-content d-none" id="step-6">
-                    <div class="row g-3">
-                        <h6 class="text-primary">Identity Proof</h6>
-                        <div class="col-md-6">
-                            <label class="form-label">Government ID Type</label>
-                            <input class="form-control" type="text" name="gov_id_type">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Upload ID Proof</label>
-                            <input class="form-control" type="file" name="gov_id_upload">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">PAN Number</label>
-                            <input class="form-control" type="text" name="pan_number">
-                        </div>
-                        <hr>
-                        <h6 class="text-primary">Banking Details</h6>
-                        <div class="col-md-6">
-                            <label class="form-label">Bank Holder Name</label>
-                            <input class="form-control" type="text" name="bank_holder_name">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Bank Name</label>
-                            <input class="form-control" type="text" name="bank_name">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Account Number</label>
-                            <input class="form-control" type="text" name="account_number">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">IFSC Code</label>
-                            <input class="form-control" type="text" name="ifsc_code">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">UPI ID</label>
-                            <input class="form-control" type="text" name="upi_id">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Upload Cancelled Cheque</label>
-                            <input class="form-control" type="file" name="cancelled_cheque">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Buttons -->
-                <div class="d-flex justify-content-between mt-4">
-                    <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">Previous</button>
-                    <div class="ms-auto">
-                        <button type="button" class="btn btn-primary" id="next-btn">Next</button>
-                        <button type="submit" class="btn btn-success" id="submit-btn" style="display: none;">Submit</button>
-                    </div>
-                </div>
-                </form>
             </div>
+
+            <!-- Step 2: Professional Identity & Registration -->
+            <div class="step-content d-none" id="step-2">
+                <div class="row g-3">
+                    <h6 class="text-primary border-bottom pb-2">Professional Details</h6>
+                    <div class="col-md-6">
+                        <label class="form-label">Yoga Therapist Type</label>
+                        <select class="form-select" name="yoga_therapist_type">
+                            <option value="" selected disabled>Select Type</option>
+                            <option value="Certified Yoga Therapist">Certified Yoga Therapist</option>
+                            <option value="Yoga Instructor with Therapy Training">Yoga Instructor with Therapy Training</option>
+                            <option value="Ayurvedic Yoga Therapist">Ayurvedic Yoga Therapist</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Years of Experience</label>
+                        <input class="form-control" type="number" name="years_of_experience">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Current Clinic / Studio / Organization</label>
+                        <input class="form-control" type="text" name="current_organization">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Workplace Address</label>
+                        <input class="form-control" type="text" name="workplace_address">
+                    </div>
+                    <div class="col-md-12">
+                        <div class="col-md-6">
+                            <label class="form-label">Website (Optional)</label>
+                            <input class="form-control" type="url" name="website_social_links[website]" placeholder="https://">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Instagram (Optional)</label>
+                            <input class="form-control" type="url" name="website_social_links[instagram]" placeholder="https://instagram.com/">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">LinkedIn (Optional)</label>
+                            <input class="form-control" type="url" name="website_social_links[linkedin]" placeholder="https://linkedin.com/in/">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">YouTube (Optional)</label>
+                            <input class="form-control" type="url" name="website_social_links[youtube]" placeholder="https://youtube.com/@">
+                        </div>
+                    </div>
+
+                    <h6 class="text-primary border-bottom pb-2 mt-4">Registration & Affiliation</h6>
+                    <div class="col-md-4">
+                        <label class="form-label">Registration No / Membership ID</label>
+                        <input class="form-control" type="text" name="registration_number">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Affiliated Body</label>
+                        <input class="form-control" type="text" name="affiliated_body">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Upload Registration Proof</label>
+                        <input class="form-control" type="file" name="registration_proof">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Qualifications -->
+            <div class="step-content d-none" id="step-3">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label">Yoga Therapy Certification Details</label>
+                        <textarea class="form-control" name="certification_details" rows="3"></textarea>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Upload Certificates (Multiple)</label>
+                        <input class="form-control" type="file" name="certificates[]" multiple>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Additional Certifications (Optional)</label>
+                        <textarea class="form-control" name="additional_certifications" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Expertise & Setup -->
+            <div class="step-content d-none" id="step-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Areas of Expertise</label>
+                        <div class="row" style="max-height: 300px; overflow-y:auto;">
+                            @foreach($areasOfExpertise as $area)
+                            <div class="col-12">
+                                <div class="form-check checkbox-primary d-flex align-items-center">
+                                    <input class="form-check-input" type="checkbox" name="areas_of_expertise[]" value="{{ $area->name }}" id="area_{{ $area->id }}">
+                                    <label class="form-check-label flex-grow-1 mb-0" for="area_{{ $area->id }}">{{ $area->name }}</label>
+                                    <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $area->id }}" data-type="yoga_expertises"><i class="fa fa-trash"></i></a>
+                                </div>
+                            </div>
+                            @endforeach
+                            <div class="col-12 mt-2">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control new-master-data-input" data-type="yoga_expertises" placeholder="Add New Expertise">
+                                    <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Session Setup</label>
+                        <div class="mb-3">
+                            <label class="form-label">Consultation Modes</label>
+                            <div class="d-flex gap-2 flex-wrap">
+                                @foreach($consultationModes as $mode)
+                                <div class="form-check checkbox-info">
+                                    <input class="form-check-input" type="checkbox" name="consultation_modes[]" value="{{ $mode }}" id="mode_{{ $loop->index }}">
+                                    <label class="form-check-label" for="mode_{{ $loop->index }}">{{ $mode }}</label>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Languages Spoken</label>
+                            <select class="form-select" id="languages_select" multiple>
+                                @foreach($languages as $lang)
+                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                @endforeach
+                            </select>
+                            <div id="languages_capabilities_container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Profile -->
+            <div class="step-content d-none" id="step-5">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label">Short Bio</label>
+                        <textarea class="form-control" name="short_bio" rows="4"></textarea>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Therapy Approach / Style</label>
+                        <textarea class="form-control" name="therapy_approach" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: Identity & Payment -->
+            <div class="step-content d-none" id="step-6">
+                <div class="row g-3">
+                    <h6 class="text-primary">Identity Proof</h6>
+                    <div class="col-md-6">
+                        <label class="form-label">Government ID Type</label>
+                        <input class="form-control" type="text" name="gov_id_type">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Upload ID Proof</label>
+                        <input class="form-control" type="file" name="gov_id_upload">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">PAN Number</label>
+                        <input class="form-control" type="text" name="pan_number">
+                    </div>
+                    <hr>
+                    <h6 class="text-primary">Banking Details</h6>
+                    <div class="col-md-6">
+                        <label class="form-label">Bank Holder Name</label>
+                        <input class="form-control" type="text" name="bank_holder_name">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Bank Name</label>
+                        <input class="form-control" type="text" name="bank_name">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Account Number</label>
+                        <input class="form-control" type="text" name="account_number">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">IFSC Code</label>
+                        <input class="form-control" type="text" name="ifsc_code">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">UPI ID</label>
+                        <input class="form-control" type="text" name="upi_id">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Upload Cancelled Cheque</label>
+                        <input class="form-control" type="file" name="cancelled_cheque">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">Previous</button>
+                <div class="ms-auto">
+                    <button type="button" class="btn btn-primary" id="next-btn">Next</button>
+                    <button type="submit" class="btn btn-success" id="submit-btn" style="display: none;">Submit</button>
+                </div>
+            </div>
+            </form>
         </div>
     </div>
+</div>
 </div>
 </div>
 </div>

@@ -9,8 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 
-<body class="bg-white h-screen flex gap-20 overflow-hidden p-5 md:p-10 max-lg:pb-15!"
-    style="background-image: url('{{ asset('frontend/assets/login-bg.webp') }}') ; background-size: cover; background-position: center; background-repeat: no-repeat;">
+<body class="bg-white h-screen flex gap-20 overflow-hidden p-5 md:p-10 max-lg:!pb-15"
+    style="background-image: url('{{ asset('frontend/assets/login-bg.webp') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
     <div class="absolute inset-0 bg-black/50 z-0"></div>
     <!-- Back Link -->
     <a href="{{ route('index') }}"
@@ -41,7 +41,7 @@
             <h2 class="text-2xl md:text-3xl font-sans! font-bold text-center mb-2 text-gray-900">Login</h2>
             <p class="text-gray-500 text-center mb-6 md:mb-10 text-md md:text-lg">Welcome Back!</p>
 
-            <form method="POST" class="space-y-6">
+            <form method="POST" action="" class="space-y-6">
                 @csrf
 
                 <div>
@@ -49,7 +49,7 @@
                         placeholder="Email or Mobile number"
                         class="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 placeholder-gray-400 bg-white shadow-sm transition-all @error('email') border-red-500 @enderror">
                     @error('email')
-                        <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
+                    <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
                     @enderror
                 </div>
 
@@ -61,7 +61,7 @@
                         <i class="ri-eye-line text-xl"></i>
                     </button>
                     @error('password')
-                        <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
+                    <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
                     @enderror
                 </div>
 

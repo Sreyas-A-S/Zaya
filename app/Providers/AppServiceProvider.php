@@ -21,5 +21,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
+
+        view()->composer('*', function ($view) {
+            $view->with('site_settings', \App\Models\HomepageSetting::pluck('value', 'key'));
+        });
     }
 }

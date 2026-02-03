@@ -20,6 +20,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Artisan;
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::get('admin/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
 Route::post('login', [LoginController::class, 'login']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
@@ -74,6 +75,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
 
     Route::resource('services', ServiceController::class);
     Route::post('services/{id}/status', [ServiceController::class, 'updateStatus'])->name('services.status');
+    Route::delete('services/image/{id}', [ServiceController::class, 'deleteGalleryImage'])->name('services.delete-image');
 
     // Reviews
     Route::get('reviews/practitioners', [\App\Http\Controllers\Admin\PractitionerReviewController::class, 'index'])->name('reviews.practitioners.index');
@@ -89,6 +91,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // Homepage Settings
     Route::get('homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'index'])->name('homepage-settings.index');
     Route::post('homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'update'])->name('homepage-settings.update');
+
+    // About Us Settings
+    Route::get('about-settings', [\App\Http\Controllers\Admin\AboutSettingController::class, 'index'])->name('about-settings.index');
+    Route::post('about-settings', [\App\Http\Controllers\Admin\AboutSettingController::class, 'update'])->name('about-settings.update');
+
+    // Services Page Settings
+    Route::get('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'index'])->name('services-settings.index');
+    Route::post('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'update'])->name('services-settings.update');
 });
 
 // Route to run artisan optimize

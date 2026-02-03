@@ -10,8 +10,18 @@ class Service extends Model
         'title',
         'description',
         'image',
-        'link',
+        'slug',
         'status',
         'order_column',
     ];
+
+    public function categories()
+    {
+        return $this->belongsToMany(ServiceCategory::class, 'service_service_category');
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ServiceImage::class);
+    }
 }

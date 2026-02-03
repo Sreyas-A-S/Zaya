@@ -14,57 +14,44 @@ class ServiceSeeder extends Seeder
     {
         $services = [
             [
-                'title' => 'Yoga Therapy',
-                'image' => 'frontend/assets/service-yoga.png',
+                'title' => 'Ayurveda & Panchakarma',
+                'image' => 'frontend/assets/ayurveda-and-panchakarma.png',
+                'description' => 'Rooted in 5,000 years of tradition, our Ayurveda sessions offer personalized detoxification and rejuvenation.',
+                'slug' => 'ayurveda-panchakarma',
                 'status' => true,
                 'order_column' => 1,
             ],
             [
-                'title' => 'Naturopathy',
-                'image' => 'frontend/assets/service-naturopathy.png',
+                'title' => 'Yoga Therapy',
+                'image' => 'frontend/assets/yoga-therapy.png',
+                'description' => 'Yoga Therapy goes beyond flexibility. It is a clinical approach to healing that combines specific asanas, breathwork...',
+                'slug' => 'yoga-therapy',
                 'status' => true,
                 'order_column' => 2,
             ],
             [
-                'title' => 'Pranic Healing',
-                'image' => 'frontend/assets/service-pranic.png',
+                'title' => 'Spiritual Guidance',
+                'image' => 'frontend/assets/spiritual-guidance.png',
+                'description' => 'Explore the deeper aspects of your existence. These sessions provide a safe space.',
+                'slug' => 'spiritual-guidance',
                 'status' => true,
                 'order_column' => 3,
             ],
             [
-                'title' => 'Massage Therapy',
-                'image' => 'frontend/assets/massage-therapy.jpg',
+                'title' => 'Mindfulness Counselling',
+                'image' => 'frontend/assets/mindfulness-counselling.png',
+                'description' => 'Cultivate a non-judgmental awareness of the present moment. Our sessions bridge traditional psychology...',
+                'slug' => 'mindfulness-counselling',
                 'status' => true,
                 'order_column' => 4,
-            ],
-            [
-                'title' => 'Hypnotherapy',
-                'image' => 'frontend/assets/hypnotherapy.jpg',
-                'status' => true,
-                'order_column' => 5,
-            ],
-            [
-                'title' => 'Graphotherapy',
-                'image' => 'frontend/assets/graphotherapy.jpg',
-                'status' => true,
-                'order_column' => 6,
-            ],
-            [
-                'title' => 'Sophrology',
-                'image' => 'frontend/assets/sophrology.jpg',
-                'status' => true,
-                'order_column' => 7,
-            ],
-            [
-                'title' => 'Life Coach',
-                'image' => 'frontend/assets/life-coach.jpg',
-                'status' => true,
-                'order_column' => 8,
             ],
         ];
 
         foreach ($services as $service) {
-            Service::create($service);
+            Service::updateOrCreate(
+                ['title' => $service['title']],
+                $service
+            );
         }
     }
 }
