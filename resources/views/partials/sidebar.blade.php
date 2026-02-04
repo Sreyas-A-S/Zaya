@@ -196,7 +196,7 @@
                     <li> <a href="{{ route('admin.homepage-settings.index') }}">Homepage Settings</a></li>
                     @endif
                     @if(auth()->user()->hasPermission('about-page-view'))
-                    <li class="d-none"> <a href="{{ route('admin.about-settings.index') }}">About Us Settings</a></li>
+                    <li> <a href="{{ route('admin.about-settings.index') }}">About Us Settings</a></li>
                     @endif
                     @if(auth()->user()->hasPermission('services-page-view'))
                     <li> <a href="{{ route('admin.services-settings.index') }}">Services Page Settings</a></li>
