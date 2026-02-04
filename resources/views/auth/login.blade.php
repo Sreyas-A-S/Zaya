@@ -12,7 +12,7 @@
           <div class="text-center"><a class="logo" href="{{ route('login') }}"><img class="img-fluid for-dark d-block m-auto" src="{{ asset('admiro/assets/images/logo/zaya-logo-admin.svg') }}" alt="logo" style="height: 100px;"></a></div>
 
           <div class="login-main">
-            <form class="theme-form" method="POST" action="{{ route('login') }}">
+            <form class="theme-form" method="POST" action="{{ route('admin.login.submit') }}">
               @csrf
               <h2 class="text-center">Sign in to account</h2>
               <p class="text-center">Enter your email &amp; password to login</p>

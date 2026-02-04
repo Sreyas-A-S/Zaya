@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Artisan;
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('admin/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
+Route::post('admin/login', [LoginController::class, 'adminLogin'])->name('admin.login.submit');
 Route::post('login', [LoginController::class, 'login']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
