@@ -14,27 +14,59 @@ use Illuminate\Validation\Rule;
 
 class YogaTherapistController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:yoga-therapists-view')->only(['index', 'show']);
+        $this->middleware('permission:yoga-therapists-create')->only(['create', 'store']);
+        $this->middleware('permission:yoga-therapists-edit')->only(['edit', 'update']);
+        $this->middleware('permission:yoga-therapists-delete')->only('destroy');
+        $this->middleware('permission:yoga-therapists-update-status')->only('updateStatus');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = User::where('role', 'yoga_therapist')
+            $query = User::where('role', 'yoga_therapist')
                 ->leftJoin('yoga_therapists', 'users.id', '=', 'yoga_therapists.user_id')
                 ->select([
                     'users.id',
                     'users.name',
                     'users.email',
+                    'users.created_at',
                     'yoga_therapists.gender',
                     'yoga_therapists.phone',
                     'yoga_therapists.country',
                     'yoga_therapists.current_organization',
                     'yoga_therapists.profile_photo_path',
-                    'yoga_therapists.status'
+                    'yoga_therapists.status',
+                    'yoga_therapists.city',
+                    'yoga_therapists.state'
                 ])
-                ->latest('users.created_at')
-                ->get();
+                ->orderBy('users.created_at', 'desc');
 
-            return DataTables::of($data)
+            return DataTables::of($query)
                 ->addIndexColumn()
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('search') && !is_null($request->get('search')['value'])) {
+                        $searchValue = $request->get('search')['value'];
+                        $query->where(function ($q) use ($searchValue) {
+                            $q->where('users.name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.email', 'LIKE', "%$searchValue%")
+                                ->orWhere('yoga_therapists.phone', 'LIKE', "%$searchValue%")
+                                ->orWhere('yoga_therapists.country', 'LIKE', "%$searchValue%")
+                                ->orWhere('yoga_therapists.city', 'LIKE', "%$searchValue%")
+                                ->orWhere('yoga_therapists.state', 'LIKE', "%$searchValue%")
+                                ->orWhere('yoga_therapists.current_organization', 'LIKE', "%$searchValue%")
+                                ->orWhere('yoga_therapists.yoga_therapist_type', 'LIKE', "%$searchValue%")
+                                ->orWhere('yoga_therapists.areas_of_expertise', 'LIKE', "%$searchValue%");
+                        });
+                    }
+                })
+                ->orderColumn('name', 'users.name $1')
+                ->orderColumn('email', 'users.email $1')
+                ->orderColumn('phone', 'yoga_therapists.phone $1')
+                ->orderColumn('country', 'yoga_therapists.country $1')
+                ->orderColumn('status', 'yoga_therapists.status $1')
                 ->editColumn('status', function ($row) {
                     $badgeClass = 'bg-danger';
                     if ($row->status == 'active') {
@@ -45,7 +77,7 @@ class YogaTherapistController extends Controller
 
                     $statusText = ucfirst($row->status ?? 'inactive');
 
-                    if (auth()->user() && auth()->user()->role === 'admin') {
+                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
                         return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '">' . $statusText . '</span>';
                     }
                     return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
@@ -340,7 +372,7 @@ class YogaTherapistController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Storage;
 
 class AboutSettingController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:about-page-view')->only(['index']);
+        $this->middleware('permission:about-page-edit')->only(['update']);
+    }
+
     public function index()
     {
         $settings = HomepageSetting::where('section', 'about_page')->get();

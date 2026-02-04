@@ -17,6 +17,14 @@ use Illuminate\Support\Str;
 
 class MasterDataController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:master-data-view')->only(['index']);
+        $this->middleware('permission:master-data-create')->only(['store']);
+        $this->middleware('permission:master-data-edit')->only(['update']);
+        $this->middleware('permission:master-data-delete')->only('destroy');
+    }
+
     protected $types = [
         'specializations' => Specialization::class,
         'expertises' => AyurvedaExpertise::class,

@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Storage;
 
 class ServicesSettingController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:services-page-view')->only(['index']);
+        $this->middleware('permission:services-page-edit')->only(['update']);
+    }
+
     public function index()
     {
         $settings = HomepageSetting::where('section', 'services_page')->get();

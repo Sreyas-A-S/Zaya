@@ -575,8 +575,12 @@
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('admin.yoga-therapists.index') }}",
+                order: [
+                    [0, 'desc']
+                ], // Default sort by first column (ID) descending
                 columns: [{
-                        data: null,
+                        data: 'id',
+                        name: 'users.id',
                         render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }

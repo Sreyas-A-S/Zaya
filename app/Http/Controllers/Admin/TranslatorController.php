@@ -14,15 +14,25 @@ use Illuminate\Validation\Rule;
 
 class TranslatorController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:translators-view')->only(['index', 'show']);
+        $this->middleware('permission:translators-create')->only(['create', 'store']);
+        $this->middleware('permission:translators-edit')->only(['edit', 'update']);
+        $this->middleware('permission:translators-delete')->only('destroy');
+        $this->middleware('permission:translators-update-status')->only('updateStatus');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = User::where('role', 'translator')
+            $query = User::where('role', 'translator')
                 ->leftJoin('translators', 'users.id', '=', 'translators.user_id')
                 ->select([
                     'users.id',
                     'users.name',
                     'users.email',
+                    'users.created_at',
                     'translators.gender',
                     'translators.native_language',
                     'translators.source_languages',
@@ -31,24 +41,45 @@ class TranslatorController extends Controller
                     'translators.country',
                     'translators.translator_type',
                     'translators.profile_photo_path',
-                    'translators.status'
+                    'translators.status',
+                    'translators.city',
+                    'translators.state'
                 ])
-                ->latest('users.created_at');
-
+                ->orderBy('users.created_at', 'desc');
 
             if ($request->filled('source_lang')) {
                 $lang = $request->source_lang;
-                $data->where('translators.source_languages', 'like', '%"' . $lang . '"%');
+                $query->where('translators.source_languages', 'like', '%"' . $lang . '"%');
             }
             if ($request->filled('target_lang')) {
                 $lang = $request->target_lang;
-                $data->where('translators.target_languages', 'like', '%"' . $lang . '"%');
+                $query->where('translators.target_languages', 'like', '%"' . $lang . '"%');
             }
 
-            $data = $data->get();
-
-            return DataTables::of($data)
+            return DataTables::of($query)
                 ->addIndexColumn()
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('search') && !is_null($request->get('search')['value'])) {
+                        $searchValue = $request->get('search')['value'];
+                        $query->where(function ($q) use ($searchValue) {
+                            $q->where('users.name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.email', 'LIKE', "%$searchValue%")
+                                ->orWhere('translators.phone', 'LIKE', "%$searchValue%")
+                                ->orWhere('translators.country', 'LIKE', "%$searchValue%")
+                                ->orWhere('translators.city', 'LIKE', "%$searchValue%")
+                                ->orWhere('translators.state', 'LIKE', "%$searchValue%")
+                                ->orWhere('translators.native_language', 'LIKE', "%$searchValue%")
+                                ->orWhere('translators.translator_type', 'LIKE', "%$searchValue%")
+                                ->orWhere('translators.fields_of_specialization', 'LIKE', "%$searchValue%")
+                                ->orWhere('translators.services_offered', 'LIKE', "%$searchValue%");
+                        });
+                    }
+                })
+                ->orderColumn('name', 'users.name $1')
+                ->orderColumn('email', 'users.email $1')
+                ->orderColumn('phone', 'translators.phone $1')
+                ->orderColumn('country', 'translators.country $1')
+                ->orderColumn('status', 'translators.status $1')
                 ->editColumn('source_languages', function ($row) {
                     if (empty($row->source_languages)) return '<span class="text-muted">N/A</span>';
                     // Check if it's already an array (due to model casting involved in query? No, Query Builder returns stdClass usually, not Models unless 'get' is on Model and hydrated. 
@@ -87,7 +118,7 @@ class TranslatorController extends Controller
 
                     $statusText = ucfirst($row->status ?? 'inactive');
 
-                    if (auth()->user() && auth()->user()->role === 'admin') {
+                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
                         return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '">' . $statusText . '</span>';
                     }
                     return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
@@ -180,8 +211,14 @@ class TranslatorController extends Controller
                 'role' => 'translator',
             ]);
 
-            $translatorData = $validatedData;
+            $translatorData = array_merge($validatedData, [
+                'full_name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+            ]);
+
+            // Remove User-specific fields that are not in translators table
             unset(
+                $translatorData['first_name'],
+                $translatorData['last_name'],
                 $translatorData['email'],
                 $translatorData['password'],
                 $translatorData['certificates'],
@@ -386,7 +423,7 @@ class TranslatorController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

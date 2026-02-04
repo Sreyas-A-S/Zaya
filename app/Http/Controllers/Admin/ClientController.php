@@ -14,14 +14,24 @@ use Illuminate\Support\Facades\Storage;
 
 class ClientController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:clients-view')->only(['index', 'show']);
+        $this->middleware('permission:clients-create')->only(['create', 'store']);
+        $this->middleware('permission:clients-edit')->only(['edit', 'update']);
+        $this->middleware('permission:clients-delete')->only('destroy');
+        $this->middleware('permission:clients-status-toggle')->only('updateStatus');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = User::where('role', 'client')
+            $query = User::where('role', 'client')
                 ->leftJoin('patients', 'users.id', '=', 'patients.user_id')
                 ->select([
                     'users.id',
                     'users.first_name',
+                    'users.middle_name',
                     'users.last_name',
                     'users.name',
                     'users.email',
@@ -36,13 +46,31 @@ class ClientController extends Controller
                     'patients.age',
                     'patients.gender',
                     'patients.client_id',
-                    'patients.profile_photo_path'
+                    'patients.profile_photo_path',
+                    'patients.status'
                 ])
-                ->latest('users.created_at')
-                ->get();
+                ->orderBy('users.created_at', 'desc');
 
-            return DataTables::of($data)
+            return DataTables::of($query)
                 ->addIndexColumn()
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('search') && !is_null($request->get('search')['value'])) {
+                        $searchValue = $request->get('search')['value'];
+                        $query->where(function ($q) use ($searchValue) {
+                            $q->where('users.name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.email', 'LIKE', "%$searchValue%")
+                                ->orWhere('patients.phone', 'LIKE', "%$searchValue%")
+                                ->orWhere('patients.client_id', 'LIKE', "%$searchValue%")
+                                ->orWhere('patients.city', 'LIKE', "%$searchValue%")
+                                ->orWhere('patients.country', 'LIKE', "%$searchValue%");
+                        });
+                    }
+                })
+                ->orderColumn('name', 'users.name $1')
+                ->orderColumn('email', 'users.email $1')
+                ->orderColumn('phone', 'patients.phone $1')
+                ->orderColumn('client_id', 'patients.client_id $1')
+                ->orderColumn('status', 'patients.status $1')
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at ? $row->created_at->format('Y-m-d H:i') : '';
                 })
@@ -57,6 +85,22 @@ class ClientController extends Controller
                 ->addColumn('client_id', function ($row) {
                     return $row->client_id ?? 'N/A';
                 })
+                ->editColumn('status', function ($row) {
+                    $badgeClass = 'bg-danger';
+                    if ($row->status == 'active') {
+                        $badgeClass = 'bg-success';
+                    } elseif ($row->status == 'pending') {
+                        $badgeClass = 'bg-warning';
+                    }
+
+                    $statusText = ucfirst($row->status ?? 'inactive');
+
+                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
+                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
+                    }
+
+                    return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
+                })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-3">';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-secondary viewClient" title="View"><i class="iconly-Show icli" style="font-size: 20px;"></i></a>';
@@ -65,7 +109,7 @@ class ClientController extends Controller
                     $btn .= '</div>';
                     return $btn;
                 })
-                ->rawColumns(['profile_photo', 'action', 'phone'])
+                ->rawColumns(['profile_photo', 'action', 'phone', 'status'])
                 ->make(true);
         }
 
@@ -83,6 +127,7 @@ class ClientController extends Controller
     {
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed', // Required for new clients
@@ -106,8 +151,9 @@ class ClientController extends Controller
 
         $user = User::create([
             'first_name' => $validatedData['first_name'],
+            'middle_name' => $validatedData['middle_name'] ?? null,
             'last_name' => $validatedData['last_name'],
-            'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+            'name' => $validatedData['first_name'] . ($validatedData['middle_name'] ? ' ' . $validatedData['middle_name'] : '') . ' ' . $validatedData['last_name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'role' => 'client'
@@ -154,6 +200,7 @@ class ClientController extends Controller
 
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => 'nullable|string|min:6|confirmed',
@@ -176,8 +223,9 @@ class ClientController extends Controller
         ]);
 
         $user->first_name = $validatedData['first_name'];
+        $user->middle_name = $validatedData['middle_name'] ?? null;
         $user->last_name = $validatedData['last_name'];
-        $user->name = $validatedData['first_name'] . ' ' . $validatedData['last_name'];
+        $user->name = $validatedData['first_name'] . ($validatedData['middle_name'] ? ' ' . $validatedData['middle_name'] : '') . ' ' . $validatedData['last_name'];
         $user->email = $validatedData['email'];
         if (!empty($validatedData['password'])) {
             $user->password = Hash::make($validatedData['password']);
@@ -227,5 +275,19 @@ class ClientController extends Controller
     {
         User::findOrFail($id)->delete();
         return response()->json(['success' => 'Client deleted successfully.']);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $patient = \App\Models\Patient::where('user_id', $id)->firstOrFail();
+        $patient->update([
+            'status' => $request->status ? 'active' : 'inactive'
+        ]);
+
+        return response()->json(['success' => 'Status updated successfully!']);
     }
 }

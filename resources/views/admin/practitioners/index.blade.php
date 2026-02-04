@@ -387,7 +387,9 @@
                                         @foreach($docs as $name => $label)
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold">{{ $label }}</label>
-                                            <input type="file" class="form-control form-control-sm" name="{{ $name }}" required>
+                                            <input type="file" class="form-control form-control-sm" name="{{ $name }}"
+                                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                @if($name !=='doc_profile_photo' ) required @endif>
                                             <div id="current-{{ $name }}" class="mt-1 d-none small"></div>
                                         </div>
                                         @endforeach
@@ -785,7 +787,7 @@
                 },
                 {
                     data: 'status',
-                    name: 'status'
+                    name: 'practitioners.status'
                 },
                 {
                     data: 'action',
@@ -794,7 +796,10 @@
                     searchable: false,
                     className: 'text-center'
                 },
-            ]
+            ],
+            order: [
+                [0, 'desc']
+            ] // Default sort by column 0 (which is the Row Index/ID logically here)
         });
 
 
@@ -1245,7 +1250,16 @@
             },
             error: function(xhr) {
                 btn.prop('disabled', false).html('<i class="fa-solid fa-check-circle me-2"></i> Save Practitioner');
-                showToast('Error saving practitioner', 'error');
+                if (xhr.status === 422) {
+                    let errors = xhr.responseJSON.errors;
+                    let errorMessages = [];
+                    Object.values(errors).forEach(errArray => {
+                        errorMessages.push(errArray[0]);
+                    });
+                    showToast(errorMessages.join('<br>'), 'error');
+                } else {
+                    showToast(xhr.responseJSON?.message || 'Error saving practitioner', 'error');
+                }
             }
         });
     });

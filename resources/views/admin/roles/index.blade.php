@@ -37,8 +37,6 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Role Name</th>
-                                    <th>Permissions Count</th>
-                                    <th>Created At</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -126,8 +124,13 @@
         const messageEl = document.getElementById('toast-message');
         if (!toastInstance) toastInstance = new bootstrap.Toast(toastEl);
         toastEl.classList.remove('bg-success', 'bg-danger', 'text-white');
-        if (type === 'success') { toastEl.classList.add('bg-success', 'text-white'); titleEl.innerText = 'Success'; }
-        else { toastEl.classList.add('bg-danger', 'text-white'); titleEl.innerText = 'Error'; }
+        if (type === 'success') {
+            toastEl.classList.add('bg-success', 'text-white');
+            titleEl.innerText = 'Success';
+        } else {
+            toastEl.classList.add('bg-danger', 'text-white');
+            titleEl.innerText = 'Error';
+        }
         messageEl.innerText = message;
         toastInstance.show();
     }
@@ -137,19 +140,26 @@
             processing: true,
             serverSide: true,
             ajax: "{{ route('admin.roles.index') }}",
-            columns: [
-                { data: 'id', name: 'id' },
-                { data: 'name', name: 'name' },
-                { data: 'permissions_count', name: 'permissions_count' },
-                { data: 'created_at', name: 'created_at', render: function(data){ return data ? new Date(data).toLocaleDateString() : ''; } },
-                { data: 'action', name: 'action', orderable: false, searchable: false },
+            columns: [{
+                    data: 'id',
+                    name: 'id'
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },
             ]
         });
 
-        // Check for session success message
-        @if(session('success'))
+        if ("{{ session('success') }}") {
             showToast("{{ session('success') }}");
-        @endif
+        }
     });
 
     function openCreateModal() {
@@ -200,7 +210,9 @@
                     showToast('Something went wrong.', 'error');
                 }
             },
-            complete: function() { btn.prop('disabled', false).html('<i class="fa-solid fa-check-circle me-2"></i> Save Role'); }
+            complete: function() {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-check-circle me-2"></i> Save Role');
+            }
         });
     });
 
@@ -217,14 +229,20 @@
         $.ajax({
             type: "DELETE",
             url: "{{ url('admin/roles') }}/" + id,
-            data: { _token: '{{ csrf_token() }}' },
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
             success: function(data) {
                 $('#role-delete-modal').modal('hide');
                 table.draw();
                 showToast(data.success);
             },
-            error: function() { showToast('Error deleting role', 'error'); },
-            complete: function() { btn.prop('disabled', false).text('Delete Now'); }
+            error: function() {
+                showToast('Error deleting role', 'error');
+            },
+            complete: function() {
+                btn.prop('disabled', false).text('Delete Now');
+            }
         });
     });
 </script>

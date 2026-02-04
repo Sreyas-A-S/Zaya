@@ -466,7 +466,8 @@
             serverSide: true,
             ajax: "{{ route('admin.mindfulness-practitioners.index') }}",
             columns: [{
-                    data: null,
+                    data: 'id',
+                    name: 'users.id',
                     render: function(data, type, row, meta) {
                         return meta.row + meta.settings._iDisplayStart + 1;
                     }
@@ -507,6 +508,9 @@
                     orderable: false,
                     searchable: false
                 },
+            ],
+            order: [
+                [0, 'desc']
             ]
         });
 

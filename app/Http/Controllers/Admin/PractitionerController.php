@@ -19,26 +19,60 @@ use Illuminate\Support\Str;
 
 class PractitionerController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:practitioners-view')->only(['index', 'show']);
+        $this->middleware('permission:practitioners-create')->only(['create', 'store']);
+        $this->middleware('permission:practitioners-edit')->only(['edit', 'update']);
+        $this->middleware('permission:practitioners-delete')->only('destroy');
+        $this->middleware('permission:practitioners-update-status')->only('updateStatus');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = User::where('role', 'practitioner')
+            $query = User::where('role', 'practitioner')
                 ->leftJoin('practitioners', 'users.id', '=', 'practitioners.user_id')
                 ->select([
                     'users.id',
                     'users.name',
                     'users.email',
+                    'users.created_at',
                     'practitioners.gender',
                     'practitioners.phone',
                     'practitioners.nationality',
                     'practitioners.profile_photo_path',
-                    'practitioners.status'
+                    'practitioners.status',
+                    'practitioners.city',
+                    'practitioners.state',
+                    'practitioners.country'
                 ])
-                ->latest('users.created_at')
-                ->get();
+                ->orderBy('users.created_at', 'desc');
 
-            return DataTables::of($data)
+            return DataTables::of($query)
                 ->addIndexColumn()
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('search') && !is_null($request->get('search')['value'])) {
+                        $searchValue = $request->get('search')['value'];
+                        $query->where(function ($q) use ($searchValue) {
+                            $q->where('users.name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.email', 'LIKE', "%$searchValue%")
+                                ->orWhere('practitioners.phone', 'LIKE', "%$searchValue%")
+                                ->orWhere('practitioners.nationality', 'LIKE', "%$searchValue%")
+                                ->orWhere('practitioners.city', 'LIKE', "%$searchValue%")
+                                ->orWhere('practitioners.state', 'LIKE', "%$searchValue%")
+                                ->orWhere('practitioners.country', 'LIKE', "%$searchValue%")
+                                ->orWhere('practitioners.consultations', 'LIKE', "%$searchValue%")
+                                ->orWhere('practitioners.body_therapies', 'LIKE', "%$searchValue%")
+                                ->orWhere('practitioners.other_modalities', 'LIKE', "%$searchValue%");
+                        });
+                    }
+                })
+                ->orderColumn('name', 'users.name $1')
+                ->orderColumn('email', 'users.email $1')
+                ->orderColumn('phone', 'practitioners.phone $1')
+                ->orderColumn('nationality', 'practitioners.nationality $1')
+                ->orderColumn('status', 'practitioners.status $1')
                 ->editColumn('status', function ($row) {
                     $badgeClass = 'bg-danger';
                     if ($row->status == 'active') {
@@ -49,7 +83,7 @@ class PractitionerController extends Controller
 
                     $statusText = ucfirst($row->status ?? 'inactive');
 
-                    if (auth()->user() && auth()->user()->role === 'admin') {
+                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
                         return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
                     }
 
@@ -111,7 +145,7 @@ class PractitionerController extends Controller
             'can_translate_english' => 'boolean',
             'profile_bio' => 'nullable|string',
             // Documents
-            'doc_cover_letter' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+            'doc_cover_letter' => 'nullable|file|mimes:pdf,doc,docx,jpeg,png,jpg|max:2048',
             'doc_certificates' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
             'doc_experience' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
             'doc_registration' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
@@ -131,7 +165,29 @@ class PractitionerController extends Controller
                 'role' => 'practitioner',
             ]);
 
-            $practitionerData = $validatedData;
+            $practitionerData = [
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
+                'gender' => $validatedData['gender'] ?? null,
+                'dob' => $validatedData['dob'] ?? null,
+                'nationality' => $validatedData['nationality'] ?? null,
+                'address_line_1' => $validatedData['address_line_1'],
+                'address_line_2' => $validatedData['address_line_2'] ?? null,
+                'city' => $validatedData['city'],
+                'state' => $validatedData['state'],
+                'zip_code' => $validatedData['zip_code'],
+                'country' => $validatedData['country'],
+                'phone' => $validatedData['phone'] ?? null,
+                'website_url' => $validatedData['website_url'] ?? null,
+                'social_links' => $validatedData['social_links'] ?? null,
+                'consultations' => $validatedData['consultations'] ?? null,
+                'body_therapies' => $validatedData['body_therapies'] ?? null,
+                'other_modalities' => $validatedData['other_modalities'] ?? null,
+                'additional_courses' => $validatedData['additional_courses'] ?? null,
+                'languages_spoken' => $validatedData['languages_spoken'] ?? null,
+                'can_translate_english' => $validatedData['can_translate_english'] ?? false,
+                'profile_bio' => $validatedData['profile_bio'] ?? null,
+            ];
 
             if ($request->hasFile('profile_photo')) {
                 $practitionerData['profile_photo_path'] = $request->file('profile_photo')->store('practitioner_photos', 'public');
@@ -211,6 +267,15 @@ class PractitionerController extends Controller
             'languages_spoken' => 'nullable|array',
             'can_translate_english' => 'boolean',
             'profile_bio' => 'nullable|string',
+
+            // Documents
+            'doc_cover_letter' => 'nullable|file|mimes:pdf,doc,docx,jpeg,png,jpg|max:2048',
+            'doc_certificates' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'doc_experience' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'doc_registration' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'doc_ethics' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'doc_contract' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'doc_id_proof' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
         ]);
 
         DB::beginTransaction();
@@ -227,23 +292,46 @@ class PractitionerController extends Controller
                 $user->save();
             }
 
+            $practitionerUpdateData = [
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
+                'gender' => $validatedData['gender'] ?? null,
+                'dob' => $validatedData['dob'] ?? null,
+                'nationality' => $validatedData['nationality'] ?? null,
+                'address_line_1' => $validatedData['address_line_1'],
+                'address_line_2' => $validatedData['address_line_2'] ?? null,
+                'city' => $validatedData['city'],
+                'state' => $validatedData['state'],
+                'zip_code' => $validatedData['zip_code'],
+                'country' => $validatedData['country'],
+                'phone' => $validatedData['phone'] ?? null,
+                'website_url' => $validatedData['website_url'] ?? null,
+                'social_links' => $validatedData['social_links'] ?? null,
+                'consultations' => $validatedData['consultations'] ?? null,
+                'body_therapies' => $validatedData['body_therapies'] ?? null,
+                'other_modalities' => $validatedData['other_modalities'] ?? null,
+                'additional_courses' => $validatedData['additional_courses'] ?? null,
+                'languages_spoken' => $validatedData['languages_spoken'] ?? null,
+                'can_translate_english' => $request->has('can_translate_english'),
+                'profile_bio' => $validatedData['profile_bio'] ?? null,
+            ];
+
             if ($request->hasFile('profile_photo')) {
                 // Delete old photo if exists
                 if ($practitioner->profile_photo_path) {
                     Storage::disk('public')->delete($practitioner->profile_photo_path);
                 }
-                $validatedData['profile_photo_path'] = $request->file('profile_photo')->store('practitioner_photos', 'public');
+                $practitionerUpdateData['profile_photo_path'] = $request->file('profile_photo')->store('practitioner_photos', 'public');
             }
 
-            $filePaths = [];
             $docFields = ['doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 'doc_contract', 'doc_id_proof'];
             foreach ($docFields as $field) {
                 if ($request->hasFile($field)) {
-                    $filePaths[$field] = $request->file($field)->store('practitioner_docs', 'public');
+                    $practitionerUpdateData[$field] = $request->file($field)->store('practitioner_docs', 'public');
                 }
             }
 
-            $practitioner->update(array_merge($validatedData, $filePaths));
+            $practitioner->update($practitionerUpdateData);
 
             // Qualifications update logic
             if ($request->has('qualifications')) {
@@ -272,7 +360,7 @@ class PractitionerController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

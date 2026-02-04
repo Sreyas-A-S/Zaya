@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\WellnessConsultation;
 use App\Models\BodyTherapy;
 use App\Models\PractitionerModality;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class RegisterController extends Controller
 {
@@ -39,7 +41,7 @@ class RegisterController extends Controller
 
     public function showRegistrationForm($type)
     {
-        if (!in_array($type, ['practitioner', 'patient'])) {
+        if (!in_array($type, ['practitioner', 'patient', 'client'])) {
             abort(404);
         }
 
@@ -52,7 +54,7 @@ class RegisterController extends Controller
             return view('auth.register_practitioner', compact('languages', 'wellnessConsultations', 'bodyTherapies', 'practitionerModalities'));
         }
 
-        if ($type === 'patient') {
+        if ($type === 'patient' || $type === 'client') {
             $languages = \App\Models\Language::all();
             return view('auth.register_patient', compact('languages'));
         }
@@ -77,7 +79,7 @@ class RegisterController extends Controller
 
             if ($request->role === 'practitioner') {
                 $this->createPractitionerProfile($user, $request);
-            } elseif ($request->role === 'patient') {
+            } elseif ($request->role === 'patient' || $request->role === 'client') {
                 $this->createPatientProfile($user, $request);
             }
 
@@ -101,23 +103,22 @@ class RegisterController extends Controller
 
     protected function createPatientProfile($user, $request)
     {
-        $profileData = $request->only([
-            'dob',
-            'age',
-            'gender',
-            'occupation',
-            'address',
-            'mobile_country_code',
-            'mobile_number',
-            'consultation_preferences',
-            'languages_spoken',
-            'referral_type',
-            'referrer_name'
+        $clientId = 'CL-' . strtoupper(Str::random(8));
+        $age = $request->dob ? Carbon::parse($request->dob)->age : null;
+
+        $user->patient()->create([
+            'client_id' => $clientId,
+            'dob' => $request->dob,
+            'age' => $age,
+            'gender' => $request->gender,
+            'address_line_1' => $request->address_line_1,
+            'address_line_2' => $request->address_line_2,
+            'city' => $request->city,
+            'state' => $request->state,
+            'country' => $request->country,
+            'phone' => $request->mobile,
+            // 'occupation' => $request->occupation, // Form doesn't have occupation
         ]);
-
-        $profileData['client_id'] = \App\Models\PatientProfile::generateClientId();
-
-        $user->patientProfile()->create($profileData);
     }
 
     protected function createPractitionerProfile($user, $request)
@@ -187,18 +188,25 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['nullable', 'string', 'max:255'],
+            'first_name' => ['nullable', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', 'string', 'in:practitioner,patient'],
+            'role' => ['required', 'string', 'in:practitioner,patient,client'],
             'profile_photo' => ['nullable', 'image', 'max:2048'],
-            'gender' => ['nullable', 'string', 'in:male,female,other'],
+            'gender' => ['nullable', 'string', 'in:male,female,transgender,other'],
             'dob' => ['nullable', 'date'],
             'phone' => ['nullable', 'string', 'max:20'],
+            'mobile' => ['nullable', 'string', 'max:20'],
             'nationality' => ['nullable', 'string', 'max:255'],
             'zip_code' => ['nullable', 'string', 'max:20'],
             'website_url' => ['nullable', 'url', 'max:255'],
+            'address_line_1' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:255'],
+            'state' => ['nullable', 'string', 'max:255'],
+            'country' => ['nullable', 'string', 'max:255'],
         ]);
     }
 
@@ -210,11 +218,39 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $name = $data['name'] ?? null;
+        if (!$name && isset($data['first_name'])) {
+            $parts = array_filter([
+                $data['first_name'] ?? '',
+                $data['middle_name'] ?? '',
+                $data['last_name'] ?? ''
+            ]);
+            $name = implode(' ', $parts);
+        }
+
         return User::create([
-            'name' => $data['name'] . ($data['role'] == 'practitioner' ? ' ' . ($data['last_name'] ?? '') : ''),
+            'name' => $name,
+            'first_name' => $data['first_name'] ?? null,
+            'middle_name' => $data['middle_name'] ?? null,
+            'last_name' => $data['last_name'] ?? null,
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role' => $data['role'],
         ]);
+    }
+    /**
+     * The user has been registered.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function registered(Request $request, $user)
+    {
+        if ($request->role === 'client' || $request->role === 'patient') {
+            // Log out user if you don't want auto-login, or keep them logged in.
+            // Assuming auto-login is desired, we redirect to home or dashboard.
+            return redirect($this->redirectPath())->with('success', 'Registration successful! Welcome to Zaya Wellness.');
+        }
     }
 }

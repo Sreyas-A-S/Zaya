@@ -17,11 +17,21 @@ class RolePermissionSeeder extends Seeder
         $modules = [
             'Dashboard' => ['view'],
             'Users' => ['view', 'create', 'edit', 'delete'],
-            'Doctors' => ['view', 'create', 'edit', 'delete'],
-            'Practitioners' => ['view', 'create', 'edit', 'delete'],
-            'Clients' => ['view', 'create', 'edit', 'delete'],
+            'Doctors' => ['view', 'create', 'edit', 'delete', 'update-status'],
+            'Practitioners' => ['view', 'create', 'edit', 'delete', 'update-status'],
+            'Mindfulness Practitioners' => ['view', 'create', 'edit', 'delete', 'update-status'],
+            'Yoga Therapists' => ['view', 'create', 'edit', 'delete', 'update-status'],
+            'Translators' => ['view', 'create', 'edit', 'delete', 'update-status'],
+            'Clients' => ['view', 'create', 'edit', 'delete', 'status-toggle'],
             'Roles' => ['view', 'create', 'edit', 'delete'],
+            'Services' => ['view', 'create', 'edit', 'delete', 'assign-engineer'],
+            'Master Data' => ['view', 'create', 'edit', 'delete'],
+            'Testimonials' => ['view', 'create', 'edit', 'delete'],
+            'Practitioner Reviews' => ['view', 'delete'],
             'Settings' => ['view', 'edit'],
+            'Home Page' => ['view', 'edit'],
+            'About Page' => ['view', 'edit'],
+            'Services Page' => ['view', 'edit'],
         ];
 
         foreach ($modules as $module => $actions) {

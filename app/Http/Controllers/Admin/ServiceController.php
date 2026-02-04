@@ -12,6 +12,15 @@ use Illuminate\Support\Str;
 
 class ServiceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:services-view')->only(['index', 'show']);
+        $this->middleware('permission:services-create')->only(['create', 'store']);
+        $this->middleware('permission:services-edit')->only(['edit', 'update', 'updateStatus', 'deleteGalleryImage']);
+        $this->middleware('permission:services-delete')->only('destroy');
+        $this->middleware('permission:services-assign-engineer')->only('assignEngineer');
+    }
+
     /**
      * Display a listing of the resource.
      */

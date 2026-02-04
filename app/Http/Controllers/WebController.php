@@ -94,7 +94,7 @@ class WebController extends Controller
      */
     private function getWordPressApiUrl()
     {
-        return config('services.wordpress.api_url', 'http://localhost/blog-zaya/wp-json/wp/v2');
+        return config('services.wordpress.api_url', 'https://blog.zayawellness.com/wp-json/wp/v2');
     }
 
     /**
