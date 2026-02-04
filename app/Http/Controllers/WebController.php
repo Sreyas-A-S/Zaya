@@ -100,7 +100,7 @@ class WebController extends Controller
     /**
      * Fetch data from WordPress REST API
      */
-    private function fetchFromWordPress($endpoint, $params = [])
+    private function fetchFromWordPress($endpoint, $params = [], $withHeaders = false)
     {
         try {
             $url = $this->getWordPressApiUrl() . '/' . $endpoint;
@@ -119,13 +119,31 @@ class WebController extends Controller
             $response = @file_get_contents($url, false, $context);
 
             if ($response === false) {
-                return null;
+                return $withHeaders ? ['data' => null, 'headers' => []] : null;
             }
 
-            return json_decode($response);
+            $data = json_decode($response);
+
+            if ($withHeaders) {
+                // Parse response headers for pagination info
+                $headers = [];
+                if (isset($http_response_header)) {
+                    foreach ($http_response_header as $header) {
+                        if (stripos($header, 'X-WP-Total:') === 0) {
+                            $headers['total'] = (int) trim(substr($header, 11));
+                        }
+                        if (stripos($header, 'X-WP-TotalPages:') === 0) {
+                            $headers['totalPages'] = (int) trim(substr($header, 16));
+                        }
+                    }
+                }
+                return ['data' => $data, 'headers' => $headers];
+            }
+
+            return $data;
         } catch (\Exception $e) {
             \Log::error('WordPress API Error: ' . $e->getMessage());
-            return null;
+            return $withHeaders ? ['data' => null, 'headers' => []] : null;
         }
     }
 
@@ -154,10 +172,13 @@ class WebController extends Controller
     {
         $settings = \App\Models\HomepageSetting::pluck('value', 'key');
 
+        $currentPage = (int) $request->get('page', 1);
+        $perPage = 8;
+
         // Build API params
         $params = [
-            'per_page' => 9,
-            'page' => $request->get('page', 1),
+            'per_page' => $perPage,
+            'page' => $currentPage,
             '_embed' => 1, // Include featured media and categories
         ];
 
@@ -171,15 +192,30 @@ class WebController extends Controller
         }
 
         // Search filter
+        $searchQuery = '';
         if ($request->filled('search')) {
-            $params['search'] = $request->search;
+            $searchQuery = $request->search;
+            $params['search'] = $searchQuery;
         }
 
-        // Fetch posts from WordPress
-        $posts = $this->fetchFromWordPress('posts', $params);
+        // Fetch posts from WordPress with headers for pagination
+        $response = $this->fetchFromWordPress('posts', $params, true);
+        $posts = $response['data'];
+        $headers = $response['headers'];
 
-        // Fetch all categories for the dropdown
-        $categories = $this->fetchFromWordPress('categories', ['per_page' => 50]);
+        // Pagination data
+        $totalPosts = $headers['total'] ?? 0;
+        $totalPages = $headers['totalPages'] ?? 1;
+
+        // Fetch all categories for the sidebar and decode HTML entities
+        $rawCategories = $this->fetchFromWordPress('categories', ['per_page' => 50]);
+        $categories = [];
+        if ($rawCategories) {
+            foreach ($rawCategories as $cat) {
+                $cat->name = html_entity_decode($cat->name);
+                $categories[] = $cat;
+            }
+        }
 
         // Process posts to extract embedded data
         $processedPosts = [];
@@ -195,7 +231,7 @@ class WebController extends Controller
 
                 // Get category name from embedded data
                 if (isset($post->_embedded->{'wp:term'}[0][0]->name)) {
-                    $categoryName = $post->_embedded->{'wp:term'}[0][0]->name;
+                    $categoryName = html_entity_decode($post->_embedded->{'wp:term'}[0][0]->name);
                 }
 
                 $processedPosts[] = [
@@ -212,7 +248,15 @@ class WebController extends Controller
             }
         }
 
-        return view('blogs', compact('settings', 'processedPosts', 'categories'));
+        // Pagination info
+        $pagination = [
+            'currentPage' => $currentPage,
+            'totalPages' => $totalPages,
+            'totalPosts' => $totalPosts,
+            'perPage' => $perPage,
+        ];
+
+        return view('blogs', compact('settings', 'processedPosts', 'categories', 'pagination', 'searchQuery'));
     }
 
     /**
@@ -243,7 +287,7 @@ class WebController extends Controller
         }
 
         if (isset($post->_embedded->{'wp:term'}[0][0]->name)) {
-            $categoryName = $post->_embedded->{'wp:term'}[0][0]->name;
+            $categoryName = html_entity_decode($post->_embedded->{'wp:term'}[0][0]->name);
         }
 
         $blogPost = [
@@ -256,16 +300,16 @@ class WebController extends Controller
             'category' => $categoryName,
         ];
 
-        // Fetch related posts (latest 3 excluding current)
+        // Fetch related posts (8 posts excluding current for sidebar)
         $relatedPosts = [];
         $related = $this->fetchFromWordPress('posts', [
-            'per_page' => 4,
+            'per_page' => 9,
             'exclude' => $post->id,
             '_embed' => 1
         ]);
 
         if ($related) {
-            foreach (array_slice($related, 0, 3) as $relPost) {
+            foreach (array_slice($related, 0, 8) as $relPost) {
                 $relFeaturedImage = null;
                 $relCategoryName = 'Uncategorized';
 
@@ -274,7 +318,7 @@ class WebController extends Controller
                 }
 
                 if (isset($relPost->_embedded->{'wp:term'}[0][0]->name)) {
-                    $relCategoryName = $relPost->_embedded->{'wp:term'}[0][0]->name;
+                    $relCategoryName = html_entity_decode($relPost->_embedded->{'wp:term'}[0][0]->name);
                 }
 
                 $relatedPosts[] = [
@@ -289,6 +333,16 @@ class WebController extends Controller
             }
         }
 
-        return view('blog-detail', compact('settings', 'blogPost', 'relatedPosts'));
+        // Fetch all categories for sidebar and decode HTML entities
+        $rawCategories = $this->fetchFromWordPress('categories', ['per_page' => 50]);
+        $categories = [];
+        if ($rawCategories) {
+            foreach ($rawCategories as $cat) {
+                $cat->name = html_entity_decode($cat->name);
+                $categories[] = $cat;
+            }
+        }
+
+        return view('blog-detail', compact('settings', 'blogPost', 'relatedPosts', 'categories'));
     }
 }
