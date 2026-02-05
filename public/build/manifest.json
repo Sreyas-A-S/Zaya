@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app--J1qKPFc.css",
+    "file": "assets/app-C22UBeXF.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -8,10 +8,25 @@
       "app.css"
     ]
   },
+  "resources/css/practitioner-register.css": {
+    "file": "assets/practitioner-register-BflPz6YG.css",
+    "src": "resources/css/practitioner-register.css",
+    "isEntry": true,
+    "name": "practitioner-register",
+    "names": [
+      "practitioner-register.css"
+    ]
+  },
   "resources/js/app.js": {
     "file": "assets/app-CAiCLEjY.js",
     "name": "app",
     "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/country-selector.js": {
+    "file": "assets/country-selector-Chl9qWOH.js",
+    "name": "country-selector",
+    "src": "resources/js/country-selector.js",
     "isEntry": true
   }
 }
