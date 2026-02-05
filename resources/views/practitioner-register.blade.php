@@ -5,355 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Practitioner Registration - Zaya Wellness</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <style>
-        /* Step Indicator Styles */
-        .step-indicator {
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            gap: 0;
-        }
-
-        .step-indicator>.flex {
-            position: relative;
-            z-index: 2;
-        }
-
-        .step-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: #E6E6E6;
-            color: #8B8B8B;
-        }
-
-        .step-circle.active {
-            background: #60E48C;
-            color: white;
-        }
-
-        .step-circle.completed {
-            background: #22C55E;
-            border-color: #22C55E;
-            color: white;
-        }
-
-        .step-line {
-            width: 140px;
-            height: 0;
-            border: none;
-            border-top: 2px dashed #C0C0C0;
-            margin: 0;
-            align-self: center;
-            margin-top: -28px;
-            /* Half of circle height + label offset to center with circles */
-            position: relative;
-        }
-
-        .step-line.active {
-            border-top: 2px dashed #60E48C;
-        }
-
-        .step-line.completed {
-            border-color: #22C55E;
-        }
-
-        .step-label {
-            font-size: 0.85rem;
-            color: #9CA3AF;
-            margin-top: 10px;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .step-label.active {
-            color: #374151;
-        }
-
-        /* Input Styles */
-        .reg-input {
-            width: 100%;
-            padding: 14px 24px;
-            background: #F5F5F5;
-            border-radius: 9999px;
-            border: 1px solid transparent;
-            outline: none;
-            font-size: 0.95rem;
-            color: #374151;
-            transition: all 0.3s ease;
-        }
-
-        .reg-input::placeholder {
-            color: #9CA3AF;
-        }
-
-        .reg-input:focus {
-            border-color: #97563D;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(151, 86, 61, 0.1);
-        }
-
-        /* Textarea Styles */
-        .reg-textarea {
-            width: 100%;
-            padding: 16px 20px;
-            background: white;
-            border-radius: 16px;
-            border: 1px solid #E5E7EB;
-            outline: none;
-            font-size: 0.95rem;
-            color: #374151;
-            transition: all 0.3s ease;
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .reg-textarea::placeholder {
-            color: #9CA3AF;
-        }
-
-        .reg-textarea:focus {
-            border-color: #97563D;
-            box-shadow: 0 0 0 3px rgba(151, 86, 61, 0.1);
-        }
-
-        /* Photo Upload */
-        .photo-upload {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-            background: #F5A623;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .photo-upload:hover {
-            background: #E09518;
-            transform: scale(1.05);
-        }
-
-        /* Radio Button Styles */
-        .gender-radio {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .gender-radio input[type="radio"] {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #D1D5DB;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .gender-radio input[type="radio"]:checked {
-            border-color: #F5A623;
-            background: radial-gradient(circle, #F5A623 40%, transparent 45%);
-        }
-
-        /* Section Card */
-        .section-card {
-            background: white;
-            border: 1px solid #E5E7EB;
-            border-radius: 16px;
-            padding: 24px;
-        }
-
-        /* Tag/Chip Styles */
-        .practice-tag {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 16px;
-            border: 1px solid #E5E7EB;
-            border-radius: 9999px;
-            font-size: 0.85rem;
-            color: #374151;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: white;
-        }
-
-        .practice-tag:hover {
-            border-color: #97563D;
-            background: #FFF7EF;
-        }
-
-        .practice-tag.selected {
-            border-color: #97563D;
-            background: #FFF7EF;
-            color: #97563D;
-        }
-
-        /* Upload Box */
-        .upload-box {
-            border: 2px dashed #E5E7EB;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .upload-box:hover {
-            border-color: #97563D;
-            background: #FFF7EF;
-        }
-
-        .upload-box-large {
-            border: 2px dashed #E5E7EB;
-            border-radius: 16px;
-            padding: 48px 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: #FAFAFA;
-        }
-
-        .upload-box-large:hover {
-            border-color: #97563D;
-            background: #FFF7EF;
-        }
-
-        /* Button Styles */
-        .btn-primary {
-            background: #F5A623;
-            color: #423131;
-            padding: 14px 32px;
-            border-radius: 9999px;
-            font-weight: normal;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background: #A87139;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            color: #594B4B;
-            font-weight: normal;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            padding: 14px 24px;
-        }
-
-        .btn-secondary:hover {
-            color: #374151;
-        }
-
-        .btn-save {
-            background: #22C55E;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 9999px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-save:hover {
-            background: #16A34A;
-        }
-
-        .btn-cancel-small {
-            color: #6B7280;
-            font-size: 0.9rem;
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            padding: 8px 16px;
-        }
-
-        .btn-cancel-small:hover {
-            color: #374151;
-        }
-
-        /* Country Select */
-        .country-select-wrapper {
-            position: relative;
-        }
-
-        .country-select {
-            padding-left: 60px !important;
-        }
-
-        .country-flag {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            pointer-events: none;
-        }
-
-        /* Tab Content */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Language checkbox */
-        .lang-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .lang-checkbox input[type="checkbox"] {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #D1D5DB;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .lang-checkbox input[type="checkbox"]:checked {
-            border-color: #F5A623;
-            background: #F5A623;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
-        }
-
-        /* Warning box */
-        .warning-box {
-            background: #FEF3C7;
-            border-radius: 8px;
-            padding: 12px 16px;
-            font-size: 0.85rem;
-            color: #92400E;
-        }
-    </style>
+    @vite(['resources/css/app.css', 'resources/css/practitioner-register.css', 'resources/js/app.js', 'resources/js/country-selector.js'])
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.1/fonts/remixicon.css" rel="stylesheet">
 </head>
 
 <body class="bg-white min-h-screen flex flex-col">
@@ -403,18 +58,18 @@
 
                 <!-- Tab 1: Basic Details -->
                 <div class="tab-content active" id="tab-1">
-                    <h3 class="text-lg font-medium text-gray-900 mb-6">Basic Details</h3>
+                    <h3 class="text-2xl font-sans! font-regular text-gray-900 mb-10">Basic Details</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <!-- Fullname & Photo Row -->
                         <div class="md:col-span-2">
-                            <label class="block text-gray-700 font-medium mb-3 text-sm">Fullname</label>
+                            <label class="block text-gray-700 font-regular mb-4 text-lg">Fullname</label>
                             <input type="text" name="fullname" value="{{ old('fullname') }}" class="reg-input"
                                 placeholder="Enter Fullname" required>
                         </div>
                         <div class="flex flex-col items-center">
                             <label class="photo-upload" for="profile-photo">
-                                <i class="ri-camera-line text-white text-2xl"></i>
+                                <i class="ri-camera-4-fill text-white text-2xl"></i>
                             </label>
                             <input type="file" id="profile-photo" name="profile_photo" accept="image/*" class="hidden">
                             <span class="text-gray-500 text-sm mt-2">Add Photo</span>
@@ -423,7 +78,7 @@
 
                     <!-- Gender -->
                     <div class="mb-8">
-                        <label class="block text-gray-700 font-medium mb-3 text-sm">Gender</label>
+                        <label class="block text-gray-700 font-regular mb-4 text-lg">Gender</label>
                         <div class="flex flex-wrap gap-6">
                             <label class="gender-radio">
                                 <input type="radio" name="gender" value="male">
@@ -443,12 +98,12 @@
                     <!-- Email & Mobile -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-medium mb-3 text-sm">Email</label>
+                            <label class="block text-gray-700 font-regular mb-4 text-lg">Email</label>
                             <input type="email" name="email" value="{{ old('email') }}" class="reg-input"
                                 placeholder="Enter Email" required>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-medium mb-3 text-sm">Mobile No.</label>
+                            <label class="block text-gray-700 font-regular mb-4 text-lg">Mobile No.</label>
                             <input type="tel" name="mobile" value="{{ old('mobile') }}" class="reg-input"
                                 placeholder="Enter Mobile No." required>
                         </div>
@@ -457,32 +112,28 @@
                     <!-- DOB & Nationality -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-medium mb-3 text-sm">DOB</label>
+                            <label class="block text-gray-700 font-regular mb-4 text-lg">DOB</label>
                             <input type="date" name="dob" value="{{ old('dob') }}" class="reg-input"
                                 placeholder="DD/MM/YYYY" required>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-medium mb-3 text-sm">Nationality</label>
-                            <div class="country-select-wrapper">
-                                <span class="country-flag">
-                                    <span class="text-lg">🇮🇳</span>
-                                    <i class="ri-arrow-down-s-line text-gray-400 text-sm"></i>
-                                </span>
-                                <input type="text" name="nationality" value="{{ old('nationality', 'India') }}"
-                                    class="reg-input country-select" placeholder="Select Country" required>
-                            </div>
+                            <label class="block text-gray-700 font-regular mb-4 text-lg">Nationality</label>
+                            <select id="nationality-select" name="nationality"
+                                data-default="{{ old('nationality', 'IN') }}" required>
+                                <option value="">Select Country</option>
+                            </select>
                         </div>
                     </div>
 
                     <!-- Address & Website -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-medium mb-3 text-sm">Residential Address</label>
+                            <label class="block text-gray-700 font-regular mb-4 text-lg">Residential Address</label>
                             <input type="text" name="address" value="{{ old('address') }}" class="reg-input"
                                 placeholder="Address with Zipcode" required>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-medium mb-3 text-sm">Website <span
+                            <label class="block text-gray-700 font-regular mb-4 text-lg">Website <span
                                     class="text-gray-400 italic">(if any)</span></label>
                             <input type="url" name="website" value="{{ old('website') }}" class="reg-input"
                                 placeholder="Enter URL">
@@ -493,45 +144,45 @@
                 <!-- Tab 2: Qualifications -->
                 <div class="tab-content" id="tab-2">
                     <!-- Education Section -->
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-medium text-gray-900">Education</h3>
-                        <button type="button" class="text-primary text-sm font-medium hover:underline"
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="text-lg font-sans! font-medium text-gray-900">Education</h3>
+                        <button type="button" class="text-[#E2980F] text-lg font-normal hover:underline"
                             onclick="addEducation()">
                             + Add Another Education
                         </button>
                     </div>
 
                     <div class="section-card mb-8" id="education-section">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
                             <div>
-                                <label class="block text-gray-600 text-sm mb-2">Institution / School</label>
+                                <label class="block text-gray-600 text-lg mb-4">Institution / School</label>
                                 <input type="text" name="education[0][institution]" class="reg-input"
                                     placeholder="Enter Institution / School">
                             </div>
                             <div>
-                                <label class="block text-gray-600 text-sm mb-2">Batch (Years/Years)</label>
+                                <label class="block text-gray-600 text-lg mb-4">Batch (Years/Years)</label>
                                 <input type="text" name="education[0][batch]" class="reg-input"
                                     placeholder="Batch Years">
                             </div>
                             <div>
-                                <label class="block text-gray-600 text-sm mb-2">Postal Address</label>
+                                <label class="block text-gray-600 text-lg mb-4">Postal Address</label>
                                 <input type="text" name="education[0][postal_address]" class="reg-input"
                                     placeholder="Enter Postal Address">
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
                             <div>
-                                <label class="block text-gray-600 text-sm mb-2">Training / Diploma</label>
+                                <label class="block text-gray-600 text-lg mb-4">Training / Diploma</label>
                                 <input type="text" name="education[0][training]" class="reg-input"
                                     placeholder="Enter Training / Diploma">
                             </div>
                             <div>
-                                <label class="block text-gray-600 text-sm mb-2">Duration (Years/Years)</label>
+                                <label class="block text-gray-600 text-lg mb-4">Duration (Years/Years)</label>
                                 <input type="text" name="education[0][duration]" class="reg-input"
                                     placeholder="Enter Duration">
                             </div>
                             <div>
-                                <label class="block text-gray-600 text-sm mb-2">Hostel Address</label>
+                                <label class="block text-gray-600 text-lg mb-4">Hostel Address</label>
                                 <input type="text" name="education[0][hostel_address]" class="reg-input"
                                     placeholder="Enter Hostel Address">
                             </div>
@@ -554,11 +205,11 @@
                         <h3 class="text-lg font-medium text-gray-900 mb-6">Professional Practice Details</h3>
 
                         <!-- Ayurvedic Wellness Consultation -->
-                        <div class="mb-6">
-                            <h4 class="font-medium text-gray-900 mb-1">Ayurvedic Wellness Consultation:</h4>
-                            <p class="text-gray-500 text-sm mb-3">Focuses on nutritional and lifestyle guidance rooted
+                        <div class="mb-12">
+                            <h4 class="font-medium text-gray-900 mb-4">Ayurvedic Wellness Consultation:</h4>
+                            <p class="text-gray-500 text-sm mb-4">Focuses on nutritional and lifestyle guidance rooted
                                 in Ayurvedic principles:</p>
-                            <input type="text" name="ayurvedic_practices_custom" class="reg-input mb-3"
+                            <input type="text" name="ayurvedic_practices_custom" class="reg-input mb-4"
                                 placeholder="Choose your practice areas">
                             <div class="flex flex-wrap gap-2">
                                 <label class="practice-tag"><input type="checkbox" name="ayurvedic_practices[]"
@@ -574,11 +225,11 @@
                         </div>
 
                         <!-- Massage & Body Therapists -->
-                        <div class="mb-6">
-                            <h4 class="font-medium text-gray-900 mb-1">Massage & Body Therapists:</h4>
-                            <p class="text-gray-500 text-sm mb-3">Includes specific traditional physical treatments and
+                        <div class="mb-12">
+                            <h4 class="font-medium text-gray-900 mb-4">Massage & Body Therapists:</h4>
+                            <p class="text-gray-500 text-sm mb-4">Includes specific traditional physical treatments and
                                 specialized care:</p>
-                            <input type="text" name="massage_practices_custom" class="reg-input mb-3"
+                            <input type="text" name="massage_practices_custom" class="reg-input mb-4"
                                 placeholder="Choose your practice areas">
                             <div class="flex flex-wrap gap-2">
                                 <label class="practice-tag"><input type="checkbox" name="massage_practices[]"
@@ -605,9 +256,9 @@
                         </div>
 
                         <!-- Other Modalities -->
-                        <div class="mb-6">
-                            <h4 class="font-medium text-gray-900 mb-1">Other Modalities:</h4>
-                            <input type="text" name="other_modalities_custom" class="reg-input mb-3"
+                        <div class="mb-12">
+                            <h4 class="font-medium text-gray-900 mb-4">Other Modalities:</h4>
+                            <input type="text" name="other_modalities_custom" class="reg-input mb-4"
                                 placeholder="Choose your practice areas">
                             <div class="flex flex-wrap gap-2">
                                 <label class="practice-tag"><input type="checkbox" name="other_modalities[]"
@@ -633,18 +284,20 @@
                     <!-- Certifications -->
                     <div class="flex justify-between items-center mb-4">
                         <div>
-                            <h3 class="text-lg font-medium text-gray-900">Certifications</h3>
-                            <p class="text-gray-500 text-sm">(Kindly include hours and dates. It should be
-                                self-attested)</p>
+                            <h3 class="text-lg font-medium text-gray-900">Certifications
+
+                                <span class="text-gray-500 text-sm text-italic">(Kindly include hours and dates. It
+                                    should be self-attested)</span>
+                            </h3>
                         </div>
-                        <button type="button" class="text-primary text-sm font-medium hover:underline"
+                        <button type="button" class="text-[#E2980F] text-sm font-medium hover:underline"
                             onclick="addCertification()">
                             + Add More Certificates
                         </button>
                     </div>
 
-                    <div class="section-card mb-6" id="certification-section">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="bg-[#F5F5F5] rounded-xl mb-6" id="certification-section">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-10">
                             <div>
                                 <label class="block text-gray-600 text-sm mb-2">Institution / School</label>
                                 <div class="upload-box">
@@ -677,13 +330,16 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="warning-box mb-4">
-                            <i class="ri-error-warning-line mr-1"></i>
-                            Incomplete applications will not be reviewed. Please ensure all documents are legible.
-                        </div>
-                        <div class="flex justify-end gap-3">
-                            <button type="button" class="btn-cancel-small">Cancel</button>
-                            <button type="button" class="btn-save">Save</button>
+                        <div class="warning-box flex justify-between items-center mb-4">
+                            <div>
+                                <i class="ri-error-warning-line mr-1"></i>
+                                <span class="italic text-[#423131] text-sm">Incomplete applications will not be reviewed.
+                                    Please ensure all documents are legible.</span>
+                            </div>
+                            <div class="flex justify-end gap-3">
+                                <button type="button" class="btn-cancel-small">Cancel</button>
+                                <button type="button" class="btn-save">Save</button>
+                            </div>
                         </div>
                     </div>
 
