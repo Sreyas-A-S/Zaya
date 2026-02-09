@@ -68,9 +68,9 @@
                 <div class="block" id="tab-1">
                     <h3 class="text-2xl font-sans! font-normal text-gray-900 mb-10">Basic Details</h3>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <!-- Fullname & Photo Row -->
-                        <div class="md:col-span-2">
+                        <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">Fullname</label>
                             <input type="text" name="fullname" value="{{ old('fullname') }}"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
@@ -168,25 +168,25 @@
                         </button>
                     </div>
 
-                    <div class="bg-[#e1e1e1] border border-gray-200 rounded-2xl py-10 px-12 mb-8"
+                    <div class="bg-[#F5F5F5] rounded-2xl py-10 px-12 mb-8"
                         id="education-section">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
                             <div>
                                 <label class="block text-gray-600 text-lg mb-4">Institution / School</label>
                                 <input type="text" name="education[0][institution]"
-                                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                    class="w-full py-3.5 px-6 bg-[#FEFEFE] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                     placeholder="Enter Institution / School">
                             </div>
                             <div>
                                 <label class="block text-gray-600 text-lg mb-4">Batch (Years/Years)</label>
                                 <input type="text" name="education[0][batch]"
-                                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                    class="w-full py-3.5 px-6 bg-[#FEFEFE] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                     placeholder="Batch Years">
                             </div>
                             <div>
                                 <label class="block text-gray-600 text-lg mb-4">Postal Address</label>
                                 <input type="text" name="education[0][postal_address]"
-                                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                    class="w-full py-3.5 px-6 bg-[#FEFEFE] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                     placeholder="Enter Postal Address">
                             </div>
                         </div>
@@ -194,20 +194,20 @@
                             <div>
                                 <label class="block text-gray-600 text-lg mb-4">Training / Diploma</label>
                                 <input type="text" name="education[0][training]"
-                                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                    class="w-full py-3.5 px-6 bg-[#FEFEFE] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                     placeholder="Enter Training / Diploma">
                             </div>
                             <div>
                                 <label class="block text-gray-600 text-lg mb-4">Duration (Years/Years)</label>
                                 <input type="text" name="education[0][duration]"
-                                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                    class="w-full py-3.5 px-6 bg-[#FEFEFE] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                     placeholder="Enter Duration">
                             </div>
                             <div>
-                                <label class="block text-gray-600 text-lg mb-4">Hostel Address</label>
-                                <input type="text" name="education[0][hostel_address]"
-                                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="Enter Hostel Address">
+                                <label class="block text-gray-600 text-lg mb-4">Postal Address</label>
+                                <input type="text" name="education[0][postal_address]"
+                                    class="w-full py-3.5 px-6 bg-[#FEFEFE] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                    placeholder="Enter Postal Address">
                             </div>
                         </div>
                         <div class="flex justify-end gap-3">
