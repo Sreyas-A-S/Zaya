@@ -8,6 +8,15 @@
       "app.css"
     ]
   },
+  "resources/css/book-session.css": {
+    "file": "assets/book-session-DzfJrajW.css",
+    "src": "resources/css/book-session.css",
+    "isEntry": true,
+    "name": "book-session",
+    "names": [
+      "book-session.css"
+    ]
+  },
   "resources/css/practitioner-register.css": {
     "file": "assets/practitioner-register-C-HZYcHP.css",
     "src": "resources/css/practitioner-register.css",
