@@ -164,9 +164,9 @@
                             }
                         @endphp
                         <div class="swiper-slide h-auto">
-                            <div class="group cursor-pointer">
+                            <div class="group">
                                 <a href="{{ route('practitioner-detail', $details->id) }}"
-                                    class="h-[400px] mb-6 overflow-hidden relative block"
+                                    class="h-[400px] mb-6 overflow-hidden relative block cursor-pointer"
                                     style="background: url('{{ $image }}') no-repeat bottom center fixed;background-size: cover;">
 
                                     <!-- Content Overlay -->
@@ -203,8 +203,8 @@
 
 
                                 <div class="text-center">
-                                    <button
-                                        class="bg-primary text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-md text-sm">{{ $settings['practitioners_button_text'] ?? 'Book Now' }}</button>
+                                    <a href="{{ route('practitioner-detail', $details->id) }}"
+                                        class="bg-primary text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 cursor-pointer transition-all shadow-md text-sm">{{ $settings['practitioners_button_text'] ?? 'Book Now' }}</a>
                                 </div>
                             </div>
                         </div>
