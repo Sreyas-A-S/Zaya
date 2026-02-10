@@ -6,33 +6,31 @@
     <section class="pt-[144px] md:pt-[150px] pb-20 px-4 md:px-6 bg-white">
         <div class="container mx-auto">
             <div
-                class="bg-[#F4F4F4] rounded-[30px] px-8 md:px-12 flex flex-col md:flex-row items-center relative gap-8 md:gap-12 overflow-hidden shadow-sm">
+                class="bg-[#E8E8E8] rounded-[30px] px-8 md:px-12 flex flex-col md:flex-row items-center relative gap-8 md:gap-12 overflow-hidden shadow-sm">
 
                 <!-- Left Image (Practitioner) -->
-                <div
-                    class="w-full md:w-5/12 relative pt-10 flex items-end justify-center md:justify-start">
+                <div class="w-full md:w-5/12 relative pt-10 flex items-end justify-center md:justify-start">
                     <!-- Cutout Image aligned to bottom -->
-                    <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}" alt="Lilly"
-                        class="h-full">
+                    <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}" alt="Lilly" class="h-full">
                 </div>
 
                 <!-- Right Content -->
                 <div class="w-full md:w-7/12 py-12 md:pl-4">
-                    <h1 class="text-4xl md:text-5xl font-serif font-bold text-black mb-3">I'm Lilly,</h1>
-                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-[#A66E58] mb-6 leading-tight">
+                    <h1 class="text-4xl md:text-5xl font-serif font-medium text-black mb-3">I'm Lilly,</h1>
+                    <h2 class="text-3xl md:text-4xl font-sans! font-medium text-[#A66E58] mb-6 leading-tight">
                         Your Art is the Bridge to <br> Holistic Well-being
                     </h2>
-                    <p class="text-gray-500 mb-10 max-w-xl leading-relaxed text-base md:text-lg">
+                    <p class="text-[#404040] mb-10 max-w-xl leading-relaxed text-base md:text-lg">
                         As an Art Therapist, you understand that healing often begins where words end. ZAYA Wellness invites
                         you to bring your unique creative modalities to a global ecosystem dedicated to authentic, holistic
                         care.
                     </p>
 
                     <div class="flex flex-col items-start gap-8">
-                        <button
-                            class="bg-[#A66E58] text-white px-8 py-3.5 rounded-full font-medium shadow-lg hover:bg-[#8e5d4a] transition-colors text-lg">
+                        <a href="{{ route('book-session') }}"
+                            class="bg-secondary text-white px-8 py-3.5 rounded-full font-medium shadow-lg hover:bg-primary transition-colors text-lg">
                             Book a Session
-                        </button>
+                        </a>
 
                         <!-- Rating Block -->
                         <div class="flex items-center gap-20">
@@ -75,6 +73,26 @@
         </div>
     </section>
 
+    <!-- Stats Section -->
+    <section class="pb-16 bg-white px-4 md:px-6">
+        <div class="container mx-auto">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <!-- Sessions Card -->
+                <div
+                    class="bg-white rounded-2xl shadow-[0_0px_72px_rgba(186,186,186,0.45)] border border-gray-100 px-16 py-10 text-center w-full xl:w-auto xl:min-w-[500px]">
+                    <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">100+</h3>
+                    <p class="text-gray-500 text-xl">Total No.of Sessions</p>
+                </div>
+
+                <!-- Clients Card -->
+                <div
+                    class="bg-white rounded-2xl shadow-[0_0px_72px_rgba(186,186,186,0.45)] border border-gray-100 px-16 py-10 text-center w-full xl:w-auto xl:min-w-[500px]">
+                    <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">80+</h3>
+                    <p class="text-gray-500 text-xl">Total No.of Clients</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Legacy of Expertise Section -->
     <section class="pb-20 bg-white">
@@ -86,7 +104,7 @@
             </div>
 
             <!-- Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 text-center md:text-left">
                 <!-- Column 1 -->
                 <div class="flex flex-col items-center md:items-start pl-0 md:pl-10">
                     <div class="flex items-center gap-4 mb-6">
@@ -139,7 +157,7 @@
     </section>
 
     <!-- Reviews Section -->
-    <section class="py-20 bg-white">
+    <section class="pb-20 bg-white">
         <div class="container mx-auto px-6 relative">
             <div class="text-center mb-16 max-w-4xl mx-auto">
                 <h2 class="text-4xl md:text-5xl font-serif font-bold text-[#A66E58] mb-6">Stories of Transformation</h2>
@@ -383,6 +401,22 @@
                 <button
                     class="border cursor-pointer border-secondary text-secondary px-10 py-3 rounded-full hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 font-medium bg-white shadow-sm pointer-events-auto relative z-20">Load
                     More</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom CTA Section -->
+    <section class="py-4 px-4 md:px-6 bg-white">
+        <div class="container mx-auto">
+            <div
+                class="bg-[#F9EBD6] rounded-full px-8 md:px-12 py-5 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+                <p class="text-gray-700 text-base md:text-lg text-center md:text-left">
+                    Ready to start your wellness journey with Lily Marie?
+                </p>
+                <a href="{{ route('book-session') }}"
+                    class="bg-secondary text-white px-8 py-3 rounded-full font-medium hover:bg-primary transition-colors text-sm md:text-base whitespace-nowrap">
+                    Book a Session
+                </a>
             </div>
         </div>
     </section>
