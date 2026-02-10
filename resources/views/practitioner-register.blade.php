@@ -27,8 +27,7 @@
             </div>
 
             <!-- Form Title -->
-            <h2 class="text-xl md:text-2xl font-sans! font-medium text-center text-gray-900 mb-8">Practitioner
-                Registration Form</h2>
+            <h2 class="text-xl md:text-2xl font-sans! font-medium text-center text-gray-900 mb-8">Practitioner Registration Form</h2>
 
             <!-- Step Indicator -->
             <div class="sticky top-0 z-50 bg-white flex justify-center pb-6 pt-8 mb-20 border-b border-[#D0D0D0]">

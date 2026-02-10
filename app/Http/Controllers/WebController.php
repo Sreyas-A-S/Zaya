@@ -89,6 +89,11 @@ class WebController extends Controller
         return view('service-detail', compact('service', 'otherServices'));
     }
 
+    public function bookSession()
+    {
+        return view('book-session');
+    }
+
     /**
      * WordPress API Base URL
      */
