@@ -31,9 +31,11 @@
                     <ul class="space-y-3 text-sm text-secondary">
                         <li><a href="{{ route('home') }}" class="hover:text-primary transition-colors">Home</a></li>
                         <li><a href="#" class="hover:text-primary transition-colors">Practitioners</a></li>
-                        <li><a href="{{ route('services') }}" class="hover:text-primary transition-colors">Treatments</a></li>
+                        <li><a href="{{ route('services') }}"
+                                class="hover:text-primary transition-colors">Treatments</a></li>
                         <li><a href="#" class="hover:text-primary transition-colors">E-Consultation</a></li>
-                        <li><a href="{{ route('about-us') }}" class="hover:text-primary transition-colors">Contact</a></li>
+                        <li><a href="{{ route('contact-us') }}" class="hover:text-primary transition-colors">Contact</a>
+                        </li>
                     </ul>
                 </div>
 
@@ -51,27 +53,31 @@
                     </div>
                     <div class="flex gap-4 mt-6">
                         @if(!empty($site_settings['website_url']))
-                        <a href="{{ $site_settings['website_url'] }}" target="_blank" class="w-6 h-6 hover:opacity-80 transition-opacity">
-                            <img src="{{ asset('frontend/assets/web-icon.svg') }}" alt="Website" class="w-full h-full">
-                        </a>
+                            <a href="{{ $site_settings['website_url'] }}" target="_blank"
+                                class="w-6 h-6 hover:opacity-80 transition-opacity">
+                                <img src="{{ asset('frontend/assets/web-icon.svg') }}" alt="Website" class="w-full h-full">
+                            </a>
                         @endif
                         @if(!empty($site_settings['instagram_url']))
-                        <a href="{{ $site_settings['instagram_url'] }}" target="_blank" class="w-6 h-6 hover:opacity-80 transition-opacity">
-                            <img src="{{ asset('frontend/assets/instagram-icon.svg') }}" alt="Instagram"
-                                class="w-full h-full">
-                        </a>
+                            <a href="{{ $site_settings['instagram_url'] }}" target="_blank"
+                                class="w-6 h-6 hover:opacity-80 transition-opacity">
+                                <img src="{{ asset('frontend/assets/instagram-icon.svg') }}" alt="Instagram"
+                                    class="w-full h-full">
+                            </a>
                         @endif
                         @if(!empty($site_settings['facebook_url']))
-                        <a href="{{ $site_settings['facebook_url'] }}" target="_blank" class="w-6 h-6 hover:opacity-80 transition-opacity">
-                            <img src="{{ asset('frontend/assets/facebook-line-icon.svg') }}" alt="Facebook"
-                                class="w-full h-full">
-                        </a>
+                            <a href="{{ $site_settings['facebook_url'] }}" target="_blank"
+                                class="w-6 h-6 hover:opacity-80 transition-opacity">
+                                <img src="{{ asset('frontend/assets/facebook-line-icon.svg') }}" alt="Facebook"
+                                    class="w-full h-full">
+                            </a>
                         @endif
                         @if(!empty($site_settings['whatsapp_number']))
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $site_settings['whatsapp_number']) }}" target="_blank" class="w-6 h-6 hover:opacity-80 transition-opacity">
-                            <img src="{{ asset('frontend/assets/whatsapp-icon.svg') }}" alt="WhatsApp"
-                                class="w-full h-full">
-                        </a>
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $site_settings['whatsapp_number']) }}"
+                                target="_blank" class="w-6 h-6 hover:opacity-80 transition-opacity">
+                                <img src="{{ asset('frontend/assets/whatsapp-icon.svg') }}" alt="WhatsApp"
+                                    class="w-full h-full">
+                            </a>
                         @endif
                     </div>
                 </div>

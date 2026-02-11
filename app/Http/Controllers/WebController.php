@@ -94,6 +94,11 @@ class WebController extends Controller
         return view('book-session');
     }
 
+    public function contactUs()
+    {
+        return view('contact-us');
+    }
+
     /**
      * WordPress API Base URL
      */

@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <a href="#" class="hover:text-primary transition-colors">Contact Us</a>
+            <a href="{{ route('contact-us') }}" class="hover:text-primary transition-colors">Contact Us</a>
         </nav>
 
         <!-- Logo (Centered) -->
@@ -95,13 +95,17 @@
         <div class="flex flex-col gap-2">
             <span class="text-lg font-medium text-secondary">Services</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
-                <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing" class="text-gray-600 text-sm">Ayurveda</a>
-                <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing" class="text-gray-600 text-sm">Yoga</a>
-                <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing" class="text-gray-600 text-sm">Counselling</a>
+                <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
+                    class="text-gray-600 text-sm">Ayurveda</a>
+                <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
+                    class="text-gray-600 text-sm">Yoga</a>
+                <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
+                    class="text-gray-600 text-sm">Counselling</a>
             </div>
         </div>
 
-        <a href="#" class="text-lg font-medium text-secondary border-b border-gray-50 pb-2">Contact Us</a>
+        <a href="{{ route('contact-us') }}"
+            class="text-lg font-medium text-secondary border-b border-gray-50 pb-2">Contact Us</a>
         <a href="{{ route('zaya-login') }}" class="text-lg font-medium text-secondary pb-2">Login</a>
 
         <div class="pt-2">
