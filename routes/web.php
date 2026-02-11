@@ -52,6 +52,7 @@ Route::get('/service/{slug}', [WebController::class, 'serviceDetail'])->name('se
 Route::get('/blogs', [WebController::class, 'blogs'])->name('blogs');
 Route::get('/blog/{slug}', [WebController::class, 'blogDetail'])->name('blog-detail');
 Route::get('/book-session', [WebController::class, 'bookSession'])->name('book-session');
+Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');

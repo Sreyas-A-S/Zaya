@@ -180,7 +180,6 @@
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent">
                                         </div>
 
-
                                         <!-- Text layer (ABOVE blur) -->
                                         <div class="relative z-10">
                                             <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">
