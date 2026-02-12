@@ -115,11 +115,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 centeredSlides: false,
             },
             1440: {
-                slidesPerView: 4.6,
+                slidesPerView: 4,
+                spaceBetween: 80,
                 centeredSlides: false,
             },
             1920: {
-                slidesPerView: 6.3,
+                slidesPerView: 5,
+                spaceBetween: 80,
                 centeredSlides: false,
             },
         },
