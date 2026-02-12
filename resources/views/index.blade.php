@@ -72,7 +72,7 @@
     <!-- Services Section -->
     <section id="services" class="py-20 md:py-22 relative">
         <img src="{{ asset('frontend/assets/leaf-01.png') }}" alt="Leaf Image"
-            class="absolute top-[300px] lg:top-[180px] left-0 z-[2]">
+            class="absolute top-[300px] lg:top-[180px] left-0 z-[2] w-20 xl:w-[138px]">
         <img src="{{ asset('frontend/assets/floating-leaf.png') }}" alt="Leaf Image"
             class="absolute top-0 lg:top-10 left-10 z-[2]">
         <img src="{{ asset('frontend/assets/holy-basil.png') }}" alt="Thulasi Image"
@@ -118,19 +118,37 @@
 
     <!-- Practitioner Directory -->
     <section id="practitioners" class="pb-20">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-start mb-16 animate-on-scroll">
-                <h2 class="text-4xl md:text-5xl font-serif font-bold text-primary">
-                    {{ $settings['practitioners_title'] ?? 'Practitioner Directory' }}</h2>
+        <div class="container-fluid mx-auto relative mb-16">
+            <!-- Floating Images -->
+            <img src="{{ asset('frontend/assets/holy-basil-left.png') }}" alt="Holy Basil" 
+                class="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-24 xl:w-40 pointer-events-none animate-on-scroll">
+            <img src="{{ asset('frontend/assets/leaf-04.png') }}" alt="Leaf" 
+                class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-24 xl:w-40 pointer-events-none animate-on-scroll">
 
-                <!-- Search small -->
-                <div class="mt-4 md:mt-0 relative w-full md:w-64 xl:w-80">
+            <div class="text-center max-w-4xl mx-auto animate-on-scroll">
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">
+                    {{ $settings['practitioners_title'] ?? 'Practitioners Who Guide Your Journey' }}
+                </h2>
+                
+                <p class="text-gray-500 text-base leading-relaxed mb-8 max-w-3xl mx-auto">
+                    {{ $settings['practitioners_description'] ?? 'Zaya practitioners are experienced, compassionate, and deeply committed to holistic healing. They guide you with personalized care and connect you to specialized experts when required. Supported by Zaya’s digital tools, practitioners focus fully on healing while the platform handles coordination and technology. They work within a trusted professional network that values ethics, collaboration, and transparency. Together, Zaya practitioners create meaningful, long-term wellness journeys.' }}
+                </p>
+
+                <div class="mb-20">
+                    <a href="{{ route('services') }}" class="bg-primary text-white px-8 py-3 rounded-full hover:bg-opacity-90 transition-all font-medium text-lg inline-block shadow-md">
+                        {{ $settings['practitioners_browse_btn'] ?? 'Browse All Practitioners' }}
+                    </a>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="relative max-w-xl mx-auto">
                     <input type="text"
-                        placeholder="{{ $settings['practitioners_search_placeholder'] ?? 'Search practitioners...' }}"
+                        placeholder="{{ $settings['practitioners_search_placeholder'] ?? 'Search Practitioner' }}"
                         id="practitioner-search-input" name="practitioner-search-input"
-                        class="w-full pl-7 pr-14 py-5 rounded-full border text-primary border-[#EFC6B6] bg-white focus:outline-none focus:border-primary placeholder-[#CD8162]">
-                    <i
-                        class="ri-search-line absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 text-2xl text-primary"></i>
+                        class="w-full pl-6 pr-12 py-4 rounded-full border border-[#EFC6B6] bg-white focus:outline-none focus:border-primary placeholder-[#CD8162] text-primary shadow-sm transition-all md:text-lg">
+                    <button class="absolute right-4 top-1/2 -translate-y-1/2 text-primary hover:scale-110 transition-transform">
+                        <i class="ri-search-line text-2xl"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -158,52 +176,49 @@
                                 $roleName = $details->consultations[0];
                             }
 
-                            $image = asset('frontend/assets/lilly.png'); // Default image
+                            $image = asset('frontend/assets/dummy-practitioner-img.webp'); // Default image
                             if ($details->profile_photo_path) {
                                 $image = asset('storage/' . $details->profile_photo_path);
                             }
                         @endphp
                         <div class="swiper-slide h-auto">
-                            <div class="group">
-                                <a href="{{ route('practitioner-detail', $details->id) }}"
-                                    class="h-[400px] mb-6 overflow-hidden relative block cursor-pointer"
-                                    style="background: url('{{ $image }}') no-repeat bottom center fixed;background-size: cover;">
-
-                                    <!-- Content Overlay -->
-                                    <div class="absolute bottom-0 left-0 w-full p-6">
-
-                                        <!-- Blur/gradient layer (BEHIND text) -->
-                                        <div class="absolute left-[-40px] bottom-[-40px] right-[-40px] top-0 blur-xl"
-                                            style="background: url('{{ $image }}') no-repeat bottom center fixed;background-size: cover;">
-                                        </div>
-
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent">
-                                        </div>
-
-                                        <!-- Text layer (ABOVE blur) -->
-                                        <div class="relative z-10">
-                                            <h3 class="text-3xl font-sans! font-bold text-light-gold mb-2 leading-none">
-                                                {{ $name }}
-                                            </h3>
-                                            <p class="text-white/90 text-lg font-normal tracking-wide">
-                                                {{ $roleName }}
-                                            </p>
-                                        </div>
-                                    </div>
-
+                            <div class="group relative">
+                                <!-- Image Card -->
+                                <div class="relative h-[400px] overflow-hidden mb-6">
+                                    <img src="{{ $image }}" alt="{{ $name }}" class="w-full h-full object-cover">
+                                    
                                     <!-- Rating Badge -->
-                                    <div
-                                        class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-sm">
-                                        <i class="ri-star-fill text-secondary text-xs"></i>
-                                        <span
-                                            class="text-secondary text-xs font-bold">{{ number_format($details->average_rating, 1) }}</span>
+                                    <div class="absolute top-4 right-4 bg-[#FDFEF3] border-[#E8E8D8] backdrop-blur-sm rounded-full px-3 py-2 flex items-center gap-1 shadow-sm">
+                                        <i class="ri-star-fill text-secondary text-sm leading-none"></i>
+                                        <span class="text-secondary text-sm leading-none font-bold">{{ number_format($details->average_rating, 1) }}</span>
                                     </div>
-                                </a>
 
+                                    <!-- Book Now Button -->
+                                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-max z-10">
+                                        <a href="{{ route('practitioner-detail', $details->id) }}" 
+                                           class="bg-white text-primary px-8 py-2.5 rounded-full font-medium shadow-lg hover:bg-primary hover:text-white transition-all text-sm block">
+                                            {{ $settings['practitioners_button_text'] ?? 'Book Now' }}
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Clickable Overlay for Image -->
+                                    <a href="{{ route('practitioner-detail', $details->id) }}" class="absolute inset-0 z-0"></a>
+                                </div>
 
+                                <!-- Info Section -->
                                 <div class="text-center">
-                                    <a href="{{ route('practitioner-detail', $details->id) }}"
-                                        class="bg-primary text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 cursor-pointer transition-all shadow-md text-sm">{{ $settings['practitioners_button_text'] ?? 'Book Now' }}</a>
+                                    <h3 class="text-2xl font-serif font-medium text-primary mb-3 leading-none">
+                                        <a href="{{ route('practitioner-detail', $details->id) }}" class="hover:text-secondary transition-colors">
+                                            {{ $name }}
+                                        </a>
+                                    </h3>
+                                    <p class="text-secondary text-xl font-serif italic mb-4 cursor-default">
+                                        {{ $roleName }}
+                                    </p>
+                                    <div class="flex items-center justify-center gap-1 text-[#434343] text-base font-regular cursor-default">
+                                        <i class="ri-map-pin-line text-lg"></i>
+                                        <span>{{ $details->city ?? 'Zaya' }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -214,7 +229,7 @@
         </div>
         <div class="container mx-auto">
             <!-- Custom Nav Arrows -->
-            <div class="flex justify-center items-center gap-8">
+            <div class="flex justify-center items-center gap-12">
                 <button
                     class="prev-practitioner w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer">
                     <i class="ri-arrow-left-line text-xl"></i>
@@ -253,13 +268,13 @@
                     <h2 class="text-4xl md:text-4xl font-serif font-bold text-primary mb-8 leading-tight">
                         {!! nl2br($settings['blog_subtitle'] ?? 'Your Guide to Ayurvedic<br>Mastery') !!}
                     </h2>
-                    <h3 class="text-2xl md:text-3xl font-serif text-secondary mb-8">
+                    <h3 class="text-2xl md:text-3xl font-serif text-secondary mb-12">
                         {{ $settings['blog_title'] ?? 'Wisdom Journal' }}</h3>
                     <a href="{{ route('blogs') }}"
                         class="border border-secondary text-secondary px-8 py-3 rounded-full hover:bg-secondary hover:text-white transition-all text-lg">{{ $settings['blog_button_text'] ?? 'Explore Journal' }}</a>
                 </div>
                 <!-- Plant Image (Bottom) -->
-                <div class="mt-auto flex justify-end translate-y-12 animate-on-scroll">
+                <div class="mt-auto flex justify-end animate-on-scroll">
                     <img src="{{ isset($settings['blog_image_main']) ? (Str::startsWith($settings['blog_image_main'], 'frontend/') ? asset($settings['blog_image_main']) : asset('storage/' . $settings['blog_image_main'])) : asset('frontend/assets/Eucalyptus-Essential-Oil.png') }}"
                         alt="Eucalyptus Essential Oil" class="w-2/3 md:w-1/2 lg:w-[80%] object-contain">
                 </div>
@@ -343,25 +358,26 @@
     </section>
 
     <!-- Testimonials Section -->
-    <section class="py-20 md:py-28 bg-white text-center relative overflow-hidden">
+    <section class="py-20 md:pt-28 md:pb-18 bg-white text-center relative overflow-hidden">
         <!-- Decorative Leaf -->
         <img src="{{ asset('frontend/assets/leaf-02.png') }}" alt="Leaf"
-            class="absolute right-0 top-1/3 -translate-y-1/2 w-24 md:w-32 opacity-80 pointer-events-none">
+            class="absolute right-0 top-1/3 w-24 md:w-32 pointer-events-none">
 
         <div class="container mx-auto px-6 max-w-4xl relative z-10">
             <h2 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary mb-8 animate-on-scroll">
-                {{ $settings['testimonials_title'] ?? 'Real Stories of Healing' }}</h2>
+                {{ $settings['testimonials_title'] ?? 'Real Stories, Real Experiences' }}</h2>
 
-            <div class="mb-8 animate-on-scroll">
-                <span class="bg-[#F8E0BB] text-[#2E4B3C] px-8 py-2.5 rounded-full font-medium text-base inline-block">
+            <p class="text-gray-500 text-base leading-relaxed max-w-2xl mx-auto animate-on-scroll mb-8"
+                style="transition-delay: 100ms;">
+                {{ $settings['testimonials_subtitle'] ?? 'Stories from those who have experienced thoughtful care, expert guidance, and meaningful wellness journeys with Zaya.' }}
+            </p>
+
+            <div class="animate-on-scroll">
+                <span class="bg-[#F6F6F6] text-[#8F8F8F] px-8 py-2.5 rounded-full font-medium text-base inline-block">
                     {{ $settings['testimonials_badge'] ?? 'Testimonials' }}
                 </span>
             </div>
 
-            <p class="text-gray-500 text-base md:text-lg leading-relaxed max-w-2xl mx-auto animate-on-scroll"
-                style="transition-delay: 100ms;">
-                {{ $settings['testimonials_subtitle'] ?? 'Discover how our personalized Ayurvedic consultations have helped our community find balance, vitality and lasting wellness.' }}
-            </p>
         </div>
     </section>
 
@@ -379,12 +395,11 @@
                                     <img src="{{ $testimonial->image ? asset('storage/' . $testimonial->image) : 'https://ui-avatars.com/api/?name=' . urlencode($testimonial->name) }}"
                                         class="w-16 h-16 rounded-full object-cover">
                                     <div>
-                                        <h4 class="font-bold text-[#A66E58] text-xl font-serif">{{ $testimonial->name }}</h4>
-                                        <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">{{ $testimonial->role }}
-                                        </p>
+                                        <h4 class="font-bold text-[#A66E58] text-xl font-sans!">{{ $testimonial->name }}</h4>
+                                        <p class="text-sm text-gray-500 mt-1!">{{$testimonial->role }}</p>
                                     </div>
                                 </div>
-                                <p class="text-gray-600 text-sm leading-relaxed mb-6">"{{ $testimonial->message }}"</p>
+                                <p class="text-[#404040] text-sm/7 mb-6">"{{ $testimonial->message }}"</p>
                                 <div class="text-yellow-400 text-lg flex gap-1">
                                     @for($i = 1; $i <= 5; $i++)
                                         @if($i <= $testimonial->rating)
@@ -404,9 +419,9 @@
         <div class="container py-16 mx-auto">
             <!-- Custom Nav Arrows Centered Below -->
             <div class="flex justify-center items-center gap-12 text-primary">
-                <button class="prev-testimonial hover:scale-110 transition-transform"><i
+                <button class="prev-testimonial w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer"><i
                         class="ri-arrow-left-line text-3xl"></i></button>
-                <button class="next-testimonial hover:scale-110 transition-transform"><i
+                <button class="next-testimonial w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer"><i
                         class="ri-arrow-right-line text-3xl"></i></button>
             </div>
         </div>
