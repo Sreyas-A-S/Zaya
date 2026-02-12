@@ -37,6 +37,7 @@ return [
 
     'wordpress' => [
         'api_url' => env('WORDPRESS_API_URL', 'https://blog.zayawellness.com/wp-json/wp/v2'),
+        'verify_ssl' => env('WORDPRESS_API_VERIFY_SSL', true),
     ],
 
 ];

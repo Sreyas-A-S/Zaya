@@ -116,11 +116,18 @@ class WebController extends Controller
     {
         try {
             $url = $this->getWordPressApiUrl() . '/' . $endpoint;
+            $verifySsl = config('services.wordpress.verify_ssl', true);
 
-            $response = Http::withHeaders([
+            $request = Http::withHeaders([
                 'User-Agent' => 'ZayaWellness/1.0',
                 'Accept' => 'application/json',
-            ])->timeout(10)->get($url, $params);
+            ])->timeout(10);
+
+            if (!$verifySsl) {
+                $request->withoutVerifying();
+            }
+
+            $response = $request->get($url, $params);
 
             if ($response->failed()) {
                 Log::error('WordPress API Error: ' . $response->body());
@@ -133,6 +140,11 @@ class WebController extends Controller
             // existing logic uses $post->title->rendered. json_decode default is object.
             // Http::json() returns array. json_decode($response->body()) returns object.
             $data = json_decode($response->body());
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('WordPress API JSON Decode Error: ' . json_last_error_msg());
+                return $withHeaders ? ['data' => [], 'headers' => []] : [];
+            }
 
             if ($withHeaders) {
                 $headers = [
