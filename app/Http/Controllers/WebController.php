@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WebController extends Controller
 {
@@ -104,7 +106,7 @@ class WebController extends Controller
      */
     private function getWordPressApiUrl()
     {
-        return config('services.wordpress.api_url', 'https://blog.zayawellness.com/wp-json/wp/v2');
+        return config('services.wordpress.api_url');
     }
 
     /**
@@ -115,45 +117,35 @@ class WebController extends Controller
         try {
             $url = $this->getWordPressApiUrl() . '/' . $endpoint;
 
-            if (!empty($params)) {
-                $url .= '?' . http_build_query($params);
+            $response = Http::withHeaders([
+                'User-Agent' => 'ZayaWellness/1.0',
+                'Accept' => 'application/json',
+            ])->timeout(10)->get($url, $params);
+
+            if ($response->failed()) {
+                Log::error('WordPress API Error: ' . $response->body());
+                return $withHeaders ? ['data' => [], 'headers' => []] : [];
             }
 
-            $context = stream_context_create([
-                'http' => [
-                    'timeout' => 10,
-                    'ignore_errors' => true
-                ]
-            ]);
+            $data = $response->json(); // Returns array by default, we might need object for current logic
 
-            $response = @file_get_contents($url, false, $context);
-
-            if ($response === false) {
-                return $withHeaders ? ['data' => null, 'headers' => []] : null;
-            }
-
-            $data = json_decode($response);
+            // Convert to object to match existing logic if needed, or update logic.
+            // existing logic uses $post->title->rendered. json_decode default is object.
+            // Http::json() returns array. json_decode($response->body()) returns object.
+            $data = json_decode($response->body());
 
             if ($withHeaders) {
-                // Parse response headers for pagination info
-                $headers = [];
-                if (isset($http_response_header)) {
-                    foreach ($http_response_header as $header) {
-                        if (stripos($header, 'X-WP-Total:') === 0) {
-                            $headers['total'] = (int) trim(substr($header, 11));
-                        }
-                        if (stripos($header, 'X-WP-TotalPages:') === 0) {
-                            $headers['totalPages'] = (int) trim(substr($header, 16));
-                        }
-                    }
-                }
+                $headers = [
+                    'total' => (int) ($response->header('X-WP-Total') ?? 0),
+                    'totalPages' => (int) ($response->header('X-WP-TotalPages') ?? 0),
+                ];
                 return ['data' => $data, 'headers' => $headers];
             }
 
             return $data;
         } catch (\Exception $e) {
-            \Log::error('WordPress API Error: ' . $e->getMessage());
-            return $withHeaders ? ['data' => null, 'headers' => []] : null;
+            Log::error('WordPress API Exception: ' . $e->getMessage());
+            return $withHeaders ? ['data' => [], 'headers' => []] : [];
         }
     }
 
