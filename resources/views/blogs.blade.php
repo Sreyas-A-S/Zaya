@@ -92,7 +92,7 @@
                                         </div>
                                     </a>
                                     <div class="p-6">
-                                        <div class="flex items-center gap-3 mb-4">
+                                        <div class="flex items-center gap-3 mb-4 cursor-default">
                                             <span class="bg-accent/20 text-secondary px-4 py-1.5 rounded-full text-sm font-medium">{{ $post['category'] }}</span>
                                             <span class="text-gray-400 text-sm">{{ $post['date'] }}</span>
                                         </div>
@@ -101,7 +101,7 @@
                                                 {{ $post['title'] }}
                                             </h3>
                                         </a>
-                                        <p class="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-3">
+                                        <p class="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-3 cursor-default">
                                             {{ Str::limit($post['excerpt'], 150) }}
                                         </p>
                                         <a href="{{ route('blog-detail', $post['slug']) }}" class="inline-flex items-center text-secondary font-medium hover:text-primary transition-colors">

@@ -187,7 +187,7 @@ class WebController extends Controller
         $settings = \App\Models\HomepageSetting::pluck('value', 'key');
 
         $currentPage = (int) $request->get('page', 1);
-        $perPage = 8;
+        $perPage = 9;
 
         // Build API params
         $params = [
