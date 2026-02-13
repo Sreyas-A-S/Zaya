@@ -17,24 +17,47 @@
                             <li><a href="{{ route('blogs') }}" class="text-gray-400 hover:text-secondary transition-colors">Blog</a>
                             </li>
                             <li class="text-gray-300">/</li>
-                            <li class="text-secondary">{{ Str::limit($blogPost['title'], 40) }}</li>
+                            <li class="text-secondary line-clamp-1">{{ Str::limit($blogPost['title'], 40) }}</li>
                         </ol>
                     </nav>
 
                     <!-- Post Header -->
-                    <div class="mb-8">
-                        <div class="flex items-center gap-4 mb-6">
-                            <span class="bg-accent text-secondary px-6 py-2 rounded-full text-sm font-medium">
-                                {{ $blogPost['category'] }}
-                            </span>
-                            <span class="text-gray-400 text-sm flex items-center gap-2">
-                                <i class="ri-calendar-line"></i>
-                                {{ $blogPost['date'] }}
-                            </span>
-                        </div>
-                        <h1 class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary leading-tight">
+                    <div class="mb-10">
+                        <h1 class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary leading-tight mb-8">
                             {{ $blogPost['title'] }}
                         </h1>
+
+                        <!-- Author & Meta Section -->
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <!-- Author -->
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm ring-2 ring-gray-100">
+                                    @if($blogPost['author_image'])
+                                        <img src="{{ $blogPost['author_image'] }}" alt="{{ $blogPost['author'] }}" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">
+                                            <i class="ri-user-line text-2xl"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-base text-gray-400 italic font-regular tracking-wider">By</span>
+                                    <span class="text-gray-400 font-serif font-regular text-lg leading-none italic">{{ $blogPost['author'] }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Meta -->
+                            <div class="flex items-center gap-4 md:gap-6">
+                                <div class="flex items-center gap-2 text-gray-500 text-sm">
+                                    <i class="ri-calendar-line text-base leading-none"></i>
+                                    <span class="font-regular leading-none">{{ $blogPost['date'] }}</span>
+                                </div>
+                                <div class="w-px h-8 bg-gray-200 hidden md:block"></div>
+                                <span class="bg-[#FFE7CF] text-primary px-4 py-1.5 rounded-full text-xs font-regular tracking-wide">
+                                    {{ $blogPost['category'] }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Featured Image -->

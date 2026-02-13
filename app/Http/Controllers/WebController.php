@@ -304,6 +304,18 @@ class WebController extends Controller
             $categoryName = html_entity_decode($post->_embedded->{'wp:term'}[0][0]->name);
         }
 
+        $authorName = 'Unknown';
+        $authorImage = null;
+        if (isset($post->_embedded->author[0])) {
+            $authorData = $post->_embedded->author[0];
+            $authorName = html_entity_decode($authorData->name);
+            if (isset($authorData->avatar_urls)) {
+                // Get the largest avatar usually '96'
+                $avatars = (array) $authorData->avatar_urls;
+                $authorImage = end($avatars); // Get the last one which is usually the largest
+            }
+        }
+
         $blogPost = [
             'id' => $post->id,
             'title' => html_entity_decode($post->title->rendered),
@@ -312,6 +324,8 @@ class WebController extends Controller
             'date' => \Carbon\Carbon::parse($post->date)->format('M d, Y'),
             'featured_image' => $featuredImage,
             'category' => $categoryName,
+            'author' => $authorName,
+            'author_image' => $authorImage,
         ];
 
         // Fetch related posts (8 posts excluding current for sidebar)
