@@ -1,94 +1,118 @@
 <!-- Footer -->
-<footer class="mt-10 lg:mt-20">
-    <div class="relative z-1">
-        <!-- Decorative Images -->
-        <img src="{{ asset('frontend/assets/leaf-03.png') }}" alt="Leaf Image"
-            class="absolute bottom-full translate-y-[70px] left-0 w-30 md:w-[100px] opacity-80 pointer-events-none z-10">
-        <img src="{{ asset('frontend/assets/tulsi-image.png') }}" alt="Tulsi Image"
-            class="absolute bottom-full translate-y-[80px] right-0 w-30 md:w-[163px] opacity-80 pointer-events-none z-10">
+<footer class="text-[#2E2E2E]">
+    <div class="container-fluid mx-auto relative z-10">
 
-    </div>
-    <div class="p-4 relative z-10">
-        <div class="container-fluid bg-[#F2F2F2] pl-10 pr-10 pt-16 pb-8 rounded-xl">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                <!-- Column 1 -->
-                <div class="col-span-1 md:col-span-1">
-                    <!-- Logo (Centered) -->
-                    <a href="#" class="text-2xl md:text-3xl font-serif font-bold tracking-widest text-secondary">
-                        <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="h-24">
+        <!-- Newsletter Section -->
+        <div class="bg-[#79584B] px-6 py-8 md:px-12 flex flex-col md:flex-row items-center justify-center gap-8">
+            <h3 class="text-white text-lg md:text-xl font-regular text-center md:text-left font-sans!">
+                Join our newsletter for weekly wellness tips.
+            </h3>
+            <div class="flex w-full md:w-auto gap-2">
+                <input type="email" placeholder="Your email..."
+                    class="bg-[#F2F2F2] text-[#2E4B3C] placeholder-gray-400 rounded-lg px-4 py-3 w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-[#DFAF7F]">
+                <button
+                    class="bg-[#FFD28D] hover:bg-[#e0caaa] text-[#2E4B3C] rounded-lg px-6 py-3 transition-all flex items-center justify-center">
+                    <i class="ri-send-plane-2-fill text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Footer Content -->
+        <div class="bg-gradient-to-b from-[#FFE7CF] to-[#DFAF7F] px-6 py-12 md:px-18 md:py-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:mb-16">
+
+                <!-- Column 1: Logo & Tagline -->
+                <div class="flex flex-col items-start space-y-6">
+                    <a href="{{ route('home') }}" class="block">
+                        <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness"
+                            class="h-24 w-auto object-contain">
                     </a>
-                    <p class="text-secondary text-sm leading-relaxed mt-4">Embracing the ancient wisdom of Ayurveda
-                        to
-                        bring harmony to your modern life.</p>
+                    <p class="text-[#2E2E2E] opacity-80 text-sm leading-relaxed max-w-xs">
+                        Empowering your wellness journey through ancient wisdom and modern science.
+                    </p>
                 </div>
 
-                <!-- Spacer -->
-                <div class="hidden md:block"></div>
-
-                <!-- Links -->
+                <!-- Column 2: Quick Links -->
                 <div>
-                    <h4 class="font-bold font-sans text-primary mb-6 text-lg">Quick Links</h4>
-                    <ul class="space-y-3 text-sm text-secondary">
-                        <li><a href="{{ route('home') }}" class="hover:text-primary transition-colors">Home</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors">Practitioners</a></li>
-                        <li><a href="{{ route('services') }}"
-                                class="hover:text-primary transition-colors">Treatments</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors">E-Consultation</a></li>
-                        <li><a href="{{ route('contact-us') }}" class="hover:text-primary transition-colors">Contact</a>
-                        </li>
+                    <h4 class="font-medium font-sans! mb-6 text-xl text-[#2E2E2E]">Quick Links</h4>
+                    <ul class="space-y-4 text-base font-regular text-[#2E2E2E]/80">
+                        <li><a href="{{ route('home') }}" class="hover:text-[#79584B] transition-colors">Home</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Who we are</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">What we do</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Our Team</a></li>
+                        <li><a href="{{ route('contact-us') }}" class="hover:text-[#79584B] transition-colors">Contact
+                                Us</a></li>
                     </ul>
                 </div>
 
-                <!-- Newsletter -->
+                <!-- Column 3: Conditions -->
                 <div>
-                    <h4 class="font-bold font-sans text-primary mb-6 text-lg">Stay Connected</h4>
-                    <p class="text-xs text-secondary mb-4">Join our newsletter for wellness tips.</p>
-                    <div class="flex gap-2">
-                        <input type="email" placeholder="Your email..."
-                            class="bg-[#95B2A3] placeholder-[#2E4B3C]/70 text-[#2E4B3C] rounded-lg px-4 py-3 w-full text-base focus:outline-none">
-                        <button
-                            class="bg-[#F8E0BB] text-[#2E4B3C] rounded-lg px-5 hover:bg-opacity-90 transition-colors flex items-center justify-center">
-                            <i class="ri-send-plane-2-fill text-xl"></i>
+                    <h4 class="font-medium font-sans! mb-6 text-xl text-[#2E2E2E]">Conditions We Support</h4>
+                    <ul class="space-y-4 text-base font-regular text-[#2E2E2E]/80">
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Life Transitions</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Mental Imbalance</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Stress Reduction</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Toxin Removal</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Chronic Pain</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Immune Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Pincode & Socials -->
+                <div>
+                    <h4 class="font-medium font-sans! mb-4 text-base text-[#2E2E2E]">Save your pincode & find nearby care.</h4>
+                    <form class="flex gap-2 mb-10">
+                        <input type="text" placeholder="Enter Pincode"
+                            class="bg-[#F9F9F9] placeholder-gray-400 text-gray-800 rounded px-4 py-2 w-full text-sm focus:outline-none border border-transparent focus:border-[#79584B]">
+                        <button type="button"
+                            class="bg-[#79584B] text-white font-medium rounded px-6 py-2 text-sm hover:bg-[#5e4339] transition-colors shadow-sm">
+                            Save
                         </button>
-                    </div>
-                    <div class="flex gap-4 mt-6">
-                        @if(!empty($site_settings['website_url']))
-                            <a href="{{ $site_settings['website_url'] }}" target="_blank"
-                                class="w-6 h-6 hover:opacity-80 transition-opacity">
-                                <img src="{{ asset('frontend/assets/web-icon.svg') }}" alt="Website" class="w-full h-full">
+                    </form>
+
+                    <div class="flex flex-wrap gap-3"> 
+                            <a href="#" target="_blank"
+                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                                <i class="ri-global-line text-lg"></i>
+                            </a>  
+                            <a href="#" target="_blank"
+                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                                <i class="ri-facebook-fill text-lg"></i>
+                            </a> 
+                            <a href="#" target="_blank"
+                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                                <i class="ri-instagram-line text-lg"></i>
+                            </a>  
+                            <a href="#" target="_blank"
+                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                                <i class="ri-youtube-fill text-lg"></i>
+                            </a>  
+                            <a href="#" target="_blank"
+                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                                <i class="ri-linkedin-fill text-lg"></i>
                             </a>
-                        @endif
-                        @if(!empty($site_settings['instagram_url']))
-                            <a href="{{ $site_settings['instagram_url'] }}" target="_blank"
-                                class="w-6 h-6 hover:opacity-80 transition-opacity">
-                                <img src="{{ asset('frontend/assets/instagram-icon.svg') }}" alt="Instagram"
-                                    class="w-full h-full">
+                            <a href="#"
+                                target="_blank"
+                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                                <i class="ri-whatsapp-line text-lg"></i>
                             </a>
-                        @endif
-                        @if(!empty($site_settings['facebook_url']))
-                            <a href="{{ $site_settings['facebook_url'] }}" target="_blank"
-                                class="w-6 h-6 hover:opacity-80 transition-opacity">
-                                <img src="{{ asset('frontend/assets/facebook-line-icon.svg') }}" alt="Facebook"
-                                    class="w-full h-full">
-                            </a>
-                        @endif
-                        @if(!empty($site_settings['whatsapp_number']))
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $site_settings['whatsapp_number']) }}"
-                                target="_blank" class="w-6 h-6 hover:opacity-80 transition-opacity">
-                                <img src="{{ asset('frontend/assets/whatsapp-icon.svg') }}" alt="WhatsApp"
-                                    class="w-full h-full">
-                            </a>
-                        @endif
                     </div>
                 </div>
             </div>
 
-            <div
-                class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
-                <p>&copy; {{ date('Y') }} Zaya Wellness. All rights reserved.</p>
-                <div class="flex gap-4">
-                    <a href="#" class="hover:text-primary">Privacy Policy</a>
-                    <a href="#" class="hover:text-primary">Terms of Service</a>
+            <!-- Bottom Links & Copy -->
+            <div class="pt-8 flex flex-col items-center gap-6">
+                <div class="w-full flex flex-col md:flex-row justify-between text-sm text-[#252525]/80 gap-4"> 
+                    <a href="#" class="hover:text-[#79584B] transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-[#79584B] transition-colors">Cookie Policy</a> 
+                    <a href="#" class="hover:text-[#79584B] transition-colors">Terms & Conditions</a>
+                    <a href="#" class="hover:text-[#79584B] transition-colors">GDPR & Data Protection</a> 
+                </div>
+
+                <div class="w-full border-t border-[#252525]/80"></div>
+
+                <div class="text-center text-sm text-[#252525] cursor-default">
+                    <p>All rights reserved. &copy; {{ date('Y') }} Zaya Wellness</p>
                 </div>
             </div>
         </div>
