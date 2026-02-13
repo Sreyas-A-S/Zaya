@@ -64,9 +64,7 @@
             <a href="{{ route('zaya-login') }}"
                 class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors">Login</a>
 
-            <a href="#"
-                class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap">Book
-                a Practitioner</a>
+            <a href="#" class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap">Find Practitioner</a>
 
             <!-- Language Toggle -->
             <div class="flex items-center bg-gray-100 rounded-full p-1 border border-gray-200">

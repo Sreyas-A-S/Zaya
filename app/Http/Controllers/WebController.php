@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\BlogLike;
 
 class WebController extends Controller
 {
@@ -104,7 +105,7 @@ class WebController extends Controller
     /**
      * WordPress API Base URL
      */
-    private function getWordPressApiUrl()
+    protected function getWordPressApiUrl()
     {
         return config('services.wordpress.api_url');
     }
@@ -112,7 +113,7 @@ class WebController extends Controller
     /**
      * Fetch data from WordPress REST API
      */
-    private function fetchFromWordPress($endpoint, $params = [], $withHeaders = false)
+    protected function fetchFromWordPress($endpoint, $params = [], $withHeaders = false)
     {
         try {
             $url = $this->getWordPressApiUrl() . '/' . $endpoint;
@@ -316,6 +317,11 @@ class WebController extends Controller
             }
         }
 
+
+        // Get Likes
+        $likeCount = BlogLike::where('post_id', $post->id)->count();
+        $hasLiked = BlogLike::where('post_id', $post->id)->where('ip_address', request()->ip())->exists();
+
         $blogPost = [
             'id' => $post->id,
             'title' => html_entity_decode($post->title->rendered),
@@ -326,6 +332,9 @@ class WebController extends Controller
             'category' => $categoryName,
             'author' => $authorName,
             'author_image' => $authorImage,
+            'likes' => $likeCount,
+            'liked' => $hasLiked,
+            'comment_status' => $post->comment_status ?? 'closed',
         ];
 
         // Fetch related posts (8 posts excluding current for sidebar)
@@ -372,5 +381,151 @@ class WebController extends Controller
         }
 
         return view('blog-detail', compact('settings', 'blogPost', 'relatedPosts', 'categories'));
+    }
+
+    /**
+     * Handle Blog Like Toggle
+     */
+    public function toggleLike(Request $request)
+    {
+        try {
+            $request->validate([
+                'post_id' => 'required|integer'
+            ]);
+
+            $postId = $request->post_id;
+            $ip = $request->ip();
+            $userAgent = $request->userAgent();
+
+            $like = BlogLike::where('post_id', $postId)->where('ip_address', $ip)->first();
+            $isLiked = false;
+
+            if ($like) {
+                $like->delete();
+                $isLiked = false;
+                Log::info("Like removed for Post ID: {$postId} from IP: {$ip}");
+            } else {
+                BlogLike::create([
+                    'post_id' => $postId,
+                    'ip_address' => $ip,
+                    'user_agent' => $userAgent
+                ]);
+                $isLiked = true;
+                Log::info("Like added for Post ID: {$postId} from IP: {$ip}");
+            }
+
+            $count = BlogLike::where('post_id', $postId)->count();
+            Log::info("New Like Count for Post ID {$postId}: {$count}");
+
+            return response()->json(['success' => true, 'liked' => $isLiked, 'count' => $count]);
+        } catch (\Exception $e) {
+            Log::error('Blog Like Error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error processing like'], 500);
+        }
+    }
+
+    /**
+     * Handle Blog Comment Submission
+     */
+    public function postComment(Request $request)
+    {
+        $request->validate([
+            'post_id' => 'required|integer',
+            'author_name' => 'required|string',
+            'author_email' => 'required|email',
+            'content' => 'required|string',
+        ]);
+
+        try {
+            $url = $this->getWordPressApiUrl() . '/comments';
+            $verifySsl = config('services.wordpress.verify_ssl', true);
+
+            $data = [
+                'post' => $request->post_id,
+                'author_name' => $request->author_name,
+                'author_email' => $request->author_email,
+                'content' => $request->content,
+                'author_ip' => $request->ip(),
+                'author_user_agent' => $request->userAgent(),
+            ];
+
+            // Some WP setups STRICTLY require Auth for REST API comments, even if "Users must be registered" is unchecked.
+            // We can try to use Application Passwords if available, or just rely on public access.
+            // If you have an Application Password set up in .env, utilize it here.
+            $username = config('services.wordpress.username');
+            $appPassword = config('services.wordpress.application_password');
+
+            $headers = [
+                'User-Agent' => 'ZayaWellness/1.0',
+                'Accept' => 'application/json',
+            ];
+
+            $response = Http::withHeaders($headers);
+
+            if ($username && $appPassword) {
+                $response->withBasicAuth($username, $appPassword);
+            }
+
+            if (!$verifySsl) {
+                $response->withoutVerifying();
+            }
+
+            $result = $response->post($url, $data);
+
+            if ($result->successful()) {
+                $responseData = $result->json();
+                $message = 'Comment submitted successfully!';
+                if (isset($responseData['status']) && $responseData['status'] === 'hold') {
+                    $message = 'Your comment is awaiting moderation.';
+                }
+                return response()->json(['success' => true, 'message' => $message]);
+            } else {
+                $errorBody = $result->json();
+                Log::error('WP Comment Post Error: ', $errorBody);
+
+                $message = 'Unable to post comment.';
+                if (isset($errorBody['code'])) {
+                    if ($errorBody['code'] === 'rest_comment_login_required') {
+                        $message = 'WordPress blocked this comment. If you are using an email address associated with an Admin or Registered User, please try a different email address.';
+                    } elseif ($errorBody['code'] === 'rest_invalid_param') {
+                        $message = 'Invalid comment data provided.';
+                    } elseif ($errorBody['code'] === 'comment_duplicate') {
+                        $message = 'You have already submitted this comment.';
+                    }
+                }
+
+                return response()->json(['success' => false, 'message' => $message], 400);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('WP Comment Exception: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'An error occurred. Please try again.'], 500);
+        }
+    }
+
+    /**
+     * Fetch Blog Comments
+     */
+    public function getComments($postId)
+    {
+        // Get approved comments only
+        try {
+            $comments = $this->fetchFromWordPress('comments', [
+                'post' => $postId,
+                'order' => 'asc',
+                'status' => 'approve'
+            ]);
+
+            // Ensure we have an array
+            if (!is_array($comments)) {
+                Log::warning('WP Comments Invalid Response for Post ' . $postId, ['response' => $comments]);
+                return response()->json([]);
+            }
+
+            return response()->json($comments);
+        } catch (\Exception $e) {
+            Log::error('WP Comment Fetch Error: ' . $e->getMessage());
+            return response()->json([]);
+        }
     }
 }

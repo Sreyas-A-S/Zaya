@@ -54,6 +54,10 @@ Route::get('/blog/{slug}', [WebController::class, 'blogDetail'])->name('blog-det
 Route::get('/book-session', [WebController::class, 'bookSession'])->name('book-session');
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
 
+Route::post('/blog/like', [WebController::class, 'toggleLike'])->name('blog.like');
+Route::post('/blog/comment', [WebController::class, 'postComment'])->name('blog.comment');
+Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->name('blog.comments');
+
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
 
