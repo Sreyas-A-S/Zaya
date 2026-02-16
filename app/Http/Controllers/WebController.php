@@ -187,9 +187,32 @@ class WebController extends Controller
     {
         $settings = \App\Models\HomepageSetting::pluck('value', 'key');
 
+        // Fetch authors for the filter dropdown
+        $authors = [];
+        try {
+            // Fetch users who have published posts
+            $rawAuthors = $this->fetchFromWordPress('users', [
+                'has_published_posts' => true,
+                'per_page' => 100 // Get enough authors
+            ]);
+
+            if ($rawAuthors && is_array($rawAuthors)) {
+                $authors = array_map(function ($author) {
+                    return [
+                        'id' => $author->id,
+                        'name' => $author->name,
+                        'slug' => $author->slug
+                    ];
+                }, $rawAuthors);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error fetching authors: ' . $e->getMessage());
+        }
+
         $currentPage = (int) $request->get('page', 1);
         $perPage = 9;
 
+        // Build API params
         // Build API params
         $params = [
             'per_page' => $perPage,
@@ -197,7 +220,14 @@ class WebController extends Controller
             '_embed' => 1, // Include featured media and categories
         ];
 
-        // Category filter
+        // Author filter
+        $selectedAuthorId = null;
+        if ($request->filled('author')) {
+            $selectedAuthorId = $request->author;
+            $params['author'] = $selectedAuthorId;
+        }
+
+        // Category filter (Sidebar)
         if ($request->filled('category')) {
             // First get category ID by name
             $categories = $this->fetchFromWordPress('categories', ['search' => $request->category]);
@@ -206,17 +236,99 @@ class WebController extends Controller
             }
         }
 
-        // Search filter
+        // Comprehensive Search Logic (Text + Tags + Categories)
         $searchQuery = '';
         if ($request->filled('search')) {
             $searchQuery = $request->search;
-            $params['search'] = $searchQuery;
-        }
 
-        // Fetch posts from WordPress with headers for pagination
-        $response = $this->fetchFromWordPress('posts', $params, true);
-        $posts = $response['data'];
-        $headers = $response['headers'];
+            // 1. Standard Text Search
+            $params['search'] = $searchQuery;
+            $textSearchResponse = $this->fetchFromWordPress('posts', $params, true);
+            $posts = $textSearchResponse['data'] ?? [];
+            $headers = $textSearchResponse['headers'] ?? [];
+
+            // 2. Search for matching Categories
+            $catParams = ['search' => $searchQuery];
+            $matchedCats = $this->fetchFromWordPress('categories', $catParams);
+
+            // 3. Search for matching Tags
+            $tagParams = ['search' => $searchQuery];
+            $matchedTags = $this->fetchFromWordPress('tags', $tagParams);
+
+            $additionalPosts = [];
+
+            // Fetch posts from matched categories
+            if ($matchedCats && count($matchedCats) > 0) {
+                $catIds = array_column($matchedCats, 'id');
+                // Only if we found categories, fetch posts for them
+                // We use a separate query without the 'search' param to avoid AND logic
+                // Copy base params but remove search
+                $catPostParams = $params;
+                unset($catPostParams['search']);
+                $catPostParams['categories'] = implode(',', $catIds);
+
+                $catPosts = $this->fetchFromWordPress('posts', $catPostParams);
+                if ($catPosts && is_array($catPosts)) {
+                    $additionalPosts = array_merge($additionalPosts, $catPosts);
+                }
+            }
+
+            // Fetch posts from matched tags 
+            if ($matchedTags && count($matchedTags) > 0) {
+                $tagIds = array_column($matchedTags, 'id');
+                // We use a separate query without the 'search' param
+                $tagPostParams = $params;
+                unset($tagPostParams['search']);
+                $tagPostParams['tags'] = implode(',', $tagIds);
+
+                $tagPosts = $this->fetchFromWordPress('posts', $tagPostParams);
+                if ($tagPosts && is_array($tagPosts)) {
+                    $additionalPosts = array_merge($additionalPosts, $tagPosts);
+                }
+            }
+
+            // Merge and Unique
+            if (!empty($additionalPosts)) {
+                // Merge initial search results with category/tag results
+                $allPosts = array_merge($posts, $additionalPosts);
+
+                // Deduplicate by ID
+                $uniquePosts = [];
+                $seenIds = [];
+                foreach ($allPosts as $post) {
+                    if (!in_array($post->id, $seenIds)) {
+                        $uniquePosts[] = $post;
+                        $seenIds[] = $post->id;
+                    }
+                }
+
+                // Re-assign to posts
+                $posts = $uniquePosts;
+
+                // Recalculate total (approximate)
+                // We can't easily know true total without fetching all, but we update the count for current view
+                $headers['total'] = count($uniquePosts);
+                // Fix totalPages if count > perPage
+                $headers['totalPages'] = ceil(count($uniquePosts) / $perPage);
+
+                // Since we merged multiple pages of results potentially, we might want to sort by date
+                usort($posts, function ($a, $b) {
+                    return strtotime($b->date) - strtotime($a->date);
+                });
+
+                // Manual Pagination Slice (if we have too many checks)
+                // Note: This is an approximation. True pagination across merged queries needs more complex logic.
+                // For now, we only show the first page logic or simple merge. 
+                // If page > 1, the API calls above fetched page X of each.
+                // Merging Page X of A + Page X of B is a reasonable "Combined Page X".
+            }
+
+        } else {
+            // No search, just fetch
+            $response = $this->fetchFromWordPress('posts', $params, true);
+            $posts = $response['data'];
+            $headers = $response['headers'];
+        }
 
         // Pagination data
         $totalPosts = $headers['total'] ?? 0;
@@ -271,7 +383,7 @@ class WebController extends Controller
             'perPage' => $perPage,
         ];
 
-        return view('blogs', compact('settings', 'processedPosts', 'categories', 'pagination', 'searchQuery'));
+        return view('blogs', compact('settings', 'processedPosts', 'categories', 'pagination', 'searchQuery', 'authors', 'selectedAuthorId'));
     }
 
     /**

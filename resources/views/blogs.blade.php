@@ -39,32 +39,91 @@
                 <!-- Main Content -->
                 <div class="lg:col-span-3">
                     <!-- Search Box -->
-                    <div class="mb-8">
-                        <form action="{{ route('blogs') }}" method="GET">
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
-                                    <i class="ri-search-line text-xl text-gray-400 group-focus-within:text-secondary transition-colors"></i>
-                                </div>
-                                <input type="text" 
-                                       name="search" 
-                                       value="{{ $searchQuery ?? '' }}" 
-                                       placeholder="Search articles, topics, wellness tips..." 
-                                       class="w-full pl-14 pr-32 py-4 bg-gray-50 border border-gray-200 rounded-full text-gray-700 placeholder-gray-400 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all duration-300">
-                                @if(!empty($searchQuery))
-                                    <a href="{{ route('blogs') }}" 
-                                       class="absolute right-28 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
-                                        <i class="ri-close-circle-line text-xl"></i>
-                                    </a>
+                    <div class="mb-12">
+                        <form id="blogs-filter-form" action="{{ route('blogs') }}" method="GET">
+                            <div class="flex flex-col md:flex-row gap-6 mb-6">
+                                @if(request()->has('category'))
+                                    <input type="hidden" name="category" value="{{ request('category') }}">
                                 @endif
-                                <button type="submit" 
-                                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-secondary hover:bg-secondary/90 text-white px-6 py-2.5 rounded-full font-medium transition-all duration-300 hover:shadow-lg">
-                                    Search
-                                </button>
+                                
+                                <!-- Search Input -->
+                                <div class="relative group grow">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-6 pointer-events-none">
+                                        <i class="ri-search-line text-2xl text-[#C5896B]"></i>
+                                    </div>
+                                    <input type="text" 
+                                           name="search" 
+                                           value="{{ $searchQuery ?? '' }}" 
+                                           placeholder="Search articles, topics..." 
+                                           class="w-full pl-16 pr-20 h-[72px] bg-white border border-[#D4A58E] rounded-full text-[#A67B5B] placeholder-[#C5896B] outline-none focus:ring-1 focus:ring-[#D4A58E] transition-all duration-300 text-lg shadow-sm hover:shadow-md">
+                                    
+                                    @if(!empty($searchQuery))
+                                        <a href="{{ route('blogs') }}" 
+                                           class="absolute right-20 top-1/2 -translate-y-1/2 text-[#C5896B] hover:text-[#B07459] transition-colors p-2">
+                                            <i class="ri-close-circle-line text-2xl"></i>
+                                        </a>
+                                    @endif
+
+                                    <button type="submit" 
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#C5896B] hover:bg-[#B07459] text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-md cursor-pointer">
+                                        <i class="ri-search-line text-xl"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Author Dropdown -->
+                                @if(isset($authors) && count($authors) > 0)
+                                    <div class="relative w-full md:w-80" id="author-dropdown-container">
+                                        <input type="hidden" name="author" id="author-input" value="{{ $selectedAuthorId ?? '' }}">
+                                        
+                                        @php
+                                            $displayAuthorName = 'All Authors';
+                                            if(isset($selectedAuthorId) && $selectedAuthorId) {
+                                                foreach($authors as $a) {
+                                                    if($a['id'] == $selectedAuthorId) {
+                                                        $displayAuthorName = $a['name'];
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        @endphp
+
+                                        <button type="button" onclick="toggleAuthorDropdown()" class="w-full h-[72px] pl-8 pr-6 bg-white border border-[#D4A58E] rounded-full text-[#C5896B] text-left outline-none focus:ring-1 focus:ring-[#D4A58E] transition-all duration-300 flex items-center justify-between shadow-sm hover:shadow-md cursor-pointer">
+                                            <span class="truncate block text-lg font-sans" id="selected-author-text">
+                                                {{ $displayAuthorName }}
+                                            </span>
+                                            <i class="ri-arrow-down-s-line text-2xl text-[#C5896B] transition-transform duration-300" id="author-dropdown-arrow"></i>
+                                        </button>
+                                        
+                                        <!-- Dropdown List -->
+                                        <div id="author-dropdown-list" class="absolute top-full left-0 w-full mt-2 bg-white border border-[#efe6e1] rounded-[2rem] shadow-xl overflow-hidden hidden z-50">
+                                            <div class="max-h-60 overflow-y-auto py-2 flex flex-col gap-1 px-2">
+                                                <div onclick="selectAuthor('', 'All Authors')" class="px-6 py-3 hover:bg-[#FFFBF5] rounded-xl cursor-pointer transition-colors text-[#5A3E31] font-medium text-base">
+                                                    All Authors
+                                                </div>
+                                                @foreach($authors as $author)
+                                                    <div onclick="selectAuthor('{{ $author['id'] }}', '{{ addslashes($author['name']) }}')" class="px-6 py-3 hover:bg-[#FFFBF5] rounded-xl cursor-pointer transition-colors text-[#5A3E31] font-medium text-base {{ isset($selectedAuthorId) && $selectedAuthorId == $author['id'] ? 'bg-[#FFFBF5]' : '' }}">
+                                                        {{ $author['name'] }}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
-                            @if(!empty($searchQuery))
-                                <div class="mt-4">
+
+                            @if(!empty($searchQuery) || (isset($selectedAuthorId) && $selectedAuthorId))
+                                <div class="mt-4 ml-2">
                                     <p class="text-gray-500">
-                                        Showing results for "<span class="font-medium text-primary">{{ $searchQuery }}</span>"
+                                        Showing results
+                                        @if(!empty($searchQuery))
+                                             for "<span class="font-medium text-primary">{{ $searchQuery }}</span>"
+                                        @endif
+                                        @if(!empty($searchQuery) && (isset($selectedAuthorId) && $selectedAuthorId))
+                                            and
+                                        @endif
+                                        @if(isset($selectedAuthorId) && $selectedAuthorId)
+                                             posts by "<span class="font-medium text-primary">{{ $displayAuthorName }}</span>"
+                                        @endif
                                         @if(isset($pagination['totalPosts']))
                                             <span class="text-gray-400">({{ $pagination['totalPosts'] }} {{ $pagination['totalPosts'] == 1 ? 'result' : 'results' }} found)</span>
                                         @endif
@@ -286,5 +345,45 @@
             </div>
         </div>
     </section>
+
+    <script>
+        function toggleAuthorDropdown() {
+            const list = document.getElementById('author-dropdown-list');
+            const arrow = document.getElementById('author-dropdown-arrow');
+            
+            if (list.classList.contains('hidden')) {
+                list.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            } else {
+                list.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        }
+
+        function selectAuthor(id, name) {
+            // Show preloader
+            if (window.showPreloader) {
+                window.showPreloader();
+            }
+
+            document.getElementById('author-input').value = id;
+            document.getElementById('selected-author-text').innerText = name;
+            toggleAuthorDropdown();
+            document.getElementById('blogs-filter-form').submit();
+        }
+
+        // Close on click outside
+        window.addEventListener('click', function(e) {
+            const container = document.getElementById('author-dropdown-container');
+            if (container && !container.contains(e.target)) {
+                const list = document.getElementById('author-dropdown-list');
+                const arrow = document.getElementById('author-dropdown-arrow');
+                if (!list.classList.contains('hidden')) {
+                    list.classList.add('hidden');
+                    arrow.classList.remove('rotate-180');
+                }
+            }
+        });
+    </script>
 
 @endsection
