@@ -434,6 +434,7 @@ class WebController extends Controller
             'author_name' => 'required|string',
             'author_email' => 'required|email',
             'content' => 'required|string',
+            'parent' => 'nullable|integer'
         ]);
 
         try {
@@ -441,10 +442,11 @@ class WebController extends Controller
             $verifySsl = config('services.wordpress.verify_ssl', true);
 
             $data = [
-                'post' => $request->post_id,
-                'author_name' => $request->author_name,
-                'author_email' => $request->author_email,
-                'content' => $request->content,
+                'post' => $request->input('post_id'),
+                'author_name' => $request->input('author_name'),
+                'author_email' => $request->input('author_email'),
+                'content' => $request->input('content'),
+                'parent' => $request->input('parent', 0),
                 'author_ip' => $request->ip(),
                 'author_user_agent' => $request->userAgent(),
             ];

@@ -80,7 +80,7 @@
                         <div class="flex items-center gap-4">
                             <span class="text-gray-400 text-sm font-medium uppercase tracking-wide">Like this article?</span>
                             <button id="like-btn" onclick="toggleLike()" data-liked="{{ $blogPost['liked'] }}"
-                                class="group flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all duration-300 shadow-sm
+                                class="group flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all duration-300 shadow-sm cursor-pointer
                                 {{ $blogPost['liked'] ? 'border-red-200 bg-red-50 text-red-500' : 'border-gray-200 bg-white text-gray-500 hover:border-red-200 hover:bg-red-50 hover:text-red-500' }}">
                                 <i class="{{ $blogPost['liked'] ? 'ri-heart-fill' : 'ri-heart-line' }} text-xl group-hover:scale-110 transition-transform"></i>
                                 <span class="font-medium text-sm"><span id="like-count">{{ $blogPost['likes'] }}</span> Likes</span>
@@ -117,9 +117,9 @@
 
                     <!-- Comments Section -->
                     <div class="mt-16 border-t border-gray-100 pt-12" id="comments-section">
-                        <div class="flex items-center justify-between mb-8">
-                            <h3 class="text-2xl font-serif font-bold text-primary">Comments</h3>
-                            <span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-xs font-bold" id="comments-count-badge" style="display:none">0</span>
+                        <div class="flex items-center gap-3 mb-8">
+                            <h3 class="text-2xl font-serif font-bold text-primary leading-none">Comments</h3>
+                            <span class="bg-secondary/20 text-secondary px-3 py-2 rounded-full text-sm font-bold leading-none" id="comments-count-badge" style="display:none">0</span>
                         </div>
                         
                         <!-- Comment List -->
@@ -131,8 +131,16 @@
 
                         @if($blogPost['comment_status'] === 'open')
                         <!-- Comment Form -->
-                        <div class="bg-gray-50 p-6 md:p-8 rounded-2xl border border-gray-100">
+                        <div id="comment-form-scroll-target"></div>
+                        <div class="bg-gray-50 p-6 md:p-8 rounded-2xl border border-gray-100" id="comment-form-container">
                             <h4 class="text-lg font-bold text-primary mb-6">Leave a Comment</h4>
+                            
+                            <!-- Reply Indicator -->
+                            <div id="reply-info" style="display:none;" class="mb-4 bg-secondary/10 text-secondary px-4 py-2 rounded-lg flex justify-between items-center">
+                                <span class="text-sm font-medium">Replying to <span id="reply-name" class="font-bold"></span></span>
+                                <button onclick="cancelReply()" class="text-xs font-bold hover:underline">Cancel</button>
+                            </div>
+
                             <form id="comment-form" onsubmit="submitComment(event)">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div>
@@ -259,6 +267,7 @@
     });
 
     const postId = {{ $blogPost['id'] }};
+    let replyToId = null;
 
     // Like Functionality
     async function toggleLike() {
@@ -319,18 +328,21 @@
         submitBtn.disabled = true;
 
         try {
+            const payload = {
+                post_id: postId,
+                author_name: formData.get('author_name'),
+                author_email: formData.get('author_email'),
+                content: formData.get('content'),
+                parent: replyToId || 0
+            };
+
             const response = await fetch("{{ route('blog.comment') }}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({
-                    post_id: postId,
-                    author_name: formData.get('author_name'),
-                    author_email: formData.get('author_email'),
-                    content: formData.get('content')
-                })
+                body: JSON.stringify(payload)
             });
 
             const data = await response.json();
@@ -338,6 +350,7 @@
             if(data.success) {
                 alert(data.message);
                 form.reset();
+                cancelReply(); // Reset reply state
                 if(!data.message.includes('moderation')) {
                     loadComments(); 
                 }
@@ -350,6 +363,22 @@
             submitBtn.innerText = originalBtnText;
             submitBtn.disabled = false;
         }
+    }
+
+    function replyTo(commentId, authorName) {
+        replyToId = commentId;
+        const formContainer = document.getElementById('comment-form-container');
+        const replyInfo = document.getElementById('reply-info');
+        const replyName = document.getElementById('reply-name');
+        
+        replyName.innerText = authorName;
+        replyInfo.style.display = 'flex';
+        document.getElementById('comment-form-scroll-target').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelReply() {
+        replyToId = null;
+        document.getElementById('reply-info').style.display = 'none';
     }
 
     async function loadComments() {
@@ -370,33 +399,105 @@
                 countBadge.style.display = 'inline-block';
             }
 
-            let html = '';
-            comments.forEach(comment => {
-                const date = new Date(comment.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-                const content = comment.content.rendered; 
-                
-                html += `
-                    <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-bold text-lg">
-                                ${comment.author_name.charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                                <h5 class="font-bold font-sans! text-primary text-sm">${comment.author_name}</h5>
-                                <span class="text-xs text-gray-400">${date}</span>
-                            </div>
-                        </div>
-                        <div class="text-gray-600 text-sm leading-relaxed prose prose-sm max-w-none">
-                            ${content}
-                        </div>
-                    </div>
-                `;
+            // Build Tree
+            const commentMap = {};
+            const roots = [];
+
+            comments.forEach(c => {
+                c.children = [];
+                commentMap[c.id] = c;
             });
-            container.innerHTML = html;
+
+            comments.forEach(c => {
+                if(c.parent && commentMap[c.parent]) {
+                    commentMap[c.parent].children.push(c);
+                } else {
+                    roots.push(c);
+                }
+            });
+
+            container.innerHTML = renderCommentsTree(roots);
 
         } catch (error) {
+            console.error(error);
             container.innerHTML = '<p class="text-red-400 italic">Failed to load comments.</p>';
         }
+    }
+
+    function renderCommentsTree(comments, isRecursive = false) {
+        if(!comments || comments.length === 0) return '';
+        
+        let html = isRecursive ? '' : '<div class="space-y-8">';
+        
+        comments.forEach((comment) => {
+            const date = new Date(comment.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            const content = comment.content.rendered;
+            const authorName = comment.author_name;
+            const avatarChar = authorName.charAt(0).toUpperCase();
+            const hasChildren = comment.children.length > 0;
+            
+            // Check if registered user (author ID > 0) to show avatar
+            const isRegistered = comment.author && comment.author != 0;
+            const avatarUrl = comment.author_avatar_urls ? (comment.author_avatar_urls['96'] || comment.author_avatar_urls['48']) : null;
+            const showImage = isRegistered && avatarUrl;
+
+            html += `
+                <div class="relative group ${isRecursive ? 'pl-8' : ''}">
+                <!-- Child Curve Connector -->
+                ${isRecursive ? `
+                    <div class="absolute left-0 -top-3 w-8 h-8 border-b-[2px] border-l-[0px] border-gray-100 rounded-bl-2xl"></div>
+                ` : ''}
+                    <div class="flex gap-4 items-start relative z-10">
+                        <!-- Avatar -->
+                        <div class="flex-shrink-0">
+                            ${showImage ? 
+                                `<img src="${avatarUrl}" alt="${authorName}" class="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover shadow-sm ring-2 ring-white">` : 
+                                `<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#FFE6B7] flex items-center justify-center text-[#423131] font-bold text-xs md:text-sm shadow-sm ring-2 ring-white">
+                                    ${avatarChar}
+                                </div>`
+                            }
+                        </div>
+
+                        <!-- Content -->
+                        <div class="flex-1 min-w-0 pt-0.5">
+                            <div class="flex items-baseline flex-wrap gap-2">
+                                <h5 class="text-sm font-bold font-sans! text-gray-900">${authorName}</h5>
+                                <span class="text-xs text-gray-500">${date}</span>
+                            </div>
+                            
+                            <div class="text-sm text-gray-700 leading-relaxed my-1.5 prose prose-sm max-w-none">
+                                ${content}
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center gap-4">
+                                <button onclick="replyTo(${comment.id}, '${authorName.replace(/'/g, "\\'")}')" 
+                                    class="group/btn flex items-center gap-1.5 text-xs cursor-pointer text-gray-500 hover:text-secondary transition-colors">
+                                    <i class="ri-message-3-line text-sm group-hover/btn:scale-110 transition-transform"></i>
+                                    Reply
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Children Container -->
+                    ${hasChildren ? `
+                        <div class="relative mt-2 ml-4 md:ml-5">
+                            <!-- Vertical Line (Spine) -->
+                            <div class="absolute left-0 top-[-1rem] bottom-0 w-[2px] bg-gray-100 -translate-x-1/2"></div>
+                            
+                            <!-- Children Wrapper -->
+                            <div class="pt-3 flex flex-col gap-6">
+                                ${renderCommentsTree(comment.children, true)}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        });
+        
+        html += isRecursive ? '' : '</div>';
+        return html;
     }
 </script>
 @endpush
