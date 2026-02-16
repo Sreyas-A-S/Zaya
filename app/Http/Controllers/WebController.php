@@ -6,9 +6,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\BlogLike;
+use App\Services\WordPressBlogService;
 
 class WebController extends Controller
 {
+    protected $blogService;
+
+    public function __construct(WordPressBlogService $blogService)
+    {
+        $this->blogService = $blogService;
+    }
+
     //
     public function index()
     {
@@ -113,53 +121,12 @@ class WebController extends Controller
     /**
      * Fetch data from WordPress REST API
      */
+    /**
+     * Fetch data from WordPress REST API (Delegated to Service)
+     */
     protected function fetchFromWordPress($endpoint, $params = [], $withHeaders = false)
     {
-        try {
-            $url = $this->getWordPressApiUrl() . '/' . $endpoint;
-            $verifySsl = config('services.wordpress.verify_ssl', true);
-
-            $request = Http::withHeaders([
-                'User-Agent' => 'ZayaWellness/1.0',
-                'Accept' => 'application/json',
-            ])->timeout(10);
-
-            if (!$verifySsl) {
-                $request->withoutVerifying();
-            }
-
-            $response = $request->get($url, $params);
-
-            if ($response->failed()) {
-                Log::error('WordPress API Error: ' . $response->body());
-                return $withHeaders ? ['data' => [], 'headers' => []] : [];
-            }
-
-            $data = $response->json(); // Returns array by default, we might need object for current logic
-
-            // Convert to object to match existing logic if needed, or update logic.
-            // existing logic uses $post->title->rendered. json_decode default is object.
-            // Http::json() returns array. json_decode($response->body()) returns object.
-            $data = json_decode($response->body());
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                Log::error('WordPress API JSON Decode Error: ' . json_last_error_msg());
-                return $withHeaders ? ['data' => [], 'headers' => []] : [];
-            }
-
-            if ($withHeaders) {
-                $headers = [
-                    'total' => (int) ($response->header('X-WP-Total') ?? 0),
-                    'totalPages' => (int) ($response->header('X-WP-TotalPages') ?? 0),
-                ];
-                return ['data' => $data, 'headers' => $headers];
-            }
-
-            return $data;
-        } catch (\Exception $e) {
-            Log::error('WordPress API Exception: ' . $e->getMessage());
-            return $withHeaders ? ['data' => [], 'headers' => []] : [];
-        }
+        return $this->blogService->fetchFromWordPress($endpoint, $params, $withHeaders);
     }
 
     /**
