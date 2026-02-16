@@ -242,13 +242,13 @@
                         <!-- Newsletter CTA -->
                         <div class="bg-gradient-to-br from-secondary to-primary rounded-[20px] p-6 text-white">
                             <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                                <i class="ri-mail-line text-2xl"></i>
+                                <i class="ri-article-line text-2xl"></i>
                             </div>
-                            <h3 class="text-lg font-serif font-bold mb-2">Stay Updated</h3>
-                            <p class="text-white/80 text-sm mb-4">Get the latest wellness tips and insights delivered to your inbox.</p>
+                            <h3 class="text-lg font-sans! font-bold mb-2">Stay Updated</h3>
+                            <p class="text-white/80 text-sm mb-4">Discover insightful articles, stories, and expert perspectives from our latest blog posts.</p>
                             <a href="{{ route('blogs') }}" 
                                class="inline-flex items-center gap-2 bg-white text-secondary px-5 py-2.5 rounded-full font-medium text-sm hover:bg-accent transition-all duration-300">
-                                Explore More
+                                Explore Blogs
                                 <i class="ri-arrow-right-line"></i>
                             </a>
                         </div>
