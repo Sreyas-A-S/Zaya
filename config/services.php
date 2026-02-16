@@ -40,6 +40,7 @@ return [
         'verify_ssl' => env('WORDPRESS_API_VERIFY_SSL', true),
         'username' => env('WORDPRESS_USERNAME'),
         'application_password' => env('WORDPRESS_APPLICATION_PASSWORD'),
+        'cache_secret' => env('WORDPRESS_CACHE_SECRET'),
     ],
 
 ];
