@@ -3,34 +3,10 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class WordPressBlogService
 {
-    protected $cacheDuration = 60; // 60 minutes
-    protected $cacheVersionKey = 'wp_blog_cache_version';
-
-    /**
-     * Get the current cache version.
-     * Incrementing this invalidates all blog cache.
-     */
-    protected function getCacheVersion()
-    {
-        return Cache::rememberForever($this->cacheVersionKey, function () {
-            return time();
-        });
-    }
-
-    /**
-     * Clear all blog cache by updating the version key.
-     */
-    public function clearCache()
-    {
-        Cache::put($this->cacheVersionKey, time());
-        Log::info('WordPress Blog Cache Cleared (Version Updated)');
-    }
-
     /**
      * WordPress API Base URL
      */
