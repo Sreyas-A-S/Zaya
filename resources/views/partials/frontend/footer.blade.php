@@ -39,7 +39,8 @@
                         <li><a href="{{ route('home') }}" class="hover:text-[#79584B] transition-colors">Home</a></li>
                         <li><a href="#" class="hover:text-[#79584B] transition-colors">Who we are</a></li>
                         <li><a href="#" class="hover:text-[#79584B] transition-colors">What we do</a></li>
-                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Our Team</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Our Team</a></li> 
+                        <li><a href="{{ route('blogs') }}" class="hover:text-[#79584B] transition-colors">Blog</a></li>
                         <li><a href="{{ route('contact-us') }}" class="hover:text-[#79584B] transition-colors">Contact
                                 Us</a></li>
                     </ul>

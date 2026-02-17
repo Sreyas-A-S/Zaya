@@ -39,7 +39,8 @@ class WebController extends Controller
     public function aboutUs()
     {
         $settings = \App\Models\HomepageSetting::pluck('value', 'key');
-        return view('about', compact('settings'));
+        $testimonials = \App\Models\Testimonial::where('status', true)->latest()->get();
+        return view('about', compact('settings', 'testimonials'));
     }
 
     public function services(Request $request)
@@ -351,6 +352,152 @@ class WebController extends Controller
         ];
 
         return view('blogs', compact('settings', 'processedPosts', 'categories', 'pagination', 'searchQuery', 'authors', 'selectedAuthorId'));
+    }
+
+    /**
+     * Announcements listing page - fetches announcements CPT from WordPress
+     */
+    public function announcements(Request $request)
+    {
+        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+
+        $currentPage = (int) $request->get('page', 1);
+        $perPage = 9;
+
+        // Build API params
+        $params = [
+            'per_page' => $perPage,
+            'page' => $currentPage,
+            '_embed' => 1,
+        ];
+
+        // Fetch Announcements - specific CPT endpoint
+        // 1. Try 'announcement' (singular)
+        $endpoint = 'announcement';
+        $response = $this->fetchFromWordPress($endpoint, $params, true);
+
+        // 2. If empty, try 'announcements' (plural) - assuming plural CPT name
+        if (empty($response['data'])) {
+            $endpoint = 'announcements';
+            $response = $this->fetchFromWordPress($endpoint, $params, true);
+        }
+
+        $posts = $response['data'] ?? [];
+        $headers = $response['headers'] ?? [];
+
+        // Pagination data
+        $totalPosts = $headers['total'] ?? 0;
+        $totalPages = $headers['totalPages'] ?? 1;
+
+        // Process posts
+        $processedPosts = [];
+        if ($posts) {
+            foreach ($posts as $post) {
+                $featuredImage = null;
+
+                // Get featured image 
+                if (isset($post->_embedded->{'wp:featuredmedia'}[0]->source_url)) {
+                    $featuredImage = $post->_embedded->{'wp:featuredmedia'}[0]->source_url;
+                }
+
+                $processedPosts[] = [
+                    'id' => $post->id,
+                    'title' => html_entity_decode($post->title->rendered),
+                    'excerpt' => strip_tags(html_entity_decode($post->excerpt->rendered ?? '')),
+                    'content' => $post->content->rendered,
+                    'slug' => $post->slug,
+                    'date' => \Carbon\Carbon::parse($post->date)->format('M d, Y'),
+                    'featured_image' => $featuredImage,
+                    'link' => $post->link,
+                ];
+            }
+        }
+
+        // Pagination info
+        $pagination = [
+            'currentPage' => $currentPage,
+            'totalPages' => $totalPages,
+            'totalPosts' => $totalPosts,
+            'perPage' => $perPage,
+        ];
+
+        return view('announcements', compact('settings', 'processedPosts', 'pagination'));
+    }
+
+    /**
+     * Single announcement detail page
+     */
+    public function announcementDetail($slug)
+    {
+        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+
+        // Fetch single announcement by slug
+        // 1. Try singular
+        $endpoint = 'announcement';
+        $posts = $this->fetchFromWordPress($endpoint, [
+            'slug' => $slug,
+            '_embed' => 1
+        ]);
+
+        // 2. Try plural if not found
+        if (!$posts || count($posts) === 0) {
+            $endpoint = 'announcements';
+            $posts = $this->fetchFromWordPress($endpoint, [
+                'slug' => $slug,
+                '_embed' => 1
+            ]);
+        }
+
+        if (!$posts || count($posts) === 0) {
+            abort(404);
+        }
+
+        $post = $posts[0];
+
+        // Process the post data
+        $featuredImage = null;
+
+        if (isset($post->_embedded->{'wp:featuredmedia'}[0]->source_url)) {
+            $featuredImage = $post->_embedded->{'wp:featuredmedia'}[0]->source_url;
+        }
+
+        $announcement = [
+            'id' => $post->id,
+            'title' => html_entity_decode($post->title->rendered),
+            'content' => $post->content->rendered,
+            'slug' => $post->slug,
+            'date' => \Carbon\Carbon::parse($post->date)->format('M d, Y'),
+            'featured_image' => $featuredImage,
+        ];
+
+        // Fetch related posts using the SAME endpoint regarding singular/plural
+        $relatedPosts = [];
+        $related = $this->fetchFromWordPress($endpoint, [
+            'per_page' => 4,
+            'exclude' => $post->id,
+            '_embed' => 1
+        ]);
+
+        if ($related) {
+            foreach ($related as $relPost) {
+                $relFeaturedImage = null;
+
+                if (isset($relPost->_embedded->{'wp:featuredmedia'}[0]->source_url)) {
+                    $relFeaturedImage = $relPost->_embedded->{'wp:featuredmedia'}[0]->source_url;
+                }
+
+                $relatedPosts[] = [
+                    'id' => $relPost->id,
+                    'title' => html_entity_decode($relPost->title->rendered),
+                    'excerpt' => strip_tags(html_entity_decode($relPost->excerpt->rendered ?? '')),
+                    'slug' => $relPost->slug,
+                    'date' => \Carbon\Carbon::parse($relPost->date)->format('M d, Y'),
+                    'featured_image' => $relFeaturedImage,
+                ];
+            }
+        }
+
+        return view('announcement-detail', compact('settings', 'announcement', 'relatedPosts'));
     }
 
     /**
