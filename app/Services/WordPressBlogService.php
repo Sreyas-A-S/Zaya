@@ -44,60 +44,47 @@ class WordPressBlogService
      */
     public function fetchFromWordPress($endpoint, $params = [], $withHeaders = false)
     {
-        $version = $this->getCacheVersion();
+        // Cache removed to ensure immediate updates from WordPress
+        try {
+            $url = $this->getWordPressApiUrl() . '/' . $endpoint;
+            $verifySsl = config('services.wordpress.verify_ssl', true);
 
-        // Create a unique cache key based on version, endpoint, and params
-        $keyPayload = [
-            'endpoint' => $endpoint,
-            'params' => $params,
-            'withHeaders' => $withHeaders,
-            'version' => $version // Include version in key
-        ];
+            $request = Http::withHeaders([
+                'User-Agent' => 'ZayaWellness/1.0',
+                'Accept' => 'application/json',
+            ])->timeout(10); // 10 second timeout
 
-        $cacheKey = 'wp_blog_' . md5(json_encode($keyPayload));
+            if (!$verifySsl) {
+                $request->withoutVerifying();
+            }
 
-        return Cache::remember($cacheKey, now()->addMinutes($this->cacheDuration), function () use ($endpoint, $params, $withHeaders) {
-            try {
-                $url = $this->getWordPressApiUrl() . '/' . $endpoint;
-                $verifySsl = config('services.wordpress.verify_ssl', true);
+            $response = $request->get($url, $params);
 
-                $request = Http::withHeaders([
-                    'User-Agent' => 'ZayaWellness/1.0',
-                    'Accept' => 'application/json',
-                ])->timeout(10); // 10 second timeout
-
-                if (!$verifySsl) {
-                    $request->withoutVerifying();
-                }
-
-                $response = $request->get($url, $params);
-
-                if ($response->failed()) {
-                    Log::error('WordPress API Error: ' . $response->body());
-                    return $withHeaders ? ['data' => [], 'headers' => []] : [];
-                }
-
-                $data = json_decode($response->body());
-
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    Log::error('WordPress API JSON Decode Error: ' . json_last_error_msg());
-                    return $withHeaders ? ['data' => [], 'headers' => []] : [];
-                }
-
-                if ($withHeaders) {
-                    $headers = [
-                        'total' => (int) ($response->header('X-WP-Total') ?? 0),
-                        'totalPages' => (int) ($response->header('X-WP-TotalPages') ?? 0),
-                    ];
-                    return ['data' => $data, 'headers' => $headers];
-                }
-
-                return $data;
-            } catch (\Exception $e) {
-                Log::error('WordPress API Exception: ' . $e->getMessage());
+            if ($response->failed()) {
+                Log::error('WordPress API Error: ' . $response->body());
                 return $withHeaders ? ['data' => [], 'headers' => []] : [];
             }
-        });
+
+            $data = json_decode($response->body());
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('WordPress API JSON Decode Error: ' . json_last_error_msg());
+                return $withHeaders ? ['data' => [], 'headers' => []] : [];
+            }
+
+            if ($withHeaders) {
+                $headers = [
+                    'total' => (int) ($response->header('X-WP-Total') ?? 0),
+                    'totalPages' => (int) ($response->header('X-WP-TotalPages') ?? 0),
+                ];
+                return ['data' => $data, 'headers' => $headers];
+            }
+
+            return $data;
+        } catch (\Exception $e) {
+            Log::error('WordPress API Exception: ' . $e->getMessage());
+            return $withHeaders ? ['data' => [], 'headers' => []] : [];
+        }
     }
 
     /**

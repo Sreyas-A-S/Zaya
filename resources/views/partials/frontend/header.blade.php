@@ -20,19 +20,22 @@
                 </button>
                 <div
                     class="absolute top-full left-0 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden">
-                    <a href="{{ route('about-us') }}"
+                    <a href="{{ route('about-us') }}#who-we-are"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">Who
                         we are?</a>
-                    <a href="#"
+                    <a href="{{ route('about-us') }}#what-we-do"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">What
                         we do?</a>
-                    <a href="#"
+                    <a href="{{ route('about-us') }}#our-team"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Our
                         Team</a>
+                    <a href="#" class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Gallery</a>
+                    <a href="{{ route('blogs') }}"
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Blog</a>
                 </div>
             </div>
 
-            <!-- Services Dropdown (Desktop) -->
+            <!-- Services Dropdown (Desktop)-->
             <div class="relative group">
                 <button class="flex items-center gap-1 hover:text-primary transition-colors focus:outline-none py-4">
                     Services <i

@@ -50,6 +50,8 @@ Route::get('/client-register', [WebController::class, 'clientRegister'])->name('
 Route::get('/practitioner-register', [WebController::class, 'practitionerRegister'])->name('practitioner-register');
 Route::get('/service/{slug}', [WebController::class, 'serviceDetail'])->name('service-detail');
 Route::get('/blogs', [WebController::class, 'blogs'])->name('blogs');
+Route::get('/announcements', [WebController::class, 'announcements'])->name('announcements');
+Route::get('/announcement/{slug}', [WebController::class, 'announcementDetail'])->name('announcement-detail');
 Route::get('/blog/{slug}', [WebController::class, 'blogDetail'])->name('blog-detail');
 Route::get('/book-session', [WebController::class, 'bookSession'])->name('book-session');
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
