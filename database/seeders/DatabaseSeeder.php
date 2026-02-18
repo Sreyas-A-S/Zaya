@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             TestimonialSeeder::class,
             ServiceSeeder::class,
             PractitionerReviewSeeder::class,
+            CountriesSeeder::class,
         ]);
 
         User::updateOrCreate(

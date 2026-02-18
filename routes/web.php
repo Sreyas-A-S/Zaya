@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\TranslatorController;
 use App\Http\Controllers\Admin\YogaTherapistController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\CountryController;
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\WebController;
@@ -62,7 +63,7 @@ Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->na
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
-
+    Route::resource('countries', CountryController::class);
     Route::resource('doctors', DoctorController::class);
     Route::post('doctors/{id}/status', [DoctorController::class, 'updateStatus'])->name('doctors.status');
     Route::resource('practitioners', PractitionerController::class);
@@ -134,4 +135,9 @@ Route::get('/storage-link', function () {
 Route::get('/seed', function () {
     Artisan::call('db:seed', ['--force' => true]);
     return '<pre>' . Artisan::output() . '</pre>';
+});
+
+//Country crud
+Route::prefix('admin')->group(function () {
+    Route::resource('countries', CountryController::class);
 });
