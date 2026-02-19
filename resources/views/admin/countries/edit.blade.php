@@ -2,53 +2,38 @@
 
 @section('content')
 
-<div class="container">
-    <h2 class="mb-4">Edit Country</h2>
+<!-- Edit Country Modal -->
+<div class="modal fade" id="editCountryModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">     
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Country</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
 
-    <a href="{{ route('admin.countries.index') }}" class="btn btn-secondary mb-3">
-        Back to List
-    </a>
+      <div class="modal-body">
+        <form id="editCountryForm">
+          <input type="hidden" id="countryId">
 
-    <form action="{{ route('admin.countries.update', $country->id) }}" method="POST">
-        @csrf
-        @method('PUT')
+          <div class="mb-3">
+            <label>Name</label>
+            <input type="text" id="countryName" class="form-control">
+          </div>
 
-        <div class="mb-3">
-            <label class="form-label">Country Code</label>
-            <input type="text" 
-                   name="code" 
-                   value="{{ old('code', $country->code) }}"
-                   class="form-control @error('code') is-invalid @enderror">
+          <div class="mb-3">
+            <label>Code</label>
+            <input type="text" id="countryCode" class="form-control">
+          </div>
 
-            @error('code')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Country Name</label>
-            <input type="text" 
-                   name="name" 
-                   value="{{ old('name', $country->name) }}"
-                   class="form-control @error('name') is-invalid @enderror">
-
-            @error('name')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Country Flag (Emoji)</label>
-            <input type="text" 
-                   name="flag" 
-                   value="{{ old('flag', $country->flag) }}"
-                   class="form-control">
-        </div>
-
-        <button type="submit" class="btn btn-success">
-            Update Country
-        </button>
-    </form>
+          <button type="submit" class="btn btn-primary">
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+
+
 
 @endsection

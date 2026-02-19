@@ -25,19 +25,12 @@ class CountryController extends Controller
             ->addColumn('action', function ($row) {
 
               
-                return '
-                        <a href="'. route('countries.show', $row->id) .'" 
-                        
-                         <button 
-                            class="btn btn-sm btn-warning"
-                            onclick="editCountry(
-                                '.$row->id.'
-                                
-                            )">
+                return '<button type="button" class="btn btn-sm btn-warning editCountry" data-id="'.$row->id.'">
                             Edit
                         </button>
-                        </a>      
-                        <form action="#" method="POST" style="display:inline-block;">
+
+                             
+                        <form action="admin/countries/'.$row.'" method="POST" style="display:inline-block;">
                         '.csrf_field().'
                         '.method_field('DELETE').'
                         <button type="submit" class="btn btn-sm btn-danger"
@@ -107,8 +100,11 @@ return response()->json(['country' => $country]);    }
         'flag' => $request->flag,
     ]);
 
-    return redirect()->route('countries.index')
-                     ->with('success', 'Updated successfully');
+   return response()->json([
+    'status' => 'success',
+    'message' => 'Updated successfully'
+]);
+
     }
 
     /**
@@ -119,9 +115,10 @@ return response()->json(['country' => $country]);    }
         $country = Country::findOrFail($id);
         $country->delete();
 
-        return redirect()
-            ->route('admin.countries.index')
-            ->with('success', 'Country deleted successfully.');
+       return response()->json([
+    'status' => 'success',
+    'message' => 'Deleted successfully'
+]);
     }
 }
 

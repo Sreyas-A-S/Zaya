@@ -63,6 +63,8 @@
                     @if(auth()->user()->hasPermission('translators-view'))
                     <li> <a href="{{ route('admin.translators.index') }}">Translators</a></li>
                     @endif
+                    <li> <a href="{{ route('admin.admins.index') }}">Admins</a></li>
+
                 </ul>
             </li>
             @endif
@@ -181,6 +183,11 @@
                     </li>
                     <li>
                             <a href="{{ route('countries.index') }}">Countries</a>
+                           
+                        </a>
+                    </li>
+                    <li>
+                            <a href="{{ route('languages.index') }}">Languages</a>
                            
                         </a>
                     </li>

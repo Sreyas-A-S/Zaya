@@ -74,6 +74,43 @@
     </div>
 </div>
 
+
+<!-- Edit Modal-->
+
+<div class="modal fade" id="editCountryModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">     
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Country</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="editCountryForm">
+          <input type="hidden" id="countryId">
+
+          <div class="mb-3">
+            <label>Name</label>
+            <input type="text" id="countryName" name="name" class="form-control">
+          </div>
+
+          <div class="mb-3">
+            <label>Code</label>
+            <input type="text" id="countryCode" name="code" class="form-control">
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
 <!-- View Modal -->
 <div class="modal fade" id="doctor-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -357,7 +394,7 @@
         opacity: 0.8;
     }
 </style>
-
+@push('scripts')
 <script>
     let table;
     let toastInstance;
@@ -440,25 +477,52 @@ $(document).on('click', '.editBtn', function () {
     });
 });
 
+//Edit modal            
+$(document).ready(function(){
 
+      $(document).on('click', '.editCountry', function(e){
+        e.preventDefault(); 
+        console.log('clicked');
 
+        let id = $(this).data('id');
+
+        fetch(`/admin/countries/${id}`)
+            .then(res => res.json())
+            .then(data => {
+
+                console.log(id);
+                document.getElementById('countryId').value = data.country.id;
+                document.getElementById('countryName').value = data.country.name;
+                document.getElementById('countryCode').value = data.country.code;
+
+                let modal = new bootstrap.Modal(document.getElementById('editCountryModal'));
+                modal.show();
+            });
+
+    });
+
+});
 
 // Submit Edit Form
 $(document).on('submit', '#editCountryForm', function (e) {
 
     e.preventDefault();
 
-    let id = $(this).data('id');
+    
+    let id = $('#countryId').val();  
     let formData = $(this).serialize();
 
     $.ajax({
         url: '/admin/countries/' + id,
-        type: 'POST',
+        type: 'PUT', // or PUT (see below)
         data: formData,
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
         success: function () {
 
-            $('#editModal').modal('hide');
-            $('#countries-table').DataTable().ajax.reload();
+            $('#editCountryModal').modal('hide');
+            $('#countries-table').DataTable().ajax.reload(null, false);
 
         }
     });
@@ -487,7 +551,7 @@ $(document).on('submit', '#editCountryForm', function (e) {
 
         initFormNavigation();
 
-        $('#password-input, #password-confirm-input').on('input', validatePasswordMatch);
+        // $('#password-input, #password-confirm-input').on('input', validatePasswordMatch);
     });
 
     function addLanguageCapabilityRow(value, label, caps = null) {
@@ -1284,6 +1348,7 @@ $(document).on('submit', '#editCountryForm', function (e) {
         }
     };
 </script>
+@endpush
 <!-- Master Data Delete Modal -->
 <div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
