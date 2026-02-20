@@ -40,17 +40,302 @@
                                 <h6 class="lang-txt f-w-700">ENG</h6>
                             </a></div>
                         <ul class="custom-menu profile-menu language-menu py-0 more_lang">
-                            <li class="d-block"><a class="lang" href="#" data-value="English"><i class="flag-icon flag-icon-us"></i>
-                                    <div class="lang-txt">English</div>
-                                </a></li>
-                            <li class="d-block"><a class="lang" href="#" data-value="fr"><i class="flag-icon flag-icon-fr"></i>
-                                    <div class="lang-txt">Français</div>
-                                </a></li>
-                            <li class="d-block"><a class="lang" href="#" data-value="es"><i class="flag-icon flag-icon-es"></i>
-                                    <div class="lang-txt">Español</div>
-                                </a></li>
+                           <li class="d-block">
+                            <a class="lang" href="#" data-value="af">
+                                <i class="flag-icon flag-icon-af"></i>
+                                <div class="lang-txt">Afghanistan</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="al">
+                                <i class="flag-icon flag-icon-al"></i>
+                                <div class="lang-txt">Albania</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="dz">
+                                <i class="flag-icon flag-icon-dz"></i>
+                                <div class="lang-txt">Algeria</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="ad">
+                                <i class="flag-icon flag-icon-ad"></i>
+                                <div class="lang-txt">Andorra</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="ao">
+                                <i class="flag-icon flag-icon-ao"></i>
+                                <div class="lang-txt">Angola</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="ar">
+                                <i class="flag-icon flag-icon-ar"></i>
+                                <div class="lang-txt">Argentina</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="au">
+                                <i class="flag-icon flag-icon-au"></i>
+                                <div class="lang-txt">Australia</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="at">
+                                <i class="flag-icon flag-icon-at"></i>
+                                <div class="lang-txt">Austria</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="bd">
+                                <i class="flag-icon flag-icon-bd"></i>
+                                <div class="lang-txt">Bangladesh</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="be">
+                                <i class="flag-icon flag-icon-be"></i>
+                                <div class="lang-txt">Belgium</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="br">
+                                <i class="flag-icon flag-icon-br"></i>
+                                <div class="lang-txt">Brazil</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="ca">
+                                <i class="flag-icon flag-icon-ca"></i>
+                                <div class="lang-txt">Canada</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="cn">
+                                <i class="flag-icon flag-icon-cn"></i>
+                                <div class="lang-txt">China</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="dk">
+                                <i class="flag-icon flag-icon-dk"></i>
+                                <div class="lang-txt">Denmark</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="eg">
+                                <i class="flag-icon flag-icon-eg"></i>
+                                <div class="lang-txt">Egypt</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="fi">
+                                <i class="flag-icon flag-icon-fi"></i>
+                                <div class="lang-txt">Finland</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="fr">
+                                <i class="flag-icon flag-icon-fr"></i>
+                                <div class="lang-txt">France</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="de">
+                                <i class="flag-icon flag-icon-de"></i>
+                                <div class="lang-txt">Germany</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="in">
+                                <i class="flag-icon flag-icon-in"></i>
+                                <div class="lang-txt">India</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="it">
+                                <i class="flag-icon flag-icon-it"></i>
+                                <div class="lang-txt">Italy</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="jp">
+                                <i class="flag-icon flag-icon-jp"></i>
+                                <div class="lang-txt">Japan</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="my">
+                                <i class="flag-icon flag-icon-my"></i>
+                                <div class="lang-txt">Malaysia</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="mx">
+                                <i class="flag-icon flag-icon-mx"></i>
+                                <div class="lang-txt">Mexico</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="np">
+                                <i class="flag-icon flag-icon-np"></i>
+                                <div class="lang-txt">Nepal</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="nl">
+                                <i class="flag-icon flag-icon-nl"></i>
+                                <div class="lang-txt">Netherlands</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="nz">
+                                <i class="flag-icon flag-icon-nz"></i>
+                                <div class="lang-txt">New Zealand</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="pk">
+                                <i class="flag-icon flag-icon-pk"></i>
+                                <div class="lang-txt">Pakistan</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="qa">
+                                <i class="flag-icon flag-icon-qa"></i>
+                                <div class="lang-txt">Qatar</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="ru">
+                                <i class="flag-icon flag-icon-ru"></i>
+                                <div class="lang-txt">Russia</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="sa">
+                                <i class="flag-icon flag-icon-sa"></i>
+                                <div class="lang-txt">Saudi Arabia</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="sg">
+                                <i class="flag-icon flag-icon-sg"></i>
+                                <div class="lang-txt">Singapore</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="za">
+                                <i class="flag-icon flag-icon-za"></i>
+                                <div class="lang-txt">South Africa</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="kr">
+                                <i class="flag-icon flag-icon-kr"></i>
+                                <div class="lang-txt">South Korea</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="es">
+                                <i class="flag-icon flag-icon-es"></i>
+                                <div class="lang-txt">Spain</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="se">
+                                <i class="flag-icon flag-icon-se"></i>
+                                <div class="lang-txt">Sweden</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="ch">
+                                <i class="flag-icon flag-icon-ch"></i>
+                                <div class="lang-txt">Switzerland</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="th">
+                                <i class="flag-icon flag-icon-th"></i>
+                                <div class="lang-txt">Thailand</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="ae">
+                                <i class="flag-icon flag-icon-ae"></i>
+                                <div class="lang-txt">United Arab Emirates</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="gb">
+                                <i class="flag-icon flag-icon-gb"></i>
+                                <div class="lang-txt">United Kingdom</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="us">
+                                <i class="flag-icon flag-icon-us"></i>
+                                <div class="lang-txt">United States</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="vn">
+                                <i class="flag-icon flag-icon-vn"></i>
+                                <div class="lang-txt">Vietnam</div>
+                            </a>
+                        </li>
+
+                        <li class="d-block">
+                            <a class="lang" href="#" data-value="zw">
+                                <i class="flag-icon flag-icon-zw"></i>
+                                <div class="lang-txt">Zimbabwe</div>
+                            </a>
+                        </li>
                         </ul>
                     </div>
+                     
                 </li>
                 <li class="search d-lg-none d-flex"> <a href="javascript:void(0)">
                         <svg>

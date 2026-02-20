@@ -62,6 +62,9 @@
                     <h3>Manage Homepage Content</h3>
                     <p>Update titles, subtitles, and images for different sections of the landing page.</p>
                 </div>
+                @php
+                    // dd($settings);
+                @endphp
                 <div class="card-body">
                     <form id="homepageSettingsForm" action="{{ route('admin.homepage-settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf

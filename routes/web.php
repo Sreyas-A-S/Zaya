@@ -65,6 +65,9 @@ Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->na
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource( '/admins',AdminsController::class);
+    Route::get('admin/admins/{id}/edit', [AdminController::class, 'edit']);
+    Route::put('admin/admins/{id}', [AdminController::class, 'update']); 
+    Route::delete( '/admin/admins/{id}', [AdminsController::class, 'destroy']);  
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::resource('countries', CountryController::class);
     Route::resource('doctors', DoctorController::class);
@@ -154,7 +157,7 @@ Route::prefix('admin')->group(function () {
     Route::put( '/admin/languages/{id}', [CountryController::class, 'update']);
     Route::delete( '/admin/languages/{id}', [CountryController::class, 'destroy']);
 
-    //Admins 
+    
    
 });
 
