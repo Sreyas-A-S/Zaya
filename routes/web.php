@@ -111,7 +111,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // Homepage Settings
     Route::get('homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'index'])->name('homepage-settings.index');
     Route::post('homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'update'])->name('homepage-settings.update');
-
     // About Us Settings
     Route::get('about-settings', [\App\Http\Controllers\Admin\AboutSettingController::class, 'index'])->name('about-settings.index');
     Route::post('about-settings', [\App\Http\Controllers\Admin\AboutSettingController::class, 'update'])->name('about-settings.update');
@@ -156,6 +155,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/admin/languages/{id}', [CountryController::class, 'show']);
     Route::put( '/admin/languages/{id}', [CountryController::class, 'update']);
     Route::delete( '/admin/languages/{id}', [CountryController::class, 'destroy']);
+    Route::post('/change-language/{id}', [LanguageController::class, 'change'])->name('change.language');
 
     
    

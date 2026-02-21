@@ -39,304 +39,671 @@
                         <div class="current_lang"><a class="lang" href="javascript:void(0)"><i class="flag-icon flag-icon-us"></i>
                                 <h6 class="lang-txt f-w-700">ENG</h6>
                             </a></div>
-                        <ul class="custom-menu profile-menu language-menu py-0 more_lang">
-                           <li class="d-block">
-                            <a class="lang" href="#" data-value="af">
-                                <i class="flag-icon flag-icon-af"></i>
-                                <div class="lang-txt">Afghanistan</div>
-                            </a>
-                        </li>
+                      
+                        <ul class="custom-menu profile-menu language-menu py-0 more_lang  onclick="changeLanguage(this)"
+                            style="max-height:350px; overflow-y:auto;">
+                            @php
+                                $languages = \App\Models\Language::all();
+                                function emojiToISO($emoji) {
+                                    $chars = preg_split('//u', $emoji, null, PREG_SPLIT_NO_EMPTY);
 
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="al">
-                                <i class="flag-icon flag-icon-al"></i>
-                                <div class="lang-txt">Albania</div>
-                            </a>
-                        </li>
+                                    $iso = '';
+                                    foreach ($chars as $char) {
+                                        $code = mb_ord($char, 'UTF-8') - 127397;
+                                        $iso .= chr($code);
+                                    }
 
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="dz">
-                                <i class="flag-icon flag-icon-dz"></i>
-                                <div class="lang-txt">Algeria</div>
-                            </a>
-                        </li>
+                                    return strtolower($iso);
+                                }
+                            @endphp
+                             @foreach($languages as $lang)
+                             @php
+                                //  dd($lang);
+                             @endphp
+        <li>
+            <a href="#"
+               class="lang {{ session('locale', 'en') == $lang->language ? 'active' : '' }}"
+               data-value="{{ $lang->code }}">
+                <i class="flag-icon flag-icon-{{ emojiToISO($lang->flag) }}"></i>  {{ strtoupper($lang->name) }} 
+            </a>
+        </li>
+    @endforeach
 
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="ad">
-                                <i class="flag-icon flag-icon-ad"></i>
-                                <div class="lang-txt">Andorra</div>
-                            </a>
-                        </li>
+                     <li class="d-block">
+        <a class="lang"
+           href="javascript:void(0)"
+           data-value="af"
+           onclick="changeLanguage(this)">
+            <i class="flag-icon flag-icon-za"></i>
+            <div class="lang-txt">Afrikaans</div>
+        </a>
+    </li>
 
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="ao">
-                                <i class="flag-icon flag-icon-ao"></i>
-                                <div class="lang-txt">Angola</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="ar">
-                                <i class="flag-icon flag-icon-ar"></i>
-                                <div class="lang-txt">Argentina</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="au">
-                                <i class="flag-icon flag-icon-au"></i>
-                                <div class="lang-txt">Australia</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="at">
-                                <i class="flag-icon flag-icon-at"></i>
-                                <div class="lang-txt">Austria</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="bd">
-                                <i class="flag-icon flag-icon-bd"></i>
-                                <div class="lang-txt">Bangladesh</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="be">
-                                <i class="flag-icon flag-icon-be"></i>
-                                <div class="lang-txt">Belgium</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="br">
-                                <i class="flag-icon flag-icon-br"></i>
-                                <div class="lang-txt">Brazil</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="ca">
-                                <i class="flag-icon flag-icon-ca"></i>
-                                <div class="lang-txt">Canada</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="cn">
-                                <i class="flag-icon flag-icon-cn"></i>
-                                <div class="lang-txt">China</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="dk">
-                                <i class="flag-icon flag-icon-dk"></i>
-                                <div class="lang-txt">Denmark</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="eg">
-                                <i class="flag-icon flag-icon-eg"></i>
-                                <div class="lang-txt">Egypt</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="fi">
-                                <i class="flag-icon flag-icon-fi"></i>
-                                <div class="lang-txt">Finland</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="fr">
-                                <i class="flag-icon flag-icon-fr"></i>
-                                <div class="lang-txt">France</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="de">
-                                <i class="flag-icon flag-icon-de"></i>
-                                <div class="lang-txt">Germany</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="in">
-                                <i class="flag-icon flag-icon-in"></i>
-                                <div class="lang-txt">India</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="it">
-                                <i class="flag-icon flag-icon-it"></i>
-                                <div class="lang-txt">Italy</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="jp">
-                                <i class="flag-icon flag-icon-jp"></i>
-                                <div class="lang-txt">Japan</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="my">
-                                <i class="flag-icon flag-icon-my"></i>
-                                <div class="lang-txt">Malaysia</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="mx">
-                                <i class="flag-icon flag-icon-mx"></i>
-                                <div class="lang-txt">Mexico</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="np">
-                                <i class="flag-icon flag-icon-np"></i>
-                                <div class="lang-txt">Nepal</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="nl">
-                                <i class="flag-icon flag-icon-nl"></i>
-                                <div class="lang-txt">Netherlands</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="nz">
-                                <i class="flag-icon flag-icon-nz"></i>
-                                <div class="lang-txt">New Zealand</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="pk">
-                                <i class="flag-icon flag-icon-pk"></i>
-                                <div class="lang-txt">Pakistan</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="qa">
-                                <i class="flag-icon flag-icon-qa"></i>
-                                <div class="lang-txt">Qatar</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="ru">
-                                <i class="flag-icon flag-icon-ru"></i>
-                                <div class="lang-txt">Russia</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="sa">
-                                <i class="flag-icon flag-icon-sa"></i>
-                                <div class="lang-txt">Saudi Arabia</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="sg">
-                                <i class="flag-icon flag-icon-sg"></i>
-                                <div class="lang-txt">Singapore</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="za">
-                                <i class="flag-icon flag-icon-za"></i>
-                                <div class="lang-txt">South Africa</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="kr">
-                                <i class="flag-icon flag-icon-kr"></i>
-                                <div class="lang-txt">South Korea</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="es">
-                                <i class="flag-icon flag-icon-es"></i>
-                                <div class="lang-txt">Spain</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="se">
-                                <i class="flag-icon flag-icon-se"></i>
-                                <div class="lang-txt">Sweden</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="ch">
-                                <i class="flag-icon flag-icon-ch"></i>
-                                <div class="lang-txt">Switzerland</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="th">
-                                <i class="flag-icon flag-icon-th"></i>
-                                <div class="lang-txt">Thailand</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="ae">
-                                <i class="flag-icon flag-icon-ae"></i>
-                                <div class="lang-txt">United Arab Emirates</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="gb">
-                                <i class="flag-icon flag-icon-gb"></i>
-                                <div class="lang-txt">United Kingdom</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="us">
-                                <i class="flag-icon flag-icon-us"></i>
-                                <div class="lang-txt">United States</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="vn">
-                                <i class="flag-icon flag-icon-vn"></i>
-                                <div class="lang-txt">Vietnam</div>
-                            </a>
-                        </li>
-
-                        <li class="d-block">
-                            <a class="lang" href="#" data-value="zw">
-                                <i class="flag-icon flag-icon-zw"></i>
-                                <div class="lang-txt">Zimbabwe</div>
-                            </a>
-                        </li>
-                        </ul>
-                    </div>
-                     
+<li class="d-block">
+    <a class="lang" href="#" data-value="sq">
+        <i class="flag-icon flag-icon-al"></i>
+        <div class="lang-txt">Albanian</div>
+                </a>
                 </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="am">
+                        <i class="flag-icon flag-icon-et"></i>
+                        <div class="lang-txt">Amharic</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ar">
+                        <i class="flag-icon flag-icon-sa"></i>
+                        <div class="lang-txt">Arabic</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="hy">
+                        <i class="flag-icon flag-icon-am"></i>
+                        <div class="lang-txt">Armenian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="az">
+                        <i class="flag-icon flag-icon-az"></i>
+                        <div class="lang-txt">Azerbaijani</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="eu">
+                        <i class="flag-icon flag-icon-es"></i>
+                        <div class="lang-txt">Basque</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="be">
+                        <i class="flag-icon flag-icon-by"></i>
+                        <div class="lang-txt">Belarusian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="bn">
+                        <i class="flag-icon flag-icon-bd"></i>
+                        <div class="lang-txt">Bengali</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="bs">
+                        <i class="flag-icon flag-icon-ba"></i>
+                        <div class="lang-txt">Bosnian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="bg">
+                        <i class="flag-icon flag-icon-bg"></i>
+                        <div class="lang-txt">Bulgarian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ca">
+                        <i class="flag-icon flag-icon-es"></i>
+                        <div class="lang-txt">Catalan</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ceb">
+                        <i class="flag-icon flag-icon-ph"></i>
+                        <div class="lang-txt">Cebuano</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ny">
+                        <i class="flag-icon flag-icon-mw"></i>
+                        <div class="lang-txt">Chichewa</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="zh">
+                        <i class="flag-icon flag-icon-cn"></i>
+                        <div class="lang-txt">Chinese</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="co">
+                        <i class="flag-icon flag-icon-fr"></i>
+                        <div class="lang-txt">Corsican</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="hr">
+                        <i class="flag-icon flag-icon-hr"></i>
+                        <div class="lang-txt">Croatian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="cs">
+                        <i class="flag-icon flag-icon-cz"></i>
+                        <div class="lang-txt">Czech</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="da">
+                        <i class="flag-icon flag-icon-dk"></i>
+                        <div class="lang-txt">Danish</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="nl">
+                        <i class="flag-icon flag-icon-nl"></i>
+                        <div class="lang-txt">Dutch</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="en">
+                        <i class="flag-icon flag-icon-gb"></i>
+                        <div class="lang-txt">English</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="eo">
+                        <i class="flag-icon flag-icon-pl"></i>
+                        <div class="lang-txt">Esperanto</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="et">
+                        <i class="flag-icon flag-icon-ee"></i>
+                        <div class="lang-txt">Estonian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="fi">
+                        <i class="flag-icon flag-icon-fi"></i>
+                        <div class="lang-txt">Finnish</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="fr">
+                        <i class="flag-icon flag-icon-fr"></i>
+                        <div class="lang-txt">French</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="gl">
+                        <i class="flag-icon flag-icon-es"></i>
+                        <div class="lang-txt">Galician</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ka">
+                        <i class="flag-icon flag-icon-ge"></i>
+                        <div class="lang-txt">Georgian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="de">
+                        <i class="flag-icon flag-icon-de"></i>
+                        <div class="lang-txt">German</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="el">
+                        <i class="flag-icon flag-icon-gr"></i>
+                        <div class="lang-txt">Greek</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="gu">
+                        <i class="flag-icon flag-icon-in"></i>
+                        <div class="lang-txt">Gujarati</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ht">
+                        <i class="flag-icon flag-icon-ht"></i>
+                        <div class="lang-txt">Haitian Creole</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ha">
+                        <i class="flag-icon flag-icon-ng"></i>
+                        <div class="lang-txt">Hausa</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="he">
+                        <i class="flag-icon flag-icon-il"></i>
+                        <div class="lang-txt">Hebrew</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="hi">
+                        <i class="flag-icon flag-icon-in"></i>
+                        <div class="lang-txt">Hindi</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="hu">
+                        <i class="flag-icon flag-icon-hu"></i>
+                        <div class="lang-txt">Hungarian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="is">
+                        <i class="flag-icon flag-icon-is"></i>
+                        <div class="lang-txt">Icelandic</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="id">
+                        <i class="flag-icon flag-icon-id"></i>
+                        <div class="lang-txt">Indonesian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ga">
+                        <i class="flag-icon flag-icon-ie"></i>
+                        <div class="lang-txt">Irish</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="it">
+                        <i class="flag-icon flag-icon-it"></i>
+                        <div class="lang-txt">Italian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ja">
+                        <i class="flag-icon flag-icon-jp"></i>
+                        <div class="lang-txt">Japanese</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="jw">
+                        <i class="flag-icon flag-icon-id"></i>
+                        <div class="lang-txt">Javanese</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="kn">
+                        <i class="flag-icon flag-icon-in"></i>
+                        <div class="lang-txt">Kannada</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="kk">
+                        <i class="flag-icon flag-icon-kz"></i>
+                        <div class="lang-txt">Kazakh</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="km">
+                        <i class="flag-icon flag-icon-kh"></i>
+                        <div class="lang-txt">Khmer</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ko">
+                        <i class="flag-icon flag-icon-kr"></i>
+                        <div class="lang-txt">Korean</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ku">
+                        <i class="flag-icon flag-icon-iq"></i>
+                        <div class="lang-txt">Kurdish</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ky">
+                        <i class="flag-icon flag-icon-kg"></i>
+                        <div class="lang-txt">Kyrgyz</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="lo">
+                        <i class="flag-icon flag-icon-la"></i>
+                        <div class="lang-txt">Lao</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="lv">
+                        <i class="flag-icon flag-icon-lv"></i>
+                        <div class="lang-txt">Latvian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="lt">
+                        <i class="flag-icon flag-icon-lt"></i>
+                        <div class="lang-txt">Lithuanian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="mk">
+                        <i class="flag-icon flag-icon-mk"></i>
+                        <div class="lang-txt">Macedonian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="mg">
+                        <i class="flag-icon flag-icon-mg"></i>
+                        <div class="lang-txt">Malagasy</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ms">
+                        <i class="flag-icon flag-icon-my"></i>
+                        <div class="lang-txt">Malay</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ml">
+                        <i class="flag-icon flag-icon-in"></i>
+                        <div class="lang-txt">Malayalam</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="mt">
+                        <i class="flag-icon flag-icon-mt"></i>
+                        <div class="lang-txt">Maltese</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="mi">
+                        <i class="flag-icon flag-icon-nz"></i>
+                        <div class="lang-txt">Maori</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="mr">
+                        <i class="flag-icon flag-icon-in"></i>
+                        <div class="lang-txt">Marathi</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="mn">
+                        <i class="flag-icon flag-icon-mn"></i>
+                        <div class="lang-txt">Mongolian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="my">
+                        <i class="flag-icon flag-icon-mm"></i>
+                        <div class="lang-txt">Myanmar (Burmese)</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ne">
+                        <i class="flag-icon flag-icon-np"></i>
+                        <div class="lang-txt">Nepali</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="no">
+                        <i class="flag-icon flag-icon-no"></i>
+                        <div class="lang-txt">Norwegian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="or">
+                        <i class="flag-icon flag-icon-in"></i>
+                        <div class="lang-txt">Odia</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ps">
+                        <i class="flag-icon flag-icon-af"></i>
+                        <div class="lang-txt">Pashto</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="fa">
+                        <i class="flag-icon flag-icon-ir"></i>
+                        <div class="lang-txt">Persian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="pl">
+                        <i class="flag-icon flag-icon-pl"></i>
+                        <div class="lang-txt">Polish</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="pt">
+                        <i class="flag-icon flag-icon-pt"></i>
+                        <div class="lang-txt">Portuguese</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="pa">
+                        <i class="flag-icon flag-icon-in"></i>
+                        <div class="lang-txt">Punjabi</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ro">
+                        <i class="flag-icon flag-icon-ro"></i>
+                        <div class="lang-txt">Romanian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ru">
+                        <i class="flag-icon flag-icon-ru"></i>
+                        <div class="lang-txt">Russian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="sr">
+                        <i class="flag-icon flag-icon-rs"></i>
+                        <div class="lang-txt">Serbian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="si">
+                        <i class="flag-icon flag-icon-lk"></i>
+                        <div class="lang-txt">Sinhala</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="sk">
+                        <i class="flag-icon flag-icon-sk"></i>
+                        <div class="lang-txt">Slovak</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="sl">
+                        <i class="flag-icon flag-icon-si"></i>
+                        <div class="lang-txt">Slovenian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="so">
+                        <i class="flag-icon flag-icon-so"></i>
+                        <div class="lang-txt">Somali</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="es">
+                        <i class="flag-icon flag-icon-es"></i>
+                        <div class="lang-txt">Spanish</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="sw">
+                        <i class="flag-icon flag-icon-ke"></i>
+                        <div class="lang-txt">Swahili</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="sv">
+                        <i class="flag-icon flag-icon-se"></i>
+                        <div class="lang-txt">Swedish</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ta">
+                        <i class="flag-icon flag-icon-in"></i>
+                        <div class="lang-txt">Tamil</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="te">
+                        <i class="flag-icon flag-icon-in"></i>
+                        <div class="lang-txt">Telugu</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="th">
+                        <i class="flag-icon flag-icon-th"></i>
+                        <div class="lang-txt">Thai</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="tr">
+                        <i class="flag-icon flag-icon-tr"></i>
+                        <div class="lang-txt">Turkish</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="uk">
+                        <i class="flag-icon flag-icon-ua"></i>
+                        <div class="lang-txt">Ukrainian</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="ur">
+                        <i class="flag-icon flag-icon-pk"></i>
+                        <div class="lang-txt">Urdu</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="uz">
+                        <i class="flag-icon flag-icon-uz"></i>
+                        <div class="lang-txt">Uzbek</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="vi">
+                        <i class="flag-icon flag-icon-vn"></i>
+                        <div class="lang-txt">Vietnamese</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="cy">
+                        <i class="flag-icon flag-icon-gb"></i>
+                        <div class="lang-txt">Welsh</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="xh">
+                        <i class="flag-icon flag-icon-za"></i>
+                        <div class="lang-txt">Xhosa</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="yi">
+                        <i class="flag-icon flag-icon-il"></i>
+                        <div class="lang-txt">Yiddish</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="yo">
+                        <i class="flag-icon flag-icon-ng"></i>
+                        <div class="lang-txt">Yoruba</div>
+                    </a>
+                </li>
+
+                <li class="d-block">
+                    <a class="lang" href="#" data-value="zu">
+                        <i class="flag-icon flag-icon-za"></i>
+                        <div class="lang-txt">Zulu</div>
+                    </a>
+                </li>
+
+                        </ul>
+                <li class="d-b
                 <li class="search d-lg-none d-flex"> <a href="javascript:void(0)">
                         <svg>
                             <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Search') }}"></use>
@@ -557,3 +924,54 @@
         </div>
     </div>
 </header>
+<script>
+
+
+document.querySelectorAll(".lang").forEach(function (element) {
+
+    element.addEventListener("click", function (e) {
+
+        e.preventDefault();
+
+        let id = this.getAttribute("data-value");
+        console.log(id);
+
+        fetch(`change-language/${id}`, {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            }
+        })
+        .then(response => response.json())
+      .then(data => {
+
+            if (data.status) {
+
+                Object.keys(data.data).forEach(function (key) {
+
+                    let element = document.getElementById(key);
+
+                    if (element) {
+                        element.value = data.data[key] ?? '';
+                    }
+
+                });
+
+            } else {
+
+                // Clear all inputs if not found
+                document.querySelectorAll("input, textarea").forEach(el => {
+                    el.value = '';
+                });
+
+                console.warn(data.message);
+            }
+
+        });
+
+    });
+
+});
+
+</script>
+

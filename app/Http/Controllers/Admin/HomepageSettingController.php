@@ -54,4 +54,8 @@ class HomepageSettingController extends Controller
 
         return redirect()->back()->with('success', 'Homepage settings updated successfully.');
     }
+
+    
 }
+
+

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\HomepageSetting;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -34,6 +35,15 @@ class LanguageController extends Controller
                         </button>
                     </form>
                     ';
+                     // Get selected language from homepage_settings
+    $setting = HomepageSetting::first();
+
+    $language = $setting->language ?? 'en';
+
+    // Fetch homepage content based on language
+    $homepageData = HomepageSetting::where('language', $language)->first();
+
+    return view('home', compact('homepageData'));
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -98,11 +108,30 @@ class LanguageController extends Controller
             'message' => 'Language updated successfully'
         ]);
     }
+ public function change($id)
+    {
+        // Try to find selected language row
+        $homepage = HomepageSetting::find($id);
 
+            if (!$homepage) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Language not found'
+                ]);
+            }
+
+        session(['locale' => $homepage->language ?? 'en']);
+
+        return response()->json([
+            'status' => true,
+            'data' => $homepage
+        ]);
+    }
     /**
      * Delete language
      */
-    public function destroy($id)
+public function destroy($id)
+    
     {
        
         $language = Language::findOrFail($id);
@@ -113,4 +142,4 @@ class LanguageController extends Controller
             'message' => 'Language deleted successfully'
         ]);
     }
-}
+}   

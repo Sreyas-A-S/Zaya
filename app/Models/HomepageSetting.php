@@ -6,5 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class HomepageSetting extends Model
 {
-    protected $guarded = [];
+
+      protected $fillable = [
+        'language',
+        'header_title',
+        'header_subtitle',
+        'description',
+    ];
+
 }
