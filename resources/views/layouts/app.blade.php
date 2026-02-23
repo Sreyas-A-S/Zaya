@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+    
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
 
     <link rel="icon" type="image/png" href="{{ asset('frontend/assets/favicon-96x96.png') }}" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="{{ asset('frontend/assets/favicon.svg') }}" />
@@ -30,7 +32,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: ty 0.5s ease;opacity 0.5s ease, visibili
         }
 
         .preloader-logo {
@@ -65,6 +67,15 @@
     <div id="global-preloader">
         <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="preloader-logo">
     </div>
+    <form id="homepageSettingsForm"
+      action="{{ route('admin.services-settings.update') }}"
+      method="POST">
+
+    @csrf   {{-- ✅ ADD THIS LINE --}}
+
+    <!-- your input fields here -->
+
+</form>
 
     @include('partials.frontend.header')
 
@@ -143,6 +154,34 @@
                 }
             });
         });
+
+        let formData = new FormData(this);
+        formData.append('_token', '{{ csrf_token() }}');
+
+        $('#homepageSettingsForm').on('submit', function(e) {
+    e.preventDefault();
+
+    let formData = new FormData(this);
+    formData.append('_token', '{{ csrf_token() }}'); // ✅ add this
+
+    $.ajax({
+        url: $(this).attr('action'),
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            alert('Saved');
+        }
+    });
+});
+
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+
     </script>
 
     @stack('scripts')

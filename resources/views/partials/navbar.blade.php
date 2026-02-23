@@ -40,7 +40,7 @@
                                 <h6 class="lang-txt f-w-700">ENG</h6>
                             </a></div>
                       
-                        <ul class="custom-menu profile-menu language-menu py-0 more_lang  onclick="changeLanguage(this)"
+                        <ul class="custom-menu profile-menu language-menu py-0 more_lang      onclick="changeLanguage(this)"
                             style="max-height:350px; overflow-y:auto;">
                             @php
                                 $languages = \App\Models\Language::all();
@@ -69,7 +69,7 @@
         </li>
     @endforeach
 
-                     <li class="d-block">
+     <li class="d-block">
         <a class="lang"
            href="javascript:void(0)"
            data-value="af"
@@ -80,7 +80,7 @@
     </li>
 
 <li class="d-block">
-    <a class="lang" href="#" data-value="sq">
+    <a class="lang" href="javascript:void(0)" data-value="sq">
         <i class="flag-icon flag-icon-al"></i>
         <div class="lang-txt">Albanian</div>
                 </a>
