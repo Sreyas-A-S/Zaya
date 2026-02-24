@@ -193,7 +193,7 @@
                                         <a href="{{ route('blog-detail', $post['slug']) }}" 
                                            class="group flex gap-4 p-3 rounded-xl bg-white hover:shadow-md transition-all duration-300 border border-gray-100">
                                             <!-- Thumbnail -->
-                                            <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
+                                            <div class="w-20 h-20 shrink-0 rounded-lg overflow-hidden">
                                                 @if($post['featured_image'])
                                                     <img src="{{ $post['featured_image'] }}" 
                                                          @if(!empty($post['featured_image_srcset'])) 
@@ -204,7 +204,7 @@
                                                          loading="lazy"
                                                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                                 @else
-                                                    <div class="w-full h-full bg-gradient-to-br from-accent/30 to-secondary/20 flex items-center justify-center">
+                                                    <div class="w-full h-full bg-linear-to-br from-accent/30 to-secondary/20 flex items-center justify-center">
                                                         <i class="ri-article-line text-xl text-secondary/40"></i>
                                                     </div>
                                                 @endif
@@ -251,7 +251,7 @@
                         @endif
 
                         <!-- Newsletter CTA -->
-                        <div class="bg-gradient-to-br from-secondary to-primary rounded-[20px] p-6 text-white">
+                        <div class="bg-linear-to-br from-secondary to-primary rounded-[20px] p-6 text-white">
                             <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-4">
                                 <i class="ri-article-line text-2xl"></i>
                             </div>
