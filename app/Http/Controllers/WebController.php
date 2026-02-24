@@ -149,6 +149,57 @@ class WebController extends Controller
     }
 
     /**
+     * Extract optimized image data from embedded WP post
+     */
+    private function extractOptimizedImage($post)
+    {
+        $imageData = [
+            'url' => null,
+            'srcset' => null,
+            'sizes' => null,
+        ];
+
+        if (isset($post->_embedded->{'wp:featuredmedia'}[0])) {
+            $media = $post->_embedded->{'wp:featuredmedia'}[0];
+
+            if (isset($media->source_url)) {
+                $imageData['url'] = $media->source_url;
+            }
+
+            if (isset($media->media_details->sizes)) {
+                $srcset = [];
+                // Include full size if possible
+                if (isset($media->media_details->width) && isset($media->source_url)) {
+                    $srcset[] = $media->source_url . ' ' . $media->media_details->width . 'w';
+                }
+
+                // Add all other sizes
+                foreach (get_object_vars($media->media_details->sizes) as $sizeName => $size) {
+                    if (isset($size->source_url) && isset($size->width)) {
+                        $srcset[] = $size->source_url . ' ' . $size->width . 'w';
+                    }
+                }
+
+                if (!empty($srcset)) {
+                    $imageData['srcset'] = implode(', ', array_unique($srcset));
+                    $imageData['sizes'] = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw';
+                }
+
+                // Set a smaller default image for 'src' fallback to speed up initial load
+                if (isset($media->media_details->sizes->medium_large->source_url)) {
+                    $imageData['url'] = $media->media_details->sizes->medium_large->source_url;
+                } elseif (isset($media->media_details->sizes->large->source_url)) {
+                    $imageData['url'] = $media->media_details->sizes->large->source_url;
+                } elseif (isset($media->media_details->sizes->medium->source_url)) {
+                    $imageData['url'] = $media->media_details->sizes->medium->source_url;
+                }
+            }
+        }
+
+        return $imageData;
+    }
+
+    /**
      * Blogs listing page - fetches posts from WordPress
      */
     public function blogs(Request $request)
@@ -316,13 +367,13 @@ class WebController extends Controller
         $processedPosts = [];
         if ($posts) {
             foreach ($posts as $post) {
-                $featuredImage = null;
-                $categoryName = 'Uncategorized';
+                // Get image data
+                $imageData = $this->extractOptimizedImage($post);
+                $featuredImage = $imageData['url'];
+                $featuredImageSrcset = $imageData['srcset'];
+                $featuredImageSizes = $imageData['sizes'];
 
-                // Get featured image from embedded data
-                if (isset($post->_embedded->{'wp:featuredmedia'}[0]->source_url)) {
-                    $featuredImage = $post->_embedded->{'wp:featuredmedia'}[0]->source_url;
-                }
+                $categoryName = 'Uncategorized';
 
                 // Get category name from embedded data
                 if (isset($post->_embedded->{'wp:term'}[0][0]->name)) {
@@ -337,6 +388,8 @@ class WebController extends Controller
                     'slug' => $post->slug,
                     'date' => \Carbon\Carbon::parse($post->date)->format('M d, Y'),
                     'featured_image' => $featuredImage,
+                    'featured_image_srcset' => $featuredImageSrcset,
+                    'featured_image_sizes' => $featuredImageSizes,
                     'category' => $categoryName,
                     'link' => $post->link,
                 ];
@@ -393,12 +446,10 @@ class WebController extends Controller
         $processedPosts = [];
         if ($posts) {
             foreach ($posts as $post) {
-                $featuredImage = null;
-
-                // Get featured image 
-                if (isset($post->_embedded->{'wp:featuredmedia'}[0]->source_url)) {
-                    $featuredImage = $post->_embedded->{'wp:featuredmedia'}[0]->source_url;
-                }
+                $imageData = $this->extractOptimizedImage($post);
+                $featuredImage = $imageData['url'];
+                $featuredImageSrcset = $imageData['srcset'];
+                $featuredImageSizes = $imageData['sizes'];
 
                 $processedPosts[] = [
                     'id' => $post->id,
@@ -408,6 +459,8 @@ class WebController extends Controller
                     'slug' => $post->slug,
                     'date' => \Carbon\Carbon::parse($post->date)->format('M d, Y'),
                     'featured_image' => $featuredImage,
+                    'featured_image_srcset' => $featuredImageSrcset,
+                    'featured_image_sizes' => $featuredImageSizes,
                     'link' => $post->link,
                 ];
             }
@@ -455,11 +508,10 @@ class WebController extends Controller
         $post = $posts[0];
 
         // Process the post data
-        $featuredImage = null;
-
-        if (isset($post->_embedded->{'wp:featuredmedia'}[0]->source_url)) {
-            $featuredImage = $post->_embedded->{'wp:featuredmedia'}[0]->source_url;
-        }
+        $imageData = $this->extractOptimizedImage($post);
+        $featuredImage = $imageData['url'];
+        $featuredImageSrcset = $imageData['srcset'];
+        $featuredImageSizes = '(max-width: 1024px) 100vw, 66vw';
 
         $announcement = [
             'id' => $post->id,
@@ -468,6 +520,8 @@ class WebController extends Controller
             'slug' => $post->slug,
             'date' => \Carbon\Carbon::parse($post->date)->format('M d, Y'),
             'featured_image' => $featuredImage,
+            'featured_image_srcset' => $featuredImageSrcset,
+            'featured_image_sizes' => $featuredImageSizes,
         ];
 
         // Fetch related posts using the SAME endpoint regarding singular/plural
@@ -480,11 +534,10 @@ class WebController extends Controller
 
         if ($related) {
             foreach ($related as $relPost) {
-                $relFeaturedImage = null;
-
-                if (isset($relPost->_embedded->{'wp:featuredmedia'}[0]->source_url)) {
-                    $relFeaturedImage = $relPost->_embedded->{'wp:featuredmedia'}[0]->source_url;
-                }
+                $relImageData = $this->extractOptimizedImage($relPost);
+                $relFeaturedImage = $relImageData['url'];
+                $relFeaturedImageSrcset = $relImageData['srcset'];
+                $relFeaturedImageSizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw';
 
                 $relatedPosts[] = [
                     'id' => $relPost->id,
@@ -493,6 +546,8 @@ class WebController extends Controller
                     'slug' => $relPost->slug,
                     'date' => \Carbon\Carbon::parse($relPost->date)->format('M d, Y'),
                     'featured_image' => $relFeaturedImage,
+                    'featured_image_srcset' => $relFeaturedImageSrcset,
+                    'featured_image_sizes' => $relFeaturedImageSizes,
                 ];
             }
         }
@@ -520,12 +575,11 @@ class WebController extends Controller
         $post = $posts[0];
 
         // Process the post data
-        $featuredImage = null;
+        $imageData = $this->extractOptimizedImage($post);
+        $featuredImage = $imageData['url'];
+        $featuredImageSrcset = $imageData['srcset'];
+        $featuredImageSizes = '(max-width: 1024px) 100vw, 66vw';
         $categoryName = 'Uncategorized';
-
-        if (isset($post->_embedded->{'wp:featuredmedia'}[0]->source_url)) {
-            $featuredImage = $post->_embedded->{'wp:featuredmedia'}[0]->source_url;
-        }
 
         if (isset($post->_embedded->{'wp:term'}[0][0]->name)) {
             $categoryName = html_entity_decode($post->_embedded->{'wp:term'}[0][0]->name);
@@ -555,6 +609,8 @@ class WebController extends Controller
             'slug' => $post->slug,
             'date' => \Carbon\Carbon::parse($post->date)->format('M d, Y'),
             'featured_image' => $featuredImage,
+            'featured_image_srcset' => $featuredImageSrcset,
+            'featured_image_sizes' => $featuredImageSizes,
             'category' => $categoryName,
             'author' => $authorName,
             'author_image' => $authorImage,
@@ -573,12 +629,11 @@ class WebController extends Controller
 
         if ($related) {
             foreach (array_slice($related, 0, 8) as $relPost) {
-                $relFeaturedImage = null;
+                $relImageData = $this->extractOptimizedImage($relPost);
+                $relFeaturedImage = $relImageData['url'];
+                $relFeaturedImageSrcset = $relImageData['srcset'];
+                $relFeaturedImageSizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw';
                 $relCategoryName = 'Uncategorized';
-
-                if (isset($relPost->_embedded->{'wp:featuredmedia'}[0]->source_url)) {
-                    $relFeaturedImage = $relPost->_embedded->{'wp:featuredmedia'}[0]->source_url;
-                }
 
                 if (isset($relPost->_embedded->{'wp:term'}[0][0]->name)) {
                     $relCategoryName = html_entity_decode($relPost->_embedded->{'wp:term'}[0][0]->name);
@@ -591,6 +646,8 @@ class WebController extends Controller
                     'slug' => $relPost->slug,
                     'date' => \Carbon\Carbon::parse($relPost->date)->format('M d, Y'),
                     'featured_image' => $relFeaturedImage,
+                    'featured_image_srcset' => $relFeaturedImageSrcset,
+                    'featured_image_sizes' => $relFeaturedImageSizes,
                     'category' => $relCategoryName,
                 ];
             }

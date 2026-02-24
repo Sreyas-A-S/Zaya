@@ -63,7 +63,12 @@
                     <!-- Featured Image -->
                     @if($blogPost['featured_image'])
                         <div class="w-full overflow-hidden rounded-[20px] mb-12">
-                            <img src="{{ $blogPost['featured_image'] }}" alt="{{ $blogPost['title'] }}"
+                            <img src="{{ $blogPost['featured_image'] }}" 
+                                @if(!empty($blogPost['featured_image_srcset'])) 
+                                srcset="{{ $blogPost['featured_image_srcset'] }}" 
+                                sizes="{{ $blogPost['featured_image_sizes'] }}" 
+                                @endif
+                                alt="{{ $blogPost['title'] }}"
                                 class="w-full h-[300px] md:h-[400px] lg:h-[450px] object-cover">
                         </div>
                     @endif
@@ -190,7 +195,13 @@
                                             <!-- Thumbnail -->
                                             <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
                                                 @if($post['featured_image'])
-                                                    <img src="{{ $post['featured_image'] }}" alt="{{ $post['title'] }}" 
+                                                    <img src="{{ $post['featured_image'] }}" 
+                                                         @if(!empty($post['featured_image_srcset'])) 
+                                                         srcset="{{ $post['featured_image_srcset'] }}" 
+                                                         sizes="{{ $post['featured_image_sizes'] }}" 
+                                                         @endif
+                                                         alt="{{ $post['title'] }}" 
+                                                         loading="lazy"
                                                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                                 @else
                                                     <div class="w-full h-full bg-gradient-to-br from-accent/30 to-secondary/20 flex items-center justify-center">
