@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('homepage_settings', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
+            $table->string('key');
             $table->longText('value')->nullable();
             $table->string('type')->default('text'); // text, textarea, image
             $table->string('section')->nullable(); // hero, services, etc.
+            $table->unsignedBigInteger('language_id')->nullable();
             $table->timestamps();
         });
     }

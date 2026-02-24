@@ -12,6 +12,12 @@ class HomepageSetting extends Model
         'header_title',
         'header_subtitle',
         'description',
+
+         'key',
+          'value',
+           'language',
+            'type',
     ];
+  
 
 }

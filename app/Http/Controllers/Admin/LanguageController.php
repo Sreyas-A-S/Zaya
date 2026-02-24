@@ -112,6 +112,7 @@ class LanguageController extends Controller
     {
         // Try to find selected language row
         $homepage = HomepageSetting::find($id);
+          session(['locale' => $id ?? 'en']);
 
             if (!$homepage) {
                 return response()->json([
@@ -120,12 +121,13 @@ class LanguageController extends Controller
                 ]);
             }
 
-        session(['locale' => $homepage->language ?? 'en']);
+      
+        // dd(session('locale'));
 
         return response()->json([
             'status' => true,
             'data' => $homepage
-        ]);
+        ]); 
     }
     /**
      * Delete language

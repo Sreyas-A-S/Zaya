@@ -22,41 +22,72 @@ class ServicesSettingController extends Controller
     }
 
     public function update(Request $request)
-    {
-        $data = $request->except('_token');
+            {// Get current language from session (default en)
 
-        foreach ($data as $key => $value) {
-            $setting = HomepageSetting::where('key', $key)->first();
-            if ($setting) {
-                // Validate max length if applicable
-                if ($setting->max_length && strlen($value) > $setting->max_length) {
-                    if ($request->ajax()) {
-                        return response()->json(['success' => false, 'message' => "The {$key} field cannot be longer than {$setting->max_length} characters."], 422);
-                    }
-                    return redirect()->back()->withErrors(["{$key}" => "The {$key} field cannot be longer than {$setting->max_length} characters."]);
-                }
+          
+$language = session('locale', 'en');
+//   dd($language);
+$data = $request->except(['_token', 'language']);
 
-                if ($setting->type === 'image' && $request->hasFile($key)) {
-                    // Delete old image if exists
-                    if ($setting->value && Storage::disk('public')->exists($setting->value)) {
-                        Storage::disk('public')->delete($setting->value);
-                    }
-                    $path = $request->file($key)->store('services', 'public');
-                    $setting->update(['value' => $path]);
-                } else {
-                    $setting->update(['value' => $value]);
-                }
+foreach ($data as $key => $value) {
+
+    $setting = HomepageSetting::where('key', $key)
+                ->where('language', $language)
+                ->first();
+
+    if ($setting) {
+
+        // Validate only text fields
+        if ($setting->type !== 'image' &&
+            $setting->max_length &&
+            strlen($value) > $setting->max_length) {
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "The {$key} field cannot be longer than {$setting->max_length} characters."
+                ], 422);
             }
-        }
 
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Services page settings updated successfully.',
-                'path' => $path ?? null
+            return redirect()->back()->withErrors([
+                $key => "The {$key} field cannot be longer than {$setting->max_length} characters."
             ]);
         }
 
-        return redirect()->back()->with('success', 'Services page settings updated successfully.');
+        // Handle image
+        if ($setting->type === 'image' && $request->hasFile($key)) {
+
+            if ($setting->value && Storage::disk('public')->exists($setting->value)) {
+                Storage::disk('public')->delete($setting->value);
+            }
+
+            $path = $request->file($key)
+                    ->store("services/{$language}", 'public');
+
+            $setting->update(['value' => $path]);
+
+        } else {
+            $setting->update(['value' => $value]);
+        }
+
+    } else {
+
+        HomepageSetting::create([
+            'key' => $key,
+            'value' => $value,
+            'language' => $language,
+            'type' => 'text'
+        ]);
     }
+}
+
+if ($request->ajax()) {
+    return response()->json([
+        'success' => true,
+        'message' => 'Services page settings updated successfully.',
+        'language' => $language
+    ]);
+}
+
+return redirect()->back()->with('success', 'Services page settings updated successfully.');}
 }
