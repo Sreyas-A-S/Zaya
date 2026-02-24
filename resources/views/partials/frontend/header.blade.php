@@ -1,6 +1,6 @@
 <!-- Header -->
-<header class="fixed w-full top-0 z-50 transition-all duration-300 py-8 bg-white">
-    <div class="container mx-auto px-4 lg:px-6 flex justify-between items-center relative">
+<header class="fixed w-full px-4 md:px-6 top-0 z-50 transition-all duration-300 py-8 bg-white">
+    <div class="container mx-auto flex justify-between items-center relative">
 
         <!-- Mobile Toggle (Visible on Mobile) -->
         <button id="mobile-menu-btn" class="lg:hidden text-2xl text-secondary focus:outline-none">
@@ -89,7 +89,7 @@
 
             <!-- Language Toggle -->
             <button type="button"
-                class="relative flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
+                class="relative hidden sm:flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
                 onclick="toggleLanguage()">
                 <!-- Sliding Pill -->
                 <div id="lang-toggle-pill"

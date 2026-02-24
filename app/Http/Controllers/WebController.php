@@ -95,8 +95,49 @@ class WebController extends Controller
 
     public function serviceDetail($slug)
     {
-        $service = \App\Models\Service::with('images')->where('slug', $slug)->where('status', true)->firstOrFail();
+        $service = \App\Models\Service::with('images')->where('slug', $slug)->where('status', true)->first();
+
+        if (!$service) {
+            // Dummy Data Support for UI Design
+            $dummyServices = [
+                'wellness-based-ayurveda-consultation' => 'Wellness based Ayurveda consultation',
+                'ayurvedic-diet-nutrition-guidance' => 'Ayurvedic diet & nutrition guidance',
+                'herbal-wellness-support' => 'Herbal wellness support',
+                'abhyanga-ayurvedic-oil-massage' => 'Abhyanga (Ayurvedic Oil Massage)',
+                'shirodhara' => 'Shirodhara',
+                'panchakarma-inspired-detox-programs-light-versions' => 'Panchakarma-inspired detox programs (light versions)'
+            ];
+
+            if (isset($dummyServices[$slug])) {
+                $service = new \App\Models\Service();
+                $service->title = $dummyServices[$slug];
+                $service->slug = $slug;
+                $service->image = 'frontend/assets/' . $slug . '.png';
+                $service->description = '<p>Experience a premium holistic session designed perfectly for your lifestyle and energetic pathway.</p><ul><li>Natural rejuvenation</li><li>Mindful balancing approach</li></ul>';
+                $service->setRelation('images', collect([])); // empty relation so gallery check doesn't fail
+            } else {
+                abort(404);
+            }
+        }
+
         $otherServices = \App\Models\Service::where('slug', '!=', $slug)->where('status', true)->inRandomOrder()->take(4)->get();
+
+        if ($otherServices->isEmpty()) {
+            $otherServices = collect([
+                (object) [
+                    'title' => 'Yoga Therapy Session',
+                    'slug' => 'yoga-therapy',
+                    'image' => 'frontend/assets/yoga-service.png',
+                    'description' => 'Realign your body and energetic pathways with our expert yoga guidance.'
+                ],
+                (object) [
+                    'title' => 'Counseling Session',
+                    'slug' => 'counseling',
+                    'image' => 'frontend/assets/counselling-service.png',
+                    'description' => 'Nurture your mental well-being with our holistic approaches.'
+                ]
+            ]);
+        }
 
         return view('service-detail', compact('service', 'otherServices'));
     }
