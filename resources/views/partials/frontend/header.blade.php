@@ -29,7 +29,8 @@
                     <a href="{{ route('about-us') }}#our-team"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Our
                         Team</a>
-                    <a href="#" class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Gallery</a>
+                    <a href="#"
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Gallery</a>
                     <a href="{{ route('blogs') }}"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Blog</a>
                 </div>
@@ -67,15 +68,42 @@
             <a href="{{ route('zaya-login') }}"
                 class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors">Login</a>
 
-            <a href="#" class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap">Find Practitioner</a>
+            <a href="#"
+                class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap">Find
+                Practitioner</a>
 
             <!-- Language Toggle -->
-            <div class="flex items-center bg-gray-100 rounded-full p-1 border border-gray-200">
-                <button
-                    class="bg-secondary text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm transition-all">En</button>
-                <button
-                    class="text-gray-500 text-xs font-bold px-3 py-1.5 rounded-full hover:bg-gray-200 transition-all">Fr</button>
-            </div>
+            <button type="button"
+                class="relative flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
+                onclick="toggleLanguage()">
+                <!-- Sliding Pill -->
+                <div id="lang-toggle-pill"
+                    class="absolute top-1 bottom-1 left-1 w-9 bg-primary rounded-full shadow-sm transition-transform duration-300 ease-in-out translate-x-0">
+                </div>
+
+                <span id="lang-text-en"
+                    class="relative z-10 w-9 text-center text-white text-sm font-bold py-1.5 transition-colors duration-300">En</span>
+                <span id="lang-text-fr"
+                    class="relative z-10 w-9 text-center text-gray-500 text-sm font-bold py-1.5 transition-colors duration-300">Fr</span>
+            </button>
+
+            <!-- User Profile -->
+            <a href="#" class="relative block shrink-0 ml-1">
+                @php
+                    // NOTE FOR BACKEND: Replace these variables with actual auth/user logic
+                    $mockHasProfilePicture = true; // Toggle to false to see the placeholder design
+                    $mockProfilePictureUrl = 'https://i.pravatar.cc/150?img=48'; // Example profile image
+                @endphp
+
+                <div
+                    class="w-11 h-11 md:w-12 md:h-12 rounded-full border-2 border-gray-200 overflow-hidden flex items-center justify-center bg-secondary/10 transition-transform duration-300 hover:scale-105 hover:border-gray-300">
+                    @if($mockHasProfilePicture)
+                        <img src="{{ $mockProfilePictureUrl }}" alt="User Profile" class="w-full h-full object-cover">
+                    @else
+                        <i class="ri-user-3-line text-xl text-secondary"></i>
+                    @endif
+                </div>
+            </a>
         </div>
     </div>
 
@@ -115,4 +143,34 @@
                 a Practitioner</a>
         </div>
     </div>
+
+    <script>
+        function toggleLanguage() {
+            const pill = document.getElementById('lang-toggle-pill');
+            const enText = document.getElementById('lang-text-en');
+            const frText = document.getElementById('lang-text-fr');
+
+            if (pill.classList.contains('translate-x-0')) {
+                // Switch to Fr
+                pill.classList.remove('translate-x-0');
+                pill.classList.add('translate-x-full');
+
+                enText.classList.remove('text-white');
+                enText.classList.add('text-gray-500');
+
+                frText.classList.remove('text-gray-500');
+                frText.classList.add('text-white');
+            } else {
+                // Switch to En
+                pill.classList.remove('translate-x-full');
+                pill.classList.add('translate-x-0');
+
+                frText.classList.remove('text-white');
+                frText.classList.add('text-gray-500');
+
+                enText.classList.remove('text-gray-500');
+                enText.classList.add('text-white');
+            }
+        }
+    </script>
 </header>
