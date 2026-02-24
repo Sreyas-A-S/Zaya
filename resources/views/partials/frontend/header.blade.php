@@ -43,13 +43,28 @@
                         class="ri-arrow-down-s-line transition-transform duration-300 group-hover:-rotate-180"></i>
                 </button>
                 <div
-                    class="absolute top-full left-0 w-56 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden">
-                    <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">Ayurveda</a>
-                    <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">Yoga</a>
-                    <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">Counselling</a>
+                    class="absolute top-full -left-8 w-[240px] bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden py-5">
+                    <a href="{{ route('services') }}"
+                        class="block px-6 pb-4 text-[16px] leading-none font-medium text-gray-800 hover:text-primary transition-colors">Our
+                        Specialities</a>
+                    <div class="flex flex-col gap-1 pl-3">
+                        <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
+                            class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
+                            <span class="text-gray-400 font-light">&mdash;</span> Ayurveda
+                        </a>
+                        <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
+                            class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
+                            <span class="text-gray-400 font-light">&mdash;</span> Yoga
+                        </a>
+                        <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
+                            class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
+                            <span class="text-gray-400 font-light">&mdash;</span> Counselling
+                        </a>
+                        <a href="{{ route('services', ['category' => 'Packages']) }}#services-listing"
+                            class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
+                            <span class="text-gray-400 font-light">&mdash;</span> Packages
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -115,21 +130,38 @@
         <div class="flex flex-col gap-2">
             <span class="text-lg font-medium text-secondary">About Us</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
-                <a href="{{ route('about-us') }}" class="text-gray-600 text-sm">Who we are?</a>
-                <a href="#" class="text-gray-600 text-sm">What we do?</a>
-                <a href="#" class="text-gray-600 text-sm">Our Team</a>
+                <a href="{{ route('about-us') }}#who-we-are" class="text-gray-600 text-base">Who we are?</a>
+                <a href="{{ route('about-us') }}#what-we-do" class="text-gray-600 text-base">What we do?</a>
+                <a href="{{ route('about-us') }}#our-team" class="text-gray-600 text-base">Our Team</a>
+                <a href="#" class="text-gray-600 text-base">Gallery</a>
+                <a href="{{ route('blogs') }}" class="text-gray-600 text-base">Blog</a>
             </div>
         </div>
 
         <div class="flex flex-col gap-2">
             <span class="text-lg font-medium text-secondary">Services</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
-                <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
-                    class="text-gray-600 text-sm">Ayurveda</a>
-                <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
-                    class="text-gray-600 text-sm">Yoga</a>
-                <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
-                    class="text-gray-600 text-sm">Counselling</a>
+                <a href="{{ route('services') }}"
+                    class="text-base font-medium text-gray-800 hover:text-primary transition-colors inline-block mt-1">Our
+                    Specialities</a>
+                <div class="pl-2 flex flex-col gap-2 mt-1 mb-2">
+                    <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Ayurveda
+                    </a>
+                    <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Yoga
+                    </a>
+                    <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Counselling
+                    </a>
+                    <a href="{{ route('services', ['category' => 'Packages']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Packages
+                    </a>
+                </div>
             </div>
         </div>
 

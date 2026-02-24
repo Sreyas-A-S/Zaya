@@ -358,7 +358,7 @@
     <section class="py-20 md:pt-28 md:pb-18 bg-white text-center relative overflow-hidden">
         <!-- Decorative Leaf -->
         <img src="{{ asset('frontend/assets/leaf-02.png') }}" alt="Leaf"
-            class="absolute right-0 top-1/3 w-24 md:w-32 pointer-events-none">
+            class="absolute right-0 top-1/3 w-24 md:w-40 pointer-events-none">
 
         <div class="container mx-auto px-6 max-w-4xl relative z-10">
             <h2 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary mb-8 animate-on-scroll">
