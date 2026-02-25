@@ -47,6 +47,7 @@ Route::get('/index', [WebController::class, 'index'])->name('index');
 Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-soon');
 Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
+Route::get('/gallery', [WebController::class, 'gallery'])->name('gallery');
 Route::get('/practitioner/{id}', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
 Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login');
 Route::get('/client-register', [WebController::class, 'clientRegister'])->name('client-register');
@@ -64,7 +65,7 @@ Route::post('/blog/comment', [WebController::class, 'postComment'])->name('blog.
 Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->name('blog.comments');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
-    Route::resource( '/admins',AdminsController::class);
+    Route::resource('/admins', AdminsController::class);
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::resource('countries', CountryController::class);
     Route::resource('doctors', DoctorController::class);
@@ -146,16 +147,16 @@ Route::prefix('admin')->group(function () {
     Route::get('/admin/countries/{id}', [CountryController::class, 'show']);
     Route::put( '/admin/countries/{id}', [CountryController::class, 'update']);
     Route::delete( '/admin/countries/{id}', [CountryController::class, 'destroy']);
-    
+
     //Language Crud
-    
+
     Route::resource('languages', LanguageController::class);
     Route::get('/admin/languages/{id}', [CountryController::class, 'show']);
     Route::put( '/admin/languages/{id}', [CountryController::class, 'update']);
     Route::delete( '/admin/languages/{id}', [CountryController::class, 'destroy']);
 
     //Admins 
-   
+
 });
 
 

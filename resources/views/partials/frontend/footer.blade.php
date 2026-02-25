@@ -39,7 +39,9 @@
                         <li><a href="{{ route('home') }}" class="hover:text-[#79584B] transition-colors">Home</a></li>
                         <li><a href="#" class="hover:text-[#79584B] transition-colors">Who we are</a></li>
                         <li><a href="#" class="hover:text-[#79584B] transition-colors">What we do</a></li>
-                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Our Team</a></li> 
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Our Team</a></li>
+                        <li><a href="{{ route('gallery') }}" class="hover:text-[#79584B] transition-colors">Gallery</a>
+                        </li>
                         <li><a href="{{ route('blogs') }}" class="hover:text-[#79584B] transition-colors">Blog</a></li>
                         <li><a href="{{ route('contact-us') }}" class="hover:text-[#79584B] transition-colors">Contact
                                 Us</a></li>
@@ -61,7 +63,8 @@
 
                 <!-- Column 4: Pincode & Socials -->
                 <div>
-                    <h4 class="font-medium font-sans! mb-4 text-base text-[#2E2E2E]">Save your pincode & find nearby care.</h4>
+                    <h4 class="font-medium font-sans! mb-4 text-base text-[#2E2E2E]">Save your pincode & find nearby
+                        care.</h4>
                     <form class="flex gap-2 mb-10">
                         <input type="text" placeholder="Enter Pincode"
                             class="bg-[#F9F9F9] placeholder-gray-400 text-gray-800 rounded px-4 py-2 w-full text-sm focus:outline-none border border-transparent focus:border-[#79584B]">
@@ -71,43 +74,42 @@
                         </button>
                     </form>
 
-                    <div class="flex flex-wrap gap-3"> 
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-global-line text-lg"></i>
-                            </a>  
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-facebook-fill text-lg"></i>
-                            </a> 
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-instagram-line text-lg"></i>
-                            </a>  
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-youtube-fill text-lg"></i>
-                            </a>  
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-linkedin-fill text-lg"></i>
-                            </a>
-                            <a href="#"
-                                target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-whatsapp-line text-lg"></i>
-                            </a>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-global-line text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-facebook-fill text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-instagram-line text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-youtube-fill text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-linkedin-fill text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-whatsapp-line text-lg"></i>
+                        </a>
                     </div>
                 </div>
             </div>
 
             <!-- Bottom Links & Copy -->
             <div class="pt-8 flex flex-col items-center gap-6">
-                <div class="w-full flex flex-col md:flex-row justify-between text-sm text-[#252525]/80 gap-4"> 
+                <div class="w-full flex flex-col md:flex-row justify-between text-sm text-[#252525]/80 gap-4">
                     <a href="#" class="hover:text-[#79584B] transition-colors">Privacy Policy</a>
-                    <a href="#" class="hover:text-[#79584B] transition-colors">Cookie Policy</a> 
+                    <a href="#" class="hover:text-[#79584B] transition-colors">Cookie Policy</a>
                     <a href="#" class="hover:text-[#79584B] transition-colors">Terms & Conditions</a>
-                    <a href="#" class="hover:text-[#79584B] transition-colors">GDPR & Data Protection</a> 
+                    <a href="#" class="hover:text-[#79584B] transition-colors">GDPR & Data Protection</a>
                 </div>
 
                 <div class="w-full border-t border-[#252525]/80"></div>
