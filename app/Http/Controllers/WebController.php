@@ -108,7 +108,8 @@ class WebController extends Controller
 
     public function contactUs()
     {
-        return view('contact-us');
+        $settings = \App\Models\HomepageSetting::where('key', 'like', 'contact_%')->pluck('value', 'key');
+        return view('contact-us', compact('settings'));
     }
 
     /**

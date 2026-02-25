@@ -7,17 +7,17 @@
         <div
             class="container mx-auto relative h-[280px] md:h-[484px] rounded-[30px] overflow-hidden flex items-center justify-center">
             <!-- Background Image -->
-            <img src="{{ asset('frontend/assets/contact-us-bg.jpg') }}" alt="Contact Us Banner"
+            <img src="{{ !empty($settings['contact_banner_image']) ? asset('storage/' . $settings['contact_banner_image']) : asset('frontend/assets/contact-us-bg.jpg') }}" alt="Contact Us Banner"
                 class="absolute inset-0 w-full h-full object-cover scale-110">
             <!-- Overlay -->
             <div class="absolute inset-0 bg-black/50 z-10"></div>
             <!-- Content -->
             <div class="relative z-20 text-center px-4">
-                <h1 class="text-4xl md:text-5xl font-serif font-bold text-white mb-4 tracking-wide">Contact Us
+                <h1 class="text-4xl md:text-5xl font-serif font-bold text-white mb-4 tracking-wide">
+                    {!! $settings['contact_banner_title'] ?? 'Contact Us' !!}
                 </h1>
                 <p class="text-white/80 text-base md:text-xl max-w-3xl mx-auto leading-[35px]">
-                    Zaya connects you with trusted Ayurvedic practitioners for personalized wellness guidance, treatments,
-                    and ongoing practitioner or client support.
+                    {!! $settings['contact_banner_subtitle'] ?? 'Zaya connects you with trusted Ayurvedic practitioners for personalized wellness guidance, treatments, and ongoing practitioner or client support.' !!}
                 </p>
             </div>
         </div>
@@ -35,7 +35,7 @@
                         <i class="ri-map-pin-line text-primary text-xl"></i>
                     </div>
                     <h3 class="text-primary font-bold font-sans! text-sm tracking-wider">Location</h3>
-                    <p class="text-gray-500 text-sm ">No. 1234, 5th Avenue,<br>Kochi, India</p>
+                    <p class="text-gray-500 text-sm ">{!! $settings['contact_info_location'] ?? 'No. 1234, 5th Avenue,<br>Kochi, India' !!}</p>
                 </div>
 
                 <!-- Contact Card -->
@@ -46,7 +46,7 @@
                         <i class="ri-phone-line text-primary text-xl"></i>
                     </div>
                     <h3 class="text-primary font-bold font-sans! text-sm tracking-wider">Contact</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">+91 123 456 7890<br>+91 987 654 3210</p>
+                    <p class="text-gray-500 text-sm leading-relaxed">{!! $settings['contact_info_phone'] ?? '+91 123 456 7890<br>+91 987 654 3210' !!}</p>
                 </div>
 
                 <!-- Email Card -->
@@ -57,7 +57,7 @@
                         <i class="ri-mail-line text-primary text-xl"></i>
                     </div>
                     <h3 class="text-primary font-bold font-sans! text-sm tracking-wider">Email</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">support@zayawellness.com<br>info@zayawellness.com</p>
+                    <p class="text-gray-500 text-sm leading-relaxed">{!! $settings['contact_info_email'] ?? 'support@zayawellness.com<br>info@zayawellness.com' !!}</p>
                 </div>
 
                 <!-- Working Hours Card -->
@@ -68,7 +68,7 @@
                         <i class="ri-time-line text-primary text-xl"></i>
                     </div>
                     <h3 class="text-primary font-bold font-sans! text-sm tracking-wider">Working Hours</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">Mon - Fri: 9 AM - 6 PM<br>Sat: 10 AM - 2 PM</p>
+                    <p class="text-gray-500 text-sm leading-relaxed">{!! $settings['contact_info_working_hours'] ?? 'Mon - Fri: 9 AM - 6 PM<br>Sat: 10 AM - 2 PM' !!}</p>
                 </div>
             </div>
         </div>
@@ -89,8 +89,8 @@
         <div class="container mx-auto max-w-3xl relative z-10">
             <!-- Section Heading -->
             <div class="text-center mb-10 md:mb-14">
-                <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-secondary mb-3">Send Us A Message</h2>
-                <p class="text-secondary text-base md:text-lg">Your Pathway to Wellness Starts with a Conversation</p>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-secondary mb-3">{!! $settings['contact_form_title'] ?? 'Send Us A Message' !!}</h2>
+                <p class="text-secondary text-base md:text-lg">{!! $settings['contact_form_subtitle'] ?? 'Your Pathway to Wellness Starts with a Conversation' !!}</p>
             </div>
 
             <!-- Contact Form -->
@@ -192,10 +192,9 @@
             <div class="flex flex-col md:flex-row relative">
                 <!-- Practitioner Enquiries -->
                 <div class="flex-1 flex flex-col items-center justify-center text-center p-6 md:p-10">
-                    <h3 class="text-3xl md:text-[32px] font-sans font-bold text-secondary mb-4">Practitioner Enquiries
-                    </h3>
+                    <h3 class="text-3xl md:text-[32px] font-sans font-bold text-secondary mb-4">{!! $settings['contact_support_practitioner_title'] ?? 'Practitioner Enquiries' !!}</h3>
                     <p class="text-[#515151] text-sm md:text-base mb-8 leading-relaxed max-w-sm mx-auto font-normal">
-                        Connect with experienced Ayurvedic Vaidyas through Zaya. Join us.
+                        {!! $settings['contact_support_practitioner_text'] ?? 'Connect with experienced Ayurvedic Vaidyas through Zaya. Join us.' !!}
                     </p>
                     <a href="{{ route('practitioner-register') }}"
                         class="inline-block bg-[#345041] text-white px-8 py-2.5 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-sm text-sm">
@@ -212,9 +211,9 @@
 
                 <!-- Client Support -->
                 <div class="flex-1 flex flex-col items-center justify-center text-center p-6 md:p-10">
-                    <h3 class="text-3xl md:text-[32px] font-sans font-bold text-primary mb-4">Client Support</h3>
+                    <h3 class="text-3xl md:text-[32px] font-sans font-bold text-primary mb-4">{!! $settings['contact_support_client_title'] ?? 'Client Support' !!}</h3>
                     <p class="text-[#515151] text-sm md:text-base mb-8 leading-relaxed max-w-sm mx-auto font-normal">
-                        Looking for help? Check our FAQs or contact us using the above form.
+                        {!! $settings['contact_support_client_text'] ?? 'Looking for help? Check our FAQs or contact us using the above form.' !!}
                     </p>
                     <a href="#faqs"
                         class="inline-block bg-primary text-white px-10 py-2.5 rounded-full font-medium hover:bg-opacity-90 transition-all shadow-sm text-sm">
@@ -230,8 +229,7 @@
         <div class="container mx-auto max-w-5xl">
             <!-- Section Heading -->
             <div class="text-center mb-10 md:mb-14">
-                <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary mb-3">Frequently Asked
-                    Questions</h2>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary mb-3">{!! $settings['contact_faq_title'] ?? 'Frequently Asked Questions' !!}</h2>
             </div>
 
             <!-- FAQ Grid -->

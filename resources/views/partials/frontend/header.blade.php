@@ -78,7 +78,7 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Mobile Menu -->
     <div id="mobile-menu"
         class="absolute top-full left-0 w-full bg-white shadow-xl border-t border-gray-100 flex flex-col p-6 gap-4 lg:hidden max-h-0 opacity-0 invisible transform -translate-y-4 transition-all duration-300 ease-in-out overflow-hidden">
