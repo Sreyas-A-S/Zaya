@@ -78,6 +78,12 @@ class WebController extends Controller
         return view('gallery', compact('settings'));
     }
 
+    public function findPractitioner()
+    {
+        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+        return view('find-practitioner', compact('settings'));
+    }
+
     public function practitionerDetail($id)
     {
         $practitioner = \App\Models\Practitioner::with(['user', 'reviews'])->findOrFail($id);

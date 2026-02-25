@@ -48,6 +48,7 @@ Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-s
 Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
 Route::get('/gallery', [WebController::class, 'gallery'])->name('gallery');
+Route::get('/find-practitioner', [WebController::class, 'findPractitioner'])->name('find-practitioner');
 Route::get('/practitioner/{id}', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
 Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login');
 Route::get('/client-register', [WebController::class, 'clientRegister'])->name('client-register');
@@ -145,15 +146,15 @@ Route::get('/seed', function () {
 Route::prefix('admin')->group(function () {
     Route::resource('countries', CountryController::class);
     Route::get('/admin/countries/{id}', [CountryController::class, 'show']);
-    Route::put( '/admin/countries/{id}', [CountryController::class, 'update']);
-    Route::delete( '/admin/countries/{id}', [CountryController::class, 'destroy']);
+    Route::put('/admin/countries/{id}', [CountryController::class, 'update']);
+    Route::delete('/admin/countries/{id}', [CountryController::class, 'destroy']);
 
     //Language Crud
 
     Route::resource('languages', LanguageController::class);
     Route::get('/admin/languages/{id}', [CountryController::class, 'show']);
-    Route::put( '/admin/languages/{id}', [CountryController::class, 'update']);
-    Route::delete( '/admin/languages/{id}', [CountryController::class, 'destroy']);
+    Route::put('/admin/languages/{id}', [CountryController::class, 'update']);
+    Route::delete('/admin/languages/{id}', [CountryController::class, 'destroy']);
 
     //Admins 
 
