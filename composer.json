@@ -7,13 +7,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "darkaonline/l5-swagger": "^10.0",
+        "darkaonline/l5-swagger": "*",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "laravel/ui": "^4.6",
         "sreyas-a-s/unslay-shell": "dev-main",
         "tymon/jwt-auth": "^2.2",
-        "yajra/laravel-datatables-oracle": "*"
+        "yajra/laravel-datatables-oracle": "*",
+        "zircote/swagger-php": "4.8.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
