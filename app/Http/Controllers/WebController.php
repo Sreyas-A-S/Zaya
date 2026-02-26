@@ -289,7 +289,6 @@ class WebController extends Controller
                 // If page > 1, the API calls above fetched page X of each.
                 // Merging Page X of A + Page X of B is a reasonable "Combined Page X".
             }
-
         } else {
             // No search, just fetch
             $response = $this->fetchFromWordPress('posts', $params, true);
@@ -577,7 +576,6 @@ class WebController extends Controller
 
                 return response()->json(['success' => false, 'message' => $message], 400);
             }
-
         } catch (\Exception $e) {
             Log::error('WP Comment Exception: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'An error occurred. Please try again.'], 500);

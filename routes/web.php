@@ -110,6 +110,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // Services Page Settings
     Route::get('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'index'])->name('services-settings.index');
     Route::post('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'update'])->name('services-settings.update');
+
+    // General Site Settings
+    Route::get('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'index'])->name('general-settings.index');
+    Route::post('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'update'])->name('general-settings.update');
 });
 
 // Route to run artisan optimize

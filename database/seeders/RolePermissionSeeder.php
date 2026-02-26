@@ -32,6 +32,7 @@ class RolePermissionSeeder extends Seeder
             'Home Page' => ['view', 'edit'],
             'About Page' => ['view', 'edit'],
             'Services Page' => ['view', 'edit'],
+
         ];
 
         foreach ($modules as $module => $actions) {

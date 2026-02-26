@@ -100,7 +100,6 @@
             </li>
             @endif
 
-            @if(auth()->user()->hasPermission('roles-view') || auth()->user()->hasPermission('master-data-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Setting') }}"></use>
@@ -111,6 +110,8 @@
                     @if(auth()->user()->hasPermission('roles-view'))
                     <li> <a href="{{ route('admin.roles.index') }}">Roles</a></li>
                     @endif
+
+                    <li> <a href="{{ route('admin.general-settings.index') }}">Site Settings</a></li>
 
                     @if(auth()->user()->hasPermission('master-data-view'))
                     <li>
@@ -179,10 +180,10 @@
                             <li><a href="{{ route('admin.master-data.index', 'yoga_expertises') }}">Expertise</a></li>
                         </ul>
                     </li>
+
                     @endif
                 </ul>
             </li>
-            @endif
 
             @if(auth()->user()->hasPermission('home-page-view') || auth()->user()->hasPermission('about-page-view') || auth()->user()->hasPermission('services-page-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
