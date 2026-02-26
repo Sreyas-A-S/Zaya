@@ -125,7 +125,7 @@ return [
              *
              * @see \OpenApi\scan
              */
-            'analyser' => new \OpenApi\Analysers\TokenScanner(),
+            'analyser' => null,
 
             /**
              * analysis: defaults to a new \OpenApi\Analysis .
