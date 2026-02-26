@@ -125,7 +125,7 @@ return [
              *
              * @see \OpenApi\scan
              */
-            'analyser' => null,
+            'analyser' => new \OpenApi\Analysers\StaticAnalyser(),
 
             /**
              * analysis: defaults to a new \OpenApi\Analysis .

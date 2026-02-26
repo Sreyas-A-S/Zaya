@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminsController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\DoctorController;
+use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\PractitionerController;
 use App\Http\Controllers\Admin\MasterDataController;
 use App\Http\Controllers\Admin\MindfulnessPractitionerController;
@@ -10,6 +12,7 @@ use App\Http\Controllers\Admin\TranslatorController;
 use App\Http\Controllers\Admin\YogaTherapistController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\CountryController;
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\WebController;
@@ -44,12 +47,16 @@ Route::get('/index', [WebController::class, 'index'])->name('index');
 Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-soon');
 Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
+Route::get('/gallery', [WebController::class, 'gallery'])->name('gallery');
+Route::get('/find-practitioner', [WebController::class, 'findPractitioner'])->name('find-practitioner');
 Route::get('/practitioner/{id}', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
 Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login');
 Route::get('/client-register', [WebController::class, 'clientRegister'])->name('client-register');
 Route::get('/practitioner-register', [WebController::class, 'practitionerRegister'])->name('practitioner-register');
 Route::get('/service/{slug}', [WebController::class, 'serviceDetail'])->name('service-detail');
 Route::get('/blogs', [WebController::class, 'blogs'])->name('blogs');
+Route::get('/announcements', [WebController::class, 'announcements'])->name('announcements');
+Route::get('/announcement/{slug}', [WebController::class, 'announcementDetail'])->name('announcement-detail');
 Route::get('/blog/{slug}', [WebController::class, 'blogDetail'])->name('blog-detail');
 Route::get('/book-session', [WebController::class, 'bookSession'])->name('book-session');
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
@@ -59,8 +66,9 @@ Route::post('/blog/comment', [WebController::class, 'postComment'])->name('blog.
 Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->name('blog.comments');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
+    Route::resource('/admins', AdminsController::class);
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
-
+    Route::resource('countries', CountryController::class);
     Route::resource('doctors', DoctorController::class);
     Route::post('doctors/{id}/status', [DoctorController::class, 'updateStatus'])->name('doctors.status');
     Route::resource('practitioners', PractitionerController::class);
@@ -137,3 +145,24 @@ Route::get('/seed', function () {
     Artisan::call('db:seed', ['--force' => true]);
     return '<pre>' . Artisan::output() . '</pre>';
 });
+
+//Country crud
+Route::prefix('admin')->group(function () {
+    Route::resource('countries', CountryController::class);
+    Route::get('/admin/countries/{id}', [CountryController::class, 'show']);
+    Route::put('/admin/countries/{id}', [CountryController::class, 'update']);
+    Route::delete('/admin/countries/{id}', [CountryController::class, 'destroy']);
+
+    //Language Crud
+
+    Route::resource('languages', LanguageController::class);
+    Route::get('/admin/languages/{id}', [CountryController::class, 'show']);
+    Route::put('/admin/languages/{id}', [CountryController::class, 'update']);
+    Route::delete('/admin/languages/{id}', [CountryController::class, 'destroy']);
+
+    //Admins 
+
+});
+
+
+

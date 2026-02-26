@@ -34,6 +34,41 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "phone": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "gender": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "dob": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "nullable": true
+                                                    },
+                                                    "nationality": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
                                                 "type": "object"
                                             }
                                         }

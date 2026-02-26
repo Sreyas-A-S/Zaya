@@ -31,44 +31,44 @@
                 <div
                     class="bg-[#FFFFFF] rounded-2xl p-6 flex flex-col items-center text-center gap-3 shadow-[0_30px_82px_rgba(186,186,186,0.29)] transition-all duration-300 group">
                     <div
-                        class="w-12 h-12 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
-                        <i class="ri-map-pin-line text-primary text-xl"></i>
+                        class="w-14 h-14 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
+                        <i class="ri-map-pin-line text-primary text-2xl"></i>
                     </div>
-                    <h3 class="text-primary font-bold font-sans! text-sm tracking-wider">Location</h3>
-                    <p class="text-gray-500 text-sm ">No. 1234, 5th Avenue,<br>Kochi, India</p>
+                    <h3 class="text-primary font-bold font-sans! text-lg tracking-wider">Location</h3>
+                    <p class="text-gray-500 text-base leading-relaxed">No. 1234, 5th Avenue,<br>Kochi, India</p>
                 </div>
 
                 <!-- Contact Card -->
                 <div
                     class="bg-[#FFFFFF] rounded-2xl p-6 flex flex-col items-center text-center gap-3 shadow-[0_30px_82px_rgba(186,186,186,0.29)] transition-all duration-300 group">
                     <div
-                        class="w-12 h-12 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
-                        <i class="ri-phone-line text-primary text-xl"></i>
+                        class="w-14 h-14 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
+                        <i class="ri-phone-line text-primary text-2xl"></i>
                     </div>
-                    <h3 class="text-primary font-bold font-sans! text-sm tracking-wider">Contact</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">+91 123 456 7890<br>+91 987 654 3210</p>
+                    <h3 class="text-primary font-bold font-sans! text-lg tracking-wider">Contact</h3>
+                    <p class="text-gray-500 text-base leading-relaxed">+91 123 456 7890<br>+91 987 654 3210</p>
                 </div>
 
                 <!-- Email Card -->
                 <div
                     class="bg-[#FFFFFF] rounded-2xl p-6 flex flex-col items-center text-center gap-3 shadow-[0_30px_82px_rgba(186,186,186,0.29)] transition-all duration-300 group">
                     <div
-                        class="w-12 h-12 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
-                        <i class="ri-mail-line text-primary text-xl"></i>
+                        class="w-14 h-14 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
+                        <i class="ri-mail-line text-primary text-2xl"></i>
                     </div>
-                    <h3 class="text-primary font-bold font-sans! text-sm tracking-wider">Email</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">support@zayawellness.com<br>info@zayawellness.com</p>
+                    <h3 class="text-primary font-bold font-sans! text-lg tracking-wider">Email</h3>
+                    <p class="text-gray-500 text-base leading-relaxed">support@zayawellness.com<br>info@zayawellness.com</p>
                 </div>
 
                 <!-- Working Hours Card -->
                 <div
                     class="bg-[#FFFFFF] rounded-2xl p-6 flex flex-col items-center text-center gap-3 shadow-[0_30px_82px_rgba(186,186,186,0.29)] transition-all duration-300 group">
                     <div
-                        class="w-12 h-12 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
-                        <i class="ri-time-line text-primary text-xl"></i>
+                        class="w-14 h-14 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
+                        <i class="ri-time-line text-primary text-2xl"></i>
                     </div>
-                    <h3 class="text-primary font-bold font-sans! text-sm tracking-wider">Working Hours</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">Mon - Fri: 9 AM - 6 PM<br>Sat: 10 AM - 2 PM</p>
+                    <h3 class="text-primary font-bold font-sans! text-lg tracking-wider">Working Hours</h3>
+                    <p class="text-gray-500 text-base leading-relaxed">Mon - Fri: 9 AM - 6 PM<br>Sat: 10 AM - 2 PM</p>
                 </div>
             </div>
         </div>
@@ -78,13 +78,10 @@
     <section class="py-12 md:py-20 px-4 md:px-6 relative overflow-hidden">
         <!-- Decorative Leaves -->
         <img src="{{ asset('frontend/assets/otoo-img.png') }}" alt="Leaf"
-            class="absolute top-16 left-0 w-24 md:w-36 pointer-events-none z-0 hidden md:block">
-        <img src="{{ asset('frontend/assets/Aloe-Veera-img-02.png') }}" alt="Leaf"
-            class="absolute top-1/4 right-0 w-28 md:w-40 pointer-events-none z-0 hidden md:block">
-        <img src="{{ asset('frontend/assets/Aloe-Veera-img-03.png') }}" alt="Leaf"
-            class="absolute bottom-100 left-0 w-20 md:w-28 pointer-events-none z-0 hidden md:block">
+            class="absolute top-16 left-0 w-24 md:w-44 pointer-events-none z-0 hidden md:block">
+
         <img src="{{ asset('frontend/assets/otoo-img-02.png') }}" alt="Leaf"
-            class="absolute bottom-50 right-0 w-28 md:w-40 pointer-events-none z-0 hidden md:block">
+            class="absolute bottom-50 right-0 w-28 md:w-44 pointer-events-none z-0 hidden md:block">
 
         <div class="container mx-auto max-w-3xl relative z-10">
             <!-- Section Heading -->
@@ -192,7 +189,7 @@
             <div class="flex flex-col md:flex-row relative">
                 <!-- Practitioner Enquiries -->
                 <div class="flex-1 flex flex-col items-center justify-center text-center p-6 md:p-10">
-                    <h3 class="text-3xl md:text-[32px] font-sans font-bold text-secondary mb-4">Practitioner Enquiries
+                    <h3 class="text-3xl md:text-4xl font-sans! font-semibold text-secondary mb-4">Practitioner Enquiries
                     </h3>
                     <p class="text-[#515151] text-sm md:text-base mb-8 leading-relaxed max-w-sm mx-auto font-normal">
                         Connect with experienced Ayurvedic Vaidyas through Zaya. Join us.
@@ -206,13 +203,13 @@
                 <!-- Vertical Divider (Desktop) -->
                 <div class="hidden md:block w-px bg-[#BBBBBB] absolute top-10 bottom-10 left-1/2 -translate-x-1/2">
                 </div>
-                
-                 <!-- Horizontal Divider (Mobile) -->
+
+                <!-- Horizontal Divider (Mobile) -->
                 <div class="block md:hidden h-px w-3/4 mx-auto bg-[#BBBBBB] my-6"></div>
 
                 <!-- Client Support -->
                 <div class="flex-1 flex flex-col items-center justify-center text-center p-6 md:p-10">
-                    <h3 class="text-3xl md:text-[32px] font-sans font-bold text-primary mb-4">Client Support</h3>
+                    <h3 class="text-3xl md:text-4xl font-sans! font-semibold text-primary mb-4">Client Support</h3>
                     <p class="text-[#515151] text-sm md:text-base mb-8 leading-relaxed max-w-sm mx-auto font-normal">
                         Looking for help? Check our FAQs or contact us using the above form.
                     </p>
@@ -226,7 +223,7 @@
     </section>
 
     <!-- FAQ Section -->
-    <section class="py-12 md:py-20 px-4 md:px-6 bg-white">
+    <section class="py-12 md:py-20 px-4 md:px-6 bg-white scroll-mt-20" id="faqs">
         <div class="container mx-auto max-w-5xl">
             <!-- Section Heading -->
             <div class="text-center mb-10 md:mb-14">
@@ -235,7 +232,7 @@
             </div>
 
             <!-- FAQ Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="columns-1 md:columns-2 gap-4 [&>div]:break-inside-avoid [&>div]:mb-4">
                 <!-- FAQ Item 1 -->
                 <div
                     class="faq-item border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md">
@@ -246,7 +243,8 @@
                             class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
                             What is Ayurveda and how can it help me?
                         </span>
-                        <div class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
+                        <div
+                            class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
                             <i class="ri-add-line text-white text-lg"></i>
                         </div>
                     </button>
@@ -270,7 +268,8 @@
                             class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
                             How do I book a consultation online?
                         </span>
-                        <div class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
+                        <div
+                            class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
                             <i class="ri-add-line text-white text-lg"></i>
                         </div>
                     </button>
@@ -293,7 +292,8 @@
                             class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
                             What types of practitioners are available?
                         </span>
-                        <div class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
+                        <div
+                            class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
                             <i class="ri-add-line text-white text-lg"></i>
                         </div>
                     </button>
@@ -315,7 +315,8 @@
                             class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
                             Can I get a consultation from abroad?
                         </span>
-                        <div class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
+                        <div
+                            class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
                             <i class="ri-add-line text-white text-lg"></i>
                         </div>
                     </button>
@@ -337,7 +338,8 @@
                             class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
                             How do I join as a practitioner on Zaya?
                         </span>
-                        <div class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
+                        <div
+                            class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
                             <i class="ri-add-line text-white text-lg"></i>
                         </div>
                     </button>
@@ -359,7 +361,8 @@
                             class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
                             What conditions do your practitioners treat?
                         </span>
-                        <div class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
+                        <div
+                            class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
                             <i class="ri-add-line text-white text-lg"></i>
                         </div>
                     </button>
@@ -381,7 +384,8 @@
                             class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
                             Are your practitioners certified and verified?
                         </span>
-                        <div class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
+                        <div
+                            class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
                             <i class="ri-add-line text-white text-lg"></i>
                         </div>
                     </button>
@@ -403,7 +407,8 @@
                             class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
                             How can I cancel or reschedule a session?
                         </span>
-                        <div class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
+                        <div
+                            class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
                             <i class="ri-add-line text-white text-lg"></i>
                         </div>
                     </button>

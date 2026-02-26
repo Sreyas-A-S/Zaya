@@ -6,31 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Practitioner;
 use App\Models\User;
 use Illuminate\Http\Request;
-use OpenApi\Attributes as OA;
 
 class PractitionerController extends Controller
 {
-    #[OA\Get(
-        path: '/practitioners',
-        summary: 'Get all practitioners',
-        description: 'Returns a list of all practitioners with their profile details and qualifications.',
-        tags: ['Practitioners'],
-        security: [['apiKeyAuth' => []]],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Successful operation',
-                content: new OA\JsonContent(
-                    type: 'object',
-                    properties: [
-                        new OA\Property(property: 'success', type: 'boolean', example: true),
-                        new OA\Property(property: 'data', type: 'array', items: new OA\Items(type: 'object'))
-                    ]
-                )
-            ),
-            new OA\Response(response: 500, description: 'Server error')
-        ]
-    )]
     public function index()
     {
         try {
@@ -39,7 +17,7 @@ class PractitionerController extends Controller
                 ->get()
                 ->map(function ($user) {
                     $profile = $user->practitioner;
-                    if (!$profile) return null;
+                    if (!$profile) return null; 
 
                     return [
                         'id' => $user->id,
