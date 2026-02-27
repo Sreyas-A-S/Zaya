@@ -6,5 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class HomepageSetting extends Model
 {
-    protected $guarded = [];
+
+    protected $fillable = [
+        'key',
+        'value',
+        'type',
+        'section',
+        'max_length',
+        'language',
+    ];
+  
+
 }

@@ -212,6 +212,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       $(".current_lang .lang-txt").text(lang);
       $(".current_lang i").attr("class", i);
+      localStorage.setItem("selectedLanguage", lang);
     });
   });
 

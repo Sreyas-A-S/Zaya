@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\HomepageSetting;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
 
 class LanguageController extends Controller
@@ -34,6 +36,15 @@ class LanguageController extends Controller
                         </button>
                     </form>
                     ';
+                     // Get selected language from homepage_settings
+    $setting = HomepageSetting::first();
+
+    $language = $setting->language ?? 'en';
+
+    // Fetch homepage content based on language
+    $homepageData = HomepageSetting::where('language', $language)->first();
+
+    return view('home', compact('homepageData'));
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -98,11 +109,43 @@ class LanguageController extends Controller
             'message' => 'Language updated successfully'
         ]);
     }
+    public function change($code)
+    {
+        $code = strtolower((string) $code);
+        $normalized = explode('-', $code)[0] ?? $code;
 
+        $language = Language::where('code', $code)
+            ->orWhere('code', $normalized)
+            ->first();
+
+        if (!$language) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Language not found',
+            ]);
+        }
+
+        $locale = $language->code;
+        if (strpos($locale, '-') !== false) {
+            $locale = explode('-', $locale)[0];
+        }
+
+        Session::put('locale', $locale);
+
+        $settings = HomepageSetting::where('language', $locale)
+            ->pluck('value', 'key');
+
+        return response()->json([
+            'status' => true,
+            'language' => $locale,
+            'data' => $settings,
+        ]);
+    }
     /**
      * Delete language
      */
-    public function destroy($id)
+public function destroy($id)
+    
     {
        
         $language = Language::findOrFail($id);
@@ -113,4 +156,4 @@ class LanguageController extends Controller
             'message' => 'Language deleted successfully'
         ]);
     }
-}
+}   

@@ -9,7 +9,7 @@
             <!-- Banner Image & Text -->
             <div class="relative w-full h-[400px] md:h-[500px] rounded-[30px] overflow-hidden shadow-xl mb-16 md:mb-20">
                 <!-- Background Image -->
-                <img src="{{ asset('frontend/assets/about-us-cover-img.png') }}" alt="Zaya Community"
+                <img id="about_banner_image" src="{{ isset($settings['about_banner_image']) ? (str_starts_with($settings['about_banner_image'], 'frontend/') ? asset($settings['about_banner_image']) : asset('storage/' . $settings['about_banner_image'])) : asset('frontend/assets/about-us-cover-img.png') }}" alt="Zaya Community"
                     class="w-full h-full object-cover">
 
                 <!-- Dark Overlay -->
@@ -17,25 +17,18 @@
 
                 <!-- Text Content -->
                 <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 md:p-12">
-                    <h2 class="text-3xl font-semibold text-white max-w-3xl leading-[60px] font-sans! drop-shadow-md">
-                        We connect you with trusted wellness practitioners and Ayurveda experts through secure, personalized
-                        consultations - anywhere in the world
+                    <h2 id="about_banner_title" class="text-3xl font-semibold text-white max-w-3xl leading-[60px] font-sans! drop-shadow-md">
+                        {{ $settings['about_banner_title'] ?? 'We connect you with trusted wellness practitioners and Ayurveda experts through secure, personalized consultations - anywhere in the world' }}
                     </h2>
                 </div>
             </div>
 
             <!-- Who We Are Content -->
             <div class="max-w-4xl mx-auto text-center">
-                <h2 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-8 tracking-wide">Who we are?</h2>
+                <h2 id="about_title" class="text-4xl md:text-5xl font-serif font-bold text-primary mb-8 tracking-wide">{{ $settings['about_title'] ?? 'Who we are?' }}</h2>
 
-                <p class="text-lg text-gray-700 leading-8 font-regular">
-                    Zaya is a holistic wellness platform that connects you with trusted wellness practitioners and
-                    Ayurveda-based specialists through secure online and offline consultations. The practitioner is the
-                    first point of care, ensuring personalized guidance and continuity. When needed, you are seamlessly
-                    referred to Ayurvedic doctors, yoga therapists, or mindfulness counsellors within the Zaya network. All
-                    consultations, records, and recommendations are managed securely with your consent. With multilingual
-                    support and integrated video consultations, Zaya makes authentic Ayurvedic wellness— rooted in
-                    traditional wisdom, natural herbs, diet, and lifestyle—accessible worldwide.
+                <p id="about_description" class="text-lg text-gray-700 leading-8 font-regular">
+                    {{ $settings['about_description'] ?? 'Zaya is a holistic wellness platform that connects you with trusted wellness practitioners and Ayurveda-based specialists through secure online and offline consultations. The practitioner is the first point of care, ensuring personalized guidance and continuity. When needed, you are seamlessly referred to Ayurvedic doctors, yoga therapists, or mindfulness counsellors within the Zaya network. All consultations, records, and recommendations are managed securely with your consent. With multilingual support and integrated video consultations, Zaya makes authentic Ayurvedic wellness— rooted in traditional wisdom, natural herbs, diet, and lifestyle—accessible worldwide.' }}
                 </p>
             </div>
 
@@ -48,7 +41,7 @@
         <div class="container mx-auto px-4 mb-12 md:mb-20">
             <!-- Heading -->
             <div class="text-center">
-                <h2 class="text-4xl md:text-5xl font-serif font-bold text-primary">What we do?</h2>
+                <h2 id="about_what_we_do_title" class="text-4xl md:text-5xl font-serif font-bold text-primary">{{ $settings['about_what_we_do_title'] ?? 'What we do?' }}</h2>
             </div>
         </div>
 
@@ -57,13 +50,9 @@
             <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
                 <!-- Text Content Area (Left Offset) -->
                 <div class="w-full md:w-8/12 md:ml-[10%] lg:ml-[20%]">
-                    <h3 class="text-3xl md:text-4xl font-serif font-bold text-secondary mb-6">Our Vision</h3>
-                    <p class="text-gray-600 leading-relaxed text-base md:text-lg max-w-2xl">
-                        Our vision is to create a global, practitioner-led wellness ecosystem rooted in Ayurveda and
-                        holistic care. Zaya aims to make authentic, ethical, and personalized wellness accessible across
-                        borders through trusted collaboration and thoughtful use of technology. We envision a future where
-                        practitioners are empowered, specialists work together seamlessly, and you experience care that
-                        truly supports long-term well-being.
+                    <h3 id="about_vision_title" class="text-3xl md:text-4xl font-serif font-bold text-secondary mb-6">{{ $settings['about_vision_title'] ?? 'Our Vision' }}</h3>
+                    <p id="about_vision_description" class="text-gray-600 leading-relaxed text-base md:text-lg max-w-2xl">
+                        {{ $settings['about_vision_description'] ?? 'Our vision is to create a global, practitioner-led wellness ecosystem rooted in Ayurveda and holistic care. Zaya aims to make authentic, ethical, and personalized wellness accessible across borders through trusted collaboration and thoughtful use of technology. We envision a future where practitioners are empowered, specialists work together seamlessly, and you experience care that truly supports long-term well-being.' }}
                     </p>
                 </div>
             </div>
@@ -84,11 +73,9 @@
                 <!-- Text Content Area (Right Offset) -->
                 <div class="w-full md:w-8/12 md:mr-[10%] lg:mr-[20%] text-left md:text-right">
                     <div class="flex flex-col items-start md:items-end">
-                        <h3 class="text-3xl md:text-4xl font-serif font-bold text-secondary mb-6">Our Mission</h3>
-                        <p class="text-gray-600 leading-relaxed text-base md:text-lg max-w-2xl">
-                            We're on a mission to support the practitioners and simplify the wellness process for everyone
-                            across the globe. Driven by a passion for holistic health, our team empowers practitioners to
-                            provide the best care that you deserve.
+                        <h3 id="about_mission_title" class="text-3xl md:text-4xl font-serif font-bold text-secondary mb-6">{{ $settings['about_mission_title'] ?? 'Our Mission' }}</h3>
+                        <p id="about_mission_description" class="text-gray-600 leading-relaxed text-base md:text-lg max-w-2xl">
+                            {{ $settings['about_mission_description'] ?? "We're on a mission to support the practitioners and simplify the wellness process for everyone across the globe. Driven by a passion for holistic health, our team empowers practitioners to provide the best care that you deserve." }}
                         </p>
                     </div>
                 </div>
@@ -110,7 +97,7 @@
         <div class="container mx-auto px-4">
             <!-- Section Header -->
             <div class="text-center mb-16 md:mb-20">
-                <h2 class="text-4xl md:text-5xl font-serif font-bold text-primary tracking-wide">Core Values</h2>
+                <h2 id="about-core-values-title" class="text-4xl md:text-5xl font-serif font-bold text-primary tracking-wide">{{ __('Core Values') }}</h2>
             </div>
 
             <!-- Values Grid -->
@@ -122,9 +109,9 @@
                         style="border-radius: 4px;">
                         <i class="ri-shield-check-line text-4xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 font-sans!">Trust & Ethics</h3>
-                    <p class="text-gray-500 leading-relaxed max-w-xs mx-auto text-base">
-                        We respect the practitioner-client relationship and uphold transparency in every interaction.
+                    <h3 id="about-value-1-title" class="text-xl font-bold text-gray-900 mb-3 font-sans!">{{ __('Trust & Ethics') }}</h3>
+                    <p id="about-value-1-desc" class="text-gray-500 leading-relaxed max-w-xs mx-auto text-base">
+                        {{ __('We respect the practitioner-client relationship and uphold transparency in every interaction.') }}
                     </p>
                 </div>
 
@@ -134,9 +121,9 @@
                         style="border-radius: 4px;">
                         <i class="ri-heart-line text-4xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 font-sans!">Holistic Care</h3>
-                    <p class="text-gray-500 leading-relaxed max-w-xs mx-auto text-base">
-                        We believe in treating the whole person through Ayurveda, yoga, and mindfulness.
+                    <h3 id="about-value-2-title" class="text-xl font-bold text-gray-900 mb-3 font-sans!">{{ __('Holistic Care') }}</h3>
+                    <p id="about-value-2-desc" class="text-gray-500 leading-relaxed max-w-xs mx-auto text-base">
+                        {{ __('We believe in treating the whole person through Ayurveda, yoga, and mindfulness.') }}
                     </p>
                 </div>
 
@@ -146,9 +133,9 @@
                         style="border-radius: 4px;">
                         <i class="ri-group-line text-4xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 font-sans!">Collaboration</h3>
-                    <p class="text-gray-500 leading-relaxed max-w-xs mx-auto text-base">
-                        We foster meaningful partnerships between practitioners and specialists.
+                    <h3 id="about-value-3-title" class="text-xl font-bold text-gray-900 mb-3 font-sans!">{{ __('Collaboration') }}</h3>
+                    <p id="about-value-3-desc" class="text-gray-500 leading-relaxed max-w-xs mx-auto text-base">
+                        {{ __('We foster meaningful partnerships between practitioners and specialists.') }}
                     </p>
                 </div>
 
@@ -158,9 +145,9 @@
                         style="border-radius: 4px;">
                         <i class="ri-computer-line text-4xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 font-sans!">Human-Centered Technology</h3>
-                    <p class="text-gray-500 leading-relaxed max-w-xs mx-auto text-base">
-                        We use technology to support care, not to replace it.
+                    <h3 id="about-value-4-title" class="text-xl font-bold text-gray-900 mb-3 font-sans!">{{ __('Human-Centered Technology') }}</h3>
+                    <p id="about-value-4-desc" class="text-gray-500 leading-relaxed max-w-xs mx-auto text-base">
+                        {{ __('We use technology to support care, not to replace it.') }}
                     </p>
                 </div>
 
@@ -170,17 +157,17 @@
                         style="border-radius: 4px;">
                         <i class="ri-global-line text-4xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 font-sans!">Accessibility</h3>
-                    <p class="text-gray-500 leading-relaxed max-w-xs mx-auto text-base">
-                        We strive to make quality wellness services available across borders and languages.
+                    <h3 id="about-value-5-title" class="text-xl font-bold text-gray-900 mb-3 font-sans!">{{ __('Accessibility') }}</h3>
+                    <p id="about-value-5-desc" class="text-gray-500 leading-relaxed max-w-xs mx-auto text-base">
+                        {{ __('We strive to make quality wellness services available across borders and languages.') }}
                     </p>
                 </div>
 
                 <!-- Call to Action -->
                 <div class="flex flex-col items-center justify-center h-full pt-8 md:pt-0">
-                    <a href="{{ route('services') }}"
+                    <a id="about-services-btn" href="{{ route('services') }}"
                         class="border border-gray-400 text-gray-600 px-10 py-3.5 rounded-full hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 text-lg font-medium whitespace-nowrap">
-                        Go to Our Services
+                        {{ __('Go to Our Services') }}
                     </a>
                 </div>
 
@@ -193,11 +180,11 @@
         <div class="container-fluid">
             <!-- Section Header -->
             <div class="text-center mb-16 md:mb-24">
-                <h2
+                <h2 id="about_team_title"
                     class="text-4xl md:text-6xl font-serif font-bold text-primary mb-5 flex items-center justify-center gap-4">
                     {{ $settings['about_team_title'] ?? 'Meet the Team' }}
                 </h2>
-                <p class="text-[#404040] text-base tracking-wide w-xl mx-auto">
+                <p id="about_team_subtitle" class="text-[#404040] text-base tracking-wide w-xl mx-auto">
                     {{ $settings['about_team_subtitle'] ?? 'Meet the people behind your wellness journey - empowering providers and smoothing the path to whole-body health.' }}
                 </p>
             </div>
@@ -316,24 +303,24 @@
                 <!-- Patient Card -->
                 <div
                     class="bg-[#F8F9FA] rounded-[12px] p-10 md:p-14 flex flex-col items-center justify-center text-center h-full">
-                    <h3 class="text-2xl font-sans! font-regular text-gray-900 mb-8 leading-tight">
-                        Ready to start your wellness journey?
+                    <h3 id="about-cta-1-title" class="text-2xl font-sans! font-regular text-gray-900 mb-8 leading-tight">
+                        {{ __('Ready to start your wellness journey?') }}
                     </h3>
-                    <a href="{{ route('book-session') }}"
+                    <a id="about-cta-1-btn" href="{{ route('book-session') }}"
                         class="inline-block bg-secondary hover:bg-transparent border-1 border-secondary text-white hover:text-secondary px-8 py-3.5 rounded-full hover:bg-opacity-90 transition-all duration-300 font-regular text-base shadow-sm">
-                        Book a Practitioner
+                        {{ __('Book a Practitioner') }}
                     </a>
                 </div>
 
                 <!-- Practitioner Card -->
                 <div
                     class="bg-[#F8F9FA] rounded-[12px] p-10 md:p-14 flex flex-col items-center justify-center text-center h-full">
-                    <h3 class="text-2xl font-sans! font-regular text-gray-900 mb-8 leading-tight">
-                        Join our community of holistic experts.
+                    <h3 id="about-cta-2-title" class="text-2xl font-sans! font-regular text-gray-900 mb-8 leading-tight">
+                        {{ __('Join our community of holistic experts.') }}
                     </h3>
-                    <a href="{{ route('practitioner-register') }}"
+                    <a id="about-cta-2-btn" href="{{ route('practitioner-register') }}"
                         class="inline-block bg-primary hover:bg-transparent border-1 border-primary text-white hover:text-primary px-8 py-3.5 rounded-full hover:bg-opacity-90 transition-all duration-300 font-regular text-base shadow-sm">
-                        Apply to Join
+                        {{ __('Apply to Join') }}
                     </a>
                 </div>
 
@@ -344,12 +331,12 @@
     <!-- Help Banner Section -->
     <section class="py-4 bg-[#FDF6E9]">
         <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
-            <p class="text-xl text-[#121212] font-sans! font-regular mb-0">
-                Have questions? We're here to help.
+            <p id="about-help-title" class="text-xl text-[#121212] font-sans! font-regular mb-0">
+                {{ __("Have questions? We're here to help.") }}
             </p>
-            <a href="{{ route('contact-us') }}"
+            <a id="about-help-btn" href="{{ route('contact-us') }}"
                 class="inline-block bg-white text-primary px-8 py-3.5 rounded-full hover:shadow-lg transition-all duration-300 font-medium text-base shadow-sm border border-transparent hover:border-primary/20">
-                Contact Us
+                {{ __('Contact Us') }}
             </a>
         </div>
     </section>
@@ -359,8 +346,8 @@
     <section class="py-20 pb-0 md:pt-28 md:pb-0 bg-white text-center relative overflow-hidden">
 
         <div class="container mx-auto px-6 max-w-4xl relative z-10">
-            <h2 class="text-5xl font-serif font-bold text-primary mb-14 animate-on-scroll">
-                {{ $settings['testimonials_title'] ?? 'What people say about Zaya?' }}
+            <h2 id="about-testimonials-title" class="text-5xl font-serif font-bold text-primary mb-14 animate-on-scroll">
+                {{ $settings['testimonials_title'] ?? __('What people say about Zaya?') }}
             </h2>
         </div>
     </section>
