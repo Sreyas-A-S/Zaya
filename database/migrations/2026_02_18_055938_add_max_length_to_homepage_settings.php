@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('homepage_settings', function (Blueprint $table) {
-            $table->integer('max_length')->nullable()->after('section');
-        });
+        if (Schema::hasTable('homepage_settings')) {
+            if (!Schema::hasColumn('homepage_settings', 'max_length')) {
+                Schema::table('homepage_settings', function (Blueprint $table) {
+                    $table->integer('max_length')->nullable()->after('section');
+                });
+            }
+        }
     }
 
     /**
@@ -21,8 +25,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('homepage_settings', function (Blueprint $table) {
-            $table->dropColumn('max_length');
-        });
+        if (Schema::hasTable('homepage_settings')) {
+            if (Schema::hasColumn('homepage_settings', 'max_length')) {
+                Schema::table('homepage_settings', function (Blueprint $table) {
+                    $table->dropColumn('max_length');
+                });
+            }
+        }
     }
 };

@@ -9,30 +9,43 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-     public function up()
+    public function up()
     {
-        Schema::table('homepage_settings', function (Blueprint $table) {
+        // 1. If language_id exists, rename it to language
+        if (Schema::hasColumn('homepage_settings', 'language_id')) {
+            Schema::table('homepage_settings', function (Blueprint $table) {
+                // We wrap this in a try-catch because dropForeign can be very finicky with index names
+                try {
+                    $table->dropForeign(['language_id']);
+                } catch (\Exception $e) {
+                    // Ignore if foreign key doesn't exist
+                }
+                
+                // Rename column
+                $table->renameColumn('language_id', 'language');
+            });
+        } 
+        // 2. If neither language nor language_id exists, add language
+        elseif (!Schema::hasColumn('homepage_settings', 'language')) {
+            Schema::table('homepage_settings', function (Blueprint $table) {
+                $table->string('language', 10)->nullable()->after('section');
+            });
+        }
 
-            // Drop foreign key first (important)
-            $table->dropForeign(['language_id']);
-
-            // Rename column
-            $table->renameColumn('language_id', 'language');
-
-            // Change column type to string
-            $table->string('language', 10)->nullable()->change();
-             
-        });
+        // 3. Now that we are sure 'language' exists (or we just added it), ensure it's the right type
+        if (Schema::hasColumn('homepage_settings', 'language')) {
+            Schema::table('homepage_settings', function (Blueprint $table) {
+                $table->string('language', 10)->nullable()->change();
+            });
+        }
     }
 
     public function down()
     {
-        Schema::table('homepage_settings', function (Blueprint $table) {
-
-            $table->renameColumn('language', 'language_id');
-            
-
-            $table->unsignedBigInteger('language_id')->nullable()->change();
-        });
+        if (Schema::hasColumn('homepage_settings', 'language')) {
+            Schema::table('homepage_settings', function (Blueprint $table) {
+                $table->renameColumn('language', 'language_id');
+            });
+        }
     }
 };
