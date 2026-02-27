@@ -148,6 +148,11 @@ Route::get('/migrate', function () {
     return '<pre>' . Artisan::output() . '</pre>';
 });
 
+Route::get('/migrate-fresh-seed', function () {
+    Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
+    return '<pre>' . Artisan::output() . '</pre>';
+});
+
 Route::get('/storage-link', function () {
     Artisan::call('storage:link');
     return 'Storage linked successfully!';
