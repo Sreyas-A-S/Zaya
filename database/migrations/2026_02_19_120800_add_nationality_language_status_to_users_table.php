@@ -12,23 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-             $table->foreignId('nationality_id')
+              $table->foreignId('national_id')
               ->nullable()
               ->after('email')
               ->constrained('countries')
               ->onDelete('cascade');
 
         // Language Foreign Key
-        $table->foreignId('language_id')
-              ->nullable()
-              ->after('nationality_id')
-              ->constrained('languages')
-              ->onDelete('cascade');
+            $table->json('languages')
+                ->nullable()
+                ->after('national_id');
 
         // Status Column
-        $table->tinyInteger('status')
+            $table->tinyInteger('status')
               ->default(0)
-              ->after('language_id')
+              ->after('languages')
               ->comment('0 = Pending, 1 = Approved');
     });
     }
@@ -36,10 +34,12 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+   public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+
+            $table->dropForeign(['national_id']);
+            $table->dropColumn(['national_id', 'languages', 'status']);
         });
     }
 };

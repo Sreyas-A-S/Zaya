@@ -80,27 +80,26 @@ class HomepageSettingSeeder extends Seeder
                 'max_length' => 30
             ],
 
-            // Practitioners Section
             [
                 'key' => 'practitioners_title',
                 'value' => 'Practitioner Directory',
                 'type' => 'text',
                 'section' => 'practitioners',
-                'max_length' => 40
+                'max_length' => 100
             ],
             [
-                'key' => 'practitioners_search_placeholder',
-                'value' => 'Search practitioners...',
+                'key' => 'practitioners_description',
+                'value' => 'Zaya practitioners are experienced, compassionate, and deeply committed to holistic healing. They guide you with personalized care and connect you to specialized experts when required. Supported by Zaya’s digital tools, practitioners focus fully on healing while the platform handles coordination and technology. They work within a trusted professional network that values ethics, collaboration, and transparency. Together, Zaya practitioners create meaningful, long-term wellness journeys.',
+                'type' => 'textarea',
+                'section' => 'practitioners',
+                'max_length' => 1000
+            ],
+            [
+                'key' => 'practitioners_browse_btn',
+                'value' => 'Browse All Practitioners',
                 'type' => 'text',
                 'section' => 'practitioners',
                 'max_length' => 50
-            ],
-            [
-                'key' => 'practitioners_button_text',
-                'value' => 'Book Now',
-                'type' => 'text',
-                'section' => 'practitioners',
-                'max_length' => 20
             ],
 
             // CTA Section
@@ -281,6 +280,41 @@ class HomepageSettingSeeder extends Seeder
                 'section' => 'about_page',
                 'max_length' => 80
             ],
+            [
+                'key' => 'about_what_we_do_title',
+                'value' => 'What we do?',
+                'type' => 'text',
+                'section' => 'about_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'about_vision_title',
+                'value' => 'Our Vision',
+                'type' => 'text',
+                'section' => 'about_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'about_vision_description',
+                'value' => 'Our vision is to create a global, practitioner-led wellness ecosystem rooted in Ayurveda and holistic care. Zaya aims to make authentic, ethical, and personalized wellness accessible across borders through trusted collaboration and thoughtful use of technology. We envision a future where practitioners are empowered, specialists work together seamlessly, and you experience care that truly supports long-term well-being.',
+                'type' => 'textarea',
+                'section' => 'about_page',
+                'max_length' => 1000
+            ],
+            [
+                'key' => 'about_mission_title',
+                'value' => 'Our Mission',
+                'type' => 'text',
+                'section' => 'about_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'about_mission_description',
+                'value' => "We're on a mission to support the practitioners and simplify the wellness process for everyone across the globe. Driven by a passion for holistic health, our team empowers practitioners to provide the best care that you deserve.",
+                'type' => 'textarea',
+                'section' => 'about_page',
+                'max_length' => 1000
+            ],
 
             // Services Page Section
             [
@@ -374,11 +408,103 @@ class HomepageSettingSeeder extends Seeder
                 'section' => 'services_page',
                 'max_length' => 30
             ],
+            // Contact Us Page
+            [
+                'key' => 'contact_banner_title',
+                'value' => 'Contact Us',
+                'type' => 'text',
+                'section' => 'contact_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'contact_banner_subtitle',
+                'value' => 'Zaya connects you with trusted Ayurvedic practitioners for personalized wellness guidance, treatments, and ongoing practitioner or client support.',
+                'type' => 'textarea',
+                'section' => 'contact_page',
+                'max_length' => 500
+            ],
+            [
+                'key' => 'contact_info_location',
+                'value' => 'No. 1234, 5th Avenue,<br>Kochi, India',
+                'type' => 'textarea',
+                'section' => 'contact_page',
+                'max_length' => 200
+            ],
+            [
+                'key' => 'contact_info_phone',
+                'value' => '+91 123 456 7890<br>+91 987 654 3210',
+                'type' => 'textarea',
+                'section' => 'contact_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'contact_info_email',
+                'value' => 'support@zayawellness.com<br>info@zayawellness.com',
+                'type' => 'textarea',
+                'section' => 'contact_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'contact_info_working_hours',
+                'value' => 'Mon - Fri: 9 AM - 6 PM<br>Sat: 10 AM - 2 PM',
+                'type' => 'textarea',
+                'section' => 'contact_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'contact_form_title',
+                'value' => 'Send Us A Message',
+                'type' => 'text',
+                'section' => 'contact_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'contact_form_subtitle',
+                'value' => 'Your Pathway to Wellness Starts with a Conversation',
+                'type' => 'text',
+                'section' => 'contact_page',
+                'max_length' => 200
+            ],
+            [
+                'key' => 'contact_support_practitioner_title',
+                'value' => 'Practitioner Enquiries',
+                'type' => 'text',
+                'section' => 'contact_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'contact_support_practitioner_text',
+                'value' => 'Connect with experienced Ayurvedic Vaidyas through Zaya. Join us.',
+                'type' => 'textarea',
+                'section' => 'contact_page',
+                'max_length' => 300
+            ],
+            [
+                'key' => 'contact_support_client_title',
+                'value' => 'Client Support',
+                'type' => 'text',
+                'section' => 'contact_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'contact_support_client_text',
+                'value' => 'Looking for help? Check our FAQs or contact us using the above form.',
+                'type' => 'textarea',
+                'section' => 'contact_page',
+                'max_length' => 300
+            ],
+            [
+                'key' => 'contact_faq_title',
+                'value' => 'Frequently Asked Questions',
+                'type' => 'text',
+                'section' => 'contact_page',
+                'max_length' => 100
+            ],
         ];
 
         foreach ($settings as $setting) {
             \App\Models\HomepageSetting::updateOrCreate(
-                ['key' => $setting['key']],
+                ['key' => $setting['key'], 'language' => 'en'],
                 $setting
             );
         }

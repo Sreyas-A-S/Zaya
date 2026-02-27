@@ -134,6 +134,12 @@
             activateTabFromHash();
         });
 
+           $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
         $('#servicesSettingsForm').on('submit', function(e) {
             e.preventDefault();
 

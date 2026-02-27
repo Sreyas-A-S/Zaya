@@ -114,6 +114,12 @@
         "EnglishName": "Finnish"
     },
     {
+        "Code": "fr",
+        "NativeName": "Français",
+        "Flag": "🇫🇷",
+        "EnglishName": "French"
+    },
+    {
         "Code": "fr-FR",
         "NativeName": "Français (France)",
         "Flag": "🇫🇷",

@@ -20,15 +20,22 @@ class WebController extends Controller
     //
     public function index()
     {
+        $language = \App::getLocale();
+        $languages = \App\Models\Language::all();
         $practitioners = \App\Models\Practitioner::with(['user', 'reviews'])
             ->latest()
             ->take(8)
             ->get();
         $testimonials = \App\Models\Testimonial::where('status', true)->latest()->get();
         $services = \App\Models\Service::where('status', true)->orderBy('order_column')->get();
-        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+        $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+        
+        // Fallback to English if no settings found for current language
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+        }
 
-        return view('index', compact('practitioners', 'testimonials', 'services', 'settings'));
+        return view('index', compact('practitioners', 'testimonials', 'services', 'settings', 'language', 'languages'));
     }
 
     public function comingSoon()
@@ -38,14 +45,32 @@ class WebController extends Controller
 
     public function aboutUs()
     {
-        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+        
+        // Fallback to English if no settings found for current language
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+        }
+        
         $testimonials = \App\Models\Testimonial::where('status', true)->latest()->get();
         return view('about', compact('settings', 'testimonials'));
     }
 
     public function services(Request $request)
     {
-        $settings = \App\Models\HomepageSetting::where('section', 'services_page')->pluck('value', 'key');
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('section', 'services_page')
+            ->where('language', $language)
+            ->pluck('value', 'key');
+            
+        // Fallback to English if no settings found for current language
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('section', 'services_page')
+                ->where('language', 'en')
+                ->pluck('value', 'key');
+        }
+
         $query = \App\Models\Service::where('status', true);
 
         if ($request->filled('category')) {
@@ -161,7 +186,11 @@ class WebController extends Controller
 
     public function contactUs()
     {
-        return view('contact-us');
+        $language = \Illuminate\Support\Facades\Session::get('locale', 'en');
+        $settings = \App\Models\HomepageSetting::where('key', 'like', 'contact_%')
+            ->where('language', $language)
+            ->pluck('value', 'key');
+        return view('contact-us', compact('settings'));
     }
 
     /**
@@ -257,7 +286,13 @@ class WebController extends Controller
      */
     public function blogs(Request $request)
     {
-        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+        
+        // Fallback to English if no settings found for current language
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+        }
 
         // Fetch authors for the filter dropdown
         $authors = [];
@@ -464,7 +499,13 @@ class WebController extends Controller
      */
     public function announcements(Request $request)
     {
-        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+        
+        // Fallback to English if no settings found for current language
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+        }
 
         $currentPage = (int) $request->get('page', 1);
         $perPage = 9;
@@ -534,7 +575,13 @@ class WebController extends Controller
      */
     public function announcementDetail($slug)
     {
-        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+        
+        // Fallback to English if no settings found for current language
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+        }
 
         // Fetch single announcement by slug
         // 1. Try singular
@@ -612,7 +659,13 @@ class WebController extends Controller
      */
     public function blogDetail($slug)
     {
-        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+        
+        // Fallback to English if no settings found for current language
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+        }
 
         // Fetch single post by slug
         $posts = $this->fetchFromWordPress('posts', [

@@ -17,19 +17,25 @@ class AboutSettingController extends Controller
 
     public function index()
     {
-        $settings = HomepageSetting::where('section', 'about_page')->get();
+        $language = session('locale', 'en');
+        $settings = HomepageSetting::where('section', 'about_page')
+            ->where('language', $language)
+            ->get();
         return view('admin.about-settings.index', compact('settings'));
     }
 
     public function update(Request $request)
     {
+        $language = session('locale', 'en');
         $data = $request->except('_token');
 
         foreach ($data as $key => $value) {
-            $setting = HomepageSetting::where('key', $key)->first();
+            $setting = HomepageSetting::where('key', $key)
+                ->where('language', $language)
+                ->first();
             if ($setting) {
                 // Validate max length if applicable
-                if ($setting->max_length && strlen($value) > $setting->max_length) {
+                if ($setting->max_length && is_string($value) && strlen($value) > $setting->max_length) {
                     if ($request->ajax()) {
                         return response()->json(['success' => false, 'message' => "The {$key} field cannot be longer than {$setting->max_length} characters."], 422);
                     }
@@ -43,8 +49,21 @@ class AboutSettingController extends Controller
                     }
                     $path = $request->file($key)->store('about', 'public');
                     $setting->update(['value' => $path]);
-                } else {
+                } else if ($setting->type !== 'image') {
                     $setting->update(['value' => $value]);
+                }
+            } else {
+                // If setting doesn't exist for this language, we might want to create it if it exists for 'en'
+                $originalSetting = HomepageSetting::where('key', $key)->where('language', 'en')->first();
+                if ($originalSetting) {
+                    HomepageSetting::create([
+                        'key' => $key,
+                        'value' => is_string($value) ? $value : $originalSetting->value,
+                        'type' => $originalSetting->type,
+                        'section' => $originalSetting->section,
+                        'max_length' => $originalSetting->max_length,
+                        'language' => $language,
+                    ]);
                 }
             }
         }
