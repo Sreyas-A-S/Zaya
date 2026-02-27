@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Registration - Zaya Wellness</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/country-selector.js'])
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         /* Custom Gender Select Dropdown Styles */
@@ -190,24 +192,104 @@
             opacity: 1;
         }
 
-        /* Country Select Styles */
-        .country-select-wrapper {
-            position: relative;
+        /* Tom Select Overrides */
+        #nationality-select+.ts-wrapper {
+            width: 100%;
         }
 
-        .country-select {
-            padding-left: 60px !important;
-        }
-
-        .country-flag {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
+        #nationality-select+.ts-wrapper .ts-control {
+            padding: 14px 24px;
+            background: #F5F5F5;
+            border-radius: 9999px;
+            border: 1px solid transparent;
+            font-size: 0.95rem;
+            color: #374151;
+            transition: all 0.3s ease;
+            min-height: 48px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            pointer-events: none;
+        }
+
+        #nationality-select+.ts-wrapper .ts-control:hover {
+            background: #EFEFEF;
+        }
+
+        #nationality-select+.ts-wrapper.focus .ts-control {
+            border-color: #97563D;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(151, 86, 61, 0.1);
+        }
+
+        #nationality-select+.ts-wrapper .ts-control input {
+            color: #374151;
+        }
+
+        #nationality-select+.ts-wrapper .ts-control input::placeholder {
+            color: #9CA3AF;
+        }
+
+        #nationality-select+.ts-wrapper .ts-dropdown {
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        #nationality-select+.ts-wrapper .ts-dropdown .ts-dropdown-content {
+            max-height: 200px;
+            padding: 8px 0;
+        }
+
+        .country-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .country-option:hover,
+        #nationality-select+.ts-wrapper .ts-dropdown .option.active {
+            background: #FFF7EF;
+        }
+
+        .country-option-flag {
+            width: 24px;
+            height: 18px;
+            border-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .country-option-name {
+            font-size: 0.95rem;
+            color: #374151;
+        }
+
+        .country-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .country-item-flag {
+            width: 24px;
+            height: 18px;
+            border-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .country-item-arrow {
+            font-size: 1rem;
+            color: #9CA3AF;
+            margin-left: -2px;
+        }
+
+        .country-item-name {
+            font-size: 0.95rem;
+            color: #374151;
+            margin-left: 8px;
         }
 
         /* Button Styles */
@@ -285,23 +367,21 @@
     <!-- Main Content -->
     <div class="flex-1 relative overflow-x-hidden">
         <!-- Floating Leaves -->
-        <img src="{{ asset('frontend/assets/reg-floating-img-01.png') }}"
-            alt="Decorative Leaf"
+        <img src="{{ asset('frontend/assets/reg-floating-img-01.png') }}" alt="Decorative Leaf"
             class="floating-leaf floating-leaf-2 w-14 md:w-16 lg:w-20 right-4 md:right-12 lg:right-20 top-16 md:top-20">
 
-        <img src="{{ asset('frontend/assets/reg-floating-img-02.png') }}"
-            alt="Decorative Leaf"
+        <img src="{{ asset('frontend/assets/reg-floating-img-02.png') }}" alt="Decorative Leaf"
             class="floating-leaf floating-leaf-1 w-16 md:w-20 lg:w-24 -left-2 md:left-0 top-40 md:top-52">
 
-        <img src="{{ asset('frontend/assets/reg-floating-img-03.png') }}"
-            alt="Decorative Leaf"
+        <img src="{{ asset('frontend/assets/reg-floating-img-03.png') }}" alt="Decorative Leaf"
             class="floating-leaf floating-leaf-3 w-20 md:w-28 lg:w-36 right-0 bottom-32 md:bottom-40">
 
         <div class="container mx-auto px-4 py-8 md:py-12 lg:py-16">
             <!-- Header -->
             <div class="text-center mb-8 md:mb-16">
                 <p class="text-[#424F93] font-regular text-base md:text-lg mb-2">Create Account</p>
-                <h1 class="text-2xl md:text-3xl lg:text-4xl font-sans! font-medium text-gray-900">Client Registration Form</h1>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-sans! font-medium text-gray-900">Client Registration
+                    Form</h1>
             </div>
 
             <!-- Toast Container -->
@@ -319,13 +399,12 @@
                             class="reg-input @error('first_name') border-red-500! @enderror"
                             placeholder="Enter First Name" required>
                         @error('first_name')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Middle Name</label>
-                        <input type="text" name="middle_name" value="{{ old('middle_name') }}"
-                            class="reg-input"
+                        <input type="text" name="middle_name" value="{{ old('middle_name') }}" class="reg-input"
                             placeholder="Enter Middle Name">
                     </div>
                     <div>
@@ -334,7 +413,7 @@
                             class="reg-input @error('last_name') border-red-500! @enderror"
                             placeholder="Enter Last Name" required>
                         @error('last_name')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -344,20 +423,17 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Date of Birth</label>
                         <div class="date-input-wrapper">
-                            <input type="date" name="dob" value="{{ old('dob') }}"
-                                id="dob-input"
-                                class="reg-input @error('dob') border-red-500! @enderror"
-                                placeholder="DOB" required>
+                            <input type="date" name="dob" value="{{ old('dob') }}" id="dob-input"
+                                class="reg-input @error('dob') border-red-500! @enderror" placeholder="DOB" required>
                         </div>
                         @error('dob')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Age</label>
                         <input type="number" name="age" id="age-input" value="{{ old('age') }}"
-                            class="reg-input bg-gray-100 cursor-not-allowed"
-                            placeholder="Age" readonly>
+                            class="reg-input bg-gray-100 cursor-not-allowed" placeholder="Age" readonly>
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Gender</label>
@@ -376,7 +452,7 @@
                             <input type="hidden" name="gender" id="gender-input" value="{{ old('gender') }}" required>
                         </div>
                         @error('gender')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -386,19 +462,19 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Email</label>
                         <input type="email" name="email" value="{{ old('email') }}"
-                            class="reg-input @error('email') border-red-500! @enderror"
-                            placeholder="Enter Email" required>
+                            class="reg-input @error('email') border-red-500! @enderror" placeholder="Enter Email"
+                            required>
                         @error('email')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Mobile No.</label>
                         <input type="tel" name="mobile" value="{{ old('mobile') }}"
-                            class="reg-input @error('mobile') border-red-500! @enderror"
-                            placeholder="Enter Mobile No." required>
+                            class="reg-input @error('mobile') border-red-500! @enderror" placeholder="Enter Mobile No."
+                            required>
                         @error('mobile')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -411,13 +487,12 @@
                             class="reg-input @error('address_line_1') border-red-500! @enderror"
                             placeholder="Enter Address line 1" required>
                         @error('address_line_1')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Address line 2</label>
-                        <input type="text" name="address_line_2" value="{{ old('address_line_2') }}"
-                            class="reg-input"
+                        <input type="text" name="address_line_2" value="{{ old('address_line_2') }}" class="reg-input"
                             placeholder="Enter Address line 2">
                     </div>
                 </div>
@@ -427,51 +502,89 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">City</label>
                         <input type="text" name="city" value="{{ old('city') }}"
-                            class="reg-input @error('city') border-red-500! @enderror"
-                            placeholder="Enter City" required>
+                            class="reg-input @error('city') border-red-500! @enderror" placeholder="Enter City"
+                            required>
                         @error('city')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">State</label>
                         <input type="text" name="state" value="{{ old('state') }}"
-                            class="reg-input @error('state') border-red-500! @enderror"
-                            placeholder="Enter State" required>
+                            class="reg-input @error('state') border-red-500! @enderror" placeholder="Enter State"
+                            required>
                         @error('state')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Country</label>
-                        <div class="country-select-wrapper custom-select relative" id="country-select-container">
-                            <span class="country-flag">
-                                <span id="current-country-flag" class="text-lg">🇮🇳</span>
-                                <i class="ri-arrow-down-s-line text-gray-400 text-sm"></i>
-                            </span>
-                            <input type="text" name="country" id="country-input" value="{{ old('country', 'India') }}"
-                                class="reg-input country-select cursor-pointer"
-                                placeholder="Select Country" required autocomplete="off" onkeyup="filterCountries()">
-
-                            <div class="custom-options" id="country-options" style="max-height: 250px; overflow-y: auto;">
-                                @foreach(config('countries') as $code => $name)
-                                @php
-                                $flag = implode('', array_map(fn($char) => mb_chr(ord($char) + 127397), str_split($code)));
-                                @endphp
-                                <div class="custom-option country-option" data-value="{{ $name }}" data-flag="{{ $flag }}">
-                                    <span class="mr-2">{{ $flag }}</span> {{ $name }}
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
+                        <select id="nationality-select" name="country" data-default="{{ old('country', 'IN') }}"
+                            required>
+                            <option value="">Select Country</option>
+                        </select>
                         @error('country')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
 
-                <!-- Password Fields (Hidden but required for registration) -->
+                <!-- Row 6: Promocode and Captcha -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Promocode</label>
+                        <div class="relative">
+                            <input type="text" name="promocode" placeholder="CODE1234"
+                                class="reg-input pr-[110px] w-full">
+                            <button type="button"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2 rounded-full hover:bg-[#E8AA32] transition-colors text-sm font-medium cursor-pointer">
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Captcha
+                            Verification</label>
+                        <div class="flex items-center gap-3 md:gap-4 lg:gap-6">
+                            <!-- Captcha Mockup -->
+                            <div
+                                class="bg-[#F5F5F5] rounded-full flex items-center justify-center py-2 h-[52px] min-w-[130px] md:min-w-[150px] overflow-hidden relative shrink-0">
+                                <div class="absolute inset-0 p-2 w-full h-full pointer-events-none opacity-60">
+                                    <!-- SVG lines to accurately mimic captcha distortion -->
+                                    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"
+                                        preserveAspectRatio="none">
+                                        <path d="M0,15 Q30,30 50,15 T150,15" stroke="black" stroke-width="1.5"
+                                            fill="none" />
+                                        <path d="M0,35 Q40,20 70,35 T150,20" stroke="black" stroke-width="1"
+                                            fill="none" />
+                                        <path d="M0,45 Q50,55 80,10 T150,45" stroke="black" stroke-width="2"
+                                            fill="none" />
+                                        <circle cx="10%" cy="30%" r="1" fill="black" />
+                                        <circle cx="30%" cy="70%" r="1.5" fill="black" />
+                                        <circle cx="80%" cy="20%" r="2" fill="black" />
+                                        <circle cx="60%" cy="80%" r="1" fill="black" />
+                                    </svg>
+                                </div>
+                                <span
+                                    class="relative z-10 text-[28px] md:text-[32px] font-black text-gray-900 tracking-[2px] md:tracking-[4px]"
+                                    style="font-family: 'Courier New', Courier, monospace; transform: scaleY(1.3) skewX(-12deg); text-shadow: 1px 1px 0px rgba(245,245,245,0.8), -1px -1px 0px rgba(245,245,245,0.8);">98RW6</span>
+                            </div>
+
+                            <!-- Refresh Arrow -->
+                            <button type="button"
+                                class="text-[#1052CE] hover:text-blue-800 transition-colors focus:outline-none cursor-pointer shrink-0">
+                                <i class="ri-restart-line text-[22px] md:text-[26px] font-medium"
+                                    style="display: inline-block;"></i>
+                            </button>
+
+                            <!-- Captcha Input -->
+                            <input type="text" name="captcha" placeholder="Enter Code" class="reg-input w-full">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password Fields (Hidden but required for registration) -->
+                <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
                         <div class="relative">
@@ -500,7 +613,7 @@
                         </div>
                         <span id="password-match-error" class="text-red-500 text-xs mt-1 pl-4 block h-4"></span>
                     </div>
-                </div>
+                </div> -->
             </form>
         </div>
     </div>
@@ -517,7 +630,7 @@
 
     <script>
         // Custom Select Logic (Generic)
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             function setupCustomSelect(selectId, inputId, selectedId, flagId = null) {
                 const select = document.getElementById(selectId);
                 const input = document.getElementById(inputId);
@@ -530,7 +643,7 @@
                 const options = select.querySelectorAll('.custom-option');
 
                 // Toggle dropdown
-                trigger.addEventListener('click', function() {
+                trigger.addEventListener('click', function () {
                     // Close other open selects first
                     document.querySelectorAll('.custom-select').forEach(s => {
                         if (s !== select) s.classList.remove('open');
@@ -540,7 +653,7 @@
 
                 // Select option
                 options.forEach(option => {
-                    option.addEventListener('click', function() {
+                    option.addEventListener('click', function () {
                         const value = this.getAttribute('data-value');
                         const text = this.innerText; // Gets text including flag if present inline, but we want structured
                         // Actually for Country, text includes flag. For Gender it doesn't.
@@ -549,7 +662,7 @@
                         // For display in trigger:
                         const displayFlag = this.getAttribute('data-flag');
                         // Clean text (remove flag if it was in innerText) - simpler to just use textContent and trim?
-                        // The loop has <span class="mr-2">{{ $flag }}</span> {{ $name }}
+                        // The loop has a span and the name.
                         // So textContent has both. 
                         // For the input value, use data-value.
 
@@ -590,74 +703,10 @@
             // Initialize Gender Select (Still uses generic Logic)
             setupCustomSelect('gender-select', 'gender-input', 'gender-selected');
 
-            // Country Select Logic (Specific for new structure)
-            const countryInput = document.getElementById('country-input');
-            const countryContainer = document.getElementById('country-select-container');
-            const countryOptionsContainer = document.getElementById('country-options');
-            const currentCountryFlag = document.getElementById('current-country-flag');
-            const countryOptions = document.querySelectorAll('.country-option');
-
-            // Toggle Dropdown
-            function toggleCountryDropdown(e) {
-                e.stopPropagation();
-                // Close others
-                document.querySelectorAll('.custom-select').forEach(s => s.classList.remove('open'));
-
-                countryContainer.classList.toggle('open');
-            }
-
-            countryInput.addEventListener('click', toggleCountryDropdown);
-            countryContainer.querySelector('.country-flag').addEventListener('click', toggleCountryDropdown);
-
-            // Handle Option Click
-            countryOptions.forEach(option => {
-                option.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const value = this.getAttribute('data-value');
-                    const flag = this.getAttribute('data-flag');
-
-                    countryInput.value = value;
-                    currentCountryFlag.textContent = flag;
-
-                    countryContainer.classList.remove('open');
-                });
-            });
-
-            // Close on outside click
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('#country-select-container')) {
-                    countryContainer.classList.remove('open');
-                }
-                if (!e.target.closest('.custom-select')) {
-                    document.querySelectorAll('.custom-select').forEach(s => s.classList.remove('open'));
-                }
-            });
         });
 
-        // Filter Countries Function
-        function filterCountries() {
-            const input = document.getElementById('country-input');
-            const filter = input.value.toUpperCase();
-            const container = document.getElementById('country-select-container');
-            const options = container.getElementsByClassName('country-option');
-
-            // Open dropdown when typing
-            if (!container.classList.contains('open')) {
-                container.classList.add('open');
-            }
-
-            for (let i = 0; i < options.length; i++) {
-                const txtValue = options[i].textContent || options[i].innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    options[i].style.display = "";
-                } else {
-                    options[i].style.display = "none";
-                }
-            }
-        }
-
         // Calculate Age from DOB
-        document.getElementById('dob-input').addEventListener('change', function() {
+        document.getElementById('dob-input').addEventListener('change', function () {
             const dob = new Date(this.value);
             const today = new Date();
             let age = today.getFullYear() - dob.getFullYear();
@@ -712,7 +761,7 @@
 
         // Form Submit Validation
         const registrationForm = document.getElementById('registration-form');
-        registrationForm.addEventListener('submit', function(e) {
+        registrationForm.addEventListener('submit', function (e) {
             if (passwordInput.value !== confirmPasswordInput.value) {
                 e.preventDefault();
                 checkPasswordMatch();
