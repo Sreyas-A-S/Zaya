@@ -1,7 +1,6 @@
 <!-- Footer -->
 <footer class="text-[#2E2E2E]">
     <div class="container-fluid mx-auto relative z-10">
-
         <!-- Newsletter Section -->
         <div class="bg-[#79584B] px-6 py-8 md:px-12 flex flex-col md:flex-row items-center justify-center gap-8">
             <h3 id="footer-newsletter-title" class="text-white text-lg md:text-xl font-regular text-center md:text-left font-sans!">
@@ -18,11 +17,12 @@
         </div>
 
         <!-- Main Footer Content -->
-        <div class="bg-gradient-to-b from-[#FFE7CF] to-[#DFAF7F] px-6 py-12 md:px-18 md:py-16">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:mb-16">
-
+        <div class="bg-gradient-to-b from-[#FFE7CF] to-[#DFAF7F] ">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 px-6 py-12 sm:px-12 md:px-12 md:py-16 relative">
+                <img src="{{ asset('frontend/assets/MinimalistGreenLeaves.png') }}" alt=""
+                    class="absolute bottom-0 left-0 w-100 z-0 pointer-events-none">
                 <!-- Column 1: Logo & Tagline -->
-                <div class="flex flex-col items-start space-y-6">
+                <div class="flex flex-col items-start space-y-6 z-1">
                     <a href="{{ route('home') }}" class="block">
                         <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness"
                             class="h-24 w-auto object-contain">
@@ -39,7 +39,7 @@
                         <li><a id="footer-home" href="{{ route('home') }}" class="hover:text-[#79584B] transition-colors">{{ __('Home') }}</a></li>
                         <li><a id="footer-who-we-are" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Who we are') }}</a></li>
                         <li><a id="footer-what-we-do" href="#" class="hover:text-[#79584B] transition-colors">{{ __('What we do') }}</a></li>
-                        <li><a id="footer-our-team" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Our Team') }}</a></li> 
+                        <li><a id="footer-our-team" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Our Team') }}</a></li>
                         <li><a id="footer-blog" href="{{ route('blogs') }}" class="hover:text-[#79584B] transition-colors">{{ __('Blog') }}</a></li>
                         <li><a id="footer-contact-us" href="{{ route('contact-us') }}" class="hover:text-[#79584B] transition-colors">{{ __('Contact Us') }}</a></li>
                     </ul>
@@ -70,43 +70,40 @@
                         </button>
                     </form>
 
-                    <div class="flex flex-wrap gap-3"> 
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-global-line text-lg"></i>
-                            </a>  
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-facebook-fill text-lg"></i>
-                            </a> 
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-instagram-line text-lg"></i>
-                            </a>  
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-youtube-fill text-lg"></i>
-                            </a>  
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-linkedin-fill text-lg"></i>
-                            </a>
-                            <a href="#"
-                                target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-whatsapp-line text-lg"></i>
-                            </a>
+                    <div class="flex flex-wrap gap-3 xl:gap-8">
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-facebook-fill text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-instagram-line text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-youtube-fill text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-linkedin-fill text-lg"></i>
+                        </a>
+                    </div>
+
+                    <div class="flex flex-col justify-between text-sm text-[#252525] gap-4 mt-8 mb-20">
+                        <a href="#" class="hover:text-[#79584B] transition-colors">Privacy Policy</a>
+                        <a href="#" class="hover:text-[#79584B] transition-colors">Cookie Policy</a>
+                        <a href="#" class="hover:text-[#79584B] transition-colors">Terms & Conditions</a>
                     </div>
                 </div>
             </div>
 
             <!-- Bottom Links & Copy -->
             <div class="pt-8 flex flex-col items-center gap-6">
-                <div class="w-full flex flex-col md:flex-row justify-between text-sm text-[#252525]/80 gap-4"> 
+                <div class="w-full flex flex-col md:flex-row justify-between text-sm text-[#252525]/80 gap-4">
                     <a id="footer-privacy" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Privacy Policy') }}</a>
-                    <a id="footer-cookie" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Cookie Policy') }}</a> 
+                    <a id="footer-cookie" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Cookie Policy') }}</a>
                     <a id="footer-terms" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Terms & Conditions') }}</a>
-                    <a id="footer-gdpr" href="#" class="hover:text-[#79584B] transition-colors">{{ __('GDPR & Data Protection') }}</a> 
+                    <a id="footer-gdpr" href="#" class="hover:text-[#79584B] transition-colors">{{ __('GDPR & Data Protection') }}</a>
                 </div>
 
                 <div class="w-full border-t border-[#252525]/80"></div>
@@ -116,5 +113,7 @@
                 </div>
             </div>
         </div>
+
+
     </div>
 </footer>

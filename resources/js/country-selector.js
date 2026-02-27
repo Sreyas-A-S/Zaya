@@ -52,4 +52,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const defaultValue = nationalitySelect.dataset.default || 'IN';
         initCountrySelector('#nationality-select', defaultValue);
     }
+
+    // Auto-initialize Education Country Selectors
+    const educationSelects = document.querySelectorAll('.education-country-select');
+    educationSelects.forEach(select => {
+        const id = select.id;
+        const defaultValue = select.dataset.default || '';
+        if (id) {
+            initCountrySelector('#' + id, defaultValue);
+        }
+    });
 });

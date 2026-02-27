@@ -18,6 +18,7 @@
                     {!! nl2br($settings['services_page_title'] ?? "Embrace Holistic \n Wellness") !!}
                 </h1>
             </div>
+        </section>
 
             <!-- Right Text -->
             <div class="col-span-2 pt-2 lg:pt-4">
@@ -92,7 +93,19 @@
                 <!-- Category Custom Dropdown -->
                 <div class="flex-1 relative" id="category-dropdown">
                     @php
-                    $currentCategory = request('category', 'Select Category');
+                        $bannerImg = asset('frontend/assets/services-page-bg.png');
+                        if (isset($settings['services_page_image'])) {
+                            $si = $settings['services_page_image'];
+                            if (file_exists(public_path($si))) {
+                                $bannerImg = asset($si);
+                            } elseif (file_exists(public_path('storage/' . $si))) {
+                                $bannerImg = asset('storage/' . $si);
+                            } elseif (file_exists(storage_path('app/public/' . $si))) {
+                                $bannerImg = asset('storage/' . $si);
+                            } else {
+                                $bannerImg = storage_path($si);
+                            }
+                        }
                     @endphp
                     <button type="button" onclick="toggleDropdown()"
                         class="w-full h-[72px] flex items-center justify-between border border-[#D4A58E] rounded-full pl-8 pr-8 bg-white text-[#C5896B] text-lg shadow-sm hover:shadow-md transition-all outline-none focus:ring-1 focus:ring-[#D4A58E] font-sans cursor-pointer">
@@ -121,6 +134,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
                 <!-- Search Box -->
                 <div class="flex-1 relative flex items-center border border-[#D4A58E] rounded-full p-2 bg-white shadow-sm hover:shadow-md transition-shadow h-[72px]">

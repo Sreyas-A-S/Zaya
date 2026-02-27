@@ -34,7 +34,12 @@
             <!-- Featured Image -->
             @if($announcement['featured_image'])
                 <div class="w-full overflow-hidden rounded-[20px] mb-12 shadow-lg">
-                    <img src="{{ $announcement['featured_image'] }}" alt="{{ $announcement['title'] }}"
+                    <img src="{{ $announcement['featured_image'] }}" 
+                        @if(!empty($announcement['featured_image_srcset'])) 
+                        srcset="{{ $announcement['featured_image_srcset'] }}" 
+                        sizes="{{ $announcement['featured_image_sizes'] }}" 
+                        @endif
+                        alt="{{ $announcement['title'] }}"
                         class="w-full h-auto object-cover">
                 </div>
             @endif
@@ -90,7 +95,13 @@
                     <a href="{{ route('announcement-detail', $post['slug']) }}" class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 block h-full">
                         <div class="aspect-video overflow-hidden relative">
                             @if($post['featured_image'])
-                                <img src="{{ $post['featured_image'] }}" alt="{{ $post['title'] }}" 
+                                <img src="{{ $post['featured_image'] }}" 
+                                     @if(!empty($post['featured_image_srcset'])) 
+                                     srcset="{{ $post['featured_image_srcset'] }}" 
+                                     sizes="{{ $post['featured_image_sizes'] }}" 
+                                     @endif
+                                     alt="{{ $post['title'] }}" 
+                                     loading="lazy"
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             @else
                                 <div class="w-full h-full bg-linear-to-br from-accent/30 to-secondary/20 flex items-center justify-center">

@@ -7,5 +7,7 @@ use App\Http\Controllers\Api\PractitionerController;
 
 Route::post('/clear-blog-cache', [BlogCacheController::class, 'clear'])->name('api.clear-blog-cache');
 
-//Practitioners List 
-Route::get('/practitioners', [PractitionerController::class, 'index']);
+Route::get('/practitioners', [\App\Http\Controllers\Api\PractitionerController::class, 'index'])
+    ->middleware('apiKey')
+    ->name('api.practitioners.index');
+

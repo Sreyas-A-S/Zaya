@@ -72,14 +72,11 @@
     <!-- Services Section -->
     <section id="services" class="py-20 md:py-22 relative">
         <img src="{{ asset('frontend/assets/leaf-01.png') }}" alt="Leaf Image"
-            class="absolute top-[300px] lg:top-[180px] left-0 z-[2] w-20 xl:w-[138px]">
-        <img src="{{ asset('frontend/assets/floating-leaf.png') }}" alt="Leaf Image"
-            class="absolute top-0 lg:top-10 left-10 z-[2]">
+            class="absolute top-[300px] lg:top-[110px] left-0 z-[2] w-20 xl:w-[200px]">
         <img src="{{ asset('frontend/assets/holy-basil.png') }}" alt="Thulasi Image"
-            class="absolute top-0 lg:top-26 right-0 z-[2] w-[100px] lg:w-[163px]">
-        <!-- <img src="{{ asset('frontend/assets/monstera-leaf.png') }}" alt="Monstera leaf Image" class="absolute bottom-0 right-0 z-[2]"> -->
+            class="absolute top-0 lg:top-48 right-0 z-[2] w-[100px] lg:w-[163px]">
         <img src="{{ asset('frontend/assets/circle-outlines.png') }}" alt="Circle Outlines Image"
-            class="absolute top-[20rem] lg:top-36 right-0 z-[0]">
+            class="absolute top-[20rem] lg:top-48 right-0 z-[0]">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16 animate-on-scroll">
                 <h2 id="services_title" class="text-4xl md:text-6xl font-serif text-primary mb-7 font-bold">
@@ -120,16 +117,16 @@
     <section id="practitioners" class="pb-20">
         <div class="container-fluid mx-auto relative mb-16">
             <!-- Floating Images -->
-            <img src="{{ asset('frontend/assets/holy-basil-left.png') }}" alt="Holy Basil" 
-                class="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-24 xl:w-40 pointer-events-none animate-on-scroll">
-            <img src="{{ asset('frontend/assets/leaf-04.png') }}" alt="Leaf" 
-                class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-24 xl:w-40 pointer-events-none animate-on-scroll">
+            <img src="{{ asset('frontend/assets/holy-basil-left.png') }}" alt="Holy Basil"
+                class="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-24 xl:w-46 pointer-events-none animate-on-scroll">
+            <img src="{{ asset('frontend/assets/leaf-04.png') }}" alt="Leaf"
+                class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-24 xl:w-46 pointer-events-none animate-on-scroll">
 
             <div class="text-center max-w-4xl mx-auto animate-on-scroll">
                 <h2 id="practitioners_title" class="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">
                     {{ $settings['practitioners_title'] ?? 'Practitioners Who Guide Your Journey' }}
                 </h2>
-                
+
                 <p id="practitioners_description" class="text-gray-500 text-base leading-relaxed mb-8 max-w-3xl mx-auto">
                     {{ $settings['practitioners_description'] ?? 'Zaya practitioners are experienced, compassionate, and deeply committed to holistic healing. They guide you with personalized care and connect you to specialized experts when required. Supported by Zaya’s digital tools, practitioners focus fully on healing while the platform handles coordination and technology. They work within a trusted professional network that values ethics, collaboration, and transparency. Together, Zaya practitioners create meaningful, long-term wellness journeys.' }}
                 </p>
@@ -186,7 +183,7 @@
                                 <!-- Image Card -->
                                 <div class="relative h-[400px] overflow-hidden mb-6">
                                     <img src="{{ $image }}" alt="{{ $name }}" class="w-full h-full object-cover">
-                                    
+
                                     <!-- Rating Badge -->
                                     <div class="absolute top-4 right-4 bg-[#FDFEF3] border-[#E8E8D8] backdrop-blur-sm rounded-full px-3 py-2 flex items-center gap-1 shadow-sm">
                                         <i class="ri-star-fill text-secondary text-sm leading-none"></i>
@@ -195,12 +192,12 @@
 
                                     <!-- Book Now Button -->
                                     <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-max z-10">
-                                        <a href="{{ route('practitioner-detail', $details->id) }}" 
+                                        <a href="{{ route('practitioner-detail', $details->id) }}"
                                            class="bg-white text-primary px-8 py-2.5 rounded-full font-medium shadow-lg hover:bg-primary hover:text-white transition-all text-sm block">
                                             {{ $settings['practitioners_button_text'] ?? 'Book Now' }}
                                         </a>
                                     </div>
-                                    
+
                                     <!-- Clickable Overlay for Image -->
                                     <a href="{{ route('practitioner-detail', $details->id) }}" class="absolute inset-0 z-0"></a>
                                 </div>
@@ -249,7 +246,7 @@
                 {{ $settings['cta_title'] ?? "Let's Embrace Wellness Together" }}</h2>
             <p id="cta_description" class="text-gray-500 text-base md:text-lg mb-12 leading-relaxed max-w-2xl mx-auto animate-on-scroll"
                 style="transition-delay: 100ms;">
-                {{ $settings['cta_description'] ?? 'Connect with clients seeking authentic wellness. List your services, manage bookings and join a professional community of Ayurvedic and wellness experts.' }}
+                {{ $settings['cta_description'] ?? 'Join Zaya and become part of a trusted, practitioner-led holistic wellness network. Support your practice with expert collaboration, secure digital tools, and global reach.' }}
             </p>
             <a id="cta_button_text" href="{{ route('practitioner-register') }}"
                 class="animate-on-scroll border border-secondary text-secondary px-10 py-3 rounded-full hover:bg-secondary hover:text-white transition-all font-medium text-lg">
@@ -361,7 +358,7 @@
     <section class="py-20 md:pt-28 md:pb-18 bg-white text-center relative overflow-hidden">
         <!-- Decorative Leaf -->
         <img src="{{ asset('frontend/assets/leaf-02.png') }}" alt="Leaf"
-            class="absolute right-0 top-1/3 w-24 md:w-32 pointer-events-none">
+            class="absolute right-0 top-1/3 w-24 md:w-40 pointer-events-none">
 
         <div class="container mx-auto px-6 max-w-4xl relative z-10">
             <h2 id="testimonials_title" class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary mb-8 animate-on-scroll">

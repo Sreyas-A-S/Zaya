@@ -56,6 +56,8 @@ Route::get('/index', [WebController::class, 'index'])->name('index');
 Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-soon');
 Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
+Route::get('/gallery', [WebController::class, 'gallery'])->name('gallery');
+Route::get('/find-practitioner', [WebController::class, 'findPractitioner'])->name('find-practitioner');
 Route::get('/practitioner/{id}', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
 Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login');
 Route::get('/client-register', [WebController::class, 'clientRegister'])->name('client-register');
@@ -75,8 +77,8 @@ Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->na
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource( '/admins',AdminsController::class);
     Route::get('admin/admins/{id}/edit', [AdminController::class, 'edit']);
-    Route::put('admin/admins/{id}', [AdminController::class, 'update']); 
-    Route::delete( '/admin/admins/{id}', [AdminsController::class, 'destroy']);  
+    Route::put('admin/admins/{id}', [AdminController::class, 'update']);
+    Route::delete( '/admin/admins/{id}', [AdminsController::class, 'destroy']);
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::resource('countries', CountryController::class);
     Route::resource('doctors', DoctorController::class);
@@ -128,10 +130,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'index'])->name('services-settings.index');
     Route::post('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'update'])->name('services-settings.update');
     Route::get('/contact-settings',[\App\Http\Controllers\Admin\ContactusController::class, 'index'])-> name('contact-us.index');
-   
+
 
     Route::post('/contact-settings/update',[\App\Http\Controllers\Admin\ContactusController::class, 'update'])->name('contact-settings.update');
-   
+
     });
 
 // Route to run artisan optimize
@@ -160,17 +162,17 @@ Route::get('/seed', function () {
 Route::prefix('admin')->group(function () {
     Route::resource('countries', CountryController::class);
     Route::get('/admin/countries/{id}', [CountryController::class, 'show']);
-    Route::put( '/admin/countries/{id}', [CountryController::class, 'update']);
-    Route::delete( '/admin/countries/{id}', [CountryController::class, 'destroy']);
-    
+    Route::put('/admin/countries/{id}', [CountryController::class, 'update']);
+    Route::delete('/admin/countries/{id}', [CountryController::class, 'destroy']);
+
     //Language Crud
-    
+
     Route::resource('languages', LanguageController::class);
     Route::get('/admin/languages/{id}', [CountryController::class, 'show']);
     Route::put( '/admin/languages/{id}', [CountryController::class, 'update']);
     Route::delete( '/admin/languages/{id}', [CountryController::class, 'destroy']);
-    
-   
+
+
 });
 
 

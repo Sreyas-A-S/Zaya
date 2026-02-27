@@ -141,7 +141,13 @@
                                     <a href="{{ route('blog-detail', $post['slug']) }}" class="block">
                                         <div class="aspect-video overflow-hidden">
                                             @if($post['featured_image'])
-                                                <img src="{{ $post['featured_image'] }}" alt="{{ $post['title'] }}" 
+                                                <img src="{{ $post['featured_image'] }}" 
+                                                    @if(!empty($post['featured_image_srcset'])) 
+                                                    srcset="{{ $post['featured_image_srcset'] }}" 
+                                                    sizes="{{ $post['featured_image_sizes'] }}" 
+                                                    @endif
+                                                    alt="{{ $post['title'] }}" 
+                                                    loading="lazy"
                                                     class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
                                             @else
                                                 <div class="w-full h-full bg-gradient-to-br from-accent/30 to-secondary/20 flex items-center justify-center">

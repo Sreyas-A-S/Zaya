@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'isAdmin' => \App\Http\Middleware\IsAdmin::class,
             'permission' => \App\Http\Middleware\PermissionMiddleware::class,
+            'apiKey' => \App\Http\Middleware\ApiKeyAuth::class,
         ]);
 
         $middleware->redirectGuestsTo(fn(Request $request) => $request->routeIs('admin.*') || $request->is('admin/*') || $request->is('admin') ? route('admin.login') : route('login'));

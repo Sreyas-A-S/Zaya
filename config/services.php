@@ -43,4 +43,8 @@ return [
         'cache_secret' => env('WORDPRESS_CACHE_SECRET'),
     ],
 
+    'chatbot' => [
+        'api_key' => env('CHATBOT_API_KEY'),
+    ],
+
 ];

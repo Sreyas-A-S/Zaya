@@ -4,6 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ asset('frontend/assets/favicon-96x96.png') }}" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="{{ asset('frontend/assets/favicon.svg') }}" />
+    <link rel="shortcut icon" href="{{ asset('frontend/assets/favicon.ico') }}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('frontend/assets/apple-touch-icon.png') }}" />
+    <meta name="apple-mobile-web-app-title" content="Zaya Wellness" />
+    <link rel="manifest" href="{{ asset('frontend/assets/site.webmanifest') }}">
     <title>Login - Zaya Wellness</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -49,7 +55,7 @@
                         placeholder="Email or Mobile number"
                         class="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 placeholder-gray-400 bg-white shadow-sm transition-all @error('email') border-red-500 @enderror">
                     @error('email')
-                    <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
                     @enderror
                 </div>
 
@@ -61,8 +67,53 @@
                         <i class="ri-eye-line text-xl"></i>
                     </button>
                     @error('password')
-                    <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
+                        <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
                     @enderror
+                </div>
+
+                <!-- Promocode Field -->
+                <div class="relative">
+                    <input type="text" name="promocode" placeholder="Enter New Promocode"
+                        class="w-full pl-6 pr-[110px] py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 placeholder-[#A3A3A3] bg-white shadow-sm transition-all">
+                    <button type="button"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#D1D1D1]/60 text-[#818181] px-7 py-2.5 rounded-full hover:bg-gray-300 transition-colors text-sm font-medium cursor-pointer">
+                        Apply
+                    </button>
+                </div>
+
+                <!-- Captcha Section -->
+                <div class="flex items-center gap-3 md:gap-4">
+                    <!-- Captcha Mockup -->
+                    <div
+                        class="bg-white border border-gray-200 rounded-full shadow-sm flex items-center justify-center py-2 h-[58px] min-w-[140px] md:min-w-[160px] overflow-hidden relative shrink-0">
+                        <div class="absolute inset-0 p-2 w-full h-full pointer-events-none opacity-60">
+                            <!-- SVG lines to accurately mimic captcha distortion -->
+                            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"
+                                preserveAspectRatio="none">
+                                <path d="M0,15 Q30,30 50,15 T150,15" stroke="black" stroke-width="1.5" fill="none" />
+                                <path d="M0,35 Q40,20 70,35 T150,20" stroke="black" stroke-width="1" fill="none" />
+                                <path d="M0,45 Q50,55 80,10 T150,45" stroke="black" stroke-width="2" fill="none" />
+                                <circle cx="10%" cy="30%" r="1" fill="black" />
+                                <circle cx="30%" cy="70%" r="1.5" fill="black" />
+                                <circle cx="80%" cy="20%" r="2" fill="black" />
+                                <circle cx="60%" cy="80%" r="1" fill="black" />
+                            </svg>
+                        </div>
+                        <span
+                            class="relative z-10 text-[32px] md:text-[36px] font-black text-gray-900 tracking-[2px] md:tracking-[4px]"
+                            style="font-family: 'Courier New', Courier, monospace; transform: scaleY(1.3) skewX(-12deg); text-shadow: 1px 1px 0px rgba(255,255,255,0.8), -1px -1px 0px rgba(255,255,255,0.8);">98RW6</span>
+                    </div>
+
+                    <!-- Refresh Arrow -->
+                    <button type="button"
+                        class="text-[#1052CE] hover:text-blue-800 transition-colors focus:outline-none cursor-pointer shrink-0">
+                        <i class="ri-restart-line text-[22px] md:text-[26px] font-medium"
+                            style="display: inline-block;"></i>
+                    </button>
+
+                    <!-- Captcha Input -->
+                    <input type="text" name="captcha" placeholder="Enter Code"
+                        class="w-full px-5 md:px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 placeholder-[#A3A3A3] bg-white shadow-sm transition-all h-[58px]">
                 </div>
 
                 <button type="submit"

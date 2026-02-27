@@ -1,6 +1,6 @@
 <!-- Header -->
-<header class="fixed w-full top-0 z-50 transition-all duration-300 py-8 bg-white">
-    <div class="container mx-auto px-4 lg:px-6 flex justify-between items-center relative">
+<header class="fixed w-full px-4 md:px-6 top-0 z-50 transition-all duration-300 py-8 bg-white">
+    <div class="container mx-auto flex justify-between items-center relative">
 
         <!-- Mobile Toggle (Visible on Mobile) -->
         <button id="mobile-menu-btn" class="lg:hidden text-2xl text-secondary focus:outline-none">
@@ -89,7 +89,7 @@
         // Immediate visual feedback (swap classes)
         const toggle = document.getElementById('frontend-lang-toggle');
         const buttons = toggle.querySelectorAll('button');
-        
+
         buttons.forEach(btn => {
             if (btn.innerText.toLowerCase() === langCode.toLowerCase()) {
                 btn.className = 'bg-primary text-white shadow-sm text-xs font-bold px-3 py-1.5 rounded-full transition-all uppercase';
@@ -134,16 +134,16 @@
 
                 // Update Navigation / Static translations if they were returned
                 // Note: The 'change' method currently only returns HomepageSetting data.
-                // For full "no-reload" translations of __('Home') etc, 
+                // For full "no-reload" translations of __('Home') etc,
                 // we'd need to fetch the JSON lang file or have the controller return them.
-                
-                // If you want static menu items to also change without reload, 
+
+                // If you want static menu items to also change without reload,
                 // we can add a small map here for the main ones:
                 const translations = {
                     'en': {
-                        'nav-home': 'Home', 'nav-about': 'About Us', 'nav-who-we-are': 'Who we are?', 
-                        'nav-what-we-do': 'What we do?', 'nav-our-team': 'Our Team', 'nav-gallery': 'Gallery', 
-                        'nav-blog': 'Blog', 'nav-services': 'Services', 'nav-ayurveda': 'Ayurveda', 
+                        'nav-home': 'Home', 'nav-about': 'About Us', 'nav-who-we-are': 'Who we are?',
+                        'nav-what-we-do': 'What we do?', 'nav-our-team': 'Our Team', 'nav-gallery': 'Gallery',
+                        'nav-blog': 'Blog', 'nav-services': 'Services', 'nav-ayurveda': 'Ayurveda',
                         'nav-yoga': 'Yoga', 'nav-counselling': 'Counselling', 'nav-contact': 'Contact Us',
                         'nav-login': 'Login', 'nav-find-practitioner': 'Find Practitioner',
                         'footer-newsletter-title': 'Join our newsletter for weekly wellness tips.',
@@ -193,9 +193,9 @@
                         'selected-category': 'Select Category'
                     },
                     'fr': {
-                        'nav-home': 'Accueil', 'nav-about': 'À propos', 'nav-who-we-are': 'Qui sommes-nous ?', 
-                        'nav-what-we-do': 'Que faisons-nous ?', 'nav-our-team': 'Notre équipe', 'nav-gallery': 'Galerie', 
-                        'nav-blog': 'Blog', 'nav-services': 'Services', 'nav-ayurveda': 'Ayurvéda', 
+                        'nav-home': 'Accueil', 'nav-about': 'À propos', 'nav-who-we-are': 'Qui sommes-nous ?',
+                        'nav-what-we-do': 'Que faisons-nous ?', 'nav-our-team': 'Notre équipe', 'nav-gallery': 'Galerie',
+                        'nav-blog': 'Blog', 'nav-services': 'Services', 'nav-ayurveda': 'Ayurvéda',
                         'nav-yoga': 'Yoga', 'nav-counselling': 'Conseils', 'nav-contact': 'Contactez-nous',
                         'nav-login': 'Connexion', 'nav-find-practitioner': 'Trouver un praticien',
                         'footer-newsletter-title': 'Rejoignez notre newsletter pour des conseils hebdomadaires sur le bien-être.',
@@ -272,7 +272,7 @@
         });
     }
     </script>
-    
+
     <!-- Mobile Menu -->
     <div id="mobile-menu"
         class="absolute top-full left-0 w-full bg-white shadow-xl border-t border-gray-100 flex flex-col p-6 gap-4 lg:hidden max-h-0 opacity-0 invisible transform -translate-y-4 transition-all duration-300 ease-in-out overflow-hidden">
@@ -281,21 +281,38 @@
         <div class="flex flex-col gap-2">
             <span class="text-lg font-medium text-secondary">About Us</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
-                <a href="{{ route('about-us') }}" class="text-gray-600 text-sm">Who we are?</a>
-                <a href="#" class="text-gray-600 text-sm">What we do?</a>
-                <a href="#" class="text-gray-600 text-sm">Our Team</a>
+                <a href="{{ route('about-us') }}#who-we-are" class="text-gray-600 text-base">Who we are?</a>
+                <a href="{{ route('about-us') }}#what-we-do" class="text-gray-600 text-base">What we do?</a>
+                <a href="{{ route('about-us') }}#our-team" class="text-gray-600 text-base">Our Team</a>
+                <a href="{{ route('gallery') }}" class="text-gray-600 text-base">Gallery</a>
+                <a href="{{ route('blogs') }}" class="text-gray-600 text-base">Blog</a>
             </div>
         </div>
 
         <div class="flex flex-col gap-2">
             <span class="text-lg font-medium text-secondary">Services</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
-                <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
-                    class="text-gray-600 text-sm">Ayurveda</a>
-                <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
-                    class="text-gray-600 text-sm">Yoga</a>
-                <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
-                    class="text-gray-600 text-sm">Counselling</a>
+                <a href="{{ route('services') }}"
+                    class="text-base font-medium text-gray-800 hover:text-primary transition-colors inline-block mt-1">Our
+                    Specialities</a>
+                <div class="pl-2 flex flex-col gap-2 mt-1 mb-2">
+                    <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Ayurveda
+                    </a>
+                    <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Yoga
+                    </a>
+                    <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Counselling
+                    </a>
+                    <a href="{{ route('services', ['category' => 'Packages']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Packages
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -324,4 +341,34 @@
                 a Practitioner</a>
         </div>
     </div>
+
+    <script>
+        function toggleLanguage() {
+            const pill = document.getElementById('lang-toggle-pill');
+            const enText = document.getElementById('lang-text-en');
+            const frText = document.getElementById('lang-text-fr');
+
+            if (pill.classList.contains('translate-x-0')) {
+                // Switch to Fr
+                pill.classList.remove('translate-x-0');
+                pill.classList.add('translate-x-full');
+
+                enText.classList.remove('text-white');
+                enText.classList.add('text-gray-500');
+
+                frText.classList.remove('text-gray-500');
+                frText.classList.add('text-white');
+            } else {
+                // Switch to En
+                pill.classList.remove('translate-x-full');
+                pill.classList.add('translate-x-0');
+
+                frText.classList.remove('text-white');
+                frText.classList.add('text-gray-500');
+
+                enText.classList.remove('text-gray-500');
+                enText.classList.add('text-white');
+            }
+        }
+    </script>
 </header>
