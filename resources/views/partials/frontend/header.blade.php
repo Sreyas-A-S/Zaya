@@ -1,6 +1,6 @@
 <!-- Header -->
-<header class="fixed w-full top-0 z-50 transition-all duration-300 py-8 bg-white">
-    <div class="container mx-auto px-4 lg:px-6 flex justify-between items-center relative">
+<header class="fixed w-full px-4 md:px-6 top-0 z-50 transition-all duration-300 py-8 bg-white">
+    <div class="container mx-auto flex justify-between items-center relative">
 
         <!-- Mobile Toggle (Visible on Mobile) -->
         <button id="mobile-menu-btn" class="lg:hidden text-2xl text-secondary focus:outline-none">
@@ -20,6 +20,7 @@
                 </button>
                 <div
                     class="absolute top-full left-0 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden">
+<<<<<<< HEAD
                     <a id="nav-who-we-are" href="{{ route('about-us') }}#who-we-are"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">{{ __('Who we are?') }}</a>
                     <a id="nav-what-we-do" href="{{ route('about-us') }}#what-we-do"
@@ -29,6 +30,21 @@
                     <a id="nav-gallery" href="#" class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">{{ __('Gallery') }}</a>
                     <a id="nav-blog" href="{{ route('blogs') }}"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">{{ __('Blog') }}</a>
+=======
+                    <a href="{{ route('about-us') }}#who-we-are"
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">Who
+                        we are?</a>
+                    <a href="{{ route('about-us') }}#what-we-do"
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">What
+                        we do?</a>
+                    <a href="{{ route('about-us') }}#our-team"
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Our
+                        Team</a>
+                    <a href="{{ route('gallery') }}"
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Gallery</a>
+                    <a href="{{ route('blogs') }}"
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Blog</a>
+>>>>>>> origin/Gallery-Page
                 </div>
             </div>
 
@@ -39,6 +55,7 @@
                         class="ri-arrow-down-s-line transition-transform duration-300 group-hover:-rotate-180"></i>
                 </button>
                 <div
+<<<<<<< HEAD
                     class="absolute top-full left-0 w-56 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden">
                     <a id="nav-ayurveda" href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">{{ __('Ayurveda') }}</a>
@@ -46,6 +63,30 @@
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">{{ __('Yoga') }}</a>
                     <a id="nav-counselling" href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">{{ __('Counselling') }}</a>
+=======
+                    class="absolute top-full -left-8 w-[240px] bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden py-5">
+                    <a href="{{ route('services') }}"
+                        class="block px-6 pb-4 text-[16px] leading-none font-medium text-gray-800 hover:text-primary transition-colors">Our
+                        Specialities</a>
+                    <div class="flex flex-col gap-1 pl-3">
+                        <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
+                            class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
+                            <span class="text-gray-400 font-light">&mdash;</span> Ayurveda
+                        </a>
+                        <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
+                            class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
+                            <span class="text-gray-400 font-light">&mdash;</span> Yoga
+                        </a>
+                        <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
+                            class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
+                            <span class="text-gray-400 font-light">&mdash;</span> Counselling
+                        </a>
+                        <a href="{{ route('services', ['category' => 'Packages']) }}#services-listing"
+                            class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
+                            <span class="text-gray-400 font-light">&mdash;</span> Packages
+                        </a>
+                    </div>
+>>>>>>> origin/Gallery-Page
                 </div>
             </div>
 
@@ -64,6 +105,7 @@
             <a id="nav-login" href="{{ route('zaya-login') }}"
                 class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors">{{ __('Login') }}</a>
 
+<<<<<<< HEAD
             <a id="nav-find-practitioner" href="#" class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap">{{ __('Find Practitioner') }}</a>
 
             <!-- Language Toggle -->
@@ -80,6 +122,44 @@
                     Fr
                 </button>
             </div>
+=======
+            <a href="#"
+                class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap">Find
+                Practitioner</a>
+
+            <!-- Language Toggle -->
+            <button type="button"
+                class="relative hidden sm:flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
+                onclick="toggleLanguage()">
+                <!-- Sliding Pill -->
+                <div id="lang-toggle-pill"
+                    class="absolute top-1 bottom-1 left-1 w-9 bg-primary rounded-full shadow-sm transition-transform duration-300 ease-in-out translate-x-0">
+                </div>
+
+                <span id="lang-text-en"
+                    class="relative z-10 w-9 text-center text-white text-sm font-bold py-1.5 transition-colors duration-300">En</span>
+                <span id="lang-text-fr"
+                    class="relative z-10 w-9 text-center text-gray-500 text-sm font-bold py-1.5 transition-colors duration-300">Fr</span>
+            </button>
+
+            <!-- User Profile -->
+            <a href="#" class="relative block shrink-0 ml-1">
+                @php
+                    // NOTE FOR BACKEND: Replace these variables with actual auth/user logic
+                    $mockHasProfilePicture = true; // Toggle to false to see the placeholder design
+                    $mockProfilePictureUrl = 'https://i.pravatar.cc/150?img=48'; // Example profile image
+                @endphp
+
+                <div
+                    class="w-11 h-11 md:w-12 md:h-12 rounded-full border-2 border-gray-200 overflow-hidden flex items-center justify-center bg-secondary/10 transition-transform duration-300 hover:scale-105 hover:border-gray-300">
+                    @if($mockHasProfilePicture)
+                        <img src="{{ $mockProfilePictureUrl }}" alt="User Profile" class="w-full h-full object-cover">
+                    @else
+                        <i class="ri-user-3-line text-xl text-secondary"></i>
+                    @endif
+                </div>
+            </a>
+>>>>>>> origin/Gallery-Page
         </div>
     </div>
 
@@ -281,21 +361,38 @@
         <div class="flex flex-col gap-2">
             <span class="text-lg font-medium text-secondary">About Us</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
-                <a href="{{ route('about-us') }}" class="text-gray-600 text-sm">Who we are?</a>
-                <a href="#" class="text-gray-600 text-sm">What we do?</a>
-                <a href="#" class="text-gray-600 text-sm">Our Team</a>
+                <a href="{{ route('about-us') }}#who-we-are" class="text-gray-600 text-base">Who we are?</a>
+                <a href="{{ route('about-us') }}#what-we-do" class="text-gray-600 text-base">What we do?</a>
+                <a href="{{ route('about-us') }}#our-team" class="text-gray-600 text-base">Our Team</a>
+                <a href="{{ route('gallery') }}" class="text-gray-600 text-base">Gallery</a>
+                <a href="{{ route('blogs') }}" class="text-gray-600 text-base">Blog</a>
             </div>
         </div>
 
         <div class="flex flex-col gap-2">
             <span class="text-lg font-medium text-secondary">Services</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
-                <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
-                    class="text-gray-600 text-sm">Ayurveda</a>
-                <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
-                    class="text-gray-600 text-sm">Yoga</a>
-                <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
-                    class="text-gray-600 text-sm">Counselling</a>
+                <a href="{{ route('services') }}"
+                    class="text-base font-medium text-gray-800 hover:text-primary transition-colors inline-block mt-1">Our
+                    Specialities</a>
+                <div class="pl-2 flex flex-col gap-2 mt-1 mb-2">
+                    <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Ayurveda
+                    </a>
+                    <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Yoga
+                    </a>
+                    <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Counselling
+                    </a>
+                    <a href="{{ route('services', ['category' => 'Packages']) }}#services-listing"
+                        class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
+                        <span class="text-gray-800 font-light">&mdash;</span> Packages
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -324,4 +421,34 @@
                 a Practitioner</a>
         </div>
     </div>
+
+    <script>
+        function toggleLanguage() {
+            const pill = document.getElementById('lang-toggle-pill');
+            const enText = document.getElementById('lang-text-en');
+            const frText = document.getElementById('lang-text-fr');
+
+            if (pill.classList.contains('translate-x-0')) {
+                // Switch to Fr
+                pill.classList.remove('translate-x-0');
+                pill.classList.add('translate-x-full');
+
+                enText.classList.remove('text-white');
+                enText.classList.add('text-gray-500');
+
+                frText.classList.remove('text-gray-500');
+                frText.classList.add('text-white');
+            } else {
+                // Switch to En
+                pill.classList.remove('translate-x-full');
+                pill.classList.add('translate-x-0');
+
+                frText.classList.remove('text-white');
+                frText.classList.add('text-gray-500');
+
+                enText.classList.remove('text-gray-500');
+                enText.classList.add('text-white');
+            }
+        }
+    </script>
 </header>

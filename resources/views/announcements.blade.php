@@ -35,7 +35,9 @@
 
                                 <div class="w-full relative">
                                     @if($post['featured_image'])
-                                        <img src="{{ $post['featured_image'] }}" alt="{{ $post['title'] }}"
+                                        <img src="{{ $post['featured_image'] }}" @if(!empty($post['featured_image_srcset']))
+                                            srcset="{{ $post['featured_image_srcset'] }}" sizes="{{ $post['featured_image_sizes'] }}"
+                                        @endif alt="{{ $post['title'] }}" loading="lazy"
                                             class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500 rounded-[20px]">
                                     @else
                                         <!-- Fallback for no image -->

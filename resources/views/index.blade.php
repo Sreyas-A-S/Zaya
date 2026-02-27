@@ -62,8 +62,13 @@
                     {{ $settings['hero_subtitle'] ?? 'Personalized wellness guided by experienced practitioners and trusted holistic experts.' }}
                 </p>
 
+<<<<<<< HEAD
                 <a id="hero_button_text" href="{{ route('about-us') }}"
                     class="bg-white text-primary px-6 py-3 rounded-full text-lg font-medium border border-white hover:bg-primary hover:text-white transition-all shadow-lg hover:shadow-xl">{{ $settings['hero_button_text'] ?? 'Discover Our Story' }}</a>
+=======
+                <a href="{{ route('about-us') }}"
+                    class="bg-white text-primary px-6 py-3 rounded-full text-lg font-normal border border-white hover:bg-primary hover:text-white transition-all shadow-lg hover:shadow-xl">{{ $settings['hero_button_text'] ?? 'Discover Our Story' }}</a>
+>>>>>>> origin/Gallery-Page
             </div>
         </div>
     </section>
@@ -72,22 +77,26 @@
     <!-- Services Section -->
     <section id="services" class="py-20 md:py-22 relative">
         <img src="{{ asset('frontend/assets/leaf-01.png') }}" alt="Leaf Image"
-            class="absolute top-[300px] lg:top-[180px] left-0 z-[2] w-20 xl:w-[138px]">
-        <img src="{{ asset('frontend/assets/floating-leaf.png') }}" alt="Leaf Image"
-            class="absolute top-0 lg:top-10 left-10 z-[2]">
+            class="absolute top-[300px] lg:top-[110px] left-0 z-[2] w-20 xl:w-[200px]"> 
         <img src="{{ asset('frontend/assets/holy-basil.png') }}" alt="Thulasi Image"
-            class="absolute top-0 lg:top-26 right-0 z-[2] w-[100px] lg:w-[163px]">
-        <!-- <img src="{{ asset('frontend/assets/monstera-leaf.png') }}" alt="Monstera leaf Image" class="absolute bottom-0 right-0 z-[2]"> -->
+            class="absolute top-0 lg:top-48 right-0 z-[2] w-[100px] lg:w-[163px]"> 
         <img src="{{ asset('frontend/assets/circle-outlines.png') }}" alt="Circle Outlines Image"
-            class="absolute top-[20rem] lg:top-36 right-0 z-[0]">
+            class="absolute top-[20rem] lg:top-48 right-0 z-[0]">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16 animate-on-scroll">
                 <h2 id="services_title" class="text-4xl md:text-6xl font-serif text-primary mb-7 font-bold">
                     {{ $settings['services_title'] ?? 'Our Services' }}</h2>
+<<<<<<< HEAD
                 <h3 id="services_subtitle" class="text-secondary font-serif text-2xl">
                     {{ $settings['services_subtitle'] ?? 'Holistic Healing for Mind, Body & Soul' }}</h3>
                 <p id="services_description" class="text-gray-500 text-base mt-6 max-w-lg mx-auto">
                     {{ $settings['services_description'] ?? 'Explore our specialized Ayurvedic treatments, transformative Yoga therapy and professional Mindfulness counseling. Connect with global experts dedicated to your wellness journey.' }}
+=======
+                <h3 class="text-secondary font-serif text-2xl">
+                    {{ $settings['services_subtitle'] ?? 'Holistic Ayurvedic Wellness' }}</h3>
+                <p class="text-gray-500 text-base mt-6 max-w-3xl mx-auto">
+                    {{ $settings['services_description'] ?? 'Zaya offers experienced practitioner-led holistic wellness services rooted in Ayurveda. Through online consultations, yoga therapy, and mindfulness support, we provide personalized guidance based on natural herbs, diet, and lifestyle—accessible globally through secure, multilingual video consultations.' }}
+>>>>>>> origin/Gallery-Page
                 </p>
             </div>
 
@@ -121,9 +130,9 @@
         <div class="container-fluid mx-auto relative mb-16">
             <!-- Floating Images -->
             <img src="{{ asset('frontend/assets/holy-basil-left.png') }}" alt="Holy Basil" 
-                class="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-24 xl:w-40 pointer-events-none animate-on-scroll">
+                class="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-24 xl:w-46 pointer-events-none animate-on-scroll">
             <img src="{{ asset('frontend/assets/leaf-04.png') }}" alt="Leaf" 
-                class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-24 xl:w-40 pointer-events-none animate-on-scroll">
+                class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-24 xl:w-46 pointer-events-none animate-on-scroll">
 
             <div class="text-center max-w-4xl mx-auto animate-on-scroll">
                 <h2 id="practitioners_title" class="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">
@@ -135,7 +144,11 @@
                 </p>
 
                 <div class="mb-20">
+<<<<<<< HEAD
                     <a id="practitioners_browse_btn" href="{{ route('services') }}" class="bg-primary text-white px-8 py-3 rounded-full hover:bg-opacity-90 transition-all font-medium text-lg inline-block shadow-md">
+=======
+                    <a href="{{ route('services') }}" class="bg-primary text-white px-8 py-3 rounded-full hover:bg-opacity-90 transition-all font-normal text-lg inline-block shadow-md">
+>>>>>>> origin/Gallery-Page
                         {{ $settings['practitioners_browse_btn'] ?? 'Browse All Practitioners' }}
                     </a>
                 </div>
@@ -245,14 +258,25 @@
     <!-- Join Team Section -->
     <section class="pb-20 md:pb-28 bg-white text-center">
         <div class="container mx-auto px-6 max-w-4xl">
+<<<<<<< HEAD
             <h2 id="cta_title" class="text-3xl md:text-5xl font-serif font-bold text-primary mb-6 animate-on-scroll">
                 {{ $settings['cta_title'] ?? "Let's Embrace Wellness Together" }}</h2>
             <p id="cta_description" class="text-gray-500 text-base md:text-lg mb-12 leading-relaxed max-w-2xl mx-auto animate-on-scroll"
+=======
+            <h2 class="text-3xl md:text-5xl font-serif font-bold text-primary mb-6 animate-on-scroll">
+                {{ $settings['cta_title'] ?? "Are you a Wellness Practitioner?" }}</h2>
+            <p class="text-gray-500 text-base md:text-lg mb-12 leading-relaxed max-w-xl mx-auto animate-on-scroll"
+>>>>>>> origin/Gallery-Page
                 style="transition-delay: 100ms;">
-                {{ $settings['cta_description'] ?? 'Connect with clients seeking authentic wellness. List your services, manage bookings and join a professional community of Ayurvedic and wellness experts.' }}
+                {{ $settings['cta_description'] ?? 'Join Zaya and become part of a trusted, practitioner-led holistic wellness network. Support your practice with expert collaboration, secure digital tools, and global reach.' }}
             </p>
+<<<<<<< HEAD
             <a id="cta_button_text" href="{{ route('practitioner-register') }}"
                 class="animate-on-scroll border border-secondary text-secondary px-10 py-3 rounded-full hover:bg-secondary hover:text-white transition-all font-medium text-lg">
+=======
+            <a href="{{ route('practitioner-register') }}"
+                class="animate-on-scroll border border-secondary text-secondary px-10 py-3 rounded-full hover:bg-secondary hover:text-white transition-all font-normal text-lg">
+>>>>>>> origin/Gallery-Page
                 {{ $settings['cta_button_text'] ?? 'Join as a Practitioner' }}
             </a>
         </div>
@@ -361,7 +385,7 @@
     <section class="py-20 md:pt-28 md:pb-18 bg-white text-center relative overflow-hidden">
         <!-- Decorative Leaf -->
         <img src="{{ asset('frontend/assets/leaf-02.png') }}" alt="Leaf"
-            class="absolute right-0 top-1/3 w-24 md:w-32 pointer-events-none">
+            class="absolute right-0 top-1/3 w-24 md:w-40 pointer-events-none">
 
         <div class="container mx-auto px-6 max-w-4xl relative z-10">
             <h2 id="testimonials_title" class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary mb-8 animate-on-scroll">

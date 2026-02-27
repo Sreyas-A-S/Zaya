@@ -36,12 +36,24 @@
                 <div>
                     <h4 id="footer-quick-links-title" class="font-medium font-sans! mb-6 text-xl text-[#2E2E2E]">{{ __('Quick Links') }}</h4>
                     <ul class="space-y-4 text-base font-regular text-[#2E2E2E]/80">
+<<<<<<< HEAD
                         <li><a id="footer-home" href="{{ route('home') }}" class="hover:text-[#79584B] transition-colors">{{ __('Home') }}</a></li>
                         <li><a id="footer-who-we-are" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Who we are') }}</a></li>
                         <li><a id="footer-what-we-do" href="#" class="hover:text-[#79584B] transition-colors">{{ __('What we do') }}</a></li>
                         <li><a id="footer-our-team" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Our Team') }}</a></li> 
                         <li><a id="footer-blog" href="{{ route('blogs') }}" class="hover:text-[#79584B] transition-colors">{{ __('Blog') }}</a></li>
                         <li><a id="footer-contact-us" href="{{ route('contact-us') }}" class="hover:text-[#79584B] transition-colors">{{ __('Contact Us') }}</a></li>
+=======
+                        <li><a href="{{ route('home') }}" class="hover:text-[#79584B] transition-colors">Home</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Who we are</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">What we do</a></li>
+                        <li><a href="#" class="hover:text-[#79584B] transition-colors">Our Team</a></li>
+                        <li><a href="{{ route('gallery') }}" class="hover:text-[#79584B] transition-colors">Gallery</a>
+                        </li>
+                        <li><a href="{{ route('blogs') }}" class="hover:text-[#79584B] transition-colors">Blog</a></li>
+                        <li><a href="{{ route('contact-us') }}" class="hover:text-[#79584B] transition-colors">Contact
+                                Us</a></li>
+>>>>>>> origin/Gallery-Page
                     </ul>
                 </div>
 
@@ -60,7 +72,12 @@
 
                 <!-- Column 4: Pincode & Socials -->
                 <div>
+<<<<<<< HEAD
                     <h4 id="footer-pincode-title" class="font-medium font-sans! mb-4 text-base text-[#2E2E2E]">{{ __('Save your pincode & find nearby care.') }}</h4>
+=======
+                    <h4 class="font-medium font-sans! mb-4 text-base text-[#2E2E2E]">Save your pincode & find nearby
+                        care.</h4>
+>>>>>>> origin/Gallery-Page
                     <form class="flex gap-2 mb-10">
                         <input id="footer-pincode-input" type="text" placeholder="{{ __('Enter Pincode') }}"
                             class="bg-[#F9F9F9] placeholder-gray-400 text-gray-800 rounded px-4 py-2 w-full text-sm focus:outline-none border border-transparent focus:border-[#79584B]">
@@ -70,43 +87,50 @@
                         </button>
                     </form>
 
-                    <div class="flex flex-wrap gap-3"> 
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-global-line text-lg"></i>
-                            </a>  
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-facebook-fill text-lg"></i>
-                            </a> 
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-instagram-line text-lg"></i>
-                            </a>  
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-youtube-fill text-lg"></i>
-                            </a>  
-                            <a href="#" target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-linkedin-fill text-lg"></i>
-                            </a>
-                            <a href="#"
-                                target="_blank"
-                                class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
-                                <i class="ri-whatsapp-line text-lg"></i>
-                            </a>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-global-line text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-facebook-fill text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-instagram-line text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-youtube-fill text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-linkedin-fill text-lg"></i>
+                        </a>
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
+                            <i class="ri-whatsapp-line text-lg"></i>
+                        </a>
                     </div>
                 </div>
             </div>
 
             <!-- Bottom Links & Copy -->
             <div class="pt-8 flex flex-col items-center gap-6">
+<<<<<<< HEAD
                 <div class="w-full flex flex-col md:flex-row justify-between text-sm text-[#252525]/80 gap-4"> 
                     <a id="footer-privacy" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Privacy Policy') }}</a>
                     <a id="footer-cookie" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Cookie Policy') }}</a> 
                     <a id="footer-terms" href="#" class="hover:text-[#79584B] transition-colors">{{ __('Terms & Conditions') }}</a>
                     <a id="footer-gdpr" href="#" class="hover:text-[#79584B] transition-colors">{{ __('GDPR & Data Protection') }}</a> 
+=======
+                <div class="w-full flex flex-col md:flex-row justify-between text-sm text-[#252525]/80 gap-4">
+                    <a href="#" class="hover:text-[#79584B] transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-[#79584B] transition-colors">Cookie Policy</a>
+                    <a href="#" class="hover:text-[#79584B] transition-colors">Terms & Conditions</a>
+                    <a href="#" class="hover:text-[#79584B] transition-colors">GDPR & Data Protection</a>
+>>>>>>> origin/Gallery-Page
                 </div>
 
                 <div class="w-full border-t border-[#252525]/80"></div>
