@@ -424,7 +424,7 @@
 
             <!-- GDPR Center -->
             <div
-                class="bg-white rounded-2xl p-6 border border-[#2E4B3D]/12 flex flex-col flex-wrap gap-4 items-center justify-between">
+                class="bg-white rounded-2xl p-6 border border-[#2E4B3D]/12 flex flex-col md:flex-row flex-wrap gap-4 items-center justify-between">
                 <div class="flex flex-1 items-center space-x-3">
                     <i class="ri-shield-check-fill text-secondary text-xl"></i>
                     <h2 class="text-lg font-sans! font-medium text-secondary">General Data Protection Regulation Control
