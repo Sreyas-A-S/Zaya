@@ -183,3 +183,7 @@ Route::prefix('admin')->group(function () {
 Route::get('/client-profile', function () {
     return view('client-profile');
 })->name('client-profile');
+
+Route::get('/practitioner-profile', function () {
+    return view('practitioner-profile');
+})->name('practitioner-profile');
