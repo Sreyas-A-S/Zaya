@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Booking UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fa;
+            /* Light grey background matching the image */
+            color: #333;
+        }
+
+        /* Custom QR Code pattern */
+        .qr-code {
+            display: inline-block;
+            width: 44px;
+            height: 44px;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 3H9V9H3V3ZM5 5V7H7V5H5ZM15 3H21V9H15V3ZM17 5V7H19V5H17ZM3 15H9V21H3V15ZM5 17V19H7V17H5ZM21 21H11V15H21V21ZM13 17H19V19H13V17ZM11 11H13V13H11V11ZM13 9H15V11H13V9ZM9 13H11V15H9V13ZM15 13H17V15H15V13ZM17 11H21V13H17V11ZM9 11H7V13H9V11Z' fill='%231f2937'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen py-10 flex flex-col items-center">
+
+    <!-- Top Status Icon & Header -->
+    <div class="text-center mb-8 mt-4">
+        <div class="w-[72px] h-[72px] rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
+            <div class="w-12 h-12 rounded-full bg-[#52e28b] flex items-center justify-center shadow-sm">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+        </div>
+        <h1 class="text-[20px] text-gray-800 font-semibold mb-2">Your Session has been Booked!</h1>
+        <p class="text-[13px] text-gray-500 max-w-[260px] mx-auto leading-relaxed">Please check your email for
+            confirmation and further instruction.</p>
+    </div>
+
+    <!-- Main Receipt Card -->
+    <div class="bg-white rounded-[24px] shadow-[0_8px_40px_-15px_rgba(0,0,0,0.08)] w-full max-w-[560px] p-7 mb-8">
+
+        <!-- Header: Client Info & QR Code -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-4">
+                <img src="https://i.pravatar.cc/150?img=47" alt="Client Avatar"
+                    class="w-[52px] h-[52px] rounded-full object-cover">
+                <div>
+                    <p class="text-[12px] text-gray-400 mb-0.5">Client Name</p>
+                    <p class="text-[15px] font-semibold text-gray-800">Quinn Emerson</p>
+                </div>
+            </div>
+            <div>
+                <div class="qr-code"></div>
+            </div>
+        </div>
+
+        <hr class="border-gray-100 mb-5">
+
+        <!-- Client Details Container -->
+        <div class="flex justify-between mb-5 px-1">
+            <div class="w-1/3">
+                <p class="text-[12px] text-gray-400 mb-1">Client ID</p>
+                <p class="text-[14px] font-semibold text-gray-800">Z-99821</p>
+            </div>
+            <div class="w-1/3 text-center">
+                <p class="text-[12px] text-gray-400 mb-1">DOB</p>
+                <p class="text-[14px] font-semibold text-gray-800">May 01, 1998</p>
+            </div>
+            <div class="w-1/3 text-right">
+                <p class="text-[12px] text-gray-400 mb-1">Location</p>
+                <p class="text-[14px] font-semibold text-gray-800">London, UK</p>
+            </div>
+        </div>
+
+        <hr class="border-gray-100 mb-6">
+
+        <!-- Sessions List -->
+        <h2 class="text-[15px] font-bold text-gray-800 mb-4">Sessions</h2>
+
+        <div class="flex flex-col gap-3 mb-6">
+            <!-- Session Item 1 -->
+            <div class="bg-[#f5f6f8] rounded-2xl p-4 flex justify-between items-center">
+                <div class="w-1/3">
+                    <p class="text-[12px] text-gray-400 mb-1">Service</p>
+                    <p class="text-[14px] font-semibold text-gray-800">Art Therapy</p>
+                </div>
+                <div class="w-1/3 text-center">
+                    <p class="text-[12px] text-gray-400 mb-1">Date</p>
+                    <p class="text-[14px] font-semibold text-gray-800">Feb 07, 2026</p>
+                </div>
+                <div class="w-1/3 text-right">
+                    <p class="text-[12px] text-gray-400 mb-1">Time</p>
+                    <p class="text-[14px] font-semibold text-gray-800">10.00 AM</p>
+                </div>
+            </div>
+
+            <!-- Session Item 2 -->
+            <div class="bg-[#f5f6f8] rounded-2xl p-4 flex justify-between items-center">
+                <div class="w-1/3">
+                    <p class="text-[12px] text-gray-400 mb-1">Service</p>
+                    <p class="text-[14px] font-semibold text-gray-800">Life Coach</p>
+                </div>
+                <div class="w-1/3 text-center">
+                    <p class="text-[12px] text-gray-400 mb-1">Date</p>
+                    <p class="text-[14px] font-semibold text-gray-800">Mar 01, 2026</p>
+                </div>
+                <div class="w-1/3 text-right">
+                    <p class="text-[12px] text-gray-400 mb-1">Time</p>
+                    <p class="text-[14px] font-semibold text-gray-800">5.00 PM</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-gray-100 mb-6">
+
+        <!-- Total Amount -->
+        <div class="flex justify-between items-center mb-6 px-1">
+            <span class="text-[13px] text-gray-400">Total Amount</span>
+            <div class="flex items-center gap-4">
+                <span class="bg-[#eef1f6] text-gray-600 text-[11px] font-medium px-3 py-1 rounded-full">Paid</span>
+                <span class="text-[22px] font-bold text-gray-800">&euro; 100.00</span>
+            </div>
+        </div>
+
+        <hr class="border-gray-100 mb-6">
+
+        <!-- Practitioners List -->
+        <h2 class="text-[15px] font-bold text-gray-800 mb-5">Sessions with Practitioner</h2>
+
+        <div class="flex flex-col gap-5 mb-7 px-1">
+            <!-- Practitioner 1 -->
+            <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-4">
+                    <img src="https://i.pravatar.cc/150?img=32" alt="Dr. Lily Marie"
+                        class="w-[42px] h-[42px] rounded-full object-cover">
+                    <div class="flex flex-col justify-center">
+                        <p class="text-[14px] font-semibold text-gray-800 leading-tight mb-0.5">Dr. Lily Marie</p>
+                        <p class="text-[12px] text-gray-400">Art Therapist</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-1.5 max-w-[160px]">
+                    <svg class="w-3.5 h-3.5 text-gray-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <p class="text-[10px] text-gray-500 leading-relaxed font-medium">The Heritage Grove PTP Nagar,
+                        Kowdiar Road, Trivandrum, Kerala.</p>
+                </div>
+            </div>
+
+            <!-- Practitioner 2 -->
+            <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-4">
+                    <img src="https://i.pravatar.cc/150?img=11" alt="Dr. Robert Lee"
+                        class="w-[42px] h-[42px] rounded-full object-cover">
+                    <div class="flex flex-col justify-center">
+                        <p class="text-[14px] font-semibold text-gray-800 leading-tight mb-0.5">Dr. Robert Lee</p>
+                        <p class="text-[12px] text-gray-400">Life Coach</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-1.5 max-w-[160px]">
+                    <svg class="w-3.5 h-3.5 text-gray-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <p class="text-[10px] text-gray-500 leading-relaxed font-medium">HealthCare Centre, Pattambi Road,
+                        Malappuram, Kerala.</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-gray-100 mb-6">
+
+        <!-- Footer -->
+        <div class="text-center pt-1 mb-2">
+            <p class="text-[16px] font-semibold text-gray-800 mb-1.5">Thanks for Booking!</p>
+            <p class="text-[11px] text-gray-500 font-medium">For more queries &middot; <a href="#"
+                    class="text-blue-500 hover:underline">www.zayawellness.com</a></p>
+        </div>
+    </div>
+
+    <!-- Bottom Action Buttons -->
+    <div class="flex justify-between items-center w-full max-w-[420px] px-2 mb-10">
+        <!-- Print Button -->
+        <button
+            class="w-10 h-10 rounded-full border border-red-200 bg-white flex items-center justify-center text-red-400 hover:bg-red-50 transition-colors shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                </path>
+            </svg>
+        </button>
+
+        <!-- Right Buttons -->
+        <div class="flex gap-3">
+            <button
+                class="px-[26px] py-2.5 bg-[#daf1fe] text-[#0ea5e9] font-medium text-[14px] rounded-full hover:bg-blue-100 transition-colors shadow-sm">
+                Share
+            </button>
+            <button
+                class="px-[26px] py-2.5 bg-[#1e2024] text-white font-medium text-[14px] rounded-full hover:bg-black transition-colors shadow-sm">
+                Download
+            </button>
+        </div>
+    </div>
+
+</body>
+
+</html>
