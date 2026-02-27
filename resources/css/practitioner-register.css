@@ -50,7 +50,8 @@ h6 {
 /* ========================================
    TOM SELECT - Third-party library overrides
    ======================================== */
-#nationality-select+.ts-wrapper {
+#nationality-select+.ts-wrapper,
+.education-country-select+.ts-wrapper {
     width: 100%;
 }
 
@@ -67,25 +68,59 @@ h6 {
     align-items: center;
 }
 
+.education-country-select+.ts-wrapper .ts-control {
+    padding: 12px 24px;
+    background: white;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    font-size: 0.95rem;
+    color: #374151;
+    transition: all 0.3s ease;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+}
+
+#nationality-select+.ts-wrapper .ts-control>*,
+.education-country-select+.ts-wrapper .ts-control>* {
+    vertical-align: top;
+}
+
+#nationality-select+.ts-wrapper .ts-control>.item,
+.education-country-select+.ts-wrapper .ts-control>.item {
+    margin: 0;
+    padding: 0;
+    line-height: inherit;
+    height: auto;
+}
+
 #nationality-select+.ts-wrapper .ts-control:hover {
     background: #EFEFEF;
 }
 
-#nationality-select+.ts-wrapper.focus .ts-control {
+.education-country-select+.ts-wrapper .ts-control:hover {
+    background: #FAFAFA;
+}
+
+#nationality-select+.ts-wrapper.focus .ts-control,
+.education-country-select+.ts-wrapper.focus .ts-control {
     border-color: #97563D;
     background: white;
     box-shadow: 0 0 0 3px rgba(151, 86, 61, 0.1);
 }
 
-#nationality-select+.ts-wrapper .ts-control input {
+#nationality-select+.ts-wrapper .ts-control input,
+.education-country-select+.ts-wrapper .ts-control input {
     color: #374151;
 }
 
-#nationality-select+.ts-wrapper .ts-control input::placeholder {
+#nationality-select+.ts-wrapper .ts-control input::placeholder,
+.education-country-select+.ts-wrapper .ts-control input::placeholder {
     color: #9CA3AF;
 }
 
-#nationality-select+.ts-wrapper .ts-dropdown {
+#nationality-select+.ts-wrapper .ts-dropdown,
+.education-country-select+.ts-wrapper .ts-dropdown {
     border: 1px solid #E5E7EB;
     border-radius: 16px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
@@ -93,7 +128,8 @@ h6 {
     overflow: hidden;
 }
 
-#nationality-select+.ts-wrapper .ts-dropdown .ts-dropdown-content {
+#nationality-select+.ts-wrapper .ts-dropdown .ts-dropdown-content,
+.education-country-select+.ts-wrapper .ts-dropdown .ts-dropdown-content {
     max-height: 200px;
     padding: 8px 0;
 }
@@ -108,7 +144,8 @@ h6 {
 }
 
 .country-option:hover,
-#nationality-select+.ts-wrapper .ts-dropdown .option.active {
+#nationality-select+.ts-wrapper .ts-dropdown .option.active,
+.education-country-select+.ts-wrapper .ts-dropdown .option.active {
     background: #FFF7EF;
 }
 
@@ -147,4 +184,92 @@ h6 {
     font-size: 0.95rem;
     color: #374151;
     margin-left: 8px;
+}
+
+/* Custom Select Dropdown Styles */
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select {
+    cursor: pointer;
+    position: relative;
+}
+
+.custom-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: #ffffff;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    color: #A3A3A3;
+    font-size: 0.95rem;
+    min-height: 48px;
+}
+
+.custom-select-trigger.has-value {
+    color: #374151;
+}
+
+.custom-select-trigger:hover {
+    background: #FAFAFA;
+}
+
+.custom-select-wrapper.focus .custom-select-trigger,
+.custom-select-trigger.focus-ring {
+    border-color: #97563D;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(151, 86, 61, 0.1);
+}
+
+.custom-select-trigger .arrow {
+    transition: transform 0.3s ease;
+}
+
+.custom-select.open .custom-select-trigger .arrow {
+    transform: rotate(180deg);
+}
+
+.custom-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 8px;
+}
+
+.custom-select.open .custom-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.custom-option {
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.custom-option:hover {
+    background: #F9FAFB;
+}
+
+.custom-option.selected {
+    background: #FFF7EF;
+    color: #97563D;
 }
