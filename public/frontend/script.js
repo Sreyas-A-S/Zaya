@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const SwiperLib = window.Swiper;
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     const header = document.querySelector('header');
@@ -70,108 +71,117 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 
-    // Hero Background Image Slider
-    new Swiper('.heroSlider', {
-        slidesPerView: 1,
-        spaceBetween: 0,
-        loop: true,
-        speed: 1000,
-        effect: 'fade',
-        fadeEffect: {
-            crossFade: true
-        },
-        autoplay: {
-            delay: 2000,
-            disableOnInteraction: false,
-        },
-    });
-
-
-    new Swiper('.practitioner-slider', {
-        slidesPerView: 1.5,
-        spaceBetween: 40,
-        loop: true,
-        centeredSlides: true,
-        autoplay: {
-            delay: 3500,
-            pauseOnMouseEnter: true,
-            pauseOnFocus: true,
-        },
-        navigation: {
-            nextEl: '.next-practitioner',
-            prevEl: '.prev-practitioner',
-        },
-        breakpoints: {
-            512: {
-                slidesPerView: 2.3,
-                centeredSlides: true,
-            },
-            768: {
-                slidesPerView: 3.3,
-                centeredSlides: false,
-            },
-            1152: {
-                slidesPerView: 4.3,
-                centeredSlides: false,
-            },
-            1440: {
-                slidesPerView: 4,
-                spaceBetween: 80,
-                centeredSlides: false,
-            },
-            1920: {
-                slidesPerView: 5,
-                spaceBetween: 80,
-                centeredSlides: false,
-            },
-        },
-    });
-
-    // Testimonial Slider
-    new Swiper('.testimonial-slider', {
-        slidesPerView: 'auto', // Fluid width to match design
-        spaceBetween: 40,
-        loop: true,
-        speed: 800,
-        autoplay: {
-            delay: 3000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-        },
-        allowTouchMove: true,
-        bgWhite: false,
-        navigation: {
-            nextEl: '.next-testimonial',
-            prevEl: '.prev-testimonial',
-        },
-        breakpoints: {
-            640: {
-                spaceBetween: 60,
-            }
+    if (SwiperLib) {
+        // Hero Background Image Slider
+        if (document.querySelector('.heroSlider')) {
+            new SwiperLib('.heroSlider', {
+                slidesPerView: 1,
+                spaceBetween: 0,
+                loop: true,
+                speed: 1000,
+                effect: 'fade',
+                fadeEffect: {
+                    crossFade: true
+                },
+                autoplay: {
+                    delay: 2000,
+                    disableOnInteraction: false,
+                },
+            });
         }
-    });
 
-    // Service Detail Image Slider
-    new Swiper('.serviceImageSwiper', {
-        slidesPerView: 1,
-        spaceBetween: 0,
-        loop: true,
-        speed: 600,
-        grabCursor: true,
-        autoplay: {
-            delay: 2000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-    });
+        if (document.querySelector('.practitioner-slider')) {
+            new SwiperLib('.practitioner-slider', {
+                slidesPerView: 1.5,
+                spaceBetween: 40,
+                loop: true,
+                centeredSlides: true,
+                autoplay: {
+                    delay: 3500,
+                    pauseOnMouseEnter: true,
+                    pauseOnFocus: true,
+                },
+                navigation: {
+                    nextEl: '.next-practitioner',
+                    prevEl: '.prev-practitioner',
+                },
+                breakpoints: {
+                    512: {
+                        slidesPerView: 2.3,
+                        centeredSlides: true,
+                    },
+                    768: {
+                        slidesPerView: 3.3,
+                        centeredSlides: false,
+                    },
+                    1152: {
+                        slidesPerView: 4.3,
+                        centeredSlides: false,
+                    },
+                    1440: {
+                        slidesPerView: 4,
+                        spaceBetween: 80,
+                        centeredSlides: false,
+                    },
+                    1920: {
+                        slidesPerView: 5,
+                        spaceBetween: 80,
+                        centeredSlides: false,
+                    },
+                },
+            });
+        }
+
+        // Testimonial Slider
+        if (document.querySelector('.testimonial-slider')) {
+            new SwiperLib('.testimonial-slider', {
+                slidesPerView: 'auto', // Fluid width to match design
+                spaceBetween: 40,
+                loop: true,
+                speed: 800,
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                },
+                allowTouchMove: true,
+                bgWhite: false,
+                navigation: {
+                    nextEl: '.next-testimonial',
+                    prevEl: '.prev-testimonial',
+                },
+                breakpoints: {
+                    640: {
+                        spaceBetween: 60,
+                    }
+                }
+            });
+        }
+
+        // Service Detail Image Slider
+        if (document.querySelector('.serviceImageSwiper')) {
+            new SwiperLib('.serviceImageSwiper', {
+                slidesPerView: 1,
+                spaceBetween: 0,
+                loop: true,
+                speed: 600,
+                grabCursor: true,
+                autoplay: {
+                    delay: 2000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+            });
+        }
+    }
 
 
 

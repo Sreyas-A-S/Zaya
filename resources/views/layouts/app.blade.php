@@ -72,7 +72,7 @@
 
     @include('partials.frontend.footer')
 
-    <script src="{{ asset('frontend/script.js') }}"></script>
+    <script src="{{ asset('frontend/script.js') }}?v={{ filemtime(public_path('frontend/script.js')) }}"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
