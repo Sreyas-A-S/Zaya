@@ -75,10 +75,10 @@ Route::post('/blog/comment', [WebController::class, 'postComment'])->name('blog.
 Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->name('blog.comments');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
-    Route::resource( '/admins',AdminsController::class);
+    Route::resource('/admins', AdminsController::class);
     Route::get('admin/admins/{id}/edit', [AdminController::class, 'edit']);
     Route::put('admin/admins/{id}', [AdminController::class, 'update']);
-    Route::delete( '/admin/admins/{id}', [AdminsController::class, 'destroy']);
+    Route::delete('/admin/admins/{id}', [AdminsController::class, 'destroy']);
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::resource('countries', CountryController::class);
     Route::resource('doctors', DoctorController::class);
@@ -129,12 +129,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // Services Page Settings
     Route::get('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'index'])->name('services-settings.index');
     Route::post('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'update'])->name('services-settings.update');
-    Route::get('/contact-settings',[\App\Http\Controllers\Admin\ContactusController::class, 'index'])-> name('contact-us.index');
+    Route::get('/contact-settings', [\App\Http\Controllers\Admin\ContactusController::class, 'index'])->name('contact-us.index');
 
 
-    Route::post('/contact-settings/update',[\App\Http\Controllers\Admin\ContactusController::class, 'update'])->name('contact-settings.update');
+    Route::post('/contact-settings/update', [\App\Http\Controllers\Admin\ContactusController::class, 'update'])->name('contact-settings.update');
 
-    });
+});
 
 // Route to run artisan optimize
 Route::get('/optimize', function () {
@@ -174,10 +174,12 @@ Route::prefix('admin')->group(function () {
 
     Route::resource('languages', LanguageController::class);
     Route::get('/admin/languages/{id}', [CountryController::class, 'show']);
-    Route::put( '/admin/languages/{id}', [CountryController::class, 'update']);
-    Route::delete( '/admin/languages/{id}', [CountryController::class, 'destroy']);
+    Route::put('/admin/languages/{id}', [CountryController::class, 'update']);
+    Route::delete('/admin/languages/{id}', [CountryController::class, 'destroy']);
 
 
 });
 
-
+Route::get('/client-profile', function () {
+    return view('client-profile');
+})->name('client-profile');
