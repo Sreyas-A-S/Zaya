@@ -20,31 +20,17 @@
                 </button>
                 <div
                     class="absolute top-full left-0 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden">
-<<<<<<< HEAD
                     <a id="nav-who-we-are" href="{{ route('about-us') }}#who-we-are"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">{{ __('Who we are?') }}</a>
                     <a id="nav-what-we-do" href="{{ route('about-us') }}#what-we-do"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">{{ __('What we do?') }}</a>
                     <a id="nav-our-team" href="{{ route('about-us') }}#our-team"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">{{ __('Our Team') }}</a>
-                    <a id="nav-gallery" href="#" class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">{{ __('Gallery') }}</a>
+                    <a id="nav-gallery" href="{{ route('gallery') }}"
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">{{ __('Gallery') }}</a>
                     <a id="nav-blog" href="{{ route('blogs') }}"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">{{ __('Blog') }}</a>
-=======
-                    <a href="{{ route('about-us') }}#who-we-are"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">Who
-                        we are?</a>
-                    <a href="{{ route('about-us') }}#what-we-do"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">What
-                        we do?</a>
-                    <a href="{{ route('about-us') }}#our-team"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Our
-                        Team</a>
-                    <a href="{{ route('gallery') }}"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Gallery</a>
-                    <a href="{{ route('blogs') }}"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Blog</a>
->>>>>>> origin/Gallery-Page
+                </div>
                 </div>
             </div>
 
@@ -55,38 +41,29 @@
                         class="ri-arrow-down-s-line transition-transform duration-300 group-hover:-rotate-180"></i>
                 </button>
                 <div
-<<<<<<< HEAD
-                    class="absolute top-full left-0 w-56 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden">
-                    <a id="nav-ayurveda" href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">{{ __('Ayurveda') }}</a>
-                    <a id="nav-yoga" href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">{{ __('Yoga') }}</a>
-                    <a id="nav-counselling" href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">{{ __('Counselling') }}</a>
-=======
                     class="absolute top-full -left-8 w-[240px] bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden py-5">
                     <a href="{{ route('services') }}"
                         class="block px-6 pb-4 text-[16px] leading-none font-medium text-gray-800 hover:text-primary transition-colors">Our
                         Specialities</a>
                     <div class="flex flex-col gap-1 pl-3">
-                        <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
+                        <a id="nav-ayurveda" href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
                             class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
-                            <span class="text-gray-400 font-light">&mdash;</span> Ayurveda
+                            <span class="text-gray-400 font-light">&mdash;</span> {{ __('Ayurveda') }}
                         </a>
-                        <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
+                        <a id="nav-yoga" href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
                             class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
-                            <span class="text-gray-400 font-light">&mdash;</span> Yoga
+                            <span class="text-gray-400 font-light">&mdash;</span> {{ __('Yoga') }}
                         </a>
-                        <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
+                        <a id="nav-counselling" href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
                             class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
-                            <span class="text-gray-400 font-light">&mdash;</span> Counselling
+                            <span class="text-gray-400 font-light">&mdash;</span> {{ __('Counselling') }}
                         </a>
-                        <a href="{{ route('services', ['category' => 'Packages']) }}#services-listing"
+                        <a id="nav-packages" href="{{ route('services', ['category' => 'Packages']) }}#services-listing"
                             class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors">
-                            <span class="text-gray-400 font-light">&mdash;</span> Packages
+                            <span class="text-gray-400 font-light">&mdash;</span> {{ __('Packages') }}
                         </a>
                     </div>
->>>>>>> origin/Gallery-Page
+                </div>
                 </div>
             </div>
 
@@ -105,48 +82,29 @@
             <a id="nav-login" href="{{ route('zaya-login') }}"
                 class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors">{{ __('Login') }}</a>
 
-<<<<<<< HEAD
             <a id="nav-find-practitioner" href="#" class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap">{{ __('Find Practitioner') }}</a>
 
             <!-- Language Toggle -->
-            <div class="flex items-center bg-gray-100 rounded-full p-1 border border-gray-200" id="frontend-lang-toggle">
-                @php $currentLocale = app()->getLocale(); @endphp
-                <button
-                    onclick="switchLanguage('en')"
-                    class="{{ $currentLocale == 'en' ? 'bg-primary text-white shadow-sm' : 'text-gray-500 hover:bg-gray-200' }} text-xs font-bold px-3 py-1.5 rounded-full transition-all uppercase">
-                    En
-                </button>
-                <button
-                    onclick="switchLanguage('fr')"
-                    class="{{ $currentLocale == 'fr' ? 'bg-primary text-white shadow-sm' : 'text-gray-500 hover:bg-gray-200' }} text-xs font-bold px-3 py-1.5 rounded-full transition-all uppercase">
-                    Fr
-                </button>
-            </div>
-=======
-            <a href="#"
-                class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap">Find
-                Practitioner</a>
-
-            <!-- Language Toggle -->
-            <button type="button"
+            @php $currentLocale = app()->getLocale(); @endphp
+            <button type="button" id="frontend-lang-toggle"
                 class="relative hidden sm:flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
-                onclick="toggleLanguage()">
+                onclick="switchLanguage('{{ $currentLocale == 'en' ? 'fr' : 'en' }}')">
                 <!-- Sliding Pill -->
                 <div id="lang-toggle-pill"
-                    class="absolute top-1 bottom-1 left-1 w-9 bg-primary rounded-full shadow-sm transition-transform duration-300 ease-in-out translate-x-0">
+                    class="absolute top-1 bottom-1 left-1 w-9 bg-primary rounded-full shadow-sm transition-transform duration-300 ease-in-out {{ $currentLocale == 'fr' ? 'translate-x-full' : 'translate-x-0' }}">
                 </div>
 
                 <span id="lang-text-en"
-                    class="relative z-10 w-9 text-center text-white text-sm font-bold py-1.5 transition-colors duration-300">En</span>
+                    class="relative z-10 w-9 text-center {{ $currentLocale == 'en' ? 'text-white' : 'text-gray-500' }} text-sm font-bold py-1.5 transition-colors duration-300">En</span>
                 <span id="lang-text-fr"
-                    class="relative z-10 w-9 text-center text-gray-500 text-sm font-bold py-1.5 transition-colors duration-300">Fr</span>
+                    class="relative z-10 w-9 text-center {{ $currentLocale == 'fr' ? 'text-white' : 'text-gray-500' }} text-sm font-bold py-1.5 transition-colors duration-300">Fr</span>
             </button>
 
             <!-- User Profile -->
             <a href="#" class="relative block shrink-0 ml-1">
                 @php
                     // NOTE FOR BACKEND: Replace these variables with actual auth/user logic
-                    $mockHasProfilePicture = true; // Toggle to false to see the placeholder design
+                    $mockHasProfilePicture = false; // Toggle to false to see the placeholder design
                     $mockProfilePictureUrl = 'https://i.pravatar.cc/150?img=48'; // Example profile image
                 @endphp
 
@@ -159,24 +117,35 @@
                     @endif
                 </div>
             </a>
->>>>>>> origin/Gallery-Page
         </div>
     </div>
 
     <!-- Script for Dynamic Toggling -->
     <script>
     function switchLanguage(langCode) {
-        // Immediate visual feedback (swap classes)
-        const toggle = document.getElementById('frontend-lang-toggle');
-        const buttons = toggle.querySelectorAll('button');
-        
-        buttons.forEach(btn => {
-            if (btn.innerText.toLowerCase() === langCode.toLowerCase()) {
-                btn.className = 'bg-primary text-white shadow-sm text-xs font-bold px-3 py-1.5 rounded-full transition-all uppercase';
-            } else {
-                btn.className = 'text-gray-500 hover:bg-gray-200 text-xs font-bold px-3 py-1.5 rounded-full transition-all uppercase';
-            }
-        });
+        // Immediate visual feedback (sliding pill and colors)
+        const pill = document.getElementById('lang-toggle-pill');
+        const enText = document.getElementById('lang-text-en');
+        const frText = document.getElementById('lang-text-fr');
+        const toggleBtn = document.getElementById('frontend-lang-toggle');
+
+        if (langCode === 'fr') {
+            pill.classList.add('translate-x-full');
+            pill.classList.remove('translate-x-0');
+            enText.classList.remove('text-white');
+            enText.classList.add('text-gray-500');
+            frText.classList.remove('text-gray-500');
+            frText.classList.add('text-white');
+            toggleBtn.setAttribute('onclick', "switchLanguage('en')");
+        } else {
+            pill.classList.add('translate-x-0');
+            pill.classList.remove('translate-x-full');
+            enText.classList.add('text-white');
+            enText.classList.remove('text-gray-500');
+            frText.classList.add('text-gray-500');
+            frText.classList.remove('text-white');
+            toggleBtn.setAttribute('onclick', "switchLanguage('fr')");
+        }
 
         // Backend switch
         fetch(`/change-language/${langCode}`, {

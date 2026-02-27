@@ -62,13 +62,8 @@
                     {{ $settings['hero_subtitle'] ?? 'Personalized wellness guided by experienced practitioners and trusted holistic experts.' }}
                 </p>
 
-<<<<<<< HEAD
                 <a id="hero_button_text" href="{{ route('about-us') }}"
                     class="bg-white text-primary px-6 py-3 rounded-full text-lg font-medium border border-white hover:bg-primary hover:text-white transition-all shadow-lg hover:shadow-xl">{{ $settings['hero_button_text'] ?? 'Discover Our Story' }}</a>
-=======
-                <a href="{{ route('about-us') }}"
-                    class="bg-white text-primary px-6 py-3 rounded-full text-lg font-normal border border-white hover:bg-primary hover:text-white transition-all shadow-lg hover:shadow-xl">{{ $settings['hero_button_text'] ?? 'Discover Our Story' }}</a>
->>>>>>> origin/Gallery-Page
             </div>
         </div>
     </section>
@@ -86,17 +81,11 @@
             <div class="text-center mb-16 animate-on-scroll">
                 <h2 id="services_title" class="text-4xl md:text-6xl font-serif text-primary mb-7 font-bold">
                     {{ $settings['services_title'] ?? 'Our Services' }}</h2>
-<<<<<<< HEAD
                 <h3 id="services_subtitle" class="text-secondary font-serif text-2xl">
-                    {{ $settings['services_subtitle'] ?? 'Holistic Healing for Mind, Body & Soul' }}</h3>
-                <p id="services_description" class="text-gray-500 text-base mt-6 max-w-lg mx-auto">
-                    {{ $settings['services_description'] ?? 'Explore our specialized Ayurvedic treatments, transformative Yoga therapy and professional Mindfulness counseling. Connect with global experts dedicated to your wellness journey.' }}
-=======
-                <h3 class="text-secondary font-serif text-2xl">
                     {{ $settings['services_subtitle'] ?? 'Holistic Ayurvedic Wellness' }}</h3>
-                <p class="text-gray-500 text-base mt-6 max-w-3xl mx-auto">
+                <p id="services_description" class="text-gray-500 text-base mt-6 max-w-3xl mx-auto">
                     {{ $settings['services_description'] ?? 'Zaya offers experienced practitioner-led holistic wellness services rooted in Ayurveda. Through online consultations, yoga therapy, and mindfulness support, we provide personalized guidance based on natural herbs, diet, and lifestyle—accessible globally through secure, multilingual video consultations.' }}
->>>>>>> origin/Gallery-Page
+                </p>
                 </p>
             </div>
 
@@ -144,11 +133,7 @@
                 </p>
 
                 <div class="mb-20">
-<<<<<<< HEAD
                     <a id="practitioners_browse_btn" href="{{ route('services') }}" class="bg-primary text-white px-8 py-3 rounded-full hover:bg-opacity-90 transition-all font-medium text-lg inline-block shadow-md">
-=======
-                    <a href="{{ route('services') }}" class="bg-primary text-white px-8 py-3 rounded-full hover:bg-opacity-90 transition-all font-normal text-lg inline-block shadow-md">
->>>>>>> origin/Gallery-Page
                         {{ $settings['practitioners_browse_btn'] ?? 'Browse All Practitioners' }}
                     </a>
                 </div>
@@ -258,25 +243,14 @@
     <!-- Join Team Section -->
     <section class="pb-20 md:pb-28 bg-white text-center">
         <div class="container mx-auto px-6 max-w-4xl">
-<<<<<<< HEAD
             <h2 id="cta_title" class="text-3xl md:text-5xl font-serif font-bold text-primary mb-6 animate-on-scroll">
-                {{ $settings['cta_title'] ?? "Let's Embrace Wellness Together" }}</h2>
-            <p id="cta_description" class="text-gray-500 text-base md:text-lg mb-12 leading-relaxed max-w-2xl mx-auto animate-on-scroll"
-=======
-            <h2 class="text-3xl md:text-5xl font-serif font-bold text-primary mb-6 animate-on-scroll">
                 {{ $settings['cta_title'] ?? "Are you a Wellness Practitioner?" }}</h2>
-            <p class="text-gray-500 text-base md:text-lg mb-12 leading-relaxed max-w-xl mx-auto animate-on-scroll"
->>>>>>> origin/Gallery-Page
+            <p id="cta_description" class="text-gray-500 text-base md:text-lg mb-12 leading-relaxed max-w-xl mx-auto animate-on-scroll"
                 style="transition-delay: 100ms;">
                 {{ $settings['cta_description'] ?? 'Join Zaya and become part of a trusted, practitioner-led holistic wellness network. Support your practice with expert collaboration, secure digital tools, and global reach.' }}
             </p>
-<<<<<<< HEAD
             <a id="cta_button_text" href="{{ route('practitioner-register') }}"
                 class="animate-on-scroll border border-secondary text-secondary px-10 py-3 rounded-full hover:bg-secondary hover:text-white transition-all font-medium text-lg">
-=======
-            <a href="{{ route('practitioner-register') }}"
-                class="animate-on-scroll border border-secondary text-secondary px-10 py-3 rounded-full hover:bg-secondary hover:text-white transition-all font-normal text-lg">
->>>>>>> origin/Gallery-Page
                 {{ $settings['cta_button_text'] ?? 'Join as a Practitioner' }}
             </a>
         </div>
