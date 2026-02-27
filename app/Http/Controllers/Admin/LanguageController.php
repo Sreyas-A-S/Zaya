@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HomepageSetting;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
 
 class LanguageController extends Controller
@@ -108,26 +109,37 @@ class LanguageController extends Controller
             'message' => 'Language updated successfully'
         ]);
     }
- public function change($id)
+    public function change($code)
     {
-        // Try to find selected language row
-        $homepage = HomepageSetting::find($id);
-          session(['locale' => $id ?? 'en']);
+        $code = strtolower((string) $code);
+        $normalized = explode('-', $code)[0] ?? $code;
 
-            if (!$homepage) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Language not found'
-                ]);
-            }
+        $language = Language::where('code', $code)
+            ->orWhere('code', $normalized)
+            ->first();
 
-      
-        // dd(session('locale'));
+        if (!$language) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Language not found',
+            ]);
+        }
+
+        $locale = $language->code;
+        if (strpos($locale, '-') !== false) {
+            $locale = explode('-', $locale)[0];
+        }
+
+        Session::put('locale', $locale);
+
+        $settings = HomepageSetting::where('language', $locale)
+            ->pluck('value', 'key');
 
         return response()->json([
             'status' => true,
-            'data' => $homepage
-        ]); 
+            'language' => $locale,
+            'data' => $settings,
+        ]);
     }
     /**
      * Delete language

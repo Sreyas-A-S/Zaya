@@ -10,21 +10,21 @@
             <!-- Left Text -->
             <div>
                 <div class="mb-8 animate-on-scroll">
-                    <span class="bg-accent text-secondary px-8 py-2.5 rounded-full font-medium text-base inline-block">
+                    <span id="services_page_badge" class="bg-accent text-secondary px-8 py-2.5 rounded-full font-medium text-base inline-block">
                         {{ $settings['services_page_badge'] ?? 'Our Services' }}
                     </span>
                 </div>
-                <h1 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-8 leading-tight">
+                <h1 id="services_page_title" class="text-4xl md:text-5xl font-serif font-bold text-primary mb-8 leading-tight">
                     {!! nl2br($settings['services_page_title'] ?? "Embrace Holistic \n Wellness") !!}
                 </h1>
             </div>
 
             <!-- Right Text -->
             <div class="col-span-2 pt-2 lg:pt-4">
-                <h2 class="text-2xl md:text-[28px] font-serif text-secondary mb-6 leading-snug">
+                <h2 id="services_page_subtitle" class="text-2xl md:text-[28px] font-serif text-secondary mb-6 leading-snug">
                     {!! nl2br($settings['services_page_subtitle'] ?? 'Detailed guidance for your journey toward physical vitality, mental clarity and spiritual harmony.') !!}
                 </h2>
-                <p class="text-gray-500 leading-relaxed text-base font-light">
+                <p id="services_page_description" class="text-gray-500 leading-relaxed text-base font-light">
                     {{ $settings['services_page_description'] ?? 'ZAYA Wellness serves as a global bridge for those seeking authentic, expert-led care rooted in traditional Indian wisdom...' }}
                 </p>
             </div>
@@ -47,7 +47,7 @@
             }
             }
             @endphp
-            <img src="{{ $bannerImg }}" alt="Holistic Wellness"
+            <img id="services_page_image" src="{{ $bannerImg }}" alt="Holistic Wellness"
                 class="w-full h-[400px] object-cover align-top scale-110 transition-all duration-1000 group-hover:scale-125">
         </div>
     </div>
@@ -59,26 +59,26 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Stat 1 -->
             <div class="bg-gray-100 py-12 px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
-                <h3 class="text-5xl font-medium !font-sans text-black mb-4">{{ $settings['services_stat_1_count'] ?? '300' }}</h3>
-                <p class="text-gray-500 font-medium text-[15px]">{{ $settings['services_stat_1_label'] ?? 'Sessions Completed' }}</p>
+                <h3 id="services_stat_1_count" class="text-5xl font-medium !font-sans text-black mb-4">{{ $settings['services_stat_1_count'] ?? '300' }}</h3>
+                <p id="services_stat_1_label" class="text-gray-500 font-medium text-[15px]">{{ $settings['services_stat_1_label'] ?? 'Sessions Completed' }}</p>
             </div>
 
             <!-- Stat 2 -->
             <div class="bg-gray-100 py-12 px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
-                <h3 class="text-5xl font-medium !font-sans text-black mb-4">{{ $settings['services_stat_2_count'] ?? '50+' }}</h3>
-                <p class="text-gray-500 font-medium text-[15px]">{{ $settings['services_stat_2_label'] ?? 'Certified Practitioners' }}</p>
+                <h3 id="services_stat_2_count" class="text-5xl font-medium !font-sans text-black mb-4">{{ $settings['services_stat_2_count'] ?? '50+' }}</h3>
+                <p id="services_stat_2_label" class="text-gray-500 font-medium text-[15px]">{{ $settings['services_stat_2_label'] ?? 'Certified Practitioners' }}</p>
             </div>
 
             <!-- Stat 3 -->
             <div class="bg-gray-100 py-12 px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
-                <h3 class="text-5xl font-medium !font-sans text-black mb-4">{{ $settings['services_stat_3_count'] ?? '99%' }}</h3>
-                <p class="text-gray-500 font-medium text-[15px]">{{ $settings['services_stat_3_label'] ?? 'Positive Feedbacks' }}</p>
+                <h3 id="services_stat_3_count" class="text-5xl font-medium !font-sans text-black mb-4">{{ $settings['services_stat_3_count'] ?? '99%' }}</h3>
+                <p id="services_stat_3_label" class="text-gray-500 font-medium text-[15px]">{{ $settings['services_stat_3_label'] ?? 'Positive Feedbacks' }}</p>
             </div>
 
             <!-- Stat 4 -->
             <div class="bg-gray-100 py-12 px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
-                <h3 class="text-5xl font-medium !font-sans text-black mb-4">{{ $settings['services_stat_4_count'] ?? '10' }}</h3>
-                <p class="text-gray-500 font-medium text-[15px]">{{ $settings['services_stat_4_label'] ?? 'Years of Tradition' }}</p>
+                <h3 id="services_stat_4_count" class="text-5xl font-medium !font-sans text-black mb-4">{{ $settings['services_stat_4_count'] ?? '10' }}</h3>
+                <p id="services_stat_4_label" class="text-gray-500 font-medium text-[15px]">{{ $settings['services_stat_4_label'] ?? 'Years of Tradition' }}</p>
             </div>
         </div>
     </div>
@@ -96,7 +96,7 @@
                     @endphp
                     <button type="button" onclick="toggleDropdown()"
                         class="w-full h-[72px] flex items-center justify-between border border-[#D4A58E] rounded-full pl-8 pr-8 bg-white text-[#C5896B] text-lg shadow-sm hover:shadow-md transition-all outline-none focus:ring-1 focus:ring-[#D4A58E] font-sans cursor-pointer">
-                        <span id="selected-category">{{ $currentCategory }}</span>
+                        <span id="selected-category">{{ __($currentCategory) }}</span>
                         <i class="ri-arrow-down-s-line text-2xl transition-transform duration-300"
                             id="dropdown-arrow"></i>
                     </button>
@@ -106,18 +106,18 @@
                     <div id="dropdown-menu"
                         class="absolute top-full left-0 w-full mt-2 bg-white rounded-[2rem] shadow-xl border border-[#efe6e1] overflow-hidden opacity-0 invisible transform -translate-y-2 transition-all duration-300 z-50">
                         <div class="px-2 py-2 my-2 flex flex-col gap-1 max-h-[300px] overflow-y-auto">
-                            <a href="javascript:void(0)" onclick="applyCategoryFilter('', 'All Services')"
-                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">All Services</a>
-                            <a href="javascript:void(0)" onclick="applyCategoryFilter('Ayurveda', 'Ayurveda')"
-                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">Ayurveda</a>
-                            <a href="javascript:void(0)" onclick="applyCategoryFilter('Yoga', 'Yoga')"
-                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">Yoga</a>
-                            <a href="javascript:void(0)" onclick="applyCategoryFilter('Counselling', 'Counselling')"
-                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">Counselling</a>
-                            <a href="javascript:void(0)" onclick="applyCategoryFilter('Mindfulness', 'Mindfulness')"
-                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">Mindfulness</a>
-                            <a href="javascript:void(0)" onclick="applyCategoryFilter('Spiritual Guidance', 'Spiritual Guidance')"
-                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">Spiritual Guidance</a>
+                            <a id="cat-all" href="javascript:void(0)" onclick="applyCategoryFilter('', 'All Services')"
+                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">{{ __('All Services') }}</a>
+                            <a id="cat-ayurveda" href="javascript:void(0)" onclick="applyCategoryFilter('Ayurveda', 'Ayurveda')"
+                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">{{ __('Ayurveda') }}</a>
+                            <a id="cat-yoga" href="javascript:void(0)" onclick="applyCategoryFilter('Yoga', 'Yoga')"
+                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">{{ __('Yoga') }}</a>
+                            <a id="cat-counselling" href="javascript:void(0)" onclick="applyCategoryFilter('Counselling', 'Counselling')"
+                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">{{ __('Counselling') }}</a>
+                            <a id="cat-mindfulness" href="javascript:void(0)" onclick="applyCategoryFilter('Mindfulness', 'Mindfulness')"
+                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">{{ __('Mindfulness') }}</a>
+                            <a id="cat-spiritual" href="javascript:void(0)" onclick="applyCategoryFilter('Spiritual Guidance', 'Spiritual Guidance')"
+                                class="block px-6 py-3 text-[#5A3E31] hover:bg-[#FFFBF5] rounded-xl transition-colors text-base font-medium">{{ __('Spiritual Guidance') }}</a>
                         </div>
                     </div>
                 </div>
@@ -127,7 +127,7 @@
                     <div class="pl-6 pr-4 text-[#C5896B]">
                         <i class="ri-search-line text-2xl"></i>
                     </div>
-                    <input type="text" name="search" id="search-input" value="{{ request('search') }}" placeholder="Search services..."
+                    <input type="text" name="search" id="services-search-input" value="{{ request('search') }}" placeholder="{{ __('Search services...') }}"
                         class="flex-1 outline-none text-[#A67B5B] text-lg bg-transparent placeholder-[#C5896B] font-sans h-full">
                     <button type="submit"
                         class="bg-[#C5896B] hover:bg-[#B07459] cursor-pointer text-white w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-md">

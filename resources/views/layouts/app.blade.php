@@ -67,15 +67,6 @@
     <div id="global-preloader">
         <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="preloader-logo">
     </div>
-    <form id="homepageSettingsForm"
-      action="{{ route('admin.services-settings.update') }}"
-      method="POST">
-
-    @csrf   {{-- ✅ ADD THIS LINE --}}
-
-    <!-- your input fields here -->
-
-</form>
 
     @include('partials.frontend.header')
 
@@ -154,34 +145,6 @@
                 }
             });
         });
-
-        let formData = new FormData(this);
-        formData.append('_token', '{{ csrf_token() }}');
-
-        $('#homepageSettingsForm').on('submit', function(e) {
-    e.preventDefault();
-
-    let formData = new FormData(this);
-    formData.append('_token', '{{ csrf_token() }}'); // ✅ add this
-
-    $.ajax({
-        url: $(this).attr('action'),
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            alert('Saved');
-        }
-    });
-});
-
-$.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
-});
-
     </script>
 
     @stack('scripts')

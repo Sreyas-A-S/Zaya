@@ -7,16 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class HomepageSetting extends Model
 {
 
-      protected $fillable = [
+    protected $fillable = [
+        'key',
+        'value',
+        'type',
+        'section',
+        'max_length',
         'language',
-        'header_title',
-        'header_subtitle',
-        'description',
-
-         'key',
-          'value',
-           'language',
-            'type',
     ];
   
 

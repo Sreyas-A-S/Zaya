@@ -42,6 +42,15 @@ Route::get('register', function () {
 // Public Master Data Quick Add (for registration forms)
 Route::post('master-data/quick-add/{type}', [MasterDataController::class, 'store'])->name('master-data.quick-add');
 
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'fr'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('lang.switch');
+
+Route::post('/change-language/{id}', [LanguageController::class, 'change'])->name('change.language');
+
 Route::get('/', [WebController::class, 'index'])->name('home');
 Route::get('/index', [WebController::class, 'index'])->name('index');
 Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-soon');
@@ -160,8 +169,6 @@ Route::prefix('admin')->group(function () {
     Route::get('/admin/languages/{id}', [CountryController::class, 'show']);
     Route::put( '/admin/languages/{id}', [CountryController::class, 'update']);
     Route::delete( '/admin/languages/{id}', [CountryController::class, 'destroy']);
-    Route::post('/change-language/{id}', [LanguageController::class, 'change'])->name('change.language');
-
     
    
 });
