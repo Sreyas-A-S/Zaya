@@ -133,7 +133,7 @@
                 <a href="{{ route('about-us') }}#who-we-are" class="text-gray-600 text-base">Who we are?</a>
                 <a href="{{ route('about-us') }}#what-we-do" class="text-gray-600 text-base">What we do?</a>
                 <a href="{{ route('about-us') }}#our-team" class="text-gray-600 text-base">Our Team</a>
-                <a href="#" class="text-gray-600 text-base">Gallery</a>
+                <a href="{{ route('gallery') }}" class="text-gray-600 text-base">Gallery</a>
                 <a href="{{ route('blogs') }}" class="text-gray-600 text-base">Blog</a>
             </div>
         </div>
