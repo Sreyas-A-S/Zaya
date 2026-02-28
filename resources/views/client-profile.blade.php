@@ -192,7 +192,7 @@
                         <div class="space-y-6">
                             <!-- Session 1 -->
                             <div
-                                class="flex justify-between items-center pb-6 border-b border-gray-50 last:border-0 last:pb-0">
+                                class="flex flex-wrap gap-2 justify-between items-center pb-6 border-b border-gray-50 last:border-0 last:pb-0">
                                 <div>
                                     <div class="flex items-center space-x-2 mb-1">
                                         <p class="text-sm font-medium text-gray-800">Life Coach</p>
@@ -205,7 +205,7 @@
                                     class="px-5 py-2 bg-[#D1EBE1] text-[#2B4C3B] hover:bg-[#bce0d2] rounded-full text-xs font-semimedium transition-colors">Reschedule</button>
                             </div>
                             <!-- Session 2 -->
-                            <div class="flex justify-between items-center">
+                            <div class="flex flex-wrap gap-2 justify-between items-center">
                                 <div>
                                     <div class="flex items-center space-x-2 mb-1">
                                         <p class="text-sm font-medium text-gray-800">Naturopathy</p>
@@ -325,7 +325,7 @@
                             <h3 class="font-sans! text-base font-medium text-gray-800">Art Therapy</h3>
                             <span class="text-sm text-gray-400">Just now</span>
                         </div>
-                        <div class="flex justify-between items-start">
+                        <div class="flex flex-wrap gap-2 justify-between items-start">
                             <div>
                                 <p class="text-sm text-gray-600 mb-2.5 leading-relaxed">Comment: "Dr. Bennett was
                                     incredibly attentive and provided excellent care."</p>
@@ -340,7 +340,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3 ml-4 shrink-0">
+                            <div class="flex items-center gap-3 ml-auto shrink-0">
                                 <button
                                     class="w-10 h-10 text-lg rounded-full flex items-center justify-center text-[#2B4C3B] hover:bg-gray-50 transition-colors cursor-pointer"><i
                                         class="ri-pencil-line"></i></button>
@@ -357,7 +357,7 @@
                             <h3 class="font-sans! text-base font-medium text-gray-800">Hypnotherapy</h3>
                             <span class="text-sm text-gray-400">2h ago</span>
                         </div>
-                        <div class="flex justify-between items-start">
+                        <div class="flex flex-wrap gap-2 justify-between items-start">
                             <div>
                                 <p class="text-sm text-gray-600 mb-2.5 leading-relaxed">Comment: "The session was
                                     helpful, but the waiting time was a bit long."</p>
@@ -372,7 +372,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3 ml-4 shrink-0">
+                            <div class="flex items-center gap-3 ml-auto shrink-0">
                                 <button
                                     class="w-10 h-10 text-lg rounded-full flex items-center justify-center text-[#2B4C3B] hover:bg-gray-50 transition-colors cursor-pointer"><i
                                         class="ri-pencil-line"></i></button>
@@ -389,7 +389,7 @@
                             <h3 class="font-sans! text-base font-medium text-gray-800">Life Coach</h3>
                             <span class="text-sm text-gray-400">2w ago</span>
                         </div>
-                        <div class="flex justify-between items-start">
+                        <div class="flex flex-wrap gap-2 justify-between items-start">
                             <div>
                                 <p class="text-sm text-gray-600 mb-2.5 leading-relaxed">Comment: "They didn't just
                                     give me supplements; they gave me a lifestyle shift. I'll definitely be booking a
@@ -405,7 +405,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3 ml-4 shrink-0">
+                            <div class="flex items-center gap-3 ml-auto shrink-0">
                                 <button
                                     class="w-10 h-10 text-lg rounded-full flex items-center justify-center text-[#2B4C3B] hover:bg-gray-50 transition-colors cursor-pointer"><i
                                         class="ri-pencil-line"></i></button>
