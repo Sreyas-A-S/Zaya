@@ -45,12 +45,12 @@
                     <div class="flex -flex-wrap items-center gap-3">
                         <a href="#"
                             class="bg-secondary text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-primary transition-all shadow-md flex items-center gap-2">
-                            <span class="text-nowrap">Book a Session</span>
+                            <span class="text-nowrap">{{ $settings['service_detail_book_button_text'] ?? 'Book a Session' }}</span>
                         </a>
                         <button onclick="shareService()"
                             class="rounded-full px-6 py-3 text-[#1D77AE] bg-[#1D77AE]/17 hover:bg-[#1D77AE] hover:text-white transition-all flex items-center justify-center cursor-pointer gap-2">
                             <i class="ri-share-line text-sm"></i>
-                            <span class="text-sm">Share</span>
+                            <span class="text-sm">{{ $settings['service_detail_share_button_text'] ?? 'Share' }}</span>
                         </button>
                     </div>
                 </div>
@@ -175,7 +175,7 @@
                 <div class="sticky top-[150px]">
                     <!-- Header -->
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-sans! font-bold text-secondary">Other Services</h3>
+                        <h3 class="text-xl font-sans! font-bold text-secondary">{{ $settings['service_detail_sidebar_title'] ?? 'Other Services' }}</h3>
                         <a href="{{ route('services') }}" class="text-secondary text-base hover:underline">See all</a>
                     </div>
 
@@ -229,14 +229,13 @@
 <section class="py-16 bg-white">
     <div class="container mx-auto px-6">
         <div class="text-center max-w-2xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-serif font-medium text-primary mb-4">Ready to restore your natural
-                rhythm?</h2>
+            <h2 class="text-3xl md:text-4xl font-serif font-medium text-primary mb-4">{{ $settings['service_detail_cta_title'] ?? 'Ready to restore your natural rhythm?' }}</h2>
             <p class="text-gray-500 mb-8">
-                Join a global community committed to authentic, expert-led wellness.
+                {{ $settings['service_detail_cta_description'] ?? 'Join a global community committed to authentic, expert-led wellness.' }}
             </p>
             <a href="#"
                 class="inline-block bg-secondary text-white px-10 py-4 rounded-full font-medium hover:bg-primary transition-all shadow-lg">
-                Book Your Sessions Now
+                {{ $settings['service_detail_cta_button_text'] ?? 'Book Your Sessions Now' }}
             </a>
         </div>
     </div>

@@ -132,6 +132,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
 
     Route::post('/contact-settings/update',[\App\Http\Controllers\Admin\ContactusController::class, 'update'])->name('contact-settings.update');
    
+    Route::get('/service-settings', [\App\Http\Controllers\Admin\ServiceSettingsController::class, 'index'] )->name('service-settings.index');
+
+    // Update Service Settings (AJAX form submit)
+    Route::post('/service-settings/update',[\App\Http\Controllers\Admin\ServiceSettingsController::class, 'update'])->name('service-settings.update');
+
+
+
     });
 
 // Route to run artisan optimize

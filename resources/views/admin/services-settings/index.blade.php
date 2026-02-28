@@ -60,7 +60,7 @@
             <div class="card">
                 <div class="card-header pb-0 card-no-border">
                     <h3>Manage Services Page Content</h3>
-                    <p>Update content for the Services page, including the banner and statistics.</p>
+                    <p>Update content for the Services page list, including the banner and statistics.</p>
                 </div>
                 <div class="card-body">
                     <form id="servicesSettingsForm" action="{{ route('admin.services-settings.update') }}" method="POST" enctype="multipart/form-data">
@@ -105,7 +105,7 @@
                         </div>
 
                         <div class="card-footer text-end mt-4">
-                            <button type="submit" id="saveSettingsBtn" class="btn btn-primary px-5">Save All Settings</button>
+                            <button type="submit" id="saveSettingsBtn" class="btn btn-primary px-5">Save List Settings</button>
                         </div>
                     </form>
                 </div>
@@ -170,7 +170,7 @@
                     }
                 },
                 complete: function() {
-                    btn.prop('disabled', false).html('Save All Settings');
+                    btn.prop('disabled', false).html('Save List Settings');
                 }
             });
         });

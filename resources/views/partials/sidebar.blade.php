@@ -216,6 +216,8 @@
                   
                     <li> <a href="{{ route('admin.contact-us.index') }}">Contact Us Settings</a></li>
 
+                 <li> <a href="{{ route('admin.service-settings.index') }}">Service Page Settings</a></li>
+
                 </ul>
             </li>
             @endif

@@ -120,10 +120,22 @@ class WebController extends Controller
 
     public function serviceDetail($slug)
     {
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('section', 'services_page')
+            ->where('language', $language)
+            ->pluck('value', 'key');
+            
+        // Fallback to English if no settings found for current language
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('section', 'services_page')
+                ->where('language', 'en')
+                ->pluck('value', 'key');
+        }
+
         $service = \App\Models\Service::with('images')->where('slug', $slug)->where('status', true)->firstOrFail();
         $otherServices = \App\Models\Service::where('slug', '!=', $slug)->where('status', true)->inRandomOrder()->take(4)->get();
 
-        return view('service-detail', compact('service', 'otherServices'));
+        return view('service-detail', compact('service', 'otherServices', 'settings'));
     }
 
     public function bookSession()
