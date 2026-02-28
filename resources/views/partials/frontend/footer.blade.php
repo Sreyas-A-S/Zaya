@@ -20,7 +20,7 @@
         <!-- Main Footer Content -->
         <div class="bg-gradient-to-b from-[#FFE7CF] to-[#DFAF7F] ">
             <div
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 px-6 py-12 sm:px-12 md:px-12 md:py-16 relative">
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 px-6 pt-12 pb-18 sm:px-12 md:px-12 md:py-16 relative">
                 <img src="{{ asset('frontend/assets/MinimalistGreenLeaves.png') }}" alt=""
                     class="absolute bottom-0 left-0 w-100 z-0 pointer-events-none">
                 <!-- Column 1: Logo & Tagline -->

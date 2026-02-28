@@ -4,8 +4,7 @@
 
     <!-- Hero Section -->
     <section class="pt-[144px] md:pt-[150px] pb-12 px-4 md:px-6 bg-white">
-        <div
-            class="container mx-auto relative h-[500px] md:h-[600px] rounded-[3.125rem] overflow-hidden flex items-center justify-center">
+        <div class="container mx-auto relative min-h-[500px] md:min-h-[600px] rounded-3xl overflow-hidden flex items-center justify-center">
             <!-- Background Image Slider -->
             <div class="absolute inset-0 z-0">
                 <div class="swiper heroSlider h-full w-full">
@@ -29,7 +28,7 @@
             </div>
 
             <!-- Content (Static - Does not slide) -->
-            <div class="relative z-20 text-center px-4 max-w-3xl mx-auto animate-on-scroll">
+            <div class="relative z-20 text-center px-4 py-4 max-w-3xl mx-auto animate-on-scroll">
 
                 <!-- Search Bar Mockup -->
                 <div
@@ -55,10 +54,10 @@
                     </button>
                 </div>
 
-                <h1 id="hero_title" class="text-4xl md:text-5xl lg:text-5xl font-serif font-bold text-white mb-4 leading-tight">
+                <h1 id="hero_title" class="text-2xl md:text-5xl lg:text-5xl font-serif font-bold text-white mb-4 leading-tight">
                     {{ $settings['hero_title'] ?? 'Where Indian Wisdom Meets Modern Wellness' }}
                 </h1>
-                <p id="hero_subtitle" class="text-lg md:text-xl text-white/90 font-light  mb-8">
+                <p id="hero_subtitle" class="text-base md:text-xl text-white/90 font-light  mb-8">
                     {{ $settings['hero_subtitle'] ?? 'Personalized wellness guided by experienced practitioners and trusted holistic experts.' }}
                 </p>
 
@@ -115,7 +114,7 @@
 
     <!-- Practitioner Directory -->
     <section id="practitioners" class="pb-20">
-        <div class="container-fluid mx-auto relative mb-16">
+        <div class="container-fluid mx-auto relative mb-16 px-6">
             <!-- Floating Images -->
             <img src="{{ asset('frontend/assets/holy-basil-left.png') }}" alt="Holy Basil"
                 class="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-24 xl:w-46 pointer-events-none animate-on-scroll">
@@ -181,7 +180,7 @@
                         <div class="swiper-slide h-auto">
                             <div class="group relative">
                                 <!-- Image Card -->
-                                <div class="relative h-[400px] overflow-hidden mb-6">
+                                <div class="relative h-[280px] lg:h-[400px] overflow-hidden mb-6">
                                     <img src="{{ $image }}" alt="{{ $name }}" class="w-full h-full object-cover">
 
                                     <!-- Rating Badge -->
@@ -358,7 +357,7 @@
     <section class="py-20 md:pt-28 md:pb-18 bg-white text-center relative overflow-hidden">
         <!-- Decorative Leaf -->
         <img src="{{ asset('frontend/assets/leaf-02.png') }}" alt="Leaf"
-            class="absolute right-0 top-1/3 w-24 md:w-40 pointer-events-none">
+            class="absolute right-0 bottom-0 lg:top-1/3 w-24 md:w-40 pointer-events-none">
 
         <div class="container mx-auto px-6 max-w-4xl relative z-10">
             <h2 id="testimonials_title" class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary mb-8 animate-on-scroll">

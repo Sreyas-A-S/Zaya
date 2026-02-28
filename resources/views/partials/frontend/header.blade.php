@@ -103,7 +103,7 @@
             </button>
 
             <!-- User Profile -->
-            <a href="#" class="relative block shrink-0 ml-1">
+            <a href="#" class="relative shrink-0 ml-1 hidden lg:block">
                 @php
                     // NOTE FOR BACKEND: Replace these variables with actual auth/user logic
                     $mockHasProfilePicture = true; // Toggle to false to see the placeholder design
