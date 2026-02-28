@@ -128,7 +128,6 @@ jobs:
           local-dir: ./
           server-dir: /
           timeout: 900000
-          log-level: verbose
           exclude: |
             vendor/**
             public/admiro/** 
