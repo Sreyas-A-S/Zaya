@@ -35,7 +35,7 @@
                 <div class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></div>
             </div>
             <!-- Profile Avatar -->
-            <img src="https://i.pravatar.cc/150?img=11" alt="Profile"
+            <img src="{{ asset('frontend/assets/practitioner-profile-placeholder.png') }}" alt="Profile"
                 class="w-10 h-10 rounded-full object-cover shadow-sm">
         </div>
     </header>
@@ -98,7 +98,7 @@
             <div class="lg:col-span-8 xl:col-span-9 flex flex-col gap-8">
 
                 <!-- Personal Details Card -->
-                <div class="bg-white rounded-xl p-12 border border-[#2E4B3D]/12 relative">
+                <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12 relative">
                     <button class="absolute top-8 right-8 text-gray-400 hover:text-secondary transition-colors">
                         <i class="ri-pencil-line text-2xl"></i>
                     </button>
@@ -141,7 +141,7 @@
                 </div>
 
                 <!-- Specialities & Conditions Card -->
-                <div class="bg-white rounded-xl p-12 border border-[#2E4B3D]/12">
+                <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12">
                     <!-- Specialities -->
                     <div class="relative mb-8">
                         <button class="absolute top-0 right-0 text-gray-400 hover:text-secondary transition-colors">
@@ -187,26 +187,26 @@
         </div>
 
         <!-- 4 Stats Banner -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 mt-8">
             <div
                 class="bg-white rounded-xl px-4 py-8 flex flex-col items-center justify-center text-center border border-[#2E4B3D]/12">
-                <h3 class="text-5xl font-medium font-sans! text-[#1A1A1A] mb-4">100+</h3>
-                <p class="text-xl text-gray-400 font-normal">Total Sessions</p>
+                <h3 class="text-4xl lg:text-5xl font-medium font-sans! text-[#1A1A1A] mb-4">100+</h3>
+                <p class="text-base lg:text-xl text-gray-400 font-normal">Total Sessions</p>
             </div>
             <div
                 class="bg-white rounded-xl px-4 py-8 flex flex-col items-center justify-center text-center border border-[#2E4B3D]/12">
-                <h3 class="text-5xl font-medium font-sans! text-[#1A1A1A] mb-4">80+</h3>
-                <p class="text-xl text-gray-400 font-normal">Total No.of Clients</p>
+                <h3 class="text-4xl lg:text-5xl font-medium font-sans! text-[#1A1A1A] mb-4">80+</h3>
+                <p class="text-base lg:text-xl text-gray-400 font-normal">Total No.of Clients</p>
             </div>
             <div
                 class="bg-white rounded-xl px-4 py-8 flex flex-col items-center justify-center text-center border border-[#2E4B3D]/12">
-                <h3 class="text-5xl font-medium font-sans! text-[#1A1A1A] mb-4">3</h3>
-                <p class="text-xl text-gray-400 font-normal">Today's Session</p>
+                <h3 class="text-4xl lg:text-5xl font-medium font-sans! text-[#1A1A1A] mb-4">3</h3>
+                <p class="text-base lg:text-xl text-gray-400 font-normal">Today's Session</p>
             </div>
             <div
                 class="bg-white rounded-xl px-4 py-8 flex flex-col items-center justify-center text-center border border-[#2E4B3D]/12">
-                <h3 class="text-5xl font-medium font-sans! text-[#1A1A1A] mb-4">2</h3>
-                <p class="text-xl text-gray-400 font-normal">Upcoming Sessions</p>
+                <h3 class="text-4xl lg:text-5xl font-medium font-sans! text-[#1A1A1A] mb-4">2</h3>
+                <p class="text-base lg:text-xl text-gray-400 font-normal">Upcoming Sessions</p>
             </div>
         </div>
 
@@ -214,7 +214,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
 
             <!-- Services History -->
-            <div class="bg-white rounded-xl p-8 border border-[#2E4B3D]/12 flex flex-col">
+            <div class="bg-white rounded-xl px-5 py-8 lg:p-8 border border-[#2E4B3D]/12 flex flex-col">
                 <h2 class="text-2xl font-medium font-sans! text-[#2B4C3B] mb-8">Services History</h2>
 
                 <div class="flex-1 space-y-6">
@@ -230,9 +230,14 @@
                         <div class="text-sm text-gray-400 hidden sm:block">
                             11:30 AM - 12:30 PM
                         </div>
-                        <div class="w-[120px] text-right">
-                            <span
-                                class="bg-[#38C683] text-white text-sm font-medium px-4 py-1.5 rounded-full inline-block text-center w-full">Completed</span>
+                        <div class="flex flex-col sm:flex-row items-center gap-2">
+                            <div class="text-[10px] sm:text-sm text-gray-400 sm:hidden">
+                                11:30 AM - 12:30 PM
+                            </div>
+                            <div class="w-[100px] sm:w-[120px] text-right">
+                                <span
+                                    class="bg-[#38C683] text-white text-xs sm:text-sm font-normal p-2 sm:px-4 sm:py-1.5 rounded-full inline-block text-center w-full">Completed</span>
+                            </div>
                         </div>
                     </div>
 
@@ -248,9 +253,14 @@
                         <div class="text-sm text-gray-400 hidden sm:block">
                             11:30 AM - 12:30 PM
                         </div>
-                        <div class="w-[120px] text-right">
-                            <span
-                                class="bg-[#38C683] text-white text-sm font-medium px-4 py-1.5 rounded-full inline-block text-center w-full">Completed</span>
+                        <div class="flex flex-col sm:flex-row items-center gap-2">
+                            <div class="text-[10px] sm:text-sm text-gray-400 sm:hidden">
+                                11:30 AM - 12:30 PM
+                            </div>
+                            <div class="w-[100px] sm:w-[120px] text-right">
+                                <span
+                                    class="bg-[#38C683] text-white text-xs sm:text-sm font-normal p-2 sm:px-4 sm:py-1.5 rounded-full inline-block text-center w-full">Completed</span>
+                            </div>
                         </div>
                     </div>
 
@@ -264,11 +274,16 @@
                             </div>
                         </div>
                         <div class="text-sm text-gray-400 hidden sm:block">
-                            10:00 AM - 11:00 AM
+                            11:30 AM - 12:30 PM
                         </div>
-                        <div class="w-[120px] text-right">
-                            <span
-                                class="bg-[#38C683] text-white text-sm font-medium px-4 py-1.5 rounded-full inline-block text-center w-full">Completed</span>
+                        <div class="flex flex-col sm:flex-row items-center gap-2">
+                            <div class="text-[10px] sm:text-sm text-gray-400 sm:hidden">
+                                11:30 AM - 12:30 PM
+                            </div>
+                            <div class="w-[100px] sm:w-[120px] text-right">
+                                <span
+                                    class="bg-[#38C683] text-white text-xs sm:text-sm font-normal p-2 sm:px-4 sm:py-1.5 rounded-full inline-block text-center w-full">Completed</span>
+                            </div>
                         </div>
                     </div>
 
@@ -282,24 +297,28 @@
                             </div>
                         </div>
                         <div class="text-sm text-gray-400 hidden sm:block">
-                            10:00 AM - 11:00 AM
+                            11:30 AM - 12:30 PM
                         </div>
-                        <div class="w-[120px] text-right">
-                            <span
-                                class="bg-[#38C683] text-white text-sm font-medium px-4 py-1.5 rounded-full inline-block text-center w-full">Completed</span>
+                        <div class="flex flex-col sm:flex-row items-center gap-2">
+                            <div class="text-[10px] sm:text-sm text-gray-400 sm:hidden">
+                                11:30 AM - 12:30 PM
+                            </div>
+                            <div class="w-[100px] sm:w-[120px] text-right">
+                                <span
+                                    class="bg-[#38C683] text-white text-xs sm:text-sm font-normal p-2 sm:px-4 sm:py-1.5 rounded-full inline-block text-center w-full">Completed</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-8 text-center pt-2">
-                    <a href="#"
-                        class="text-lg text-gray-400 hover:text-gray-600 transition-colors font-normal">View
+                    <a href="#" class="text-lg text-gray-400 hover:text-gray-600 transition-colors font-normal">View
                         More...</a>
                 </div>
             </div>
 
             <!-- Upcoming Services -->
-            <div class="bg-white rounded-xl p-8 border border-[#2E4B3D]/12">
+            <div class="bg-white rounded-xl px-5 py-8 lg:p-8 border border-[#2E4B3D]/12">
                 <h2 class="text-2xl font-medium font-sans! text-secondary mb-8">Upcoming Services</h2>
 
                 <div class="space-y-6">
@@ -315,9 +334,14 @@
                         <div class="text-sm text-gray-400 hidden sm:block">
                             11:30 AM - 12:30 PM
                         </div>
-                        <div class="w-[120px] text-right">
-                            <span
-                                class="bg-[#38C683] text-white text-sm font-medium px-4 py-1.5 rounded-full inline-block text-center w-full">Confirmed</span>
+                        <div class="flex flex-col sm:flex-row items-center gap-2">
+                            <div class="text-[10px] sm:text-sm text-gray-400 sm:hidden">
+                                11:30 AM - 12:30 PM
+                            </div>
+                            <div class="w-[100px] sm:w-[120px] text-right">
+                                <span
+                                    class="bg-[#38C683] text-white text-xs sm:text-sm font-normal p-2 sm:px-4 sm:py-1.5 rounded-full inline-block text-center w-full">Completed</span>
+                            </div>
                         </div>
                     </div>
 
@@ -331,11 +355,16 @@
                             </div>
                         </div>
                         <div class="text-sm text-gray-400 hidden sm:block">
-                            10:00 AM - 11:00 AM
+                            11:30 AM - 12:30 PM
                         </div>
-                        <div class="w-[120px] text-right">
-                            <span
-                                class="bg-[#38C683] text-white text-[12px] font-medium px-4 py-1.5 rounded-full inline-block text-center w-full">Confirmed</span>
+                        <div class="flex flex-col sm:flex-row items-center gap-2">
+                            <div class="text-[10px] sm:text-sm text-gray-400 sm:hidden">
+                                11:30 AM - 12:30 PM
+                            </div>
+                            <div class="w-[100px] sm:w-[120px] text-right">
+                                <span
+                                    class="bg-[#38C683] text-white text-xs sm:text-sm font-normal p-2 sm:px-4 sm:py-1.5 rounded-full inline-block text-center w-full">Completed</span>
+                            </div>
                         </div>
                     </div>
 
@@ -349,11 +378,16 @@
                             </div>
                         </div>
                         <div class="text-sm text-gray-400 hidden sm:block">
-                            10:00 AM - 11:00 AM
+                            11:30 AM - 12:30 PM
                         </div>
-                        <div class="w-[120px] text-right">
-                            <span
-                                class="bg-[#F04B59] text-white text-sm font-medium px-4 py-1.5 rounded-full inline-block text-center w-full">Cancelled</span>
+                        <div class="flex flex-col sm:flex-row items-center gap-2">
+                            <div class="text-[10px] sm:text-sm text-gray-400 sm:hidden">
+                                11:30 AM - 12:30 PM
+                            </div>
+                            <div class="w-[100px] sm:w-[120px] text-right">
+                                <span
+                                    class="bg-[#F3324C] text-white text-xs sm:text-sm font-normal p-2 sm:px-4 sm:py-1.5 rounded-full inline-block text-center w-full">Cancelled</span>
+                            </div>
                         </div>
                     </div>
 
@@ -367,11 +401,16 @@
                             </div>
                         </div>
                         <div class="text-sm text-gray-400 hidden sm:block">
-                            11:30 AM - 12:30 PM
-                        </div>
-                        <div class="w-[120px] text-right">
-                            <span
-                                class="bg-[#F04B59] text-white text-sm font-medium px-4 py-1.5 rounded-full inline-block text-center w-full">Cancelled</span>
+                                11:30 AM - 12:30 PM
+                            </div>
+                        <div class="flex flex-col sm:flex-row items-center gap-2">
+                            <div class="text-[10px] sm:text-sm text-gray-400 sm:hidden">
+                                11:30 AM - 12:30 PM
+                            </div>
+                            <div class="w-[100px] sm:w-[120px] text-right">
+                                <span
+                                    class="bg-[#F3324C] text-white text-xs sm:text-sm font-normal p-2 sm:px-4 sm:py-1.5 rounded-full inline-block text-center w-full">Cancelled</span>
+                            </div>
                         </div>
                     </div>
 
@@ -385,11 +424,16 @@
                             </div>
                         </div>
                         <div class="text-sm text-gray-400 hidden sm:block">
-                            10:00 AM - 11:00 AM
-                        </div>
-                        <div class="w-[120px] text-right">
-                            <span
-                                class="bg-[#38C683] text-white text-[12px] font-medium px-4 py-1.5 rounded-full inline-block text-center w-full">Confirmed</span>
+                                11:30 AM - 12:30 PM
+                            </div>
+                        <div class="flex flex-col sm:flex-row items-center gap-2">
+                            <div class="text-[10px] sm:text-sm text-gray-400 sm:hidden">
+                                11:30 AM - 12:30 PM
+                            </div>
+                            <div class="w-[100px] sm:w-[120px] text-right">
+                                <span
+                                    class="bg-[#38C683] text-white text-xs sm:text-sm font-normal p-2 sm:px-4 sm:py-1.5 rounded-full inline-block text-center w-full">Completed</span>
+                            </div>
                         </div>
                     </div>
                 </div>
