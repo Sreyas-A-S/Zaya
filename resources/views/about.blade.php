@@ -92,7 +92,8 @@
         </div>
     </section>
 
-    <!-- Core Values Section -->
+    <!-- Core Values Section --> 
+     
     <section class="py-16 md:py-24 bg-white" id="core-values">
         <div class="container mx-auto px-4">
             <!-- Section Header -->
@@ -395,10 +396,11 @@
                         class="ri-arrow-left-line text-3xl"></i></button>
                 <button
                     class="next-testimonial w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer"><i
-                        class="ri-arrow-right-line text-3xl"></i></button>
+                        class="ri-arrow-right-line text-3xl" ></i></button>
             </div>
         </div>
     </section>
+
 
 
 
