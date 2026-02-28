@@ -29,7 +29,7 @@
                     <a href="{{ route('about-us') }}#our-team"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Our
                         Team</a>
-                    <a href="#"
+                    <a href="{{ route('gallery') }}"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Gallery</a>
                     <a href="{{ route('blogs') }}"
                         class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors">Blog</a>
@@ -103,7 +103,7 @@
             </button>
 
             <!-- User Profile -->
-            <a href="#" class="relative block shrink-0 ml-1">
+            <a href="#" class="relative shrink-0 ml-1 hidden lg:block">
                 @php
                     // NOTE FOR BACKEND: Replace these variables with actual auth/user logic
                     $mockHasProfilePicture = true; // Toggle to false to see the placeholder design
@@ -170,9 +170,9 @@
         <a href="{{ route('zaya-login') }}" class="text-lg font-medium text-secondary pb-2">Login</a>
 
         <div class="pt-2">
-            <a href="#"
-                class="block w-full bg-secondary text-white px-6 py-3 rounded-full text-center hover:bg-opacity-90">Book
-                a Practitioner</a>
+            <a href="{{ route('find-practitioner') }}"
+                class="block w-full bg-secondary text-white px-6 py-3 rounded-full text-center hover:bg-opacity-90">Find
+                Practitioner</a>
         </div>
     </div>
 
