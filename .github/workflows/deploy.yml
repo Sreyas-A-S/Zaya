@@ -118,15 +118,20 @@ jobs:
       - name: Clear Application Cache
         run: php artisan cache:clear
 
-      - name: 🚀 SFTP Deploy
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
+      - name: 🚀 FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          username: ${{ secrets.FTP_USERNAME }}
           server: demo.zayawellness.com
+          username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 22
-          local_path: './'
-          remote_path: '/'
-          sftp_only: true
-          rsyncArgs: '--exclude=vendor --exclude=public/admiro --exclude=.env --exclude=storage --exclude=.git'
+          protocol: ftp
+          local-dir: ./
+          server-dir: /
+          timeout: 600000
+          exclude: |
+            vendor/**
+            public/admiro/** 
+            .env
+            storage/**
+            .git/**
 
