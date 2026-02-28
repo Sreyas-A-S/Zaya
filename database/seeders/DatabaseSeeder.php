@@ -32,7 +32,8 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             PractitionerReviewSeeder::class,
             CountriesSeeder::class,
-            HomepageSettingSeeder::class
+            HomepageSettingSeeder::class,
+            ServiceSeeder::class,
         ]);
 
         User::updateOrCreate(
