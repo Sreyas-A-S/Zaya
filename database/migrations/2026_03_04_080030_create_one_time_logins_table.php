@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('one_time_logins', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
             $table->string('token', 128)->unique();
             $table->timestamp('used_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
