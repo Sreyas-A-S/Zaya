@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolePermissionSeeder::class,
+            AdminSeeder::class,
             DoctorSeeder::class,
             PractitionerSeeder::class,
             LanguageSeeder::class,
@@ -32,16 +33,8 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             PractitionerReviewSeeder::class,
             CountriesSeeder::class,
-            HomepageSettingSeeder::class
+            HomepageSettingSeeder::class,
+            FinanceSettingSeeder::class,
         ]);
-
-        User::updateOrCreate(
-            ['email' => 'admin@admin.com'],
-            [
-                'name' => 'Admin User',
-                'password' => Hash::make('password'),
-                'role' => 'admin',
-            ]
-        );
     }
 }

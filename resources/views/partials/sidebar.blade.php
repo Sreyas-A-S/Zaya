@@ -63,7 +63,9 @@
                     @if(auth()->user()->hasPermission('translators-view'))
                     <li> <a href="{{ route('admin.translators.index') }}">Translators</a></li>
                     @endif
+                    @if(auth()->user()->hasPermission('admins-view'))
                     <li> <a href="{{ route('admin.admins.index') }}">Admins</a></li>
+                    @endif
                     @if(auth()->user()->hasPermission('credentials-view'))
                     <li> <a href="{{ route('admin.credentials.index') }}">Credentials</a></li>
                     @endif
@@ -122,6 +124,7 @@
             </li>
             @endif
 
+            @if(auth()->user()->hasPermission('roles-view') || auth()->user()->hasPermission('settings-view') || auth()->user()->hasPermission('master-data-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Setting') }}"></use>
@@ -133,7 +136,9 @@
                     <li> <a href="{{ route('admin.roles.index') }}">Roles</a></li>
                     @endif
 
+                    @if(auth()->user()->hasPermission('settings-view'))
                     <li> <a href="{{ route('admin.general-settings.index') }}">Site Settings</a></li>
+                    @endif
 
                     @if(auth()->user()->hasPermission('master-data-view'))
                     <li>
@@ -215,8 +220,9 @@
                     @endif
                 </ul>
             </li>
+            @endif
 
-            @if(auth()->user()->hasPermission('home-page-view') || auth()->user()->hasPermission('about-page-view') || auth()->user()->hasPermission('services-page-view'))
+            @if(auth()->user()->hasPermission('home-page-view') || auth()->user()->hasPermission('about-page-view') || auth()->user()->hasPermission('services-page-view') || auth()->user()->hasPermission('settings-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Document') }}"></use>
@@ -234,7 +240,9 @@
                     <li> <a href="{{ route('admin.services-settings.index') }}">Services Page Settings</a></li>
                     @endif
                   
+                    @if(auth()->user()->hasPermission('settings-view'))
                     <li> <a href="{{ route('admin.contact-us.index') }}">Contact Us Settings</a></li>
+                    @endif
 
                 </ul>
             </li>

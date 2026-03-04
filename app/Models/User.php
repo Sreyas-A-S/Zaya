@@ -86,11 +86,20 @@ class User extends Authenticatable implements JWTSubject
      */
     public function roleData()
     {
-        // Some users might have 'admin' but Role name is 'Super Admin'? 
-        // We'll need a mapping or ensure they match.
-        // For now, let's assume a mapping for common roles if they don't match exactly.
         $roleName = $this->role;
-        if ($roleName === 'admin') $roleName = 'Super Admin';
+        
+        $mapping = [
+            'super-admin' => 'Super Admin',
+            'admin' => 'Admin',
+            'country-admin' => 'Country Admin',
+            'financial-manager' => 'Financial Manager',
+            'content-manager' => 'Content Manager',
+            'user-manager' => 'User Manager',
+        ];
+
+        if (isset($mapping[$roleName])) {
+            $roleName = $mapping[$roleName];
+        }
 
         return Role::where('name', $roleName)->first();
     }

@@ -27,7 +27,7 @@ class PractitionerSeeder extends Seeder
             $user = User::create([
                 'name' => $firstName . ' ' . $lastName,
                 'email' => $faker->unique()->safeEmail(),
-                'password' => Hash::make('password123'),
+                'password' => Hash::make('password'),
                 'role' => 'practitioner',
                 'email_verified_at' => now(),
             ]);
