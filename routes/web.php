@@ -74,6 +74,8 @@ Route::post('/blog/like', [WebController::class, 'toggleLike'])->name('blog.like
 Route::post('/blog/comment', [WebController::class, 'postComment'])->name('blog.comment');
 Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->name('blog.comments');
 
+Route::get('magic-login', [\App\Http\Controllers\Auth\MagicLoginController::class, 'login'])->name('magic.login');
+
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource('/admins', AdminsController::class);
     Route::get('admin/admins/{id}/edit', [AdminController::class, 'edit']);
@@ -106,6 +108,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::resource('services', ServiceController::class);
     Route::post('services/{id}/status', [ServiceController::class, 'updateStatus'])->name('services.status');
     Route::delete('services/image/{id}', [ServiceController::class, 'deleteGalleryImage'])->name('services.delete-image');
+
+    Route::resource('packages', \App\Http\Controllers\Admin\PackageController::class);
+    Route::post('packages/{id}/status', [\App\Http\Controllers\Admin\PackageController::class, 'updateStatus'])->name('packages.status');
+
+    Route::get('other-fees', [\App\Http\Controllers\Admin\FinanceSettingController::class, 'index'])->name('other-fees.index');
+    Route::post('other-fees', [\App\Http\Controllers\Admin\FinanceSettingController::class, 'update'])->name('other-fees.update');
+
+    Route::get('credentials', [\App\Http\Controllers\Admin\CredentialController::class, 'index'])->name('credentials.index');
+    Route::post('credentials/{id}/password', [\App\Http\Controllers\Admin\CredentialController::class, 'updatePassword'])->name('credentials.update-password');
+    Route::post('credentials/{id}/generate-link', [\App\Http\Controllers\Admin\CredentialController::class, 'generateLoginLink'])->name('credentials.generate-link');
+    
     Route::post('doctors/delete-certificate/{id}', [DoctorController::class, 'deleteCertificate'])->name('doctors.delete-certificate');
 
     // Reviews

@@ -64,7 +64,7 @@
                     <li> <a href="{{ route('admin.translators.index') }}">Translators</a></li>
                     @endif
                     <li> <a href="{{ route('admin.admins.index') }}">Admins</a></li>
-
+                    <li> <a href="{{ route('admin.credentials.index') }}">Credentials</a></li>
                 </ul>
             </li>
             @endif
@@ -89,10 +89,28 @@
             </li>
             @endif
 
+            @if(auth()->user()->hasPermission('packages-view') || auth()->user()->hasPermission('other-fees-view'))
+            <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Wallet') }}"></use>
+                    </svg>
+                    <h6 class="f-w-600">Finance</h6><i class="iconly-Arrow-Right-2 icli"> </i>
+                </a>
+                <ul class="sidebar-submenu">
+                    @if(auth()->user()->hasPermission('packages-view'))
+                    <li> <a href="{{ route('admin.packages.index') }}">Packages</a></li>
+                    @endif
+                    @if(auth()->user()->hasPermission('other-fees-view'))
+                    <li> <a href="{{ route('admin.other-fees.index') }}">Other Fees</a></li>
+                    @endif
+                </ul>
+            </li>
+            @endif
+
             @if(auth()->user()->hasPermission('practitioner-reviews-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
-                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Star') }}"></use>
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#star') }}"></use>
                     </svg>
                     <h6 class="f-w-600">Reviews</h6><i class="iconly-Arrow-Right-2 icli"> </i>
                 </a>
