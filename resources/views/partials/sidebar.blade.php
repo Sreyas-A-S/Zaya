@@ -64,7 +64,9 @@
                     <li> <a href="{{ route('admin.translators.index') }}">Translators</a></li>
                     @endif
                     <li> <a href="{{ route('admin.admins.index') }}">Admins</a></li>
+                    @if(auth()->user()->hasPermission('credentials-view'))
                     <li> <a href="{{ route('admin.credentials.index') }}">Credentials</a></li>
+                    @endif
                 </ul>
             </li>
             @endif

@@ -75,6 +75,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(YogaTherapist::class);
     }
 
+    public function nationality()
+    {
+        return $this->belongsTo(Country::class, 'national_id');
+    }
+
     /**
      * Get the role associated with the user based on the 'role' string.
      * Note: This assumes users.role matches roles.name (case sensitive or needs mapping).

@@ -27,6 +27,7 @@ class RolePermissionSeeder extends Seeder
             'Services' => ['view', 'create', 'edit', 'delete', 'assign-engineer'],
             'Packages' => ['view', 'create', 'edit', 'delete', 'update-status'],
             'Other Fees' => ['view', 'create', 'edit', 'delete', 'update-status'],
+            'Credentials' => ['view', 'edit'],
             'Master Data' => ['view', 'create', 'edit', 'delete'],
             'Testimonials' => ['view', 'create', 'edit', 'delete'],
             'Practitioner Reviews' => ['view', 'delete'],

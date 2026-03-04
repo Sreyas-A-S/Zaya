@@ -8,6 +8,12 @@ use App\Models\HomepageSetting;
 
 class FinanceSettingController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:other-fees-view')->only('index');
+        $this->middleware('permission:other-fees-edit')->only('update');
+    }
+
     public function index()
     {
         $settings = HomepageSetting::where('section', 'finance')->get();

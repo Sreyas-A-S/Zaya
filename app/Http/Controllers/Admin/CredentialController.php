@@ -12,6 +12,12 @@ use Illuminate\Support\Str;
 
 class CredentialController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:credentials-view')->only('index');
+        $this->middleware('permission:credentials-edit')->only(['updatePassword', 'generateLoginLink']);
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
