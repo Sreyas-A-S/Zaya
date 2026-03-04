@@ -63,11 +63,28 @@
                     @if(auth()->user()->hasPermission('translators-view'))
                     <li> <a href="{{ route('admin.translators.index') }}">Translators</a></li>
                     @endif
-                    <li> <a href="{{ route('admin.admins.index') }}">Admins</a></li>
+                    
 
                 </ul>
             </li>
             @endif
+            <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Profile') }}"></use>
+                    </svg>
+                    <h6 class="f-w-600">Backend Users</h6><i class="iconly-Arrow-Right-2 icli"> </i>
+                </a>
+                <ul class="sidebar-submenu">
+                    @if(auth()->user()->hasPermission('admins-view'))
+                    <li> <a href="{{ route('admin.admins.index') }}">Admins</a></li>
+                    <li> <a href="{{ route('admin.finance-managers.index') }}">Finance Manager</a></li>
+                    <li> <a href="{{ route('admin.content-managers.index') }}">Content Manager</a></li>
+                    <li> <a href="{{ route('admin.user-managers.index') }}">User Manager</a></li>
+              
+
+                    @endif
+                </ul>
+            </li>
 
             @if(auth()->user()->hasPermission('testimonials-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="{{ route('admin.testimonials.index') }}">
@@ -183,12 +200,12 @@
                         </ul>
                     </li>
                     <li>
-                            <a href="{{ route('countries.index') }}">Countries</a>
+                            <a href="{{ route('admin.countries.index') }}">Countries</a>
                            
                         </a>
                     </li>
                     <li>
-                            <a href="{{ route('languages.index') }}">Languages</a>
+                            <a href="{{ route('admin.languages.index') }}">Languages</a>
                            
                         </a>
                     </li>
