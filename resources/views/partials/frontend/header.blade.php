@@ -1,6 +1,6 @@
 <!-- Header -->
-<header class="fixed w-full top-0 z-50 transition-all duration-300 py-8 bg-white">
-    <div class="container mx-auto px-4 lg:px-6 flex justify-between items-center relative">
+<header class="fixed w-full top-0 z-50 transition-all duration-300 py-8 px-4 bg-white">
+    <div class="container mx-auto flex justify-between items-center relative">
 
         <!-- Mobile Toggle (Visible on Mobile) -->
         <button id="mobile-menu-btn" class="lg:hidden text-2xl text-secondary focus:outline-none">
@@ -9,7 +9,7 @@
 
         <!-- Left Nav (Desktop) -->
         <nav
-            class="hidden lg:flex items-center gap-6 lg:gap-8 text-base lg:text-lg font-medium flex-1 justify-start text-gray-700">
+            class="hidden lg:flex items-center gap-6 xl:gap-8 text-base lg:text-lg font-medium flex-1 justify-start text-gray-700">
             <a href="{{ route('index') }}" class="hover:text-primary transition-colors">Home</a>
 
             <!-- About Us Dropdown -->
@@ -79,7 +79,7 @@
         </a>
 
         <!-- Right Actions (Desktop) -->
-        <div class="flex items-center gap-6 lg:gap-8 justify-end flex-1">
+        <div class="flex items-center gap-6 xl:gap-8 justify-end flex-1">
             <a href="{{ route('zaya-login') }}"
                 class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors">Login</a>
 
@@ -103,7 +103,7 @@
             </button>
 
             <!-- User Profile -->
-            <a href="#" class="relative shrink-0 ml-1 hidden lg:block">
+            <a href="#" class="relative shrink-0 ml-1 hidden">
                 @php
                     // NOTE FOR BACKEND: Replace these variables with actual auth/user logic
                     $mockHasProfilePicture = true; // Toggle to false to see the placeholder design
@@ -144,22 +144,22 @@
                 <a href="{{ route('services') }}"
                     class="text-base font-medium text-gray-800 hover:text-primary transition-colors inline-block mt-1">Our
                     Specialities</a>
-                <div class="pl-2 flex flex-col gap-2 mt-1 mb-2">
+                <div class="flex flex-col gap-2">
                     <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
                         class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
-                        <span class="text-gray-800 font-light">&mdash;</span> Ayurveda
+                        Ayurveda
                     </a>
                     <a href="{{ route('services', ['category' => 'Yoga']) }}#services-listing"
                         class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
-                        <span class="text-gray-800 font-light">&mdash;</span> Yoga
+                        Yoga
                     </a>
                     <a href="{{ route('services', ['category' => 'Counselling']) }}#services-listing"
                         class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
-                        <span class="text-gray-800 font-light">&mdash;</span> Counselling
+                        Counselling
                     </a>
                     <a href="{{ route('services', ['category' => 'Packages']) }}#services-listing"
                         class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors">
-                        <span class="text-gray-800 font-light">&mdash;</span> Packages
+                        Packages
                     </a>
                 </div>
             </div>
