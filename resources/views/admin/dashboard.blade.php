@@ -30,13 +30,50 @@
         </div>
         <div class="card-body">
         <div class="d-flex align-center">
-            <h1>Hello, Amirreza  <img src="{{ asset('admiro/assets/images/dashboard-1/hand.png') }}" alt=""/></h1>
+            <h1>Hello, {{ $user->first_name ?: $user->name }} <img src="{{ asset('admiro/assets/images/dashboard-1/hand.png') }}" alt=""/></h1>
         </div>
-        <p> Welcome back! Let’s start from where you left.</p>
-        <div class="d-flex align-center justify-content-between"><a class="btn btn-pill btn-primary" href="">Whats New!</a><span> 
+        <p class="mb-4">Welcome back! Let’s start from where you left.</p>
+        
+        <div class="d-flex flex-wrap gap-4 mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <div class="flex-shrink-0 bg-light-primary p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <svg class="stroke-icon stroke-primary" style="width: 20px; height: 20px;">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Location') }}"></use>
+                    </svg>
+                </div>
+                <div>
+                    <h6 class="mb-0 text-muted f-w-600" style="font-size: 12px;">Nationality</h6>
+                    @if($user->nationality)
+                        <span class="f-w-700 text-dark">{{ $user->nationality->name }}</span>
+                    @else
+                        <span class="text-muted f-w-500" style="font-size: 13px;">Not specified</span>
+                    @endif
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <div class="flex-shrink-0 bg-light-secondary p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <svg class="stroke-icon stroke-secondary" style="width: 20px; height: 20px;">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Chat') }}"></use>
+                    </svg>
+                </div>
+                <div>
+                    <h6 class="mb-0 text-muted f-w-600" style="font-size: 12px;">Languages</h6>
+                    <div class="d-flex flex-wrap gap-1 mt-1">
+                        @forelse($myLanguages as $lang)
+                            <span class="badge badge-light-secondary">{{ $lang->name }}</span>
+                        @empty
+                            <span class="text-muted f-w-500" style="font-size: 13px;">Not specified</span>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex align-center justify-content-between mt-auto"><a class="btn btn-pill btn-primary" href="">Whats New!</a><span> 
             <svg class="stroke-icon">
                 <use href="{{ asset('admiro/assets/svg/icon-sprite.svg#watch') }}"></use>
-            </svg> 11:14 AM</span></div>
+            </svg> {{ date('h:i A') }}</span></div>
         </div>
     </div>
     </div>

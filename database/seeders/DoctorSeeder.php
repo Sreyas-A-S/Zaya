@@ -31,7 +31,7 @@ class DoctorSeeder extends Seeder
             $user = User::create([
                 'name' => 'Dr. ' . $name,
                 'email' => $faker->unique()->safeEmail(),
-                'password' => Hash::make('password123'),
+                'password' => Hash::make('password'),
                 'role' => 'doctor',
                 'email_verified_at' => now(),
             ]);
