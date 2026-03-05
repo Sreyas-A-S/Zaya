@@ -63,8 +63,12 @@
                     @if(auth()->user()->hasPermission('translators-view'))
                     <li> <a href="{{ route('admin.translators.index') }}">Translators</a></li>
                     @endif
+                    @if(auth()->user()->hasPermission('admins-view'))
                     <li> <a href="{{ route('admin.admins.index') }}">Admins</a></li>
-
+                    @endif
+                    @if(auth()->user()->hasPermission('credentials-view'))
+                    <li> <a href="{{ route('admin.credentials.index') }}">Credentials</a></li>
+                    @endif
                 </ul>
             </li>
             @endif
@@ -89,10 +93,28 @@
             </li>
             @endif
 
+            @if(auth()->user()->hasPermission('packages-view') || auth()->user()->hasPermission('other-fees-view'))
+            <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Wallet') }}"></use>
+                    </svg>
+                    <h6 class="f-w-600">Finance</h6><i class="iconly-Arrow-Right-2 icli"> </i>
+                </a>
+                <ul class="sidebar-submenu">
+                    @if(auth()->user()->hasPermission('packages-view'))
+                    <li> <a href="{{ route('admin.packages.index') }}">Packages</a></li>
+                    @endif
+                    @if(auth()->user()->hasPermission('other-fees-view'))
+                    <li> <a href="{{ route('admin.other-fees.index') }}">Other Fees</a></li>
+                    @endif
+                </ul>
+            </li>
+            @endif
+
             @if(auth()->user()->hasPermission('practitioner-reviews-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
-                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Star') }}"></use>
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#star') }}"></use>
                     </svg>
                     <h6 class="f-w-600">Reviews</h6><i class="iconly-Arrow-Right-2 icli"> </i>
                 </a>
@@ -102,6 +124,7 @@
             </li>
             @endif
 
+            @if(auth()->user()->hasPermission('roles-view') || auth()->user()->hasPermission('settings-view') || auth()->user()->hasPermission('master-data-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Setting') }}"></use>
@@ -113,7 +136,9 @@
                     <li> <a href="{{ route('admin.roles.index') }}">Roles</a></li>
                     @endif
 
+                    @if(auth()->user()->hasPermission('settings-view'))
                     <li> <a href="{{ route('admin.general-settings.index') }}">Site Settings</a></li>
+                    @endif
 
                     @if(auth()->user()->hasPermission('master-data-view'))
                     <li>
@@ -195,8 +220,9 @@
                     @endif
                 </ul>
             </li>
+            @endif
 
-            @if(auth()->user()->hasPermission('home-page-view') || auth()->user()->hasPermission('about-page-view') || auth()->user()->hasPermission('services-page-view'))
+            @if(auth()->user()->hasPermission('home-page-view') || auth()->user()->hasPermission('about-page-view') || auth()->user()->hasPermission('services-page-view') || auth()->user()->hasPermission('settings-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Document') }}"></use>
@@ -214,7 +240,9 @@
                     <li> <a href="{{ route('admin.services-settings.index') }}">Services Page Settings</a></li>
                     @endif
                   
+                    @if(auth()->user()->hasPermission('settings-view'))
                     <li> <a href="{{ route('admin.contact-us.index') }}">Contact Us Settings</a></li>
+                    @endif
 
                 </ul>
             </li>

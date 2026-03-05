@@ -14,7 +14,15 @@ use Yajra\DataTables\DataTables;
 
 class AdminsController extends Controller
 {
-        public function index(Request $request)
+    public function __construct()
+    {
+        $this->middleware('permission:admins-view')->only(['index', 'show']);
+        $this->middleware('permission:admins-create')->only(['create', 'store']);
+        $this->middleware('permission:admins-edit')->only(['edit', 'update']);
+        $this->middleware('permission:admins-delete')->only('destroy');
+    }
+
+    public function index(Request $request)
 {
     if ($request->ajax()) {
 

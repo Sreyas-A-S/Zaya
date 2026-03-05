@@ -45,7 +45,9 @@ class LoginController extends Controller
         ]);
 
         if (auth()->attempt($request->only('email', 'password'), $request->remember)) {
-            if (auth()->user()->role === 'admin') {
+            $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
+
+            if (in_array(auth()->user()->role, $adminRoles)) {
                 return redirect()->intended('/admin');
             }
 
