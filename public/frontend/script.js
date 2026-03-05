@@ -74,10 +74,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (SwiperLib) {
         // Hero Background Image Slider
         if (document.querySelector('.heroSlider')) {
+            const slidesCount = document.querySelectorAll('.heroSlider .swiper-slide').length;
             new SwiperLib('.heroSlider', {
                 slidesPerView: 1,
                 spaceBetween: 0,
-                loop: true,
+                loop: slidesCount > 1,
                 speed: 1000,
                 effect: 'fade',
                 fadeEffect: {
@@ -91,10 +92,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (document.querySelector('.practitioner-slider')) {
+            const slidesCount = document.querySelectorAll('.practitioner-slider .swiper-slide').length;
             new SwiperLib('.practitioner-slider', {
                 slidesPerView: 1.5,
                 spaceBetween: 40,
-                loop: true,
+                loop: slidesCount > 5, // Only loop if more than max slidesPerView
                 centeredSlides: true,
                 autoplay: {
                     delay: 3500,
@@ -134,10 +136,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Testimonial Slider
         if (document.querySelector('.testimonial-slider')) {
+            const slidesCount = document.querySelectorAll('.testimonial-slider .swiper-slide').length;
             new SwiperLib('.testimonial-slider', {
                 slidesPerView: 'auto', // Fluid width to match design
                 spaceBetween: 40,
-                loop: true,
+                loop: slidesCount > 3, // Basic check for auto slides
                 speed: 800,
                 autoplay: {
                     delay: 3000,
@@ -160,10 +163,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Service Detail Image Slider
         if (document.querySelector('.serviceImageSwiper')) {
+            const slidesCount = document.querySelectorAll('.serviceImageSwiper .swiper-slide').length;
             new SwiperLib('.serviceImageSwiper', {
                 slidesPerView: 1,
                 spaceBetween: 0,
-                loop: true,
+                loop: slidesCount > 1,
                 speed: 600,
                 grabCursor: true,
                 autoplay: {

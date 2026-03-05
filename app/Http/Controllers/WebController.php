@@ -106,12 +106,13 @@ class WebController extends Controller
     public function findPractitioner()
     {
         $settings = \App\Models\HomepageSetting::pluck('value', 'key');
-        return view('find-practitioner', compact('settings'));
+        $practitioners = \App\Models\Practitioner::with(['user', 'reviews'])->where('status', 'active')->get();
+        return view('find-practitioner', compact('settings', 'practitioners'));
     }
 
-    public function practitionerDetail($id)
+    public function practitionerDetail($slug)
     {
-        $practitioner = \App\Models\Practitioner::with(['user', 'reviews'])->findOrFail($id);
+        $practitioner = \App\Models\Practitioner::with(['user', 'reviews'])->where('slug', $slug)->firstOrFail();
         return view('practitioner-detail', compact('practitioner'));
     }
 
@@ -120,9 +121,10 @@ class WebController extends Controller
         return view('zaya-login');
     }
 
-    public function clientRegister()
+    public function clientRegister(Request $request)
     {
-        return view('client-register');
+        $redirect = $request->query('redirect');
+        return view('client-register', compact('redirect'));
     }
 
     public function practitionerRegister()
@@ -179,9 +181,48 @@ class WebController extends Controller
         return view('service-detail', compact('service', 'otherServices'));
     }
 
-    public function bookSession()
+    public function bookSession(Request $request, $practitioner = null)
     {
-        return view('book-session');
+        $practitioners = \App\Models\Practitioner::with(['user', 'reviews'])->where('status', 'active')->get();
+        $selectedPractitioner = null;
+
+        if ($practitioner) {
+            $selectedPractitioner = \App\Models\Practitioner::with(['user', 'reviews'])->where('slug', $practitioner)->first();
+        }
+
+        if (!$selectedPractitioner && $request->filled('practitioner_id')) {
+            $selectedPractitioner = \App\Models\Practitioner::with(['user', 'reviews'])->find($request->practitioner_id);
+        }
+
+        if (!$selectedPractitioner && $practitioners->isNotEmpty()) {
+            $selectedPractitioner = $practitioners->first();
+        }
+
+        // Filter services based on selected practitioner
+        $practitionerServices = [];
+        if ($selectedPractitioner) {
+            $practitionerServices = array_merge(
+                $selectedPractitioner->consultations ?? [],
+                $selectedPractitioner->body_therapies ?? [],
+                $selectedPractitioner->other_modalities ?? []
+            );
+        }
+
+        if (!empty($practitionerServices)) {
+            $services = \App\Models\Service::where('status', true)
+                ->whereIn('title', $practitionerServices)
+                ->get();
+            
+            // If some modalities don't have a matching Service entry, we might want to create "virtual" services or just skip.
+            // For now, let's also pass the raw list to allow future flexibility.
+        } else {
+            $services = \App\Models\Service::where('status', true)->get();
+        }
+
+        $languages = \App\Models\Language::all();
+        $consultationPreferences = \App\Models\ClientConsultationPreference::all();
+
+        return view('book-session', compact('practitioners', 'selectedPractitioner', 'services', 'languages', 'consultationPreferences'));
     }
 
     public function contactUs()

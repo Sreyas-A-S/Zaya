@@ -58,6 +58,7 @@ class PractitionerSeeder extends Seeder
                 'languages_spoken' => $faker->randomElements(['English', 'Hindi', 'Marathi'], 2),
                 'can_translate_english' => $faker->boolean(),
                 'profile_bio' => $faker->paragraph(),
+                'status' => 'active',
             ]);
 
             // Add some qualifications
