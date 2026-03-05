@@ -127,13 +127,15 @@ class AdminsController extends Controller
     }
 
     User::create([
+        'name'        => $request->firstname . ' ' . $request->lastname,
         'profile_pic' => $imagePath,
-        'firstname'   => $request->firstname,
-        'lastname'    => $request->lastname,
+        'first_name'  => $request->firstname,
+        'last_name'   => $request->lastname,
         'email'       => $request->email,
-        'country'     => $request->country,
-        'language'    => $request->language,
+        'national_id' => $request->country,
+        'languages'   => $request->language, // Assuming single selected language ID
         'password'    => Hash::make($request->password),
+        'role'        => 'admin',
     ]);
 
     return redirect()->back()->with('success', 'User created successfully.');

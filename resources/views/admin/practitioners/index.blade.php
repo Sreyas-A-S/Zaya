@@ -117,46 +117,46 @@
                                             <div id="current-profile-photo" class="d-none"></div>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">First Name</label>
-                                            <input type="text" class="form-control" name="first_name" required>
+                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="first_name" required pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="First Name">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Last Name</label>
-                                            <input type="text" class="form-control" name="last_name" required>
+                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="last_name" required pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="Last Name">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Email Address</label>
-                                            <input type="email" class="form-control" name="email" required>
+                                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                            <input type="email" class="form-control" name="email" required placeholder="Email Address">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Password <span class="small text-muted" id="password-hint">(New Only)</span></label>
+                                            <label class="form-label">Password <span class="text-danger">*</span> <span class="small text-muted" id="password-hint">(New Only)</span></label>
                                             <input type="password" class="form-control" name="password" id="password-input">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Confirm Password</label>
+                                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                             <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input">
                                             <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label">Gender</label>
-                                            <select class="form-select" name="gender">
-                                                <option value="">Select Gender</option>
+                                            <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="gender" required>
+                                                <option value="" disabled selected>Select Gender</option>
                                                 <option value="male">Male</option>
                                                 <option value="female">Female</option>
                                                 <option value="other">Other</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label">Date of Birth</label>
-                                            <input type="date" class="form-control" name="dob">
+                                            <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" name="dob" max="{{ date('Y-m-d', strtotime('-1 day')) }}" required>
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label">Nationality</label>
-                                            <input type="text" class="form-control" name="nationality">
+                                            <label class="form-label">Nationality <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="nationality" required pattern="^[a-zA-Z\s]+$" title="Only letters and spaces allowed" placeholder="Nationality">
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label">Phone Number</label>
-                                            <input type="text" class="form-control" name="phone">
+                                            <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="phone" required  pattern="^\+\d{1,3}\s\d{10,15}$" title="Phone number must contain 10 to 15 digits" placeholder="Phone Number">
                                         </div>
                                         <div class="col-12 mt-3">
                                             <h6 class="f-w-600 mb-3">Address Information</h6>
@@ -179,7 +179,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
+                                            <input type="text" class="form-control" name="zip_code" required  pattern="^[A-Za-z0-9\s\-]{3,10}$" placeholder="Pincode">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Country <span class="text-danger">*</span></label>

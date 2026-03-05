@@ -95,8 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const slidesCount = document.querySelectorAll('.practitioner-slider .swiper-slide').length;
             new SwiperLib('.practitioner-slider', {
                 slidesPerView: 1.5,
-                spaceBetween: 40,
-                loop: slidesCount > 5, // Only loop if more than max slidesPerView
+                spaceBetween: 20,
+                loop: true,
                 centeredSlides: true,
                 autoplay: {
                     delay: 3500,
@@ -113,16 +113,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         centeredSlides: true,
                     },
                     768: {
-                        slidesPerView: 3.3,
+                        slidesPerView: 3,
                         centeredSlides: false,
                     },
                     1152: {
-                        slidesPerView: 4.3,
+                        slidesPerView: 4,
                         centeredSlides: false,
                     },
                     1440: {
-                        slidesPerView: 4,
-                        spaceBetween: 80,
+                        slidesPerView: 4.4,
+                        spaceBetween: 40,
                         centeredSlides: false,
                     },
                     1920: {
@@ -138,9 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.querySelector('.testimonial-slider')) {
             const slidesCount = document.querySelectorAll('.testimonial-slider .swiper-slide').length;
             new SwiperLib('.testimonial-slider', {
-                slidesPerView: 'auto', // Fluid width to match design
+                slidesPerView: '1', // Fluid width to match design
                 spaceBetween: 40,
-                loop: slidesCount > 3, // Basic check for auto slides
+                centeredSlides: true,
+                loop: true,
                 speed: 800,
                 autoplay: {
                     delay: 3000,
@@ -155,7 +156,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 breakpoints: {
                     640: {
-                        spaceBetween: 60,
+                        slidesPerView: '2',
+                        spaceBetween: 50,
+                        centeredSlides: true,
+                    },
+                    768: {
+                        slidesPerView: '3',
+                        spaceBetween: 50,
+                        centeredSlides: true,
+                    },
+                    1024: {
+                        slidesPerView: '4',
+                        spaceBetween: 50,
+                        centeredSlides: false,
                     }
                 }
             });

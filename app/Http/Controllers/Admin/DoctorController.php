@@ -210,6 +210,7 @@ class DoctorController extends Controller
             'services_offered' => 'required|string|max:500',
             'awards_recognitions' => 'nullable|string|max:500',
             'website' => 'nullable|url|max:255',
+            'facebook' => 'nullable|url|max:255',
             'instagram' => 'nullable|url|max:255',
             'youtube' => 'nullable|url|max:255',
             'linkedin' => 'nullable|url|max:255',
@@ -248,6 +249,7 @@ class DoctorController extends Controller
 
         $socialLinks = [
             'website' => $validatedData['website'] ?? null,
+            'facebook' => $validatedData['facebook'] ?? null,
             'instagram' => $validatedData['instagram'] ?? null,
             'youtube' => $validatedData['youtube'] ?? null,
             'linkedin' => $validatedData['linkedin'] ?? null,
@@ -414,6 +416,7 @@ class DoctorController extends Controller
             'services_offered' => 'required|string|max:500',
             'awards_recognitions' => 'nullable|string|max:500',
             'website' => 'nullable|url|max:255',
+            'facebook' => 'nullable|url|max:255',
             'instagram' => 'nullable|url|max:255',
             'youtube' => 'nullable|url|max:255',
             'linkedin' => 'nullable|url|max:255',
@@ -447,6 +450,7 @@ class DoctorController extends Controller
 
         $socialLinks = [
             'website' => $validatedData['website'] ?? null,
+            'facebook' => $validatedData['facebook'] ?? null,
             'instagram' => $validatedData['instagram'] ?? null,
             'youtube' => $validatedData['youtube'] ?? null,
             'linkedin' => $validatedData['linkedin'] ?? null,

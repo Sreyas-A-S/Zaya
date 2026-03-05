@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 
-<body class="bg-white h-screen flex gap-20 overflow-hidden p-5 md:p-10 max-lg:!pb-15"
+<body class="bg-white min-h-screen flex gap-10 xl:gap-20 p-2 md:p-10 max-lg:pb-15! relative"
     style="background-image: url('{{ asset('frontend/assets/login-bg.webp') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
     <div class="absolute inset-0 bg-black/50 z-0"></div>
     <!-- Back Link -->
@@ -27,12 +27,12 @@
     <div class="relative hidden lg:flex w-1/2 bg-cover bg-center items-end p-16 z-10">
         <!-- Back Link -->
         <a href="{{ route('index') }}"
-            class="absolute top-0 right-0 text-white flex items-center gap-2 hover:opacity-80 transition z-10 text-sm font-normal">
+            class="absolute top-0 right-0 text-white flex items-center gap-2 hover:opacity-80 transition z-10 text-sm font-normal mt-5">
             <i class="ri-arrow-left-line"></i> Back to Website
         </a>
 
         <!-- Text Content -->
-        <div class="relative z-10 text-white max-w-xl pb-10">
+        <div class="relative z-10 text-white max-w-xl">
             <h1 class="text-4xl xl:text-5xl font-sans! font-bold mb-6 leading-tight">Continue Your Journey with ZAYA
             </h1>
             <p class="text-white/80 text-lg font-light leading-relaxed">Access your personalized dashboard to manage
@@ -42,10 +42,11 @@
     </div>
 
     <!-- Right Side - Form -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white overflow-y-auto h-full z-20 rounded-3xl">
+    <div
+        class="w-full lg:w-1/2 flex items-center justify-center px-4 py-6 lg:p-8 bg-white overflow-y-auto z-20 rounded-3xl">
         <div class="w-full max-w-md">
-            <h2 class="text-2xl md:text-3xl font-sans! font-bold text-center mb-2 text-gray-900">Login</h2>
-            <p class="text-gray-500 text-center mb-6 md:mb-10 text-md md:text-lg">Welcome Back!</p>
+            <h2 class="text-lg md:text-3xl font-sans! font-bold text-center text-gray-900 lg:mb-[18px]">Login</h2>
+            <p class="text-gray-500 text-center mb-4 md:mb-7 text-md md:text-[22px]">Welcome Back!</p>
 
             <form method="POST" action="{{ route('login') }}" class="space-y-6">
                 @csrf
@@ -56,7 +57,7 @@
                 <div>
                     <input type="email" name="email" value="{{ old('email') }}" required autofocus
                         placeholder="Email or Mobile number"
-                        class="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 placeholder-gray-400 bg-white shadow-sm transition-all @error('email') border-red-500 @enderror">
+                        class="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 text-sm lg:text-base placeholder-gray-400 bg-white shadow-sm transition-all @error('email') border-red-500 @enderror">
                     @error('email')
                         <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
                     @enderror
@@ -94,7 +95,7 @@
                 <!-- Promocode Field -->
                 <div class="relative">
                     <input type="text" name="promocode" placeholder="Enter New Promocode"
-                        class="w-full pl-6 pr-[110px] py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 placeholder-[#A3A3A3] bg-white shadow-sm transition-all">
+                        class="w-full pl-6 pr-[110px] py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 text-sm lg:text-base placeholder-gray-400 bg-white shadow-sm transition-all">
                     <button type="button"
                         class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#D1D1D1]/60 text-[#818181] px-7 py-2.5 rounded-full hover:bg-gray-300 transition-colors text-sm font-medium cursor-pointer">
                         Apply
@@ -131,13 +132,13 @@
                 </script>
 
                 <button type="submit"
-                    class="w-full bg-gradient-to-r from-[#422251] to-[#AA349F] text-white py-4 rounded-full font-medium text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200 cursor-pointer">
+                    class="w-full bg-gradient-to-r from-[#422251] to-[#AA349F] text-white py-4 rounded-full font-medium text-base lg:text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200 cursor-pointer">
                     Login
                 </button>
             </form>
 
             <div class="mt-8 text-center text-gray-500 text-sm">Login with other accounts</div>
-            <div class="flex justify-center gap-6 mt-6 mb-12">
+            <div class="flex justify-center gap-6 mt-6 mb-8 lg:mb-12">
                 <a href="#"
                     class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition shadow-sm hover:shadow-md">
                     <img src="{{ asset('frontend/assets/google-icon.svg') }}" class="w-6 h-6" alt="Google">
@@ -152,7 +153,7 @@
                 </a>
             </div>
 
-            <div class="text-center text-gray-600 text-base">
+            <div class="text-center text-gray-600 text-sm lg:text-base">
                 Don't have an account? <a href="{{ route('client-register') }}"
                     class="text-[#FF6B6B] font-medium hover:underline ml-1 text-nowrap">Register Now</a>
             </div>

@@ -37,6 +37,7 @@
                                         <th>ID</th>
                                         <th>Name</th>
                                         <th>Email</th>
+                                        <th>Phone</th>
                                         <th>Nationality</th>
                                         <th>Languages</th>
                                         <th>Status</th>
@@ -95,6 +96,13 @@
                 <th>Email</th>
                 <td>
                     <input type="email" name="email" class="form-control" required>
+                </td>
+            </tr>
+
+            <tr>
+                <th>Phone number</th>
+                <td>
+                    <input type="number" name="phone" class="form-control" required>
                 </td>
             </tr>
 
@@ -195,6 +203,14 @@
                 </td>
             </tr>
 
+             <tr>
+                <th>Phone number</th>
+                <td>
+                    <input type="number" name="phone" class="form-control" required>
+                </td>
+            </tr>
+
+
             <tr>
                 <th>Country</th>
                 <td>
@@ -274,6 +290,12 @@
                 name: 'users.email' 
             },
 
+
+             { 
+                data: 'phone', 
+                name: 'users.phone' 
+            },
+
             { 
                 data: 'nationality', 
                 name: 'countries.name'   // ✅ important for join search/order
@@ -346,6 +368,7 @@ $(document).on('click', '.editUser', function () {
             $('#edit_id').val(data.id);
             $('#edit_name').val(data.name);
             $('#edit_email').val(data.email);
+            $('#edit_phone').val(data.phone);
             $('#edit_status').val(data.status);
 
             $('#editAdminModal').modal('show');
@@ -371,6 +394,7 @@ $('#editAdminForm').submit(function (e) {
             _token: "{{ csrf_token() }}",
             name: $('#edit_name').val(),
             email: $('#edit_email').val(),
+            phone: $('#edit_phone').val(),
             status: $('#edit_status').val()
         },
         success: function (response) {

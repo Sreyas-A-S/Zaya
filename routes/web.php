@@ -153,7 +153,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // General Settings
     Route::get('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'index'])->name('general-settings.index');
     Route::post('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'update'])->name('general-settings.update');
+     
+    Route::resource('finance-managers', \App\Http\Controllers\Admin\FinanceManagerController::class);
+    Route::get('finance-manager', function() { return redirect()->route('admin.finance-managers.index'); });
+    Route::post('finance-managers/{id}/status', [\App\Http\Controllers\Admin\FinanceManagerController::class, 'updateStatus'])->name('finance-managers.status');
 
+    Route::resource('content-managers', \App\Http\Controllers\Admin\ContentManagerController::class);
+    Route::get('content-manager', function() { return redirect()->route('admin.content-managers.index'); });
+    Route::post('content-managers/{id}/status', [\App\Http\Controllers\Admin\ContentManagerController::class, 'updateStatus'])->name('content-managers.status');
+
+    Route::resource('user-managers', \App\Http\Controllers\Admin\UserManagerController::class);
+    Route::get('user-manager', function() { return redirect()->route('admin.user-managers.index'); });
+    Route::post('user-managers/{id}/status', [\App\Http\Controllers\Admin\UserManagerController::class, 'updateStatus'])->name('user-managers.status');
+
+    Route::resource('languages', \App\Http\Controllers\Admin\LanguageController::class);
 });
 
 // Route to run artisan optimize
@@ -183,22 +196,6 @@ Route::get('/seed', function () {
     return '<pre>' . Artisan::output() . '</pre>';
 });
 
-//Country crud
-Route::prefix('admin')->group(function () {
-    Route::resource('countries', CountryController::class);
-    Route::get('/admin/countries/{id}', [CountryController::class, 'show']);
-    Route::put('/admin/countries/{id}', [CountryController::class, 'update']);
-    Route::delete('/admin/countries/{id}', [CountryController::class, 'destroy']);
-
-    //Language Crud
-
-    Route::resource('languages', LanguageController::class);
-    Route::get('/admin/languages/{id}', [CountryController::class, 'show']);
-    Route::put('/admin/languages/{id}', [CountryController::class, 'update']);
-    Route::delete('/admin/languages/{id}', [CountryController::class, 'destroy']);
-
-
-});
 
 Route::get('/client-profile', function () {
     return view('client-profile');

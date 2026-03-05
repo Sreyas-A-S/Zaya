@@ -119,11 +119,12 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">First Name</label>
-                                            <input type="text" class="form-control" name="first_name" required placeholder="Enter first name">
-                                        </div>
+                                            <input class="form-control @error('firstname') is-invalid @enderror"type="text" name="firstname" id="firstname"
+                                            value="{{ old('firstname') }}" required pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="First Name">                                        </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Last Name</label>
-                                            <input type="text" class="form-control" name="last_name" required placeholder="Enter last name">
+                                           <input class="form-control @error('lastname') is-invalid @enderror" type="text" name="lastname" id="lastname"
+                                            value="{{ old('lastname') }}" required  pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="Last Name">
                                         </div>
 
                                         <div class="col-md-4">
@@ -137,11 +138,12 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Date of Birth</label>
-                                            <input type="date" class="form-control" name="dob" required>
+                                            <input type="date" class="form-control" name="date" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Mobile Number</label>
-                                            <input type="text" class="form-control" name="mobile_number" required placeholder="Enter mobile number">
+                                            <input type="text" class="form-control" name="mobile_number" required pattern="^[0-9]{10,15}$"
+                                             title="Phone number must contain 10 to 15 digits" placeholder="Enter mobile number">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Email ID</label>
@@ -168,7 +170,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">State Ayurveda Council Name</label>
-                                            <input type="text" class="form-control" name="state_council" required placeholder="Enter council name">
+                                            <input type="text" class="form-control" name="state_council" required pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="Enter council name">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Registration Certificate (Upload) <span class="file-keep-note d-none text-muted">(Leave blank to keep)</span></label>
@@ -467,19 +469,23 @@
                                             <label class="form-label">Awards & Recognitions (Optional)</label>
                                             <textarea class="form-control" name="awards_recognitions" rows="2" placeholder="Enter awards..."></textarea>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <label class="form-label">Website (Optional)</label>
                                             <input type="url" class="form-control" name="website" placeholder="https://example.com">
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Facebook Link (Optional)</label>
+                                            <input type="url" class="form-control" name="facebook">
+                                        </div>
+                                        <div class="col-md-4">
                                             <label class="form-label">Instagram Link (Optional)</label>
                                             <input type="url" class="form-control" name="instagram">
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <label class="form-label">YouTube Link (Optional)</label>
                                             <input type="url" class="form-control" name="youtube">
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <label class="form-label">LinkedIn Link (Optional)</label>
                                             <input type="url" class="form-control" name="linkedin">
                                         </div>
@@ -1168,6 +1174,7 @@
 
             const social = profile.social_links || {};
             $('[name="website"]').val(social.website || '');
+            $('[name="facebook"]').val(social.facebook || '');
             $('[name="instagram"]').val(social.instagram || '');
             $('[name="youtube"]').val(social.youtube || '');
             $('[name="linkedin"]').val(social.linkedin || '');
@@ -1273,6 +1280,7 @@
                             
                             <div class="d-flex justify-content-center gap-2 mt-2">
                                 ${social.website ? `<a href="${social.website}" target="_blank" class="btn btn-outline-primary btn-xs"><i class="fa-solid fa-globe"></i></a>` : ''}
+                                ${social.facebook ? `<a href="${social.facebook}" target="_blank" class="btn btn-outline-primary btn-xs"><i class="fa-brands fa-facebook"></i></a>` : ''}
                                 ${social.instagram ? `<a href="${social.instagram}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-instagram"></i></a>` : ''}
                                 ${social.linkedin ? `<a href="${social.linkedin}" target="_blank" class="btn btn-outline-info btn-xs"><i class="fa-brands fa-linkedin"></i></a>` : ''}
                                 ${social.youtube ? `<a href="${social.youtube}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-youtube"></i></a>` : ''}

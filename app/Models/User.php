@@ -26,6 +26,11 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'role',
+        'national_id',
+        'languages',
+        'status',
+        'profile_pic',
+        'phone',
     ];
 
     /**
@@ -48,6 +53,8 @@ class User extends Authenticatable implements JWTSubject
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'national_id' => 'array',
+            'languages' => 'array',
         ];
     }
     public function doctor()
@@ -73,6 +80,16 @@ class User extends Authenticatable implements JWTSubject
     public function yogaTherapist()
     {
         return $this->hasOne(YogaTherapist::class);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'national_id');
+    }
+
+    public function language()
+    {
+        return $this->belongsTo(Language::class, 'languages'); // Note: if 'languages' is a single ID, if it's JSON it might need decoding
     }
 
     public function nationality()
