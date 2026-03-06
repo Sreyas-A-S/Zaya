@@ -27,9 +27,36 @@ class LoginController extends Controller
         // Middleware removed for now
     }
 
-    public function showLoginForm()
+    /**
+     * Validate the user login request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function validateLogin(Request $request)
     {
-        return view('zaya-login');
+        $request->validate([
+            $this->username() => 'required|string',
+            'password' => 'required|string',
+            'captcha' => ['required', 'string', function ($attribute, $value, $fail) {
+                $storedCode = session('captcha_code');
+                if (!$storedCode || strtoupper($value) !== $storedCode) {
+                    $fail('The captcha code is incorrect.');
+                }
+            }],
+        ]);
+
+        // We can keep the forget here as it only runs if the above validate passes.
+        // If it fails, Laravel throws an exception and this line is never reached.
+        session()->forget('captcha_code');
+    }
+
+    public function showLoginForm(Request $request)
+    {
+        $redirect = $request->query('redirect');
+        return view('zaya-login', compact('redirect'));
     }
 
     public function showAdminLoginForm()
@@ -69,9 +96,13 @@ class LoginController extends Controller
     {
         // This method is called by the standard 'login' route (Client Login)
         // If an admin tries to login via the client login page, log them out and redirect.
-        if ($user->role === 'admin') {
+        if (in_array($user->role, ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin'])) {
             auth()->logout();
             return redirect()->route('admin.login')->with('error', 'Admins must login via the Admin Portal.');
+        }
+
+        if ($request->has('redirect')) {
+            return redirect($request->redirect);
         }
 
         return redirect()->intended('/');

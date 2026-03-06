@@ -10,7 +10,33 @@ class Practitioner extends Model
     use HasFactory;
 
     protected $table = 'practitioners';
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'status',
+        'first_name',
+        'last_name',
+        'slug',
+        'gender',
+        'dob',
+        'nationality',
+        'profile_photo_path',
+        'zip_code',
+        'phone',
+        'website_url',
+        'social_links',
+        'consultations',
+        'body_therapies',
+        'other_modalities',
+        'additional_courses',
+        'languages_spoken',
+        'can_translate_english',
+        'profile_bio',
+        'address_line_1',
+        'address_line_2',
+        'city',
+        'state',
+        'country',
+    ];
 
     protected $casts = [
         'consultations' => 'array',
@@ -39,5 +65,13 @@ class Practitioner extends Model
     public function getAverageRatingAttribute()
     {
         return $this->reviews()->where('status', true)->avg('rating') ?? 0;
+    }
+
+    public function getCityStateAttribute()
+    {
+        if ($this->city && $this->state) {
+            return $this->city . ', ' . $this->state;
+        }
+        return $this->city ?: ($this->state ?: 'Location not set');
     }
 }
