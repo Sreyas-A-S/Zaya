@@ -218,3 +218,197 @@ function shareService() {
         });
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Condition section toggle logic
+    const actionBtn = document.getElementById('condition-action-btn');
+    const selectedTagsContainer = document.getElementById('condition-selected-tags');
+    const availableTagsContainer = document.getElementById('condition-available-tags');
+    const availableOptions = document.querySelectorAll('.condition-tag-option');
+
+    if (actionBtn) {
+        // Classes for buttons
+        const classAmber = ['bg-[#FFE5B4]', 'hover:bg-[#F5D0A9]', 'text-[#594B4B]', 'border-transparent'];
+        const classCancel = ['bg-white', 'border-[#D0D0D0]', 'text-gray-600', 'hover:bg-gray-50'];
+
+        let mode = 'view'; // 'view' or 'edit'
+        let savedTags = ['Identifying Imbalances', 'Preventative Lifestyle Guidance', 'Holistic Restoration', 'Natural Healing'];
+        let currentEditTags = [];
+
+        function renderSelectedTags(tagsArray) {
+            selectedTagsContainer.innerHTML = '';
+            tagsArray.forEach(tag => {
+                const span = document.createElement('span');
+                // Use light gray background for the tag inside the top box
+                span.className = 'bg-[#F2F2F2] text-[#423131] px-4 py-2 rounded-[6px] text-sm font-normal transition-colors cursor-default';
+                span.textContent = tag;
+
+                selectedTagsContainer.appendChild(span);
+            });
+        }
+
+        function updateEditState() {
+            renderSelectedTags(currentEditTags);
+
+            actionBtn.classList.remove(...classAmber, ...classCancel);
+
+            if (currentEditTags.length > 0) {
+                actionBtn.textContent = 'Add';
+                actionBtn.classList.add(...classAmber);
+            } else {
+                actionBtn.textContent = 'Cancel';
+                actionBtn.classList.add(...classCancel);
+            }
+
+            // Update bottom tags visual active state to match the amber hover color
+            availableOptions.forEach(opt => {
+                const val = opt.getAttribute('data-val');
+                if (currentEditTags.includes(val)) {
+                    opt.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                    opt.classList.add('bg-[#FABD4D]', 'border-[#FABD4D]', 'text-[#423131]');
+                } else {
+                    opt.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+                    opt.classList.remove('bg-[#FABD4D]', 'border-[#FABD4D]', 'text-[#423131]');
+                }
+            });
+        }
+
+        // Initial setup
+        renderSelectedTags(savedTags);
+
+        actionBtn.addEventListener('click', () => {
+            if (mode === 'view') {
+                // Enter Edit Mode
+                mode = 'edit';
+                currentEditTags = []; // Blank out as requested
+                updateEditState();
+                availableTagsContainer.classList.remove('hidden');
+                actionBtn.classList.remove('px-6');
+                actionBtn.classList.add('px-5'); // slightly smaller padding for cancel
+            } else if (mode === 'edit') {
+                if (currentEditTags.length > 0) {
+                    // Save and return to view mode
+                    savedTags = [...currentEditTags];
+                }
+                // If 0 length, it's 'Cancel', so we just revert to old savedTags
+
+                mode = 'view';
+                renderSelectedTags(savedTags);
+
+                actionBtn.textContent = 'Change';
+                actionBtn.classList.remove(...classCancel);
+                actionBtn.classList.add(...classAmber);
+                actionBtn.classList.add('px-6');
+                actionBtn.classList.remove('px-5');
+
+                availableTagsContainer.classList.add('hidden');
+            }
+        });
+
+        // Add clicking listener to options
+        availableOptions.forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (mode === 'edit') {
+                    const val = opt.getAttribute('data-val');
+                    if (currentEditTags.includes(val)) {
+                        // If already active, repress to remove
+                        currentEditTags = currentEditTags.filter(t => t !== val);
+                    } else {
+                        // Otherwise add
+                        currentEditTags.push(val);
+                    }
+                    updateEditState();
+                }
+            });
+        });
+    }
+});
+
+
+// Practitioner Modal Logic
+function openPractitionerModal() {
+    const modal = document.getElementById('practitionerModal');
+    if(!modal) return;
+    
+    // Initialize swiper if not already done
+    if (!modal.classList.contains('swiper-initialized-custom')) {
+        modal.classList.add('swiper-initialized-custom');
+        new Swiper('.practitioner-modal-slider', {
+            slidesPerView: 'auto',
+            spaceBetween: 28,
+            grabCursor: true,
+            freeMode: true,
+            slidesOffsetBefore:40,           
+
+        });
+    }
+
+    const backdrop = modal.querySelector('.popup-backdrop');
+    const content = modal.querySelector('.popup-content');
+    
+    modal.classList.remove('hidden');
+    
+    // Trigger animations
+    setTimeout(() => {
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+        content.classList.remove('opacity-0', 'scale-95');
+        content.classList.add('opacity-100', 'scale-100');
+    }, 10);
+}
+
+function closePractitionerModal() {
+    const modal = document.getElementById('practitionerModal');
+    if(!modal) return;
+    
+    const backdrop = modal.querySelector('.popup-backdrop');
+    const content = modal.querySelector('.popup-content');
+    
+    // Trigger closing animations
+    backdrop.classList.remove('opacity-100');
+    backdrop.classList.add('opacity-0');
+    content.classList.remove('opacity-100', 'scale-100');
+    content.classList.add('opacity-0', 'scale-95');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
+
+
+// Payment Success Modal Logic
+function openSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if(!modal) return;
+    
+    const backdrop = modal.querySelector('.popup-backdrop');
+    const content = modal.querySelector('.popup-content');
+    
+    modal.classList.remove('hidden');
+    
+    // Trigger animations
+    setTimeout(() => {
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+        content.classList.remove('opacity-0', 'scale-95');
+        content.classList.add('opacity-100', 'scale-100');
+    }, 10);
+}
+
+function closeSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if(!modal) return;
+    
+    const backdrop = modal.querySelector('.popup-backdrop');
+    const content = modal.querySelector('.popup-content');
+    
+    // Trigger closing animations
+    backdrop.classList.remove('opacity-100');
+    backdrop.classList.add('opacity-0');
+    content.classList.remove('opacity-100', 'scale-100');
+    content.classList.add('opacity-0', 'scale-95');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
