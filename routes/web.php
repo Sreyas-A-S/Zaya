@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CaptchaController;
 use Illuminate\Support\Facades\Artisan;
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -58,7 +60,7 @@ Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
 Route::get('/gallery', [WebController::class, 'gallery'])->name('gallery');
 Route::get('/find-practitioner', [WebController::class, 'findPractitioner'])->name('find-practitioner');
-Route::get('/practitioner/{id}', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
+Route::get('/practitioner/{slug}', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
 Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login');
 Route::get('/client-register', [WebController::class, 'clientRegister'])->name('client-register');
 Route::get('/practitioner-register', [WebController::class, 'practitionerRegister'])->name('practitioner-register');
@@ -67,14 +69,17 @@ Route::get('/blogs', [WebController::class, 'blogs'])->name('blogs');
 Route::get('/announcements', [WebController::class, 'announcements'])->name('announcements');
 Route::get('/announcement/{slug}', [WebController::class, 'announcementDetail'])->name('announcement-detail');
 Route::get('/blog/{slug}', [WebController::class, 'blogDetail'])->name('blog-detail');
-Route::get('/book-session', [WebController::class, 'bookSession'])->name('book-session');
+Route::get('/book-session/{practitioner?}', [WebController::class, 'bookSession'])->name('book-session');
+Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+Route::get('/fetch-translators', [BookingController::class, 'fetchTranslators'])->name('fetch-translators');
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
 
 Route::post('/blog/like', [WebController::class, 'toggleLike'])->name('blog.like');
 Route::post('/blog/comment', [WebController::class, 'postComment'])->name('blog.comment');
 Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->name('blog.comments');
 
-Route::get('magic-login', [\App\Http\Controllers\Auth\MagicLoginController::class, 'login'])->name('magic.login');
+Route::get('/captcha', [CaptchaController::class, 'generate'])->name('captcha');
+Route::get('/magic-login', [\App\Http\Controllers\Auth\MagicLoginController::class, 'login'])->name('magic.login');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource('/admins', AdminsController::class);

@@ -13,44 +13,44 @@ class ServiceSeeder extends Seeder
     public function run(): void
     {
         $services = [
-            [
-                'title' => 'Ayurveda & Panchakarma',
-                'image' => 'frontend/assets/ayurveda-and-panchakarma.png',
-                'description' => 'Rooted in 5,000 years of tradition, our Ayurveda sessions offer personalized detoxification and rejuvenation.',
-                'slug' => 'ayurveda-panchakarma',
-                'status' => true,
-                'order_column' => 1,
-            ],
-            [
-                'title' => 'Yoga Therapy',
-                'image' => 'frontend/assets/yoga-therapy.png',
-                'description' => 'Yoga Therapy goes beyond flexibility. It is a clinical approach to healing that combines specific asanas, breathwork...',
-                'slug' => 'yoga-therapy',
-                'status' => true,
-                'order_column' => 2,
-            ],
-            [
-                'title' => 'Spiritual Guidance',
-                'image' => 'frontend/assets/spiritual-guidance.png',
-                'description' => 'Explore the deeper aspects of your existence. These sessions provide a safe space.',
-                'slug' => 'spiritual-guidance',
-                'status' => true,
-                'order_column' => 3,
-            ],
-            [
-                'title' => 'Mindfulness Counselling',
-                'image' => 'frontend/assets/mindfulness-counselling.png',
-                'description' => 'Cultivate a non-judgmental awareness of the present moment. Our sessions bridge traditional psychology...',
-                'slug' => 'mindfulness-counselling',
-                'status' => true,
-                'order_column' => 4,
-            ],
+            // Consultations
+            ['title' => 'Ayurveda Nutrition Advisor', 'slug' => 'ayurveda-nutrition-advisor'],
+            ['title' => 'Ayurveda Educator', 'slug' => 'ayurveda-educator'],
+            ['title' => 'Ayurveda Consultant Advisor', 'slug' => 'ayurveda-consultant-advisor'],
+            ['title' => 'Lifestyle Advice', 'slug' => 'lifestyle-advice'],
+            
+            // Therapies
+            ['title' => 'Abhyanga', 'slug' => 'abhyanga'],
+            ['title' => 'Pindasweda', 'slug' => 'pindasweda'],
+            ['title' => 'Udwarthanam', 'slug' => 'udwarthanam'],
+            ['title' => 'Sirodhara', 'slug' => 'sirodhara'],
+            ['title' => 'Full Body Dhara', 'slug' => 'full-body-dhara'],
+            ['title' => 'Lepam', 'slug' => 'lepam'],
+            ['title' => 'Pain Management', 'slug' => 'pain-management'],
+            ['title' => 'Face & Beauty Care', 'slug' => 'face-beauty-care'],
+            ['title' => 'Marma Therapy', 'slug' => 'marma-therapy'],
+            
+            // Other Modalities
+            ['title' => 'Yoga Sessions', 'slug' => 'yoga-sessions'],
+            ['title' => 'Yoga Therapy', 'slug' => 'yoga-therapy'],
+            ['title' => 'Ayurvedic Cooking', 'slug' => 'ayurvedic-cooking'],
+
+            // Original Main Services (for compatibility)
+            ['title' => 'Ayurveda & Panchakarma', 'slug' => 'ayurveda-panchakarma'],
+            ['title' => 'Spiritual Guidance', 'slug' => 'spiritual-guidance'],
+            ['title' => 'Mindfulness Counselling', 'slug' => 'mindfulness-counselling'],
         ];
 
-        foreach ($services as $service) {
+        foreach ($services as $index => $s) {
             Service::updateOrCreate(
-                ['title' => $service['title']],
-                $service
+                ['title' => $s['title']],
+                [
+                    'slug' => $s['slug'],
+                    'description' => 'Professional ' . $s['title'] . ' session focused on your holistic well-being.',
+                    'status' => true,
+                    'order_column' => $index + 1,
+                    'image' => 'frontend/assets/ayurveda-and-panchakarma.png' // Default image
+                ]
             );
         }
     }

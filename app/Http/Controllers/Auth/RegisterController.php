@@ -247,9 +247,11 @@ class RegisterController extends Controller
      */
     protected function registered(Request $request, $user)
     {
+        if ($request->has('redirect')) {
+            return redirect($request->redirect);
+        }
+
         if ($request->role === 'client' || $request->role === 'patient') {
-            // Log out user if you don't want auto-login, or keep them logged in.
-            // Assuming auto-login is desired, we redirect to home or dashboard.
             return redirect($this->redirectPath())->with('success', 'Registration successful! Welcome to Zaya Wellness.');
         }
     }

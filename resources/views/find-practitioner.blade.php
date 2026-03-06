@@ -107,50 +107,33 @@
                     India'</span>
             </h2>
 
-            @php
-                $practitioners = [
-                    ['name' => 'Diya', 'role' => 'Life Coach', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop&crop=face'],
-                    ['name' => 'Hriday', 'role' => 'Yoga Therapist', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face'],
-                    ['name' => 'Lily', 'role' => 'Art Therapist', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&crop=face'],
-                    ['name' => 'Jeeva', 'role' => 'Spiritual Guide', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop&crop=face'],
-
-                    ['name' => 'Jeeva', 'role' => 'Spiritual Guide', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=face'],
-                    ['name' => 'Nahala', 'role' => 'Sophrologist', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&h=300&fit=crop&crop=face'],
-                    ['name' => 'Hriday', 'role' => 'Yoga Therapist', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&h=300&fit=crop&crop=face'],
-                    ['name' => 'Diya', 'role' => 'Life Coach', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&h=300&fit=crop&crop=face'],
-
-                    ['name' => 'Hriday', 'role' => 'Yoga Therapist', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face'],
-                    ['name' => 'Diya', 'role' => 'Life Coach', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=300&h=300&fit=crop&crop=face'],
-                    ['name' => 'Jeeva', 'role' => 'Spiritual Guide', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&h=300&fit=crop&crop=face'],
-                    ['name' => 'Lily', 'role' => 'Art Therapist', 'location' => 'Kazhakuttam', 'avatar' => 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300&h=300&fit=crop&crop=face'],
-                ];
-            @endphp
-
             <!-- Practitioner Grid -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
-                @foreach($practitioners as $practitioner)
-                    <div class="flex flex-col items-center text-center group cursor-pointer">
+                @foreach($practitioners as $p)
+                    <a href="{{ route('practitioner-detail', $p->slug) }}" class="flex flex-col items-center text-center group cursor-pointer">
                         <!-- Avatar -->
-                        <div class="w-32 h-32 md:w-[150px] md:h-[150px] mb-4 overflow-hidden rounded-full">
-                            <img src="{{ $practitioner['avatar'] }}" alt="{{ $practitioner['name'] }}"
+                        <div class="w-32 h-32 md:w-[150px] md:h-[150px] mb-4 overflow-hidden rounded-full border border-gray-100">
+                            <img src="{{ $p->profile_photo_path ? asset('storage/'.$p->profile_photo_path) : asset('frontend/assets/lilly-profile-pic.png') }}" alt="{{ $p->first_name }}"
                                 class="w-full h-full object-cover rounded-full transition-transform duration-500 group-hover:scale-110">
                         </div>
 
                         <!-- Name -->
                         <h3
                             class="font-sans! text-xl md:text-2xl font-medium text-primary group-hover:opacity-80 transition-opacity duration-300">
-                            {{ $practitioner['name'] }}
+                            {{ $p->first_name }} {{ $p->last_name }}
                         </h3>
 
                         <!-- Role -->
-                        <p class="font-serif text-lg italic text-secondary mt-0.5">{{ $practitioner['role'] }}</p>
+                        <p class="font-serif text-lg italic text-secondary mt-0.5">
+                            {{ $p->other_modalities[0] ?? ($p->consultations[0] ?? 'Holistic Practitioner') }}
+                        </p>
 
                         <!-- Location -->
                         <div class="flex items-center justify-center gap-1 mt-2 text-sm text-gray-500">
                             <i class="ri-map-pin-line text-gray-800"></i>
-                            <span>{{ $practitioner['location'] }}</span>
+                            <span>{{ $p->city_state }}</span>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
 

@@ -48,8 +48,11 @@
             <h2 class="text-lg md:text-3xl font-sans! font-bold text-center text-gray-900 lg:mb-[18px]">Login</h2>
             <p class="text-gray-500 text-center mb-4 md:mb-7 text-md md:text-[22px]">Welcome Back!</p>
 
-            <form method="POST" action="" class="space-y-6">
+            <form method="POST" action="{{ route('login') }}" class="space-y-6">
                 @csrf
+                @if(isset($redirect))
+                    <input type="hidden" name="redirect" value="{{ $redirect }}">
+                @endif
 
                 <div>
                     <input type="email" name="email" value="{{ old('email') }}" required autofocus
@@ -61,16 +64,33 @@
                 </div>
 
                 <div class="relative">
-                    <input type="password" name="password" required placeholder="Password"
-                        class="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 text-sm lg:text-base placeholder-gray-400 bg-white shadow-sm transition-all @error('password') border-red-500 @enderror">
-                    <button type="button"
-                        class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
-                        <i class="ri-eye-line text-xl"></i>
+                    <input type="password" name="password" id="password" required placeholder="Password"
+                        class="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 placeholder-gray-400 bg-white shadow-sm transition-all @error('password') border-red-500 @enderror">
+                    <button type="button" onclick="togglePasswordVisibility()"
+                        class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer">
+                        <i id="password-toggle-icon" class="ri-eye-line text-xl"></i>
                     </button>
                     @error('password')
                         <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
                     @enderror
                 </div>
+
+                <script>
+                    function togglePasswordVisibility() {
+                        const passwordInput = document.getElementById('password');
+                        const toggleIcon = document.getElementById('password-toggle-icon');
+                        
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            toggleIcon.classList.remove('ri-eye-line');
+                            toggleIcon.classList.add('ri-eye-off-line');
+                        } else {
+                            passwordInput.type = 'password';
+                            toggleIcon.classList.remove('ri-eye-off-line');
+                            toggleIcon.classList.add('ri-eye-line');
+                        }
+                    }
+                </script>
 
                 <!-- Promocode Field -->
                 <div class="relative">
@@ -83,41 +103,33 @@
                 </div>
 
                 <!-- Captcha Section -->
-                <div class="flex flex-col lg:flex-row gap-3 md:gap-4">
-                    <div class="flex gap-3 md:gap-4">
-                        <!-- Captcha Mockup -->
-                        <div
-                            class="flex-1 bg-white border border-gray-200 rounded-full shadow-sm flex items-center justify-center p-2 h-[58px] overflow-hidden relative">
-                            <div class="absolute inset-0 p-2 w-full h-full pointer-events-none opacity-60">
-                                <!-- SVG lines to accurately mimic captcha distortion -->
-                                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"
-                                    preserveAspectRatio="none">
-                                    <path d="M0,15 Q30,30 50,15 T150,15" stroke="black" stroke-width="1.5"
-                                        fill="none" />
-                                    <path d="M0,35 Q40,20 70,35 T150,20" stroke="black" stroke-width="1" fill="none" />
-                                    <path d="M0,45 Q50,55 80,10 T150,45" stroke="black" stroke-width="2" fill="none" />
-                                    <circle cx="10%" cy="30%" r="1" fill="black" />
-                                    <circle cx="30%" cy="70%" r="1.5" fill="black" />
-                                    <circle cx="80%" cy="20%" r="2" fill="black" />
-                                    <circle cx="60%" cy="80%" r="1" fill="black" />
-                                </svg>
-                            </div>
-                            <span
-                                class="relative z-10 text-[32px] md:text-[36px] font-black text-gray-900 tracking-[2px] md:tracking-[4px]"
-                                style="font-family: 'Courier New', Courier, monospace; transform: scaleY(1.3) skewX(-12deg); text-shadow: 1px 1px 0px rgba(255,255,255,0.8), -1px -1px 0px rgba(255,255,255,0.8);">98RW6</span>
-                        </div>
-                        <!-- Refresh Arrow -->
-                        <button type="button"
-                            class="px-3 text-[#1052CE] hover:text-blue-800 transition-colors focus:outline-none cursor-pointer">
-                            <i class="ri-restart-line text-[22px] md:text-[26px] font-medium"
-                                style="display: inline-block;"></i>
-                        </button>
+                <div class="flex items-center gap-3 md:gap-4">
+                    <!-- Dynamic Captcha -->
+                    <div
+                        class="bg-white border border-gray-200 rounded-full shadow-sm flex items-center justify-center py-2 h-[58px] min-w-[140px] md:min-w-[160px] overflow-hidden relative shrink-0">
+                        <img id="captcha-img" src="{{ route('captcha') }}" alt="Captcha" class="h-full w-full object-contain">
                     </div>
 
+                    <!-- Refresh Arrow -->
+                    <button type="button" onclick="refreshCaptcha()"
+                        class="text-[#1052CE] hover:text-blue-800 transition-colors focus:outline-none cursor-pointer shrink-0">
+                        <i class="ri-restart-line text-[22px] md:text-[26px] font-medium"
+                            style="display: inline-block;"></i>
+                    </button>
+
                     <!-- Captcha Input -->
-                    <input type="text" name="captcha" placeholder="Enter Code"
-                        class="w-full px-5 md:px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 text-sm lg:text-base placeholder-[#A3A3A3] bg-white shadow-sm transition-all h-[58px]">
+                    <input type="text" name="captcha" placeholder="Enter Code" required
+                        class="w-full px-5 md:px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 placeholder-[#A3A3A3] bg-white shadow-sm transition-all h-[58px] @error('captcha') border-red-500 @enderror">
                 </div>
+                @error('captcha')
+                    <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
+                @enderror
+
+                <script>
+                    function refreshCaptcha() {
+                        document.getElementById('captcha-img').src = "{{ route('captcha') }}?" + Math.random();
+                    }
+                </script>
 
                 <button type="submit"
                     class="w-full bg-gradient-to-r from-[#422251] to-[#AA349F] text-white py-4 rounded-full font-medium text-base lg:text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200 cursor-pointer">

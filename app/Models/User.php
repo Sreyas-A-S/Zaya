@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Country;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -53,7 +54,6 @@ class User extends Authenticatable implements JWTSubject
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'national_id' => 'array',
             'languages' => 'array',
         ];
     }
@@ -84,7 +84,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function country()
     {
-        return $this->belongsTo(Country::class, 'national_id');
+        return $this->belongsTo('App\Models\Country', 'national_id');
     }
 
     public function language()
@@ -94,7 +94,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function nationality()
     {
-        return $this->belongsTo(Country::class, 'national_id');
+        return $this->belongsTo('App\Models\Country', 'national_id');
     }
 
     /**

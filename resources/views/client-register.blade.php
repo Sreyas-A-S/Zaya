@@ -396,6 +396,9 @@
             <form action="{{ route('register') }}" method="POST" id="registration-form" class="max-w-5xl mx-auto">
                 @csrf
                 <input type="hidden" name="role" value="client">
+                @if(isset($redirect))
+                    <input type="hidden" name="redirect" value="{{ $redirect }}">
+                @endif
 
                 <!-- Row 1: Name Fields -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
