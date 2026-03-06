@@ -120,7 +120,7 @@
                                 </div>
                             </div>
 
-                            <form id="translator-form" method="POST" enctype="multipart/form-data" class="theme-form">
+                            <form id="translator-form" method="POST" enctype="multipart/form-data" class="theme-form" novalidate>
                                 @csrf
                                 <input type="hidden" name="_method" id="form-method" value="POST">
                                 <input type="hidden" name="translator_id" id="translator_id">
@@ -139,31 +139,44 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div id="current-profile_photo" class="mt-2 d-none small text-center"></div>
                                             <label class="form-label mt-2">Profile Photo</label>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="first_name" required>
+                                            <input class="form-control" type="text" name="first_name" required 
+                                                maxlength="50" pattern="^[A-Z][a-zA-Z\s]{1,49}$" 
+                                                title="First letter must be capital (Example: John)"
+                                                oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="last_name" required>
+                                            <input class="form-control" type="text" name="last_name" required 
+                                                maxlength="50" pattern="^[A-Z][a-zA-Z\s]{1,49}$" 
+                                                title="First letter must be capital (Example: Smith)"
+                                                oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="email" name="email" required>
+                                            <input class="form-control" type="email" name="email" required 
+                                                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                                title="Enter a valid email address (Example: user@example.com)">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="phone" required>
+                                            <input class="form-control" type="text" name="phone" required 
+                                                pattern="^[0-9]{10,15}$" title="Enter 10 to 15 digits only"
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                         </div>
                                         <div class="col-md-4 password-field">
                                             <label class="form-label">Password <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="password" name="password">
+                                            <input class="form-control" type="password" name="password" id="password-input"
+                                                minlength="6" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$"
+                                                title="Password must be at least 6 characters and include at least one number">
                                         </div>
                                         <div class="col-md-4 password-field">
                                             <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="password" name="password_confirmation">
+                                            <input class="form-control" type="password" name="password_confirmation" id="password-confirm-input" minlength="6">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Gender</label>
@@ -176,27 +189,29 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Date of Birth</label>
-                                            <input class="form-control" type="date" name="dob">
+                                            <input class="form-control" type="date" name="dob" max="{{ date('Y-m-d') }}">
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street">
+                                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street" maxlength="255">
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Address Line 2</label>
-                                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark">
+                                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark" maxlength="255">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">City <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="city" required placeholder="City">
+                                            <input type="text" class="form-control" name="city" required placeholder="City" pattern="^[a-zA-Z\s]{2,100}$" title="City name should be at least 2 characters">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">State <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="state" required placeholder="State">
+                                            <input type="text" class="form-control" name="state" required placeholder="State" pattern="^[a-zA-Z\s]{2,100}$" title="State name should be at least 2 characters">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
+                                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode" 
+                                                pattern="^[0-9]{5,10}$" title="Enter valid zip code (5-10 digits)"
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Country <span class="text-danger">*</span></label>
@@ -214,8 +229,8 @@
                                 <div class="step-content d-none" id="step-2">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label">Native Language</label>
-                                            <select class="form-select" name="native_language">
+                                            <label class="form-label">Native Language <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="native_language" required>
                                                 <option value="">Select</option>
                                                 @foreach($languages as $lang)
                                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
@@ -223,8 +238,8 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Source Languages</label>
-                                            <select class="form-select" id="source_languages_select" multiple>
+                                            <label class="form-label">Source Languages <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="source_languages_select" multiple required>
                                                 @foreach($languages as $lang)
                                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
                                                 @endforeach
@@ -232,8 +247,8 @@
                                             <div id="source_languages_capabilities_container"></div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Target Languages</label>
-                                            <select class="form-select" id="target_languages_select" multiple>
+                                            <label class="form-label">Target Languages <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="target_languages_select" multiple required>
                                                 @foreach($languages as $lang)
                                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
                                                 @endforeach
@@ -256,24 +271,24 @@
                                 <div class="step-content d-none" id="step-3">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label">Translator Type</label>
-                                            <select class="form-select" name="translator_type">
+                                            <label class="form-label">Translator Type <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="translator_type" required>
                                                 <option value="Freelance">Freelance</option>
                                                 <option value="Agency">Agency</option>
                                                 <option value="In-house">In-house</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Years of Experience</label>
-                                            <input class="form-control" type="number" name="years_of_experience">
+                                            <label class="form-label">Years of Experience <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="number" name="years_of_experience" required min="0" max="60" required>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label fw-bold">Fields of Specialization</label>
+                                            <label class="form-label fw-bold">Fields of Specialization <span class="text-danger">*</span></label>
                                             <div class="row">
                                                 @foreach($specializations as $spec)
                                                 <div class="col-md-4">
                                                     <div class="form-check checkbox-secondary d-flex align-items-center">
-                                                        <input class="form-check-input" type="checkbox" name="fields_of_specialization[]" value="{{ $spec->name }}" id="spec_{{ $spec->id }}">
+                                                        <input class="form-check-input group-required" type="checkbox" name="fields_of_specialization[]" value="{{ $spec->name }}" id="spec_{{ $spec->id }}" data-group="specialization">
                                                         <label class="form-check-label flex-grow-1 mb-0" for="spec_{{ $spec->id }}">{{ $spec->name }}</label>
                                                         <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $spec->id }}" data-type="translator_specializations"><i class="fa fa-trash"></i></a>
                                                     </div>
@@ -288,12 +303,12 @@
                                             </div>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Previous Clients / Projects</label>
-                                            <textarea class="form-control" name="previous_clients_projects" rows="2"></textarea>
+                                            <label class="form-label" required>Previous Clients / Projects</label>
+                                            <textarea class="form-control" name="previous_clients_projects" rows="2" placeholder="List key clients or projects" required></textarea>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Portfolio / Sample Work Link</label>
-                                            <input class="form-control" type="url" name="portfolio_link">
+                                            <input class="form-control" type="url" name="portfolio_link" placeholder="https://example.com/portfolio" required>
                                         </div>
                                     </div>
                                 </div>
@@ -302,20 +317,22 @@
                                 <div class="step-content d-none" id="step-4">
                                     <div class="row g-3">
                                         <div class="col-md-12">
-                                            <label class="form-label">Highest Education Qualification</label>
-                                            <input class="form-control" type="text" name="highest_education">
+                                            <label class="form-label">Highest Education Qualification <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="highest_education" required placeholder="e.g. Master's in Translation">
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Translation Certification Details</label>
-                                            <textarea class="form-control" name="certification_details" rows="2"></textarea>
+                                            <textarea class="form-control" name="certification_details" rows="2" placeholder="Relevant certifications" required></textarea>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Upload Certificates (Multiple)</label>
-                                            <input class="form-control" type="file" name="certificates[]" multiple>
+                                            <input class="form-control" type="file" name="certificates[]" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                            <div id="current-certificates" class="mt-1 d-none d-flex flex-wrap gap-2"></div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Upload Sample Work (Multiple)</label>
-                                            <input class="form-control" type="file" name="sample_work[]" multiple>
+                                            <input class="form-control" type="file" name="sample_work[]" multiple accept=".pdf,.doc,.docx">
+                                            <div id="current-sample_work" class="mt-1 d-none d-flex flex-wrap gap-2"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -324,12 +341,12 @@
                                 <div class="step-content d-none" id="step-5">
                                     <div class="row g-3">
                                         <div class="col-md-12">
-                                            <label class="form-label fw-bold">Select Services Offered</label>
+                                            <label class="form-label fw-bold">Select Services Offered <span class="text-danger">*</span></label>
                                             <div class="row">
                                                 @foreach($servicesOffered as $service)
                                                 <div class="col-md-6">
                                                     <div class="form-check checkbox-primary d-flex align-items-center">
-                                                        <input class="form-check-input" type="checkbox" name="services_offered[]" value="{{ $service->name }}" id="service_{{ $service->id }}">
+                                                        <input class="form-check-input group-required" type="checkbox" name="services_offered[]" value="{{ $service->name }}" id="service_{{ $service->id }}" data-group="services">
                                                         <label class="form-check-label flex-grow-1 mb-0" for="service_{{ $service->id }}">{{ $service->name }}</label>
                                                         <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $service->id }}" data-type="translator_services"><i class="fa fa-trash"></i></a>
                                                     </div>
@@ -350,44 +367,57 @@
                                 <div class="step-content d-none" id="step-6">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label">Government ID Type</label>
-                                            <input class="form-control" type="text" name="gov_id_type">
+                                            <label class="form-label">Government ID Type <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="gov_id_type" required placeholder="Aadhar, Passport, etc.">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Upload ID Proof</label>
-                                            <input class="form-control" type="file" name="gov_id_upload">
+                                            <label class="form-label">Upload ID Proof <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="file" name="gov_id_upload" accept=".pdf,.jpg,.jpeg,.png">
+                                            <div id="current-gov_id_upload" class="mt-1 d-none small"></div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">PAN Number (optional)</label>
-                                            <input class="form-control" type="text" name="pan_number">
+                                            <label class="form-label">PAN Number</label>
+                                            <input class="form-control" type="text" name="pan_number" 
+                                               pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                                                title="Enter valid PAN Number (Example: ABCDE1234F)"
+                                                maxlength="10"
+                                                style="text-transform:uppercase;"
+                                                oninput="this.value = this.value.toUpperCase()" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Bank Holder Name</label>
-                                            <input class="form-control" type="text" name="bank_holder_name">
+                                            <label class="form-label">Bank Holder Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="bank_holder_name" required pattern="^[A-Z\s]{2,100}$" title="First letter capital" oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Bank Name</label>
-                                            <input class="form-control" type="text" name="bank_name">
+                                            <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="bank_name" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Account Number</label>
-                                            <input class="form-control" type="text" name="account_number">
+                                            <label class="form-label">Account Number <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="account_number" required 
+                                                pattern="^[0-9]{9,18}$" title="Enter valid account number (9-18 digits)"
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">IFSC Code</label>
-                                            <input class="form-control" type="text" name="ifsc_code">
+                                            <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="ifsc_code" required 
+                                                pattern="^[A-Z]{4}0[A-Z0-9]{6}$" title="Enter valid IFSC (Example: SBIN0123456)"
+                                                oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">SWIFT Code</label>
-                                            <input class="form-control" type="text" name="swift_code">
+                                            <input class="form-control" type="text" name="swift_code" pattern="^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$"maxlength="11"oninput="this.value=this.value.toUpperCase()"title="Enter valid SWIFT Code (Example: HDFCINBBXXX)" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">UPI ID (optional)</label>
-                                            <input class="form-control" type="text" name="upi_id">
+                                            <input class="form-control" type="text" name="upi_id" 
+                                                pattern="^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$" 
+                                                title="Enter valid UPI ID (Example: user@upi)" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Cancelled Cheque / Passbook Upload</label>
-                                            <input class="form-control" type="file" name="cancelled_cheque">
+                                            <label class="form-label">Cancelled Cheque / Passbook Upload <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="file" name="cancelled_cheque" accept=".pdf,.jpg,.jpeg,.png">
+                                            <div id="current-cancelled_cheque" class="mt-1 d-none small"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -452,10 +482,18 @@
                 <h5 class="modal-title">Confirm Status Change</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p id="status-confirmation-msg">Are you sure you want to change the status?</p>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Info-Square icli text-primary mb-3" style="font-size: 50px;"></i>
+                <h5>Update Translator Status</h5>
+                <p id="status-confirmation-msg">Select the new status for this translator:</p>
+                <div class="mb-3 px-5">
+                    <select id="status-select-input-translator" class="form-select">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
                 <input type="hidden" id="status-translator-id">
-                <input type="hidden" id="status-new-value">
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
@@ -491,6 +529,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
+        const storageBase = "{{ asset('storage') }}/";
         let table;
         let currentStep = 1;
         const totalSteps = 6;
@@ -714,17 +753,100 @@
             function validateStep(step) {
                 let isValid = true;
                 let $step = $('#step-' + step);
-                // Basic required validation for visible inputs in current step
-                $step.find('input[required], select[required]').each(function() {
-                    if (!$(this).val()) {
-                        isValid = false;
-                        $(this).addClass('is-invalid');
+                
+                // Clear previous errors in this step
+                $step.find('.is-invalid').removeClass('is-invalid');
+                $step.find('.invalid-feedback').remove();
+
+                // Track which checkbox groups have been validated
+                let validatedGroups = [];
+
+                $step.find('input, select, textarea').each(function() {
+                    const el = $(this);
+                    
+                    // Skip disabled
+                    if (el.prop('disabled')) return;
+                    
+                    // Skip hidden UNLESS it's a select (which might be hidden by Choices.js)
+                    if (el.is(':hidden') && !el.is('select')) return;
+
+                    let fieldValid = true;
+                    let errorMessage = '';
+
+                    // Group Checkbox Validation (Select at least one)
+                    if (el.hasClass('group-required')) {
+                        const groupName = el.data('group');
+                        if (validatedGroups.indexOf(groupName) !== -1) return; // Already validated this group
+                        
+                        const checkboxes = $step.find(`.group-required[data-group="${groupName}"]`);
+                        if (checkboxes.filter(':checked').length === 0) {
+                            fieldValid = false;
+                            errorMessage = 'Please select at least one option';
+                            // Target the container to show error
+                            const container = el.closest('.row');
+                            container.after(`<div class="invalid-feedback d-block mt-n2 mb-3">${errorMessage}</div>`);
+                            checkboxes.addClass('is-invalid');
+                        }
+                        validatedGroups.push(groupName);
                     } else {
-                        $(this).removeClass('is-invalid');
+                        // 1. Native HTML5 Validation
+                        if (!this.checkValidity()) {
+                            fieldValid = false;
+                            errorMessage = el.attr('title') || this.validationMessage || 'This field is required';
+                        }
+
+                        // 2. Custom Validations
+                        if (fieldValid) {
+                            // Password Confirmation Match
+                            if (el.attr('id') === 'password-confirm-input') {
+                                const password = $('#password-input').val();
+                                if (el.val() !== password) {
+                                    fieldValid = false;
+                                    errorMessage = 'Passwords do not match';
+                                }
+                            }
+                        }
+
+                        if (!fieldValid) {
+                            el.addClass('is-invalid');
+                            // Handle error message placement
+                            if (el.next('.invalid-feedback').length === 0) {
+                                if (el.parent().hasClass('input-group')) {
+                                    el.parent().after(`<div class="invalid-feedback d-block">${errorMessage}</div>`);
+                                } else if (el.parent().hasClass('choices')) {
+                                    el.parent().after(`<div class="invalid-feedback d-block">${errorMessage}</div>`);
+                                } else {
+                                    el.after(`<div class="invalid-feedback">${errorMessage}</div>`);
+                                }
+                            }
+                        }
                     }
+
+                    if (!fieldValid) isValid = false;
                 });
+
+                if (!isValid) {
+                    const firstError = $step.find('.is-invalid').first();
+                    if (firstError.length) {
+                        firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+
                 return isValid;
             }
+
+            // Real-time validation clearance
+            $(document).on('input change', '#translator-form input, #translator-form select, #translator-form textarea', function() {
+                const el = $(this);
+                if (el.hasClass('is-invalid')) {
+                    el.removeClass('is-invalid');
+                    if (el.parent().hasClass('input-group')) {
+                        el.parent().next('.invalid-feedback').remove();
+                    } else {
+                        el.next('.invalid-feedback').remove();
+                    }
+                }
+            });
 
             // Image Preview and Validation
             $("#imageUpload").change(function() {
@@ -887,6 +1009,9 @@
             // Form Submit
             $('#translator-form').on('submit', function(e) {
                 e.preventDefault();
+                
+                if (!validateStep(currentStep)) return;
+
                 let id = $('#translator_id').val();
                 let url = id ? "{{ url('admin/translators') }}/" + id : "{{ route('admin.translators.store') }}";
                 let formData = new FormData(this);
@@ -927,15 +1052,16 @@
                 $('.password-field').hide();
                 $('input[name="password"]').removeAttr('required');
                 $('input[name="password_confirmation"]').removeAttr('required');
+                $('[id^="current-"]').addClass('d-none').html(''); // Clear existing previews
 
                 $.get("{{ url('admin/translators') }}/" + id + "/edit", function(response) {
                     let u = response.user;
                     let t = response.translator;
 
-                    $('input[name="first_name"]').val(t.first_name);
-                    $('input[name="last_name"]').val(t.last_name);
+                    $('input[name="first_name"]').val(t.first_name || u.first_name || '');
+                    $('input[name="last_name"]').val(t.last_name || u.last_name || '');
                     $('input[name="email"]').val(u.email);
-                    $('input[name="phone"]').val(t.phone);
+                    $('input[name="phone"]').val((t.phone || '').replace(/[^0-9]/g, ''));
                     $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
                     $('input[name="address_line_1"]').val(t.address_line_1);
                     $('input[name="address_line_2"]').val(t.address_line_2);
@@ -946,7 +1072,8 @@
                     $('select[name="gender"]').val(t.gender);
 
                     if (t.profile_photo_path) {
-                        $('#imagePreview').css('background-image', 'url(/storage/' + t.profile_photo_path + ')');
+                        $('#imagePreview').css('background-image', 'url(' + storageBase + t.profile_photo_path + ')');
+                        $('#current-profile_photo').removeClass('d-none').html(`<a href="${storageBase}${t.profile_photo_path}" target="_blank" class="text-primary">View Current Photo</a>`);
                     }
 
                     $('select[name="native_language"]').val(t.native_language);
@@ -958,6 +1085,7 @@
                             const langs = Array.isArray(t[field]) ? t[field] : [];
                             if (langs.length > 0 && typeof langs[0] === 'string') {
                                 choicesInstance.setChoiceByValue(langs);
+                                langs.forEach(l => addLanguageCapabilityRow(l, l, field));
                             } else {
                                 const langValues = [];
                                 $.each(t[field], function(key, caps) {
@@ -992,6 +1120,22 @@
                     $('input[name="highest_education"]').val(t.highest_education);
                     $('textarea[name="certification_details"]').val(t.certification_details);
 
+                    if (t.certificates_path && t.certificates_path.length > 0) {
+                        let certsHtml = t.certificates_path.map((path, i) => `<a href="${storageBase}${path}" target="_blank" class="badge bg-primary text-white p-2">Cert ${i+1}</a>`).join('');
+                        $('#current-certificates').removeClass('d-none').html(certsHtml);
+                        $('input[name="certificates[]"]').prop('required', false);
+                    } else {
+                        $('input[name="certificates[]"]').prop('required', true);
+                    }
+
+                    if (t.sample_work_path && t.sample_work_path.length > 0) {
+                        let sampleHtml = t.sample_work_path.map((path, i) => `<a href="${storageBase}${path}" target="_blank" class="badge bg-secondary text-white p-2">Sample ${i+1}</a>`).join('');
+                        $('#current-sample_work').removeClass('d-none').html(sampleHtml);
+                        $('input[name="sample_work[]"]').prop('required', false);
+                    } else {
+                        $('input[name="sample_work[]"]').prop('required', true);
+                    }
+
                     if (t.services_offered) {
                         t.services_offered.forEach(val => {
                             $(`input[name="services_offered[]"][value="${val}"]`).prop('checked', true);
@@ -999,6 +1143,13 @@
                     }
 
                     $('input[name="gov_id_type"]').val(t.gov_id_type);
+                    if (t.gov_id_upload_path) {
+                        $('#current-gov_id_upload').removeClass('d-none').html(`<a href="${storageBase}${t.gov_id_upload_path}" target="_blank" class="text-primary">View Current ID</a>`);
+                        $('input[name="gov_id_upload"]').prop('required', false);
+                    } else {
+                        $('input[name="gov_id_upload"]').prop('required', true);
+                    }
+
                     $('input[name="pan_number"]').val(t.pan_number);
                     $('input[name="bank_holder_name"]').val(t.bank_holder_name);
                     $('input[name="bank_name"]').val(t.bank_name);
@@ -1006,6 +1157,13 @@
                     $('input[name="ifsc_code"]').val(t.ifsc_code);
                     $('input[name="swift_code"]').val(t.swift_code);
                     $('input[name="upi_id"]').val(t.upi_id);
+
+                    if (t.cancelled_cheque_path) {
+                        $('#current-cancelled_cheque').removeClass('d-none').html(`<a href="${storageBase}${t.cancelled_cheque_path}" target="_blank" class="text-primary">View Current Cheque</a>`);
+                        $('input[name="cancelled_cheque"]').prop('required', false);
+                    } else {
+                        $('input[name="cancelled_cheque"]').prop('required', true);
+                    }
                 });
             });
 
@@ -1275,17 +1433,16 @@
                 });
             });
 
-            // Status Toggle
-            $('body').on('click', '.toggle-status', function() {
-                var id = $(this).data('id');
-                var currentStatus = $(this).data('status');
-                var newStatus = (currentStatus === 'active') ? 0 : 1;
-                var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
+            // Status Toggle - Robust Implementation
+            $(document).off('click', '.toggle-status').on('click', '.toggle-status', function(e) {
+                e.preventDefault();
+                var $this = $(this);
+                var id = $this.data('id');
+                var currentStatus = String($this.data('status')).toLowerCase();
 
                 $('#status-translator-id').val(id);
-                $('#status-new-value').val(newStatus);
-                $('#status-confirmation-msg').text(`Are you sure you want to change the status to ${newStatusText}?`);
-
+                $('#status-select-input-translator').val(currentStatus); // Pre-select current status
+                
                 var modalEl = document.getElementById('status-confirmation-modal');
                 var modal = bootstrap.Modal.getInstance(modalEl);
                 if (!modal) {
@@ -1294,9 +1451,10 @@
                 modal.show();
             });
 
-            $('#confirm-status-btn').on('click', function() {
+            // Handle Confirm Status Change
+            $(document).off('click', '#confirm-status-btn').on('click', '#confirm-status-btn', function() {
                 var id = $('#status-translator-id').val();
-                var newStatus = $('#status-new-value').val();
+                var newStatus = $('#status-select-input-translator').val();
                 var btn = $(this);
                 btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
 

@@ -20,7 +20,7 @@ class TranslatorController extends Controller
         $this->middleware('permission:translators-create')->only(['create', 'store']);
         $this->middleware('permission:translators-edit')->only(['edit', 'update']);
         $this->middleware('permission:translators-delete')->only('destroy');
-        $this->middleware('permission:translators-update-status')->only('updateStatus');
+        $this->middleware('permission:translators-update-status|super-admin')->only('updateStatus');
     }
 
     public function index(Request $request)
@@ -31,6 +31,8 @@ class TranslatorController extends Controller
                 ->select([
                     'users.id',
                     'users.name',
+                    'users.first_name',
+                    'users.last_name',
                     'users.email',
                     'users.created_at',
                     'translators.gender',
@@ -63,6 +65,8 @@ class TranslatorController extends Controller
                         $searchValue = $request->get('search')['value'];
                         $query->where(function ($q) use ($searchValue) {
                             $q->where('users.name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.first_name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.last_name', 'LIKE', "%$searchValue%")
                                 ->orWhere('users.email', 'LIKE', "%$searchValue%")
                                 ->orWhere('translators.phone', 'LIKE', "%$searchValue%")
                                 ->orWhere('translators.country', 'LIKE', "%$searchValue%")
@@ -109,8 +113,8 @@ class TranslatorController extends Controller
                     })->implode(' ');
                 })
                 ->editColumn('status', function ($row) {
-                    $badgeClass = 'bg-danger';
-                    if ($row->status == 'active') {
+                    $badgeClass = 'bg-danger'; // For rejected or inactive
+                    if (in_array($row->status, ['active', 'approved'])) {
                         $badgeClass = 'bg-success';
                     } elseif ($row->status == 'pending') {
                         $badgeClass = 'bg-warning';
@@ -118,8 +122,8 @@ class TranslatorController extends Controller
 
                     $statusText = ucfirst($row->status ?? 'inactive');
 
-                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
-                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '">' . $statusText . '</span>';
+                    if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
+                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
                     }
                     return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
                 })
@@ -423,13 +427,13 @@ class TranslatorController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || !in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $translator = Translator::where('user_id', $id)->firstOrFail();
         $translator->update([
-            'status' => $request->status ? 'active' : 'inactive'
+            'status' => $request->status
         ]);
 
         return response()->json(['success' => 'Status updated successfully!']);

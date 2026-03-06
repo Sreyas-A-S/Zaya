@@ -27,24 +27,10 @@ class LanguageController extends Controller
                             Edit
                         </button>
 
-                        <form action="languages/'.$row->id.'" method="POST" style="display:inline-block;">
-                        '.csrf_field().'
-                        '.method_field('DELETE').'
-                        <button type="submit" class="btn btn-sm btn-danger"
-                            onclick="return confirm(\'Are you sure ?\')">
+                        <button type="button" class="btn btn-sm btn-danger deleteLanguage" data-id="'.$row->id.'">
                             Delete
                         </button>
-                    </form>
                     ';
-                     // Get selected language from homepage_settings
-    $setting = HomepageSetting::first();
-
-    $language = $setting->language ?? 'en';
-
-    // Fetch homepage content based on language
-    $homepageData = HomepageSetting::where('language', $language)->first();
-
-    return view('home', compact('homepageData'));
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -109,6 +95,7 @@ class LanguageController extends Controller
             'message' => 'Language updated successfully'
         ]);
     }
+
     public function change($code)
     {
         $code = strtolower((string) $code);
@@ -141,13 +128,12 @@ class LanguageController extends Controller
             'data' => $settings,
         ]);
     }
+
     /**
      * Delete language
      */
-public function destroy($id)
-    
+    public function destroy($id)
     {
-       
         $language = Language::findOrFail($id);
         $language->delete();
 
@@ -156,4 +142,4 @@ public function destroy($id)
             'message' => 'Language deleted successfully'
         ]);
     }
-}   
+}

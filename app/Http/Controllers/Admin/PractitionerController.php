@@ -36,6 +36,8 @@ class PractitionerController extends Controller
                 ->select([
                     'users.id',
                     'users.name',
+                    'users.first_name',
+                    'users.last_name',
                     'users.email',
                     'users.created_at',
                     'practitioners.gender',
@@ -56,6 +58,8 @@ class PractitionerController extends Controller
                         $searchValue = $request->get('search')['value'];
                         $query->where(function ($q) use ($searchValue) {
                             $q->where('users.name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.first_name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.last_name', 'LIKE', "%$searchValue%")
                                 ->orWhere('users.email', 'LIKE', "%$searchValue%")
                                 ->orWhere('practitioners.phone', 'LIKE', "%$searchValue%")
                                 ->orWhere('practitioners.nationality', 'LIKE', "%$searchValue%")
@@ -74,8 +78,8 @@ class PractitionerController extends Controller
                 ->orderColumn('nationality', 'practitioners.nationality $1')
                 ->orderColumn('status', 'practitioners.status $1')
                 ->editColumn('status', function ($row) {
-                    $badgeClass = 'bg-danger';
-                    if ($row->status == 'active') {
+                    $badgeClass = 'bg-danger'; // For rejected or inactive
+                    if (in_array($row->status, ['active', 'approved'])) {
                         $badgeClass = 'bg-success';
                     } elseif ($row->status == 'pending') {
                         $badgeClass = 'bg-warning';
@@ -83,7 +87,7 @@ class PractitionerController extends Controller
 
                     $statusText = ucfirst($row->status ?? 'inactive');
 
-                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
+                    if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
                         return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
                     }
 
@@ -360,13 +364,13 @@ class PractitionerController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || !in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $practitioner = Practitioner::where('user_id', $id)->firstOrFail();
         $practitioner->update([
-            'status' => $request->status ? 'active' : 'inactive'
+            'status' => $request->status
         ]);
 
         return response()->json(['success' => 'Status updated successfully!']);

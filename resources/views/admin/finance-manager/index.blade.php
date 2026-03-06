@@ -87,87 +87,87 @@
                             <label class="form-label mt-2">Profile Photo</label>
                         </div>
 
-                        <!-- Fields -->
-                        <div class="col-sm-6 col-md-4">
-    <label class="form-label">
-        First Name <span class="text-danger">*</span>
-    </label>
-    <input 
-        class="form-control @error('firstname') is-invalid @enderror"
-        type="text"
-        name="firstname"
-        id="firstname"
-        value="{{ old('firstname') }}"
-        required
-        pattern="^[A-Z][a-z]*$"
-        title="First letter must be capital and only letters allowed"
-        placeholder="First Name"
-    >
-    @error('firstname')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
+                                            <!-- Fields -->
+                                            <div class="col-sm-6 col-md-4">
+                        <label class="form-label">
+                            First Name <span class="text-danger">*</span>
+                        </label>
+                        <input 
+                            class="form-control @error('firstname') is-invalid @enderror"
+                            type="text"
+                            name="firstname"
+                            id="firstname"
+                            value="{{ old('firstname') }}"
+                            required
+                            pattern="^[A-Z][a-z]*$"
+                            title="First letter must be capital and only letters allowed"
+                            placeholder="First Name"
+                        >
+                        @error('firstname')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
 
-<div class="col-sm-6 col-md-4">
-    <label class="form-label">
-        Last Name <span class="text-danger">*</span>
-    </label>
-    <input 
-        class="form-control @error('lastname') is-invalid @enderror"
-        type="text"
-        name="lastname"
-        id="lastname"
-        value="{{ old('lastname') }}"
-        required
-        pattern="^[A-Z][a-z]*$"
-        title="First letter must be capital and only letters allowed"
-        placeholder="Last Name"
-    >
-    @error('lastname')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
+                    <div class="col-sm-6 col-md-4">
+                        <label class="form-label">
+                            Last Name <span class="text-danger">*</span>
+                        </label>
+                        <input 
+                            class="form-control @error('lastname') is-invalid @enderror"
+                            type="text"
+                            name="lastname"
+                            id="lastname"
+                            value="{{ old('lastname') }}"
+                            required
+                            pattern="^[A-Z][a-z]*$"
+                            title="First letter must be capital and only letters allowed"
+                            placeholder="Last Name"
+                        >
+                        @error('lastname')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
 
-<div class="col-sm-6 col-md-4">
-    <label class="form-label">
-        Email Address <span class="text-danger">*</span>
-    </label>
-    <input 
-        class="form-control @error('email') is-invalid @enderror"
-        type="email"
-        name="email"
-        id="email"
-        value="{{ old('email') }}"
-        required
-        placeholder="Email"
-    >
-    @error('email')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
+                    <div class="col-sm-6 col-md-4">
+                        <label class="form-label">
+                            Email Address <span class="text-danger">*</span>
+                        </label>
+                        <input 
+                            class="form-control @error('email') is-invalid @enderror"
+                            type="email"
+                            name="email"
+                            id="email"
+                            value="{{ old('email') }}"
+                            required
+                            placeholder="Email"
+                        >
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
 
-<div class="col-sm-6 col-md-4">
-    <label class="form-label">
-        Phone Number <span class="text-danger">*</span>
-    </label>
-    <input 
-        class="form-control @error('phone') is-invalid @enderror"
-        type="text"
-        name="phone"
-        id="phone"
-        value="{{ old('phone') }}"
-        required
-        pattern="^[0-9]{10,15}$"
-        title="Phone number must contain 10 to 15 digits"
-        placeholder="Phone Number"
-    >
-    @error('phone')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
+                    <div class="col-sm-6 col-md-4">
+                        <label class="form-label">
+                            Phone Number <span class="text-danger">*</span>
+                        </label>
+                        <input 
+                            class="form-control @error('phone') is-invalid @enderror"
+                            type="text"
+                            name="phone"
+                            id="phone"
+                            value="{{ old('phone') }}"
+                            required
+                            pattern="^\+\d{1,3}\s\d{10,15}$"
+                            title="Phone number must contain 10 to 15 digits"
+                            placeholder="Phone Number"
+                        >
+                        @error('phone')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                         <div class="col-sm-6 col-md-4">
                             <label class="form-label">Country <span class="text-danger">*</span></label>
                             <select name="country[]" id="country" class="form-control select2" multiple required>
@@ -376,9 +376,19 @@
     .select2-container--default .select2-selection--multiple {
         border-color: #dee2e6;
         min-height: 38px;
+        resize: none !important;
+    }
+    textarea.select2-search__field {
+        resize: none !important;
     }
     .select2-container {
         width: 100% !important;
+        resize: none !important;
+    }
+    .avatar-upload {
+        position: relative;
+        max-width: 150px;
+        margin: 0 auto;
     }
     .avatar-upload .avatar-edit {
         position: absolute;

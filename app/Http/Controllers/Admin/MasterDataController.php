@@ -74,7 +74,7 @@ class MasterDataController extends Controller
                 ->editColumn('status', function ($row) {
                     $badgeClass = $row->status ? 'bg-success' : 'bg-danger';
                     $statusText = $row->status ? 'Active' : 'Inactive';
-                    return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
+                    return '<span class="badge ' . $badgeClass . ' toggleStatus cursor-pointer" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
                 })
                 ->addColumn('action', function ($row) use ($type) {
                     $btn = '<div class="d-flex align-items-center gap-2">';
@@ -112,6 +112,13 @@ class MasterDataController extends Controller
         }
 
         $model = $this->types[$type];
+
+        // Check for duplicates (case-insensitive if DB allows, but simple where is usually enough)
+        $exists = $model::where('name', $request->name)->exists();
+        if ($exists) {
+            return response()->json(['error' => 'This item already exists.'], 422);
+        }
+
         $item = $model::create($data);
 
         return response()->json(['success' => 'Item created successfully!', 'data' => $item]);
@@ -136,6 +143,21 @@ class MasterDataController extends Controller
         ]);
 
         return response()->json(['success' => 'Item updated successfully!']);
+    }
+
+    public function updateStatus(Request $request, $type, $id)
+    {
+        if (!isset($this->types[$type])) {
+            return response()->json(['error' => 'Invalid type'], 404);
+        }
+
+        $model = $this->types[$type];
+        $item = $model::findOrFail($id);
+        $item->update([
+            'status' => $request->status
+        ]);
+
+        return response()->json(['success' => 'Status updated successfully!']);
     }
 
     public function destroy($type, $id)

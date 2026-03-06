@@ -31,6 +31,8 @@ class MindfulnessPractitionerController extends Controller
                 ->select([
                     'users.id',
                     'users.name',
+                    'users.first_name',
+                    'users.last_name',
                     'users.email',
                     'users.created_at',
                     'mindfulness_practitioners.gender',
@@ -49,6 +51,8 @@ class MindfulnessPractitionerController extends Controller
                         $searchValue = $request->get('search')['value'];
                         $query->where(function ($q) use ($searchValue) {
                             $q->where('users.name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.first_name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.last_name', 'LIKE', "%$searchValue%")
                                 ->orWhere('users.email', 'LIKE', "%$searchValue%")
                                 ->orWhere('mindfulness_practitioners.phone', 'LIKE', "%$searchValue%")
                                 ->orWhere('mindfulness_practitioners.country', 'LIKE', "%$searchValue%")
@@ -66,8 +70,8 @@ class MindfulnessPractitionerController extends Controller
                 ->orderColumn('country', 'mindfulness_practitioners.country $1')
                 ->orderColumn('status', 'mindfulness_practitioners.status $1')
                 ->editColumn('status', function ($row) {
-                    $badgeClass = 'bg-danger';
-                    if ($row->status == 'active') {
+                    $badgeClass = 'bg-danger'; // For rejected or inactive
+                    if (in_array($row->status, ['active', 'approved'])) {
                         $badgeClass = 'bg-success';
                     } elseif ($row->status == 'pending') {
                         $badgeClass = 'bg-warning';
@@ -75,8 +79,8 @@ class MindfulnessPractitionerController extends Controller
 
                     $statusText = ucfirst($row->status ?? 'inactive');
 
-                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
-                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '">' . $statusText . '</span>';
+                    if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
+                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
                     }
                     return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
                 })
@@ -120,7 +124,7 @@ class MindfulnessPractitionerController extends Controller
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'required|string|max:20',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
             'city' => 'required|string|max:255',
@@ -236,7 +240,7 @@ class MindfulnessPractitionerController extends Controller
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'required|string|max:20',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
             'city' => 'required|string|max:255',
@@ -349,13 +353,13 @@ class MindfulnessPractitionerController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || !in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $practitioner = MindfulnessPractitioner::where('user_id', $id)->firstOrFail();
         $practitioner->update([
-            'status' => $request->status ? 'active' : 'inactive'
+            'status' => $request->status
         ]);
 
         return response()->json(['success' => 'Status updated successfully!']);

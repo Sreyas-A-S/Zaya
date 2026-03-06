@@ -232,25 +232,25 @@ class ClientController extends Controller
         }
         $user->save();
 
-        $age = $validatedData['dob'] ? Carbon::parse($validatedData['dob'])->age : null;
+        $age = !empty($validatedData['dob']) ? Carbon::parse($validatedData['dob'])->age : null;
 
         $patientData = [
-            'dob' => $validatedData['dob'],
+            'dob' => $validatedData['dob'] ?? null,
             'age' => $age,
-            'gender' => $validatedData['gender'],
-            'occupation' => $validatedData['occupation'],
+            'gender' => $validatedData['gender'] ?? null,
+            'occupation' => $validatedData['occupation'] ?? null,
             'address_line_1' => $validatedData['address_line_1'],
-            'address_line_2' => $validatedData['address_line_2'],
+            'address_line_2' => $validatedData['address_line_2'] ?? null,
             'city' => $validatedData['city'],
             'state' => $validatedData['state'],
             'zip_code' => $validatedData['zip_code'],
             'country' => $validatedData['country'],
-            'mobile_country_code' => $validatedData['mobile_country_code'],
-            'phone' => $validatedData['phone'],
-            'consultation_preferences' => $validatedData['consultation_preferences'],
-            'languages_spoken' => $validatedData['languages_spoken'],
-            'referral_type' => $validatedData['referral_type'],
-            'referrer_name' => $validatedData['referrer_name'],
+            'mobile_country_code' => $validatedData['mobile_country_code'] ?? null,
+            'phone' => $validatedData['phone'] ?? null,
+            'consultation_preferences' => $validatedData['consultation_preferences'] ?? [],
+            'languages_spoken' => $validatedData['languages_spoken'] ?? [],
+            'referral_type' => $validatedData['referral_type'] ?? null,
+            'referrer_name' => $validatedData['referrer_name'] ?? null,
         ];
 
         if ($request->hasFile('profile_photo')) {
@@ -279,7 +279,7 @@ class ClientController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || !in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

@@ -427,7 +427,7 @@
         table = $('#countries-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('countries.index') }}",
+            ajax: "{{ route('admin.countries.index') }}",
             columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',

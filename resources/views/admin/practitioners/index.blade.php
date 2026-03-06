@@ -36,6 +36,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Profile</th>
                                     <th>Name</th>
                                     <th>Gender</th>
                                     <th>Email</th>
@@ -114,7 +115,7 @@
                                                 </div>
                                             </div>
                                             <label class="form-label mt-2">Profile Photo <span class="text-danger">*</span></label>
-                                            <div id="current-profile-photo" class="d-none"></div>
+                                            <div id="current-profile_photo" class="d-none"></div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">First Name <span class="text-danger">*</span></label>
@@ -179,7 +180,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="zip_code" required  pattern="^[A-Za-z0-9\s\-]{3,10}$" placeholder="Pincode">
+                                            <input type="text" class="form-control" name="zip_code" required     pattern="^[A-Za-z0-9\s\-]{3,10}$" placeholder="Pincode">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Country <span class="text-danger">*</span></label>
@@ -277,24 +278,24 @@
                                                 <div class="qualification-row border p-3 rounded mb-3 bg-light position-relative">
                                                     <div class="row g-2">
                                                         <div class="col-md-3">
-                                                            <label class="small fw-bold">Year of Passing</label>
-                                                            <input type="text" class="form-control form-control-sm" name="qualifications[0][year_of_passing]">
+                                                            <label class="small fw-bold">Year of Passing <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control form-control-sm" name="qualifications[0][year_of_passing]" required pattern="^[0-9]{4}$" title="Enter 4-digit year">
                                                         </div>
                                                         <div class="col-md-5">
-                                                            <label class="small fw-bold">Institute Name</label>
-                                                            <input type="text" class="form-control form-control-sm" name="qualifications[0][institute_name]">
+                                                            <label class="small fw-bold">Institute Name <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control form-control-sm" name="qualifications[0][institute_name]" required>
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <label class="small fw-bold">Training/Diploma Title</label>
-                                                            <input type="text" class="form-control form-control-sm" name="qualifications[0][training_diploma_title]">
+                                                            <label class="small fw-bold">Training/Diploma Title <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control form-control-sm" name="qualifications[0][training_diploma_title]" required>
                                                         </div>
                                                         <div class="col-md-3">
                                                             <label class="small fw-bold">Online Hours</label>
-                                                            <input type="text" class="form-control form-control-sm" name="qualifications[0][training_duration_online_hours]">
+                                                            <input type="text" class="form-control form-control-sm" name="qualifications[0][training_duration_online_hours]" pattern="^[0-9]+$" title="Only numbers allowed">
                                                         </div>
                                                         <div class="col-md-3">
                                                             <label class="small fw-bold">Contact Hours</label>
-                                                            <input type="text" class="form-control form-control-sm" name="qualifications[0][training_duration_contact_hours]">
+                                                            <input type="text" class="form-control form-control-sm" name="qualifications[0][training_duration_contact_hours]" pattern="^[0-9]+$" title="Only numbers allowed">
                                                         </div>
                                                         <div class="col-md-6">
                                                             <label class="small fw-bold">Institute Address</label>
@@ -389,7 +390,7 @@
                                             <label class="form-label small fw-bold">{{ $label }}</label>
                                             <input type="file" class="form-control form-control-sm" name="{{ $name }}"
                                                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                @if($name !=='doc_profile_photo' ) required @endif>
+                                                required>
                                             <div id="current-{{ $name }}" class="mt-1 d-none small"></div>
                                         </div>
                                         @endforeach
@@ -488,10 +489,16 @@
             </div>
             <div class="modal-body text-center p-4">
                 <i class="iconly-Info-Square icli text-primary mb-3" style="font-size: 50px;"></i>
-                <h5>Update Status?</h5>
-                <p id="status-confirmation-text">Are you sure you want to change the status of this practitioner?</p>
+                <h5>Update Practitioner Status</h5>
+                <p id="status-confirmation-text">Select the new status for this practitioner:</p>
+                <div class="mb-3 px-5">
+                    <select id="status-select-input" class="form-select">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
                 <input type="hidden" id="status-practitioner-id">
-                <input type="hidden" id="status-new-value">
             </div>
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
@@ -711,6 +718,7 @@
 </style>
 
 <script>
+    const storageBase = "{{ asset('storage') }}/";
     let table;
     let toastInstance;
     let languageChoices;
@@ -756,6 +764,12 @@
             columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'profile_photo',
+                    name: 'profile_photo',
                     orderable: false,
                     searchable: false
                 },
@@ -888,19 +902,63 @@
         });
     });
 
+    function validateStep(step) {
+        let valid = true;
+        const stepContainer = $('#step' + step);
+        
+        // Clear previous errors
+        stepContainer.find('.is-invalid').removeClass('is-invalid');
+        stepContainer.find('.invalid-feedback').remove();
+        
+        // Find all required fields and those with patterns
+        const inputs = stepContainer.find('input[required], select[required], textarea[required], input[pattern]').not(':hidden');
+        
+        inputs.each(function() {
+            const el = $(this);
+            let fieldValid = true;
+            let message = 'This field is required';
+
+            if (el.prop('required')) {
+                if (el.is(':checkbox')) {
+                    if (!el.is(':checked')) fieldValid = false;
+                } else if (el.is('select')) {
+                    if (!el.val() || el.val() === '') fieldValid = false;
+                } else {
+                    if (!el.val() || el.val().trim() === '') fieldValid = false;
+                }
+            }
+
+            if (fieldValid && el.attr('pattern')) {
+                const pattern = new RegExp(el.attr('pattern'));
+                if (el.val() && !pattern.test(el.val())) {
+                    fieldValid = false;
+                    message = el.attr('title') || 'Invalid format';
+                }
+            }
+
+            if (!fieldValid) {
+                el.addClass('is-invalid');
+                if (el.next('.invalid-feedback').length === 0) {
+                    el.after(`<div class="invalid-feedback d-block">${message}</div>`);
+                }
+                valid = false;
+            }
+        });
+
+        if (!valid) {
+            const firstError = stepContainer.find('.is-invalid').first();
+            if (firstError.length) {
+                firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        return valid;
+    }
+
     function initFormNavigation() {
         $('.next-step').on('click', function() {
-            var currentStepDiv = $(this).closest('.step-content');
-            var inputs = currentStepDiv.find('input[required], select[required], textarea[required]').not(':hidden');
-            var valid = true;
-            inputs.each(function() {
-                if (!this.checkValidity()) {
-                    this.reportValidity();
-                    valid = false;
-                    return false;
-                }
-            });
-            if (!valid) return;
+            var currentStep = $(this).closest('.step-content').attr('id').replace('step', '');
+            if (!validateStep(currentStep)) return;
             updateStep($(this).data('next'));
         });
 
@@ -909,7 +967,21 @@
         });
 
         $('.stepper-item').on('click', function() {
-            updateStep($(this).data('step'));
+            const targetStep = parseInt($(this).data('step'));
+            const currentStep = parseInt($('.step-content:not(.d-none)').attr('id').replace('step', ''));
+            
+            if (targetStep < currentStep) {
+                // Going backward is always allowed
+                updateStep(targetStep);
+            } else if (targetStep > currentStep) {
+                // Going forward one by one and validating
+                if (validateStep(currentStep)) {
+                    // Only allow going forward to the next step or already completed steps
+                    if (targetStep === currentStep + 1 || $(this).hasClass('completed')) {
+                         updateStep(targetStep);
+                    }
+                }
+            }
         });
     }
 
@@ -925,30 +997,39 @@
         $('#practitioner-form-modal .modal-body').scrollTop(0);
     }
 
+    // Real-time validation: Clear error when user starts typing
+    $(document).on('input change', '#practitioner-form input, #practitioner-form select, #practitioner-form textarea', function() {
+        const el = $(this);
+        if (el.hasClass('is-invalid')) {
+            el.removeClass('is-invalid');
+            el.next('.invalid-feedback').remove();
+        }
+    });
+
     function addQualificationRow(data = {}) {
         const html = `
             <div class="qualification-row border p-3 rounded mb-3 bg-light position-relative">
                 <i class="fa fa-times-circle remove-qual" onclick="$(this).parent().remove()"></i>
                 <div class="row g-2">
                     <div class="col-md-3">
-                        <label class="small fw-bold">Year of Passing</label>
-                        <input type="text" class="form-control form-control-sm" name="qualifications[${qualCount}][year_of_passing]" value="${data.year_of_passing || ''}">
+                        <label class="small fw-bold">Year of Passing <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" name="qualifications[${qualCount}][year_of_passing]" value="${data.year_of_passing || ''}" required pattern="^[0-9]{4}$" title="Enter 4-digit year">
                     </div>
                     <div class="col-md-5">
-                        <label class="small fw-bold">Institute Name</label>
-                        <input type="text" class="form-control form-control-sm" name="qualifications[${qualCount}][institute_name]" value="${data.institute_name || ''}">
+                        <label class="small fw-bold">Institute Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" name="qualifications[${qualCount}][institute_name]" value="${data.institute_name || ''}" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="small fw-bold">Training/Diploma Title</label>
-                        <input type="text" class="form-control form-control-sm" name="qualifications[${qualCount}][training_diploma_title]" value="${data.training_diploma_title || ''}">
+                        <label class="small fw-bold">Training/Diploma Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" name="qualifications[${qualCount}][training_diploma_title]" value="${data.training_diploma_title || ''}" required>
                     </div>
                     <div class="col-md-3">
                         <label class="small fw-bold">Online Hours</label>
-                        <input type="text" class="form-control form-control-sm" name="qualifications[${qualCount}][training_duration_online_hours]" value="${data.training_duration_online_hours || ''}">
+                        <input type="text" class="form-control form-control-sm" name="qualifications[${qualCount}][training_duration_online_hours]" value="${data.training_duration_online_hours || ''}" pattern="^[0-9]+$" title="Only numbers allowed">
                     </div>
                     <div class="col-md-3">
                         <label class="small fw-bold">Contact Hours</label>
-                        <input type="text" class="form-control form-control-sm" name="qualifications[${qualCount}][training_duration_contact_hours]" value="${data.training_duration_contact_hours || ''}">
+                        <input type="text" class="form-control form-control-sm" name="qualifications[${qualCount}][training_duration_contact_hours]" value="${data.training_duration_contact_hours || ''}" pattern="^[0-9]+$" title="Only numbers allowed">
                     </div>
                     <div class="col-md-6">
                         <label class="small fw-bold">Institute Address</label>
@@ -1044,48 +1125,51 @@
         const id = $(this).data('id');
         $.get("{{ url('admin/practitioners') }}/" + id + "/edit", function(data) {
             const u = data.user;
-            const p = data.practitioner;
+            const p = data.practitioner || {};
             $('#practitioner_id').val(u.id);
             $('#form-method').val('PUT');
             $('#form-modal-title').text('Edit Practitioner');
 
-            // Profile Photo
+            // Reset UI states
+            $('[id^="current-"]').addClass('d-none').html('');
+            $('#languages_capabilities_container').empty(); 
+            $('#qualifications-container').empty();
+            $('#imageUpload').val('');
+            croppedFile = null;
+
+            // Profile Photo Preview
             if (p.profile_photo_path) {
-                $('#imagePreview').css('background-image', 'url(/storage/' + p.profile_photo_path + ')');
-                $('#current-profile-photo').removeClass('d-none').html(`<a href="/storage/${p.profile_photo_path}" target="_blank" class="text-primary">View Current Photo</a>`);
+                $('#imagePreview').css('background-image', 'url(' + storageBase + p.profile_photo_path + ')');
+                $('#current-profile_photo').removeClass('d-none').html(`<a href="${storageBase}${p.profile_photo_path}" target="_blank" class="text-primary">View Current Photo</a>`);
                 $('input[name="profile_photo"]').prop('required', false);
             } else {
                 $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
-                $('#current-profile-photo').addClass('d-none').html('');
                 $('input[name="profile_photo"]').prop('required', true);
             }
-            $('#imageUpload').val(''); // Clear file input
-            croppedFile = null;
 
-            $('[name="first_name"]').val(p.first_name);
-            $('[name="last_name"]').val(p.last_name);
+            $('[name="first_name"]').val(p.first_name || u.first_name || '');
+            $('[name="last_name"]').val(p.last_name || u.last_name || '');
             $('[name="email"]').val(u.email);
-            $('[name="gender"]').val(p.gender);
+            $('[name="gender"]').val(p.gender || '');
             $('[name="dob"]').val(p.dob ? p.dob.substring(0, 10) : '');
-            $('[name="nationality"]').val(p.nationality);
-            $('[name="phone"]').val(p.phone);
-            $('[name="address_line_1"]').val(p.address_line_1);
-            $('[name="address_line_2"]').val(p.address_line_2);
-            $('[name="city"]').val(p.city);
-            $('[name="state"]').val(p.state);
-            $('[name="zip_code"]').val(p.zip_code);
+            $('[name="nationality"]').val(p.nationality || '');
+            $('[name="phone"]').val(p.phone || '');
+            $('[name="address_line_1"]').val(p.address_line_1 || '');
+            $('[name="address_line_2"]').val(p.address_line_2 || '');
+            $('[name="city"]').val(p.city || '');
+            $('[name="state"]').val(p.state || '');
+            $('[name="zip_code"]').val(p.zip_code || '');
             $('[name="country"]').val(p.country || 'India');
             $('[name="social_links[website]"]').val(p.social_links?.website || '');
             $('[name="social_links[instagram]"]').val(p.social_links?.instagram || '');
             $('[name="social_links[linkedin]"]').val(p.social_links?.linkedin || '');
             $('[name="social_links[youtube]"]').val(p.social_links?.youtube || '');
-            $('[name="additional_courses"]').val(p.additional_courses);
-            $('[name="profile_bio"]').val(p.profile_bio);
+            $('[name="additional_courses"]').val(p.additional_courses || '');
+            $('[name="profile_bio"]').val(p.profile_bio || '');
 
-            // Languages Spoken and Capabilities
-            $('#languages_capabilities_container').empty(); // Clear existing rows
+            // Languages Spoken
             if (languageChoices) {
-                languageChoices.removeActiveItems(); // Clear Choices.js selection
+                languageChoices.removeActiveItems();
                 if (p.languages_spoken) {
                     const selectedLanguages = [];
                     if (Array.isArray(p.languages_spoken)) {
@@ -1119,7 +1203,6 @@
             check('.mod-checkbox', p.other_modalities);
 
             // Qualifications
-            $('#qualifications-container').empty();
             if (p.qualifications && p.qualifications.length > 0) {
                 p.qualifications.forEach(q => addQualificationRow(q));
             } else {
@@ -1127,14 +1210,13 @@
             }
 
             // Documents
-            $('[id^="current-"]').addClass('d-none').html('');
-            const docs = ['doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 'doc_contract', 'doc_id_proof'];
-            docs.forEach(d => {
-                if (p[d]) {
-                    $(`#current-${d}`).removeClass('d-none').html(`<a href="/storage/${p[d]}" target="_blank" class="text-primary">View Current</a>`);
-                    $(`input[name="${d}"]`).prop('required', false); // Mark as not required if document exists
+            const docsList = ['doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 'doc_contract', 'doc_id_proof'];
+            docsList.forEach(inputName => {
+                if (p[inputName]) {
+                    $(`#current-${inputName}`).removeClass('d-none').html(`<a href="${storageBase}${p[inputName]}" target="_blank" class="text-primary">View Current</a>`);
+                    $(`input[name="${inputName}"]`).prop('required', false);
                 } else {
-                    $(`input[name="${d}"]`).prop('required', true);
+                    $(`input[name="${inputName}"]`).prop('required', true);
                 }
             });
 
@@ -1149,16 +1231,15 @@
         });
     });
 
-    // Status Toggle Handler (Triggers Modal)
-    $('body').on('click', '.toggle-status', function() {
-        var id = $(this).data('id');
-        var currentStatus = $(this).data('status');
-        var newStatus = (currentStatus === 'active') ? 0 : 1;
-        var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
+    // Status Toggle Handler - Robust Implementation
+    $(document).off('click', '.toggle-status').on('click', '.toggle-status', function(e) {
+        e.preventDefault();
+        var $this = $(this);
+        var id = $this.data('id');
+        var currentStatus = String($this.data('status')).toLowerCase();
 
         $('#status-practitioner-id').val(id);
-        $('#status-new-value').val(newStatus);
-        $('#status-confirmation-text').text(`Are you sure you want to change the status of this practitioner to ${newStatusText}?`);
+        $('#status-select-input').val(currentStatus); // Pre-select current status
         $('#status-confirmation-modal').modal('show');
     });
 
@@ -1180,9 +1261,9 @@
     });
 
     // Handle Confirm Status Change
-    $('#confirm-status-btn').on('click', function() {
+    $(document).off('click', '#confirm-status-btn').on('click', '#confirm-status-btn', function() {
         var id = $('#status-practitioner-id').val();
-        var newStatus = $('#status-new-value').val();
+        var newStatus = $('#status-select-input').val();
         var btn = $(this);
 
         btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
@@ -1268,7 +1349,7 @@
         const id = $(this).data('id');
         $.get("{{ url('admin/practitioners') }}/" + id, function(data) {
             const u = data.user;
-            const p = data.practitioner;
+            const p = data.practitioner || {};
             const badges = (arr) => (arr || []).map(i => `<span class="badge bg-light text-dark border me-1 mb-1">${i}</span>`).join('');
 
             let qualsHtml = (p.qualifications || []).map(q => `
@@ -1282,7 +1363,7 @@
                 <div class="row">
                     <div class="col-md-4 border-end">
                         <div class="text-center mb-3">
-                            <img src="${p.profile_photo_path ? '/storage/' + p.profile_photo_path : '/admiro/assets/images/user/user.png'}" class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;">
+                            <img src="${p.profile_photo_path ? storageBase + p.profile_photo_path : '/admiro/assets/images/user/user.png'}" class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;">
                             <h5>${u.name}</h5>
                             <span class="badge bg-success">${p.status.toUpperCase()}</span>
                         </div>
@@ -1372,6 +1453,21 @@
             return;
         }
 
+        // Frontend duplicate check
+        let isDuplicate = false;
+        container.find('.form-check-label').each(function() {
+            if ($(this).text().trim().toLowerCase() === value.toLowerCase()) {
+                isDuplicate = true;
+                return false;
+            }
+        });
+
+        if (isDuplicate) {
+            showToast('This item already exists.', 'error');
+            input.focus();
+            return;
+        }
+
         btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
 
         $.ajax({
@@ -1405,10 +1501,11 @@
 
                     container.append(newCheckbox);
                     input.val('');
+                    showToast(response.success);
                 }
             },
             error: function(xhr) {
-                // Silently fail
+                showToast(xhr.responseJSON?.error || 'Error adding item', 'error');
             },
             complete: function() {
                 btn.prop('disabled', false).html('<i class="fa fa-plus"></i>');

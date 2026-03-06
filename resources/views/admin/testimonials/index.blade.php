@@ -72,7 +72,7 @@
                         <div class="col-md-12 text-center mb-4">
                             <div class="avatar-upload">
                                 <div class="avatar-edit">
-                                    <input type='file' id="imageUpload" name="image" accept=".png, .jpg, .jpeg" />
+                                    <input type='file' id="imageUpload" name="image" accept=".png, .jpg, .jpeg" required/>
                                     <label for="imageUpload"><i class="iconly-Edit icli"></i></label>
                                 </div>
                                 <div class="avatar-preview">
@@ -85,11 +85,12 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="name" required>
+                            <input type="text" class="form-control" pattern="^[A-Z][a-zA-Z\s]{1,49}$"
+                              title="First letter must be capital and only letters allowed" name="name" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Role/Designation</label>
-                            <input type="text" class="form-control" name="role" placeholder="e.g. Yoga, Naturopathy">
+                            <input type="text" class="form-control" name="role" placeholder="e.g. Yoga, Naturopathy" required>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">Message <span class="text-danger">*</span></label>
@@ -99,23 +100,23 @@
                             <label class="form-label">Rating <span class="text-danger">*</span></label>
                             <div class="rating-container">
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="rating" id="rating5" value="5" checked>
+                                    <input class="form-check-input" type="radio" name="rating" id="rating5" value="5" checked required>
                                     <label class="form-check-label" for="rating5">5 Stars</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="rating" id="rating4" value="4">
+                                    <input class="form-check-input" type="radio" name="rating" id="rating4" value="4" required>
                                     <label class="form-check-label" for="rating4">4 Stars</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="rating" id="rating3" value="3">
+                                    <input class="form-check-input" type="radio" name="rating" id="rating3" value="3" required>
                                     <label class="form-check-label" for="rating3">3 Stars</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="rating" id="rating2" value="2">
+                                    <input class="form-check-input" type="radio" name="rating" id="rating2" value="2" required>
                                     <label class="form-check-label" for="rating2">2 Stars</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="rating" id="rating1" value="1">
+                                    <input class="form-check-input" type="radio" name="rating" id="rating1" value="1" required>
                                     <label class="form-check-label" for="rating1">1 Star</label>
                                 </div>
                             </div>

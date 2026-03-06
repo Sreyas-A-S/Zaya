@@ -92,7 +92,7 @@
                                 </div>
                             </div>
 
-                            <form id="doctor-form" method="POST" enctype="multipart/form-data" class="theme-form">
+                            <form id="doctor-form" enctype="multipart/form-data" novalidate>
                                 @csrf
                                 <input type="hidden" name="_method" id="form-method" value="POST">
                                 <input type="hidden" name="doctor_id" id="doctor_id">
@@ -114,17 +114,16 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <label class="form-label mt-2">Profile Photo <span class="text-danger">*</span></label>
+                                            <label class="form-label mt-2">Profile Photo <span class="text-danger">*</span> <span class="small text-muted">(Max 2MB)</span></label>
                                             <div id="current-profile-photo" class="d-none"></div>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">First Name</label>
-                                            <input class="form-control @error('firstname') is-invalid @enderror"type="text" name="firstname" id="firstname"
-                                            value="{{ old('firstname') }}" required pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="First Name">                                        </div>
+                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="first_name" required maxlength="255" pattern="[a-zA-Z\s\.]+" placeholder="First Name">
+                                        </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Last Name</label>
-                                           <input class="form-control @error('lastname') is-invalid @enderror" type="text" name="lastname" id="lastname"
-                                            value="{{ old('lastname') }}" required  pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="Last Name">
+                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="last_name" required maxlength="255" pattern="[a-zA-Z\s\.]+" placeholder="Last Name">
                                         </div>
 
                                         <div class="col-md-4">
@@ -138,25 +137,23 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Date of Birth</label>
-                                            <input type="date" class="form-control" name="date" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
+                                            <input type="date" class="form-control" name="dob" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Mobile Number</label>
-                                            <input type="text" class="form-control" name="mobile_number" required pattern="^[0-9]{10,15}$"
-                                             title="Phone number must contain 10 to 15 digits" placeholder="Enter mobile number">
+                                            <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="mobile_number" required maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter mobile number">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Email ID</label>
-                                            <input type="email" class="form-control" name="email" required placeholder="Enter email id">
+                                            <label class="form-label">Email ID <span class="text-danger">*</span></label>
+                                            <input type="email" class="form-control" name="email" required maxlength="255" placeholder="Enter email id">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Password <span class="small text-muted" id="password-hint">(Required for new)</span></label>
-                                            <input type="password" class="form-control" name="password" id="password-input">
+                                            <input type="password" class="form-control" name="password" id="password-input" minlength="6">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Confirm Password</label>
-                                            <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input">
-                                            <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
+                                            <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input" minlength="6">
                                         </div>
 
 
@@ -165,12 +162,12 @@
                                             <h5 class="f-w-600 mb-3">B. Medical Registration</h5>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">AYUSH Registration Number</label>
-                                            <input type="text" class="form-control" name="ayush_reg_no" required placeholder="Enter registration number">
+                                            <label class="form-label">AYUSH Registration Number <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="ayush_reg_no" required maxlength="100" placeholder="Enter registration number">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">State Ayurveda Council Name</label>
-                                            <input type="text" class="form-control" name="state_council" required pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="Enter council name">
+                                            <label class="form-label">State Ayurveda Council Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="state_council" required maxlength="255" placeholder="Enter council name">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Registration Certificate (Upload) <span class="file-keep-note d-none text-muted">(Leave blank to keep)</span></label>
@@ -253,15 +250,15 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">City <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="city" required placeholder="City">
+                                            <input type="text" class="form-control" name="city" required maxlength="100" placeholder="City">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">State <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="state" required placeholder="State">
+                                            <input type="text" class="form-control" name="state" required maxlength="100" placeholder="State">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
+                                            <input type="text" class="form-control" name="zip_code" required maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Pincode">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Country <span class="text-danger">*</span></label>
@@ -402,34 +399,34 @@
                                             <h5 class="f-w-600 mb-3">H. KYC & Payment Details</h5>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">PAN Card Number</label>
-                                            <input type="text" class="form-control" name="pan_number" required placeholder="Enter PAN number">
+                                            <label class="form-label">PAN Card Number <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control text-uppercase" name="pan_number" required maxlength="10" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" placeholder="ABCDE1234F">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Upload PAN Card <span class="file-keep-note d-none text-muted">(Leave blank to keep)</span></label>
-                                            <input type="file" class="form-control" name="pan_upload">
+                                            <input type="file" class="form-control" name="pan_upload" accept=".pdf,.jpg,.jpeg,.png">
                                             <div id="current-pan" class="mt-2 d-none"></div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Upload Aadhaar (Optional)</label>
-                                            <input type="file" class="form-control" name="aadhaar_upload">
+                                            <input type="file" class="form-control" name="aadhaar_upload" accept=".pdf,.jpg,.jpeg,.png">
                                             <div id="current-aadhaar" class="mt-2 d-none"></div>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Bank Account Holder Name</label>
-                                            <input type="text" class="form-control" name="bank_account_holder" required placeholder="Enter holder name">
+                                            <label class="form-label">Bank Account Holder Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="bank_account_holder" required maxlength="255" placeholder="Enter holder name">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Bank Name</label>
-                                            <input type="text" class="form-control" name="bank_name" required placeholder="Enter bank name">
+                                            <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="bank_name" required maxlength="255" placeholder="Enter bank name">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Account Number</label>
-                                            <input type="text" class="form-control" name="account_number" required placeholder="Enter account number">
+                                            <label class="form-label">Account Number <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="account_number" required maxlength="50" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter account number">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">IFSC Code</label>
-                                            <input type="text" class="form-control" name="ifsc_code" required placeholder="Enter IFSC code">
+                                            <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control text-uppercase" name="ifsc_code" required maxlength="11" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" placeholder="ABCD0123456">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Upload Cancelled Cheque/Passbook <span class="file-keep-note d-none text-muted">(Leave blank to keep)</span></label>
@@ -547,7 +544,7 @@
                 <h5 class="modal-title">Doctor Details</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4" id="view-modal-content">
+            <div class="modal-body p-4" id="view-modal-content" style="max-height: 80vh; overflow-y: auto;">
                 <!-- Content loaded via JS -->
             </div>
         </div>
@@ -586,10 +583,16 @@
             </div>
             <div class="modal-body text-center p-4">
                 <i class="iconly-Info-Square icli text-primary mb-3" style="font-size: 50px;"></i>
-                <h5>Update Status?</h5>
-                <p id="status-confirmation-text">Are you sure you want to change the status of this doctor?</p>
+                <h5>Update Doctor Status</h5>
+                <p id="status-confirmation-text">Select the new status for this doctor:</p>
+                <div class="mb-3 px-5">
+                    <select id="status-select-input" class="form-select">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
                 <input type="hidden" id="status-doctor-id">
-                <input type="hidden" id="status-new-value">
             </div>
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
@@ -803,18 +806,72 @@
         color: #51bb25;
     }
 
+    /* Modal Body Scrollbar */
+    #view-modal-content::-webkit-scrollbar {
+        width: 5px;
+    }
+    #view-modal-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    #view-modal-content::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 10px;
+    }
+    #view-modal-content::-webkit-scrollbar-thumb:hover {
+        background: var(--theme-default);
+    }
+
     /* Read More functionality for Bio */
+    .bio-content {
+        line-height: 1.6;
+        transition: all 0.3s ease;
+        word-break: break-word;
+        position: relative;
+    }
+
     .bio-content.collapsed {
         display: -webkit-box;
         -webkit-line-clamp: 4;
-        line-clamp: 4;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        max-height: 6.4em; /* 4 lines * 1.6 line-height */
+    }
+
+    .bio-content:not(.collapsed) {
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+
+    /* Refined Scrollbars */
+    #view-modal-content::-webkit-scrollbar,
+    .bio-content::-webkit-scrollbar {
+        width: 6px;
+    }
+    #view-modal-content::-webkit-scrollbar-track,
+    .bio-content::-webkit-scrollbar-track {
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    #view-modal-content::-webkit-scrollbar-thumb,
+    .bio-content::-webkit-scrollbar-thumb {
+        background: #ced4da;
+        border-radius: 10px;
+        border: 1px solid #f8f9fa;
+    }
+    #view-modal-content::-webkit-scrollbar-thumb:hover,
+    .bio-content::-webkit-scrollbar-thumb:hover {
+        background: var(--theme-default);
     }
 
     .read-more-link {
         cursor: pointer;
-        transition: all 0.2s ease;
+        display: inline-block;
+        margin-top: 5px;
+        font-weight: 600;
+        color: var(--theme-default) !important;
+        text-decoration: none !important;
     }
 
     .read-more-link:hover {
@@ -941,6 +998,25 @@
         initFormNavigation();
 
         $('#password-input, #password-confirm-input').on('input', validatePasswordMatch);
+
+        // Read More Toggle for View Modal - Resilient Implementation
+        $(document).off('click', '.read-more-link').on('click', '.read-more-link', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const $link = $(this);
+            const $wrapper = $link.closest('.bio-wrapper');
+            const $content = $wrapper.find('.bio-content');
+            
+            if ($content.hasClass('collapsed')) {
+                $content.removeClass('collapsed');
+                $link.text('Read less');
+            } else {
+                $content.addClass('collapsed');
+                $link.text('Read more...');
+                $content.scrollTop(0);
+            }
+        });
     });
 
     function addLanguageCapabilityRow(value, label, caps = null) {
@@ -981,17 +1057,8 @@
 
     function initFormNavigation() {
         $('.next-step').on('click', function() {
-            var currentStepDiv = $(this).closest('.step-content');
-            var inputs = currentStepDiv.find('input[required], select[required], textarea[required]').not(':hidden');
-            var valid = true;
-            inputs.each(function() {
-                if (!this.checkValidity()) {
-                    this.reportValidity();
-                    valid = false;
-                    return false;
-                }
-            });
-            if (!valid) return;
+            var stepNum = $(this).closest('.step-content').attr('id').replace('step', '');
+            if (!validateStep(stepNum)) return;
             updateStep($(this).data('next'));
         });
 
@@ -1085,6 +1152,10 @@
         $('#doctor-form')[0].reset();
         $('.is-invalid').removeClass('is-invalid');
         $('.invalid-feedback').remove();
+        
+        // Clear all current file indicators
+        $('#current-reg-cert, #current-signature, #current-pan, #current-aadhaar, #current-cheque, #current-degree-certs, #current-profile-photo').addClass('d-none').empty();
+        $('.file-keep-note').addClass('d-none');
 
         $.get("{{ url('admin/doctors') }}/" + id + "/edit", function(data) {
             const doctor = data.doctor;
@@ -1097,12 +1168,31 @@
             $('.file-keep-note').removeClass('d-none');
 
             // Fill basics
-            $('[name="first_name"]').val(profile.first_name);
-            $('[name="last_name"]').val(profile.last_name);
+            let firstName = profile.first_name || doctor.first_name;
+            let lastName = profile.last_name || doctor.last_name;
+
+            if (!firstName && doctor.name) {
+                const parts = doctor.name.split(' ');
+                firstName = parts[0];
+                if (!lastName && parts.length > 1) {
+                    lastName = parts.slice(1).join(' ');
+                }
+            }
+
+            $('[name="first_name"]').val(firstName || '');
+            $('[name="last_name"]').val(lastName || '');
             $('[name="gender"]').val(profile.gender);
             $('[name="dob"]').val(profile.dob ? profile.dob.substring(0, 10) : '');
-            $('[name="mobile_number"]').val(profile.phone);
+            $('[name="mobile_number"]').val((profile.phone || '').replace(/[^0-9]/g, ''));
             $('[name="email"]').val(doctor.email);
+
+            // Update Image Preview
+            if (profile.profile_photo_path) {
+                $('#imagePreview').css('background-image', 'url(/storage/' + profile.profile_photo_path + ')');
+                $('#current-profile-photo').removeClass('d-none').html(`<span class="badge bg-light-primary text-primary border border-primary"><i class="fa fa-image me-1"></i> Current Photo Saved</span>`);
+            } else {
+                $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+            }
             $('[name="ayush_reg_no"]').val(profile.ayush_registration_number);
             $('[name="state_council"]').val(profile.state_ayurveda_council_name);
             $('[name="years_of_experience"]').val(profile.years_of_experience);
@@ -1184,12 +1274,22 @@
             $('#check_all_consent').prop('checked', true);
 
             // Files display
-            if (profile.profile_photo_path) $('#current-profile-photo').removeClass('d-none').html(`<small><a href="/storage/${profile.profile_photo_path}" target="_blank">View Photo</a></small>`);
-            if (profile.reg_certificate_path) $('#current-reg-cert').removeClass('d-none').html(`<small><a href="/storage/${profile.reg_certificate_path}" target="_blank">View Certificate</a></small>`);
-            if (profile.digital_signature_path) $('#current-signature').removeClass('d-none').html(`<small><a href="/storage/${profile.digital_signature_path}" target="_blank">View Signature</a></small>`);
-            if (profile.pan_path) $('#current-pan').removeClass('d-none').html(`<small><a href="/storage/${profile.pan_path}" target="_blank">View PAN</a></small>`);
-            if (profile.aadhaar_path) $('#current-aadhaar').removeClass('d-none').html(`<small><a href="/storage/${profile.aadhaar_path}" target="_blank">View Aadhaar</a></small>`);
-            if (profile.cancelled_cheque_path) $('#current-cheque').removeClass('d-none').html(`<small><a href="/storage/${profile.cancelled_cheque_path}" target="_blank">View Cheque</a></small>`);
+            // Files display with better visibility
+            if (profile.reg_certificate_path) {
+                $('#current-reg-cert').removeClass('d-none').html(`<a href="/storage/${profile.reg_certificate_path}" target="_blank" class="badge bg-light-primary text-primary border border-primary text-decoration-none p-2"><i class="fa fa-file-text-o me-1"></i> View Current Registration Certificate</a>`);
+            }
+            if (profile.digital_signature_path) {
+                $('#current-signature').removeClass('d-none').html(`<a href="/storage/${profile.digital_signature_path}" target="_blank" class="badge bg-light-info text-info border border-info text-decoration-none p-2"><i class="fa fa-pencil-square-o me-1"></i> View Current Digital Signature</a>`);
+            }
+            if (profile.pan_upload_path) {
+                $('#current-pan').removeClass('d-none').html(`<a href="/storage/${profile.pan_upload_path}" target="_blank" class="badge bg-light-secondary text-secondary border border-secondary text-decoration-none p-2"><i class="fa fa-id-card-o me-1"></i> View Current PAN</a>`);
+            }
+            if (profile.aadhaar_upload_path) {
+                $('#current-aadhaar').removeClass('d-none').html(`<a href="/storage/${profile.aadhaar_upload_path}" target="_blank" class="badge bg-light-warning text-warning border border-warning text-decoration-none p-2"><i class="fa fa-id-card-o me-1"></i> View Current Aadhaar</a>`);
+            }
+            if (profile.cancelled_cheque_path) {
+                $('#current-cheque').removeClass('d-none').html(`<a href="/storage/${profile.cancelled_cheque_path}" target="_blank" class="badge bg-light-dark text-dark border border-dark text-decoration-none p-2"><i class="fa fa-bank me-1"></i> View Current Cheque/Passbook</a>`);
+            }
 
             if (profile.degree_certificates_path && profile.degree_certificates_path.length > 0) {
                 let certsHtml = '<div class="d-flex flex-wrap gap-2 mt-1">';
@@ -1248,6 +1348,10 @@
                 let badgeHtml = '';
                 $.each(arr, function(key, caps) {
                     const langName = caps.language || key;
+                    if (typeof caps === 'string') {
+                         badgeHtml += `<span class="badge bg-light text-dark border me-1 mb-1">${caps}</span>`;
+                         return;
+                    }
                     let capsList = [];
                     if (caps.read) capsList.push('Read');
                     if (caps.write) capsList.push('Write');
@@ -1259,7 +1363,16 @@
                 return badgeHtml || '<span class="text-muted">None</span>';
             };
 
+            const formatDate = (dateStr) => {
+                if (!dateStr) return 'N/A';
+                try {
+                    const date = new Date(dateStr);
+                    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+                } catch (e) { return dateStr; }
+            };
+
             const social = p.social_links || {};
+            const fullName = (p.first_name && p.last_name) ? `${p.first_name} ${p.last_name}` : (d.name || 'N/A');
 
             let html = `
                 <div class="row">
@@ -1274,7 +1387,8 @@
                                     ${p.status ? p.status.toUpperCase() : 'PENDING'}
                                 </span>
                             </div>
-                            <h4 class="mb-1">${p.first_name} ${p.last_name}</h4>
+                            <h4 class="mb-1">${fullName}</h4>
+                            <p class="text-muted mb-1 small text-uppercase fw-bold">${p.gender || 'N/A'} • ${formatDate(p.dob)}</p>
                             <p class="text-muted mb-2"><i class="fa-solid fa-envelope me-1"></i> ${d.email}</p>
                             <p class="text-muted"><i class="fa-solid fa-phone me-1"></i> ${p.phone || 'N/A'}</p>
                             
@@ -1289,9 +1403,9 @@
                         <hr>
                         <div class="mb-3">
                             <h6 class="f-w-600">Short Bio</h6>
-                            <div class="bio-wrapper">
+                            <div class="bio-wrapper" style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
                                 <p class="small text-muted mb-0 bio-content collapsed">${p.short_doctor_bio || 'No bio provided.'}</p>
-                                ${p.short_doctor_bio && p.short_doctor_bio.length > 160 ? '<a href="javascript:void(0)" class="read-more-link small fw-bold mt-1 d-inline-block" style="color: var(--theme-default); text-decoration: none;">Read more...</a>' : ''}
+                                ${p.short_doctor_bio && p.short_doctor_bio.length > 100 ? '<a href="javascript:void(0)" class="read-more-link small fw-bold mt-1 d-inline-block" style="color: var(--theme-default); text-decoration: none;">Read more...</a>' : ''}
                             </div>
                         </div>
                         <div class="mb-3">
@@ -1316,8 +1430,8 @@
                                     <div class="col-sm-6"><label class="small text-muted mb-0">State Council</label><p class="f-w-600">${p.state_ayurveda_council_name || 'N/A'}</p></div>
                                     
                                     <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Qualifications & Experience</h6></div>
-                                    <div class="col-sm-6"><label class="small text-muted mb-0">Primary Qualification</label><p class="f-w-600">${p.primary_qualification || 'N/A'}</p></div>
-                                    <div class="col-sm-6"><label class="small text-muted mb-0">Post Graduation</label><p class="f-w-600">${p.post_graduation || 'None'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Primary Qualification</label><p class="f-w-600">${p.primary_qualification === 'other' ? p.primary_qualification_other : (p.primary_qualification || 'N/A')}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Post Graduation</label><p class="f-w-600">${p.post_graduation === 'other' ? p.post_graduation_other : (p.post_graduation || 'None')}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Experience</label><p class="f-w-600">${p.years_of_experience || 0} Years</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Current Workplace</label><p class="f-w-600">${p.current_workplace_clinic_name || 'N/A'}</p></div>
                                     <div class="col-12"><label class="small text-muted mb-0">Specializations</label><div>${renderBadges(p.specialization)}</div></div>
@@ -1328,8 +1442,15 @@
                             <!-- Expertise Tab -->
                             <div class="tab-pane fade" id="v-expertise" role="tabpanel">
                                 <div class="row g-3">
-                                    <div class="col-12"><h6 class="text-primary border-bottom pb-2">Consultation Expertise</h6><div>${renderBadges(p.consultation_expertise)}</div></div>
-                                    <div class="col-12"><h6 class="text-primary border-bottom pb-2">Health Conditions Treated</h6><div>${renderBadges(p.health_conditions_treated)}</div></div>
+                                    <div class="col-12"><h6 class="text-primary border-bottom pb-2">Platform Profile</h6></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Key Expertise</label><p class="f-w-600">${p.key_expertise || 'N/A'}</p></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Services Offered</label><p class="f-w-600">${p.services_offered || 'N/A'}</p></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Awards & Recognitions</label><p class="f-w-600">${p.awards_recognitions || 'N/A'}</p></div>
+
+                                    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Medical Expertise</h6></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Consultation Expertise</label><div>${renderBadges(p.consultation_expertise)}</div></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Health Conditions Treated</label><div>${renderBadges(p.health_conditions_treated)}</div></div>
+                                    
                                     <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Therapy & Panchakarma</h6></div>
                                     <div class="col-sm-12"><label class="small text-muted mb-0">Panchakarma Consultation</label><p class="f-w-600">${p.panchakarma_consultation ? 'Yes (Trained)' : 'No'}</p></div>
                                     <div class="col-12"><label class="small text-muted mb-0">Panchakarma Procedures</label><div>${renderBadges(p.panchakarma_procedures)}</div></div>
@@ -1355,6 +1476,7 @@
                                         <div class="d-flex flex-wrap gap-2 pt-1">
                                             ${p.reg_certificate_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> Reg Certificate</span>` : '<span class="badge badge-light-danger">Missing Reg Cert</span>'}
                                             ${p.pan_upload_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> PAN Upload</span>` : '<span class="badge badge-light-danger">Missing PAN</span>'}
+                                            ${p.aadhaar_upload_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> Aadhaar Upload</span>` : '<span class="badge badge-light-danger">Missing Aadhaar</span>'}
                                             ${p.cancelled_cheque_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> Bank Proof</span>` : '<span class="badge badge-light-danger">Missing Bank Proof</span>'}
                                             ${p.degree_certificates_path && p.degree_certificates_path.length > 0 ? p.degree_certificates_path.map((path, idx) => 
                                                 `<a href="/storage/${path}" target="_blank" class="badge badge-light-info text-decoration-none">
@@ -1377,6 +1499,15 @@
         e.preventDefault();
         const form = $(this);
         const doctor_id = $('#doctor_id').val();
+        
+        // Final front-end check for all steps
+        for(let i=1; i<=5; i++) {
+            if(!validateStep(i)) {
+                updateStep(i);
+                return;
+            }
+        }
+
         const url = doctor_id ? "{{ url('admin/doctors') }}/" + doctor_id : "{{ route('admin.doctors.store') }}";
         const formData = new FormData(this);
 
@@ -1404,12 +1535,11 @@
                 if (xhr.status === 422) {
                     const errors = xhr.responseJSON.errors;
                     let firstErrorStep = null;
-                    $.each(errors, function(key, value) {
-                        let input = form.find(`[name="${key}"]`);
-                        if (input.length === 0) input = form.find(`[name="${key}[]"]`);
+                    $.each(errors, function(key, messages) {
+                        let input = form.find(`[name="${key}"], [name="${key}[]"]`).first();
                         if (input.length > 0) {
                             input.addClass('is-invalid');
-                            if (input.next('.invalid-feedback').length === 0) input.after(`<div class="invalid-feedback">${value[0]}</div>`);
+                            input.after(`<div class="invalid-feedback">${messages[0]}</div>`);
                             const stepId = input.closest('.step-content').attr('id').replace('step', '');
                             if (!firstErrorStep) firstErrorStep = stepId;
                         }
@@ -1421,6 +1551,135 @@
                 }
             }
         });
+    });
+
+    function validateStep(step) {
+        let valid = true;
+        const stepContainer = $('#step' + step);
+        
+        // Clear previous errors
+        stepContainer.find('.is-invalid').removeClass('is-invalid');
+        stepContainer.find('.invalid-feedback').remove();
+        
+        // Validation rules mapping
+        const validations = [
+            {
+                selector: 'input[required], select[required], textarea[required]',
+                check: (el) => {
+                    if (el.is(':checkbox')) return el.is(':checked');
+                    if (el.is('select')) return el.val() && el.val() !== '';
+                    return el.val().trim() !== '';
+                },
+                message: 'This field is required'
+            },
+            {
+                selector: 'input[type="email"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.val());
+                },
+                message: 'Please enter a valid email address'
+            },
+            {
+                selector: 'input[name="password"]',
+                check: (el) => {
+                    if ($('#doctor_id').val() || !el.val()) return true;
+                    return el.val().length >= 6;
+                },
+                message: 'Password must be at least 6 characters'
+            },
+            {
+                selector: 'input[name="password_confirmation"]',
+                check: (el) => {
+                    if ($('#doctor_id').val() || !el.val()) return true;
+                    return el.val() === $('input[name="password"]').val();
+                },
+                message: 'Passwords do not match'
+            },
+            {
+                selector: 'input[name="first_name"], input[name="last_name"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[a-zA-Z\s\.]+$/.test(el.val());
+                },
+                message: 'Should only contain letters, spaces or dots'
+            },
+            {
+                selector: 'input[name="mobile_number"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[0-9]{10,15}$/.test(el.val());
+                },
+                message: 'Please enter a valid phone number (10-15 digits)'
+            },
+            {
+                selector: 'input[name="pan_number"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(el.val().toUpperCase());
+                },
+                message: 'Invalid PAN format (e.g. ABCDE1234F)'
+            },
+            {
+                selector: 'input[name="ifsc_code"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[A-Z]{4}0[A-Z0-9]{6}$/.test(el.val().toUpperCase());
+                },
+                message: 'Invalid IFSC format (e.g. ABCD0123456)'
+            },
+            {
+                selector: 'input[name="zip_code"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[0-9]{5,10}$/.test(el.val());
+                },
+                message: 'Invalid Zip/Pincode'
+            }
+        ];
+
+        validations.forEach(v => {
+            stepContainer.find(v.selector).each(function() {
+                const el = $(this);
+                if (el.is(':hidden')) return; // ignore hidden field validation
+                if (!v.check(el)) {
+                    el.addClass('is-invalid');
+                    if (el.next('.invalid-feedback').length === 0) {
+                        el.after(`<div class="invalid-feedback">${v.message}</div>`);
+                    }
+                    valid = false;
+                }
+            });
+        });
+
+        if (!valid) {
+            const firstError = stepContainer.find('.is-invalid').first();
+            if (firstError.length) {
+                firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        return valid;
+    }
+
+    // Real-time validation: Clear error when user starts typing
+    $(document).on('input change', '#doctor-form input, #doctor-form select, #doctor-form textarea', function() {
+        const el = $(this);
+        if (el.hasClass('is-invalid')) {
+            el.removeClass('is-invalid');
+            el.next('.invalid-feedback').remove();
+        }
+    });
+
+    $(document).on('input', '#password-input, #password-confirm-input', function() {
+        const pwd = $('#password-input');
+        const conf = $('#password-confirm-input');
+        if (conf.val() && pwd.val() !== conf.val()) {
+            conf.addClass('is-invalid');
+        } else {
+            conf.removeClass('is-invalid');
+            conf.next('.invalid-feedback').remove();
+        }
     });
 
     // Cropper & Avatar Upload
@@ -1495,24 +1754,22 @@
 
 
 
-    // Handle Status Change Click
-    $('body').on('click', '.toggle-status', function() {
+    // Handle Status Change Click - Granular Implementation
+    $(document).off('click', '.toggle-status').on('click', '.toggle-status', function(e) {
+        e.preventDefault();
         const $this = $(this);
         const id = $this.data('id');
-        const currentStatus = $this.data('status');
-        const newStatus = currentStatus === 'active' ? 0 : 1;
-        const newStatusText = currentStatus === 'active' ? 'Inactive' : 'Active';
-
+        const currentStatus = String($this.data('status')).toLowerCase();
+        
         $('#status-doctor-id').val(id);
-        $('#status-new-value').val(newStatus);
-        $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
+        $('#status-select-input').val(currentStatus); // Pre-select current status
         $('#status-confirmation-modal').modal('show');
     });
 
     // Handle Confirm Status Change
     $('#confirm-status-btn').on('click', function() {
         const id = $('#status-doctor-id').val();
-        const newStatus = $('#status-new-value').val();
+        const newStatus = $('#status-select-input').val();
         const btn = $(this);
 
         btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
@@ -1585,6 +1842,21 @@
             return;
         }
 
+        // Frontend duplicate check
+        let isDuplicate = false;
+        container.find('.form-check-label').each(function() {
+            if ($(this).text().trim().toLowerCase() === value.toLowerCase()) {
+                isDuplicate = true;
+                return false;
+            }
+        });
+
+        if (isDuplicate) {
+            showToast('This item already exists.', 'error');
+            input.focus();
+            return;
+        }
+
         btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
 
         $.ajax({
@@ -1621,12 +1893,13 @@
 
                     container.append(newCheckbox);
                     input.val('');
+                    showToast(response.success);
                 } else {
-                    alert('Failed to add item: ' + (response.error || 'Unknown error'));
+                    showToast(response.error || 'Failed to add item', 'error');
                 }
             },
             error: function(xhr) {
-                alert('Error: ' + xhr.responseText);
+                showToast(xhr.responseJSON?.error || 'Error adding item', 'error');
             },
             complete: function() {
                 btn.prop('disabled', false).html('<i class="fa fa-plus"></i>');

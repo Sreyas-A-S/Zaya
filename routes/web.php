@@ -130,6 +130,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('master-data/{type}', [MasterDataController::class, 'index'])->name('master-data.index');
     Route::post('master-data/{type}', [MasterDataController::class, 'store'])->name('master-data.store');
     Route::put('master-data/{type}/{id}', [MasterDataController::class, 'update'])->name('master-data.update');
+    Route::post('master-data/{type}/{id}/status', [MasterDataController::class, 'updateStatus'])->name('master-data.status');
     Route::delete('master-data/{type}/{id}', [MasterDataController::class, 'destroy'])->name('master-data.destroy');
 
     // Homepage Settings
