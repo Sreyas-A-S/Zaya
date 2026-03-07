@@ -27,6 +27,13 @@ use Illuminate\Support\Facades\Artisan;
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('admin/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
 Route::post('admin/login', [LoginController::class, 'adminLogin'])->name('admin.login.submit');
+
+Route::get('admin/forgot-password', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('admin.forgot-password.show');
+Route::post('admin/forgot-password', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetOtp'])->name('admin.forgot-password.send');
+Route::get('admin/forgot-password/otp', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showOtpForm'])->name('admin.forgot-password.otp.show');
+Route::post('admin/forgot-password/otp', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'verifyOtp'])->name('admin.forgot-password.otp.verify');
+Route::get('admin/forgot-password/reset', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showResetForm'])->name('admin.forgot-password.reset.show');
+Route::post('admin/forgot-password/reset', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'resetPassword'])->name('admin.forgot-password.reset.update');
 Route::post('login', [LoginController::class, 'login']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
@@ -51,8 +58,6 @@ Route::get('/lang/{locale}', function ($locale) {
     return redirect()->back();
 })->name('lang.switch');
 
-Route::post('/change-language/{id}', [LanguageController::class, 'change'])->name('change.language');
-
 Route::get('/', [WebController::class, 'index'])->name('home');
 Route::get('/index', [WebController::class, 'index'])->name('index');
 Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-soon');
@@ -73,8 +78,11 @@ Route::get('/book-session/{practitioner?}', [WebController::class, 'bookSession'
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
 Route::get('/fetch-translators', [BookingController::class, 'fetchTranslators'])->name('fetch-translators');
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
+Route::post('/contact-us', [WebController::class, 'storeContact'])->name('contact-us.store');
+Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
 Route::post('/blog/like', [WebController::class, 'toggleLike'])->name('blog.like');
+Route::post('/testimonial/{id}/like', [\App\Http\Controllers\Admin\TestimonialController::class, 'toggleLike'])->name('testimonial.like');
 Route::post('/blog/comment', [WebController::class, 'postComment'])->name('blog.comment');
 Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->name('blog.comments');
 
@@ -87,6 +95,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::put('admin/admins/{id}', [AdminController::class, 'update']);
     Route::delete('/admin/admins/{id}', [AdminsController::class, 'destroy']);
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
+    Route::post('/profile/password', [AdminController::class, 'updatePassword'])->name('profile.password.update');
     Route::resource('countries', CountryController::class);
     Route::resource('doctors', DoctorController::class);
     Route::post('doctors/{id}/status', [DoctorController::class, 'updateStatus'])->name('doctors.status');
@@ -109,6 +119,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
 
     Route::resource('testimonials', TestimonialController::class);
     Route::post('testimonials/{id}/status', [TestimonialController::class, 'updateStatus'])->name('testimonials.status');
+    Route::get('testimonials/{id}/replies', [TestimonialController::class, 'replies'])->name('testimonials.replies');
+    Route::get('testimonials/{id}/likes', [TestimonialController::class, 'likes'])->name('testimonials.likes');
+    Route::delete('testimonials/like/{id}', [TestimonialController::class, 'destroyLike'])->name('testimonials.like.destroy');
+    Route::post('testimonials/{id}/reply', [TestimonialController::class, 'storeReply'])->name('testimonials.reply.store');
+    Route::delete('testimonials/reply/{id}', [TestimonialController::class, 'destroyReply'])->name('testimonials.reply.destroy');
 
     Route::resource('services', ServiceController::class);
     Route::post('services/{id}/status', [ServiceController::class, 'updateStatus'])->name('services.status');
@@ -149,6 +164,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'update'])->name('services-settings.update');
     Route::get('/contact-settings', [\App\Http\Controllers\Admin\ContactusController::class, 'index'])->name('contact-us.index');
     Route::post('/contact-settings/update', [\App\Http\Controllers\Admin\ContactusController::class, 'update'])->name('contact-settings.update');
+    // Contact Messages
+    Route::get('/contact-messages', [\App\Http\Controllers\Admin\ContactusController::class, 'messages'])->name('contact-us.messages');
+    Route::delete('/contact-messages/{id}', [\App\Http\Controllers\Admin\ContactusController::class, 'destroyMessage'])->name('contact-us.destroy-message');
+
+    // Email Logs
+    Route::get('/email-logs', [\App\Http\Controllers\Admin\ContactusController::class, 'emailLogs'])->name('email-logs.index');
+    Route::delete('/email-logs/{id}', [\App\Http\Controllers\Admin\ContactusController::class, 'destroyEmailLog'])->name('email-logs.destroy');
+
+    // Newsletter Management
+    Route::get('/newsletters', [\App\Http\Controllers\Admin\NewsletterController::class, 'index'])->name('newsletters.index');
+    Route::post('/newsletters/{id}/status', [\App\Http\Controllers\Admin\NewsletterController::class, 'updateStatus'])->name('newsletters.status');
+    Route::delete('/newsletters/{id}', [\App\Http\Controllers\Admin\NewsletterController::class, 'destroy'])->name('newsletters.destroy');
+    Route::get('/newsletters/export', [\App\Http\Controllers\Admin\NewsletterController::class, 'export'])->name('newsletters.export');
 
     // General Settings
     Route::get('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'index'])->name('general-settings.index');
@@ -167,6 +195,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('user-managers/{id}/status', [\App\Http\Controllers\Admin\UserManagerController::class, 'updateStatus'])->name('user-managers.status');
 
     Route::resource('languages', \App\Http\Controllers\Admin\LanguageController::class);
+    Route::post('/change-language/{id}', [LanguageController::class, 'change'])->name('change-language');
 });
 
 // Route to run artisan optimize
@@ -204,3 +233,7 @@ Route::get('/client-profile', function () {
 Route::get('/practitioner-profile', function () {
     return view('practitioner-profile');
 })->name('practitioner-profile');
+
+Route::get('/preview-otp-mail', function () {
+    return new App\Mail\AdminOTPMail('123456');
+});

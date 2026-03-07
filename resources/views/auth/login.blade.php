@@ -17,6 +17,12 @@
               <h2 class="text-center">Sign in to account</h2>
               <p class="text-center">Enter your email &amp; password to login</p>
 
+              @if(session('status'))
+              <div class="alert alert-success text-center py-2" role="alert">
+                {{ session('status') }}
+              </div>
+              @endif
+
               @if(session('error'))
               <div class="alert alert-danger text-center py-2" role="alert">
                 {{ session('error') }}
@@ -48,6 +54,7 @@
                   <input class="form-check-input" id="solid6" type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
                   <label class="form-check-label" for="solid6">Remember Me</label>
                 </div>
+                <a class="link" href="{{ route('admin.forgot-password.show') }}">Forgot password?</a>
                 <div class="text-end mt-3">
                   <button class="btn btn-primary btn-block w-100" type="submit" id="sign-in-btn">
                     <i class="fa fa-spinner fa-spin btn-loader"></i> Sign in

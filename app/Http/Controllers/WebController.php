@@ -6,7 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\BlogLike;
+use App\Models\ContactUs;
+use App\Mail\ContactUsMail;
 use App\Services\WordPressBlogService;
+use Illuminate\Support\Facades\Mail;
 
 class WebController extends Controller
 {
@@ -26,7 +29,11 @@ class WebController extends Controller
             ->latest()
             ->take(8)
             ->get();
-        $testimonials = \App\Models\Testimonial::where('status', true)->latest()->get();
+        $testimonials = \App\Models\Testimonial::withCount(['likes', 'replies'])->where('status', true)->latest()->get();
+        $ip = request()->ip();
+        $testimonials->each(function($testimonial) use ($ip) {
+            $testimonial->is_liked = $testimonial->likes()->where('ip_address', $ip)->exists();
+        });
         $services = \App\Models\Service::where('status', true)->orderBy('order_column')->get();
         $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
         
@@ -53,7 +60,11 @@ class WebController extends Controller
             $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
         }
         
-        $testimonials = \App\Models\Testimonial::where('status', true)->latest()->get();
+        $testimonials = \App\Models\Testimonial::withCount(['likes', 'replies'])->where('status', true)->latest()->get();
+        $ip = request()->ip();
+        $testimonials->each(function($testimonial) use ($ip) {
+            $testimonial->is_liked = $testimonial->likes()->where('ip_address', $ip)->exists();
+        });
         return view('about', compact('settings', 'testimonials'));
     }
 
@@ -232,6 +243,48 @@ class WebController extends Controller
             ->where('language', $language)
             ->pluck('value', 'key');
         return view('contact-us', compact('settings'));
+    }
+
+    public function storeContact(Request $request)
+    {
+        $validatedData = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'user_type' => 'nullable|array',
+            'message' => 'required|string',
+        ]);
+
+        $message = ContactUs::create($validatedData);
+
+        // Send Email to Admin
+        $to = 'info@zayawellness.com';
+        
+        // SECURITY CHECK: Only allow sending if email exists in our DB (users table)
+        $recipientExists = \App\Models\User::where('email', $to)->exists();
+        
+        if (!$recipientExists) {
+            Log::warning("Email delivery blocked: {$to} is not in our database.");
+            \App\Services\EmailLoggerService::log($to, 'Blocked: ' . $message->first_name, null, 'error', 'Recipient not in database');
+            return response()->json(['success' => 'Thank you! Your message has been recorded.']);
+        }
+
+        $mailable = new ContactUsMail($message);
+        $subject = 'New Contact Us Message - ' . $message->first_name . ' ' . $message->last_name;
+        $startTime = microtime(true);
+
+        try {
+            Mail::mailer('noreply')->to($to)->send($mailable);
+            $duration = round(microtime(true) - $startTime, 2);
+            \App\Services\EmailLoggerService::log($to, $subject, null, 'success', null, $duration);
+        } catch (\Exception $e) {
+            $duration = round(microtime(true) - $startTime, 2);
+            Log::error('Failed to send contact email: ' . $e->getMessage());
+            \App\Services\EmailLoggerService::log($to, $subject, null, 'error', $e->getMessage(), $duration);
+        }
+
+        return response()->json(['success' => 'Thank you for contacting us! Your message has been sent successfully.']);
     }
 
     /**

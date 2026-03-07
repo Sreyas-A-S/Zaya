@@ -51,23 +51,28 @@ const sidebarListItems = document.querySelectorAll(".sidebar-link");
 // Add onclick event listener to each sidebar-list item
 sidebarListItems.forEach((item) => {
   item.addEventListener("click", () => {
-    item.classList.toggle("active");
     const submenu = item
       .closest(".sidebar-list")
       .querySelector(".sidebar-submenu");
+    
     if (submenu) {
-      submenu.style.display = item.classList.contains("active")
-        ? "block"
-        : "none";
+      if (item.classList.contains("active")) {
+        slideUp(submenu, 300);
+        item.classList.remove("active");
+      } else {
+        slideDown(submenu, 300);
+        item.classList.add("active");
+      }
     }
+
     sidebarListItems.forEach((otherList) => {
       if (otherList !== item) {
-        otherList.classList.remove("active");
         const otherSubmenu = otherList
           .closest(".sidebar-list")
           .querySelector(".sidebar-submenu");
-        if (otherSubmenu) {
-          otherSubmenu.style.display = "none";
+        if (otherSubmenu && otherList.classList.contains("active")) {
+          slideUp(otherSubmenu, 300);
+          otherList.classList.remove("active");
         }
       }
     });
@@ -173,21 +178,26 @@ const submenuTitles = document.querySelectorAll(".submenu-title");
 submenuTitles.forEach((title) => {
   title.addEventListener("click", () => {
     const parentLi = title.closest("li");
-    parentLi.classList.toggle("active");
     const submenu = parentLi.querySelector(".according-submenu");
+    
     if (submenu) {
-      submenu.style.display =
-        submenu.style.display === "block" ? "none" : "block";
+      if (parentLi.classList.contains("active")) {
+        slideUp(submenu, 300);
+        parentLi.classList.remove("active");
+      } else {
+        slideDown(submenu, 300);
+        parentLi.classList.add("active");
+      }
     }
+
     submenuTitles.forEach((otherTitle) => {
       if (otherTitle !== title) {
         const otherParentLi = otherTitle.closest("li");
-        const otherSubmenu =
-          otherParentLi.querySelector(".according-submenu");
-        if (otherSubmenu) {
-          otherSubmenu.style.display = "none";
+        const otherSubmenu = otherParentLi.querySelector(".according-submenu");
+        if (otherSubmenu && otherParentLi.classList.contains("active")) {
+          slideUp(otherSubmenu, 300);
+          otherParentLi.classList.remove("active");
         }
-        otherParentLi.classList.remove("active");
       }
     });
   });

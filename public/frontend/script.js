@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             new SwiperLib('.practitioner-slider', {
                 slidesPerView: 1.5,
                 spaceBetween: 20,
-                loop: true,
+                loop: slidesCount >= 6, // Need enough slides for looping especially on larger screens
                 centeredSlides: true,
                 autoplay: {
                     delay: 3500,
@@ -111,24 +111,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     512: {
                         slidesPerView: 2.3,
                         centeredSlides: true,
+                        loop: slidesCount >= 6,
                     },
                     768: {
                         slidesPerView: 3,
                         centeredSlides: false,
+                        loop: slidesCount >= 6,
                     },
                     1152: {
                         slidesPerView: 4,
                         centeredSlides: false,
+                        loop: slidesCount >= 8,
                     },
                     1440: {
                         slidesPerView: 4.4,
                         spaceBetween: 40,
                         centeredSlides: false,
+                        loop: slidesCount >= 10,
                     },
                     1920: {
                         slidesPerView: 5,
                         spaceBetween: 80,
                         centeredSlides: false,
+                        loop: slidesCount >= 10,
                     },
                 },
             });
@@ -138,10 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.querySelector('.testimonial-slider')) {
             const slidesCount = document.querySelectorAll('.testimonial-slider .swiper-slide').length;
             new SwiperLib('.testimonial-slider', {
-                slidesPerView: '1', // Fluid width to match design
+                slidesPerView: '1', 
                 spaceBetween: 40,
                 centeredSlides: true,
-                loop: true,
+                loop: slidesCount >= 2,
                 speed: 800,
                 autoplay: {
                     delay: 3000,
@@ -159,16 +164,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         slidesPerView: '2',
                         spaceBetween: 50,
                         centeredSlides: true,
+                        loop: slidesCount >= 4,
                     },
                     768: {
                         slidesPerView: '3',
                         spaceBetween: 50,
                         centeredSlides: true,
+                        loop: slidesCount >= 6,
                     },
                     1024: {
                         slidesPerView: '4',
                         spaceBetween: 50,
                         centeredSlides: false,
+                        loop: slidesCount >= 8,
                     }
                 }
             });
@@ -200,7 +208,95 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Testimonial Like Functionality (using event delegation for Swiper compatibility)
+    document.addEventListener('click', async function(e) {
+        const btn = e.target.closest('.testimonial-like-btn');
+        if (!btn) return;
 
+        e.preventDefault();
+        const id = btn.getAttribute('data-id');
+        const countSpan = btn.querySelector('span');
+        const icon = btn.querySelector('i');
+        
+        try {
+            const response = await fetch(`/testimonial/${id}/like`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // Update all instances of this testimonial's like count (for Swiper clones)
+                document.querySelectorAll(`.testimonial-like-btn[data-id="${id}"]`).forEach(instance => {
+                    const s = instance.querySelector('span');
+                    const i = instance.querySelector('i');
+                    if (s) s.textContent = data.likes_count;
+                    if (i) {
+                        if (data.action === 'liked') {
+                            i.classList.remove('ri-thumb-up-line');
+                            i.classList.add('ri-thumb-up-fill', 'text-primary');
+                        } else {
+                            i.classList.remove('ri-thumb-up-fill', 'text-primary');
+                            i.classList.add('ri-thumb-up-line');
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error liking testimonial:', error);
+        }
+    });
+
+    // Newsletter Subscription Handler
+    const newsletterInput = document.getElementById('footer-newsletter-input');
+    const newsletterBtn = document.getElementById('footer-newsletter-btn');
+
+    if (newsletterBtn && newsletterInput) {
+        newsletterBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const email = newsletterInput.value;
+
+            if (!email) {
+                alert('Please enter an email address.');
+                return;
+            }
+
+            newsletterBtn.disabled = true;
+            const originalIcon = newsletterBtn.innerHTML;
+            newsletterBtn.innerHTML = '<i class="ri-loader-4-line animate-spin text-xl"></i>';
+
+            try {
+                const response = await fetch('/newsletter/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await response.json();
+                alert(data.message);
+
+                if (response.ok && data.success !== false) {
+                    newsletterInput.value = '';
+                }
+            } catch (error) {
+                console.error('Newsletter error:', error);
+                alert('Something went wrong. Please try again.');
+            } finally {
+                newsletterBtn.disabled = false;
+                newsletterBtn.innerHTML = originalIcon;
+            }
+        });
+    }
 
 });
 

@@ -35,6 +35,13 @@
                     <h6>Dashboard</h6>
                 </a>
             </li>
+            <li class="sidebar-list"><a class="sidebar-link" href="{{ route('admin.profile') }}">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Profile') }}"></use>
+                    </svg>
+                    <h6>My Profile</h6>
+                </a>
+            </li>
             @endif
 
             @if(auth()->user()->hasPermission('doctors-view') || auth()->user()->hasPermission('practitioners-view') || auth()->user()->hasPermission('mindfulness-practitioners-view') || auth()->user()->hasPermission('yoga-therapists-view') || auth()->user()->hasPermission('clients-view') || auth()->user()->hasPermission('translators-view'))
@@ -63,7 +70,7 @@
                     @if(auth()->user()->hasPermission('translators-view'))
                     <li> <a href="{{ route('admin.translators.index') }}">Translators</a></li>
                     @endif
-                    
+
 
                 </ul>
             </li>
@@ -80,11 +87,21 @@
                     <li> <a href="{{ route('admin.finance-managers.index') }}">Finance Manager</a></li>
                     <li> <a href="{{ route('admin.content-managers.index') }}">Content Manager</a></li>
                     <li> <a href="{{ route('admin.user-managers.index') }}">User Manager</a></li>
-              
+
 
                     @endif
                 </ul>
             </li>
+
+            @if(auth()->user()->hasPermission('credentials-view'))
+            <li class="sidebar-list"> <a class="sidebar-link" href="{{ route('admin.credentials.index') }}">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Password') }}"></use>
+                    </svg>
+                    <h6 class="f-w-600">Credentials</h6>
+                </a>
+            </li>
+            @endif
 
             @if(auth()->user()->hasPermission('testimonials-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="{{ route('admin.testimonials.index') }}">
@@ -156,7 +173,7 @@
                     @if(auth()->user()->hasPermission('master-data-view'))
                     <li>
                         <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
-                            Doctor Settings
+                            <span>Doctor Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
@@ -169,7 +186,7 @@
 
                     <li>
                         <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
-                            Practitioner Settings
+                            <span>Practitioner Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
@@ -181,7 +198,7 @@
 
                     <li>
                         <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
-                            Client Settings
+                            <span>Client Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
@@ -191,7 +208,7 @@
 
                     <li>
                         <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
-                            Mindfulness Settings
+                            <span>Mindfulness Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
@@ -202,7 +219,7 @@
 
                     <li>
                         <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
-                            Translator Settings
+                            <span>Translator Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
@@ -213,7 +230,7 @@
 
                     <li>
                         <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
-                            Yoga Therapist Settings
+                            <span>Yoga Therapist Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
@@ -221,14 +238,10 @@
                         </ul>
                     </li>
                     <li>
-                            <a href="{{ route('admin.countries.index') }}">Countries</a>
-                           
-                        </a>
+                        <a href="{{ route('admin.countries.index') }}">Countries</a>
                     </li>
                     <li>
-                            <a href="{{ route('admin.languages.index') }}">Languages</a>
-                           
-                        </a>
+                        <a href="{{ route('admin.languages.index') }}">Languages</a>
                     </li>
                     @endif
                 </ul>
@@ -252,15 +265,44 @@
                     @if(auth()->user()->hasPermission('services-page-view'))
                     <li> <a href="{{ route('admin.services-settings.index') }}">Services Page Settings</a></li>
                     @endif
-                  
+
                     @if(auth()->user()->hasPermission('settings-view'))
                     <li> <a href="{{ route('admin.contact-us.index') }}">Contact Us Settings</a></li>
                     @endif
-
                 </ul>
             </li>
             @endif
+
+            @if(auth()->user()->hasPermission('contact-messages-view'))
+            <li class="sidebar-list">
+                <a class="sidebar-link" href="{{ route('admin.contact-us.messages') }}">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Message') }}"></use>
+                    </svg>
+                    <h6 class="f-w-600">Contact Messages</h6>
+                </a>
+            </li>
+            <li class="sidebar-list">
+                <a class="sidebar-link" href="{{ route('admin.email-logs.index') }}">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Document') }}"></use>
+                    </svg>
+                    <h6 class="f-w-600">Email Logs</h6>
+                </a>
+            </li>
+            <li class="sidebar-list">
+                <a class="sidebar-link" href="{{ route('admin.newsletters.index') }}">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Message') }}"></use>
+                    </svg>
+                    <h6 class="f-w-600">Newsletters</h6>
+                </a>
+            </li>
+            @endif
         </ul>
+        <div class="sidebar-footer-image">
+            <img src="{{ asset('assets/leaves/Leafy Minimalism Phone Wallpaper Background.jfif.png') }}" alt="leaves">
+        </div>
     </div>
     <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
 </aside>

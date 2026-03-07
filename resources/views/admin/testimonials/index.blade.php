@@ -40,6 +40,7 @@
                                     <th>Name</th>
                                     <th>Role</th>
                                     <th>Rating</th>
+                                    <th>Likes/Replies</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -49,6 +50,60 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reply Management Modal -->
+<div class="modal fade" id="replies-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Replies</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div id="testimonial-info" class="mb-4 p-3 bg-light rounded">
+                    <!-- Original Testimonial info here -->
+                </div>
+                
+                <div class="replies-list mb-4">
+                    <h6>Existing Replies</h6>
+                    <div id="replies-container" class="mt-3">
+                        <!-- Replies will be loaded here -->
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="add-reply-section">
+                    <h6>Add New Reply</h6>
+                    <form id="reply-form" class="mt-3">
+                        @csrf
+                        <input type="hidden" name="testimonial_id" id="reply_testimonial_id">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Respondent Name</label>
+                                <input type="text" class="form-control" name="name" value="Admin">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Respondent Role</label>
+                                <input type="text" class="form-control" name="role" value="Management">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Reply Message <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="reply" rows="3" required placeholder="Write your response..."></textarea>
+                            </div>
+                            <div class="col-md-12 text-end">
+                                <button type="submit" class="btn btn-primary btn-sm">Post Reply</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -289,6 +344,12 @@
                     searchable: false
                 },
                 {
+                    data: 'likes_replies',
+                    name: 'likes_replies',
+                    orderable: false,
+                    searchable: false
+                },
+                {
                     data: 'status',
                     name: 'status',
                     orderable: false,
@@ -301,6 +362,103 @@
                     searchable: false
                 },
             ]
+        });
+
+        // Manage Replies
+        $('body').on('click', '.manageReplies', function() {
+            let id = $(this).data('id');
+            $('#reply_testimonial_id').val(id);
+            loadReplies(id);
+            $('#replies-modal').modal('show');
+        });
+
+        function loadReplies(testimonialId) {
+            $.get("{{ url('admin/testimonials') }}/" + testimonialId + "/replies", function(data) {
+                let testimonial = data.testimonial;
+                let replies = data.replies;
+
+                let testimonialHtml = `
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="${testimonial.image ? '/storage/' + testimonial.image : '{{ asset('admiro/assets/images/user/user.png') }}'}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                        <div>
+                            <h6 class="mb-0">${testimonial.name}</h6>
+                            <p class="mb-0 small text-muted">${testimonial.message.substring(0, 100)}...</p>
+                        </div>
+                    </div>
+                `;
+                $('#testimonial-info').html(testimonialHtml);
+
+                let repliesHtml = '';
+                if (replies.length > 0) {
+                    replies.forEach(reply => {
+                        repliesHtml += `
+                            <div class="reply-item p-3 border rounded mb-2 bg-white">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>${reply.name}</strong> <small class="text-muted">(${reply.role})</small>
+                                        <div class="mt-1">${reply.reply}</div>
+                                        <small class="text-muted">${new Date(reply.created_at).toLocaleString()}</small>
+                                    </div>
+                                    <button class="btn btn-link text-danger deleteReply" data-id="${reply.id}">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    repliesHtml = '<p class="text-center text-muted py-3">No replies yet.</p>';
+                }
+                $('#replies-container').html(repliesHtml);
+            });
+        }
+
+        // Submit Reply
+        $('#reply-form').on('submit', function(e) {
+            e.preventDefault();
+            let testimonialId = $('#reply_testimonial_id').val();
+            let btn = $(this).find('button[type="submit"]');
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Posting...');
+
+            $.ajax({
+                url: "{{ url('admin/testimonials') }}/" + testimonialId + "/reply",
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#reply-form')[0].reset();
+                    $('#reply-form input[name="name"]').val('Admin');
+                    $('#reply-form input[name="role"]').val('Management');
+                    loadReplies(testimonialId);
+                    table.draw(false);
+                    if (typeof showToast === 'function') showToast(response.success);
+                },
+                error: function() {
+                    alert('Error posting reply');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).text('Post Reply');
+                }
+            });
+        });
+
+        // Delete Reply
+        $('body').on('click', '.deleteReply', function() {
+            let id = $(this).data('id');
+            let testimonialId = $('#reply_testimonial_id').val();
+            if (confirm('Delete this reply?')) {
+                $.ajax({
+                    url: "{{ url('admin/testimonials/reply') }}/" + id,
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        loadReplies(testimonialId);
+                        table.draw(false);
+                        if (typeof showToast === 'function') showToast(response.success);
+                    }
+                });
+            }
         });
 
         // Image Preview
@@ -429,7 +587,7 @@
             var id = $(this).data('id');
             var currentStatus = $(this).data('status');
             var newStatus = (currentStatus === 'active') ? 0 : 1;
-            var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
+            var newStatusText = (currentStatus === 'active') ? 'Disapproved' : 'Approved';
 
             $('#status-testimonial-id').val(id);
             $('#status-new-value').val(newStatus);
