@@ -11,9 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Ensure tables are using InnoDB to support foreign keys
-        \Illuminate\Support\Facades\DB::statement('ALTER TABLE countries ENGINE=InnoDB');
+        // Ensure users table is InnoDB
         \Illuminate\Support\Facades\DB::statement('ALTER TABLE users ENGINE=InnoDB');
+
+        // Check if countries table exists before trying to modify it or use it as a foreign key
+        $countriesExist = Schema::hasTable('countries');
+
+        if ($countriesExist) {
+            try {
+                \Illuminate\Support\Facades\DB::statement('ALTER TABLE countries ENGINE=InnoDB');
+            } catch (\Exception $e) {
+                // Might fail due to permissions or other issues
+            }
+        }
 
         if (!Schema::hasColumn('users', 'national_id')) {
             Schema::table('users', function (Blueprint $table) {
@@ -26,13 +36,15 @@ return new class extends Migration
         }
 
         // Add foreign key constraint separately to be more robust
-        Schema::table('users', function (Blueprint $table) {
-            try {
-                $table->foreign('national_id')->references('id')->on('countries')->onDelete('cascade');
-            } catch (\Exception $e) {
-                // Constraint might already exist
-            }
-        });
+        if ($countriesExist) {
+            Schema::table('users', function (Blueprint $table) {
+                try {
+                    $table->foreign('national_id')->references('id')->on('countries')->onDelete('cascade');
+                } catch (\Exception $e) {
+                    // Constraint might already exist
+                }
+            });
+        }
 
         if (!Schema::hasColumn('users', 'languages')) {
             Schema::table('users', function (Blueprint $table) {
