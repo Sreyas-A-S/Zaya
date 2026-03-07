@@ -57,13 +57,15 @@ h6 {
     min-width: 300px;
 }
 
-.calendar-dropdown.cal-open-bottom {
+.calendar-dropdown.cal-open-bottom,
+.duration-dropdown.cal-open-bottom {
     top: calc(100% + 8px);
     animation: calFadeInDown 0.15s ease-out;
     transform-origin: top center;
 }
 
-.calendar-dropdown.cal-open-top {
+.calendar-dropdown.cal-open-top,
+.duration-dropdown.cal-open-top {
     bottom: calc(100% + 8px);
     animation: calFadeInUp 0.15s ease-out;
     transform-origin: bottom center;
