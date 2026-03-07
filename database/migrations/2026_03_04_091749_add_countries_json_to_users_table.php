@@ -11,20 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            // Drop foreign key and its associated index safely
-            try {
+        // Drop foreign key safely
+        try {
+            Schema::table('users', function (Blueprint $table) {
                 $table->dropForeign(['national_id']);
-            } catch (\Exception $e) {
-                // Ignore if it doesn't exist
-            }
+            });
+        } catch (\Exception $e) {
+            // Ignore if it doesn't exist
+        }
 
-            try {
+        // Drop associated index safely
+        try {
+            Schema::table('users', function (Blueprint $table) {
                 $table->dropIndex('users_national_id_foreign');
-            } catch (\Exception $e) {
-                // Ignore if it doesn't exist
-            }
-        });
+            });
+        } catch (\Exception $e) {
+            // Ignore if it doesn't exist
+        }
 
         Schema::table('users', function (Blueprint $table) {
             // Change column to JSON
