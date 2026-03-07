@@ -10,7 +10,7 @@
             <div class="flex w-full md:w-auto gap-2">
                 <input id="footer-newsletter-input" type="email" placeholder="{{ __('Your email...') }}"
                     class="bg-[#F2F2F2] text-[#2E4B3C] placeholder-gray-400 rounded-lg px-4 py-3 w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-[#DFAF7F]">
-                <button
+                <button id="footer-newsletter-btn"
                     class="bg-[#FFD28D] hover:bg-[#e0caaa] text-[#2E4B3C] rounded-lg px-6 py-3 transition-all flex items-center justify-center">
                     <i class="ri-send-plane-2-fill text-xl"></i>
                 </button>

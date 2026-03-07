@@ -54,6 +54,7 @@ class User extends Authenticatable implements JWTSubject
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'national_id' => 'array',
             'languages' => 'array',
         ];
     }
@@ -84,7 +85,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function country()
     {
-        return $this->belongsTo('App\Models\Country', 'national_id');
+        return $this->belongsTo(Country::class, 'national_id');
     }
 
     public function language()
@@ -94,7 +95,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function nationality()
     {
-        return $this->belongsTo('App\Models\Country', 'national_id');
+        return $this->belongsTo(Country::class, 'national_id');
     }
 
     /**

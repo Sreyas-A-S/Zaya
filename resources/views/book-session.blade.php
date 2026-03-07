@@ -17,28 +17,32 @@
         <div class="container-fluid mx-auto">
 
             <!-- Step Indicator -->
-            <div class="sticky top-0 z-50 flex justify-center pb-8 pt-8 bg-white border-b border-[#D0D0D0]">
-                <div class="flex items-start justify-center gap-0" id="step-indicator">
-                    <div class="flex flex-col items-center relative z-2 px-8">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-base transition-all duration-300 bg-[#60E48C] text-white"
+            <div
+                class="sticky top-0 z-50 flex justify-center pb-6 md:pb-8 pt-6 md:pt-8 bg-white border-b border-[#D0D0D0] px-4">
+                <div class="flex items-start justify-center gap-0 w-full max-w-3xl" id="step-indicator">
+                    <div class="flex flex-col items-center relative z-2 px-1 sm:px-4 md:px-8">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 bg-[#60E48C] text-white"
                             id="step-circle-1">1</div>
-                        <span class="text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap"
+                        <span
+                            class="text-xs md:text-base text-gray-700 mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
                             id="step-label-1">Login</span>
                     </div>
-                    <div class="w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative"
+                    <div class="w-10 sm:w-16 md:w-[100px] lg:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]"
                         id="step-line-1"></div>
-                    <div class="flex flex-col items-center relative z-2">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]"
+                    <div class="flex flex-col items-center relative z-2 px-1 sm:px-4 md:px-8">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]"
                             id="step-circle-2">2</div>
-                        <span class="text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap"
+                        <span
+                            class="text-xs md:text-base text-gray-400 mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
                             id="step-label-2">Schedule booking</span>
                     </div>
-                    <div class="w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative"
+                    <div class="w-10 sm:w-16 md:w-[100px] lg:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]"
                         id="step-line-2"></div>
-                    <div class="flex flex-col items-center relative z-2">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]"
+                    <div class="flex flex-col items-center relative z-2 px-1 sm:px-4 md:px-8">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]"
                             id="step-circle-3">3</div>
-                        <span class="text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap"
+                        <span
+                            class="text-xs md:text-base text-gray-400 mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
                             id="step-label-3">Booking confirmation</span>
                     </div>
                 </div>
@@ -105,22 +109,25 @@
                         class="bg-[#F5F5F5] rounded-2xl p-6 mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
                         <div class="flex items-center gap-4">
                             <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}" alt="Lily Marie"
-                                class="w-[127px] h-[127px] rounded-full object-cover">
+                                class="lg:w-[127px] lg:h-[127px] w-[80px] h-[80px] rounded-full object-cover">
                             <div>
-                                <div class="flex items-center gap-2">
-                                    <h3 class="font-medium font-sans! text-gray-900 text-xl">Lily Marie</h3>
-                                    <div class="flex items-center gap-1 text-base text-[#29724C] font-medium">
-                                        <i class="ri-star-fill"></i>
-                                        <span class="text-[#29724C] text-base leading-none">4.6</span>
+                                <div class="flex items-center gap-4 mb-2">
+                                    <h3 class="font-medium font-sans! text-gray-900 lg:text-2xl text-xl  leading-none">
+                                        Lily Marie
+                                    </h3>
+                                    <div>
+                                        <i class="ri-star-fill text-base text-[#29724C] leading-none"></i>
+                                        <span
+                                            class="text-base leading-none text-[#29724C] align-middle font-medium">4.6</span>
                                     </div>
                                 </div>
                                 <p class="text-[#252525] text-base">Art Therapist</p>
-                                <p class="text-[#7D7D7D] text-base flex items-center gap-1 mt-2"><i
+                                <p class="text-[#7D7D7D] text-sm flex items-center gap-1 mt-2"><i
                                         class="ri-map-pin-line"></i>
                                     Kazhakuttam, Trivandrum</p>
                             </div>
                         </div>
-                        <button type="button"
+                        <button type="button" onclick="openPractitionerModal()"
                             class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors">
                             Change Practitioner
                         </button>
@@ -180,360 +187,266 @@
                     <!-- Explain your situation -->
                     <div class="mb-10">
                         <h3 class="text-gray-700 font-normal mb-4 text-lg">Do you want to explain your situation?
-                            (Optional)
+                            <span class="italic">(Optional)</span>
                         </h3>
                         <textarea placeholder="Write here..."
-                            class="w-full py-4 px-5 bg-[#F5F5F5] rounded-2xl outline-none text-sm text-gray-700 min-h-[120px] resize-y placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white border border-transparent"></textarea>
-                        <p class="text-right text-sm text-gray-400 mt-2">(Paragraph should contain 100 words only)</p>
-                    </div>
-
-                    <!-- Translator Option -->
-                    <div class="mb-10">
-                        <label class="flex items-center gap-3 cursor-pointer mb-4">
-                            <input type="checkbox" id="need-translator"
-                                class="w-5 h-5 rounded border-gray-300 text-[#F5A623] focus:ring-[#F5A623]">
-                            <span class="text-[#404040] font-normal text-lg">I need a Translator</span>
-                        </label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden" id="translator-options">
-                            <!-- Custom Language Dropdown -->
-                            <div class="custom-dropdown relative" id="language-dropdown">
-                                <input type="hidden" name="language" id="language-value">
-                                <button type="button"
-                                    class="dropdown-trigger w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-base text-gray-400 flex items-center justify-between cursor-pointer transition-all duration-200 hover:bg-[#EFEFEF]"
-                                    onclick="toggleDropdown('language-dropdown')">
-                                    <span class="dropdown-label">Select your Language</span>
-                                    <i
-                                        class="ri-arrow-down-s-line text-xl text-gray-400 transition-transform duration-200"></i>
-                                </button>
-                                <div
-                                    class="dropdown-menu absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 z-50 hidden max-h-[280px] overflow-y-auto">
-                                    <div class="py-2">
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                            data-value="english">English</div>
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                            data-value="french">French</div>
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                            data-value="german">German</div>
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                            data-value="spanish">Spanish</div>
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                            data-value="hindi">Hindi</div>
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                            data-value="bengali">Bengali</div>
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                            data-value="japanese">Japanese</div>
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                            data-value="arabic">Arabic</div>
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                            data-value="mandarin">Mandarin</div>
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                            data-value="portuguese">Portuguese</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Custom Translator Dropdown -->
-                            <div class="custom-dropdown relative" id="translator-dropdown">
-                                <input type="hidden" name="translator" id="translator-value">
-                                <button type="button"
-                                    class="dropdown-trigger w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-base text-gray-400 flex items-center justify-between cursor-pointer transition-all duration-200 hover:bg-[#EFEFEF]"
-                                    onclick="toggleDropdown('translator-dropdown')">
-                                    <span class="dropdown-label flex items-center gap-3">Select your Translator</span>
-                                    <i
-                                        class="ri-arrow-down-s-line text-xl text-gray-400 transition-transform duration-200"></i>
-                                </button>
-                                <div
-                                    class="dropdown-menu absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 z-50 hidden max-h-[380px] overflow-y-auto">
-                                    <div class="py-4 px-4 flex flex-col gap-2">
-                                        <!-- Translator Card 1 -->
-                                        <div class="translator-card flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-[#FAFAFA] transition-colors"
-                                            data-value="noah-alex" data-name="Noah Alex"
-                                            data-img="{{ asset('frontend/assets/lilly-profile-pic.png') }}">
-                                            <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}"
-                                                alt="Noah Alex" class="w-14 h-14 rounded-full object-cover shrink-0">
-                                            <div class="flex-1 min-w-0">
-                                                <h4 class="text-base font-medium text-gray-900">Noah Alex</h4>
-                                                <p class="text-sm text-gray-400 truncate">English, French, Spanish,
-                                                    Hindi, Japanese</p>
-                                            </div>
-                                            <button type="button"
-                                                class="translator-add-btn px-5 py-1.5 rounded-full bg-[#FABD4D] text-[#423131] text-sm font-medium cursor-pointer border-none hover:bg-[#E9AC3C] transition-colors shrink-0">Add</button>
-                                        </div>
-                                        <!-- Translator Card 2 -->
-                                        <div class="translator-card flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-[#FAFAFA] transition-colors"
-                                            data-value="nahala-nazim" data-name="Nahala Nazim"
-                                            data-img="{{ asset('frontend/assets/lilly-profile-pic.png') }}">
-                                            <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}"
-                                                alt="Nahala Nazim" class="w-14 h-14 rounded-full object-cover shrink-0">
-                                            <div class="flex-1 min-w-0">
-                                                <h4 class="text-base font-medium text-gray-900">Nahala Nazim</h4>
-                                                <p class="text-sm text-gray-400 truncate">Malayalam, English, Tamil,
-                                                    Urdu, Hindi</p>
-                                            </div>
-                                            <button type="button"
-                                                class="translator-add-btn px-5 py-1.5 rounded-full bg-[#FABD4D] text-[#423131] text-sm font-medium cursor-pointer border-none hover:bg-[#E9AC3C] transition-colors shrink-0">Add</button>
-                                        </div>
-                                        <!-- Translator Card 3 -->
-                                        <div class="translator-card flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-[#FAFAFA] transition-colors"
-                                            data-value="jacob-jones" data-name="Jacob Jones"
-                                            data-img="{{ asset('frontend/assets/lilly-profile-pic.png') }}">
-                                            <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}"
-                                                alt="Jacob Jones" class="w-14 h-14 rounded-full object-cover shrink-0">
-                                            <div class="flex-1 min-w-0">
-                                                <h4 class="text-base font-medium text-gray-900">Jacob Jones</h4>
-                                                <p class="text-sm text-gray-400 truncate">Hindi, English, Spanish,
-                                                    French</p>
-                                            </div>
-                                            <button type="button"
-                                                class="translator-add-btn px-5 py-1.5 rounded-full bg-[#FABD4D] text-[#423131] text-sm font-medium cursor-pointer border-none hover:bg-[#E9AC3C] transition-colors shrink-0">Add</button>
-                                        </div>
-                                        <!-- Translator Card 4 -->
-                                        <div class="translator-card flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-[#FAFAFA] transition-colors"
-                                            data-value="alex-parker" data-name="Alex Parker"
-                                            data-img="{{ asset('frontend/assets/lilly-profile-pic.png') }}">
-                                            <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}"
-                                                alt="Alex Parker" class="w-14 h-14 rounded-full object-cover shrink-0">
-                                            <div class="flex-1 min-w-0">
-                                                <h4 class="text-base font-medium text-gray-900">Alex Parker</h4>
-                                                <p class="text-sm text-gray-400 truncate">Indonesian, English, Japanese,
-                                                    French, Tamil</p>
-                                            </div>
-                                            <button type="button"
-                                                class="translator-add-btn px-5 py-1.5 rounded-full bg-[#FABD4D] text-[#423131] text-sm font-medium cursor-pointer border-none hover:bg-[#E9AC3C] transition-colors shrink-0">Add</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            class="w-full py-4 px-5 bg-[#F5F5F5] rounded-2xl outline-none text-sm text-gray-700 min-h-[120px] resize-y placeholder:text-gray-400 focus:border-primary focus:bg-white border border-transparent"></textarea>
+                        <p class="text-right text-sm text-gray-400 mt-2 italic">(Paragraph should contain 100 words
+                            only)</p>
                     </div>
 
                     <!-- Service Search -->
-                    <div class="mb-10">
-                        <h3 class="text-gray-700 font-normal mb-4 text-lg">Are you looking for any particular service?
+                    <div class="mb-10" id="service-search-container">
+                        <h3 class="text-gray-700 font-normal mb-4 text-base">Are you looking for any particular service?
                         </h3>
+
                         <div
-                            class="flex items-center bg-[#F5F5F5] rounded-full border border-transparent overflow-hidden">
-                            <div id="services-container"
-                                class="flex items-center gap-3 py-2 px-2 overflow-x-auto no-scrollbar cursor-default"
-                                style="flex: 2; max-width: 60%;">
-                                <!-- Static Service Tag 1 -->
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <span
-                                        class="inline-flex items-center px-3 py-1.5 rounded-full bg-[#E5E5E5] text-sm text-[#423131] font-medium whitespace-nowrap">
-                                        Life Coach &nbsp;•&nbsp; 45 Min &nbsp;•&nbsp; € 50
-                                    </span>
-                                    <button class="text-gray-400 hover:text-[#423131] transition-colors">
-                                        <i class="ri-close-line text-lg"></i>
-                                    </button>
-                                </div>
-                                <!-- Static Service Tag 2 -->
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <span
-                                        class="inline-flex items-center px-3 py-1.5 rounded-full bg-[#E5E5E5] text-sm text-[#423131] font-medium whitespace-nowrap">
-                                        Yoga Therapy &nbsp;•&nbsp; 45 Min &nbsp;•&nbsp; € 50
-                                    </span>
-                                    <button class="text-gray-400 hover:text-[#423131] transition-colors">
-                                        <i class="ri-close-line text-lg"></i>
-                                    </button>
-                                </div>
-                                <!-- Static Service Tag 3 -->
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <span
-                                        class="inline-flex items-center px-3 py-1.5 rounded-full bg-[#E5E5E5] text-sm text-[#423131] font-medium whitespace-nowrap">
-                                        Meditation &nbsp;•&nbsp; 30 Min &nbsp;•&nbsp; € 35
-                                    </span>
-                                    <button class="text-gray-400 hover:text-[#423131] transition-colors">
-                                        <i class="ri-close-line text-lg"></i>
-                                    </button>
-                                </div>
-                                <!-- Static Service Tag 4 -->
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <span
-                                        class="inline-flex items-center px-3 py-1.5 rounded-full bg-[#E5E5E5] text-sm text-[#423131] font-medium whitespace-nowrap">
-                                        Psychotherapy &nbsp;•&nbsp; 1 Hour &nbsp;•&nbsp; € 75
-                                    </span>
-                                    <button class="text-gray-400 hover:text-[#423131] transition-colors">
-                                        <i class="ri-close-line text-lg"></i>
-                                    </button>
-                                </div>
-                                <!-- Static Service Tag 5 -->
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <span
-                                        class="inline-flex items-center px-3 py-1.5 rounded-full bg-[#E5E5E5] text-sm text-[#423131] font-medium whitespace-nowrap">
-                                        Body Massage &nbsp;•&nbsp; 1 Hour &nbsp;•&nbsp; € 60
-                                    </span>
-                                    <button class="text-gray-400 hover:text-[#423131] transition-colors">
-                                        <i class="ri-close-line text-lg"></i>
-                                    </button>
-                                </div>
-                                <!-- Static Service Tag 6 -->
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <span
-                                        class="inline-flex items-center px-3 py-1.5 rounded-full bg-[#E5E5E5] text-sm text-[#423131] font-medium whitespace-nowrap">
-                                        Reiki Healing &nbsp;•&nbsp; 45 Min &nbsp;•&nbsp; € 55
-                                    </span>
-                                    <button class="text-gray-400 hover:text-[#423131] transition-colors">
-                                        <i class="ri-close-line text-lg"></i>
-                                    </button>
-                                </div>
-                                <!-- Static Service Tag 7 -->
-                                <div class="flex items-center gap-2 shrink-0">
-                                    <span
-                                        class="inline-flex items-center px-3 py-1.5 rounded-full bg-[#E5E5E5] text-sm text-[#423131] font-medium whitespace-nowrap">
-                                        Aromatherapy &nbsp;•&nbsp; 30 Min &nbsp;•&nbsp; € 40
-                                    </span>
-                                    <button class="text-gray-400 hover:text-[#423131] transition-colors">
-                                        <i class="ri-close-line text-lg"></i>
-                                    </button>
-                                </div>
+                            class="flex items-center bg-[#F5F5F5] rounded-[30px] border border-transparent overflow-hidden mb-6 h-[60px] pr-6 transition-colors focus-within:bg-[#EAEAEA]">
+                            <div id="selected-services-container"
+                                class="flex items-center gap-2 px-3 overflow-x-auto no-scrollbar h-full pl-4"
+                                style="flex: 1;">
+                                <!-- dynamically added pills go here -->
                             </div>
-                            <div class="w-px h-6 bg-gray-300 shrink-0"></div>
-                            <div class="relative shrink-0" style="flex: 1; min-width: 220px;">
-                                <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                <input type="text" placeholder="Search services"
-                                    class="w-full py-3.5 pl-10 pr-6 bg-transparent border-none outline-none text-sm text-gray-700 placeholder:text-gray-400">
+                            <div class="w-px h-6 bg-gray-300 shrink-0 mx-4" id="service-search-divider"></div>
+                            <div class="relative shrink-0 flex items-center gap-3 w-full max-w-[200px]"
+                                id="service-search-input-wrapper" style="flex: 1; max-w: none;">
+                                <i class="ri-search-line text-gray-500 text-xl font-normal ml-4"></i>
+                                <input type="text" placeholder="Search services" id="service-search-input"
+                                    class="w-full bg-transparent border-none outline-none text-[15px] text-gray-700 placeholder:text-gray-400 h-full">
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Service Cards Slider -->
-                    <div class="swiper serviceCardsSwiper mb-6">
-                        <div class="swiper-wrapper">
-                            <!-- Life Coach -->
-                            <div class="swiper-slide">
-                                <div class="bg-white rounded-xl p-6 border border-[#C0A97E] shadow-sm">
-                                    <h4 class="text-lg font-medium text-gray-900 mb-4 text-center">Life Coach</h4>
-                                    <div class="flex justify-center gap-2 mb-4">
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-[#F5A623] bg-[#FFF8E7] text-[#423131]">45
-                                            Min</button>
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-gray-200 text-gray-500 hover:border-[#F5A623]">1
-                                            Hour</button>
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-gray-200 text-gray-500 hover:border-[#F5A623]">2
-                                            Hours</button>
-                                    </div>
-                                    <p class="text-center text-2xl font-medium text-gray-900 mb-4">€ 50 <span
-                                            class="text-sm font-normal text-gray-500">/ Session</span></p>
-                                    <button
-                                        class="w-full py-2.5 rounded-md bg-[#F5A623] text-[#423131] font-medium text-sm hover:bg-[#E09518] transition-colors">Add</button>
+                        <!-- Service Tags -->
+                        <div class="flex flex-wrap gap-3" id="available-services-container">
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Life Coach">
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Life Coach
                                 </div>
-                            </div>
+                            </label>
 
-                            <!-- Yoga Therapy -->
-                            <div class="swiper-slide">
-                                <div class="bg-white rounded-xl p-6 border border-[#C0A97E] shadow-sm">
-                                    <h4 class="text-lg font-medium text-gray-900 mb-4 text-center">Yoga Therapy</h4>
-                                    <div class="flex justify-center gap-2 mb-4">
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-[#F5A623] bg-[#FFF8E7] text-[#423131]">45
-                                            Min</button>
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-gray-200 text-gray-500 hover:border-[#F5A623]">1
-                                            Hour</button>
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-gray-200 text-gray-500 hover:border-[#F5A623]">2
-                                            Hours</button>
-                                    </div>
-                                    <p class="text-center text-2xl font-medium text-gray-900 mb-4">€ 50 <span
-                                            class="text-sm font-normal text-gray-500">/ Session</span></p>
-                                    <button
-                                        class="w-full py-2.5 rounded-md bg-[#F5A623] text-[#423131] font-medium text-sm hover:bg-[#E09518] transition-colors">Add</button>
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Yoga Therapy">
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Yoga Therapy
                                 </div>
-                            </div>
+                            </label>
 
-                            <!-- Body Massage -->
-                            <div class="swiper-slide">
-                                <div class="bg-white rounded-xl p-6 border border-[#C0A97E] shadow-sm">
-                                    <h4 class="text-lg font-medium text-gray-900 mb-4 text-center">Body Massage</h4>
-                                    <div class="flex justify-center gap-2 mb-4">
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-[#F5A623] bg-[#FFF8E7] text-[#423131]">45
-                                            Min</button>
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-gray-200 text-gray-500 hover:border-[#F5A623]">1
-                                            Hour</button>
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-gray-200 text-gray-500 hover:border-[#F5A623]">2
-                                            Hours</button>
-                                    </div>
-                                    <p class="text-center text-2xl font-medium text-gray-900 mb-4">€ 50 <span
-                                            class="text-sm font-normal text-gray-500">/ Session</span></p>
-                                    <button
-                                        class="w-full py-2.5 rounded-md bg-[#F5A623] text-[#423131] font-medium text-sm hover:bg-[#E09518] transition-colors">Add</button>
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Naturopathy">
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Naturopathy
                                 </div>
-                            </div>
+                            </label>
 
-                            <!-- Psychotherapy -->
-                            <div class="swiper-slide">
-                                <div class="bg-white rounded-xl p-6 border border-[#C0A97E] shadow-sm">
-                                    <h4 class="text-lg font-medium text-gray-900 mb-4 text-center">Psychotherapy</h4>
-                                    <div class="flex justify-center gap-2 mb-4">
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-[#F5A623] bg-[#FFF8E7] text-[#423131]">45
-                                            Min</button>
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-gray-200 text-gray-500 hover:border-[#F5A623]">1
-                                            Hour</button>
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-gray-200 text-gray-500 hover:border-[#F5A623]">2
-                                            Hours</button>
-                                    </div>
-                                    <p class="text-center text-2xl font-medium text-gray-900 mb-4">€ 50 <span
-                                            class="text-sm font-normal text-gray-500">/ Session</span></p>
-                                    <button
-                                        class="w-full py-2.5 rounded-md bg-[#F5A623] text-[#423131] font-medium text-sm hover:bg-[#E09518] transition-colors">Add</button>
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Body Massage" checked>
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Body Massage
                                 </div>
-                            </div>
+                            </label>
 
-                            <!-- Meditation -->
-                            <div class="swiper-slide">
-                                <div class="bg-white rounded-xl p-6 border border-[#C0A97E] shadow-sm">
-                                    <h4 class="text-lg font-medium text-gray-900 mb-4 text-center">Meditation</h4>
-                                    <div class="flex justify-center gap-2 mb-4">
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-[#F5A623] bg-[#FFF8E7] text-[#423131]">45
-                                            Min</button>
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-gray-200 text-gray-500 hover:border-[#F5A623]">1
-                                            Hour</button>
-                                        <button
-                                            class="duration-btn px-3 py-1.5 rounded-md border text-xs font-medium border-gray-200 text-gray-500 hover:border-[#F5A623]">2
-                                            Hours</button>
-                                    </div>
-                                    <p class="text-center text-2xl font-medium text-gray-900 mb-4">€ 50 <span
-                                            class="text-sm font-normal text-gray-500">/ Session</span></p>
-                                    <button
-                                        class="w-full py-2.5 rounded-md bg-[#F5A623] text-[#423131] font-medium text-sm hover:bg-[#E09518] transition-colors">Add</button>
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Sophrology">
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Sophrology
                                 </div>
-                            </div>
+                            </label>
+
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Psychotherapy">
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Psychotherapy
+                                </div>
+                            </label>
+
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Panchakarma">
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Panchakarma
+                                </div>
+                            </label>
+
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Marma Therapy">
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Marma Therapy
+                                </div>
+                            </label>
+
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Life Coach 2">
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Life Coach
+                                </div>
+                            </label>
+
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Yoga Therapy 2">
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Yoga Therapy
+                                </div>
+                            </label>
+
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Naturopathy 2">
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Naturopathy
+                                </div>
+                            </label>
+
+                            <label class="service-tag-label inline-block cursor-pointer select-none">
+                                <input type="checkbox" class="peer hidden" value="Body Massage 2">
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                    Body Massage
+                                </div>
+                            </label>
                         </div>
-                    </div>
-
-                    <!-- Navigation Arrows -->
-                    <div class="flex justify-center gap-4 mb-10">
-                        <button id="service-prev"
-                            class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:border-[#F5A623] hover:text-[#F5A623] transition-colors cursor-pointer">
-                            <i class="ri-arrow-left-s-line text-xl"></i>
-                        </button>
-                        <button id="service-next"
-                            class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:border-[#F5A623] hover:text-[#F5A623] transition-colors cursor-pointer">
-                            <i class="ri-arrow-right-s-line text-xl"></i>
-                        </button>
                     </div>
 
                     <!-- Scheduling Section -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <!-- Yoga Therapy Schedule -->
+                    <div class="grid grid-cols-1 gap-6 mb-8">
                         <div>
-                            <h4 class="font-medium text-gray-900 mb-4">Yoga Therapy</h4>
-                            <div class="flex gap-3 mb-4">
+                            <h4 class="font-normal text-gray-400 mb-4">Service 1</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div class="relative flex-1">
+                                    <input type="text" name="yoga_therapy_service" value="Life Coach" disabled
+                                        class="w-full h-full py-2 px-4 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-[#252525] font-medium cursor-not-allowed">
+                                </div>
+                                <div class="relative flex-1" id="duration-dropdown-container">
+                                    <div class="duration-picker-trigger h-full py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
+                                        onclick="
+                                            const dd = this.nextElementSibling.nextElementSibling; 
+                                            dd.classList.toggle('hidden'); 
+                                            const icon = this.querySelector('i'); 
+                                            // Close all other duration dropdowns
+                                            document.querySelectorAll('.duration-dropdown').forEach(d => {
+                                                if(d !== dd) { d.classList.add('hidden'); }
+                                            });
+                                            if(dd.classList.contains('hidden')) { 
+                                                icon.className='ri-arrow-down-s-line text-gray-700 text-lg';
+                                                dd.classList.remove('cal-open-top', 'cal-open-bottom');
+                                            } else { 
+                                                icon.className='ri-arrow-up-s-line text-gray-700 text-lg'; 
+                                                if(typeof smartPosition !== 'undefined') { smartPosition(this, dd); } 
+                                            }">
+                                        <span class="text-sm text-gray-700 font-normal duration-label">Duration</span>
+                                        <i class="ri-arrow-down-s-line text-gray-700 text-lg"></i>
+                                    </div>
+                                    <input type="hidden" name="yoga_therapy_duration" class="duration-value">
+
+                                    <!-- Dropdown Menu -->
+                                    <div
+                                        class="duration-dropdown hidden absolute left-0 w-72 bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 z-50">
+                                        <div class="p-2">
+                                            <!-- Option 1 -->
+                                            <label
+                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
+                                                <div class="flex items-center gap-3">
+                                                    <input type="radio" name="temp_duration" value="45 Mins"
+                                                        class="peer hidden">
+                                                    <div
+                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
+                                                        <div
+                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-[15px] text-[#404040]">45 Mins</span>
+                                                </div>
+                                                <span class="text-[15px] font-medium text-[#29724C]">€ 50</span>
+                                            </label>
+
+                                            <!-- Option 2 -->
+                                            <label
+                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
+                                                <div class="flex items-center gap-3">
+                                                    <input type="radio" name="temp_duration" value="1 Hour"
+                                                        class="peer hidden" checked>
+                                                    <div
+                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
+                                                        <div
+                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-[15px] text-[#404040]">1 Hour</span>
+                                                </div>
+                                                <span class="text-[15px] font-medium text-[#29724C]">€ 100</span>
+                                            </label>
+
+                                            <!-- Option 3 -->
+                                            <label
+                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
+                                                <div class="flex items-center gap-3">
+                                                    <input type="radio" name="temp_duration" value="2 Hours"
+                                                        class="peer hidden">
+                                                    <div
+                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
+                                                        <div
+                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-[15px] text-[#404040]">2 Hours</span>
+                                                </div>
+                                                <span class="text-[15px] font-medium text-[#29724C]">€ 150</span>
+                                            </label>
+                                        </div>
+
+                                        <hr class="border-gray-100 m-0">
+
+                                        <!-- Footer -->
+                                        <div class="p-3.5 flex items-center justify-end gap-3 rounded-b-2xl bg-white">
+                                            <button type="button"
+                                                class="text-[15px] text-[#594B4B] font-medium px-4 py-2 hover:bg-gray-50 rounded-full cursor-pointer transition-colors border-none bg-transparent"
+                                                onclick="
+                                                let dd = this.closest('.duration-dropdown');
+                                                let active = dd.querySelector('input[type=radio]:checked');
+                                                if (active) active.checked = false;
+                                                dd.previousElementSibling.value = '';
+                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = 'Duration';
+                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-gray-600');
+                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-[#252525]');
+                                                dd.classList.add('hidden');
+                                                dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
+                                            ">
+                                                Clear
+                                            </button>
+                                            <button type="button"
+                                                class="bg-[#41B882] text-white px-6 py-2 rounded-full text-[15px] font-medium hover:bg-[#38A172] cursor-pointer transition-colors shadow-sm border-none"
+                                                onclick="
+                                                let dd = this.closest('.duration-dropdown');
+                                                let checked = dd.querySelector('input[type=radio]:checked');
+                                                if(checked) {
+                                                    let val = checked.value;
+                                                    dd.previousElementSibling.value = val;
+                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = val;
+                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-gray-600');
+                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-[#252525]', 'font-medium');
+                                                }
+                                                dd.classList.add('hidden');
+                                                dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
+                                            ">
+                                                Set
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="relative flex-1">
                                     <div class="day-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
                                         onclick="toggleCalendar(this)">
-                                        <span class="text-sm text-gray-400 day-label">Day</span>
-                                        <i class="ri-calendar-line text-gray-500 text-lg"></i>
+                                        <span class="text-sm text-gray-700 day-label">Day</span>
+                                        <i class="ri-calendar-line text-gray-700 text-lg"></i>
                                     </div>
                                     <input type="hidden" name="yoga_therapy_day" class="day-value">
                                     <div class="calendar-dropdown hidden">
@@ -543,8 +456,8 @@
                                 <div class="relative flex-1">
                                     <div class="time-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
                                         onclick="toggleTimePicker(this)">
-                                        <span class="text-sm text-gray-400 time-label">Time</span>
-                                        <i class="ri-time-line text-gray-500 text-lg"></i>
+                                        <span class="text-sm text-gray-700 time-label">Time</span>
+                                        <i class="ri-time-line text-gray-700 text-lg"></i>
                                     </div>
                                     <input type="hidden" name="yoga_therapy_time" class="time-value">
                                     <div class="time-picker-dropdown hidden">
@@ -553,18 +466,137 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Psychotherapy Schedule -->
                         <div>
-                            <h4 class="font-medium text-gray-900 mb-4">Psychotherapy</h4>
-                            <div class="flex gap-3 mb-4">
+                            <h4 class="font-normal text-gray-400 mb-4">Service 2</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div class="relative flex-1">
+                                    <input type="text" name="yoga_therapy_service" value="Body Massage" disabled
+                                        class="w-full h-full py-2 px-4 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-[#252525] font-medium cursor-not-allowed">
+                                </div>
+                                <div class="relative flex-1" id="duration-dropdown-container">
+                                    <div class="duration-picker-trigger h-full py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
+                                        onclick="
+                                            const dd = this.nextElementSibling.nextElementSibling; 
+                                            dd.classList.toggle('hidden'); 
+                                            const icon = this.querySelector('i'); 
+                                            // Close all other duration dropdowns
+                                            document.querySelectorAll('.duration-dropdown').forEach(d => {
+                                                if(d !== dd) { d.classList.add('hidden'); }
+                                            });
+                                            if(dd.classList.contains('hidden')) { 
+                                                icon.className='ri-arrow-down-s-line text-gray-700 text-lg';
+                                                dd.classList.remove('cal-open-top', 'cal-open-bottom');
+                                            } else { 
+                                                icon.className='ri-arrow-up-s-line text-gray-700 text-lg'; 
+                                                if(typeof smartPosition !== 'undefined') { smartPosition(this, dd); } 
+                                            }">
+                                        <span class="text-sm text-gray-700 font-normal duration-label">Duration</span>
+                                        <i class="ri-arrow-down-s-line text-gray-700 text-lg"></i>
+                                    </div>
+                                    <input type="hidden" name="yoga_therapy_duration" class="duration-value">
+
+                                    <!-- Dropdown Menu -->
+                                    <div
+                                        class="duration-dropdown hidden absolute left-0 w-72 bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 z-50">
+                                        <div class="p-2">
+                                            <!-- Option 1 -->
+                                            <label
+                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
+                                                <div class="flex items-center gap-3">
+                                                    <input type="radio" name="temp_duration" value="45 Mins"
+                                                        class="peer hidden">
+                                                    <div
+                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
+                                                        <div
+                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-[15px] text-[#404040]">45 Mins</span>
+                                                </div>
+                                                <span class="text-[15px] font-medium text-[#29724C]">€ 50</span>
+                                            </label>
+
+                                            <!-- Option 2 -->
+                                            <label
+                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
+                                                <div class="flex items-center gap-3">
+                                                    <input type="radio" name="temp_duration" value="1 Hour"
+                                                        class="peer hidden" checked>
+                                                    <div
+                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
+                                                        <div
+                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-[15px] text-[#404040]">1 Hour</span>
+                                                </div>
+                                                <span class="text-[15px] font-medium text-[#29724C]">€ 100</span>
+                                            </label>
+
+                                            <!-- Option 3 -->
+                                            <label
+                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
+                                                <div class="flex items-center gap-3">
+                                                    <input type="radio" name="temp_duration" value="2 Hours"
+                                                        class="peer hidden">
+                                                    <div
+                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
+                                                        <div
+                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-[15px] text-[#404040]">2 Hours</span>
+                                                </div>
+                                                <span class="text-[15px] font-medium text-[#29724C]">€ 150</span>
+                                            </label>
+                                        </div>
+
+                                        <hr class="border-gray-100 m-0">
+
+                                        <!-- Footer -->
+                                        <div class="p-3.5 flex items-center justify-end gap-3 rounded-b-2xl bg-white">
+                                            <button type="button"
+                                                class="text-[15px] text-[#594B4B] font-medium px-4 py-2 hover:bg-gray-50 rounded-full cursor-pointer transition-colors border-none bg-transparent"
+                                                onclick="
+                                                let dd = this.closest('.duration-dropdown');
+                                                let active = dd.querySelector('input[type=radio]:checked');
+                                                if (active) active.checked = false;
+                                                dd.previousElementSibling.value = '';
+                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = 'Duration';
+                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-gray-600');
+                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-[#252525]');
+                                                dd.classList.add('hidden');
+                                                dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
+                                            ">
+                                                Clear
+                                            </button>
+                                            <button type="button"
+                                                class="bg-[#41B882] text-white px-6 py-2 rounded-full text-[15px] font-medium hover:bg-[#38A172] cursor-pointer transition-colors shadow-sm border-none"
+                                                onclick="
+                                                let dd = this.closest('.duration-dropdown');
+                                                let checked = dd.querySelector('input[type=radio]:checked');
+                                                if(checked) {
+                                                    let val = checked.value;
+                                                    dd.previousElementSibling.value = val;
+                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = val;
+                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-gray-600');
+                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-[#252525]', 'font-medium');
+                                                }
+                                                dd.classList.add('hidden');
+                                                dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
+                                            ">
+                                                Set
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="relative flex-1">
                                     <div class="day-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
                                         onclick="toggleCalendar(this)">
-                                        <span class="text-sm text-gray-400 day-label">Day</span>
-                                        <i class="ri-calendar-line text-gray-500 text-lg"></i>
+                                        <span class="text-sm text-gray-700 day-label">Day</span>
+                                        <i class="ri-calendar-line text-gray-700 text-lg"></i>
                                     </div>
-                                    <input type="hidden" name="psychotherapy_day" class="day-value">
+                                    <input type="hidden" name="yoga_therapy_day" class="day-value">
                                     <div class="calendar-dropdown hidden">
                                         <div class="calendar-wrapper"></div>
                                     </div>
@@ -572,102 +604,13 @@
                                 <div class="relative flex-1">
                                     <div class="time-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
                                         onclick="toggleTimePicker(this)">
-                                        <span class="text-sm text-gray-400 time-label">Time</span>
-                                        <i class="ri-time-line text-gray-500 text-lg"></i>
+                                        <span class="text-sm text-gray-700 time-label">Time</span>
+                                        <i class="ri-time-line text-gray-700 text-lg"></i>
                                     </div>
-                                    <input type="hidden" name="psychotherapy_time" class="time-value">
+                                    <input type="hidden" name="yoga_therapy_time" class="time-value">
                                     <div class="time-picker-dropdown hidden">
                                         <div class="time-picker-content"></div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Confirm Schedule Buttons -->
-                    <div class="flex justify-center gap-10 mb-10">
-                        <button type="button"
-                            class="text-gray-500 font-medium hover:text-gray-700 transition-colors cursor-pointer">Cancel</button>
-                        <button type="button"
-                            class="px-8 py-3 rounded-full bg-[#F5A623] text-[#423131] font-medium hover:bg-[#E09518] transition-colors cursor-pointer">Confirm
-                            Schedule</button>
-                    </div>
-
-                    <!-- Confirmed Bookings -->
-                    <div class="mt-12 mb-8">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
-                            <!-- Life Coach -->
-                            <div>
-                                <h4 class="text-gray-800 font-medium mb-3">Life Coach</h4>
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="flex-1 border border-gray-300 rounded-md px-4 py-3 bg-white text-gray-700 text-sm">
-                                        February 17, 2026
-                                    </div>
-                                    <div
-                                        class="w-32 border border-gray-300 rounded-md px-4 py-3 bg-white text-gray-700 text-sm text-center">
-                                        10.00 AM
-                                    </div>
-                                    <button type="button"
-                                        class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-4 py-3 rounded-md text-sm font-medium transition-colors">
-                                        Change
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Yoga Therapy -->
-                            <div>
-                                <h4 class="text-gray-800 font-medium mb-3">Yoga Therapy</h4>
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="flex-1 border border-gray-300 rounded-md px-4 py-3 bg-white text-gray-700 text-sm">
-                                        March 7, 2026
-                                    </div>
-                                    <div
-                                        class="w-32 border border-gray-300 rounded-md px-4 py-3 bg-white text-gray-700 text-sm text-center">
-                                        5.00 PM
-                                    </div>
-                                    <button type="button"
-                                        class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-4 py-3 rounded-md text-sm font-medium transition-colors">
-                                        Change
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Body Massage -->
-                            <div>
-                                <h4 class="text-gray-800 font-medium mb-3">Body Massage</h4>
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="flex-1 border border-gray-300 rounded-md px-4 py-3 bg-white text-gray-700 text-sm">
-                                        February 17, 2026
-                                    </div>
-                                    <div
-                                        class="w-32 border border-gray-300 rounded-md px-4 py-3 bg-white text-gray-700 text-sm text-center">
-                                        10.00 AM
-                                    </div>
-                                    <button type="button"
-                                        class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-4 py-3 rounded-md text-sm font-medium transition-colors">
-                                        Change
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Psychotherapy -->
-                            <div>
-                                <h4 class="text-gray-800 font-medium mb-3">Psychotherapy</h4>
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="flex-1 border border-gray-300 rounded-md px-4 py-3 bg-white text-gray-700 text-sm">
-                                        March 7, 2026
-                                    </div>
-                                    <div
-                                        class="w-32 border border-gray-300 rounded-md px-4 py-3 bg-white text-gray-700 text-sm text-center">
-                                        5.00 PM
-                                    </div>
-                                    <button type="button"
-                                        class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-4 py-3 rounded-md text-sm font-medium transition-colors">
-                                        Change
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -697,29 +640,32 @@
 
         <!-- Booking Confirmation - Step 3 (Hidden by default) -->
         <div class="hidden" id="step-3-content">
-            <div class="max-w-4xl mx-auto py-8">
+            <div class="max-w-4xl mx-auto px-4 py-8">
 
                 <!-- Practitioner Card -->
                 <div
-                    class="bg-white rounded-2xl p-6 mb-10 flex flex-col md:flex-row items-center justify-between gap-4 border border-gray-100 shadow-sm">
+                    class="bg-[#F5F5F5] rounded-2xl p-6 mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
                         <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}" alt="Lily Marie"
                             class="w-[127px] h-[127px] rounded-full object-cover">
                         <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-medium font-sans! text-gray-900 text-xl">Lily Marie</h3>
-                                <div class="flex items-center gap-1 text-base text-[#29724C] font-medium">
-                                    <i class="ri-star-fill"></i>
-                                    <span class="text-[#29724C] text-base leading-none">4.6</span>
+                            <div class="flex items-center gap-4 mb-2">
+                                <h3 class="font-medium font-sans! text-gray-900 lg:text-2xl text-xl leading-none">Lily
+                                    Marie
+                                </h3>
+                                <div>
+                                    <i class="ri-star-fill text-base text-[#29724C] leading-none"></i>
+                                    <span
+                                        class="text-base leading-none text-[#29724C] align-middle font-medium">4.6</span>
                                 </div>
                             </div>
                             <p class="text-[#252525] text-base">Art Therapist</p>
-                            <p class="text-[#7D7D7D] text-base flex items-center gap-1 mt-2"><i
+                            <p class="text-[#7D7D7D] text-sm flex items-center gap-1 mt-2"><i
                                     class="ri-map-pin-line"></i>
                                 Kazhakuttam, Trivandrum</p>
                         </div>
                     </div>
-                    <button type="button"
+                    <button type="button" onclick="openPractitionerModal()"
                         class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors">
                         Change Practitioner
                     </button>
@@ -730,23 +676,41 @@
                 <div class="mb-8">
                     <h4 class="text-gray-800 font-medium mb-3">Condition</h4>
 
-                    <!-- View Mode -->
-                    <div id="step3-condition-view"
-                        class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 flex items-center justify-between">
-                        <div class="flex flex-wrap gap-2" id="step3-selected-tags-display">
-                            <span class="bg-gray-100 text-gray-600 px-4 py-2 rounded-md text-sm">Identifying
-                                Imbalances</span>
-                            <span class="bg-gray-100 text-gray-600 px-4 py-2 rounded-md text-sm">Preventative Lifestyle
-                                Guidance</span>
-                            <span class="bg-gray-100 text-gray-600 px-4 py-2 rounded-md text-sm">Holistic
-                                Restoration</span>
-                            <span class="bg-gray-100 text-gray-600 px-4 py-2 rounded-md text-sm">Natural Healing</span>
+                    <!-- Edit/View Mode toggle -->
+                    <div id="step3-condition-container"
+                        class="bg-white rounded-2xl shadow-sm p-4 border border-gray-100 flex items-center justify-between min-h-[70px]">
+                        <div class="flex flex-wrap gap-2 px-2" id="condition-selected-tags">
+                            <!-- Tags will be rendered by JS -->
                         </div>
-                        <button type="button"
-                            onclick="showStep(2); setTimeout(() => document.getElementById('conditions-input').scrollIntoView({behavior: 'smooth', block: 'center'}), 100);"
-                            class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-6 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ml-4 border-none cursor-pointer">
+                        <button type="button" id="condition-action-btn"
+                            class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-6 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ml-4 border border-transparent cursor-pointer">
                             Change
                         </button>
+                    </div>
+
+                    <!-- Available Tags (Hidden in View Mode) -->
+                    <div id="condition-available-tags" class="mt-5 flex flex-wrap gap-2 hidden">
+                        <!-- These are just for design purposes, hardcoded based on the images -->
+                        <div class="condition-tag-option cursor-pointer px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm text-normal transition-colors hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"
+                            data-val="Identifying Imbalances">
+                            Identifying Imbalances
+                        </div>
+                        <div class="condition-tag-option cursor-pointer px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm text-normal transition-colors hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"
+                            data-val="Preventative Lifestyle Guidance">
+                            Preventative Lifestyle Guidance
+                        </div>
+                        <div class="condition-tag-option cursor-pointer px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm text-normal transition-colors hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"
+                            data-val="Holistic Restoration">
+                            Holistic Restoration
+                        </div>
+                        <div class="condition-tag-option cursor-pointer px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm text-normal transition-colors hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"
+                            data-val="Natural Healing">
+                            Natural Healing
+                        </div>
+                        <div class="condition-tag-option cursor-pointer px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm text-normal transition-colors hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"
+                            data-val="Prakriti">
+                            Prakriti
+                        </div>
                     </div>
                 </div>
 
@@ -768,11 +732,12 @@
                                 </div>
                             </div>
                             <div
-                                class="md:col-span-4 text-center md:border-l md:border-r border-gray-200 h-full flex items-center justify-center">
+                                class="md:col-span-4 text-center md:border-l md:border-r border-gray-200 h-full flex items-center justify-start lg:justify-center">
                                 <span class="text-xl font-medium text-gray-900">€ 50.00</span>
                             </div>
                             <div class="md:col-span-3 text-right">
-                                <button type="button" onclick="showStep(2); setTimeout(() => document.querySelector('.serviceCardsSwiper').scrollIntoView({behavior: 'smooth', block: 'center'}), 100);"
+                                <button type="button"
+                                    onclick="showStep(2); setTimeout(() => document.querySelector('#service-search-container').scrollIntoView({behavior: 'smooth', block: 'center'}), 100);"
                                     class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-8 py-2.5 rounded-full text-sm font-medium transition-colors border-none cursor-pointer">
                                     Change
                                 </button>
@@ -793,14 +758,73 @@
                                 </div>
                             </div>
                             <div
-                                class="md:col-span-4 text-center md:border-l md:border-r border-gray-200 h-full flex items-center justify-center">
+                                class="md:col-span-4 text-center md:border-l md:border-r border-gray-200 h-full flex items-center justify-start lg:justify-center   ">
                                 <span class="text-xl font-medium text-gray-900">€ 50.00</span>
                             </div>
                             <div class="md:col-span-3 text-right">
-                                <button type="button" onclick="showStep(2); setTimeout(() => document.querySelector('.serviceCardsSwiper').scrollIntoView({behavior: 'smooth', block: 'center'}), 100);"
+                                <button type="button"
+                                    onclick="showStep(2); setTimeout(() => document.querySelector('#service-search-container').scrollIntoView({behavior: 'smooth', block: 'center'}), 100);"
                                     class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-8 py-2.5 rounded-full text-sm font-medium transition-colors border-none cursor-pointer">
                                     Change
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Translator Option -->
+                <div class="mb-10">
+
+                    <label class="flex items-center gap-3 cursor-pointer mb-4 select-none">
+
+                        <input type="checkbox" class="peer hidden" id="need-translator">
+
+                        <div
+                            class="w-6 h-6 flex items-center justify-center rounded-md bg-[#DDDDDD] peer-checked:bg-[#F5A623]">
+                            <i class="ri-check-line text-white text-sm opacity-100"></i>
+                        </div>
+
+                        <span class="text-[#404040] font-normal text-lg">
+                            I need a Translator
+                        </span>
+
+                    </label>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden" id="translator-options">
+                        <!-- Custom Language Dropdown -->
+                        <div class="custom-dropdown relative" id="language-dropdown">
+                            <input type="hidden" name="language" id="language-value">
+                            <button type="button"
+                                class="dropdown-trigger w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-base text-gray-400 flex items-center justify-between cursor-pointer transition-all duration-200 hover:bg-[#EFEFEF]"
+                                onclick="toggleDropdown('language-dropdown')">
+                                <span class="dropdown-label">Select your Language</span>
+                                <i
+                                    class="ri-arrow-down-s-line text-xl text-gray-400 transition-transform duration-200"></i>
+                            </button>
+                            <div
+                                class="dropdown-menu absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 z-50 hidden max-h-[280px] overflow-y-auto">
+                                <div class="py-2">
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="english">English</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="french">French</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="german">German</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="spanish">Spanish</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="hindi">Hindi</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="bengali">Bengali</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="japanese">Japanese</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="arabic">Arabic</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="mandarin">Mandarin</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="portuguese">Portuguese</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -820,8 +844,8 @@
                     <button type="button"
                         class="text-gray-500 hover:text-gray-800 transition-colors cursor-pointer text-base"
                         onclick="previousStep()">Back</button>
-                    <button type="button"
-                        class="bg-[#354f40] text-white px-10 py-3.5 rounded-full font-medium hover:bg-[#2a4033] transition-colors cursor-pointer text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200">
+                    <button type="button" onclick="openSuccessModal()"
+                        class="bg-secondary text-white px-10 py-3.5 rounded-full font-normal hover:bg-primary transition-colors cursor-pointer text-base transform duration-200">
                         Confirm Booking
                     </button>
                 </div>
@@ -843,27 +867,27 @@
 
                 if (i < currentStep) {
                     // Completed step
-                    circle.className = 'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-base transition-all duration-300 bg-[#22C55E] text-white';
+                    circle.className = 'w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 bg-[#22C55E] text-white';
                     circle.innerHTML = '<i class="ri-check-line"></i>';
-                    label.className = 'text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap';
+                    label.className = 'text-xs md:text-base text-gray-700 mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight';
                     if (line) {
-                        line.className = 'w-[140px] h-0 border-t-2 border-dashed border-[#22C55E] self-center -mt-7 relative';
+                        line.className = 'w-10 sm:w-16 md:w-[100px] h-0 border-t-2 border-dashed border-[#22C55E] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]';
                     }
                 } else if (i === currentStep) {
                     // Active step
-                    circle.className = 'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-base transition-all duration-300 bg-[#60E48C] text-white';
+                    circle.className = 'w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 bg-[#60E48C] text-white';
                     circle.textContent = i;
-                    label.className = 'text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap';
+                    label.className = 'text-xs md:text-base text-gray-700 mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight';
                     if (line) {
-                        line.className = 'w-[140px] h-0 border-t-2 border-dashed border-[#60E48C] self-center -mt-7 relative';
+                        line.className = 'w-10 sm:w-16 md:w-[100px] h-0 border-t-2 border-dashed border-[#60E48C] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]';
                     }
                 } else {
                     // Inactive step
-                    circle.className = 'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]';
+                    circle.className = 'w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]';
                     circle.textContent = i;
-                    label.className = 'text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap';
+                    label.className = 'text-xs md:text-base text-gray-400 mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight';
                     if (line) {
-                        line.className = 'w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative';
+                        line.className = 'w-10 sm:w-16 md:w-[100px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]';
                     }
                 }
             }
@@ -897,25 +921,44 @@
 
         // Translator checkbox toggle
         document.addEventListener('DOMContentLoaded', function () {
-            // Service Cards Swiper
-            const serviceSwiper = new Swiper('.serviceCardsSwiper', {
-                slidesPerView: 1,
-                spaceBetween: 24,
-                allowTouchMove: true,
-                autoplay: false,
-                navigation: {
-                    prevEl: '#service-prev',
-                    nextEl: '#service-next',
-                },
-                breakpoints: {
-                    640: {
-                        slidesPerView: 2,
-                    },
-                    768: {
-                        slidesPerView: 3,
-                    },
-                },
+            // Service tags selection and syncing with search box
+            const selectedServicesContainer = document.getElementById('selected-services-container');
+            // const searchDivider = document.getElementById('service-search-divider');
+            const serviceSearchInputWrapper = document.getElementById('service-search-input-wrapper');
+
+            function renderSelectedServices() {
+                const checkedBoxes = document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked');
+                selectedServicesContainer.innerHTML = '';
+
+                if (checkedBoxes.length > 0) {
+                    // searchDivider.style.display = 'block';
+                    serviceSearchInputWrapper.style.flex = '0 0 160px'; // ensure input space
+
+                    checkedBoxes.forEach(box => {
+                        const val = box.value.replace(/ \d+$/, ''); // Handle demo duplicates
+                        const pill = document.createElement('div');
+                        pill.className = 'px-4 py-2 rounded-full border border-gray-300 bg-transparent text-gray-700 text-sm font-normal whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1 hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] transition-colors';
+                        pill.textContent = val;
+                        // Click to remove
+                        pill.onclick = (e) => {
+                            e.preventDefault();
+                            box.checked = false;
+                            renderSelectedServices();
+                        };
+                        selectedServicesContainer.appendChild(pill);
+                    });
+                } else {
+                    searchDivider.style.display = 'none';
+                    serviceSearchInputWrapper.style.flex = '1';
+                }
+            }
+
+            document.querySelectorAll('.service-tag-label input[type="checkbox"]').forEach(box => {
+                box.addEventListener('change', renderSelectedServices);
             });
+
+            // Initial render
+            renderSelectedServices();
 
 
             const translatorCheckbox = document.getElementById('need-translator');
@@ -970,22 +1013,8 @@
                 });
             });
 
-            // Duration buttons selection
-            document.querySelectorAll('.bg-white.rounded-xl').forEach(card => {
-                const durationBtns = card.querySelectorAll('.duration-btn');
-                durationBtns.forEach(btn => {
-                    btn.addEventListener('click', function () {
-                        durationBtns.forEach(b => {
-                            b.classList.remove('border-[#F5A623]', 'bg-[#FFF8E7]', 'text-[#423131]');
-                            b.classList.add('border-gray-200', 'text-gray-500');
-                        });
-                        this.classList.add('border-[#F5A623]', 'bg-[#FFF8E7]', 'text-[#423131]');
-                        this.classList.remove('border-gray-200', 'text-gray-500');
-                    });
-                });
-            });
-        });
 
+        });
         // Custom dropdown functions
         function toggleDropdown(dropdownId) {
             const dropdown = document.getElementById(dropdownId);
@@ -1069,6 +1098,21 @@
                     d.querySelector('.dropdown-trigger i').style.transform = 'rotate(0deg)';
                 });
             }
+
+            // Close duration dropdowns when clicking outside
+            if (!e.target.closest('.duration-dropdown') && !e.target.closest('.duration-picker-trigger')) {
+                document.querySelectorAll('.duration-dropdown').forEach(dd => {
+                    dd.classList.add('hidden');
+                    const trigger = dd.previousElementSibling.previousElementSibling;
+                    if (trigger) {
+                        const icon = trigger.querySelector('i');
+                        if (icon) {
+                            icon.className = 'ri-arrow-down-s-line text-gray-700 text-lg';
+                        }
+                    }
+                });
+            }
+
             // Close calendar dropdowns OR time pickers when clicking outside
             if (!e.target.closest('.calendar-dropdown') && !e.target.closest('.day-picker-trigger') &&
                 !e.target.closest('.time-picker-dropdown') && !e.target.closest('.time-picker-trigger')) {
@@ -1323,6 +1367,163 @@
 
 
     </script>
+
+
+    <!-- Payment Success Modal -->
+    <div id="successModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity opacity-0 popup-backdrop"
+            onclick="closeSuccessModal()"></div>
+
+        <!-- Modal Content -->
+        <div class="bg-white rounded-[24px] w-full max-w-[480px] p-10 pb-12 relative z-10 scale-95 opacity-0 transition-all duration-300 popup-content"
+            style="box-shadow: 0px 4px 44px 0px rgba(0, 0, 0, 0.08);">
+            <!-- Success Icon -->
+            <div class="flex justify-center mb-8 mt-4">
+                <div class="relative w-24 h-24">
+                    <div class="absolute inset-0 bg-[#5CE18E] rounded-full flex items-center justify-center z-10">
+                        <i class="ri-check-line text-white text-[56px] leading-none"></i>
+                    </div>
+                    <!-- Decorative Dots -->
+                    <div class="absolute top-[20%] left-[-15%] w-2.5 h-2.5 bg-[#5CE18E] rounded-full opacity-80"></div>
+                    <div class="absolute top-[-5%] left-[25%] w-1.5 h-1.5 bg-[#5CE18E] rounded-full"></div>
+                    <div class="absolute top-[-5%] right-[5%] w-4 h-4 bg-[#5CE18E] rounded-full"></div>
+                    <div class="absolute top-[25%] right-[-15%] w-1.5 h-1.5 bg-[#5CE18E] rounded-full opacity-80"></div>
+                    <div class="absolute bottom-[20%] right-[-5%] w-1 h-1 bg-[#5CE18E] rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Text Content -->
+            <div class="text-center">
+                <h2 class="text-[22px] font-medium text-[#252525] mb-4 mt-2">Payment Succeeded!</h2>
+                <p class="text-[#747474] text-[15px] font-normal leading-relaxed pb-4">
+                    Your transaction was completed successfully.<br>Thank you!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Practitioner Modal -->
+    <div id="practitionerModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity opacity-0 popup-backdrop"
+            onclick="closePractitionerModal()"></div>
+
+        <!-- Modal Content -->
+        <div class="bg-white rounded-[24px] w-full max-w-[800px] relative z-10 scale-95 opacity-0 transition-all duration-300 popup-content"
+            style="box-shadow: 0px 4px 44px 0px rgba(0, 0, 0, 0.08);">
+            <!-- Close button -->
+            <button type="button" onclick="closePractitionerModal()"
+                class="absolute top-8 right-8 w-8 h-8 flex items-center justify-center rounded-full bg-[#F5F5F5] hover:bg-[#EAEAEA] text-gray-500 transition-colors cursor-pointer">
+                <i class="ri-close-line text-[20px]"></i>
+            </button>
+
+            <div>
+                <div class="ps-8 pe-8 lg:ps-10 lg:pe-0 pt-8">
+                    <h2 class="text-[22px] font-medium text-[#252525] mb-6">Select Practitioner</h2>
+                    <div class="relative max-w-[380px] mb-8">
+                        <i
+                            class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]"></i>
+                        <input type="text" placeholder="Search Practitioner"
+                            class="w-full pl-11 pr-4 h-[48px] rounded-full border border-[#D0D0D0] text-sm text-gray-700 outline-none focus:border-[#FABD4D] transition-colors placeholder:text-[#8B8B8B]">
+                    </div>
+                </div>
+
+                <!-- Practitioners Slider -->
+                <div class="swiper practitioner-modal-slider">
+                    <div class="swiper-wrapper">
+                        <!-- Slide 1 -->
+                        <div class="swiper-slide !w-[140px]">
+                            <div class="flex flex-col items-center group cursor-pointer text-center">
+                                <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
+                                    <img src="{{ asset('frontend/assets/practitioner-1.jpg') }}" alt="Diya"
+                                        onerror="this.src='{{ asset('frontend/assets/lilly-profile-pic.png') }}'"
+                                        class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
+                                </div>
+                                <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">Diya</h3>
+                                <p class="text-sm text-[#8B8B8B] font-normal mb-3">Life Coach</p>
+                                <a href="{{ url('practitioner/10') }}"
+                                    class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
+                                    more</a>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="swiper-slide !w-[140px]">
+                            <div class="flex flex-col items-center group cursor-pointer text-center">
+                                <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
+                                    <img src="{{ asset('frontend/assets/practitioner-2.jpg') }}" alt="Hriday"
+                                        onerror="this.src='{{ asset('frontend/assets/lilly-profile-pic.png') }}'"
+                                        class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
+                                </div>
+                                <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">Hriday</h3>
+                                <p class="text-sm text-[#8B8B8B] font-normal mb-3">Yoga Therapist</p>
+                                <a href="{{ url('practitioner/10') }}"
+                                    class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
+                                    more</a>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="swiper-slide !w-[140px]">
+                            <div class="flex flex-col items-center group cursor-pointer text-center">
+                                <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
+                                    <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}" alt="Lily"
+                                        class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
+                                </div>
+                                <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">Lily</h3>
+                                <p class="text-sm text-[#8B8B8B] font-normal mb-3">Art Therapist</p>
+                                <a href="{{ url('practitioner/10') }}"
+                                    class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
+                                    more</a>
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="swiper-slide !w-[140px]">
+                            <div class="flex flex-col items-center group cursor-pointer text-center">
+                                <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
+                                    <img src="{{ asset('frontend/assets/practitioner-3.jpg') }}" alt="Jeeva"
+                                        onerror="this.src='{{ asset('frontend/assets/lilly-profile-pic.png') }}'"
+                                        class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
+                                </div>
+                                <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">Jeeva</h3>
+                                <p class="text-sm text-[#8B8B8B] font-normal mb-3">Spiritual Guide</p>
+                                <a href="{{ url('practitioner/10') }}"
+                                    class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
+                                    more</a>
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="swiper-slide !w-[140px]">
+                            <div class="flex flex-col items-center group cursor-pointer text-center">
+                                <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
+                                    <img src="{{ asset('frontend/assets/practitioner-4.jpg') }}" alt="Mira"
+                                        onerror="this.src='{{ asset('frontend/assets/lilly-profile-pic.png') }}'"
+                                        class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
+                                </div>
+                                <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">Mira</h3>
+                                <p class="text-sm text-[#8B8B8B] font-normal mb-3">Sound Healer</p>
+                                <a href="{{ url('practitioner/10') }}"
+                                    class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
+                                    more</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-[#EAEAEA] px-8 py-6 flex justify-end gap-3 mt-4">
+                    <button type="button" onclick="closePractitionerModal()"
+                        class="px-7 py-2.5 rounded-full border border-transparent bg-white text-gray-700 text-base font-normal hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+                    <button type="button" onclick="closePractitionerModal()"
+                        class="px-10 py-2.5 rounded-full bg-[#FABD4D] text-[#423131] text-base font-normal hover:bg-[#F5A623] transition-colors border border-transparent cursor-pointer">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('frontend/script.js') }}"></script>
 </body>
 
 </html>

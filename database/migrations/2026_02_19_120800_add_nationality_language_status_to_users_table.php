@@ -11,35 +11,71 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-              $table->foreignId('national_id')
-              ->nullable()
-              ->after('email')
-              ->constrained('countries')
-              ->onDelete('cascade');
+        // Ensure users table is InnoDB
+        \Illuminate\Support\Facades\DB::statement('ALTER TABLE users ENGINE=InnoDB');
 
-        // Language Foreign Key
-            $table->json('languages')
-                ->nullable()
-                ->after('national_id');
+        // Check if countries table exists before trying to modify it or use it as a foreign key
+        $countriesExist = Schema::hasTable('countries');
 
-        // Status Column
-            $table->tinyInteger('status')
-              ->default(0)
-              ->after('languages')
-              ->comment('0 = Pending, 1 = Approved');
-    });
+        if ($countriesExist) {
+            try {
+                \Illuminate\Support\Facades\DB::statement('ALTER TABLE countries ENGINE=InnoDB');
+            } catch (\Exception $e) {
+                // Might fail due to permissions or other issues
+            }
+        }
+
+        if (!Schema::hasColumn('users', 'national_id')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->unsignedBigInteger('national_id')->nullable()->after('email');
+            });
+        } else {
+            Schema::table('users', function (Blueprint $table) {
+                $table->unsignedBigInteger('national_id')->nullable()->change();
+            });
+        }
+
+        // Add foreign key constraint separately to be more robust
+        if ($countriesExist) {
+            Schema::table('users', function (Blueprint $table) {
+                try {
+                    $table->foreign('national_id')->references('id')->on('countries')->onDelete('cascade');
+                } catch (\Exception $e) {
+                    // Constraint might already exist
+                }
+            });
+        }
+
+        if (!Schema::hasColumn('users', 'languages')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->json('languages')
+                    ->nullable()
+                    ->after('national_id');
+            });
+        }
     }
 
     /**
      * Reverse the migrations.
      */
-   public function down(): void
+    public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        // Drop foreign key if it exists
+        try {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropForeign(['national_id']);
+            });
+        } catch (\Exception $e) {
+            // Ignore if it doesn't exist
+        }
 
-            $table->dropForeign(['national_id']);
-            $table->dropColumn(['national_id', 'languages', 'status']);
+        Schema::table('users', function (Blueprint $table) {
+            if (Schema::hasColumn('users', 'national_id')) {
+                $table->dropColumn('national_id');
+            }
+            if (Schema::hasColumn('users', 'languages')) {
+                $table->dropColumn('languages');
+            }
         });
     }
 };

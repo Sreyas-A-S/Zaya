@@ -36,6 +36,7 @@ class RolePermissionSeeder extends Seeder
             'Home Page' => ['view', 'edit'],
             'About Page' => ['view', 'edit'],
             'Services Page' => ['view', 'edit'],
+            'Contact Messages' => ['view', 'delete'],
         ];
 
         foreach ($modules as $module => $actions) {
@@ -98,7 +99,7 @@ class RolePermissionSeeder extends Seeder
             Permission::whereIn('group', [
                 'Dashboard', 'Users', 'Doctors', 'Practitioners', 
                 'Mindfulness Practitioners', 'Yoga Therapists', 
-                'Translators', 'Clients', 'Credentials', 'Practitioner Reviews', 'Admins'
+                'Translators', 'Clients', 'Credentials', 'Practitioner Reviews', 'Admins', 'Contact Messages'
             ])->get()
         );
     }

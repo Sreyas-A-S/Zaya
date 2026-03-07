@@ -49,6 +49,45 @@ return [
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
+        'noreply' => [
+            'transport' => 'smtp',
+            'host' => env('MAIL_NOREPLY_HOST', env('MAIL_HOST')),
+            'port' => env('MAIL_NOREPLY_PORT', env('MAIL_PORT')),
+            'username' => env('MAIL_NOREPLY_USERNAME'),
+            'password' => env('MAIL_NOREPLY_PASSWORD'),
+            'encryption' => env('MAIL_NOREPLY_ENCRYPTION', env('MAIL_ENCRYPTION')),
+            'from' => [
+                'address' => env('MAIL_NOREPLY_FROM_ADDRESS', 'noreply@zayawellness.com'),
+                'name' => env('MAIL_NOREPLY_FROM_NAME', env('MAIL_FROM_NAME')),
+            ],
+        ],
+
+        'info' => [
+            'transport' => 'smtp',
+            'host' => env('MAIL_INFO_HOST', env('MAIL_HOST')),
+            'port' => env('MAIL_INFO_PORT', env('MAIL_PORT')),
+            'username' => env('MAIL_INFO_USERNAME'),
+            'password' => env('MAIL_INFO_PASSWORD'),
+            'encryption' => env('MAIL_INFO_ENCRYPTION', env('MAIL_ENCRYPTION')),
+            'from' => [
+                'address' => env('MAIL_INFO_FROM_ADDRESS', 'info@zayawellness.com'),
+                'name' => env('MAIL_INFO_FROM_NAME', env('MAIL_FROM_NAME')),
+            ],
+        ],
+
+        'support' => [
+            'transport' => 'smtp',
+            'host' => env('MAIL_SUPPORT_HOST', env('MAIL_HOST')),
+            'port' => env('MAIL_SUPPORT_PORT', env('MAIL_PORT')),
+            'username' => env('MAIL_SUPPORT_USERNAME'),
+            'password' => env('MAIL_SUPPORT_PASSWORD'),
+            'encryption' => env('MAIL_SUPPORT_ENCRYPTION', env('MAIL_ENCRYPTION')),
+            'from' => [
+                'address' => env('MAIL_SUPPORT_FROM_ADDRESS', 'support@zayawellness.com'),
+                'name' => env('MAIL_SUPPORT_FROM_NAME', env('MAIL_FROM_NAME')),
+            ],
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],

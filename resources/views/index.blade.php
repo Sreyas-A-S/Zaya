@@ -433,14 +433,26 @@
                                     </div>
                                 </div>
                                 <p class="text-[#404040] text-sm/7 mb-6 line-clamp-4">"{{ $testimonial->message }}"</p>
-                                <div class="text-yellow-400 text-lg flex gap-1">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= $testimonial->rating)
-                                            <i class="ri-star-fill"></i>
-                                        @else
-                                            <i class="ri-star-line"></i>
-                                        @endif
-                                    @endfor
+                                <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-100">
+                                    <div class="text-yellow-400 text-lg flex gap-1">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($i <= $testimonial->rating)
+                                                <i class="ri-star-fill"></i>
+                                            @else
+                                                <i class="ri-star-line"></i>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                    <div class="flex items-center gap-4 text-gray-400">
+                                        <div class="flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors testimonial-like-btn {{ $testimonial->is_liked ? 'text-primary' : '' }}" data-id="{{ $testimonial->id }}">
+                                            <i class="{{ $testimonial->is_liked ? 'ri-thumb-up-fill' : 'ri-thumb-up-line' }} text-lg"></i>
+                                            <span class="text-xs font-medium">{{ $testimonial->likes_count }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5">
+                                            <i class="ri-reply-line text-lg"></i>
+                                            <span class="text-xs font-medium">{{ $testimonial->replies_count }}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

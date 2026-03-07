@@ -91,7 +91,7 @@
             </div>
 
             <!-- Contact Form -->
-            <form id="contact-form" class="space-y-6">
+            <form id="contact-form" action="{{ route('contact-us.store') }}" method="POST" class="space-y-6">
                 @csrf
 
                 <!-- First Name -->
@@ -423,6 +423,52 @@
 
     <!-- FAQ Toggle Script -->
     <script>
+        document.getElementById('contact-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = this;
+            const submitBtn = form.querySelector('button[type=\"submit\"]');
+            const originalBtnText = submitBtn.innerText;
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Sending...';
+
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (window.showToast) {
+                        window.showToast(data.success, 'success');
+                    } else {
+                        alert(data.success);
+                    }
+                    form.reset();
+                } else {
+                    const errorMsg = data.message || 'Something went wrong. Please try again.';
+                    if (window.showToast) {
+                        window.showToast(errorMsg, 'error');
+                    } else {
+                        alert(errorMsg);
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalBtnText;
+            }
+        });
+
         function toggleFaq(button) {
             const faqItem = button.closest('.faq-item');
             const content = faqItem.querySelector('.faq-content');

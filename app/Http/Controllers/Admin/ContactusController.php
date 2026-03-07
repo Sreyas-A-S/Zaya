@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\HomepageSetting;
+use App\Models\ContactUs;
+use App\Models\EmailLog;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
@@ -218,6 +220,34 @@ class ContactusController extends Controller
                 }
             }
         }
+    }
+
+    public function messages()
+    {
+        $messages = ContactUs::orderBy('created_at', 'desc')->get();
+        return view('admin.contact-us.messages', compact('messages'));
+    }
+
+    public function destroyMessage($id)
+    {
+        $message = ContactUs::findOrFail($id);
+        $message->delete();
+
+        return response()->json(['success' => 'Message deleted successfully!']);
+    }
+
+    public function emailLogs()
+    {
+        $logs = EmailLog::orderBy('created_at', 'desc')->get();
+        return view('admin.email-logs.index', compact('logs'));
+    }
+
+    public function destroyEmailLog($id)
+    {
+        $log = EmailLog::findOrFail($id);
+        $log->delete();
+
+        return response()->json(['success' => 'Log deleted successfully!']);
     }
 
     private function getBaseContactValue(string $key, string $fallback): string
