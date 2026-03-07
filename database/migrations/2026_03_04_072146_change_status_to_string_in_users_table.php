@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,16 +12,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // First convert current data to strings if possible, 
-        // but tinyInteger doesn't hold strings. 
-        // We'll change the column type and then update values.
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('status')->default('pending')->change();
-        });
+        // Change status in testimonials table
+        if (Schema::hasTable('testimonials')) {
+            Schema::table('testimonials', function (Blueprint $table) {
+                $table->string('status')->default('pending')->change();
+            });
 
-        // Update existing numeric statuses to strings
-        \Illuminate\Support\Facades\DB::table('users')->where('status', '0')->update(['status' => 'pending']);
-        \Illuminate\Support\Facades\DB::table('users')->where('status', '1')->update(['status' => 'active']);
+            // Update existing boolean statuses to strings
+            DB::table('testimonials')->where('status', '1')->update(['status' => 'approved']);
+            DB::table('testimonials')->where('status', '0')->update(['status' => 'pending']);
+        }
+
+        // Change status in testimonial_replies table
+        if (Schema::hasTable('testimonial_replies')) {
+            Schema::table('testimonial_replies', function (Blueprint $table) {
+                $table->string('status')->default('pending')->change();
+            });
+
+            // Update existing boolean statuses to strings
+            DB::table('testimonial_replies')->where('status', '1')->update(['status' => 'approved']);
+            DB::table('testimonial_replies')->where('status', '0')->update(['status' => 'pending']);
+        }
     }
 
     /**
@@ -28,8 +40,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->tinyInteger('status')->default(0)->comment('0 = Pending, 1 = Approved')->change();
-        });
+        if (Schema::hasTable('testimonials')) {
+            Schema::table('testimonials', function (Blueprint $table) {
+                $table->boolean('status')->default(true)->change();
+            });
+        }
+
+        if (Schema::hasTable('testimonial_replies')) {
+            Schema::table('testimonial_replies', function (Blueprint $table) {
+                $table->boolean('status')->default(true)->change();
+            });
+        }
     }
 };

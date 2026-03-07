@@ -22,12 +22,6 @@ return new class extends Migration
             $table->json('languages')
                 ->nullable()
                 ->after('national_id');
-
-        // Status Column
-            $table->tinyInteger('status')
-              ->default(0)
-              ->after('languages')
-              ->comment('0 = Pending, 1 = Approved');
     });
     }
 
@@ -39,7 +33,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
 
             $table->dropForeign(['national_id']);
-            $table->dropColumn(['national_id', 'languages', 'status']);
+            $table->dropColumn(['national_id', 'languages']);
         });
     }
 };
