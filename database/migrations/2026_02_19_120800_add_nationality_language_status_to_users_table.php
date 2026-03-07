@@ -11,25 +11,28 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Ensure tables are using InnoDB to support foreign keys
+        \Illuminate\Support\Facades\DB::statement('ALTER TABLE countries ENGINE=InnoDB');
+        \Illuminate\Support\Facades\DB::statement('ALTER TABLE users ENGINE=InnoDB');
+
         if (!Schema::hasColumn('users', 'national_id')) {
             Schema::table('users', function (Blueprint $table) {
-                $table->foreignId('national_id')
-                    ->nullable()
-                    ->after('email')
-                    ->constrained('countries')
-                    ->onDelete('cascade');
+                $table->unsignedBigInteger('national_id')->nullable()->after('email');
             });
         } else {
             Schema::table('users', function (Blueprint $table) {
-                // Ensure it's the right type and add constraint
                 $table->unsignedBigInteger('national_id')->nullable()->change();
-                try {
-                    $table->foreign('national_id')->references('id')->on('countries')->onDelete('cascade');
-                } catch (\Exception $e) {
-                    // Constraint might already exist
-                }
             });
         }
+
+        // Add foreign key constraint separately to be more robust
+        Schema::table('users', function (Blueprint $table) {
+            try {
+                $table->foreign('national_id')->references('id')->on('countries')->onDelete('cascade');
+            } catch (\Exception $e) {
+                // Constraint might already exist
+            }
+        });
 
         if (!Schema::hasColumn('users', 'languages')) {
             Schema::table('users', function (Blueprint $table) {
