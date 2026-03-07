@@ -78,10 +78,32 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0">
-                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Cancel</button>
                     <button class="btn btn-primary" type="submit" id="save-btn"><i class="fa fa-save me-1"></i> Save Changes</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Status Confirmation Modal -->
+<div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Confirm Status Change</h5>
+                <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Info-Circle icli text-primary mb-3" style="font-size: 50px;"></i>
+                <h5 id="status-confirmation-text">Are you sure you want to change the status?</h5>
+                <input type="hidden" id="status-item-id">
+                <input type="hidden" id="status-new-value">
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
+            </div>
         </div>
     </div>
 </div>
@@ -149,6 +171,8 @@
                     let msg = 'An error occurred';
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         msg = xhr.responseJSON.message;
+                    } else if (xhr.responseJSON && xhr.responseJSON.error) {
+                        msg = xhr.responseJSON.error;
                     }
                     showToast(msg, 'error');
                 }
@@ -165,6 +189,49 @@
             $('#name').val(name);
             $('#status').val(status);
             $('#item-modal').modal('show');
+        });
+
+        // Handle Status Change Click
+        $(document).on('click', '.toggleStatus', function() {
+            const $this = $(this);
+            const id = $this.data('id');
+            const currentStatus = $this.data('status');
+            const newStatus = currentStatus == 1 ? 0 : 1;
+            const newStatusText = newStatus == 1 ? 'Active' : 'Inactive';
+
+            $('#status-item-id').val(id);
+            $('#status-new-value').val(newStatus);
+            $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
+            $('#status-confirmation-modal').modal('show');
+        });
+
+        // Handle Confirm Status Change
+        $('#confirm-status-btn').on('click', function() {
+            const id = $('#status-item-id').val();
+            const newStatus = $('#status-new-value').val();
+            const btn = $(this);
+
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
+
+            $.ajax({
+                url: "{{ url('admin/master-data') }}/{{ $type }}/" + id + "/status",
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    status: newStatus
+                },
+                success: function(response) {
+                    $('#status-confirmation-modal').modal('hide');
+                    showToast(response.success);
+                    table.draw(false);
+                },
+                error: function() {
+                    showToast('Failed to update status.', 'error');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).text('Confirm Change');
+                }
+            });
         });
 
         $('body').on('click', '.deleteItem', function() {

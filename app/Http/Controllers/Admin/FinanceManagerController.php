@@ -31,9 +31,16 @@ class FinanceManagerController extends Controller
 
                 ->addColumn('nationality', function ($row) {
                     $nationalIds = $row->national_id;
+                    if (is_string($nationalIds)) {
+                        $decoded = json_decode($nationalIds, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $nationalIds = $decoded;
+                        }
+                    }
+                    
                     if (is_array($nationalIds) && !empty($nationalIds)) {
                         return \App\Models\Country::whereIn('id', $nationalIds)->pluck('name')->implode(', ');
-                    } elseif (!is_array($nationalIds) && $nationalIds) {
+                    } elseif (!is_array($nationalIds) && $nationalIds && is_numeric($nationalIds)) {
                         return optional(\App\Models\Country::find($nationalIds))->name;
                     }
                     return 'N/A';
@@ -41,9 +48,16 @@ class FinanceManagerController extends Controller
 
                 ->addColumn('languages', function ($row) {
                     $langs = $row->languages;
+                    if (is_string($langs)) {
+                        $decoded = json_decode($langs, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $langs = $decoded;
+                        }
+                    }
+
                     if (is_array($langs) && !empty($langs)) {
                         return \App\Models\Language::whereIn('id', $langs)->pluck('name')->implode(', ');
-                    } elseif (!is_array($langs) && $langs) {
+                    } elseif (!is_array($langs) && $langs && is_numeric($langs)) {
                         return optional(\App\Models\Language::find($langs))->name;
                     }
                     return 'N/A';
@@ -93,15 +107,15 @@ class FinanceManagerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'firstname' => ['required', 'regex:/^[A-Z][a-z]*$/'],
-            'lastname'  => ['required', 'regex:/^[A-Z][a-z]*$/'],
+            'firstname' => ['required', 'string', 'max:255'],
+            'lastname'  => ['required', 'string', 'max:255'],
             'email'     => 'required|email|unique:users,email',
             'password'  => 'required|confirmed|min:6',
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',
             'language'  => 'required|array',
             'language.*'=> 'exists:languages,id',
-            'phone'     => ['required', 'digits_between:10,15'],
+            'phone'     => ['required', 'string', 'min:10', 'max:20'],
             'cropped_image' => 'nullable|string',
             'status'    => 'nullable|string|in:pending,active,rejected,inactive'
         ], [
@@ -150,14 +164,14 @@ class FinanceManagerController extends Controller
         $user = User::where('role', 'finance_manager')->findOrFail($id);
 
         $request->validate([
-            'firstname' => ['required', 'regex:/^[A-Z][a-z]*$/'],
-            'lastname'  => ['required', 'regex:/^[A-Z][a-z]*$/'],
+            'firstname' => ['required', 'string', 'max:255'],
+            'lastname'  => ['required', 'string', 'max:255'],
             'email'     => 'required|email|unique:users,email,' . $id,
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',
             'language'  => 'required|array',
             'language.*'=> 'exists:languages,id',
-            'phone'     => ['required', 'digits_between:10,15'],
+            'phone'     => ['required', 'string', 'min:10', 'max:20'],
             'cropped_image' => 'nullable|string',
             'status'    => 'required|string|in:pending,active,rejected,inactive'
         ], [
@@ -214,7 +228,7 @@ class FinanceManagerController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!\Illuminate\Support\Facades\Auth::check() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::check() || !in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

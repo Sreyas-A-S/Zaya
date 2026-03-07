@@ -133,12 +133,12 @@
 
                     <div class="row g-3">
                         <!-- Hidden Inputs for logic -->
-                        <input type="hidden" name="main_image_gallery_id" id="main_image_gallery_id">
+                        <input type="hidden" name="main_image_gallery_id" id="main_image_gallery_id" required >
                         <!-- 'image' and 'gallery_images[]' will be handled via FormData logic -->
 
                         <div class="col-md-12">
                             <label class="form-label">Service Title <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="title" required placeholder="e.g. Yoga Therapy">
+                            <input type="text" class="form-control" pattern="^[A-Z][a-zA-Z\s]{2,49}$"  title="First letter must be capital and only letters allowed" name="title" required placeholder="e.g. Yoga Therapy">
                         </div>
 
                         <!-- Categories (Root & Sub) -->
@@ -148,7 +148,7 @@
                                 @foreach($categories->whereNull('parent_id') as $parent)
                                 <div class="col-12 category-item" data-id="{{ $parent->id }}">
                                     <div class="form-check checkbox-primary mb-2 d-flex align-items-center">
-                                        <input class="form-check-input" type="checkbox" name="categories[]" value="{{ $parent->id }}" id="cat_{{ $parent->id }}">
+                                        <input class="form-check-input" type="checkbox" name="categories[]" value="{{ $parent->id }}" id="cat_{{ $parent->id }}" >
                                         <label class="form-check-label flex-grow-1 mb-0 ms-2" for="cat_{{ $parent->id }}">{{ $parent->name }}</label>
                                         <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $parent->id }}" data-type="service_categories"><i class="fa fa-trash"></i></a>
                                     </div>
@@ -156,7 +156,7 @@
                                 @endforeach
                             </div>
                             <div class="mt-2 input-group input-group-sm">
-                                <input type="text" class="form-control new-master-data-input" id="new-root-category-input" placeholder="Add Category" data-type="service_categories">
+                                <input type="text" class="form-control new-master-data-input" id="new-root-category-input" title="Please Fill the Category" name="title" required placeholder="Add Category" data-type="service_categories" required>
                                 <button class="btn btn-primary" type="button" id="add-root-category-btn"><i class="fa fa-plus"></i></button>
                             </div>
                         </div>
@@ -167,7 +167,7 @@
                                 @foreach($categories->whereNotNull('parent_id') as $child)
                                 <div class="col-12 category-item" data-id="{{ $child->id }}">
                                     <div class="form-check checkbox-secondary mb-2 d-flex align-items-center">
-                                        <input class="form-check-input" type="checkbox" name="categories[]" value="{{ $child->id }}" id="cat_{{ $child->id }}">
+                                        <input class="form-check-input" type="checkbox"  name="categories[]" value="{{ $child->id }}" id="cat_{{ $child->id }}">
                                         <label class="form-check-label flex-grow-1 mb-0 ms-2" for="cat_{{ $child->id }}">
                                             {{ $child->name }}
                                             <span class="text-muted small">({{ $child->parent->name ?? 'N/A' }})</span>
@@ -178,7 +178,7 @@
                                 @endforeach
                             </div>
                             <div class="mt-2 input-group input-group-sm">
-                                <input type="text" class="form-control new-master-data-input" id="new-sub-category-input" placeholder="Subcategory Name" data-type="service_categories">
+                                <input type="text" class="form-control new-master-data-input" id="new-sub-category-input" title="Please fill the sub category" name="title" required placeholder="Subcategory Name" data-type="service_categories">
                                 <select class="form-select" id="new-subcategory-parent">
                                     <option value="" selected disabled>Parent</option>
                                     @foreach($categories->whereNull('parent_id') as $parent)
@@ -189,8 +189,14 @@
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                           <textarea 
+                                class="form-control"
+                                id="description"
+                                name="description"
+                                rows="3"
+                                pattern="^[A-Za-z0-9\s.,'-]{10,500}$"
+                                title="Description must be 10-500 characters and can contain letters, numbers, spaces, comma, period"
+                            ></textarea>
                         </div>
 
                         <!-- Service Images (Simplified) -->
@@ -200,7 +206,7 @@
                                 <button type="button" class="btn btn-light text-dark btn-sm border" onclick="$('#bulk_upload').click()">
                                     <i class="fa fa-cloud-upload me-1"></i> Add Images
                                 </button>
-                                <input type="file" id="bulk_upload" multiple accept="image/*" class="d-none">
+                                <input type="file" id="bulk_upload" multiple accept="image/*" class="d-none" required>
                             </div>
                             <div class="border rounded p-3 bg-white">
                                 <div id="media-grid" class="d-flex flex-wrap gap-2"></div>

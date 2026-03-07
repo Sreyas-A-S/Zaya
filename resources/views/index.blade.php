@@ -205,20 +205,20 @@
 
                                     <!-- Book Now Button -->
                                     <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-max z-10">
-                                        <a href="{{ route('practitioner-detail', $details->slug) }}"
+                                        <a href="{{ route('book-session', ['practitioner' => $details->slug]) }}"
                                            class="bg-white text-primary px-8 py-2.5 rounded-full font-medium shadow-lg hover:bg-primary hover:text-white transition-all text-sm block">
                                             {{ $settings['practitioners_button_text'] ?? 'Book Now' }}
                                         </a>
                                     </div>
 
                                     <!-- Clickable Overlay for Image -->
-                                    <a href="{{ route('practitioner-detail', $details->slug) }}" class="absolute inset-0 z-0"></a>
+                                    <a href="{{ route('practitioner-detail', ['slug' => $details->slug]) }}" class="absolute inset-0 z-0"></a>
                                 </div>
 
                                 <!-- Info Section -->
                                 <div class="text-center">
                                     <h3 class="text-2xl font-serif font-medium text-primary mb-3 leading-none">
-                                        <a href="{{ route('practitioner-detail', $details->slug) }}" class="hover:text-secondary transition-colors">
+                                        <a href="{{ route('practitioner-detail', ['slug' => $details->slug]) }}" class="hover:text-secondary transition-colors">
                                             {{ $name }}
                                         </a>
                                     </h3>

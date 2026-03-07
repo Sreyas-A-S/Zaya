@@ -9,7 +9,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">Language List</h4>
 
-        <a href="{{ route('languages.create') }}" class="btn btn-success">
+        <a href="{{ route('admin.languages.create') }}" class="btn btn-success">
             <i class="fa fa-plus"></i> Register New Language
         </a>
     </div>
@@ -107,7 +107,7 @@ $(document).ready(function() {
     $('#languages-table').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('languages.index') }}",
+        ajax: "{{ route('admin.languages.index') }}",
         columns: [
             { data: 'id', name: 'id' },
             { data: 'code', name: 'code' },

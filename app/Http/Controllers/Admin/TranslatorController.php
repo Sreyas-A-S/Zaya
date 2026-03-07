@@ -20,7 +20,7 @@ class TranslatorController extends Controller
         $this->middleware('permission:translators-create')->only(['create', 'store']);
         $this->middleware('permission:translators-edit')->only(['edit', 'update']);
         $this->middleware('permission:translators-delete')->only('destroy');
-        $this->middleware('permission:translators-update-status')->only('updateStatus');
+        $this->middleware('permission:translators-update-status|super-admin')->only('updateStatus');
     }
 
     public function index(Request $request)
@@ -29,8 +29,10 @@ class TranslatorController extends Controller
             $query = User::where('role', 'translator')
                 ->leftJoin('translators', 'users.id', '=', 'translators.user_id')
                 ->select([
-                    'users.id',
+                    'users.id as user_id',
                     'users.name',
+                    'users.first_name',
+                    'users.last_name',
                     'users.email',
                     'users.created_at',
                     'translators.gender',
@@ -63,6 +65,8 @@ class TranslatorController extends Controller
                         $searchValue = $request->get('search')['value'];
                         $query->where(function ($q) use ($searchValue) {
                             $q->where('users.name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.first_name', 'LIKE', "%$searchValue%")
+                                ->orWhere('users.last_name', 'LIKE', "%$searchValue%")
                                 ->orWhere('users.email', 'LIKE', "%$searchValue%")
                                 ->orWhere('translators.phone', 'LIKE', "%$searchValue%")
                                 ->orWhere('translators.country', 'LIKE', "%$searchValue%")
@@ -82,21 +86,16 @@ class TranslatorController extends Controller
                 ->orderColumn('status', 'translators.status $1')
                 ->editColumn('source_languages', function ($row) {
                     if (empty($row->source_languages)) return '<span class="text-muted">N/A</span>';
-                    // Check if it's already an array (due to model casting involved in query? No, Query Builder returns stdClass usually, not Models unless 'get' is on Model and hydrated. 
-                    // Eloquent query: User::where...->leftJoin...->select...->get() returns collection of Models or std objects?
-                    // When using Join and Select specific columns, Laravel often returns instances of the Model starting the query (User), but with extra attributes. 
-                    // However, 'casts' on the main model (User) apply to User attributes. 'translators' attributes might simply be strings (JSON) if not carefully handled.
-                    // But wait, $data = User::...->get(); 
-                    // The attributes from joined table are just properties on the User object. They WON'T be auto-cast by the Translator model's $casts because they are on a User instance (or stdClass depending on how Laravel constructs it when bespoke select).
-                    // Actually, usually they come back as strings if they are JSON in DB.
-                    // Safe approach: json_decode if string.
                     $langs = $row->source_languages;
                     if (is_string($langs)) $langs = json_decode($langs, true) ?? [];
                     if (!is_array($langs)) return '<span class="text-muted">N/A</span>';
 
-                    return collect($langs)->map(function ($lang) {
-                        return '<span class="badge badge-light-primary me-1 mb-1">' . $lang . '</span>';
-                    })->implode(' ');
+                    $html = '';
+                    foreach ($langs as $key => $val) {
+                        $name = is_array($val) ? ($val['language'] ?? $key) : $val;
+                        $html .= '<span class="badge badge-light-primary me-1 mb-1">' . $name . '</span>';
+                    }
+                    return $html ?: '<span class="text-muted">N/A</span>';
                 })
                 ->editColumn('target_languages', function ($row) {
                     if (empty($row->target_languages)) return '<span class="text-muted">N/A</span>';
@@ -104,13 +103,16 @@ class TranslatorController extends Controller
                     if (is_string($langs)) $langs = json_decode($langs, true) ?? [];
                     if (!is_array($langs)) return '<span class="text-muted">N/A</span>';
 
-                    return collect($langs)->map(function ($lang) {
-                        return '<span class="badge badge-light-secondary me-1 mb-1">' . $lang . '</span>';
-                    })->implode(' ');
+                    $html = '';
+                    foreach ($langs as $key => $val) {
+                        $name = is_array($val) ? ($val['language'] ?? $key) : $val;
+                        $html .= '<span class="badge badge-light-secondary me-1 mb-1">' . $name . '</span>';
+                    }
+                    return $html ?: '<span class="text-muted">N/A</span>';
                 })
                 ->editColumn('status', function ($row) {
-                    $badgeClass = 'bg-danger';
-                    if ($row->status == 'active') {
+                    $badgeClass = 'bg-danger'; // For rejected or inactive
+                    if (in_array($row->status, ['active', 'approved'])) {
                         $badgeClass = 'bg-success';
                     } elseif ($row->status == 'pending') {
                         $badgeClass = 'bg-warning';
@@ -118,8 +120,8 @@ class TranslatorController extends Controller
 
                     $statusText = ucfirst($row->status ?? 'inactive');
 
-                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
-                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '">' . $statusText . '</span>';
+                    if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
+                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->user_id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
                     }
                     return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
                 })
@@ -133,9 +135,9 @@ class TranslatorController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-3">';
-                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-info viewTranslator" title="View"><i class="iconly-Show icli" style="font-size: 20px;"></i></a>';
-                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editTranslator" title="Edit"><i class="iconly-Edit-Square icli" style="font-size: 20px;"></i></a>';
-                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-danger deleteTranslator" title="Delete"><i class="iconly-Delete icli" style="font-size: 20px;"></i></a>';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->user_id . '" class="text-info viewTranslator" title="View"><i class="iconly-Show icli" style="font-size: 20px;"></i></a>';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->user_id . '" class="text-primary editTranslator" title="Edit"><i class="iconly-Edit-Square icli" style="font-size: 20px;"></i></a>';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->user_id . '" class="text-danger deleteTranslator" title="Delete"><i class="iconly-Delete icli" style="font-size: 20px;"></i></a>';
                     $btn .= '</div>';
                     return $btn;
                 })
@@ -423,13 +425,13 @@ class TranslatorController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || !in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $translator = Translator::where('user_id', $id)->firstOrFail();
         $translator->update([
-            'status' => $request->status ? 'active' : 'inactive'
+            'status' => $request->status
         ]);
 
         return response()->json(['success' => 'Status updated successfully!']);

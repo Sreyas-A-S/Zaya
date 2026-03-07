@@ -95,7 +95,7 @@ class ClientController extends Controller
 
                     $statusText = ucfirst($row->status ?? 'inactive');
 
-                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
+                    if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
                         return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
                     }
 
@@ -232,25 +232,25 @@ class ClientController extends Controller
         }
         $user->save();
 
-        $age = $validatedData['dob'] ? Carbon::parse($validatedData['dob'])->age : null;
+        $age = !empty($validatedData['dob']) ? Carbon::parse($validatedData['dob'])->age : null;
 
         $patientData = [
-            'dob' => $validatedData['dob'],
+            'dob' => $validatedData['dob'] ?? null,
             'age' => $age,
-            'gender' => $validatedData['gender'],
-            'occupation' => $validatedData['occupation'],
+            'gender' => $validatedData['gender'] ?? null,
+            'occupation' => $validatedData['occupation'] ?? null,
             'address_line_1' => $validatedData['address_line_1'],
-            'address_line_2' => $validatedData['address_line_2'],
+            'address_line_2' => $validatedData['address_line_2'] ?? null,
             'city' => $validatedData['city'],
             'state' => $validatedData['state'],
             'zip_code' => $validatedData['zip_code'],
             'country' => $validatedData['country'],
-            'mobile_country_code' => $validatedData['mobile_country_code'],
-            'phone' => $validatedData['phone'],
-            'consultation_preferences' => $validatedData['consultation_preferences'],
-            'languages_spoken' => $validatedData['languages_spoken'],
-            'referral_type' => $validatedData['referral_type'],
-            'referrer_name' => $validatedData['referrer_name'],
+            'mobile_country_code' => $validatedData['mobile_country_code'] ?? null,
+            'phone' => $validatedData['phone'] ?? null,
+            'consultation_preferences' => $validatedData['consultation_preferences'] ?? [],
+            'languages_spoken' => $validatedData['languages_spoken'] ?? [],
+            'referral_type' => $validatedData['referral_type'] ?? null,
+            'referrer_name' => $validatedData['referrer_name'] ?? null,
         ];
 
         if ($request->hasFile('profile_photo')) {
@@ -279,13 +279,18 @@ class ClientController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || !in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        $status = $request->status;
+        // If numeric 0/1 is sent from old toggle logic, convert it
+        if ($status === '1') $status = 'active';
+        if ($status === '0') $status = 'inactive';
+
         $patient = \App\Models\Patient::where('user_id', $id)->firstOrFail();
         $patient->update([
-            'status' => $request->status ? 'active' : 'inactive'
+            'status' => $status
         ]);
 
         return response()->json(['success' => 'Status updated successfully!']);

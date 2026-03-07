@@ -48,7 +48,9 @@ class DoctorController extends Controller
                     'doctors.state',
                     'doctors.status',
                     'doctors.gender',
-                    'doctors.country'
+                    'doctors.country',
+                    'doctors.first_name',
+                    'doctors.last_name'
                 ])
                 ->orderBy('users.created_at', 'desc'); // Default sort
 
@@ -61,6 +63,8 @@ class DoctorController extends Controller
                             $q->where('users.name', 'LIKE', "%$searchValue%")
                                 ->orWhere('users.email', 'LIKE', "%$searchValue%")
                                 ->orWhere('doctors.phone', 'LIKE', "%$searchValue%")
+                                ->orWhere('doctors.first_name', 'LIKE', "%$searchValue%")
+                                ->orWhere('doctors.last_name', 'LIKE', "%$searchValue%")
                                 ->orWhere('doctors.ayush_registration_number', 'LIKE', "%$searchValue%")
                                 ->orWhere('doctors.city', 'LIKE', "%$searchValue%")
                                 ->orWhere('doctors.state', 'LIKE', "%$searchValue%")
@@ -80,8 +84,8 @@ class DoctorController extends Controller
                     return $row->created_at ? \Carbon\Carbon::parse($row->created_at)->format('Y-m-d H:i') : '';
                 })
                 ->editColumn('status', function ($row) {
-                    $badgeClass = 'bg-danger';
-                    if ($row->status == 'active') {
+                    $badgeClass = 'bg-danger'; // For rejected or inactive
+                    if (in_array($row->status, ['active', 'approved'])) {
                         $badgeClass = 'bg-success';
                     } elseif ($row->status == 'pending') {
                         $badgeClass = 'bg-warning';
@@ -89,7 +93,7 @@ class DoctorController extends Controller
 
                     $statusText = ucfirst($row->status ?? 'inactive');
 
-                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
+                    if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
                         return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
                     }
 
@@ -271,9 +275,9 @@ class DoctorController extends Controller
             'reg_certificate_path' => $regCertificatePath,
             'digital_signature_path' => $digitalSignaturePath,
             'primary_qualification' => $validatedData['primary_qualification'],
-            'primary_qualification_other' => $validatedData['primary_qualification'] === 'other' ? $validatedData['primary_qualification_other'] : null,
-            'post_graduation' => $validatedData['post_graduation'],
-            'post_graduation_other' => $validatedData['post_graduation'] === 'other' ? $validatedData['post_graduation_other'] : null,
+            'primary_qualification_other' => $validatedData['primary_qualification'] === 'other' ? ($validatedData['primary_qualification_other'] ?? null) : null,
+            'post_graduation' => $validatedData['post_graduation'] ?? null,
+            'post_graduation_other' => ($validatedData['post_graduation'] ?? null) === 'other' ? ($validatedData['post_graduation_other'] ?? null) : null,
             'specialization' => $validatedData['specialization'] ?? [],
             'degree_certificates_path' => $degreeCertificatesPaths,
             'years_of_experience' => $validatedData['years_of_experience'],
@@ -411,7 +415,7 @@ class DoctorController extends Controller
             'upi_id' => 'nullable|string|max:255',
 
             // I. Platform Profile
-            'short_bio' => 'required|string|min:50|max:150',
+            'short_bio' => 'required|string|min:50|max:15000',
             'key_expertise' => 'required|string|max:500',
             'services_offered' => 'required|string|max:500',
             'awards_recognitions' => 'nullable|string|max:500',
@@ -471,9 +475,9 @@ class DoctorController extends Controller
             'reg_certificate_path' => $regCertificatePath,
             'digital_signature_path' => $digitalSignaturePath,
             'primary_qualification' => $validatedData['primary_qualification'],
-            'primary_qualification_other' => $validatedData['primary_qualification'] === 'other' ? $validatedData['primary_qualification_other'] : null,
-            'post_graduation' => $validatedData['post_graduation'],
-            'post_graduation_other' => $validatedData['post_graduation'] === 'other' ? $validatedData['post_graduation_other'] : null,
+            'primary_qualification_other' => $validatedData['primary_qualification'] === 'other' ? ($validatedData['primary_qualification_other'] ?? null) : null,
+            'post_graduation' => $validatedData['post_graduation'] ?? null,
+            'post_graduation_other' => ($validatedData['post_graduation'] ?? null) === 'other' ? ($validatedData['post_graduation_other'] ?? null) : null,
             'specialization' => $validatedData['specialization'] ?? [],
             'degree_certificates_path' => $degreeCertificatesPaths,
             'years_of_experience' => $validatedData['years_of_experience'],
@@ -519,13 +523,13 @@ class DoctorController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || !in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $doctor = Doctor::where('user_id', $id)->firstOrFail();
         $doctor->update([
-            'status' => $request->status ? 'active' : 'inactive'
+            'status' => $request->status
         ]);
 
         return response()->json(['success' => 'Status updated successfully!']);
@@ -533,7 +537,7 @@ class DoctorController extends Controller
 
     public function deleteCertificate(Request $request, $id)
     {
-        if (!\Illuminate\Support\Facades\Auth::user() || \Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+        if (!\Illuminate\Support\Facades\Auth::user() || !in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

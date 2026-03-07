@@ -157,7 +157,7 @@
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <form id="client-form" method="POST" class="theme-form">
+                <form id="client-form" method="POST" class="theme-form" novalidate>
                     @csrf
                     <input type="hidden" name="_method" id="form-method" value="POST">
                     <input type="hidden" name="client_id" id="client_id_hidden">
@@ -167,7 +167,7 @@
                         <div class="col-md-12 text-center mb-4">
                             <div class="avatar-upload">
                                 <div class="avatar-edit">
-                                    <input type='file' id="imageUpload" name="profile_photo" accept=".png, .jpg, .jpeg" />
+                                    <input type='file' id="imageUpload" name="profile_photo" accept=".png, .jpg, .jpeg"  required />
                                     <label for="imageUpload"><i class="iconly-Edit icli"></i></label>
                                 </div>
                                 <div class="avatar-preview">
@@ -177,24 +177,38 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">First Name</label>
-                            <input type="text" class="form-control" name="first_name" required placeholder="Enter first name">
+                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="first_name" required 
+                                maxlength="50" pattern="^[A-Z][a-zA-Z\s]{1,49}$" 
+                                title="First letter must be capital (Example: John)"
+                                oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)"
+                                placeholder="Enter first name">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Middle Name</label>
-                            <input type="text" class="form-control" name="middle_name" placeholder="Enter middle name">
+                            <input type="text" class="form-control" name="middle_name" 
+                                maxlength="50" pattern="^[A-Z]?[a-zA-Z\s]{0,49}$"
+                                title="Optional middle name"
+                                placeholder="Enter middle name">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Last Name</label>
-                            <input type="text" class="form-control" name="last_name" required placeholder="Enter last name">
+                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="last_name" required 
+                                maxlength="50" pattern="^[A-Z][a-zA-Z\s]{1,49}$" 
+                                title="First letter must be capital (Example: Smith)"
+                                oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)"
+                                placeholder="Enter last name">
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" class="form-control" name="email" required placeholder="Enter email address">
+                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" name="email" required 
+                                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                title="Enter a valid email address (Example: user@example.com)"
+                                placeholder="Enter email address">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Date of Birth</label>
-                            <input type="date" class="form-control" name="dob" id="dob_input">
+                            <input type="date" max="{{ date('Y-m-d') }}" class="form-control" name="dob" id="dob_input">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Age</label>
@@ -211,13 +225,18 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Occupation / Lifestyle</label>
-                            <input type="text" class="form-control" name="occupation" placeholder="Enter occupation">
+                            <input type="text" class="form-control" name="occupation" placeholder="Enter occupation" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Mobile Number</label>
+                            <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input type="text" class="form-control" name="mobile_country_code" placeholder="+91" style="max-width: 80px;">
-                                <input type="text" class="form-control" name="phone" placeholder="Enter mobile number">
+                                <input type="text" class="form-control" name="mobile_country_code" 
+                                    placeholder="+91" style="max-width: 80px;" required
+                                    pattern="^\+?[0-9]{1,4}$" title="Enter country code (Example: +91)">
+                                <input type="text" class="form-control" name="phone" 
+                                    placeholder="Enter mobile number" required
+                                    pattern="^[0-9]{10,15}$" title="Enter 10 to 15 digits only"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -238,7 +257,9 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
+                            <input type="text" class="form-control" name="zip_code" required 
+                                pattern="^[0-9]{5,10}$" title="Enter valid zip code (5-10 digits)"
+                                placeholder="Pincode" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Country <span class="text-danger">*</span></label>
@@ -251,11 +272,14 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Password <span class="text-muted small" id="password-hint">(New clients only)</span></label>
-                            <input type="password" class="form-control" name="password" id="password-input">
+                            <input type="password" class="form-control" name="password" id="password-input"
+                                minlength="6" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$"
+                                title="Password must be at least 6 characters and include at least one number">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input">
+                            <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input"
+                                minlength="6">
                             <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
                         </div>
                     </div>
@@ -268,7 +292,7 @@
                                 @foreach($consultationPreferences as $pref)
                                 <div class="col-md-6">
                                     <div class="form-check checkbox-primary mb-2 d-flex align-items-center">
-                                        <input class="form-check-input pref-checkbox" type="checkbox" name="consultation_preferences[]" value="{{ $pref->name }}" id="pref_{{ $pref->id }}">
+                                        <input class="form-check-input pref-checkbox" type="checkbox" name="consultation_preferences[]" value="{{ $pref->name }}" id="pref_{{ $pref->id }}" >
                                         <label class="form-check-label flex-grow-1 mb-0" for="pref_{{ $pref->id }}">{{ $pref->name }}</label>
                                         <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $pref->id }}" data-type="client_consultation_preferences"><i class="fa fa-trash"></i></a>
                                     </div>
@@ -276,7 +300,7 @@
                                 @endforeach
                                 <div class="col-12 mt-2">
                                     <div class="input-group input-group-sm" style="max-width: 300px;">
-                                        <input type="text" class="form-control new-master-data-input" data-type="client_consultation_preferences" placeholder="Add New Preference">
+                                        <input type="text" class="form-control new-master-data-input" data-type="client_consultation_preferences" placeholder="Add New Preference" required>
                                         <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
                                     </div>
                                 </div>
@@ -287,7 +311,7 @@
                     <h5 class="text-primary mb-3">Languages & Referral</h5>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">Languages Spoken</label>
+                            <label class="form-label" required>Languages Spoken</label>
                             <select class="form-select" id="languages_select" multiple>
                                 @foreach($languages as $lang)
                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
@@ -308,7 +332,7 @@
                         </div>
                         <div class="col-md-12 d-none" id="referrer_name_div">
                             <label class="form-label">Referring Practitioner/Client Name</label>
-                            <input type="text" class="form-control" name="referrer_name" placeholder="Enter name">
+                            <input type="text" class="form-control" name="referrer_name" placeholder="Enter name" required>
                         </div>
                     </div>
 
@@ -394,6 +418,58 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="crop-btn">Crop & Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Master Data Delete Modal -->
+<div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                <h5>Are you sure?</h5>
+                <p class="text-muted">Do you want to delete this specific item? This action is permanent.</p>
+                <input type="hidden" id="delete-master-id">
+                <input type="hidden" id="delete-master-type">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Confirmation Modal -->
+<div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Status Change</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Info-Circle icli text-primary mb-3" style="font-size: 50px;"></i>
+                <h5 id="status-confirmation-text">Update Client Status</h5>
+                <p>Select the new status for this client:</p>
+                <div class="mb-3 px-5">
+                    <select id="status-select-input" class="form-select">
+                        <option value="pending">Pending</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <input type="hidden" id="status-client-id">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
             </div>
         </div>
     </div>
@@ -557,15 +633,18 @@
         // Submit Form
         $('#client-form').on('submit', function(e) {
             e.preventDefault();
+            
+            if (!validateForm()) return;
+
             let formData = new FormData(this);
+            const btn = $('#submit-btn');
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i> Saving...');
 
             if (croppedFile) {
                 formData.set('profile_photo', croppedFile, 'profile_photo.png');
             }
 
             let url = "{{ route('admin.clients.store') }}";
-            let method = "POST";
-
             if ($('#form-method').val() === 'PUT') {
                 url = "{{ url('admin/clients') }}/" + $('#client_id_hidden').val();
                 formData.append('_method', 'PUT');
@@ -581,13 +660,15 @@
                     $('#client-form-modal').modal('hide');
                     table.ajax.reload();
                     showToast(response.success);
+                    btn.prop('disabled', false).html('<i class="iconly-Tick-Square icli me-2"></i> Save Client');
                 },
                 error: function(xhr) {
+                    btn.prop('disabled', false).html('<i class="iconly-Tick-Square icli me-2"></i> Save Client');
                     let errors = xhr.responseJSON ? xhr.responseJSON.errors : null;
                     let errorMessage = '';
                     if (errors) {
                         for (let key in errors) {
-                            errorMessage += errors[key][0] + '\n';
+                            errorMessage += errors[key][0] + '<br>';
                         }
                     } else {
                         errorMessage = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'An error occurred.';
@@ -633,17 +714,20 @@
                     $('input[name="state"]').val(data.patient.state);
                     $('input[name="zip_code"]').val(data.patient.zip_code);
                     $('select[name="country"]').val(data.patient.country || 'India');
-                    $('input[name="dob"]').val(data.patient.dob);
+
+                    if (data.patient.dob) {
+                        let dobDate = data.patient.dob.substring(0, 10);
+                        $('input[name="dob"]').val(dobDate);
+                        $('#age_display').val(calculateAge(dobDate));
+                    } else {
+                        $('input[name="dob"]').val('');
+                        $('#age_display').val('');
+                    }
+
                     $('input[name="occupation"]').val(data.patient.occupation);
                     $('select[name="gender"]').val(data.patient.gender);
                     $('select[name="referral_type"]').val(data.patient.referral_type).trigger('change');
                     $('input[name="referrer_name"]').val(data.patient.referrer_name);
-
-                    if (data.patient.dob) {
-                        $('#age_display').val(calculateAge(data.patient.dob));
-                    } else {
-                        $('#age_display').val('');
-                    }
 
                     // Handle Consultation Preferences (Multiselect)
                     if (data.patient.consultation_preferences) {
@@ -674,7 +758,6 @@
                     } else {
                         languageChoices.removeActiveItems();
                     }
-
                 } else {
                     $('#client-form')[0].reset();
                     $('#form-method').val('PUT');
@@ -688,6 +771,8 @@
                 new bootstrap.Modal(document.getElementById('client-form-modal')).show();
             });
         });
+    
+    
 
         // Delete Client
         $(document).on('click', '.deleteClient', function() {
@@ -696,21 +781,79 @@
             new bootstrap.Modal(document.getElementById('client-delete-modal')).show();
         });
 
-        // Initialize Password Validation
-        function validatePasswordMatch() {
-            const password = $('#password-input').val();
-            const confirmPassword = $('#password-confirm-input').val();
+        $('#password-input, #password-confirm-input').on('input', function() {
+            $(this).removeClass('is-invalid');
+            $(this).next('.invalid-feedback').remove();
+        });
 
-            if (confirmPassword && password !== confirmPassword) {
-                $('#password-confirm-input').addClass('is-invalid');
-                $('#submit-btn').prop('disabled', true);
-            } else {
-                $('#password-confirm-input').removeClass('is-invalid');
-                $('#submit-btn').prop('disabled', false);
+        function validateForm() {
+            let valid = true;
+            const form = $('#client-form');
+            
+            // Clear previous errors
+            form.find('.is-invalid').removeClass('is-invalid');
+            form.find('.invalid-feedback').remove();
+            
+            form.find('input, select, textarea').each(function() {
+                const el = $(this);
+                if (el.is(':hidden')) return;
+
+                let fieldValid = true;
+                let errorMessage = '';
+
+                // 1. Native HTML5 Validation
+                if (!this.checkValidity()) {
+                    fieldValid = false;
+                    errorMessage = el.attr('title') || this.validationMessage || 'This field is required';
+                }
+
+                // 2. Custom Validations
+                if (fieldValid) {
+                    // Password Confirmation Match
+                    if (el.attr('id') === 'password-confirm-input') {
+                        const password = $('#password-input').val();
+                        if (el.val() !== password) {
+                            fieldValid = false;
+                            errorMessage = 'Passwords do not match';
+                        }
+                    }
+                }
+
+                if (!fieldValid) {
+                    el.addClass('is-invalid');
+                    if (el.next('.invalid-feedback').length === 0) {
+                        if (el.parent().hasClass('input-group')) {
+                            el.parent().after(`<div class="invalid-feedback d-block">${errorMessage}</div>`);
+                        } else {
+                            el.after(`<div class="invalid-feedback">${errorMessage}</div>`);
+                        }
+                    }
+                    valid = false;
+                }
+            });
+
+            if (!valid) {
+                const firstError = form.find('.is-invalid').first();
+                if (firstError.length) {
+                    firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
+            
+            return valid;
         }
 
-        $('#password-input, #password-confirm-input').on('input', validatePasswordMatch);
+        // Real-time validation clearance
+        $(document).on('input change', '#client-form input, #client-form select, #client-form textarea', function() {
+            const el = $(this);
+            if (el.hasClass('is-invalid')) {
+                el.removeClass('is-invalid');
+                if (el.parent().hasClass('input-group')) {
+                    el.parent().next('.invalid-feedback').remove();
+                } else {
+                    el.next('.invalid-feedback').remove();
+                }
+            }
+        });
     });
 
     function addLanguageCapabilityRow(value, label, caps = null) {
@@ -814,15 +957,20 @@
             $('input[name="state"]').val(data.patient.state);
             $('input[name="zip_code"]').val(data.patient.zip_code);
             $('select[name="country"]').val(data.patient.country);
-            $('input[name="dob"]').val(data.patient.dob);
+
+            if (data.patient.dob) {
+                let dobDate = data.patient.dob.substring(0, 10);
+                $('input[name="dob"]').val(dobDate);
+                $('#age_display').val(calculateAge(dobDate));
+            } else {
+                $('input[name="dob"]').val('');
+                $('#age_display').val('');
+            }
+
             $('input[name="occupation"]').val(data.patient.occupation);
             $('select[name="gender"]').val(data.patient.gender);
             $('select[name="referral_type"]').val(data.patient.referral_type);
             $('input[name="referrer_name"]').val(data.patient.referrer_name);
-
-            if (data.patient.dob) {
-                $('#age_display').val(calculateAge(data.patient.dob));
-            }
 
             if (data.patient.consultation_preferences) {
                 data.patient.consultation_preferences.forEach(function(val) {
@@ -904,7 +1052,7 @@
                 if (response.success) {
                     let newId = response.data.id;
                     let newName = response.data.name;
-
+                    let checkboxName = 'consultation_preferences[]';
                     let idPrefix = 'pref_';
 
                     let html = `
@@ -1006,7 +1154,7 @@
     });
 
     // Confirm Master Data Delete
-    $('#confirm-master-delete-btn').click(function() {
+    $(document).off('click', '#confirm-master-delete-btn').on('click', '#confirm-master-delete-btn', function() {
         let btn = $(this);
         let id = $('#delete-master-id').val();
         let type = $('#delete-master-type').val();
@@ -1045,20 +1193,17 @@
     $(document).on('click', '.toggle-status', function() {
         const $this = $(this);
         const id = $this.data('id');
-        const currentStatus = $this.data('status');
-        const newStatus = currentStatus === 'active' ? 0 : 1;
-        const newStatusText = currentStatus === 'active' ? 'Inactive' : 'Active';
+        const currentStatus = $this.data('status') || 'inactive';
 
         $('#status-client-id').val(id);
-        $('#status-new-value').val(newStatus);
-        $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
+        $('#status-select-input').val(currentStatus);
         $('#status-confirmation-modal').modal('show');
     });
 
     // Handle Confirm Status Change
-    $('#confirm-status-btn').on('click', function() {
+    $(document).off('click', '#confirm-status-btn').on('click', '#confirm-status-btn', function() {
         const id = $('#status-client-id').val();
-        const newStatus = $('#status-new-value').val();
+        const newStatus = $('#status-select-input').val();
         const btn = $(this);
 
         btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
@@ -1084,72 +1229,5 @@
         });
     });
 </script>
-
-<!-- Call Confirmation Modal -->
-<div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Call</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-4">
-                <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
-                <h5>Make a Call?</h5>
-                <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
-                <h4 class="text-primary" id="call-number"></h4>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Master Data Delete Modal -->
-<div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Delete</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-4">
-                <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
-                <h5>Are you sure?</h5>
-                <p class="text-muted">Do you want to delete this specific item? This action is permanent.</p>
-                <input type="hidden" id="delete-master-id">
-                <input type="hidden" id="delete-master-type">
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-</div>
-<!-- Status Confirmation Modal -->
-<div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Status Change</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-4">
-                <i class="iconly-Info-Circle icli text-primary mb-3" style="font-size: 50px;"></i>
-                <h5 id="status-confirmation-text">Are you sure you want to change the status?</h5>
-                <input type="hidden" id="status-client-id">
-                <input type="hidden" id="status-new-value">
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 @endsection

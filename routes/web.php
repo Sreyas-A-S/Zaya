@@ -91,6 +91,7 @@ Route::get('/magic-login', [\App\Http\Controllers\Auth\MagicLoginController::cla
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource('/admins', AdminsController::class);
+    Route::post('/admins/{id}/status', [AdminsController::class, 'updateStatus'])->name('admins.status');
     Route::get('admin/admins/{id}/edit', [AdminController::class, 'edit']);
     Route::put('admin/admins/{id}', [AdminController::class, 'update']);
     Route::delete('/admin/admins/{id}', [AdminsController::class, 'destroy']);
@@ -150,6 +151,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('master-data/{type}', [MasterDataController::class, 'index'])->name('master-data.index');
     Route::post('master-data/{type}', [MasterDataController::class, 'store'])->name('master-data.store');
     Route::put('master-data/{type}/{id}', [MasterDataController::class, 'update'])->name('master-data.update');
+    Route::post('master-data/{type}/{id}/status', [MasterDataController::class, 'updateStatus'])->name('master-data.status');
     Route::delete('master-data/{type}/{id}', [MasterDataController::class, 'destroy'])->name('master-data.destroy');
 
     // Homepage Settings

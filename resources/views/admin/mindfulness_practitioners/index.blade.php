@@ -95,18 +95,20 @@
                                 </div>
                             </div>
 
-                            <form id="practitioner-form" method="POST" enctype="multipart/form-data" class="theme-form">
+                            <form id="practitioner-form" method="POST" enctype="multipart/form-data" class="theme-form" novalidate>
                                 @csrf
                                 <input type="hidden" name="_method" id="form-method" value="POST">
                                 <input type="hidden" name="practitioner_id" id="practitioner_id">
 
                                 <!-- Step 1: Personal Details -->
-                                <div class="step-content" id="step-1">
-                                    <div class="row g-3">
-                                        <div class="col-md-12 text-center mb-4">
+                              <div class="step-content" id="step-1">
+                                <div class="row g-3">
+                                
+                                
+                                  <div class="col-md-12 text-center mb-4">
                                             <div class="avatar-upload">
                                                 <div class="avatar-edit">
-                                                    <input type='file' id="imageUpload" name="profile_photo" accept=".png, .jpg, .jpeg" />
+                                                    <input type='file' id="imageUpload" name="profile_photo" accept=".png, .jpg, .jpeg"      />
                                                     <label for="imageUpload"><i class="iconly-Edit icli"></i></label>
                                                 </div>
                                                 <div class="avatar-preview">
@@ -114,116 +116,263 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <label class="form-label mt-2">Profile Photo</label>
+                                            <label class="form-label mt-2">Profile Photo <span class="text-danger">*</span></label>
+                                            <div id="current-profile_photo" class="d-none"></div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="first_name" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="last_name" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="email" name="email" required>
-                                        </div>
-                                        <div class="col-md-4 password-field">
-                                            <label class="form-label">Password <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="password" name="password">
-                                        </div>
-                                        <div class="col-md-4 password-field">
-                                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="password" name="password_confirmation">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="phone" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Gender</label>
-                                            <select class="form-select" name="gender">
-                                                <option value="">Select Gender</option>
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
-                                                <option value="other">Other</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Date of Birth</label>
-                                            <input class="form-control" type="date" name="dob">
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street">
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Address Line 2</label>
-                                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">City <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="city" required placeholder="City">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">State <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="state" required placeholder="State">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Country <span class="text-danger">*</span></label>
-                                            <select class="form-select" name="country" required>
-                                                <option value="">Select Country</option>
-                                                @foreach(config('countries') as $country)
-                                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>{{ $country }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
+
+
+                                <!-- First Name -->
+                                <div class="col-md-4">
+                                    <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="text" name="first_name" required maxlength="50" 
+                                        pattern="^[A-Za-z\s]{2,50}$" title="Only letters allowed (2-50 characters)">
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="text" name="last_name" required maxlength="50" 
+                                        pattern="^[A-Za-z\s]{2,50}$" title="Only letters allowed (2-50 characters)">
+                                </div>
+
+                                <!-- Email -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="email" name="email" required 
+                                        pattern="^[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Enter a valid email address">
+                                </div>
+
+                                <!-- Password -->
+                                <div class="col-md-4 password-field">
+                                    <label class="form-label">Password <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="password" name="password" id="password-input" required minlength="6" 
+                                        pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$"
+                                        title="Password must contain at least 6 characters including a number">
+                                </div>
+
+                                <!-- Confirm Password -->
+                                <div class="col-md-4 password-field">
+                                    <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="password" name="password_confirmation" id="password-confirm-input" required minlength="6">
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="col-md-4">
+                                <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                <input class="form-control"
+                                type="text"
+                                name="phone"
+                                required
+                                pattern="^[0-9]{10,15}$"
+                                maxlength="15"
+                                placeholder="Enter phone number"
+                                title="Enter 10 to 15 digits only"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                </div>
+
+                                <!-- Gender -->
+                                <div class="col-md-4">
+                                <label class="form-label">Gender</label>
+                                <select class="form-select" name="gender">
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                                </select>
+                                </div>
+
+                                <!-- DOB -->
+                                <div class="col-md-4">
+                                <label class="form-label">Date of Birth</label>
+                                <input class="form-control"
+                                type="date"
+                                name="dob"
+                                max="{{ date('Y-m-d') }}">
+                                </div>
+
+                                <!-- Address Line 1 -->
+                                <div class="col-md-12">
+                                <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
+                                <input type="text"
+                                class="form-control"
+                                name="address_line_1"
+                                required
+                                maxlength="255"
+                                pattern="^[A-Za-z0-9\s,./-]{5,255}$"
+                                title="Enter a valid address">
+                                </div>
+
+                                <!-- Address Line 2 -->
+                                <div class="col-md-12">
+                                <label class="form-label">Address Line 2</label>
+                                <input type="text"
+                                class="form-control"
+                                name="address_line_2"
+                                maxlength="255"
+                                pattern="^[A-Za-z0-9\s,./-]{0,255}$">
+                                </div>
+
+                                <!-- City -->
+                                <div class="col-md-6">
+                                <label class="form-label">City <span class="text-danger">*</span></label>
+                                <input type="text"
+                                class="form-control"
+                                name="city"
+                                required
+                                pattern="^[A-Za-z\s]{2,100}$"
+                                title="City should contain only letters">
+                                </div>
+
+                                <!-- State -->
+                                <div class="col-md-6">
+                                <label class="form-label">State <span class="text-danger">*</span></label>
+                                <input type="text"
+                                class="form-control"
+                                name="state"
+                                required
+                                pattern="^[A-Za-z\s]{2,100}$"
+                                title="State should contain only letters">
+                                </div>
+
+                                <!-- Zip Code -->
+                                <div class="col-md-6">
+                                <label class="form-label">Zip Code <span class="text-danger">*</span></label>
+                                <input type="text"
+                                class="form-control"
+                                name="zip_code"
+                                required
+                                pattern="^[0-9]{4,10}$"
+                                maxlength="10"
+                                title="Enter valid zip code">
+                                </div>
+
+                                <!-- Country -->
+                                <div class="col-md-6">
+                                <label class="form-label">Country <span class="text-danger">*</span></label>
+                                <select class="form-select" name="country" required>
+                                <option value="">Select Country</option>
+                                @foreach(config('countries') as $country)
+                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>
+                                {{ $country }}
+                                </option>
+                                @endforeach
+                                </select>
+                                </div>
+
+                                </div>
                                 </div>
 
                                 <!-- Step 2: Professional Identity -->
-                                <div class="step-content d-none" id="step-2">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Practitioner Type <span class="small text-muted">(Select Multiple)</span></label>
-                                            <select class="form-select multiple-select" name="practitioner_type[]" multiple>
-                                                <option value="Mindfulness Coach">Mindfulness Coach</option>
-                                                <option value="Meditation Teacher">Meditation Teacher</option>
-                                                <option value="Breathwork Facilitator">Breathwork Facilitator</option>
-                                                <option value="Yoga + Mindfulness Instructor">Yoga + Mindfulness Instructor</option>
-                                                <option value="Stress Management Coach">Stress Management Coach</option>
-                                                <option value="Other">Other</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Years of Experience</label>
-                                            <input class="form-control" type="number" name="years_of_experience">
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Current Workplace / Organization</label>
-                                            <input class="form-control" type="text" name="current_workplace">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Website (Optional)</label>
-                                            <input class="form-control" type="url" name="website_social_links[website]" placeholder="https://">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Instagram (Optional)</label>
-                                            <input class="form-control" type="url" name="website_social_links[instagram]" placeholder="https://instagram.com/">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">LinkedIn (Optional)</label>
-                                            <input class="form-control" type="url" name="website_social_links[linkedin]" placeholder="https://linkedin.com/in/">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">YouTube (Optional)</label>
-                                            <input class="form-control" type="url" name="website_social_links[youtube]" placeholder="https://youtube.com/@">
-                                        </div>
-                                    </div>
+                                                                <div class="step-content d-none" id="step-2">
+                                <div class="row g-3">
+
+                                <!-- Practitioner Type -->
+                                <div class="col-md-6">
+                                <label class="form-label">Practitioner Type 
+                                <span class="small text-muted">(Select Multiple)</span></label>
+
+                                <select class="form-select multiple-select"
+                                name="practitioner_type[]"
+                                multiple
+                                required>
+                                <option value="Mindfulness Coach">Mindfulness Coach</option>
+                                <option value="Meditation Teacher">Meditation Teacher</option>
+                                <option value="Breathwork Facilitator">Breathwork Facilitator</option>
+                                <option value="Yoga + Mindfulness Instructor">Yoga + Mindfulness Instructor</option>
+                                <option value="Stress Management Coach">Stress Management Coach</option>
+                                <option value="Other">Other</option>
+                                </select>
+
+                                <small class="text-muted">Hold CTRL to select multiple</small>
+                                </div>
+
+                                <!-- Years of Experience -->
+                                <div class="col-md-6">
+                                <label class="form-label">Years of Experience</label>
+
+                                <input class="form-control"
+                                type="number"
+                                name="years_of_experience"
+                                min="0"
+                                max="70"
+                                step="1"
+                                pattern="^[0-9]{1,2}$"
+                                title="Enter valid years between 0 and 70">
+                                </div>
+
+                                <!-- Workplace -->
+                                <div class="col-md-12">
+                                <label class="form-label">Current Workplace / Organization</label>
+
+                                <input class="form-control"
+                                type="text"
+                                name="current_workplace"
+                                maxlength="255"
+                                pattern="^[A-Za-z0-9\s.,&()\-]{2,255}$"
+                                title="Only letters, numbers and basic symbols allowed">
+                                </div>
+
+                                <!-- Website -->
+                                <div class="col-md-6">
+                                <label class="form-label">Website (Optional)</label>
+
+                                <input class="form-control"
+                                type="url"
+                                name="website_social_links[website]"
+                                placeholder="https://example.com"
+                                pattern="https://.*"
+                                title="Must start with https://">
+                                </div>
+
+                                <!-- Facebook -->
+                                <div class="col-md-6">
+                                <label class="form-label">Facebook (Optional)</label>
+
+                                <input class="form-control"
+                                type="url"
+                                name="website_social_links[facebook]"
+                                placeholder="https://facebook.com/username"
+                                pattern="https://(www\.)?facebook\.com/.*"
+                                title="Enter valid Facebook URL">
+                                </div>
+
+                                <!-- Instagram -->
+                                <div class="col-md-6">
+                                <label class="form-label">Instagram (Optional)</label>
+
+                                <input class="form-control"
+                                type="url"
+                                name="website_social_links[instagram]"
+                                placeholder="https://instagram.com/username"
+                                pattern="https://(www\.)?instagram\.com/.*"
+                                title="Enter valid Instagram URL">
+                                </div>
+
+                                <!-- LinkedIn -->
+                                <div class="col-md-6">
+                                <label class="form-label">LinkedIn (Optional)</label>
+
+                                <input class="form-control"
+                                type="url"
+                                name="website_social_links[linkedin]"
+                                placeholder="https://linkedin.com/in/username"
+                                pattern="https://(www\.)?linkedin\.com/.*"
+                                title="Enter valid LinkedIn URL">
+                                </div>
+
+                                <!-- YouTube -->
+                                <div class="col-md-6">
+                                <label class="form-label">YouTube (Optional)</label>
+
+                                <input class="form-control"
+                                type="url"
+                                name="website_social_links[youtube]"
+                                placeholder="https://youtube.com/@channel"
+                                pattern="https://(www\.)?(youtube\.com|youtu\.be)/.*"
+                                title="Enter valid YouTube URL">
+                                </div>
+
+                                </div>
                                 </div>
 
                                 <!-- Step 3: Qualifications -->
@@ -231,19 +380,18 @@
                                     <div class="row g-3">
                                         <div class="col-md-12">
                                             <label class="form-label">Highest Education</label>
-                                            <input class="form-control" type="text" name="highest_education">
+                                            <input class="form-control" type="text" name="highest_education" maxlength="255" required>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Mindfulness Training Details</label>
-                                            <textarea class="form-control" name="mindfulness_training_details" rows="3"></textarea>
+                                            <textarea class="form-control" name="mindfulness_training_details" rows="3" required></textarea>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Upload Certificates (Multiple)</label>
-                                            <input class="form-control" type="file" name="certificates[]" multiple>
-                                        </div>
+                                            <label class="form-label">Upload Certificates <span class="small text-muted">(Format: PDF/JPG/PNG, Max 2MB each)</span></label>
+                                            <input class="form-control" type="file" name="certificates[]" multiple accept=".pdf,.jpg,.jpeg,.png" required>                                        </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Additional Certifications (Optional)</label>
-                                            <textarea class="form-control" name="additional_certifications" rows="2"></textarea>
+                                            <textarea class="form-control" name="additional_certifications" rows="2" required></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -252,12 +400,12 @@
                                 <div class="step-content d-none" id="step-4">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold">Services Offered</label>
+                                            <label class="form-label fw-bold">Services Offered <span class="text-danger">*</span></label>
                                             <div class="row">
                                                 @foreach($servicesOffered as $service)
                                                 <div class="col-12">
                                                     <div class="form-check checkbox-primary d-flex align-items-center">
-                                                        <input class="form-check-input" type="checkbox" name="services_offered[]" value="{{ $service->name }}" id="service_{{ $service->id }}">
+                                                        <input class="form-check-input group-required" type="checkbox" name="services_offered[]" value="{{ $service->name }}" id="service_{{ $service->id }}" data-group="services">
                                                         <label class="form-check-label flex-grow-1 mb-0" for="service_{{ $service->id }}">{{ $service->name }}</label>
                                                         <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $service->id }}" data-type="mindfulness_services"><i class="fa fa-trash"></i></a>
                                                     </div>
@@ -266,18 +414,18 @@
                                                 <div class="col-12 mt-2">
                                                     <div class="input-group input-group-sm">
                                                         <input type="text" class="form-control new-master-data-input" data-type="mindfulness_services" placeholder="Add New Service">
-                                                        <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
+                                                        <button class="btn btn-primary add-master-data-btn" type="button" title="Add New Item"><i class="iconly-Plus icli"></i></button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold">Client Concerns Supported</label>
+                                            <label class="form-label fw-bold">Client Concerns Supported <span class="text-danger">*</span></label>
                                             <div class="row">
                                                 @foreach($clientConcerns as $concern)
                                                 <div class="col-12">
                                                     <div class="form-check checkbox-secondary d-flex align-items-center">
-                                                        <input class="form-check-input" type="checkbox" name="client_concerns[]" value="{{ $concern->name }}" id="concern_{{ $concern->id }}">
+                                                        <input class="form-check-input group-required" type="checkbox" name="client_concerns[]" value="{{ $concern->name }}" id="concern_{{ $concern->id }}" data-group="concerns">
                                                         <label class="form-check-label flex-grow-1 mb-0" for="concern_{{ $concern->id }}">{{ $concern->name }}</label>
                                                         <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $concern->id }}" data-type="client_concerns"><i class="fa fa-trash"></i></a>
                                                     </div>
@@ -286,7 +434,7 @@
                                                 <div class="col-12 mt-2">
                                                     <div class="input-group input-group-sm">
                                                         <input type="text" class="form-control new-master-data-input" data-type="client_concerns" placeholder="Add New Concern">
-                                                        <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
+                                                        <button class="btn btn-primary add-master-data-btn" type="button" title="Add New Item"><i class="iconly-Plus icli"></i></button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -295,86 +443,123 @@
                                 </div>
 
                                 <!-- Step 5: Consultation Setup & Identity -->
-                                <div class="step-content d-none" id="step-5">
-                                    <div class="row g-3">
-                                        <div class="col-md-12">
-                                            <label class="form-label fw-bold">Consultation Modes</label>
-                                            <div class="d-flex gap-3 flex-wrap">
-                                                @foreach($consultationModes as $mode)
-                                                <div class="form-check checkbox-info">
-                                                    <input class="form-check-input" type="checkbox" name="consultation_modes[]" value="{{ $mode }}" id="mode_{{ $loop->index }}">
-                                                    <label class="form-check-label" for="mode_{{ $loop->index }}">{{ $mode }}</label>
-                                                </div>
-                                                @endforeach
-                                            </div>
+                               <div class="step-content d-none" id="step-5">
+                                <div class="row g-3">
+
+                                <!-- Consultation Modes -->
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Consultation Modes <span class="text-danger">*</span></label>
+                                    <div class="d-flex gap-3 flex-wrap">
+                                        @foreach($consultationModes as $mode)
+                                        <div class="form-check checkbox-info">
+                                            <input class="form-check-input group-required" type="checkbox" name="consultation_modes[]" value="{{ $mode }}" id="mode_{{ $loop->index }}" data-group="modes">
+                                            <label class="form-check-label" for="mode_{{ $loop->index }}">{{ $mode }}</label>
                                         </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label fw-bold">Languages Spoken</label>
-                                            <select class="form-select" id="languages_select" multiple>
-                                                @foreach($languages as $lang)
-                                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <div id="languages_capabilities_container"></div>
-                                        </div>
-                                        <hr>
-                                        <h6 class="text-primary">Identity & Payment</h6>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Government ID Type</label>
-                                            <input class="form-control" type="text" name="gov_id_type">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Upload ID Proof</label>
-                                            <input class="form-control" type="file" name="gov_id_upload">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">PAN Number</label>
-                                            <input class="form-control" type="text" name="pan_number">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Upload Cancelled Cheque</label>
-                                            <input class="form-control" type="file" name="cancelled_cheque">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Bank Holder Name</label>
-                                            <input class="form-control" type="text" name="bank_holder_name">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Bank Name</label>
-                                            <input class="form-control" type="text" name="bank_name">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Account Number</label>
-                                            <input class="form-control" type="text" name="account_number">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">IFSC Code</label>
-                                            <input class="form-control" type="text" name="ifsc_code">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">UPI ID</label>
-                                            <input class="form-control" type="text" name="upi_id">
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
 
-                                <!-- Step 6: Platform Profile -->
-                                <div class="step-content d-none" id="step-6">
-                                    <div class="row g-3">
-                                        <div class="col-md-12">
-                                            <label class="form-label">Short Bio</label>
-                                            <textarea class="form-control" name="short_bio" rows="4"></textarea>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Coaching Style / Approach</label>
-                                            <textarea class="form-control" name="coaching_style" rows="3"></textarea>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Who you work best with (Target Audience)</label>
-                                            <textarea class="form-control" name="target_audience" rows="2"></textarea>
-                                        </div>
-                                    </div>
+                                <!-- Languages -->
+                                <div class="col-md-12">
+                                <label class="form-label fw-bold">Languages Spoken</label>
+
+                                <select class="form-select" id="languages_select" multiple required>
+                                @foreach($languages as $lang)
+                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                @endforeach
+                                </select>
+
+                                <div id="languages_capabilities_container"></div>
                                 </div>
+
+                                <hr>
+
+                                <h6 class="text-primary">Identity & Payment</h6>
+
+                                <input type="text" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')">
+                                </div>
+
+                                <!-- UPI -->
+                                <div class="col-md-6">
+                                <label class="form-label">UPI ID</label>
+
+                                <input class="form-control"
+                                type="text"
+                                name="upi_id"
+                                placeholder="username@bank"
+                                maxlength="100"
+                                pattern="^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$"
+                                title="Enter valid UPI ID">
+                                </div>
+
+                                </div>
+                                </div>
+
+                                <!-- Step 6: Platform Profile -->
+                              <div class="step-content d-none" id="step-6">
+    <div class="row g-3">
+
+        <!-- Short Bio -->
+        <div class="col-md-12">
+            <div class="row align-items-center">
+                <label class="col-md-3 form-label">
+                    Short Bio <span class="text-danger">*</span>
+                </label>
+
+                <div class="col-md-9">
+                    <textarea class="form-control"
+                        name="short_bio"
+                        rows="4"
+                        required
+                        minlength="20"
+                        maxlength="500"
+                        placeholder="Tell us about yourself..."
+                        pattern="^[A-Za-z0-9\s.,''\-()]{20,500}$"
+                        title="Short bio must be 20-500 characters"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coaching Style -->
+        <div class="col-md-12">
+            <div class="row align-items-center">
+                <label class="col-md-3 form-label">
+                    Coaching Style / Approach
+                </label>
+
+                <div class="col-md-9">
+                    <textarea class="form-control"
+                        name="coaching_style"
+                        rows="3"
+                        minlength="10"
+                        maxlength="300"
+                        pattern="^[A-Za-z0-9\s.,''\-()]{10,300}$"
+                        placeholder="Describe your coaching style"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Target Audience -->
+        <div class="col-md-12">
+            <div class="row align-items-center">
+                <label class="col-md-3 form-label">
+                    Who you work best with (Target Audience)
+                </label>
+
+                <div class="col-md-9">
+                    <textarea class="form-control"
+                        name="target_audience"
+                        rows="2"
+                        minlength="5"
+                        maxlength="200"
+                        pattern="^[A-Za-z0-9\s.,''\-()]{5,200}$"
+                        placeholder="Example: Corporate professionals, students, etc"></textarea>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
 
                                 <!-- Buttons -->
                                 <div class="d-flex justify-content-between mt-4">
@@ -436,10 +621,18 @@
                 <h5 class="modal-title">Confirm Status Change</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p id="status-confirmation-msg">Are you sure you want to change the status?</p>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Info-Square icli text-primary mb-3" style="font-size: 50px;"></i>
+                <h5>Update Practitioner Status</h5>
+                <p id="status-confirmation-msg">Select the new status for this practitioner:</p>
+                <div class="mb-3 px-5">
+                    <select id="status-select-input-practitioner" class="form-select">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
                 <input type="hidden" id="status-practitioner-id">
-                <input type="hidden" id="status-new-value">
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
@@ -555,6 +748,10 @@
             }
         });
 
+
+
+        
+
         // Stepper Click
         $('.stepper-item').click(function() {
             let step = $(this).data('step');
@@ -601,6 +798,21 @@
             container = btn.closest('.col-md-6').find('.row').first();
 
             if (!value) {
+                return;
+            }
+
+            // Frontend duplicate check
+            let isDuplicate = false;
+            container.find('.form-check-label').each(function() {
+                if ($(this).text().trim().toLowerCase() === value.toLowerCase()) {
+                    isDuplicate = true;
+                    return false;
+                }
+            });
+
+            if (isDuplicate) {
+                showToast('This item already exists.', 'error');
+                input.focus();
                 return;
             }
 
@@ -735,18 +947,42 @@
                 contentType: false,
                 success: function(response) {
                     $('#practitioner-form-modal').modal('hide');
-                    table.draw();
-                    if (typeof showToast === 'function') {
-                        showToast(response.success);
-                    } else {
-                        alert(response.success);
-                    }
+                    if (typeof table !== 'undefined') table.draw();
+                    showToast(response.success || 'Practitioner saved successfully');
                 },
                 error: function(xhr) {
-                    if (typeof showToast === 'function') {
-                        showToast('Error: ' + (xhr.responseJSON.error || 'Unknown error'), 'error');
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        $('.is-invalid').removeClass('is-invalid');
+                        $('.invalid-feedback').remove();
+
+                        let firstErrorField = null;
+                        $.each(errors, function(field, messages) {
+                            // Find field (handle array names like services_offered[])
+                            let input = $(`[name="${field}"], [name="${field}[]"]`).first();
+                            if (input.length) {
+                                input.addClass('is-invalid');
+                                input.after(`<div class="invalid-feedback">${messages[0]}</div>`);
+                                if (!firstErrorField) firstErrorField = input;
+                                
+                                // Find which step this field belongs to and switch if needed
+                                let stepId = input.closest('.step-content').attr('id');
+                                if (stepId) {
+                                    let stepNum = parseInt(stepId.split('-')[1]);
+                                    if (stepNum !== currentStep) {
+                                        currentStep = stepNum;
+                                        updateStepper();
+                                    }
+                                }
+                            }
+                        });
+                        
+                        if (firstErrorField) {
+                            firstErrorField[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                        showToast('Please correct the errors in the form.', 'error');
                     } else {
-                        alert('Error: ' + (xhr.responseJSON.error || 'Unknown error'));
+                        showToast('Error: ' + (xhr.responseJSON?.error || xhr.responseJSON?.message || 'Unknown error'), 'error');
                     }
                 },
                 complete: function() {
@@ -759,6 +995,7 @@
         $('body').on('click', '.editPractitioner', function() {
             let id = $(this).data('id');
             $('#practitioner-form')[0].reset();
+            $('input[type="checkbox"]').prop('checked', false); // Clear all checkboxes
             $('#practitioner_id').val(id);
             $('#form-method').val('PUT');
             $('#form-modal-title').text('Edit Practitioner');
@@ -773,10 +1010,10 @@
                 let p = response.practitioner;
 
                 // Populate fields
-                $('input[name="first_name"]').val(p.first_name);
-                $('input[name="last_name"]').val(p.last_name);
+                $('input[name="first_name"]').val(p.first_name || u.first_name || '');
+                $('input[name="last_name"]').val(p.last_name || u.last_name || '');
                 $('input[name="email"]').val(u.email);
-                $('input[name="phone"]').val(p.phone);
+                $('input[name="phone"]').val((p.phone || '').replace(/[^0-9]/g, ''));
                 $('select[name="gender"]').val(p.gender);
                 $('input[name="dob"]').val(p.dob ? p.dob.substring(0, 10) : '');
                 $('input[name="address_line_1"]').val(p.address_line_1);
@@ -786,17 +1023,50 @@
                 $('input[name="zip_code"]').val(p.zip_code);
                 $('select[name="country"]').val(p.country || 'India');
 
+                // Step 2: Professional Identity
                 if (window.practitionerTypeChoices) {
                     window.practitionerTypeChoices.setChoiceByValue(p.practitioner_type || []);
                 }
-                // For checkboxes and arrays, it is more complex. I will just do basic ones and basic mapping for now.
-                // In production, proper mapping for checkboxes is needed.
-                // Assuming p.services_offered is array
+                $('input[name="years_of_experience"]').val(p.years_of_experience || '');
+                $('input[name="current_workplace"]').val(p.current_workplace || '');
+                
+                if (p.website_social_links) {
+                    $('input[name="website_social_links[website]"]').val(p.website_social_links.website || '');
+                    $('input[name="website_social_links[facebook]"]').val(p.website_social_links.facebook || '');
+                    $('input[name="website_social_links[instagram]"]').val(p.website_social_links.instagram || '');
+                    $('input[name="website_social_links[linkedin]"]').val(p.website_social_links.linkedin || '');
+                    $('input[name="website_social_links[youtube]"]').val(p.website_social_links.youtube || '');
+                }
+
+                // Step 3: Qualifications
+                $('input[name="highest_education"]').val(p.highest_education || '');
+                $('textarea[name="mindfulness_training_details"]').val(p.mindfulness_training_details || '');
+                $('textarea[name="additional_certifications"]').val(p.additional_certifications || '');
+
+                // Step 4: Expertise
                 if (p.services_offered) {
                     p.services_offered.forEach(v => {
                         $(`input[name="services_offered[]"][value="${v}"]`).prop('checked', true);
                     });
                 }
+                if (p.client_concerns) {
+                    p.client_concerns.forEach(v => {
+                        $(`input[name="client_concerns[]"][value="${v}"]`).prop('checked', true);
+                    });
+                }
+
+                // Step 5: Consultation
+                if (p.consultation_modes) {
+                    p.consultation_modes.forEach(v => {
+                        $(`input[name="consultation_modes[]"][value="${v}"]`).prop('checked', true);
+                    });
+                }
+                $('input[name="upi_id"]').val(p.upi_id || '');
+
+                // Step 6: Profile
+                $('textarea[name="short_bio"]').val(p.short_bio || '');
+                $('textarea[name="coaching_style"]').val(p.coaching_style || '');
+                $('textarea[name="target_audience"]').val(p.target_audience || '');
 
                 // Handle Languages Spoken (Choices.js)
                 $('#languages_capabilities_container').empty();
@@ -811,7 +1081,7 @@
                         // New format: array of objects {language: '...', read: true, ...}
                         const langValues = [];
                         $.each(p.languages_spoken, function(key, caps) {
-                            const langName = caps.language || key; // Fallback to key if language property is missing
+                            const langName = caps.language || key;
                             langValues.push(langName);
                             addLanguageCapabilityRow(langName, langName, caps);
                         });
@@ -819,6 +1089,13 @@
                     }
                 } else {
                     window.languageChoices.removeActiveItems();
+                }
+
+                // Profile photo preview
+                if (p.profile_photo_path) {
+                    $('#imagePreview').css('background-image', 'url(/storage/' + p.profile_photo_path + ')');
+                } else {
+                    $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
                 }
 
                 // Reset stepper to 1
@@ -922,10 +1199,11 @@
                                         <div class="col-md-12">
                                             <p class="text-muted small mb-1">Social / Website</p>
                                             <div class="d-flex flex-wrap gap-2 mt-1">
-                                                ${p.website_social_links && p.website_social_links.website ? `<a href="${p.website_social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs"><i class="fa-solid fa-globe"></i></a>` : ''}
-                                                ${p.website_social_links && p.website_social_links.instagram ? `<a href="${p.website_social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-instagram"></i></a>` : ''}
-                                                ${p.website_social_links && p.website_social_links.linkedin ? `<a href="${p.website_social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs"><i class="fa-brands fa-linkedin"></i></a>` : ''}
-                                                ${p.website_social_links && p.website_social_links.youtube ? `<a href="${p.website_social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-youtube"></i></a>` : ''}
+                                                ${p.website_social_links && p.website_social_links.website ? `<a href="${p.website_social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs" title="Website"><i class="fa-solid fa-globe"></i></a>` : ''}
+                                                ${p.website_social_links && p.website_social_links.facebook ? `<a href="${p.website_social_links.facebook}" target="_blank" class="btn btn-outline-primary btn-xs" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>` : ''}
+                                                ${p.website_social_links && p.website_social_links.instagram ? `<a href="${p.website_social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs" title="Instagram"><i class="fa-brands fa-instagram"></i></a>` : ''}
+                                                ${p.website_social_links && p.website_social_links.linkedin ? `<a href="${p.website_social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>` : ''}
+                                                ${p.website_social_links && p.website_social_links.youtube ? `<a href="${p.website_social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs" title="YouTube"><i class="fa-brands fa-youtube"></i></a>` : ''}
                                             </div>
                                         </div>
                                     </div>
@@ -1086,23 +1364,22 @@
         });
 
 
-        // Status Toggle Handler (Triggers Modal)
-        $('body').on('click', '.toggle-status', function() {
-            var id = $(this).data('id');
-            var currentStatus = $(this).data('status');
-            var newStatus = (currentStatus === 'active') ? 0 : 1;
-            var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
+        // Status Toggle Handler - Robust Implementation
+        $(document).off('click', '.toggle-status').on('click', '.toggle-status', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            var id = $this.data('id');
+            var currentStatus = String($this.data('status')).toLowerCase();
 
             $('#status-practitioner-id').val(id);
-            $('#status-new-value').val(newStatus);
-            $('#status-confirmation-msg').text(`Are you sure you want to change the status to ${newStatusText}?`);
+            $('#status-select-input-practitioner').val(currentStatus); // Pre-select current status
             $('#status-confirmation-modal').modal('show');
         });
 
         // Handle Confirm Status Change
-        $('#confirm-status-btn').on('click', function() {
+        $(document).off('click', '#confirm-status-btn').on('click', '#confirm-status-btn', function() {
             var id = $('#status-practitioner-id').val();
-            var newStatus = $('#status-new-value').val();
+            var newStatus = $('#status-select-input-practitioner').val();
             var btn = $(this);
 
             btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
@@ -1125,9 +1402,9 @@
                 },
                 error: function(xhr) {
                     if (typeof showToast === 'function') {
-                        showToast('Error: ' + (xhr.responseJSON?.error || 'Unknown error'), 'error');
+                        showToast('Error updating status', 'error');
                     } else {
-                        alert('Error: ' + (xhr.responseJSON?.error || 'Unknown error'));
+                        alert('Error updating status');
                     }
                 },
                 complete: function() {
@@ -1220,36 +1497,161 @@
     };
 
     function validateStep(step) {
-        // Simple validation
         let valid = true;
-        $('#step-' + step + ' input[required], #step-' + step + ' select[required]').each(function() {
-            if (!$(this).val()) {
-                $(this).addClass('is-invalid');
-                valid = false;
-            } else {
-                $(this).removeClass('is-invalid');
+        const stepContainer = $('#step-' + step);
+        
+        // Clear previous errors
+        stepContainer.find('.is-invalid').removeClass('is-invalid');
+        stepContainer.find('.invalid-feedback').remove();
+        
+        // Validation rules mapping
+        const validations = [
+            {
+                selector: 'input[required], select[required], textarea[required]',
+                check: (el) => {
+                    if (el.is(':checkbox')) return el.is(':checked');
+                    if (el.is('select')) return el.val() && el.val() !== '';
+                    return el.val().trim() !== '';
+                },
+                message: 'This field is required'
+            },
+            {
+                selector: 'input[type="email"]',
+                check: (el) => {
+                    if (!el.val()) return true; // Handled by required check if applicable
+                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.val());
+                },
+                message: 'Please enter a valid email address'
+            },
+            {
+                selector: 'input[name="password"]',
+                check: (el) => {
+                    if ($('#practitioner_id').val() || !el.val()) return true;
+                    return el.val().length >= 6;
+                },
+                message: 'Password must be at least 6 characters'
+            },
+            {
+                selector: 'input[name="password_confirmation"]',
+                check: (el) => {
+                    if ($('#practitioner_id').val() || !el.val()) return true;
+                    return el.val() === $('input[name="password"]').val();
+                },
+                message: 'Passwords do not match'
+            },
+            {
+                selector: 'input[name="first_name"], input[name="last_name"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[a-zA-Z\s]{2,50}$/.test(el.val());
+                },
+                message: 'Only letters allowed (2-50 characters)'
+            },
+            {
+                selector: 'input[name="phone"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[0-9]{10,15}$/.test(el.val());
+                },
+                message: 'Please enter a valid phone number (10-15 digits)'
+            },
+            {
+                selector: 'input[name="pan_number"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(el.val().toUpperCase());
+                },
+                message: 'Invalid PAN format (e.g. ABCDE1234F)'
+            },
+            {
+                selector: 'input[name="ifsc_code"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[A-Z]{4}0[A-Z0-9]{6}$/.test(el.val().toUpperCase());
+                },
+                message: 'Invalid IFSC format (e.g. ABCD0123456)'
+            },
+            {
+                selector: 'input[name="upi_id"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[\w\.\-]+@[\w\-]+$/.test(el.val());
+                },
+                message: 'Invalid UPI format (e.g. user@bank)'
+            },
+            {
+                selector: 'input[name="zip_code"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[0-9]{5,10}$/.test(el.val());
+                },
+                message: 'Invalid Zip/Pincode'
             }
+        ];
+
+        validations.forEach(v => {
+            stepContainer.find(v.selector).each(function() {
+                const el = $(this);
+                if (!v.check(el)) {
+                    el.addClass('is-invalid');
+                    // Add error message if not already present
+                    if (el.next('.invalid-feedback').length === 0) {
+                        const errorMsg = el.attr('title') || v.message;
+                        el.after(`<div class="invalid-feedback">${errorMsg}</div>`);
+                    }
+                    valid = false;
+                }
+            });
         });
-        // Password validation for step 1 create mode
-        if (step === 1 && !$('#practitioner_id').val()) {
-            let pwd = $('input[name="password"]').val();
-            let conf = $('input[name="password_confirmation"]').val();
-            if (!pwd || pwd !== conf) {
-                $('input[name="password_confirmation"]').addClass('is-invalid');
-                valid = false;
+
+        if (!valid) {
+            const firstError = stepContainer.find('.is-invalid').first();
+            if (firstError.length) {
+                firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
+        
         return valid;
     }
 
+    // Real-time validation: Clear error when user starts typing
+    $(document).on('input change', '#practitioner-form input, #practitioner-form select, #practitioner-form textarea', function() {
+        const el = $(this);
+        if (el.hasClass('is-invalid')) {
+            el.removeClass('is-invalid');
+            el.next('.invalid-feedback').remove();
+        }
+    });
+
     function openCreateModal() {
+        // Reset form fields
         $('#practitioner-form')[0].reset();
         $('#practitioner_id').val('');
         $('#form-method').val('POST');
         $('#form-modal-title').text('Register Mindfulness Practitioner');
+        
+        // Show password fields
         $('.password-field').show();
         $('input[name="password"]').attr('required', true);
+        
+        // Clear Choices.js instances
+        if (window.languageChoices) {
+            window.languageChoices.removeActiveItems();
+        }
+        if (window.practitionerTypeChoices) {
+            window.practitionerTypeChoices.removeActiveItems();
+        }
+        
+        // Clear dynamic containers
+        $('#languages_capabilities_container').empty();
+        
+        // Reset image preview
+        $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+        
+        // Clear all validation errors
+        $('.is-invalid').removeClass('is-invalid');
 
+        // Reset stepper
         currentStep = 1;
         updateStepper();
         $('#practitioner-form-modal').modal('show');

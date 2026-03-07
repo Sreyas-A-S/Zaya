@@ -95,94 +95,177 @@
                                 </div>
                             </div>
 
-                            <form id="therapist-form" method="POST" enctype="multipart/form-data" class="theme-form">
+                            <form id="therapist-form" method="POST" enctype="multipart/form-data" class="theme-form" novalidate>
                                 @csrf
                                 <input type="hidden" name="_method" id="form-method" value="POST">
                                 <input type="hidden" name="therapist_id" id="therapist_id">
 
                                 <!-- Step 1: Personal Details -->
-                                <div class="step-content" id="step-1">
-                                    <div class="row g-3">
-                                        <div class="col-md-12 text-center mb-4">
-                                            <div class="avatar-upload">
-                                                <div class="avatar-edit">
-                                                    <input type='file' id="imageUpload" name="profile_photo" accept=".png, .jpg, .jpeg" />
-                                                    <label for="imageUpload"><i class="iconly-Edit icli"></i></label>
-                                                </div>
-                                                <div class="avatar-preview">
-                                                    <div id="imagePreview" style="background-image: url('{{ asset('admiro/assets/images/user/user.png') }}');">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <label class="form-label mt-2">Profile Photo</label>
-                                        <div class="col-md-4">
-                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="first_name" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="last_name" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="email" name="email" required>
-                                        </div>
-                                        <div class="col-md-4 password-field">
-                                            <label class="form-label">Password <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="password" name="password">
-                                        </div>
-                                        <div class="col-md-4 password-field">
-                                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="password" name="password_confirmation">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="phone" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Gender</label>
-                                            <select class="form-select" name="gender">
-                                                <option value="">Select Gender</option>
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
-                                                <option value="other">Other</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Date of Birth</label>
-                                            <input class="form-control" type="date" name="dob">
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street">
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Address Line 2</label>
-                                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">City <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="city" required placeholder="City">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">State <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="state" required placeholder="State">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="zip_code" required placeholder="Pincode">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Country <span class="text-danger">*</span></label>
-                                            <select class="form-select" name="country" required>
-                                                <option value="">Select Country</option>
-                                                @foreach(config('countries') as $country)
-                                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>{{ $country }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
+                              <div class="step-content" id="step-1">
+<div class="row g-3">
+
+<!-- Profile Photo -->
+<div class="col-md-12 text-center mb-4">
+<div class="avatar-upload">
+<div class="avatar-edit">
+<input type="file"
+id="imageUpload"
+name="profile_photo"
+accept=".png,.jpg,.jpeg"
+title="Upload PNG or JPG image" required>
+<label for="imageUpload"><i class="iconly-Edit icli" required></i></label>
+</div>
+
+<div class="avatar-preview">
+<div id="imagePreview"
+style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}');">
+</div>
+</div>
+</div>
+<label class="form-label mt-2">Profile Photo</label>
+</div>
+
+                                <!-- First Name -->
+                                <div class="col-md-4">
+                                    <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="text" name="first_name" required maxlength="50" 
+                                        pattern="^[A-Z][a-zA-Z\s]{1,49}$" title="First letter must be capital (Example: John)"
+                                        oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)">
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="text" name="last_name" required maxlength="50" 
+                                        pattern="^[A-Z][a-zA-Z\s]{1,49}$" title="First letter must be capital (Example: Smith)"
+                                        oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)">
+                                </div>
+
+                                <!-- Email -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="email" name="email" required 
+                                        pattern="^[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Enter a valid email address">
+                                </div>
+
+                                <!-- Password -->
+                                <div class="col-md-4 password-field">
+                                    <label class="form-label">Password <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="password" name="password" id="password-input" required minlength="6" 
+                                        pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$"
+                                        title="Password must contain at least 6 characters including a number">
+                                </div>
+
+                                <!-- Confirm Password -->
+                                <div class="col-md-4 password-field">
+                                    <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="password" name="password_confirmation" id="password-confirm-input" required minlength="6">
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="col-md-4">
+                                <label class="form-label">Phone <span class="text-danger">*</span></label>
+                                <input class="form-control"
+                                type="text"
+                                name="phone"
+                                required
+                                pattern="^[0-9]{10,15}$"
+                                maxlength="15"
+                                placeholder="Enter phone number"
+                                title="Enter 10 to 15 digits only"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                </div>
+
+                                <!-- Gender -->
+                                <div class="col-md-4">
+                                <label class="form-label">Gender</label>
+                                <select class="form-select" name="gender">
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                                </select>
+                                </div>
+
+                                <!-- DOB -->
+                                <div class="col-md-4">
+                                <label class="form-label">Date of Birth</label>
+                                <input class="form-control"
+                                type="date"
+                                name="dob"
+                                max="{{ date('Y-m-d') }}">
+                                </div>
+
+                                <!-- Address Line 1 -->
+                                <div class="col-md-12">
+                                <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
+                                <input type="text"
+                                class="form-control"
+                                name="address_line_1"
+                                required
+                                maxlength="255"
+                                pattern="^[A-Za-z0-9\s,./-]{5,255}$"
+                                title="Enter a valid address">
+                                </div>
+
+                                <!-- Address Line 2 -->
+                                <div class="col-md-12">
+                                <label class="form-label">Address Line 2</label>
+                                <input type="text"
+                                class="form-control"
+                                name="address_line_2"
+                                maxlength="255"
+                                pattern="^[A-Za-z0-9\s,./-]{0,255}$">
+                                </div>
+
+                                <!-- City -->
+                                <div class="col-md-6">
+                                <label class="form-label">City <span class="text-danger">*</span></label>
+                                <input type="text"
+                                class="form-control"
+                                name="city"
+                                required
+                                pattern="^[A-Za-z\s]{2,100}$"
+                                title="City should contain only letters">
+                                </div>
+
+                                <!-- State -->
+                                <div class="col-md-6">
+                                <label class="form-label">State <span class="text-danger">*</span></label>
+                                <input type="text"
+                                class="form-control"
+                                name="state"
+                                required
+                                pattern="^[A-Za-z\s]{2,100}$"
+                                title="State should contain only letters">
+                                </div>
+
+                                <!-- Zip Code -->
+                                <div class="col-md-6">
+                                <label class="form-label">Zip Code <span class="text-danger">*</span></label>
+                                <input type="text"
+                                class="form-control"
+                                name="zip_code"
+                                required
+                                pattern="^[0-9]{4,10}$"
+                                maxlength="10"
+                                title="Enter valid zip code">
+                                </div>
+
+                                <!-- Country -->
+                                <div class="col-md-6">
+                                <label class="form-label">Country <span class="text-danger">*</span></label>
+                                <select class="form-select" name="country" required>
+                                <option value="">Select Country</option>
+                                @foreach(config('countries') as $country)
+                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>
+                                {{ $country }}
+                                </option>
+                                @endforeach
+                                </select>
+                                </div>
+
+                                </div>
                                 </div>
                         </div>
                     </div>
@@ -221,8 +304,8 @@
                 <div class="row g-3">
                     <h6 class="text-primary border-bottom pb-2">Professional Details</h6>
                     <div class="col-md-6">
-                        <label class="form-label">Yoga Therapist Type</label>
-                        <select class="form-select" name="yoga_therapist_type">
+                        <label class="form-label">Yoga Therapist Type <span class="text-danger">*</span></label>
+                        <select class="form-select" name="yoga_therapist_type" required>
                             <option value="" selected disabled>Select Type</option>
                             <option value="Certified Yoga Therapist">Certified Yoga Therapist</option>
                             <option value="Yoga Instructor with Therapy Training">Yoga Instructor with Therapy Training</option>
@@ -231,49 +314,56 @@
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Years of Experience</label>
-                        <input class="form-control" type="number" name="years_of_experience">
+                        <label class="form-label">Years of Experience <span class="text-danger">*</span></label>
+                        <input class="form-control" type="number" name="years_of_experience" required min="0" max="60">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Current Clinic / Studio / Organization</label>
-                        <input class="form-control" type="text" name="current_organization">
+                        <label class="form-label">Current Clinic / Studio / Organization <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="current_organization" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Workplace Address</label>
-                        <input class="form-control" type="text" name="workplace_address">
+                        <label class="form-label">Workplace Address <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="workplace_address" required>
                     </div>
                     <div class="col-md-12">
-                        <div class="col-md-6">
-                            <label class="form-label">Website (Optional)</label>
-                            <input class="form-control" type="url" name="website_social_links[website]" placeholder="https://">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Instagram (Optional)</label>
-                            <input class="form-control" type="url" name="website_social_links[instagram]" placeholder="https://instagram.com/">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">LinkedIn (Optional)</label>
-                            <input class="form-control" type="url" name="website_social_links[linkedin]" placeholder="https://linkedin.com/in/">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">YouTube (Optional)</label>
-                            <input class="form-control" type="url" name="website_social_links[youtube]" placeholder="https://youtube.com/@">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Website (Optional)</label>
+                                <input class="form-control" type="url" name="website_social_links[website]" placeholder="https://">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Facebook (Optional)</label>
+                                <input class="form-control" type="url" name="website_social_links[facebook]" placeholder="https://facebook.com/">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Instagram (Optional)</label>
+                                <input class="form-control" type="url" name="website_social_links[instagram]" placeholder="https://instagram.com/">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">LinkedIn (Optional)</label>
+                                <input class="form-control" type="url" name="website_social_links[linkedin]" placeholder="https://linkedin.com/in/">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">YouTube (Optional)</label>
+                                <input class="form-control" type="url" name="website_social_links[youtube]" placeholder="https://youtube.com/@">
+                            </div>
                         </div>
                     </div>
 
                     <h6 class="text-primary border-bottom pb-2 mt-4">Registration & Affiliation</h6>
                     <div class="col-md-4">
-                        <label class="form-label">Registration No / Membership ID</label>
-                        <input class="form-control" type="text" name="registration_number">
+                        <label class="form-label">Registration No <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="registration_number" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Affiliated Body</label>
-                        <input class="form-control" type="text" name="affiliated_body">
+                        <label class="form-label">Affiliated Body <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="affiliated_body" required>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Upload Registration Proof</label>
-                        <input class="form-control" type="file" name="registration_proof">
-                    </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Upload Proof <span class="text-danger">*</span></label>
+                            <input class="form-control" type="file" name="registration_proof" accept=".pdf,.jpg,.jpeg,.png">
+                            <div id="current-registration_proof" class="mt-1 d-none small"></div>
+                        </div>
                 </div>
             </div>
 
@@ -281,16 +371,17 @@
             <div class="step-content d-none" id="step-3">
                 <div class="row g-3">
                     <div class="col-md-12">
-                        <label class="form-label">Yoga Therapy Certification Details</label>
-                        <textarea class="form-control" name="certification_details" rows="3"></textarea>
+                        <label class="form-label">Yoga Therapy Certification Details <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="certification_details" rows="3" required placeholder="List key certifications"></textarea>
                     </div>
                     <div class="col-md-12">
-                        <label class="form-label">Upload Certificates (Multiple)</label>
-                        <input class="form-control" type="file" name="certificates[]" multiple>
+                        <label class="form-label">Upload Certificates (Multiple) <span class="text-danger">*</span></label>
+                        <input class="form-control" type="file" name="certificates[]" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        <div id="current-certificates" class="mt-1 d-none d-flex flex-wrap gap-2"></div>
                     </div>
                     <div class="col-md-12">
                         <label class="form-label">Additional Certifications (Optional)</label>
-                        <textarea class="form-control" name="additional_certifications" rows="2"></textarea>
+                        <textarea class="form-control" name="additional_certifications" rows="2" placeholder="Other relevant info"></textarea>
                     </div>
                 </div>
             </div>
@@ -299,12 +390,12 @@
             <div class="step-content d-none" id="step-4">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label fw-bold">Areas of Expertise</label>
+                        <label class="form-label fw-bold">Areas of Expertise <span class="text-danger">*</span></label>
                         <div class="row" style="max-height: 300px; overflow-y:auto;">
                             @foreach($areasOfExpertise as $area)
                             <div class="col-12">
                                 <div class="form-check checkbox-primary d-flex align-items-center">
-                                    <input class="form-check-input" type="checkbox" name="areas_of_expertise[]" value="{{ $area->name }}" id="area_{{ $area->id }}">
+                                    <input class="form-check-input group-required" type="checkbox" name="areas_of_expertise[]" value="{{ $area->name }}" id="area_{{ $area->id }}" data-group="expertise">
                                     <label class="form-check-label flex-grow-1 mb-0" for="area_{{ $area->id }}">{{ $area->name }}</label>
                                     <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $area->id }}" data-type="yoga_expertises"><i class="fa fa-trash"></i></a>
                                 </div>
@@ -321,18 +412,18 @@
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Session Setup</label>
                         <div class="mb-3">
-                            <label class="form-label">Consultation Modes</label>
+                            <label class="form-label">Consultation Modes <span class="text-danger">*</span></label>
                             <div class="d-flex gap-2 flex-wrap">
                                 @foreach($consultationModes as $mode)
                                 <div class="form-check checkbox-info">
-                                    <input class="form-check-input" type="checkbox" name="consultation_modes[]" value="{{ $mode }}" id="mode_{{ $loop->index }}">
+                                    <input class="form-check-input group-required" type="checkbox" name="consultation_modes[]" value="{{ $mode }}" id="mode_{{ $loop->index }}" data-group="modes">
                                     <label class="form-check-label" for="mode_{{ $loop->index }}">{{ $mode }}</label>
                                 </div>
                                 @endforeach
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Languages Spoken</label>
+                            <label class="form-label fw-bold" required>Languages Spoken</label>
                             <select class="form-select" id="languages_select" multiple>
                                 @foreach($languages as $lang)
                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
@@ -348,12 +439,12 @@
             <div class="step-content d-none" id="step-5">
                 <div class="row g-3">
                     <div class="col-md-12">
-                        <label class="form-label">Short Bio</label>
-                        <textarea class="form-control" name="short_bio" rows="4"></textarea>
+                        <label class="form-label">Short Bio <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="short_bio" rows="4" required placeholder="Brief introduction"></textarea>
                     </div>
                     <div class="col-md-12">
-                        <label class="form-label">Therapy Approach / Style</label>
-                        <textarea class="form-control" name="therapy_approach" rows="3"></textarea>
+                        <label class="form-label">Therapy Approach / Style <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="therapy_approach" rows="3" required placeholder="Describe your style"></textarea>
                     </div>
                 </div>
             </div>
@@ -363,42 +454,57 @@
                 <div class="row g-3">
                     <h6 class="text-primary">Identity Proof</h6>
                     <div class="col-md-6">
-                        <label class="form-label">Government ID Type</label>
-                        <input class="form-control" type="text" name="gov_id_type">
+                        <label class="form-label">Government ID Type <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="gov_id_type" required placeholder="Aadhar, Passport, etc.">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Upload ID Proof</label>
-                        <input class="form-control" type="file" name="gov_id_upload">
+                        <label class="form-label">Upload ID Proof <span class="text-danger">*</span></label>
+                        <input class="form-control" type="file" name="gov_id_upload" accept=".pdf,.jpg,.jpeg,.png">
+                        <div id="current-gov_id_upload" class="mt-1 d-none small"></div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label class="form-label">PAN Number</label>
-                        <input class="form-control" type="text" name="pan_number">
+                        <input class="form-control" type="text" name="pan_number" 
+                            pattern="^[A-Z]{5}[0-9]{4}[A-Z]{1}$" 
+                            title="Enter valid PAN (Example: ABCDE1234F)"
+                            oninput="this.value = this.value.toUpperCase()">
                     </div>
                     <hr>
                     <h6 class="text-primary">Banking Details</h6>
                     <div class="col-md-6">
-                        <label class="form-label">Bank Holder Name</label>
-                        <input class="form-control" type="text" name="bank_holder_name">
+                        <label class="form-label">Bank Holder Name <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="bank_holder_name" required pattern="^[A-Z\s]{2,100}$" title="First letter capital" oninput="this.value = this.value.toUpperCase()">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Bank Name</label>
-                        <input class="form-control" type="text" name="bank_name">
+                        <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="bank_name" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Account Number</label>
-                        <input class="form-control" type="text" name="account_number">
+                        <label class="form-label">Account Number <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="account_number" required 
+                            pattern="^[0-9]{9,18}$" title="Enter valid account number (9-18 digits)"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">IFSC Code</label>
-                        <input class="form-control" type="text" name="ifsc_code">
+                        <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="ifsc_code" required 
+                            pattern="^[A-Z]{4}0[A-Z0-9]{6}$" title="Enter valid IFSC (Example: SBIN0123456)"
+                            oninput="this.value = this.value.toUpperCase()">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">UPI ID</label>
-                        <input class="form-control" type="text" name="upi_id">
+                        <label class="form-label">SWIFT Code</label>
+                        <input class="form-control" type="text" name="swift_code" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">UPI ID (optional)</label>
+                        <input class="form-control" type="text" name="upi_id" 
+                            pattern="^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$" 
+                            title="Enter valid UPI ID (Example: user@upi)">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Upload Cancelled Cheque</label>
                         <input class="form-control" type="file" name="cancelled_cheque">
+                        <div id="current-cancelled_cheque" class="mt-1 d-none small"></div>
                     </div>
                 </div>
             </div>
@@ -445,10 +551,16 @@
             </div>
             <div class="modal-body text-center p-4">
                 <i class="iconly-Info-Square icli text-primary mb-3" style="font-size: 50px;"></i>
-                <h5>Update Status?</h5>
-                <p id="status-confirmation-text">Are you sure you want to change the status?</p>
+                <h5>Update Therapist Status</h5>
+                <p id="status-confirmation-text">Select the new status for this practitioner:</p>
+                <div class="mb-3 px-5">
+                    <select id="status-select-input" class="form-select">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
                 <input type="hidden" id="status-therapist-id">
-                <input type="hidden" id="status-new-value">
             </div>
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
@@ -504,6 +616,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
+        const storageBase = "{{ asset('storage') }}/";
         let table;
         let currentStep = 1;
         const totalSteps = 6;
@@ -557,17 +670,107 @@
 
         function validateStep(step) {
             let isValid = true;
-            let stepContent = $('#step-' + step);
-            stepContent.find('input[required], select[required], textarea[required]').each(function() {
-                if (!$(this).val()) {
-                    isValid = false;
-                    $(this).addClass('is-invalid');
+            let $step = $('#step-' + step);
+            
+            // Clear previous errors in this step
+            $step.find('.is-invalid').removeClass('is-invalid');
+            $step.find('.invalid-feedback').remove();
+
+            // Track which checkbox groups have been validated
+            let validatedGroups = [];
+
+            $step.find('input, select, textarea').each(function() {
+                const el = $(this);
+                
+                // Skip disabled
+                if (el.prop('disabled')) return;
+                
+                // Skip hidden UNLESS it's a select (might be hidden by Choices.js)
+                if (el.is(':hidden') && !el.is('select')) return;
+
+                let fieldValid = true;
+                let errorMessage = '';
+
+                // Group Checkbox Validation (Select at least one)
+                if (el.hasClass('group-required')) {
+                    const groupName = el.data('group');
+                    if (validatedGroups.indexOf(groupName) !== -1) return; // Already validated this group
+                    
+                    const checkboxes = $step.find(`.group-required[data-group="${groupName}"]`);
+                    if (checkboxes.filter(':checked').length === 0) {
+                        fieldValid = false;
+                        errorMessage = 'Please select at least one option';
+                        // Target the container to show error
+                        const container = el.closest('.row').length ? el.closest('.row') : el.closest('.d-flex');
+                        container.after(`<div class="invalid-feedback d-block mt-n2 mb-3">${errorMessage}</div>`);
+                        checkboxes.addClass('is-invalid');
+                    }
+                    validatedGroups.push(groupName);
                 } else {
-                    $(this).removeClass('is-invalid');
+                    // 1. Native HTML5 Validation
+                    if (!this.checkValidity()) {
+                        fieldValid = false;
+                        errorMessage = el.attr('title') || this.validationMessage || 'This field is required';
+                    }
+
+                    // 2. Custom Validations
+                    if (fieldValid) {
+                        // Password Confirmation Match
+                        if (el.attr('id') === 'password-confirm-input') {
+                            const password = $('#password-input').val();
+                            if (el.val() !== password) {
+                                fieldValid = false;
+                                errorMessage = 'Passwords do not match';
+                            }
+                        }
+                    }
+
+                    if (!fieldValid) {
+                        el.addClass('is-invalid');
+                        // Handle error message placement
+                        if (el.next('.invalid-feedback').length === 0) {
+                            if (el.parent().hasClass('input-group')) {
+                                el.parent().after(`<div class="invalid-feedback d-block">${errorMessage}</div>`);
+                            } else {
+                                el.after(`<div class="invalid-feedback">${errorMessage}</div>`);
+                            }
+                        }
+                    }
                 }
+
+                if (!fieldValid) isValid = false;
             });
+
+            if (!isValid) {
+                const firstError = $step.find('.is-invalid').first();
+                if (firstError.length) {
+                    firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+
             return isValid;
         }
+
+        // Real-time validation clearance
+        $(document).on('input change', '#therapist-form input, #therapist-form select, #therapist-form textarea', function() {
+            const el = $(this);
+            if (el.hasClass('is-invalid')) {
+                el.removeClass('is-invalid');
+                if (el.parent().hasClass('input-group')) {
+                    el.parent().next('.invalid-feedback').remove();
+                } else if (el.hasClass('group-required')) {
+                    const groupName = el.data('group');
+                    const $step = el.closest('.step-content');
+                    $step.find(`.group-required[data-group="${groupName}"]`).removeClass('is-invalid');
+                    // Find and remove the error message specifically for this group
+                    // It was placed after the closest .row or .d-flex
+                    const container = el.closest('.row').length ? el.closest('.row') : el.closest('.d-flex');
+                    container.next('.invalid-feedback').remove();
+                } else {
+                    el.next('.invalid-feedback').remove();
+                }
+            }
+        });
 
         $(document).ready(function() {
             // DataTable
@@ -712,6 +915,21 @@
                 let container = input.closest('.row');
 
                 if (!value) return;
+                
+                // Frontend duplicate check
+                let isDuplicate = false;
+                container.find('.form-check-label').each(function() {
+                    if ($(this).text().trim().toLowerCase() === value.toLowerCase()) {
+                        isDuplicate = true;
+                        return false;
+                    }
+                });
+
+                if (isDuplicate) {
+                    showToast('This item already exists.', 'error');
+                    input.focus();
+                    return;
+                }
 
                 btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
 
@@ -809,6 +1027,8 @@
             // Form Submit
             $('#therapist-form').on('submit', function(e) {
                 e.preventDefault();
+
+                if (!validateStep(currentStep)) return;
                 let id = $('#therapist_id').val();
                 let url = id ? "{{ url('admin/yoga-therapists') }}/" + id : "{{ route('admin.yoga-therapists.store') }}";
                 let formData = new FormData(this);
@@ -857,15 +1077,16 @@
                 $('.password-field').hide();
                 $('input[name="password"]').removeAttr('required');
                 $('input[name="password_confirmation"]').removeAttr('required');
+                $('[id^="current-"]').addClass('d-none').html(''); // Clear all current file previews
 
                 $.get("{{ url('admin/yoga-therapists') }}/" + id + "/edit", function(response) {
                     let u = response.user;
                     let t = response.therapist;
 
-                    $('input[name="first_name"]').val(t.first_name);
-                    $('input[name="last_name"]').val(t.last_name);
+                    $('input[name="first_name"]').val(t.first_name || u.first_name || '');
+                    $('input[name="last_name"]').val(t.last_name || u.last_name || '');
                     $('input[name="email"]').val(u.email);
-                    $('input[name="phone"]').val(t.phone);
+                    $('input[name="phone"]').val((t.phone || '').replace(/[^0-9]/g, ''));
                     $('select[name="gender"]').val(t.gender);
                     $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
                     $('input[name="address_line_1"]').val(t.address_line_1);
@@ -876,20 +1097,43 @@
                     $('select[name="country"]').val(t.country || 'India');
 
                     if (t.profile_photo_path) {
-                        $('#imagePreview').css('background-image', 'url(/storage/' + t.profile_photo_path + ')');
+                        $('#imagePreview').css('background-image', 'url(' + storageBase + t.profile_photo_path + ')');
+                        $('#current-profile_photo').removeClass('d-none').html(`<a href="${storageBase}${t.profile_photo_path}" target="_blank" class="text-primary">View Current Photo</a>`);
                     }
 
                     $('select[name="yoga_therapist_type"]').val(t.yoga_therapist_type);
                     $('input[name="years_of_experience"]').val(t.years_of_experience);
                     $('input[name="current_organization"]').val(t.current_organization);
                     $('input[name="workplace_address"]').val(t.workplace_address);
-                    // website links handling? Assuming simple input for now or JSON
+                    
+                    if (t.website_social_links) {
+                        $('input[name="website_social_links[website]"]').val(t.website_social_links.website || '');
+                        $('input[name="website_social_links[facebook]"]').val(t.website_social_links.facebook || '');
+                        $('input[name="website_social_links[instagram]"]').val(t.website_social_links.instagram || '');
+                        $('input[name="website_social_links[linkedin]"]').val(t.website_social_links.linkedin || '');
+                        $('input[name="website_social_links[youtube]"]').val(t.website_social_links.youtube || '');
+                    }
 
                     $('input[name="registration_number"]').val(t.registration_number);
                     $('input[name="affiliated_body"]').val(t.affiliated_body);
 
+                    if (t.registration_proof_path) {
+                        $('#current-registration_proof').removeClass('d-none').html(`<a href="${storageBase}${t.registration_proof_path}" target="_blank" class="text-primary">View Current Proof</a>`);
+                        $('input[name="registration_proof"]').prop('required', false);
+                    } else {
+                        $('input[name="registration_proof"]').prop('required', true);
+                    }
+
                     if (t.certification_details) $('textarea[name="certification_details"]').val(t.certification_details);
                     if (t.additional_certifications) $('textarea[name="additional_certifications"]').val(t.additional_certifications);
+
+                    if (t.certificates_path && t.certificates_path.length > 0) {
+                        let certsHtml = t.certificates_path.map((path, i) => `<a href="${storageBase}${path}" target="_blank" class="badge bg-primary text-white p-2">Cert ${i+1}</a>`).join('');
+                        $('#current-certificates').removeClass('d-none').html(certsHtml);
+                        $('input[name="certificates[]"]').prop('required', false);
+                    } else {
+                        $('input[name="certificates[]"]').prop('required', true);
+                    }
 
                     // Handle Languages Spoken (Choices.js)
                     $('#languages_capabilities_container').empty();
@@ -898,6 +1142,7 @@
 
                         if (langs.length > 0 && typeof langs[0] === 'string') {
                             window.languageChoices.setChoiceByValue(langs);
+                            langs.forEach(lang => addLanguageCapabilityRow(lang, lang));
                         } else {
                             const langValues = [];
                             $.each(t.languages_spoken, function(key, caps) {
@@ -921,28 +1166,32 @@
                             $(`input[name="consultation_modes[]"][value="${v}"]`).prop('checked', true);
                         });
                     }
-                    // Languages - ChoicesJS needs special handling usually, or just select valid options
-                    // If using simple select multiple:
-                    if (t.languages_spoken) {
-                        let choices = document.getElementById('languages_select').choices;
-                        // This might fail if choices instance not globally accessible or different way to set
-                        // For pure select multiple, val() works if choices not active, but with choices:
-                        // We need to setChoiceByValue
-                        // Check if Choices instance is available
-                        // It seems I didn't save the instance to a variable in this scope. 
-                        // I'll reload form essentially.
-                    }
 
                     $('textarea[name="short_bio"]').val(t.short_bio);
                     $('textarea[name="therapy_approach"]').val(t.therapy_approach);
 
                     $('input[name="gov_id_type"]').val(t.gov_id_type);
+                    if (t.gov_id_upload_path) {
+                        $('#current-gov_id_upload').removeClass('d-none').html(`<a href="${storageBase}${t.gov_id_upload_path}" target="_blank" class="text-primary">View Current ID</a>`);
+                        $('input[name="gov_id_upload"]').prop('required', false);
+                    } else {
+                        $('input[name="gov_id_upload"]').prop('required', true);
+                    }
+
                     $('input[name="pan_number"]').val(t.pan_number);
                     $('input[name="bank_holder_name"]').val(t.bank_holder_name);
                     $('input[name="bank_name"]').val(t.bank_name);
                     $('input[name="account_number"]').val(t.account_number);
                     $('input[name="ifsc_code"]').val(t.ifsc_code);
+                    $('input[name="swift_code"]').val(t.swift_code || '');
                     $('input[name="upi_id"]').val(t.upi_id);
+
+                    if (t.cancelled_cheque_path) {
+                        $('#current-cancelled_cheque').removeClass('d-none').html(`<a href="${storageBase}${t.cancelled_cheque_path}" target="_blank" class="text-primary">View Current Cheque</a>`);
+                        $('input[name="cancelled_cheque"]').prop('required', false);
+                    } else {
+                        $('input[name="cancelled_cheque"]').prop('required', true);
+                    }
                 });
             });
 
@@ -1040,10 +1289,11 @@
                                         <div class="col-12">
                                             <p class="text-muted small mb-1">Social / Website</p>
                                             <div class="d-flex flex-wrap gap-2 mt-1">
-                                                ${t.website_social_links && t.website_social_links.website ? `<a href="${t.website_social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs"><i class="fa-solid fa-globe"></i></a>` : ''}
-                                                ${t.website_social_links && t.website_social_links.instagram ? `<a href="${t.website_social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-instagram"></i></a>` : ''}
-                                                ${t.website_social_links && t.website_social_links.linkedin ? `<a href="${t.website_social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs"><i class="fa-brands fa-linkedin"></i></a>` : ''}
-                                                ${t.website_social_links && t.website_social_links.youtube ? `<a href="${t.website_social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-youtube"></i></a>` : ''}
+                                                ${t.website_social_links && t.website_social_links.website ? `<a href="${t.website_social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs" title="Website"><i class="fa-solid fa-globe"></i></a>` : ''}
+                                                ${t.website_social_links && t.website_social_links.facebook ? `<a href="${t.website_social_links.facebook}" target="_blank" class="btn btn-outline-primary btn-xs" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>` : ''}
+                                                ${t.website_social_links && t.website_social_links.instagram ? `<a href="${t.website_social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs" title="Instagram"><i class="fa-brands fa-instagram"></i></a>` : ''}
+                                                ${t.website_social_links && t.website_social_links.linkedin ? `<a href="${t.website_social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>` : ''}
+                                                ${t.website_social_links && t.website_social_links.youtube ? `<a href="${t.website_social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs" title="YouTube"><i class="fa-brands fa-youtube"></i></a>` : ''}
                                             </div>
                                         </div>
                                     </div>
@@ -1142,23 +1392,22 @@
                 });
             });
 
-            // Status Toggle Handler (Triggers Modal)
-            $('body').on('click', '.toggle-status', function() {
-                var id = $(this).data('id');
-                var currentStatus = $(this).data('status');
-                var newStatus = (currentStatus === 'active') ? 0 : 1;
-                var newStatusText = (currentStatus === 'active') ? 'Inactive' : 'Active';
+            // Status Toggle Handler - Robust Implementation
+            $(document).off('click', '.toggle-status').on('click', '.toggle-status', function(e) {
+                e.preventDefault();
+                var $this = $(this);
+                var id = $this.data('id');
+                var currentStatus = String($this.data('status')).toLowerCase();
 
                 $('#status-therapist-id').val(id);
-                $('#status-new-value').val(newStatus);
-                $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
+                $('#status-select-input').val(currentStatus); // Pre-select current status
                 $('#status-confirmation-modal').modal('show');
             });
 
             // Handle Confirm Status Change
             $('#confirm-status-btn').on('click', function() {
                 var id = $('#status-therapist-id').val();
-                var newStatus = $('#status-new-value').val();
+                var newStatus = $('#status-select-input').val();
                 var btn = $(this);
 
                 btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
