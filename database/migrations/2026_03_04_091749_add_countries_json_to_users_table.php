@@ -12,9 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Drop foreign key and its associated index
-            $table->dropForeign(['national_id']);
-            $table->dropIndex('users_national_id_foreign');
+            // Drop foreign key and its associated index safely
+            try {
+                $table->dropForeign(['national_id']);
+            } catch (\Exception $e) {
+                // Ignore if it doesn't exist
+            }
+
+            try {
+                $table->dropIndex('users_national_id_foreign');
+            } catch (\Exception $e) {
+                // Ignore if it doesn't exist
+            }
         });
 
         Schema::table('users', function (Blueprint $table) {
@@ -30,7 +39,15 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->unsignedBigInteger('national_id')->nullable()->change();
-            $table->foreign('national_id')->references('id')->on('countries')->onDelete('cascade');
+            
+            // Check if countries table exists before adding foreign key
+            if (Schema::hasTable('countries')) {
+                try {
+                    $table->foreign('national_id')->references('id')->on('countries')->onDelete('cascade');
+                } catch (\Exception $e) {
+                    // Ignore if it already exists or can't be added
+                }
+            }
         });
     }
 };
