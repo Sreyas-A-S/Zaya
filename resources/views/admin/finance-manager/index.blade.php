@@ -99,8 +99,6 @@
                             id="firstname"
                             value="{{ old('firstname') }}"
                             required
-                            pattern="^[A-Z][a-z]*$"
-                            title="First letter must be capital and only letters allowed"
                             placeholder="First Name"
                         >
                         @error('firstname')
@@ -160,8 +158,6 @@
                             id="phone"
                             value="{{ old('phone') }}"
                             required
-                            pattern="^\+\d{1,3}\s\d{10,15}$"
-                            title="Phone number must contain 10 to 15 digits"
                             placeholder="Phone Number"
                         >
                         @error('phone')
@@ -675,16 +671,37 @@ $(document).ready(function () {
             $('#email').val(user.email);
             $('#phone').val(user.phone);
             
-            // Set Select2 Multiple values
+            // Set Select2 Multiple values for Country
             if (user.national_id) {
-                let countries = Array.isArray(user.national_id) ? user.national_id : [user.national_id];
+                let countries = user.national_id;
+                if (typeof countries === 'string') {
+                    try { 
+                        if (countries.startsWith('[') || countries.startsWith('{')) {
+                            countries = JSON.parse(countries); 
+                        } else {
+                            countries = [countries];
+                        }
+                    } catch(e) { countries = [countries]; }
+                }
+                if (!Array.isArray(countries)) countries = [countries];
                 $('#country').val(countries).trigger('change');
             } else {
                 $('#country').val([]).trigger('change');
             }
 
+            // Set Select2 Multiple values for Language
             if (user.languages) {
-                let languages = Array.isArray(user.languages) ? user.languages : [user.languages];
+                let languages = user.languages;
+                if (typeof languages === 'string') {
+                    try { 
+                        if (languages.startsWith('[') || languages.startsWith('{')) {
+                            languages = JSON.parse(languages); 
+                        } else {
+                            languages = [languages];
+                        }
+                    } catch(e) { languages = [languages]; }
+                }
+                if (!Array.isArray(languages)) languages = [languages];
                 $('#language').val(languages).trigger('change');
             } else {
                 $('#language').val([]).trigger('change');
@@ -744,10 +761,14 @@ $(document).ready(function () {
                 }
             },
             error: function(xhr) {
-                let errors = xhr.responseJSON.errors;
-                if (errors) {
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    let errors = xhr.responseJSON.errors;
                     let firstError = Object.values(errors)[0][0];
                     window.showToast(firstError, 'error');
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    window.showToast(xhr.responseJSON.message, 'error');
+                } else {
+                    window.showToast('Something went wrong', 'error');
                 }
             }
         });
@@ -767,9 +788,19 @@ $(document).ready(function () {
             // Country and Language Lookups (Multiple)
             let countryNames = [];
             if (user.national_id) {
-                let cIds = Array.isArray(user.national_id) ? user.national_id : [user.national_id];
-                cIds.forEach(id => {
-                    let name = $('#country option[value="'+id+'"]').text();
+                let countries = user.national_id;
+                if (typeof countries === 'string') {
+                    try { 
+                        if (countries.startsWith('[') || countries.startsWith('{')) {
+                            countries = JSON.parse(countries); 
+                        } else {
+                            countries = [countries];
+                        }
+                    } catch(e) { countries = [countries]; }
+                }
+                let cIds = Array.isArray(countries) ? countries : [countries];
+                cIds.forEach(cid => {
+                    let name = $('#country option[value="'+cid+'"]').text();
                     if(name) countryNames.push(name);
                 });
             }
@@ -777,9 +808,19 @@ $(document).ready(function () {
 
             let languageNames = [];
             if (user.languages) {
-                let lIds = Array.isArray(user.languages) ? user.languages : [user.languages];
-                lIds.forEach(id => {
-                    let name = $('#language option[value="'+id+'"]').text();
+                let languages = user.languages;
+                if (typeof languages === 'string') {
+                    try { 
+                        if (languages.startsWith('[') || languages.startsWith('{')) {
+                            languages = JSON.parse(languages); 
+                        } else {
+                            languages = [languages];
+                        }
+                    } catch(e) { languages = [languages]; }
+                }
+                let lIds = Array.isArray(languages) ? languages : [languages];
+                lIds.forEach(lid => {
+                    let name = $('#language option[value="'+lid+'"]').text();
                     if(name) languageNames.push(name);
                 });
             }

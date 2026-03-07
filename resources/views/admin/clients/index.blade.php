@@ -423,6 +423,58 @@
     </div>
 </div>
 
+<!-- Master Data Delete Modal -->
+<div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                <h5>Are you sure?</h5>
+                <p class="text-muted">Do you want to delete this specific item? This action is permanent.</p>
+                <input type="hidden" id="delete-master-id">
+                <input type="hidden" id="delete-master-type">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Confirmation Modal -->
+<div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Status Change</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Info-Circle icli text-primary mb-3" style="font-size: 50px;"></i>
+                <h5 id="status-confirmation-text">Update Client Status</h5>
+                <p>Select the new status for this client:</p>
+                <div class="mb-3 px-5">
+                    <select id="status-select-input" class="form-select">
+                        <option value="pending">Pending</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <input type="hidden" id="status-client-id">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 
@@ -1102,7 +1154,7 @@
     });
 
     // Confirm Master Data Delete
-    $('#confirm-master-delete-btn').click(function() {
+    $(document).off('click', '#confirm-master-delete-btn').on('click', '#confirm-master-delete-btn', function() {
         let btn = $(this);
         let id = $('#delete-master-id').val();
         let type = $('#delete-master-type').val();
@@ -1141,20 +1193,17 @@
     $(document).on('click', '.toggle-status', function() {
         const $this = $(this);
         const id = $this.data('id');
-        const currentStatus = $this.data('status');
-        const newStatus = currentStatus === 'active' ? 0 : 1;
-        const newStatusText = currentStatus === 'active' ? 'Inactive' : 'Active';
+        const currentStatus = $this.data('status') || 'inactive';
 
         $('#status-client-id').val(id);
-        $('#status-new-value').val(newStatus);
-        $('#status-confirmation-text').text(`Are you sure you want to change the status to ${newStatusText}?`);
+        $('#status-select-input').val(currentStatus);
         $('#status-confirmation-modal').modal('show');
     });
 
     // Handle Confirm Status Change
-    $('#confirm-status-btn').on('click', function() {
+    $(document).off('click', '#confirm-status-btn').on('click', '#confirm-status-btn', function() {
         const id = $('#status-client-id').val();
-        const newStatus = $('#status-new-value').val();
+        const newStatus = $('#status-select-input').val();
         const btn = $(this);
 
         btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
@@ -1180,72 +1229,5 @@
         });
     });
 </script>
-
-<!-- Call Confirmation Modal -->
-<div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Call</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-4">
-                <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
-                <h5>Make a Call?</h5>
-                <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
-                <h4 class="text-primary" id="call-number"></h4>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Master Data Delete Modal -->
-<div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Delete</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-4">
-                <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
-                <h5>Are you sure?</h5>
-                <p class="text-muted">Do you want to delete this specific item? This action is permanent.</p>
-                <input type="hidden" id="delete-master-id">
-                <input type="hidden" id="delete-master-type">
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-</div>
-<!-- Status Confirmation Modal -->
-<div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Status Change</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-4">
-                <i class="iconly-Info-Circle icli text-primary mb-3" style="font-size: 50px;"></i>
-                <h5 id="status-confirmation-text">Are you sure you want to change the status?</h5>
-                <input type="hidden" id="status-client-id">
-                <input type="hidden" id="status-new-value">
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 @endsection

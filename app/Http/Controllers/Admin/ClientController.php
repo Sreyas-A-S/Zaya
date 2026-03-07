@@ -95,7 +95,7 @@ class ClientController extends Controller
 
                     $statusText = ucfirst($row->status ?? 'inactive');
 
-                    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'admin') {
+                    if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
                         return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
                     }
 
@@ -283,9 +283,14 @@ class ClientController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        $status = $request->status;
+        // If numeric 0/1 is sent from old toggle logic, convert it
+        if ($status === '1') $status = 'active';
+        if ($status === '0') $status = 'inactive';
+
         $patient = \App\Models\Patient::where('user_id', $id)->firstOrFail();
         $patient->update([
-            'status' => $request->status ? 'active' : 'inactive'
+            'status' => $status
         ]);
 
         return response()->json(['success' => 'Status updated successfully!']);

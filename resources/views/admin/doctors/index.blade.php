@@ -1262,7 +1262,10 @@
                 languageChoices.removeActiveItems();
             }
 
-            const social = profile.social_links || {};
+            let social = profile.social_links || {};
+            if (typeof social === 'string') {
+                try { social = JSON.parse(social); } catch (e) { social = {}; }
+            }
             $('[name="website"]').val(social.website || '');
             $('[name="facebook"]').val(social.facebook || '');
             $('[name="instagram"]').val(social.instagram || '');
@@ -1371,7 +1374,15 @@
                 } catch (e) { return dateStr; }
             };
 
-            const social = p.social_links || {};
+            let social = p.social_links || {};
+            if (typeof social === 'string') {
+                try { 
+                    social = JSON.parse(social); 
+                } catch (e) { 
+                    console.error("Error parsing social_links:", e);
+                    social = {}; 
+                }
+            }
             const fullName = (p.first_name && p.last_name) ? `${p.first_name} ${p.last_name}` : (d.name || 'N/A');
 
             let html = `
@@ -1393,11 +1404,11 @@
                             <p class="text-muted"><i class="fa-solid fa-phone me-1"></i> ${p.phone || 'N/A'}</p>
                             
                             <div class="d-flex justify-content-center gap-2 mt-2">
-                                ${social.website ? `<a href="${social.website}" target="_blank" class="btn btn-outline-primary btn-xs"><i class="fa-solid fa-globe"></i></a>` : ''}
-                                ${social.facebook ? `<a href="${social.facebook}" target="_blank" class="btn btn-outline-primary btn-xs"><i class="fa-brands fa-facebook"></i></a>` : ''}
-                                ${social.instagram ? `<a href="${social.instagram}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-instagram"></i></a>` : ''}
-                                ${social.linkedin ? `<a href="${social.linkedin}" target="_blank" class="btn btn-outline-info btn-xs"><i class="fa-brands fa-linkedin"></i></a>` : ''}
-                                ${social.youtube ? `<a href="${social.youtube}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-youtube"></i></a>` : ''}
+                                ${social.website ? `<a href="${social.website.startsWith('http') ? social.website : 'https://' + social.website}" target="_blank" class="btn btn-outline-primary btn-xs" title="Website"><i class="fa fa-globe"></i></a>` : ''}
+                                ${social.facebook ? `<a href="${social.facebook.startsWith('http') ? social.facebook : 'https://' + social.facebook}" target="_blank" class="btn btn-outline-primary btn-xs" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>` : ''}
+                                ${social.instagram ? `<a href="${social.instagram.startsWith('http') ? social.instagram : 'https://' + social.instagram}" target="_blank" class="btn btn-outline-danger btn-xs" title="Instagram"><i class="fa-brands fa-instagram"></i></a>` : ''}
+                                ${social.linkedin ? `<a href="${social.linkedin.startsWith('http') ? social.linkedin : 'https://' + social.linkedin}" target="_blank" class="btn btn-outline-info btn-xs" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>` : ''}
+                                ${social.youtube ? `<a href="${social.youtube.startsWith('http') ? social.youtube : 'https://' + social.youtube}" target="_blank" class="btn btn-outline-danger btn-xs" title="YouTube"><i class="fa-brands fa-youtube"></i></a>` : ''}
                             </div>
                         </div>
                         <hr>
@@ -1436,6 +1447,16 @@
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Current Workplace</label><p class="f-w-600">${p.current_workplace_clinic_name || 'N/A'}</p></div>
                                     <div class="col-12"><label class="small text-muted mb-0">Specializations</label><div>${renderBadges(p.specialization)}</div></div>
                                     <div class="col-12"><label class="small text-muted mb-0">Clinic Address</label><p class="f-w-600">${[p.address_line_1, p.address_line_2, p.city, p.state, p.zip_code, p.country].filter(Boolean).join(', ') || 'N/A'}</p></div>
+                                    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Social Profiles</h6>
+                                        <div class="d-flex flex-wrap gap-3 mt-1">
+                                            ${social.website ? `<span><i class="fa fa-globe text-primary me-1"></i> <a href="${social.website.startsWith('http') ? social.website : 'https://' + social.website}" target="_blank" class="text-decoration-none">Website</a></span>` : ''}
+                                            ${social.facebook ? `<span><i class="fa-brands fa-facebook-f text-primary me-1"></i> <a href="${social.facebook.startsWith('http') ? social.facebook : 'https://' + social.facebook}" target="_blank" class="text-decoration-none">Facebook</a></span>` : ''}
+                                            ${social.instagram ? `<span><i class="fa-brands fa-instagram text-danger me-1"></i> <a href="${social.instagram.startsWith('http') ? social.instagram : 'https://' + social.instagram}" target="_blank" class="text-decoration-none">Instagram</a></span>` : ''}
+                                            ${social.linkedin ? `<span><i class="fa-brands fa-linkedin text-info me-1"></i> <a href="${social.linkedin.startsWith('http') ? social.linkedin : 'https://' + social.linkedin}" target="_blank" class="text-decoration-none">LinkedIn</a></span>` : ''}
+                                            ${social.youtube ? `<span><i class="fa-brands fa-youtube text-danger me-1"></i> <a href="${social.youtube.startsWith('http') ? social.youtube : 'https://' + social.youtube}" target="_blank" class="text-decoration-none">YouTube</a></span>` : ''}
+                                            ${!social.website && !social.facebook && !social.instagram && !social.linkedin && !social.youtube ? '<span class="text-muted">No social links provided</span>' : ''}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

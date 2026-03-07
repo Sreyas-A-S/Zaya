@@ -332,6 +332,10 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 <input class="form-control" type="url" name="website_social_links[website]" placeholder="https://">
                             </div>
                             <div class="col-md-6">
+                                <label class="form-label">Facebook (Optional)</label>
+                                <input class="form-control" type="url" name="website_social_links[facebook]" placeholder="https://facebook.com/">
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label">Instagram (Optional)</label>
                                 <input class="form-control" type="url" name="website_social_links[instagram]" placeholder="https://instagram.com/">
                             </div>
@@ -1104,6 +1108,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     
                     if (t.website_social_links) {
                         $('input[name="website_social_links[website]"]').val(t.website_social_links.website || '');
+                        $('input[name="website_social_links[facebook]"]').val(t.website_social_links.facebook || '');
                         $('input[name="website_social_links[instagram]"]').val(t.website_social_links.instagram || '');
                         $('input[name="website_social_links[linkedin]"]').val(t.website_social_links.linkedin || '');
                         $('input[name="website_social_links[youtube]"]').val(t.website_social_links.youtube || '');
@@ -1284,10 +1289,11 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                         <div class="col-12">
                                             <p class="text-muted small mb-1">Social / Website</p>
                                             <div class="d-flex flex-wrap gap-2 mt-1">
-                                                ${t.website_social_links && t.website_social_links.website ? `<a href="${t.website_social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs"><i class="fa-solid fa-globe"></i></a>` : ''}
-                                                ${t.website_social_links && t.website_social_links.instagram ? `<a href="${t.website_social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-instagram"></i></a>` : ''}
-                                                ${t.website_social_links && t.website_social_links.linkedin ? `<a href="${t.website_social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs"><i class="fa-brands fa-linkedin"></i></a>` : ''}
-                                                ${t.website_social_links && t.website_social_links.youtube ? `<a href="${t.website_social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-youtube"></i></a>` : ''}
+                                                ${t.website_social_links && t.website_social_links.website ? `<a href="${t.website_social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs" title="Website"><i class="fa-solid fa-globe"></i></a>` : ''}
+                                                ${t.website_social_links && t.website_social_links.facebook ? `<a href="${t.website_social_links.facebook}" target="_blank" class="btn btn-outline-primary btn-xs" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>` : ''}
+                                                ${t.website_social_links && t.website_social_links.instagram ? `<a href="${t.website_social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs" title="Instagram"><i class="fa-brands fa-instagram"></i></a>` : ''}
+                                                ${t.website_social_links && t.website_social_links.linkedin ? `<a href="${t.website_social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>` : ''}
+                                                ${t.website_social_links && t.website_social_links.youtube ? `<a href="${t.website_social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs" title="YouTube"><i class="fa-brands fa-youtube"></i></a>` : ''}
                                             </div>
                                         </div>
                                     </div>

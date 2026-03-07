@@ -323,6 +323,10 @@
                                             <input type="url" class="form-control" name="social_links[website]" placeholder="https://">
                                         </div>
                                         <div class="col-md-3">
+                                            <label class="form-label">Facebook</label>
+                                            <input type="url" class="form-control" name="social_links[facebook]" placeholder="https://">
+                                        </div>
+                                        <div class="col-md-3">
                                             <label class="form-label">Instagram</label>
                                             <input type="url" class="form-control" name="social_links[instagram]" placeholder="https://">
                                         </div>
@@ -1161,6 +1165,7 @@
             $('[name="zip_code"]').val(p.zip_code || '');
             $('[name="country"]').val(p.country || 'India');
             $('[name="social_links[website]"]').val(p.social_links?.website || '');
+            $('[name="social_links[facebook]"]').val(p.social_links?.facebook || '');
             $('[name="social_links[instagram]"]').val(p.social_links?.instagram || '');
             $('[name="social_links[linkedin]"]').val(p.social_links?.linkedin || '');
             $('[name="social_links[youtube]"]').val(p.social_links?.youtube || '');
@@ -1374,10 +1379,11 @@
                             <p class="mb-1"><strong>Gender:</strong> ${p.gender || 'N/A'}</p>
                             <p class="mb-1"><strong>DOB:</strong> ${p.dob ? new Date(p.dob).toLocaleDateString() : 'N/A'}</p>
                             <div class="d-flex justify-content-center gap-2 mt-3">
-                                ${p.social_links && p.social_links.website ? `<a href="${p.social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs"><i class="fa-solid fa-globe"></i></a>` : ''}
-                                ${p.social_links && p.social_links.instagram ? `<a href="${p.social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-instagram"></i></a>` : ''}
-                                ${p.social_links && p.social_links.linkedin ? `<a href="${p.social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs"><i class="fa-brands fa-linkedin"></i></a>` : ''}
-                                ${p.social_links && p.social_links.youtube ? `<a href="${p.social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs"><i class="fa-brands fa-youtube"></i></a>` : ''}
+                                ${p.social_links && p.social_links.website ? `<a href="${p.social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs" title="Website"><i class="fa-solid fa-globe"></i></a>` : ''}
+                                ${p.social_links && p.social_links.facebook ? `<a href="${p.social_links.facebook}" target="_blank" class="btn btn-outline-primary btn-xs" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>` : ''}
+                                ${p.social_links && p.social_links.instagram ? `<a href="${p.social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs" title="Instagram"><i class="fa-brands fa-instagram"></i></a>` : ''}
+                                ${p.social_links && p.social_links.linkedin ? `<a href="${p.social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>` : ''}
+                                ${p.social_links && p.social_links.youtube ? `<a href="${p.social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs" title="YouTube"><i class="fa-brands fa-youtube"></i></a>` : ''}
                             </div>
                         </div>
                         <hr>

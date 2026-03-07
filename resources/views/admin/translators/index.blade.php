@@ -548,7 +548,7 @@
                     }
                 },
                 columns: [{
-                        data: 'id',
+                        data: 'user_id',
                         name: 'users.id',
                         render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
@@ -1201,9 +1201,19 @@
             // View
             $('body').on('click', '.viewTranslator', function() {
                 let id = $(this).data('id');
+                let btn = $(this);
+                let originalHtml = btn.html();
+                btn.html('<i class="fa fa-spinner fa-spin"></i>');
+
                 $.get("{{ url('admin/translators') }}/" + id, function(response) {
+                    btn.html(originalHtml);
                     let u = response.user;
                     let t = response.translator;
+
+                    if (!t) {
+                        if (typeof showToast === 'function') showToast('Translator profile details not found.', 'error');
+                        return;
+                    }
 
                     const formatDate = (dateString) => {
                         if (!dateString) return 'N/A';
@@ -1225,12 +1235,12 @@
                                 <img src="${t.profile_photo_path ? '/storage/' + t.profile_photo_path : defaultProfile}" 
                                      class="rounded-circle shadow-sm img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
                                 <div class="mt-2">
-                                     <span class="badge rounded-pill ${t.status === 'active' ? 'bg-success' : 'bg-warning'} border border-white">
+                                     <span class="badge rounded-pill ${t.status === 'active' || t.status === 'approved' ? 'bg-success' : (t.status === 'pending' ? 'bg-warning' : 'bg-danger')} border border-white">
                                         ${(t.status || 'N/A').toUpperCase()}
                                     </span>
                                 </div>
                             </div>
-                            <h5 class="fw-bold text-dark mb-1 text-break">${t.first_name} ${t.last_name}</h5>
+                            <h5 class="fw-bold text-dark mb-1 text-break">${t.first_name || ''} ${t.last_name || ''}</h5>
                             <p class="text-muted small mb-2 text-break">${u.email}</p>
                             <p class="text-muted small mb-3"><i class="fa fa-phone me-1"></i> ${t.phone || 'N/A'}</p>
                             
@@ -1274,11 +1284,11 @@
                                         <div class="col-md-12">
                                             <p class="text-muted small mb-2">Attached Documents</p>
                                             <div class="d-flex flex-wrap gap-2">
-                                                ${t.certificates_path ? t.certificates_path.map((path, index) => 
+                                                ${t.certificates_path ? (Array.isArray(t.certificates_path) ? t.certificates_path : JSON.parse(t.certificates_path || '[]')).map((path, index) => 
                                                     `<a href="/storage/${path}" target="_blank" class="badge bg-light-primary text-primary border border-primary p-2 text-decoration-none">
                                                         <i class="fa fa-certificate me-1"></i> Certificate ${index+1}
                                                     </a>`).join('') : '<span class="text-muted small">None</span>'}
-                                                ${t.sample_work_path ? t.sample_work_path.map((path, index) => 
+                                                ${t.sample_work_path ? (Array.isArray(t.sample_work_path) ? t.sample_work_path : JSON.parse(t.sample_work_path || '[]')).map((path, index) => 
                                                     `<a href="/storage/${path}" target="_blank" class="badge bg-light-secondary text-secondary border border-secondary p-2 text-decoration-none">
                                                         <i class="fa fa-file-text me-1"></i> Sample ${index+1}
                                                     </a>`).join('') : ''}
@@ -1302,19 +1312,53 @@
                                         <div class="col-md-6">
                                             <p class="text-muted small mb-1">Source Languages</p>
                                             <div class="d-flex flex-wrap gap-1">
-                                                ${t.source_languages ? t.source_languages.map(l => `<span class="badge bg-secondary">${l}</span>`).join('') : 'None'}
+                                                ${(() => {
+                                                    let langs = t.source_languages;
+                                                    if (typeof langs === 'string') {
+                                                        try { langs = JSON.parse(langs); } catch(e) { return 'None'; }
+                                                    }
+                                                    if (!langs) return 'None';
+                                                    
+                                                    // Handle both array of strings and objects/indexed arrays
+                                                    return Object.values(langs).map(l => {
+                                                        const name = (typeof l === 'object' && l !== null) ? (l.language || JSON.stringify(l)) : l;
+                                                        return `<span class="badge bg-secondary">${name}</span>`;
+                                                    }).join('') || 'None';
+                                                })()}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <p class="text-muted small mb-1">Target Languages</p>
                                             <div class="d-flex flex-wrap gap-1">
-                                                ${t.target_languages ? t.target_languages.map(l => `<span class="badge bg-primary">${l}</span>`).join('') : 'None'}
+                                                ${(() => {
+                                                    let langs = t.target_languages;
+                                                    if (typeof langs === 'string') {
+                                                        try { langs = JSON.parse(langs); } catch(e) { return 'None'; }
+                                                    }
+                                                    if (!langs) return 'None';
+                                                    
+                                                    return Object.values(langs).map(l => {
+                                                        const name = (typeof l === 'object' && l !== null) ? (l.language || JSON.stringify(l)) : l;
+                                                        return `<span class="badge bg-primary">${name}</span>`;
+                                                    }).join('') || 'None';
+                                                })()}
                                             </div>
                                         </div>
                                         <div class="col-12">
                                             <p class="text-muted small mb-1">Additional Languages</p>
                                             <div class="d-flex flex-wrap gap-1">
-                                                ${t.additional_languages ? t.additional_languages.map(l => `<span class="badge bg-info text-dark">${l}</span>`).join('') : 'None'}
+                                                ${(() => {
+                                                    let langs = t.additional_languages;
+                                                    if (typeof langs === 'string') {
+                                                        try { langs = JSON.parse(langs); } catch(e) { return 'None'; }
+                                                    }
+                                                    if (!langs) return 'None';
+                                                    
+                                                    return Object.values(langs).map(l => {
+                                                        const name = (typeof l === 'object' && l !== null) ? (l.language || JSON.stringify(l)) : l;
+                                                        return `<span class="badge bg-info text-dark">${name}</span>`;
+                                                    }).join('') || 'None';
+                                                })()}
                                             </div>
                                         </div>
                                     </div>
@@ -1339,13 +1383,13 @@
                                         <div class="col-12 mt-4">
                                             <p class="text-muted small mb-2">Fields of Specialization</p>
                                             <div class="d-flex flex-wrap gap-2">
-                                                ${t.fields_of_specialization ? t.fields_of_specialization.map(s => `<span class="badge rounded-pill bg-light text-dark border">${s}</span>`).join('') : 'None'}
+                                                ${t.fields_of_specialization ? (Array.isArray(t.fields_of_specialization) ? t.fields_of_specialization : JSON.parse(t.fields_of_specialization || '[]')).map(s => `<span class="badge rounded-pill bg-light text-dark border">${s}</span>`).join('') : 'None'}
                                             </div>
                                         </div>
                                          <div class="col-12">
                                             <p class="text-muted small mb-2">Services Offered</p>
                                             <div class="d-flex flex-wrap gap-2">
-                                                ${t.services_offered ? t.services_offered.map(s => `<span class="badge rounded-pill bg-light text-dark border">${s}</span>`).join('') : 'None'}
+                                                ${t.services_offered ? (Array.isArray(t.services_offered) ? t.services_offered : JSON.parse(t.services_offered || '[]')).map(s => `<span class="badge rounded-pill bg-light text-dark border">${s}</span>`).join('') : 'None'}
                                             </div>
                                         </div>
                                         <div class="col-12 mt-3">
@@ -1425,11 +1469,16 @@
                 `;
                     $('#view-modal-content').html(html);
                     var modalEl = document.getElementById('translator-view-modal');
-                    var modal = bootstrap.Modal.getInstance(modalEl);
-                    if (!modal) {
-                        modal = new bootstrap.Modal(modalEl);
-                    }
+                    var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
                     modal.show();
+                }).fail(function(xhr) {
+                    btn.html(originalHtml);
+                    let errorMsg = 'Failed to fetch translator details.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    if (typeof showToast === 'function') showToast(errorMsg, 'error');
+                    else alert(errorMsg);
                 });
             });
 

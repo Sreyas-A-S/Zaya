@@ -55,362 +55,323 @@
         </div>
     </div>
 
-<div class="modal fade" id="editAdminModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Language</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal fade" id="editAdminModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="editAdminForm">
+                        @csrf
+                        <input type="hidden" id="edit_id">
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" id="edit_name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" id="edit_email" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text" id="edit_phone" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Country</label>
+                                <select id="edit_country" class="form-select" required>
+                                    <option value="" disabled>Select a Country</option>
+                                    @foreach ($countries as $country)
+                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Language</label>
+                                <select id="edit_language" class="form-select" required>
+                                    <option value="" disabled>Select a Language</option>
+                                    @foreach ($languages as $language)
+                                        <option value="{{ $language->id }}">{{ $language->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status</label>
+                                <select id="edit_status" class="form-select" required>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="text-end mt-3">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Update Admin</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        
-
-    <form action="{{ route('admin.admins.store') }}" method="POST" enctype="multipart/form-data">
-
-        @csrf
-
-        <table class="table table-bordered">
-
-            <tr>
-                <th width="200">Profile Picture</th>
-                <td>
-                    <input type="file" name="profile_picture" class="form-control">
-                </td>
-            </tr>
-
-            <tr>
-                <th>First Name</th>
-                <td>
-                    <input type="text" name="firstname" class="form-control" required>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Last Name</th>
-                <td>
-                    <input type="text" name="lastname" class="form-control" required>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Email</th>
-                <td>
-                    <input type="email" name="email" class="form-control" required>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Phone number</th>
-                <td>
-                    <input type="number" name="phone" class="form-control" required>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Country</th>
-                <td>
-                    <select name="country" class="form-control" required>
-                        <option selected disabled>Select a Country</option>
-                        @foreach ($countries as $country)
-                            <option value="{{ $country->id }}">{{ $country->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Language</th>
-                <td>
-                    <select name="language" class="form-control" required>
-                        <option selected disabled>Select a Language</option>
-                        @foreach ($languages as $language)
-                            <option value="{{ $language->id }}">{{ $language->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Password</th>
-                <td>
-                    <input type="password" name="password" class="form-control" required>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Confirm Password</th>
-                <td>
-                    <input type="password" name="password_confirmation" class="form-control" required>
-                </td>
-            </tr>
-
-            <tr>
-                <td colspan="2" class="text-center">
-                    <button type="submit" class="btn btn-primary">
-                        Create Admin
-                    </button>
-                </td>
-            </tr>
-
-        </table>
-
-    </form>
-       </div>
+        </div>
     </div>
-</div>
 
-<div class="modal fade" id="admin-form-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Language</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- Status Confirmation Modal -->
+    <div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Status Change</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="iconly-Info-Circle icli text-primary mb-3" style="font-size: 50px;"></i>
+                    <h5 id="status-confirmation-text">Update Admin Status</h5>
+                    <p>Select the new status for this administrator:</p>
+                    <div class="mb-3 px-5">
+                        <select id="status-select-input" class="form-select">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="status-admin-id">
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
+                </div>
             </div>
-        
-
-    <form action="{{ route('admin.admins.store') }}" method="POST" enctype="multipart/form-data">
-
-        @csrf
-
-        <table class="table table-bordered">
-
-            <tr>
-                <th width="200">Profile Picture</th>
-                <td>
-                    <input type="file" name="profile_picture" class="form-control">
-                </td>
-            </tr>
-
-            <tr>
-                <th>First Name</th>
-                <td>
-                    <input type="text" name="firstname" class="form-control" required>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Last Name</th>
-                <td>
-                    <input type="text" name="lastname" class="form-control" required>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Email</th>
-                <td>
-                    <input type="email" name="email" class="form-control" required>
-                </td>
-            </tr>
-
-             <tr>
-                <th>Phone number</th>
-                <td>
-                    <input type="number" name="phone" class="form-control" required>
-                </td>
-            </tr>
-
-
-            <tr>
-                <th>Country</th>
-                <td>
-                    <select name="country" class="form-control" required>
-                        <option selected disabled>Select a Country</option>
-                        @foreach ($countries as $country)
-                            <option value="{{ $country->id }}">{{ $country->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Language</th>
-                <td>
-                    <select name="language" class="form-control" required>
-                        <option selected disabled>Select a Language</option>
-                        @foreach ($languages as $language)
-                            <option value="{{ $language->id }}">{{ $language->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Password</th>
-                <td>
-                    <input type="password" name="password" class="form-control" required>
-                </td>
-            </tr>
-
-            <tr>
-                <th>Confirm Password</th>
-                <td>
-                    <input type="password" name="password_confirmation" class="form-control" required>
-                </td>
-            </tr>
-
-            <tr>
-                <td colspan="2" class="text-center">
-                    <button type="submit" class="btn btn-primary">
-                        Create Admin
-                    </button>
-                </td>
-            </tr>
-
-        </table>
-
-    </form>
-       </div>
+        </div>
     </div>
-</div>
+
+    <div class="modal fade" id="admin-form-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Register New Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form action="{{ route('admin.admins.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Profile Picture</label>
+                                <input type="file" name="profile_picture" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">First Name</label>
+                                <input type="text" name="firstname" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" name="lastname" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone number</label>
+                                <input type="text" name="phone" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Country</label>
+                                <select name="country" class="form-select" required>
+                                    <option selected disabled>Select a Country</option>
+                                    @foreach ($countries as $country)
+                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Language</label>
+                                <select name="language" class="form-select" required>
+                                    <option selected disabled>Select a Language</option>
+                                    @foreach ($languages as $language)
+                                        <option value="{{ $language->id }}">{{ $language->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Password</label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Confirm Password</label>
+                                <input type="password" name="password_confirmation" class="form-control" required>
+                            </div>
+                            <div class="col-12 text-end mt-4">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Create Admin</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
         <script>
-          $(document).ready(function () {
+            $(document).ready(function() {
 
-    $('#Admins-table').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{{ route('admin.admins.index') }}",
+                $('#Admins-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: "{{ route('admin.admins.index') }}",
 
-        columns: [
-            { 
-                data: 'DT_RowIndex', 
-                name: 'DT_RowIndex', 
-                orderable: false, 
-                searchable: false 
-            },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'name',
+                            name: 'users.name'
+                        },
+                        {
+                            data: 'email',
+                            name: 'users.email'
+                        },
+                        {
+                            data: 'phone',
+                            name: 'users.phone'
+                        },
+                        {
+                            data: 'nationality',
+                            name: 'countries.name'
+                        },
+                        {
+                            data: 'languages',
+                            name: 'users.languages',
+                            orderable: false
+                        },
+                        {
+                            data: 'status',
+                            name: 'users.status'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+                });
 
-            { 
-                data: 'name', 
-                name: 'users.name' 
-            },
+            });
 
-            { 
-                data: 'email', 
-                name: 'users.email' 
-            },
-
-
-             { 
-                data: 'phone', 
-                name: 'users.phone' 
-            },
-
-            { 
-                data: 'nationality', 
-                name: 'countries.name'   // ✅ important for join search/order
-            },
-
-            { 
-                data: 'languages', 
-                name: 'users.languages',  // JSON column
-                orderable: false          // better disable ordering
-            },
-
-            { 
-                data: 'status', 
-                name: 'users.status'      // ✅ correct column reference
-            },
-
-            { 
-                data: 'action', 
-                name: 'action',
-                orderable: false,
-                searchable: false
+            function openCreateModal() {
+                $('#admin-form-modal').modal('show');
             }
-        ]
-    });
 
-});
+            // Open Edit Modal
+            $(document).on('click', '.editUser', function() {
+                let id = $(this).data('id');
+                $.ajax({
+                    url: "{{ url('admin/admins') }}/" + id + "/edit",
+                    type: "GET",
+                    success: function(data) {
+                        $('#edit_id').val(data.id);
+                        $('#edit_name').val(data.name);
+                        $('#edit_email').val(data.email);
+                        $('#edit_phone').val(data.phone);
+                        $('#edit_country').val(data.national_id);
+                        $('#edit_language').val(data.languages);
+                        $('#edit_status').val(data.status);
+                        $('#editAdminModal').modal('show');
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
 
-  function openCreateModal() {
-        // $('#Admins-form')[0].reset();
-        // $('#doctor_id').val('');
-        // $('#form-method').val('POST');
-        // $('#form-modal-title').text('Register New Admin');
-        // $('#submit-btn').html('Complete Registration <i class="fa fa-check-circle ms-1"></i>');
-        // $('.file-keep-note').addClass('d-none');
-        // $('.is-invalid').removeClass('is-invalid');
-        // $('.invalid-feedback').remove();
-        // $('[id^="current-"]').addClass('d-none').html('');
+            // Update Admin
+            $('#editAdminForm').submit(function(e) {
+                e.preventDefault();
+                let id = $('#edit_id').val();
+                $.ajax({
+                    url: '/admin/admins/' + id,
+                    type: 'PUT',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        name: $('#edit_name').val(),
+                        email: $('#edit_email').val(),
+                        phone: $('#edit_phone').val(),
+                        country: $('#edit_country').val(),
+                        language: $('#edit_language').val(),
+                        status: $('#edit_status').val()
+                    },
+                    success: function(response) {
+                        $('#editAdminModal').modal('hide');
+                        $('#Admins-table').DataTable().ajax.reload(null, false);
+                    },
+                    error: function(xhr) {
+                        alert('Something went wrong');
+                    }
+                });
+            });
 
-        
+            // Handle Status Change Click
+            $(document).on('click', '.toggle-status', function() {
+                const $this = $(this);
+                const id = $this.data('id');
+                const currentStatus = $this.data('status') || 'inactive';
 
-        
+                $('#status-admin-id').val(id);
+                $('#status-select-input').val(currentStatus);
+                $('#status-confirmation-modal').modal('show');
+            });
 
-        // // Uncheck all checkboxes
-        // $('.spec-checkbox, .skill-checkbox, .cond-checkbox, .proc-checkbox, .ther-checkbox, .mode-checkbox').prop('checked', false);
-        // $('#panchakarma_consultation').prop('checked', false);
-        // $('#check_all_consent').prop('checked', false);
+            // Handle Confirm Status Change
+            $(document).off('click', '#confirm-status-btn').on('click', '#confirm-status-btn', function() {
+                const id = $('#status-admin-id').val();
+                const newStatus = $('#status-select-input').val();
+                const btn = $(this);
 
-        
-        // // Reset profile photo preview
-        // $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
-        // $('#imageUpload').val(''); // Clear file input
+                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
 
-        // updateStep(1);
-        $('#admin-form-modal').modal('show');
-    }
+                $.ajax({
+                    url: "{{ url('admin/admins') }}/" + id + "/status",
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        status: newStatus
+                    },
+                    success: function(response) {
+                        $('#status-confirmation-modal').modal('hide');
+                        $('#Admins-table').DataTable().ajax.reload(null, false);
+                    },
+                    error: function() {
+                        alert('Failed to update status.');
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).text('Confirm Change');
+                    }
+                });
+            });
 
-
-// Open Edit Modal
-$(document).on('click', '.editUser', function () {
-
-    let id = $(this).data('id');
-
-    $.ajax({
-        url: "{{ url('admin/admins') }}/" + id + "/edit",
-        type: "GET",
-        success: function (data) {
-
-            console.log("Response:", data);
-
-            $('#edit_id').val(data.id);
-            $('#edit_name').val(data.name);
-            $('#edit_email').val(data.email);
-            $('#edit_phone').val(data.phone);
-            $('#edit_status').val(data.status);
-
-            $('#editAdminModal').modal('show');
-        },
-        error: function (xhr) {
-            console.log(xhr.responseText);
-        }
-    });
-});
-
-
-// Update Admin
-$('#editAdminForm').submit(function (e) {
-
-    e.preventDefault();
-
-    let id = $('#edit_id').val();
-
-    $.ajax({
-        url: '/admin/admins/' + id,
-        type: 'PUT',
-        data: {
-            _token: "{{ csrf_token() }}",
-            name: $('#edit_name').val(),
-            email: $('#edit_email').val(),
-            phone: $('#edit_phone').val(),
-            status: $('#edit_status').val()
-        },
-        success: function (response) {
-
-            $('#editAdminModal').modal('hide');
-            $('#Admins-table').DataTable().ajax.reload(null, false);
-
-        },
-        error: function (xhr) {
-            alert('Something went wrong');
-        }
-    });
-
-});
-
-           
+            // Delete Admin
+            $(document).on('click', '.deleteUser', function() {
+                let id = $(this).data('id');
+                if (confirm('Are you sure?')) {
+                    $.ajax({
+                        url: "{{ url('admin/admins') }}/" + id,
+                        type: 'DELETE',
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            $('#Admins-table').DataTable().ajax.reload(null, false);
+                        },
+                        error: function(xhr) {
+                            alert('Error deleting admin');
+                        }
+                    });
+                }
+            });
         </script>
-        @endpush
-    @endsection
+    @endpush
+@endsection

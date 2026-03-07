@@ -110,7 +110,7 @@
             <!-- Practitioner Grid -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
                 @foreach($practitioners as $p)
-                    <a href="{{ route('practitioner-detail', $p->slug) }}" class="flex flex-col items-center text-center group cursor-pointer">
+                    <a href="{{ route('practitioner-detail', ['slug' => $p->slug]) }}" class="flex flex-col items-center text-center group cursor-pointer">
                         <!-- Avatar -->
                         <div class="w-32 h-32 md:w-[150px] md:h-[150px] mb-4 overflow-hidden rounded-full border border-gray-100">
                             <img src="{{ $p->profile_photo_path ? asset('storage/'.$p->profile_photo_path) : asset('frontend/assets/lilly-profile-pic.png') }}" alt="{{ $p->first_name }}"

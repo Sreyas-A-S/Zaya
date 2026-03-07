@@ -83,6 +83,7 @@ Route::get('/magic-login', [\App\Http\Controllers\Auth\MagicLoginController::cla
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource('/admins', AdminsController::class);
+    Route::post('/admins/{id}/status', [AdminsController::class, 'updateStatus'])->name('admins.status');
     Route::get('admin/admins/{id}/edit', [AdminController::class, 'edit']);
     Route::put('admin/admins/{id}', [AdminController::class, 'update']);
     Route::delete('/admin/admins/{id}', [AdminsController::class, 'destroy']);
