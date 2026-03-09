@@ -212,13 +212,13 @@
                                     </div>
 
                                     <!-- Clickable Overlay for Image -->
-                                    <a href="{{ route('practitioner-detail', ['slug' => $details->slug]) }}" class="absolute inset-0 z-0"></a>
+                                    <a href="{{ $details->slug ? route('practitioner-detail', ['slug' => $details->slug]) : '#' }}" class="absolute inset-0 z-0"></a>
                                 </div>
 
                                 <!-- Info Section -->
                                 <div class="text-center">
                                     <h3 class="text-2xl font-serif font-medium text-primary mb-3 leading-none">
-                                        <a href="{{ route('practitioner-detail', ['slug' => $details->slug]) }}" class="hover:text-secondary transition-colors">
+                                        <a href="{{ $details->slug ? route('practitioner-detail', ['slug' => $details->slug]) : '#' }}" class="hover:text-secondary transition-colors">
                                             {{ $name }}
                                         </a>
                                     </h3>

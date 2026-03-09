@@ -162,12 +162,9 @@
                                 <input class="form-control"
                                 type="text"
                                 name="phone"
+                                id="phone"
                                 required
-                                pattern="^[0-9]{10,15}$"
-                                maxlength="15"
-                                placeholder="Enter phone number"
-                                title="Enter 10 to 15 digits only"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                placeholder="Enter phone number">
                                 </div>
 
                                 <!-- Gender -->
@@ -387,7 +384,7 @@
                                             <textarea class="form-control" name="mindfulness_training_details" rows="3" required></textarea>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Upload Certificates <span class="small text-muted">(Format: PDF/JPG/PNG, Max 2MB each)</span></label>
+                                            <label class="form-label">Upload Certificates <small class="text-muted fs-9">Ctrl + click to select multiple</small><span class="small text-muted">(Format: PDF/JPG/PNG, Max 2MB each)</span></label>
                                             <input class="form-control" type="file" name="certificates[]" multiple accept=".pdf,.jpg,.jpeg,.png" required>                                        </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Additional Certifications (Optional)</label>
@@ -401,40 +398,92 @@
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold">Services Offered <span class="text-danger">*</span></label>
-                                            <div class="row">
+                                           <div class="row">
                                                 @foreach($servicesOffered as $service)
                                                 <div class="col-12">
                                                     <div class="form-check checkbox-primary d-flex align-items-center">
-                                                        <input class="form-check-input group-required" type="checkbox" name="services_offered[]" value="{{ $service->name }}" id="service_{{ $service->id }}" data-group="services">
-                                                        <label class="form-check-label flex-grow-1 mb-0" for="service_{{ $service->id }}">{{ $service->name }}</label>
-                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $service->id }}" data-type="mindfulness_services"><i class="fa fa-trash"></i></a>
+
+                                                        <input class="form-check-input group-required me-2"
+                                                            type="checkbox"
+                                                            name="services_offered[]"
+                                                            value="{{ $service->name }}"
+                                                            id="service_{{ $service->id }}"
+                                                            data-group="services">
+
+                                                        <label class="form-check-label flex-grow-1 mb-0"
+                                                            for="service_{{ $service->id }}">
+                                                            {{ $service->name }}
+                                                        </label>
+
+                                                        <a href="javascript:void(0)"
+                                                        class="text-danger ms-2 delete-master-data-btn"
+                                                        data-id="{{ $service->id }}"
+                                                        data-type="mindfulness_services">
+                                                        <i class="fa fa-trash"></i>
+                                                        </a>
+
                                                     </div>
                                                 </div>
                                                 @endforeach
+
                                                 <div class="col-12 mt-2">
                                                     <div class="input-group input-group-sm">
-                                                        <input type="text" class="form-control new-master-data-input" data-type="mindfulness_services" placeholder="Add New Service">
-                                                        <button class="btn btn-primary add-master-data-btn" type="button" title="Add New Item"><i class="iconly-Plus icli"></i></button>
+                                                        <input type="text"
+                                                            class="form-control new-master-data-input"
+                                                            data-type="mindfulness_services"
+                                                            placeholder="Add New Service">
+
+                                                        <button class="btn btn-primary add-master-data-btn"
+                                                                type="button"
+                                                                title="Add New Item">
+                                                                <i class="iconly-Plus icli"></i>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold">Client Concerns Supported <span class="text-danger">*</span></label>
-                                            <div class="row">
+                                           <div class="row">
                                                 @foreach($clientConcerns as $concern)
                                                 <div class="col-12">
                                                     <div class="form-check checkbox-secondary d-flex align-items-center">
-                                                        <input class="form-check-input group-required" type="checkbox" name="client_concerns[]" value="{{ $concern->name }}" id="concern_{{ $concern->id }}" data-group="concerns">
-                                                        <label class="form-check-label flex-grow-1 mb-0" for="concern_{{ $concern->id }}">{{ $concern->name }}</label>
-                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $concern->id }}" data-type="client_concerns"><i class="fa fa-trash"></i></a>
+
+                                                        <input class="form-check-input group-required me-2"
+                                                            type="checkbox"
+                                                            name="client_concerns[]"
+                                                            value="{{ $concern->name }}"
+                                                            id="concern_{{ $concern->id }}"
+                                                            data-group="concerns">
+
+                                                        <label class="form-check-label flex-grow-1 mb-0"
+                                                            for="concern_{{ $concern->id }}">
+                                                            {{ $concern->name }}
+                                                        </label>
+
+                                                        <a href="javascript:void(0)"
+                                                        class="text-danger ms-2 delete-master-data-btn"
+                                                        data-id="{{ $concern->id }}"
+                                                        data-type="client_concerns">
+                                                        <i class="fa fa-trash"></i>
+                                                        </a>
+
                                                     </div>
                                                 </div>
                                                 @endforeach
+
                                                 <div class="col-12 mt-2">
                                                     <div class="input-group input-group-sm">
-                                                        <input type="text" class="form-control new-master-data-input" data-type="client_concerns" placeholder="Add New Concern">
-                                                        <button class="btn btn-primary add-master-data-btn" type="button" title="Add New Item"><i class="iconly-Plus icli"></i></button>
+                                                        <input type="text"
+                                                            class="form-control new-master-data-input"
+                                                            data-type="client_concerns"
+                                                            placeholder="Add New Concern">
+
+                                                        <button class="btn btn-primary add-master-data-btn"
+                                                                type="button"
+                                                                title="Add New Item">
+                                                                <i class="iconly-Plus icli"></i>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -645,14 +694,27 @@
 @endsection
 
 @section('scripts')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script>
     let table;
     let currentStep = 1;
     const totalSteps = 6;
+    let iti;
 
     $(document).ready(function() {
+        const phoneInput = document.querySelector("#phone");
+        if (phoneInput) {
+            iti = window.intlTelInput(phoneInput, {
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                separateDialCode: true,
+                initialCountry: "in",
+                preferredCountries: ["in", "ae", "us", "gb"]
+            });
+        }
+    });
         // DataTable
         table = $('#practitioners-table').DataTable({
             processing: true,
@@ -850,7 +912,7 @@
                                 </div>
                             </div>
                         `;
-                        container.append(html);
+                        btn.closest('.col-12').before(html);
                         input.val('');
                         if (typeof showToast === 'function') {
                             showToast(response.success);
@@ -936,6 +998,10 @@
             let url = id ? "{{ url('admin/mindfulness-practitioners') }}/" + id : "{{ route('admin.mindfulness-practitioners.store') }}";
             let formData = new FormData(this);
 
+            if (iti) {
+                formData.set('phone', iti.getNumber());
+            }
+
             let btn = $('#submit-btn');
             btn.prop('disabled', true).html('Saving...');
 
@@ -1013,7 +1079,11 @@
                 $('input[name="first_name"]').val(p.first_name || u.first_name || '');
                 $('input[name="last_name"]').val(p.last_name || u.last_name || '');
                 $('input[name="email"]').val(u.email);
-                $('input[name="phone"]').val((p.phone || '').replace(/[^0-9]/g, ''));
+                if (iti) {
+                    iti.setNumber(p.phone || '');
+                } else {
+                    $('input[name="phone"]').val((p.phone || '').replace(/[^0-9]/g, ''));
+                }
                 $('select[name="gender"]').val(p.gender);
                 $('input[name="dob"]').val(p.dob ? p.dob.substring(0, 10) : '');
                 $('input[name="address_line_1"]').val(p.address_line_1);
@@ -1626,6 +1696,9 @@
     function openCreateModal() {
         // Reset form fields
         $('#practitioner-form')[0].reset();
+        if (iti) {
+            iti.setNumber('');
+        }
         $('#practitioner_id').val('');
         $('#form-method').val('POST');
         $('#form-modal-title').text('Register Mindfulness Practitioner');

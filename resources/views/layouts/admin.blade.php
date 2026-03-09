@@ -75,7 +75,7 @@
     }
 
     .main-sidebar {
-      height: calc(100vh - 100px) !important;
+      height: calc(100vh - 320px) !important;
       display: flex !important;
       flex-direction: column !important;
       position: relative !important;
@@ -83,22 +83,15 @@
     }
 
     .sidebar-menu {
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
       flex: 1 1 auto !important;
       display: block !important;
-      padding-bottom: 150px !important; /* Increased space for better scrolling */
-      scrollbar-width: thin;
-      scrollbar-color: rgba(151, 86, 61, 0.2) transparent;
+      padding-bottom: 30px !important;
     }
 
+    /* Hide the conflicting native global scrollbar */
     .sidebar-menu::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .sidebar-menu::-webkit-scrollbar-thumb {
-      background: rgba(151, 86, 61, 0.2);
-      border-radius: 10px;
+      width: 0 !important;
+      display: none !important;
     }
 
     .sidebar-footer-image {
@@ -107,8 +100,8 @@
       left: 0 !important;
       width: 100% !important;
       text-align: start !important;
-      pointer-events: none !important; 
-      z-index:-1 !important;
+      pointer-events: none !important;
+      z-index: -1 !important;
       line-height: 0 !important;
       padding: 0 !important;
       margin: 0 !important;
@@ -121,29 +114,30 @@
       margin: 0 !important;
     }
 
-    @media (max-width: 991.98px) { 
+    @media (max-width: 991.98px) {
       .sidebar-footer-image {
         bottom: 70px !important;
-      } 
+      }
     }
 
-    @media (max-width: 767.98px) { 
+    @media (max-width: 767.98px) {
       .sidebar-footer-image {
         bottom: 67px !important;
-      } 
+      }
     }
 
-    @media (max-width: 680px) { 
+    @media (max-width: 680px) {
       .sidebar-footer-image {
         bottom: 65px !important;
-      } 
+      }
     }
 
-    @media (max-width: 575.98px) { 
+    @media (max-width: 575.98px) {
       .sidebar-footer-image {
         bottom: 63px !important;
       }
-      .sidebar-footer-image img{
+
+      .sidebar-footer-image img {
         width: 220px !important;
       }
     }
@@ -156,7 +150,8 @@
 
     /* Simple & Modern Scrollbar for Sidebar */
     .simplebar-scrollbar:before {
-      background-color: rgba(151, 86, 61, 0.4) !important; /* Subtle version of brand color */
+      background-color: rgba(151, 86, 61, 0.4) !important;
+      /* Subtle version of brand color */
       width: 4px !important;
       border-radius: 10px !important;
       left: auto !important;

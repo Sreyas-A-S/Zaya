@@ -278,7 +278,11 @@
                         $('#edit_email').val(data.email);
                         $('#edit_phone').val(data.phone);
                         $('#edit_country').val(data.national_id);
-                        $('#edit_language').val(data.languages);
+                        if (Array.isArray(data.languages) && data.languages.length > 0) {
+                            $('#edit_language').val(data.languages[0]);
+                        } else {
+                            $('#edit_language').val(data.languages);
+                        }
                         $('#edit_status').val(data.status);
                         $('#editAdminModal').modal('show');
                     },

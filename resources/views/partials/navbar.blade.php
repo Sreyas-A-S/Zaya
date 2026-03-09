@@ -49,6 +49,12 @@
                         }
                     }
 
+                    // Filter unique base languages by Name (e.g., only one "English" even if regional variants exist)
+                    $languages = $languages->groupBy('name')->map(function($group) {
+                        // Prefer the shortest code (e.g., 'en' over 'en-GB')
+                        return $group->sortBy(fn($l) => strlen($l->code))->first();
+                    });
+
                     if (!function_exists('getCountryCode')) {
                         function getCountryCode($lang) {
                             if (!$lang) return 'us';
@@ -112,7 +118,7 @@
                     $currentLanguage = $allLanguages->where('code', $currentLocale)->first();
                     @endphp
 
-                    <a class="lang" href="javascript:void(0)" style="min-width: 80px; display: flex; align-items: center; text-decoration: none; padding: 10px 0;">
+                    <a class="lang lang-dropdown-trigger" href="javascript:void(0)" style="min-width: 80px; display: flex; align-items: center; text-decoration: none; padding: 10px 0;">
                         <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentLanguage ? getCountryCode($currentLanguage) : 'us') . '.svg') }}" style="width: 20px; height: 15px; margin-right: 8px; border: 1px solid #eee;" alt="flag">
                         <h6 class="lang-txt f-w-700 mb-0" style="color: #2b2b2b;">{{ $currentLanguage ? strtoupper($currentLanguage->code) : 'ENG' }}</h6>
                     </a>
@@ -124,6 +130,7 @@
                                 <a href="javascript:void(0)" 
                                    class="lang d-flex align-items-center w-100 {{ $currentLocale == $lang->code ? 'active text-primary' : '' }}" 
                                    data-value="{{ $lang->code }}"
+                                   data-flag="{{ asset('admiro/assets/fonts/flag-icon/' . getCountryCode($lang) . '.svg') }}"
                                    onclick="changeLanguage(this)"
                                    style="text-decoration: none; color: inherit;">
                                     <img src="{{ asset('admiro/assets/fonts/flag-icon/' . getCountryCode($lang) . '.svg') }}" style="width: 18px; height: 13px; margin-right: 10px; border: 1px solid #f0f0f0;" alt="flag">
@@ -229,9 +236,9 @@
 
     function changeLanguage(element) {
         let id = element.getAttribute("data-value");
+        let flagUrl = element.getAttribute("data-flag");
         if (!id) return;
 
-        const flagSrc = element.querySelector('img').src;
         const langName = id.toUpperCase();
 
         fetch(`{{ url('admin/change-language') }}/${id}`, {
@@ -244,17 +251,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status) {
-                    // Update Navbar UI
-                    const currentLangImg = document.querySelector('.current_lang img');
-                    const currentLangText = document.querySelector('.current_lang .lang-txt');
+                    // 1. Update Navbar UI Immediately
+                    const currentLangImg = document.querySelector('.lang-dropdown-trigger img');
+                    const currentLangText = document.querySelector('.lang-dropdown-trigger .lang-txt');
                     
-                    if (currentLangImg) currentLangImg.src = flagSrc;
+                    if (currentLangImg && flagUrl) currentLangImg.src = flagUrl;
                     if (currentLangText) currentLangText.textContent = langName;
 
-                    // Update localStorage
+                    // 2. Update localStorage
                     localStorage.setItem('selectedLanguage', id);
 
-                    // Update active state in dropdown
+                    // 3. Update active state in dropdown
                     document.querySelectorAll('.language-menu-list .lang').forEach(el => {
                         el.classList.remove('active', 'text-primary');
                         const checkIcon = el.querySelector('.fa-check');
@@ -264,18 +271,38 @@
                     element.classList.add('active', 'text-primary');
                     element.insertAdjacentHTML('beforeend', '<i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>');
 
-                    // Dynamically update fields on the page if they exist
-                    if (data.data) {
-                        Object.keys(data.data).forEach(function(key) {
-                            let el = document.getElementById(key);
-                            if (el) {
-                                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                                    el.value = data.data[key] ?? '';
-                                } else {
-                                    el.textContent = data.data[key] ?? '';
-                                }
+                    // 4. DYNAMIC FIELD UPDATES:
+                    // If we are on a settings page, clear all relevant inputs first
+                    // then populate with available data.
+                    const settingsForm = document.querySelector('form[id*="SettingsForm"]');
+                    if (settingsForm) {
+                        const inputs = settingsForm.querySelectorAll('input[type="text"], textarea');
+                        inputs.forEach(input => {
+                            // Clear existing values
+                            input.value = '';
+                            
+                            // If data exists for this key, fill it
+                            if (data.data && data.data[input.name] !== undefined) {
+                                input.value = data.data[input.name];
                             }
                         });
+
+                        // Special handling for images: hide previews or update them
+                        const imagePreviews = settingsForm.querySelectorAll('.img-thumbnail');
+                        imagePreviews.forEach(preview => {
+                            // Find corresponding data (this is trickier as image keys vary)
+                            // For now, let's keep images as they are or mark them as "Needs Update"
+                            // If data has the key, we could try to update SRC but usually images 
+                            // need proper path handling.
+                        });
+                        
+                        if (typeof showToast === 'function') {
+                            showToast(`Switched to ${langName} successfully.`);
+                        }
+                    } else {
+                        // If not on a settings page, a reload might still be needed 
+                        // to translate the whole UI (sidebar, etc.)
+                        location.reload();
                     }
                     
                     console.log("Language changed dynamically to:", id);

@@ -19,9 +19,29 @@ class ServicesSettingController extends Controller
     public function index()
     {
         $language = session('locale', 'en');
-        $settings = HomepageSetting::where('section', 'services_page')
+        
+        // Get all settings for current language
+        $currentSettings = HomepageSetting::where('section', 'services_page')
             ->where('language', $language)
+            ->get()
+            ->keyBy('key');
+
+        // Get all setting structure from English (default)
+        $defaultSettings = HomepageSetting::where('section', 'services_page')
+            ->where('language', 'en')
             ->get();
+
+        $settings = $defaultSettings->map(function($setting) use ($currentSettings, $language) {
+            if ($currentSettings->has($setting->key)) {
+                return $currentSettings->get($setting->key);
+            }
+            
+            $newSetting = $setting->replicate();
+            $newSetting->language = $language;
+            $newSetting->value = ($setting->type === 'image') ? $setting->value : ''; 
+            return $newSetting;
+        });
+
         return view('admin.services-settings.index', compact('settings'));
     }
 
@@ -75,13 +95,24 @@ class ServicesSettingController extends Controller
                     $setting->update(['value' => $value]);
                 }
             } else {
+                // If setting doesn't exist for this language, create it based on English structure
+                $originalSetting = HomepageSetting::where('key', $key)->where('language', 'en')->first();
+                if ($originalSetting) {
+                    // Handle image for new record
+                    $val = $value;
+                    if ($originalSetting->type === 'image' && $request->hasFile($key)) {
+                        $val = $request->file($key)->store("services/{$language}", 'public');
+                    }
 
-                HomepageSetting::create([
-                    'key' => $key,
-                    'value' => $value,
-                    'language' => $language,
-                    'type' => 'text'
-                ]);
+                    HomepageSetting::create([
+                        'key' => $key,
+                        'value' => $val ?? '',
+                        'language' => $language,
+                        'type' => $originalSetting->type,
+                        'section' => $originalSetting->section,
+                        'max_length' => $originalSetting->max_length,
+                    ]);
+                }
             }
         }
 
