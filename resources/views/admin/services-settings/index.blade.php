@@ -80,7 +80,7 @@
                                 <div class="tab-content" id="v-pills-tabContent">
                                     @php
                                     $statsSettings = $settings->filter(fn($s) => Str::contains($s->key, 'stat'));
-                                    $generalSettings = $settings->diff($statsSettings);
+                                    $generalSettings = $settings->filter(fn($s) => !Str::contains($s->key, 'stat'));
                                     @endphp
 
                                     <!-- General Tab -->

@@ -59,7 +59,8 @@
                     <li> <a href="{{ route('admin.practitioners.index') }}">Practitioners</a></li>
                     @endif
                     @if(auth()->user()->hasPermission('mindfulness-practitioners-view'))
-                    <li> <a href="{{ route('admin.mindfulness-practitioners.index') }}">Mindfulness Practitioners</a></li>
+                    <li> <a href="{{ route('admin.mindfulness-practitioners.index') }}">Mindfulness Practitioners</a>
+                    </li>
                     @endif
                     @if(auth()->user()->hasPermission('yoga-therapists-view'))
                     <li> <a href="{{ route('admin.yoga-therapists.index') }}">Yoga Therapists</a></li>
@@ -172,64 +173,83 @@
 
                     @if(auth()->user()->hasPermission('master-data-view'))
                     <li>
-                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
                             <span>Doctor Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
-                            <li><a href="{{ route('admin.master-data.index', 'specializations') }}">Specializations</a></li>
-                            <li><a href="{{ route('admin.master-data.index', 'expertises') }}">Ayurveda Expertises</a></li>
-                            <li><a href="{{ route('admin.master-data.index', 'conditions') }}">Health Conditions</a></li>
-                            <li><a href="{{ route('admin.master-data.index', 'therapies') }}">External Therapies</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'specializations') }}">Specializations</a>
+                            </li>
+                            <li><a href="{{ route('admin.master-data.index', 'expertises') }}">Ayurveda Expertises</a>
+                            </li>
+                            <li><a href="{{ route('admin.master-data.index', 'conditions') }}">Health Conditions</a>
+                            </li>
+                            <li><a href="{{ route('admin.master-data.index', 'therapies') }}">External Therapies</a>
+                            </li>
                         </ul>
                     </li>
 
                     <li>
-                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
                             <span>Practitioner Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
-                            <li><a href="{{ route('admin.master-data.index', 'wellness_consultations') }}">Wellness Consultations</a></li>
-                            <li><a href="{{ route('admin.master-data.index', 'body_therapies') }}">Massage & Body Therapies</a></li>
-                            <li><a href="{{ route('admin.master-data.index', 'practitioner_modalities') }}">Other Modalities</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'wellness_consultations') }}">Wellness
+                                    Consultations</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'body_therapies') }}">Massage & Body
+                                    Therapies</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'practitioner_modalities') }}">Other
+                                    Modalities</a></li>
                         </ul>
                     </li>
 
                     <li>
-                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
                             <span>Client Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
-                            <li><a href="{{ route('admin.master-data.index', 'client_consultation_preferences') }}">Consultation Preferences</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'client_consultation_preferences') }}">Consultation
+                                    Preferences</a></li>
                         </ul>
                     </li>
 
                     <li>
-                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
                             <span>Mindfulness Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
-                            <li><a href="{{ route('admin.master-data.index', 'mindfulness_services') }}">Services Offered</a></li>
-                            <li><a href="{{ route('admin.master-data.index', 'client_concerns') }}">Client Concerns</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'mindfulness_services') }}">Services
+                                    Offered</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'client_concerns') }}">Client Concerns</a>
+                            </li>
                         </ul>
                     </li>
 
                     <li>
-                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
                             <span>Translator Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
-                            <li><a href="{{ route('admin.master-data.index', 'translator_services') }}">Services Offered</a></li>
-                            <li><a href="{{ route('admin.master-data.index', 'translator_specializations') }}">Specializations</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'translator_services') }}">Services
+                                    Offered</a></li>
+                            <li><a
+                                    href="{{ route('admin.master-data.index', 'translator_specializations') }}">Specializations</a>
+                            </li>
                         </ul>
                     </li>
 
                     <li>
-                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)" style="letter-spacing: 0.5px;">
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
                             <span>Yoga Therapist Settings</span>
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
@@ -300,9 +320,9 @@
             </li>
             @endif
         </ul>
-        <div class="sidebar-footer-image">
-            <img src="{{ asset('assets/leaves/Leafy Minimalism Phone Wallpaper Background.jfif.png') }}" alt="leaves">
-        </div>
     </div>
     <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
+    <div class="sidebar-footer-image">
+        <img src="{{ asset('assets/leaves/admin-leaf-img.webp') }}" alt="leafs">
+    </div>
 </aside>

@@ -18,9 +18,29 @@ class AboutSettingController extends Controller
     public function index()
     {
         $language = session('locale', 'en');
-        $settings = HomepageSetting::where('section', 'about_page')
+        
+        // Get all settings for current language
+        $currentSettings = HomepageSetting::where('section', 'about_page')
             ->where('language', $language)
+            ->get()
+            ->keyBy('key');
+
+        // Get all setting structure from English (default)
+        $defaultSettings = HomepageSetting::where('section', 'about_page')
+            ->where('language', 'en')
             ->get();
+
+        $settings = $defaultSettings->map(function($setting) use ($currentSettings, $language) {
+            if ($currentSettings->has($setting->key)) {
+                return $currentSettings->get($setting->key);
+            }
+            
+            $newSetting = $setting->replicate();
+            $newSetting->language = $language;
+            $newSetting->value = ($setting->type === 'image') ? $setting->value : ''; 
+            return $newSetting;
+        });
+
         return view('admin.about-settings.index', compact('settings'));
     }
 
@@ -56,9 +76,15 @@ class AboutSettingController extends Controller
                 // If setting doesn't exist for this language, we might want to create it if it exists for 'en'
                 $originalSetting = HomepageSetting::where('key', $key)->where('language', 'en')->first();
                 if ($originalSetting) {
+                    $val = is_string($value) ? $value : $originalSetting->value;
+                    
+                    if ($originalSetting->type === 'image' && $request->hasFile($key)) {
+                        $val = $request->file($key)->store('about', 'public');
+                    }
+
                     HomepageSetting::create([
                         'key' => $key,
-                        'value' => is_string($value) ? $value : $originalSetting->value,
+                        'value' => $val,
                         'type' => $originalSetting->type,
                         'section' => $originalSetting->section,
                         'max_length' => $originalSetting->max_length,

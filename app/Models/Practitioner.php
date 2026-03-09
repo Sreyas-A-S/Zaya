@@ -9,6 +9,29 @@ class Practitioner extends Model
 {
     use HasFactory;
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (!$model->slug) {
+                $name = trim(($model->first_name ?? '') . ' ' . ($model->last_name ?? ''));
+                if (empty($name)) {
+                    $name = ($model->user ? $model->user->name : null) ?? 'practitioner-' . time();
+                }
+                $baseSlug = \Illuminate\Support\Str::slug($name);
+                if (empty($baseSlug)) {
+                    $baseSlug = 'practitioner-' . time();
+                }
+                $slug = $baseSlug;
+                $count = 1;
+                while (\App\Models\Practitioner::where('slug', $slug)->exists()) {
+                    $slug = $baseSlug . '-' . $count++;
+                }
+                $model->slug = $slug;
+            }
+        });
+    }
+
     protected $table = 'practitioners';
     protected $fillable = [
         'user_id',

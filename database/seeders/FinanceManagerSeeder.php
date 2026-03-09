@@ -31,7 +31,6 @@ class FinanceManagerSeeder extends Seeder
                 'national_id' => [rand(1,5)],
                 'languages' => [rand(1,3)],
                 'role' => 'finance_manager',
-                'status' => 'active',
                 'phone' => '1234567890'
             ]);
 

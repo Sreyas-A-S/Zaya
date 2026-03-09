@@ -29,7 +29,6 @@ class ContentManagerSeeder extends Seeder
                 'phone' => $faker->unique()->numerify('##########'),
                 'password' => Hash::make('password123'),
                 'role' => 'content_manager',
-                'status' => 'active',
             ]);
 
         }

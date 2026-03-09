@@ -17,10 +17,27 @@ class ContactusController extends Controller
         $language = $this->getCurrentLocale();
         $this->ensureContactDefaults();
 
-        // 1. Fetch all your keys starting with 'contact_'
-        $settings = HomepageSetting::where('key', 'like', 'contact_%')
+        // 1. Fetch all settings for current language
+        $currentSettings = HomepageSetting::where('key', 'like', 'contact_%')
             ->where('language', $language)
+            ->get()
+            ->keyBy('key');
+
+        // 2. Fetch all setting structure from English
+        $defaultSettings = HomepageSetting::where('key', 'like', 'contact_%')
+            ->where('language', 'en')
             ->get();
+
+        $settings = $defaultSettings->map(function($setting) use ($currentSettings, $language) {
+            if ($currentSettings->has($setting->key)) {
+                return $currentSettings->get($setting->key);
+            }
+            
+            $newSetting = $setting->replicate();
+            $newSetting->language = $language;
+            $newSetting->value = ($setting->type === 'image') ? $setting->value : ''; 
+            return $newSetting;
+        });
 
         $groupedSettings = [
             'hero_banner' => $settings->filter(fn($s) => Str::contains($s->key, 'banner')),
@@ -59,13 +76,24 @@ class ContactusController extends Controller
                     $setting->update(['value' => $value]);
                 }
             } else {
-                HomepageSetting::create([
-                    'key' => $key,
-                    'value' => is_string($value) ? $value : null,
-                    'language' => $language,
-                    'type' => 'text',
-                    'section' => 'contact',
-                ]);
+                // If setting doesn't exist for this language, we might want to create it if it exists for 'en'
+                $originalSetting = HomepageSetting::where('key', $key)->where('language', 'en')->first();
+                if ($originalSetting) {
+                    $val = is_string($value) ? $value : $originalSetting->value;
+                    
+                    if ($originalSetting->type === 'image' && $request->hasFile($key)) {
+                        $val = $request->file($key)->store('contact', 'public');
+                    }
+
+                    HomepageSetting::create([
+                        'key' => $key,
+                        'value' => $val,
+                        'language' => $language,
+                        'type' => $originalSetting->type,
+                        'section' => 'contact',
+                        'max_length' => $originalSetting->max_length,
+                    ]);
+                }
             }
         }
 

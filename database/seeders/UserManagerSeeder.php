@@ -27,7 +27,6 @@ class UserManagerSeeder extends Seeder
                 'phone' => $faker->unique()->numerify('##########'),
                 'password' => Hash::make('password123'),
                 'role' => 'user_manager',
-                'status' => 'active',
             ]);
         }
     }

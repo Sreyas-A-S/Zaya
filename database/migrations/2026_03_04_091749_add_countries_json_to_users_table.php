@@ -11,20 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            // Drop foreign key and its associated index safely
-            try {
-                $table->dropForeign(['national_id']);
-            } catch (\Exception $e) {
-                // Ignore if it doesn't exist
-            }
-
-            try {
-                $table->dropIndex('users_national_id_foreign');
-            } catch (\Exception $e) {
-                // Ignore if it doesn't exist
-            }
+        // Check for and drop foreign key safely
+        $foreignKeys = Schema::getForeignKeys('users');
+        $fkExists = collect($foreignKeys)->contains(function ($fk) {
+            return $fk['name'] === 'users_national_id_foreign';
         });
+
+        if ($fkExists) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropForeign(['national_id']);
+            });
+        }
+
+        // Check for and drop associated index safely
+        $indexes = Schema::getIndexes('users');
+        $idxExists = collect($indexes)->contains(function ($idx) {
+            return $idx['name'] === 'users_national_id_foreign';
+        });
+
+        if ($idxExists) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropIndex('users_national_id_foreign');
+            });
+        }
 
         Schema::table('users', function (Blueprint $table) {
             // Change column to JSON
