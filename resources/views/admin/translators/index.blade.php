@@ -308,23 +308,47 @@
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label fw-bold">Fields of Specialization <span class="text-danger">*</span></label>
-                                            <div class="row">
-                                                @foreach($specializations as $spec)
-                                                <div class="col-md-4">
-                                                    <div class="form-check checkbox-secondary d-flex align-items-center">
-                                                        <input class="form-check-input group-required" type="checkbox" name="fields_of_specialization[]" value="{{ $spec->name }}" id="spec_{{ $spec->id }}" data-group="specialization">
-                                                        <label class="form-check-label flex-grow-1 mb-0" for="spec_{{ $spec->id }}">{{ $spec->name }}</label>
-                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $spec->id }}" data-type="translator_specializations"><i class="fa fa-trash"></i></a>
-                                                    </div>
-                                                </div>
-                                                @endforeach
-                                                <div class="col-12 mt-2">
-                                                    <div class="input-group input-group-sm">
-                                                        <input type="text" class="form-control new-master-data-input" data-type="translator_specializations" placeholder="Add New Specialization">
-                                                        <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                           <div class="row">
+    @foreach($specializations as $spec)
+    <div class="col-md-4">
+        <div class="form-check checkbox-secondary d-flex align-items-center">
+
+            <input class="form-check-input group-required me-2"
+                   type="checkbox"
+                   name="fields_of_specialization[]"
+                   value="{{ $spec->name }}"
+                   id="spec_{{ $spec->id }}"
+                   data-group="specialization">
+
+            <label class="form-check-label flex-grow-1 mb-0"
+                   for="spec_{{ $spec->id }}">
+                   {{ $spec->name }}
+            </label>
+
+            <a href="javascript:void(0)"
+               class="text-danger ms-2 delete-master-data-btn"
+               data-id="{{ $spec->id }}"
+               data-type="translator_specializations">
+               <i class="fa fa-trash"></i>
+            </a>
+
+        </div>
+    </div>
+    @endforeach
+
+    <div class="col-12 mt-2">
+        <div class="input-group input-group-sm">
+            <input type="text"
+                   class="form-control new-master-data-input"
+                   data-type="translator_specializations"
+                   placeholder="Add New Specialization">
+
+            <button class="btn btn-primary add-master-data-btn" type="button">
+                <i class="iconly-Plus icli"></i>
+            </button>
+        </div>
+    </div>
+</div>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label" required>Previous Clients / Projects</label>
@@ -349,7 +373,7 @@
                                             <textarea class="form-control" name="certification_details" rows="2" placeholder="Relevant certifications" required></textarea>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Upload Certificates (Multiple)</label>
+                                            <label class="form-label">Upload Certificates (Multiple) <small class="text-muted fs-9">Ctrl + click to select multiple</small></label>
                                             <input class="form-control" type="file" name="certificates[]" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                                             <div id="current-certificates" class="mt-1 d-none d-flex flex-wrap gap-2"></div>
                                         </div>
@@ -369,12 +393,29 @@
                                             <div class="row">
                                                 @foreach($servicesOffered as $service)
                                                 <div class="col-md-6">
-                                                    <div class="form-check checkbox-primary d-flex align-items-center">
-                                                        <input class="form-check-input group-required" type="checkbox" name="services_offered[]" value="{{ $service->name }}" id="service_{{ $service->id }}" data-group="services">
-                                                        <label class="form-check-label flex-grow-1 mb-0" for="service_{{ $service->id }}">{{ $service->name }}</label>
-                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $service->id }}" data-type="translator_services"><i class="fa fa-trash"></i></a>
-                                                    </div>
-                                                </div>
+    <div class="form-check checkbox-primary d-flex align-items-center">
+
+        <input class="form-check-input group-required me-2"
+               type="checkbox"
+               name="services_offered[]"
+               value="{{ $service->name }}"
+               id="service_{{ $service->id }}"
+               data-group="services">
+
+        <label class="form-check-label flex-grow-1 mb-0"
+               for="service_{{ $service->id }}">
+               {{ $service->name }}
+        </label>
+
+        <a href="javascript:void(0)"
+           class="text-danger ms-2 delete-master-data-btn"
+           data-id="{{ $service->id }}"
+           data-type="translator_services">
+           <i class="fa fa-trash"></i>
+        </a>
+
+    </div>
+</div>
                                                 @endforeach
                                                 <div class="col-12 mt-2">
                                                     <div class="input-group input-group-sm">

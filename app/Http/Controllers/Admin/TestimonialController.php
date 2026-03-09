@@ -37,9 +37,9 @@ class TestimonialController extends Controller
                     return str_repeat('<i class="fa fa-star text-warning"></i>', $row->rating);
                 })
                 ->editColumn('status', function ($row) {
-                    $badgeClass = $row->status ? 'bg-success' : 'bg-danger';
-                    $statusText = $row->status ? 'Approved' : 'Disapproved';
-                    return '<span class="badge ' . $badgeClass . ' toggle-status" data-id="' . $row->id . '" data-status="' . ($row->status ? 'active' : 'inactive') . '" style="cursor: pointer;">' . $statusText . '</span>';
+                    $badgeClass = ($row->status === 'approved') ? 'bg-success' : 'bg-danger';
+                    $statusText = ($row->status === 'approved') ? 'Approved' : 'Pending';
+                    return '<span class="badge ' . $badgeClass . ' toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
                 })
                 ->addColumn('likes_replies', function ($row) {
                     return '<span class="badge bg-info"><i class="fa fa-thumbs-up"></i> ' . $row->likes_count . '</span> ' .
@@ -132,6 +132,7 @@ class TestimonialController extends Controller
             'reply' => $request->reply,
             'name' => $request->name ?? 'Admin',
             'role' => $request->role ?? 'Management',
+            'status' => 'approved',
         ]);
 
         return response()->json(['success' => 'Reply added successfully!']);
@@ -183,7 +184,7 @@ class TestimonialController extends Controller
         ]);
 
         $data = $request->except('image');
-        $data['status'] = true;
+        $data['status'] = 'approved';
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('testimonials', 'public');

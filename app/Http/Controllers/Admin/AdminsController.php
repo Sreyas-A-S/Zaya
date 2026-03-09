@@ -154,7 +154,7 @@ class AdminsController extends Controller
             'email'       => $request->email,
             'phone'       => $request->phone,
             'national_id' => $request->country,
-            'languages'   => $request->language, 
+            'languages'   => [$request->language], 
             'password'    => Hash::make($request->password),
             'role'        => 'admin',
             'status'      => 'active',
@@ -187,7 +187,7 @@ class AdminsController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'national_id' => $request->country,
-            'languages' => $request->language,
+            'languages' => [$request->language],
             'status' => $request->status,
         ]);
 

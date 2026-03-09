@@ -308,26 +308,50 @@
 
                     <h5 class="text-primary mb-3">Consultation Preferences</h5>
                     <div class="row g-3 mb-4">
-                        <div class="col-md-12">
-                            <label class="form-label">Preferred Speciality of Consultation</label>
-                            <div class="row">
-                                @foreach($consultationPreferences as $pref)
-                                <div class="col-md-6">
-                                    <div class="form-check checkbox-primary mb-2 d-flex align-items-center">
-                                        <input class="form-check-input pref-checkbox" type="checkbox" name="consultation_preferences[]" value="{{ $pref->name }}" id="pref_{{ $pref->id }}" >
-                                        <label class="form-check-label flex-grow-1 mb-0" for="pref_{{ $pref->id }}">{{ $pref->name }}</label>
-                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $pref->id }}" data-type="client_consultation_preferences"><i class="fa fa-trash"></i></a>
-                                    </div>
-                                </div>
-                                @endforeach
-                                <div class="col-12 mt-2">
-                                    <div class="input-group input-group-sm" style="max-width: 300px;">
-                                        <input type="text" class="form-control new-master-data-input" data-type="client_consultation_preferences" placeholder="Add New Preference" required>
-                                        <button class="btn btn-primary add-master-data-btn" type="button"><i class="iconly-Plus icli"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                       <div class="col-md-12">
+    <label class="form-label">Preferred Speciality of Consultation</label>
+    <div class="row">
+        @foreach($consultationPreferences as $pref)
+        <div class="col-md-6">
+            <div class="form-check checkbox-primary mb-2 d-flex align-items-center">
+
+                <input class="form-check-input pref-checkbox me-2"
+                       type="checkbox"
+                       name="consultation_preferences[]"
+                       value="{{ $pref->name }}"
+                       id="pref_{{ $pref->id }}">
+
+                <label class="form-check-label flex-grow-1 mb-0"
+                       for="pref_{{ $pref->id }}">
+                       {{ $pref->name }}
+                </label>
+
+                <a href="javascript:void(0)"
+                   class="text-danger ms-2 delete-master-data-btn"
+                   data-id="{{ $pref->id }}"
+                   data-type="client_consultation_preferences">
+                   <i class="fa fa-trash"></i>
+                </a>
+
+            </div>
+        </div>
+        @endforeach
+
+        <div class="col-12 mt-2">
+            <div class="input-group input-group-sm" style="max-width: 300px;">
+                <input type="text"
+                       class="form-control new-master-data-input"
+                       data-type="client_consultation_preferences"
+                       placeholder="Add New Preference"
+                       required>
+
+                <button class="btn btn-primary add-master-data-btn" type="button">
+                    <i class="iconly-Plus icli"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
                     </div>
 
                     <h5 class="text-primary mb-3">Languages & Referral</h5>

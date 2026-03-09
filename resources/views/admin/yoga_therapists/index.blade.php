@@ -399,7 +399,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         <textarea class="form-control" name="certification_details" rows="3" required placeholder="List key certifications"></textarea>
                     </div>
                     <div class="col-md-12">
-                        <label class="form-label">Upload Certificates (Multiple) <span class="text-danger">*</span></label>
+                        <label class="form-label">Upload Certificates (Multiple) <small class="text-muted fs-9">Ctrl + click to select multiple</small> <span class="text-danger">*</span></label>
                         <input class="form-control" type="file" name="certificates[]" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                         <div id="current-certificates" class="mt-1 d-none d-flex flex-wrap gap-2"></div>
                     </div>
