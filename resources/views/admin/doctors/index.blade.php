@@ -541,7 +541,7 @@
                                             <h5 class="f-w-600 mb-3">I. Platform Profile</h5>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Short Professional Bio (50-150 words)</label>
+                                            <label class="form-label">Short Professional Bio (50-1500 words)</label>
                                             <textarea class="form-control" name="short_bio" rows="3" required placeholder="Enter short bio..."></textarea>
                                         </div>
                                         <div class="col-md-12">
