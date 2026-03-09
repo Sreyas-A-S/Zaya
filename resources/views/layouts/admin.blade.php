@@ -103,12 +103,11 @@
 
     .sidebar-footer-image {
       position: absolute !important;
-      bottom: 0 !important;
+      bottom: 77px !important;
       left: 0 !important;
       width: 100% !important;
-      text-align: center !important;
-      pointer-events: none !important;
-      background: #fff !important;
+      text-align: start !important;
+      pointer-events: none !important; 
       z-index: 1000 !important;
       line-height: 0 !important;
       padding: 0 !important;
@@ -116,10 +115,34 @@
     }
 
     .sidebar-footer-image img {
-      width: 270px !important;
+      width: 260px !important;
       height: auto !important;
-      display: inline-block !important;
-      margin: 0 auto !important;
+      /* display: inline-block !important; */
+      margin: 0 !important;
+    }
+
+    @media (max-width: 575.98px) { 
+      .sidebar-footer-image {
+        bottom: 63px !important;
+        left: 0 !important;
+      }
+      .sidebar-footer-image img{
+        width: 220px !important;
+      }
+    }
+
+    @media (max-width: 767.98px) { 
+      .sidebar-footer-image {
+        bottom: 67px !important;
+        left: 0 !important;
+      } 
+    }
+
+    @media (max-width: 991.98px) { 
+      .sidebar-footer-image {
+        bottom: 70px !important;
+        left: 0 !important;
+      } 
     }
 
     .simplebar-content {
