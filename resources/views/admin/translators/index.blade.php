@@ -188,9 +188,8 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="phone" required 
-                                                pattern="^[0-9]{10,15}$" title="Enter 10 to 15 digits only"
-                                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                            <input class="form-control phone-input" type="tel" name="phone" id="translator_phone" required 
+                                                title="Enter a valid phone number">
                                         </div>
                                         <div class="col-md-4 password-field">
                                             <label class="form-label">Password <span class="text-danger">*</span></label>
@@ -592,15 +591,28 @@
 
     @section('scripts')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <script>
         const storageBase = "{{ asset('storage') }}/";
         let table;
+        let translatorIti;
         let currentStep = 1;
         const totalSteps = 6;
         let sourceLangChoices, targetLangChoices, addLangChoices;
 
         $(document).ready(function() {
+            const translatorPhoneInput = document.querySelector('#translator_phone');
+            if (translatorPhoneInput) {
+                translatorIti = window.intlTelInput(translatorPhoneInput, {
+                    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                    separateDialCode: true,
+                    initialCountry: 'in',
+                    preferredCountries: ['in', 'ae', 'us', 'gb']
+                });
+            }
+
             // DataTable
             table = $('#translators-table').DataTable({
                 processing: true,
@@ -960,6 +972,9 @@
                     window.translatorChoices.target.removeActiveItems();
                     window.translatorChoices.additional.removeActiveItems();
                 }
+                if (translatorIti) {
+                    translatorIti.setNumber('');
+                }
                 $('#source_languages_capabilities_container, #target_languages_capabilities_container, #additional_languages_capabilities_container').empty();
 
                 currentStep = 1;
@@ -1085,6 +1100,9 @@
                 let id = $('#translator_id').val();
                 let url = id ? "{{ url('admin/translators') }}/" + id : "{{ route('admin.translators.store') }}";
                 let formData = new FormData(this);
+                if (translatorIti) {
+                    formData.set('phone', translatorIti.getNumber());
+                }
 
                 let btn = $('#submit-btn');
                 btn.prop('disabled', true).html('Saving...');
@@ -1131,7 +1149,11 @@
                     $('input[name="first_name"]').val(t.first_name || u.first_name || '');
                     $('input[name="last_name"]').val(t.last_name || u.last_name || '');
                     $('input[name="email"]').val(u.email);
-                    $('input[name="phone"]').val((t.phone || '').replace(/[^0-9]/g, ''));
+                    if (translatorIti) {
+                        translatorIti.setNumber(t.phone || '');
+                    } else {
+                        $('input[name="phone"]').val(t.phone || '');
+                    }
                     $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
                     $('input[name="address_line_1"]').val(t.address_line_1);
                     $('input[name="address_line_2"]').val(t.address_line_2);

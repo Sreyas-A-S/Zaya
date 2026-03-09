@@ -569,16 +569,16 @@
                                             <textarea class="form-control" name="short_bio" rows="3" required placeholder="Enter short bio..."></textarea>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Key Expertise</label>
-                                            <textarea class="form-control" name="key_expertise" rows="2" required placeholder="Enter key expertise..."></textarea>
+                                            <label class="form-label">Key Expertise (50-1500 characters)</label>
+                                            <textarea class="form-control profile-textarea" name="key_expertise" rows="5" minlength="50" maxlength="1500" required placeholder="Enter key expertise..."></textarea>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Services Offered</label>
-                                            <textarea class="form-control" name="services_offered" rows="2" required placeholder="Enter services offered..."></textarea>
+                                            <label class="form-label">Services Offered (50-1500 characters)</label>
+                                            <textarea class="form-control profile-textarea" name="services_offered" rows="5" minlength="50" maxlength="1500" required placeholder="Enter services offered..."></textarea>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Awards & Recognitions (Optional)</label>
-                                            <textarea class="form-control" name="awards_recognitions" rows="2" placeholder="Enter awards..."></textarea>
+                                            <label class="form-label">Awards & Recognitions (Optional, 50-1500 characters)</label>
+                                            <textarea class="form-control profile-textarea" name="awards_recognitions" rows="5" minlength="50" maxlength="1500" placeholder="Enter awards and recognitions..."></textarea>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Website (Optional)</label>
@@ -817,6 +817,11 @@
     #doctors-table td:last-child .d-flex {
         justify-content: center;
         flex-wrap: nowrap;
+    }
+
+    .profile-textarea {
+        min-height: 140px;
+        resize: vertical;
     }
 
     .dataTables_wrapper .dataTables_length,
