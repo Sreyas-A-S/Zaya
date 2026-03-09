@@ -1029,28 +1029,6 @@
         }
     });
 
-    //password
-    document.querySelectorAll(".toggle-password").forEach(function (element) {
-
-    element.addEventListener("click", function () {
-
-        let target = document.getElementById(this.dataset.target);
-        let icon = this.querySelector("i");
-
-        if (target.type === "password") {
-            target.type = "text";
-            icon.classList.remove("fa-eye");
-            icon.classList.add("fa-eye-slash");
-        } else {
-            target.type = "password";
-            icon.classList.remove("fa-eye-slash");
-            icon.classList.add("fa-eye");
-        }
-
-    });
-
-});
-
     function showToast(message, type = 'success') {
         const toastEl = document.getElementById('liveToast');
         const titleEl = document.getElementById('toast-title');
@@ -2275,7 +2253,7 @@
         }
     };
 
-    const passwordInput = document.getElementById('password-input');
+    const passwordInput = document.getElementById('password');
     if (passwordInput) {
         passwordInput.addEventListener('input', function () {
             this.value = this.value.replace(/\s/g, '');

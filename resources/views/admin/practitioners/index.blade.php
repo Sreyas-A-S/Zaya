@@ -135,13 +135,13 @@
         <input type="password"
                class="form-control"
                name="password"
-               id="password"
+               id="password-input"
                minlength="6"
                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
                title="Password must contain uppercase, lowercase, number and no spaces"
                required>
 
-        <span class="input-group-text toggle-password" data-target="password">
+        <span class="input-group-text toggle-password" data-target="password-input">
             <i class="fa fa-eye"></i>
         </span>
     </div>                                      </div>
@@ -150,14 +150,12 @@
 <div class="input-group">
         <input type="password"
                class="form-control"
-               name="password"
-               id="password"
+               name="password_confirmation"
+               id="password-confirm-input"
                minlength="6"
-               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
-               title="Password must contain uppercase, lowercase, number and no spaces"
                required>
 
-        <span class="input-group-text toggle-password" data-target="password">
+        <span class="input-group-text toggle-password" data-target="password-confirm-input">
             <i class="fa fa-eye"></i>
         </span>
     </div>                                            <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
@@ -939,6 +937,24 @@
         initFormNavigation();
 
         $('#password-input, #password-confirm-input').on('input', validatePasswordMatch);
+
+        $(document).on('click', '.toggle-password', function() {
+            const targetId = $(this).data('target');
+            const input = $('#' + targetId);
+            const icon = $(this).find('i');
+
+            if (!input.length) {
+                return;
+            }
+
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
 
         // Cropper initialization
         const image = document.getElementById('image-to-crop');
