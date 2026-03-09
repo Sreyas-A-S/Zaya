@@ -1482,7 +1482,7 @@
                 }
             });
         });
-    });
+    
 
     function updateStepper() {
         $('.step-content').addClass('d-none');

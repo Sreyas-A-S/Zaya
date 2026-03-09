@@ -5,6 +5,7 @@
 @section('content')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
 <style>
     /* Avatar Upload Styling */
     .avatar-upload {
@@ -229,15 +230,9 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="mobile_country_code" 
-                                    placeholder="+91" style="max-width: 80px;" required
-                                    pattern="^\+?[0-9]{1,4}$" title="Enter country code (Example: +91)">
-                                <input type="text" class="form-control" name="phone" 
-                                    placeholder="Enter mobile number" required
-                                    pattern="^[0-9]{10,15}$" title="Enter 10 to 15 digits only"
-                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                            </div>
+                            <input type="hidden" name="mobile_country_code">
+                            <input type="tel" class="form-control phone-input" name="phone" id="client_phone"
+                                placeholder="Enter mobile number" required title="Enter a valid phone number">
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
@@ -506,12 +501,14 @@
 @section('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 <script>
     let table;
     let toastInstance;
     let languageChoices;
     let cropper;
     let croppedFile = null;
+    let clientIti;
 
     const renderBadges = (arr) => {
         if (!arr || (Array.isArray(arr) && arr.length === 0)) return '<span class="text-muted">None</span>';
@@ -565,6 +562,16 @@
     }
 
     $(document).ready(function() {
+        const clientPhoneInput = document.querySelector('#client_phone');
+        if (clientPhoneInput) {
+            clientIti = window.intlTelInput(clientPhoneInput, {
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                separateDialCode: true,
+                initialCountry: 'in',
+                preferredCountries: ['in', 'ae', 'us', 'gb']
+            });
+        }
+
         table = $('#clients-table').DataTable({
             processing: true,
             serverSide: true,
@@ -661,6 +668,11 @@
             if (!validateForm()) return;
 
             let formData = new FormData(this);
+            if (clientIti) {
+                const countryData = clientIti.getSelectedCountryData();
+                formData.set('phone', clientIti.getNumber());
+                formData.set('mobile_country_code', countryData?.dialCode ? `+${countryData.dialCode}` : '');
+            }
             const btn = $('#submit-btn');
             btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i> Saving...');
 
@@ -730,7 +742,11 @@
                 $('#submit-btn').prop('disabled', false);
 
                 if (data.patient) {
-                    $('input[name="phone"]').val(data.patient.phone);
+                    if (clientIti) {
+                        clientIti.setNumber(data.patient.phone || '');
+                    } else {
+                        $('input[name="phone"]').val(data.patient.phone);
+                    }
                     $('input[name="mobile_country_code"]').val(data.patient.mobile_country_code);
                     $('input[name="address_line_1"]').val(data.patient.address_line_1);
                     $('input[name="address_line_2"]').val(data.patient.address_line_2);
@@ -928,6 +944,10 @@
         $('#password-confirm-input').attr('required', 'required');
         $('#password-confirm-input').removeClass('is-invalid');
         $('#submit-btn').prop('disabled', false);
+        if (clientIti) {
+            clientIti.setNumber('');
+        }
+        $('input[name="mobile_country_code"]').val('');
 
         // Reset Profile Photo
         $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
@@ -973,7 +993,11 @@
                 $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
             }
 
-            $('input[name="phone"]').val(data.patient.phone);
+            if (clientIti) {
+                clientIti.setNumber(data.patient.phone || '');
+            } else {
+                $('input[name="phone"]').val(data.patient.phone);
+            }
             $('input[name="mobile_country_code"]').val(data.patient.mobile_country_code);
             $('input[name="address_line_1"]').val(data.patient.address_line_1);
             $('input[name="address_line_2"]').val(data.patient.address_line_2);

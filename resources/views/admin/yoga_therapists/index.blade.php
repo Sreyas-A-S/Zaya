@@ -166,14 +166,12 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 <div class="col-md-4">
                                 <label class="form-label">Phone <span class="text-danger">*</span></label>
                                 <input class="form-control"
-                                type="text"
+                                type="tel"
                                 name="phone"
+                                id="therapist_phone"
                                 required
-                                pattern="^[0-9]{10,15}$"
-                                maxlength="15"
                                 placeholder="Enter phone number"
-                                title="Enter 10 to 15 digits only"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                title="Enter a valid phone number">
                                 </div>
 
                                 <!-- Gender -->
@@ -614,10 +612,13 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
     @section('scripts')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <script>
         const storageBase = "{{ asset('storage') }}/";
         let table;
+        let therapistIti;
         let currentStep = 1;
         const totalSteps = 6;
 
@@ -635,6 +636,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 window.languageChoices.removeActiveItems();
             }
             $('#languages_capabilities_container').empty();
+            if (therapistIti) {
+                therapistIti.setNumber('');
+            }
 
             $('#therapist-form-modal').modal('show');
         }
@@ -773,6 +777,16 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
         });
 
         $(document).ready(function() {
+            const therapistPhoneInput = document.querySelector('#therapist_phone');
+            if (therapistPhoneInput) {
+                therapistIti = window.intlTelInput(therapistPhoneInput, {
+                    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                    separateDialCode: true,
+                    initialCountry: 'in',
+                    preferredCountries: ['in', 'ae', 'us', 'gb']
+                });
+            }
+
             // DataTable
             table = $('#therapists-table').DataTable({
                 processing: true,
@@ -1032,6 +1046,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 let id = $('#therapist_id').val();
                 let url = id ? "{{ url('admin/yoga-therapists') }}/" + id : "{{ route('admin.yoga-therapists.store') }}";
                 let formData = new FormData(this);
+                if (therapistIti) {
+                    formData.set('phone', therapistIti.getNumber());
+                }
                 // Append _method PUT if editing
                 if (id) formData.append('_method', 'PUT');
 
@@ -1086,7 +1103,11 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     $('input[name="first_name"]').val(t.first_name || u.first_name || '');
                     $('input[name="last_name"]').val(t.last_name || u.last_name || '');
                     $('input[name="email"]').val(u.email);
-                    $('input[name="phone"]').val((t.phone || '').replace(/[^0-9]/g, ''));
+                    if (therapistIti) {
+                        therapistIti.setNumber(t.phone || '');
+                    } else {
+                        $('input[name="phone"]').val(t.phone || '');
+                    }
                     $('select[name="gender"]').val(t.gender);
                     $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
                     $('input[name="address_line_1"]').val(t.address_line_1);
