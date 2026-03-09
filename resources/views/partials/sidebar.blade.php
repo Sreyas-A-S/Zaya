@@ -42,6 +42,13 @@
                     <h6>My Profile</h6>
                 </a>
             </li>
+            <li class="sidebar-list"><a class="sidebar-link" href="{{ route('admin.notifications.index') }}">
+                    <svg class="stroke-icon">
+                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#notification') }}"></use>
+                    </svg>
+                    <h6>Notifications</h6>
+                </a>
+            </li>
             @endif
 
             @if(auth()->user()->hasPermission('doctors-view') || auth()->user()->hasPermission('practitioners-view') || auth()->user()->hasPermission('mindfulness-practitioners-view') || auth()->user()->hasPermission('yoga-therapists-view') || auth()->user()->hasPermission('clients-view') || auth()->user()->hasPermission('translators-view'))

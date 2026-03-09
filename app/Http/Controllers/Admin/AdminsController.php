@@ -24,6 +24,10 @@ class AdminsController extends Controller
 
     public function index(Request $request)
     {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $role = $user->roleData();
+        $isSuperAdmin = ($role && $role->name === 'Super Admin');
+
         if ($request->ajax()) {
             $query = DB::table('users')
                 ->where('users.role', 'admin')
@@ -35,12 +39,23 @@ class AdminsController extends Controller
                     'users.phone',
                     'countries.name as nationality',
                     'users.languages',
-                    'users.status'
+                    'users.status',
+                    'users.national_id'
                 ]);
+
+            // Role-based country restriction for the query
+            if (!$isSuperAdmin) {
+                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+                $query->whereIn('users.national_id', $assignedCountryIds);
+            }
 
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->filter(function ($query) use ($request) {
+                    if ($request->has('country_filter') && !empty($request->country_filter)) {
+                        $query->where('users.national_id', $request->country_filter);
+                    }
+
                     if ($request->has('search') && !is_null($request->get('search')['value'])) {
                         $search = $request->get('search')['value'];
 
@@ -99,8 +114,15 @@ class AdminsController extends Controller
                 ->make(true);
         }
 
-        $countries = Country::all();
+        $allCountries = Country::all();
         $languages = Language::all();
+
+        if ($isSuperAdmin) {
+            $countries = $allCountries;
+        } else {
+            $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+            $countries = $allCountries->whereIn('id', $assignedCountryIds);
+        }
 
         return view('admin.admins.index', compact('countries', 'languages'));
     }

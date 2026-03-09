@@ -51,12 +51,7 @@ Route::get('register', function () {
 // Public Master Data Quick Add (for registration forms)
 Route::post('master-data/quick-add/{type}', [MasterDataController::class, 'store'])->name('master-data.quick-add');
 
-Route::get('/lang/{locale}', function ($locale) {
-    if (in_array($locale, ['en', 'fr'])) {
-        session(['locale' => $locale]);
-    }
-    return redirect()->back();
-})->name('lang.switch');
+Route::post('/lang/{locale}', [LanguageController::class, 'change'])->name('lang.switch');
 
 Route::get('/', [WebController::class, 'index'])->name('home');
 Route::get('/index', [WebController::class, 'index'])->name('index');
@@ -180,6 +175,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::delete('/newsletters/{id}', [\App\Http\Controllers\Admin\NewsletterController::class, 'destroy'])->name('newsletters.destroy');
     Route::get('/newsletters/export', [\App\Http\Controllers\Admin\NewsletterController::class, 'export'])->name('newsletters.export');
 
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/mark-as-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::post('/notifications/mark-all-as-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
+    Route::delete('/notifications/{id}', [\App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('notifications.destroy');
+
     // General Settings
     Route::get('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'index'])->name('general-settings.index');
     Route::post('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'update'])->name('general-settings.update');
@@ -198,6 +199,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
 
     Route::resource('languages', \App\Http\Controllers\Admin\LanguageController::class);
     Route::post('/change-language/{id}', [LanguageController::class, 'change'])->name('change-language');
+    Route::post('/change-country/{code}', function ($code) {
+        session(['admin_country' => strtolower($code)]);
+        return response()->json(['status' => true]);
+    })->name('change-country');
 });
 
 // Route to run artisan optimize

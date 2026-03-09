@@ -1,6 +1,18 @@
 @extends('layouts.admin')
 @section('content')
-
+<style>
+    #Admins-table_wrapper .dataTables_filter {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    #Admins-table_wrapper .dataTables_filter label {
+        margin-bottom: 0;
+    }
+    #custom-filters-container {
+        margin-bottom: 0 !important;
+    }
+</style>
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
@@ -24,12 +36,23 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
-                        <h3>Admins List</h3>
+                        <h3 class="mb-0">Admins List</h3>
                         <button type="button" class="btn btn-primary" onclick="openCreateModal()">
                             <i class="iconly-Add-User icli me-2"></i>Register New Admin
                         </button>
                     </div>
                     <div class="card-body">
+                        <div class="d-flex justify-content-start align-items-center mb-3 gap-3 d-none" id="custom-filters-container">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="mb-0 small fw-bold text-muted">COUNTRY:</label>
+                                <select id="country-filter" class="form-select form-select-sm" style="width: 180px;">
+                                    <option value="">All Countries</option>
+                                    @foreach($countries as $country)
+                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         <div class="table-responsive">
                             <table class="display" id="Admins-table">
                                 <thead>
@@ -215,11 +238,20 @@
         <script>
             $(document).ready(function() {
 
-                $('#Admins-table').DataTable({
+                const table = $('#Admins-table').DataTable({
                     processing: true,
                     serverSide: true,
-                    ajax: "{{ route('admin.admins.index') }}",
-
+                    ajax: {
+                        url: "{{ route('admin.admins.index') }}",
+                        data: function (d) {
+                            d.country_filter = $('#country-filter').val();
+                        }
+                    },
+                    initComplete: function() {
+                        // Move the country filter next to search box
+                        const filterHtml = $('#custom-filters-container').removeClass('d-none').detach();
+                        $('#Admins-table_wrapper .dataTables_filter').parent().prepend(filterHtml);
+                    },
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
@@ -258,6 +290,10 @@
                             searchable: false
                         }
                     ]
+                });
+
+                $('#country-filter').on('change', function() {
+                    table.ajax.reload();
                 });
 
             });

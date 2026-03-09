@@ -16,18 +16,79 @@ class FinanceSettingController extends Controller
 
     public function index()
     {
-        $settings = HomepageSetting::where('section', 'finance')->get();
+        $language = session('locale', 'en');
+        
+        // 1. Fetch current language settings
+        $currentSettings = HomepageSetting::where('section', 'finance')
+            ->where('language', $language)
+            ->get()
+            ->keyBy('key');
+
+        // 2. Fetch English settings as structure
+        $defaultSettings = HomepageSetting::where('section', 'finance')
+            ->where('language', 'en')
+            ->get();
+
+        // 3. If English is also missing (first time), let's ensure at least basic structure exists
+        if ($defaultSettings->isEmpty()) {
+            // Seed defaults if absolutely nothing exists
+            $defaults = [
+                ['key' => 'client_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
+                ['key' => 'practitioner_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
+                ['key' => 'doctor_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
+            ];
+            
+            foreach ($defaults as $def) {
+                HomepageSetting::updateOrCreate(['key' => $def['key'], 'language' => 'en'], $def);
+            }
+            
+            $defaultSettings = HomepageSetting::where('section', 'finance')
+                ->where('language', 'en')
+                ->get();
+        }
+
+        $settings = $defaultSettings->map(function($setting) use ($currentSettings, $language) {
+            if ($currentSettings->has($setting->key)) {
+                return $currentSettings->get($setting->key);
+            }
+            
+            $newSetting = $setting->replicate();
+            $newSetting->language = $language;
+            $newSetting->value = ''; 
+            return $newSetting;
+        });
+
         return view('admin.finance-settings.index', compact('settings'));
     }
 
     public function update(Request $request)
     {
+        $language = session('locale', 'en');
         $data = $request->except('_token');
 
         foreach ($data as $key => $value) {
-            $setting = HomepageSetting::where('key', $key)->first();
+            $setting = HomepageSetting::where('key', $key)
+                ->where('language', $language)
+                ->first();
+
             if ($setting) {
                 $setting->update(['value' => $value]);
+            } else {
+                // Replicate from 'en' if it exists
+                $originalSetting = HomepageSetting::where('key', $key)
+                    ->where('language', 'en')
+                    ->first();
+                
+                if ($originalSetting) {
+                    HomepageSetting::create([
+                        'key' => $key,
+                        'value' => $value,
+                        'language' => $language,
+                        'type' => $originalSetting->type,
+                        'section' => $originalSetting->section,
+                        'max_length' => $originalSetting->max_length,
+                    ]);
+                }
             }
         }
 

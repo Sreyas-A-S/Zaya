@@ -35,6 +35,7 @@
                         <table class="display" id="newsletter-table">
                             <thead>
                                 <tr>
+                                    <th>SL No</th>
                                     <th>Date Subscribed</th>
                                     <th>Email</th>
                                     <th>Status</th>
@@ -42,8 +43,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($subscriptions as $sub)
+                                @foreach($subscriptions as $index => $sub)
                                 <tr>
+                                    <td>{{ $index + 1 }}</td>
                                     <td>{{ $sub->created_at->format('d M Y H:i') }}</td>
                                     <td>{{ $sub->email }}</td>
                                     <td>
@@ -73,7 +75,7 @@
 <script>
     $(document).ready(function() {
         $('#newsletter-table').DataTable({
-            order: [[0, 'desc']]
+            order: [[1, 'desc']]
         });
 
         $('body').on('click', '.toggle-status', function() {

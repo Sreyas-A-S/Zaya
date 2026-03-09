@@ -3,6 +3,19 @@
 @section('title', 'Yoga Therapists')
 
 @section('content')
+<style>
+    #therapists-table_wrapper .dataTables_filter {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    #therapists-table_wrapper .dataTables_filter label {
+        margin-bottom: 0;
+    }
+    #custom-filters-container {
+        margin-bottom: 0 !important;
+    }
+</style>
 <div class="container-fluid">
     <div class="page-title">
         <div class="row">
@@ -31,6 +44,17 @@
                     </button>
                 </div>
                 <div class="card-body">
+                    <div class="d-flex justify-content-start align-items-center mb-3 gap-3 d-none" id="custom-filters-container">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 small fw-bold text-muted">COUNTRY:</label>
+                            <select id="country-filter" class="form-select form-select-sm" style="width: 180px;">
+                                <option value="">All Countries</option>
+                                @foreach($countries as $country)
+                                    <option value="{{ $country->name }}">{{ $country->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="display" id="therapists-table">
                             <thead>
@@ -257,9 +281,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 <label class="form-label">Country <span class="text-danger">*</span></label>
                                 <select class="form-select" name="country" required>
                                 <option value="">Select Country</option>
-                                @foreach(config('countries') as $country)
-                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>
-                                {{ $country }}
+                                @foreach($countries as $country)
+                                <option value="{{ $country->name }}">
+                                {{ $country->name }}
                                 </option>
                                 @endforeach
                                 </select>
@@ -777,7 +801,16 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             table = $('#therapists-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.yoga-therapists.index') }}",
+                ajax: {
+                    url: "{{ route('admin.yoga-therapists.index') }}",
+                    data: function (d) {
+                        d.country_filter = $('#country-filter').val();
+                    }
+                },
+                initComplete: function() {
+                    const filterHtml = $('#custom-filters-container').removeClass('d-none').detach();
+                    $('#therapists-table_wrapper .dataTables_filter').prepend(filterHtml);
+                },
                 order: [
                     [0, 'desc']
                 ], // Default sort by first column (ID) descending
@@ -825,6 +858,10 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         searchable: false
                     },
                 ]
+            });
+
+            $('#country-filter').on('change', function() {
+                table.ajax.reload();
             });
 
             // Initialize Choices.js

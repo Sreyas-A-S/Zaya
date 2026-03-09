@@ -25,6 +25,10 @@ class YogaTherapistController extends Controller
 
     public function index(Request $request)
     {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $role = $user->roleData();
+        $isSuperAdmin = ($role && $role->name === 'Super Admin');
+
         if ($request->ajax()) {
             $query = User::where('role', 'yoga_therapist')
                 ->leftJoin('yoga_therapists', 'users.id', '=', 'yoga_therapists.user_id')
@@ -43,12 +47,24 @@ class YogaTherapistController extends Controller
                     'yoga_therapists.status',
                     'yoga_therapists.city',
                     'yoga_therapists.state'
-                ])
-                ->orderBy('users.created_at', 'desc');
+                ]);
+
+            // Role-based country restriction
+            if (!$isSuperAdmin) {
+                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+                $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
+                $query->whereIn('yoga_therapists.country', $assignedCountryNames);
+            }
+
+            $query->orderBy('users.created_at', 'desc');
 
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->filter(function ($query) use ($request) {
+                    if ($request->has('country_filter') && !empty($request->country_filter)) {
+                        $query->where('yoga_therapists.country', $request->country_filter);
+                    }
+
                     if ($request->has('search') && !is_null($request->get('search')['value'])) {
                         $searchValue = $request->get('search')['value'];
                         $query->where(function ($q) use ($searchValue) {
@@ -113,7 +129,15 @@ class YogaTherapistController extends Controller
         // Assuming Language model exists as seen in MindfulnessController
         $languages = \App\Models\Language::all();
 
-        return view('admin.yoga_therapists.index', compact('areasOfExpertise', 'consultationModes', 'languages'));
+        $allCountries = \App\Models\Country::all();
+        if ($isSuperAdmin) {
+            $countries = $allCountries;
+        } else {
+            $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+            $countries = $allCountries->whereIn('id', $assignedCountryIds);
+        }
+
+        return view('admin.yoga_therapists.index', compact('areasOfExpertise', 'consultationModes', 'languages', 'countries'));
     }
 
     public function store(Request $request)

@@ -110,13 +110,27 @@ class WebController extends Controller
 
     public function gallery()
     {
-        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+        
+        // Fallback to English if no settings found for current language
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+        }
+
         return view('gallery', compact('settings'));
     }
 
     public function findPractitioner()
     {
-        $settings = \App\Models\HomepageSetting::pluck('value', 'key');
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+        
+        // Fallback to English if no settings found for current language
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+        }
+
         $practitioners = \App\Models\Practitioner::with(['user', 'reviews'])->where('status', 'active')->get();
         return view('find-practitioner', compact('settings', 'practitioners'));
     }
@@ -238,10 +252,18 @@ class WebController extends Controller
 
     public function contactUs()
     {
-        $language = \Illuminate\Support\Facades\Session::get('locale', 'en');
+        $language = \App::getLocale();
         $settings = \App\Models\HomepageSetting::where('key', 'like', 'contact_%')
             ->where('language', $language)
             ->pluck('value', 'key');
+        
+        // Fallback to English if no settings found for current language
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('key', 'like', 'contact_%')
+                ->where('language', 'en')
+                ->pluck('value', 'key');
+        }
+
         return view('contact-us', compact('settings'));
     }
 

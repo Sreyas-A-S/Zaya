@@ -25,6 +25,10 @@ class ClientController extends Controller
 
     public function index(Request $request)
     {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $role = $user->roleData();
+        $isSuperAdmin = ($role && $role->name === 'Super Admin');
+
         if ($request->ajax()) {
             $query = User::where('role', 'client')
                 ->leftJoin('patients', 'users.id', '=', 'patients.user_id')
@@ -48,12 +52,24 @@ class ClientController extends Controller
                     'patients.client_id',
                     'patients.profile_photo_path',
                     'patients.status'
-                ])
-                ->orderBy('users.created_at', 'desc');
+                ]);
+
+            // Role-based country restriction
+            if (!$isSuperAdmin) {
+                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+                $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
+                $query->whereIn('patients.country', $assignedCountryNames);
+            }
+
+            $query->orderBy('users.created_at', 'desc');
 
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->filter(function ($query) use ($request) {
+                    if ($request->has('country_filter') && !empty($request->country_filter)) {
+                        $query->where('patients.country', $request->country_filter);
+                    }
+
                     if ($request->has('search') && !is_null($request->get('search')['value'])) {
                         $searchValue = $request->get('search')['value'];
                         $query->where(function ($q) use ($searchValue) {
@@ -115,11 +131,20 @@ class ClientController extends Controller
 
         $consultationPreferences = \App\Models\ClientConsultationPreference::where('status', true)->get();
         $languages = \App\Models\Language::all();
+        
+        $allCountries = \App\Models\Country::all();
+        if ($isSuperAdmin) {
+            $countries = $allCountries;
+        } else {
+            $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+            $countries = $allCountries->whereIn('id', $assignedCountryIds);
+        }
 
         return view('admin.clients.index', [
             'pageTitle' => 'Clients Management',
             'consultationPreferences' => $consultationPreferences,
-            'languages' => $languages
+            'languages' => $languages,
+            'countries' => $countries
         ]);
     }
 
