@@ -3,6 +3,19 @@
 @section('title', 'Practitioners Management')
 
 @section('content')
+<style>
+    #practitioners-table_wrapper .dataTables_filter {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    #practitioners-table_wrapper .dataTables_filter label {
+        margin-bottom: 0;
+    }
+    #custom-filters-container {
+        margin-bottom: 0 !important;
+    }
+</style>
 <div class="container-fluid">
     <div class="page-title">
         <div class="row">
@@ -31,6 +44,17 @@
                     </button>
                 </div>
                 <div class="card-body">
+                    <div class="d-flex justify-content-start align-items-center mb-3 gap-3 d-none" id="custom-filters-container">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 small fw-bold text-muted">COUNTRY:</label>
+                            <select id="country-filter" class="form-select form-select-sm" style="width: 180px;">
+                                <option value="">All Countries</option>
+                                @foreach($countries as $country)
+                                    <option value="{{ $country->name }}">{{ $country->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="display" id="practitioners-table">
                             <thead>
@@ -208,8 +232,8 @@
                                             <label class="form-label">Country <span class="text-danger">*</span></label>
                                             <select class="form-select" name="country" id="country" required>
                                                 <option value="">Select Country</option>
-                                                @foreach(config('countries') as $code => $name)
-                                                <option value="{{ $name }}" data-flag="{{ strtolower($code) }}" {{ $name == 'India' ? 'selected' : '' }}>{{ $name }}</option>
+                                                @foreach($countries as $country)
+                                                <option value="{{ $country->name }}">{{ $country->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -856,7 +880,16 @@
         table = $('#practitioners-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('admin.practitioners.index') }}",
+            ajax: {
+                url: "{{ route('admin.practitioners.index') }}",
+                data: function (d) {
+                    d.country_filter = $('#country-filter').val();
+                }
+            },
+            initComplete: function() {
+                const filterHtml = $('#custom-filters-container').removeClass('d-none').detach();
+                $('#practitioners-table_wrapper .dataTables_filter').prepend(filterHtml);
+            },
             columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
@@ -910,6 +943,10 @@
             order: [
                 [0, 'desc']
             ] // Default sort by column 0 (which is the Row Index/ID logically here)
+        });
+
+        $('#country-filter').on('change', function() {
+            table.ajax.reload();
         });
 
 

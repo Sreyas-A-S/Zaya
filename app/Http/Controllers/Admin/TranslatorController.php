@@ -25,6 +25,10 @@ class TranslatorController extends Controller
 
     public function index(Request $request)
     {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $role = $user->roleData();
+        $isSuperAdmin = ($role && $role->name === 'Super Admin');
+
         if ($request->ajax()) {
             $query = User::where('role', 'translator')
                 ->leftJoin('translators', 'users.id', '=', 'translators.user_id')
@@ -46,8 +50,20 @@ class TranslatorController extends Controller
                     'translators.status',
                     'translators.city',
                     'translators.state'
-                ])
-                ->orderBy('users.created_at', 'desc');
+                ]);
+
+            // Role-based country restriction
+            if (!$isSuperAdmin) {
+                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+                $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
+                $query->whereIn('translators.country', $assignedCountryNames);
+            }
+
+            $query->orderBy('users.created_at', 'desc');
+
+            if ($request->filled('country_filter')) {
+                $query->where('translators.country', $request->country_filter);
+            }
 
             if ($request->filled('source_lang')) {
                 $lang = $request->source_lang;
@@ -149,7 +165,15 @@ class TranslatorController extends Controller
         $servicesOffered = \App\Models\TranslatorService::where('status', 1)->get();
         $specializations = \App\Models\TranslatorSpecialization::where('status', 1)->get();
 
-        return view('admin.translators.index', compact('languages', 'servicesOffered', 'specializations'));
+        $allCountries = \App\Models\Country::all();
+        if ($isSuperAdmin) {
+            $countries = $allCountries;
+        } else {
+            $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+            $countries = $allCountries->whereIn('id', $assignedCountryIds);
+        }
+
+        return view('admin.translators.index', compact('languages', 'servicesOffered', 'specializations', 'countries'));
     }
 
     public function store(Request $request)

@@ -17,13 +17,49 @@ class ContentManagerController extends Controller
      */
     public function index(Request $request)
     {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $role = $user->roleData();
+        $isSuperAdmin = ($role && $role->name === 'Super Admin');
+
         if ($request->ajax()) {
 
             $data = User::where('role', 'content_manager')
                         ->select('users.*');
 
+            // Role-based country restriction
+            if (!$isSuperAdmin) {
+                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+                $data->where(function($q) use ($assignedCountryIds) {
+                    foreach ($assignedCountryIds as $id) {
+                        $q->orWhereJsonContains('users.national_id', (int)$id)
+                          ->orWhereJsonContains('users.national_id', (string)$id)
+                          ->orWhere('users.national_id', $id);
+                    }
+                });
+            }
+
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('country_filter') && !empty($request->country_filter)) {
+                        $cid = $request->country_filter;
+                        $query->where(function($q) use ($cid) {
+                            $q->whereJsonContains('users.national_id', (int)$cid)
+                              ->orWhereJsonContains('users.national_id', (string)$cid)
+                              ->orWhere('users.national_id', $cid);
+                        });
+                    }
+
+                    if ($request->has('search') && !is_null($request->get('search')['value'])) {
+                        $search = $request->get('search')['value'];
+                        $query->where(function ($q) use ($search) {
+                            $q->where('users.first_name', 'LIKE', "%{$search}%")
+                                ->orWhere('users.last_name', 'LIKE', "%{$search}%")
+                                ->orWhere('users.email', 'LIKE', "%{$search}%")
+                                ->orWhere('users.phone', 'LIKE', "%{$search}%");
+                        });
+                    }
+                })
 
                 ->addColumn('name', function ($row) {
                     return $row->first_name . ' ' . $row->last_name;
@@ -95,8 +131,15 @@ class ContentManagerController extends Controller
                 ->make(true);
         }
 
-        $countries = Country::all();
+        $allCountries = Country::all();
         $languages = Language::all();
+
+        if ($isSuperAdmin) {
+            $countries = $allCountries;
+        } else {
+            $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+            $countries = $allCountries->whereIn('id', $assignedCountryIds);
+        }
 
         return view('admin.content-manager.index', compact('countries', 'languages'));
     }

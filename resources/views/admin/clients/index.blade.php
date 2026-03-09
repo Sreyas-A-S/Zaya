@@ -7,6 +7,17 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
 <style>
+    #clients-table_wrapper .dataTables_filter {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    #clients-table_wrapper .dataTables_filter label {
+        margin-bottom: 0;
+    }
+    #custom-filters-container {
+        margin-bottom: 0 !important;
+    }
     /* Avatar Upload Styling */
     .avatar-upload {
         position: relative;
@@ -118,12 +129,23 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
-                    <h3>Clients List</h3>
+                    <h3 class="mb-0">Clients List</h3>
                     <button type="button" class="btn btn-primary" onclick="openCreateModal()">
                         <i class="iconly-Add-User icli me-2"></i>Register New Client
                     </button>
                 </div>
                 <div class="card-body">
+                    <div class="d-flex justify-content-start align-items-center mb-3 gap-3 d-none" id="custom-filters-container">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 small fw-bold text-muted">COUNTRY:</label>
+                            <select id="country-filter" class="form-select form-select-sm" style="width: 180px;">
+                                <option value="">All Countries</option>
+                                @foreach($countries as $country)
+                                <option value="{{ $country->name }}">{{ $country->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="display" id="clients-table">
                             <thead>
@@ -260,8 +282,8 @@
                             <label class="form-label">Country <span class="text-danger">*</span></label>
                             <select class="form-select" name="country" required>
                                 <option value="">Select Country</option>
-                                @foreach(config('countries') as $country)
-                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>{{ $country }}</option>
+                                @foreach($countries as $country)
+                                <option value="{{ $country->name }}">{{ $country->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -575,7 +597,16 @@
         table = $('#clients-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('admin.clients.index') }}",
+            ajax: {
+                url: "{{ route('admin.clients.index') }}",
+                data: function (d) {
+                    d.country_filter = $('#country-filter').val();
+                }
+            },
+            initComplete: function() {
+                const filterHtml = $('#custom-filters-container').removeClass('d-none').detach();
+                $('#clients-table_wrapper .dataTables_filter').prepend(filterHtml);
+            },
             columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
@@ -622,6 +653,10 @@
             order: [
                 [0, 'desc']
             ]
+        });
+
+        $('#country-filter').on('change', function() {
+            table.ajax.reload();
         });
 
 

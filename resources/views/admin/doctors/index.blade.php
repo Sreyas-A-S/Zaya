@@ -3,6 +3,19 @@
 @section('title', 'Doctors Management')
 
 @section('content')
+<style>
+    #doctors-table_wrapper .dataTables_filter {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    #doctors-table_wrapper .dataTables_filter label {
+        margin-bottom: 0;
+    }
+    #custom-filters-container {
+        margin-bottom: 0 !important;
+    }
+</style>
 <div class="container-fluid">
     <div class="page-title">
         <div class="row">
@@ -31,8 +44,19 @@
                     </button>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive doctors-table-wrapper">
-                        <table class="display w-100" id="doctors-table">
+                    <div class="d-flex justify-content-start align-items-center mb-3 gap-3 d-none" id="custom-filters-container">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 small fw-bold text-muted">COUNTRY:</label>
+                            <select id="country-filter" class="form-select form-select-sm" style="width: 180px;">
+                                <option value="">All Countries</option>
+                                @foreach($countries as $country)
+                                    <option value="{{ $country->name }}">{{ $country->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="display" id="doctors-table">
                             <thead>
                                 <tr>
                                     <th class="text-center">ID</th>
@@ -1102,10 +1126,16 @@
         table = $('#doctors-table').DataTable({
             processing: true,
             serverSide: true,
-            autoWidth: false,
-            responsive: false,
-            scrollX: true,
-            ajax: "{{ route('admin.doctors.index') }}",
+            ajax: {
+                url: "{{ route('admin.doctors.index') }}",
+                data: function (d) {
+                    d.country_filter = $('#country-filter').val();
+                }
+            },
+            initComplete: function() {
+                const filterHtml = $('#custom-filters-container').removeClass('d-none').detach();
+                $('#doctors-table_wrapper .dataTables_filter').prepend(filterHtml);
+            },
             columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
@@ -1165,6 +1195,8 @@
             ] // Default sort by column 0 (which is the Row Index/ID logically here)
         });
 
+        $('#country-filter').on('change', function() {
+            table.ajax.reload();
         table.columns.adjust();
 
         $(window).on('resize', function() {
@@ -2130,7 +2162,7 @@
                     let newCheckbox = `
                         <div class="${colClass}">
                             <div class="form-check checkbox-primary d-flex align-items-center">
-                                <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${type}_${newId}" checked>
+                                <input class="form-check-input me-2" type="checkbox" name="${checkboxName}" value="${newName}" id="${type}_${newId}" checked>
                                 <label class="form-check-label flex-grow-1 mb-0" for="${type}_${newId}">${newName}</label>
                                 <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="${type}"><i class="fa fa-trash"></i></a>
                             </div>

@@ -2,9 +2,9 @@
 
 @section('content')
 
-<section class="pt-[144px] md:pt-[150px] pb-20 px-4 md:px-6 bg-white">
+<section class="pt-[144px] md:pt-[150px] pb-8 lg:pb-20 px-4 md:px-6 bg-white">
     <div class="container mx-auto max-w-6xl"> 
-        <div class="w-full h-[300px] md:h-[480px] rounded-[20px] overflow-hidden mb-8 shadow-lg relative">
+        <div class="w-full h-[200px] sm:h-[300px] md:h-[480px] rounded-[20px] overflow-hidden mb-8 relative">
             <div class="swiper serviceImageSwiper h-full">
                 <div class="swiper-wrapper">
                     <!-- Main Image -->
@@ -38,9 +38,9 @@
 
         <!-- Title & Actions Bar -->
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-gray-200">
-            <h1 class="text-3xl font-sans! font-medium text-primary">{{ $service->title }}</h1>
+            <h1 class="text-xl md:text-3xl font-sans! font-medium text-gray-900">{{ $service->title }}</h1>
             <div class="flex -flex-wrap items-center gap-3">
-                <a href="#"
+                <a href="{{ route('book-session') }}"
                     class="bg-secondary text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-primary transition-all shadow-md flex items-center gap-2">
                     <span class="text-nowrap">Book a Session</span>
                 </a>
@@ -169,15 +169,15 @@
 </section>
 
 <!-- CTA Section -->
-<section class="py-16 bg-white">
-    <div class="container mx-auto px-6">
-        <div class="text-center max-w-2xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-sans! font-medium text-primary mb-4">Ready to restore your natural
+<section class="pt-0 pb-16 bg-white">
+    <div class="container mx-auto px-4 md:px-6">
+        <div class="text-center md:max-w-2xl mx-auto">
+            <h2 class="text-xl md:text-4xl font-sans! font-medium text-primary mb-4">Ready to restore your natural
                 rhythm?</h2>
-            <p class="text-gray-500 mb-8 text-base lg:text-xl w-3/4 mx-auto">
+            <p class="text-gray-500 mb-8 text-sm md:text-base lg:text-xl md:w-3/4 mx-auto">
                 Join a global community committed to authentic, expert-led wellness.
             </p>
-            <a href="#"
+            <a href="{{ route('book-session') }}"
                 class="inline-block bg-secondary text-white px-10 py-4 rounded-full font-normal hover:bg-primary transition-all shadow-lg">
                 Book a Session
             </a>

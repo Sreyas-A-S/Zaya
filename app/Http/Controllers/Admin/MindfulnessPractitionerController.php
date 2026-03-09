@@ -25,6 +25,10 @@ class MindfulnessPractitionerController extends Controller
 
     public function index(Request $request)
     {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $role = $user->roleData();
+        $isSuperAdmin = ($role && $role->name === 'Super Admin');
+
         if ($request->ajax()) {
             $query = User::where('role', 'mindfulness_practitioner')
                 ->leftJoin('mindfulness_practitioners', 'users.id', '=', 'mindfulness_practitioners.user_id')
@@ -41,12 +45,24 @@ class MindfulnessPractitionerController extends Controller
                     'mindfulness_practitioners.current_workplace',
                     'mindfulness_practitioners.profile_photo_path',
                     'mindfulness_practitioners.status'
-                ])
-                ->orderBy('users.created_at', 'desc');
+                ]);
+
+            // Role-based country restriction
+            if (!$isSuperAdmin) {
+                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+                $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
+                $query->whereIn('mindfulness_practitioners.country', $assignedCountryNames);
+            }
+
+            $query->orderBy('users.created_at', 'desc');
 
             return DataTables::of($query)
                 ->addIndexColumn()
                 ->filter(function ($query) use ($request) {
+                    if ($request->has('country_filter') && !empty($request->country_filter)) {
+                        $query->where('mindfulness_practitioners.country', $request->country_filter);
+                    }
+
                     if ($request->has('search') && !is_null($request->get('search')['value'])) {
                         $searchValue = $request->get('search')['value'];
                         $query->where(function ($q) use ($searchValue) {
@@ -111,7 +127,15 @@ class MindfulnessPractitionerController extends Controller
 
         $languages = \App\Models\Language::all();
 
-        return view('admin.mindfulness_practitioners.index', compact('servicesOffered', 'clientConcerns', 'consultationModes', 'languages'));
+        $allCountries = \App\Models\Country::all();
+        if ($isSuperAdmin) {
+            $countries = $allCountries;
+        } else {
+            $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+            $countries = $allCountries->whereIn('id', $assignedCountryIds);
+        }
+
+        return view('admin.mindfulness_practitioners.index', compact('servicesOffered', 'clientConcerns', 'consultationModes', 'languages', 'countries'));
     }
 
     public function store(Request $request)

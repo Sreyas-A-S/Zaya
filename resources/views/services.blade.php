@@ -17,8 +17,8 @@
         <section class="pt-[144px] md:pt-[150px] px-4 md:px-6 bg-white min-h-screen pb-20">
             <div class="container mx-auto">
                 <!-- Header section: Title and Description -->
-                <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-16">
-                    <h1 class="text-5xl md:text-7xl font-serif text-primary font-medium tracking-tight">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8 md:mb-16">
+                    <h1 class="text-4xl md:text-7xl font-serif text-primary font-medium tracking-tight">
                         {{ $category }}
                     </h1>
                     <p class="text-gray-600 text-[15px] md:text-base leading-relaxed max-w-xl md:mt-4 md:text-right">
@@ -27,23 +27,24 @@
                 </div>
 
                 <!-- Tabs and Search Navigation -->
-                <div class="flex flex-col md:flex-row justify-between items-center border-b border-gray-200 pb-4 mb-12 gap-6">
+                <div class="flex flex-col lg:flex-row justify-between items-center border-b border-gray-200 pb-4 mb-12 gap-6">
                     <!-- Navigation Tabs -->
-                    <div class="flex gap-16 overflow-x-auto w-full md:w-auto scrollbar-hide">
+                    <div id="category-tabs-container"
+                        class="flex gap-8 md:gap-10 lg:gap-16 overflow-x-auto w-full lg:w-auto scrollbar-hide">
                         @foreach(['Ayurveda', 'Yoga', 'Counselling', 'Packages'] as $tab)
                             <a href="{{ route('services', ['category' => $tab]) }}"
-                                class="whitespace-nowrap text-xl pb-4 transition-all {{ $category === $tab ? 'text-secondary font-normal' : 'text-gray-400 hover:text-secondary' }}">
+                                class="whitespace-nowrap text-base md:text-lg lg:text-xl pb-4 transition-all {{ $category === $tab ? 'text-secondary font-medium' : 'text-gray-400 hover:text-secondary' }}">
                                 {{ $tab }}
                             </a>
                         @endforeach
                     </div>
 
                     <!-- Search Box -->
-                    <form action="{{ route('services') }}" method="GET" class="w-full md:w-auto flex items-center gap-2">
+                    <form action="{{ route('services') }}" method="GET" class="w-full lg:w-auto flex items-center gap-2">
                         <input type="hidden" name="category" value="{{ $category }}">
                         <input type="text" name="search" value="{{ request('search') }}"
                             placeholder="Search services or conditions..."
-                            class="text-sm outline-none text-base italic bg-transparent text-gray-700 placeholder-gray-400 w-full md:w-56">
+                            class="text-sm outline-none lg:text-base italic bg-transparent text-gray-700 placeholder-gray-400 w-full md:w-56">
                         <button type="submit" class="text-gray-600 hover:text-primary">
                             <i class="ri-search-line font-medium"></i>
                         </button>
@@ -52,17 +53,17 @@
 
                 @if($category === 'Packages')
                     <!-- Package Filter Tabs -->
-                    <div class="flex flex-wrap justify-center items-center gap-3 mb-10 w-full">
+                    <div class="flex flex-wrap justify-start md:justify-center items-center gap-2 mb-10 w-full">
                         <a href="javascript:void(0)"
-                            class="bg-[#F5F5F5] text-gray-500 hover:text-gray-800 px-6 py-2.5 rounded-full text-[14px] font-normal transition-all hover:bg-gray-200">All</a>
+                            class="bg-[#F5F5F5] text-gray-500 hover:text-gray-800 px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm lg:text-base font-normal transition-all hover:bg-gray-200">All</a>
                         <a href="javascript:void(0)"
-                            class="bg-secondary text-white px-6 py-2.5 rounded-full text-[14px] font-normal transition-all">Ayurveda
+                            class="bg-secondary text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm lg:text-base font-normal transition-all">Ayurveda
                             + Yoga</a>
                         <a href="javascript:void(0)"
-                            class="bg-[#F5F5F5] text-gray-500 hover:text-gray-800 px-6 py-2.5 rounded-full text-[14px] font-normal transition-all hover:bg-gray-200">Yoga
+                            class="bg-[#F5F5F5] text-gray-500 hover:text-gray-800 px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm lg:text-base font-normal transition-all hover:bg-gray-200">Yoga
                             + Counselling</a>
                         <a href="javascript:void(0)"
-                            class="bg-[#F5F5F5] text-gray-500 hover:text-gray-800 px-6 py-2.5 rounded-full text-[14px] font-normal transition-all hover:bg-gray-200">Counselling
+                            class="bg-[#F5F5F5] text-gray-500 hover:text-gray-800 px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm lg:text-base font-normal transition-all hover:bg-gray-200">Counselling
                             + Ayurveda</a>
                     </div>
                 @endif
@@ -79,7 +80,7 @@
                         </div>
                         <div>
                             <h3
-                                class="text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
                                 Wellness based Ayurveda consultation</h3>
                             <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
                                 A custom plan for your diet, lifestyle and herbs based on your unique body type and needs.
@@ -97,7 +98,7 @@
                         </div>
                         <div>
                             <h3
-                                class="text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
                                 Ayurvedic diet & nutrition guidance</h3>
                             <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
                                 Customized eating plans based on your body type to improve digestion and energy.
@@ -113,7 +114,7 @@
                         </div>
                         <div>
                             <h3
-                                class="text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
                                 Herbal wellness support</h3>
                             <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
                                 Natural herbal remedies tailored to your unique needs to restore balance and vitality.
@@ -131,7 +132,7 @@
                         </div>
                         <div>
                             <h3
-                                class="text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
                                 Abhyanga (Ayurvedic Oil Massage)</h3>
                             <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
                                 A soothing full-body oil massage to release toxins, reduce stress and nourish your skin.
@@ -147,7 +148,7 @@
                         </div>
                         <div>
                             <h3
-                                class="text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
                                 Shirodhara</h3>
                             <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
                                 A calming therapy of warm oil poured on the forehead to quiet the mind and improve sleep.
@@ -165,7 +166,7 @@
                         </div>
                         <div>
                             <h3
-                                class="text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
                                 Panchakarma-inspired detox programs (light versions)</h3>
                             <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
                                 Gentle detox plans to cleanse your system, boost immunity, and refresh your mind.
@@ -182,7 +183,7 @@
         <section class="pt-[144px] md:pt-[150px] px-4 md:px-6 bg-white">
             <div class="container mx-auto">
                 <!-- Text Content -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-20 mb-12 md:mb-16">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-20 mb-12 md:mb-16">
                     <!-- Left Text -->
                     <div>
                         <div class="mb-8 animate-on-scroll">
@@ -224,51 +225,55 @@
                         }
                     @endphp
                     <img src="{{ $bannerImg }}" alt="Holistic Wellness"
-                        class="w-full h-[440px] object-cover align-top scale-110 transition-all duration-1000 group-hover:scale-125">
+                        class="w-full h-[140px] sm:h-[220px] md:h-[300px] lg:h-[406px]  object-cover align-top scale-110 transition-all duration-1000 group-hover:scale-125">
                 </div>
             </div>
         </section>
 
         <!-- Stats Section -->
-        <section class="py-20 bg-white px-4 md:px-6">
+        <section class="py-6 lg:py-20 bg-white px-4 md:px-6">
             <div class="container mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                     <!-- Stat 1 -->
-                    <div class="bg-gray-100 py-12 px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
-                        <h3 class="text-5xl font-medium font-sans! text-black mb-4">
+                    <div
+                        class="bg-gray-100 py-6 md:py-12 px-2 md:px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
+                        <h3 class="text-3xl md:text-5xl font-medium font-sans! text-black mb-4">
                             {{ $settings['services_stat_1_count'] ?? '300' }}
                         </h3>
-                        <p class="text-gray-500 font-normal text-[15px]">
+                        <p class="text-gray-500 font-normal text-sm md:text-base">
                             {{ $settings['services_stat_1_label'] ?? 'Sessions Completed' }}
                         </p>
                     </div>
 
                     <!-- Stat 2 -->
-                    <div class="bg-gray-100 py-12 px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
-                        <h3 class="text-5xl font-medium font-sans! text-black mb-4">
+                    <div
+                        class="bg-gray-100 py-6 md:py-12 px-2 md:px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
+                        <h3 class="text-3xl md:text-5xl font-medium font-sans! text-black mb-4">
                             {{ $settings['services_stat_2_count'] ?? '50+' }}
                         </h3>
-                        <p class="text-gray-500 font-normal text-[15px]">
+                        <p class="text-gray-500 font-normal text-sm md:text-base">
                             {{ $settings['services_stat_2_label'] ?? 'Certified Practitioners' }}
                         </p>
                     </div>
 
                     <!-- Stat 3 -->
-                    <div class="bg-gray-100 py-12 px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
-                        <h3 class="text-5xl font-medium font-sans! text-black mb-4">
+                    <div
+                        class="bg-gray-100 py-6 md:py-12 px-2 md:px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
+                        <h3 class="text-3xl md:text-5xl font-medium font-sans! text-black mb-4">
                             {{ $settings['services_stat_3_count'] ?? '99%' }}
                         </h3>
-                        <p class="text-gray-500 font-normal text-[15px]">
+                        <p class="text-gray-500 font-normal text-sm md:text-base">
                             {{ $settings['services_stat_3_label'] ?? 'Positive Feedbacks' }}
                         </p>
                     </div>
 
                     <!-- Stat 4 -->
-                    <div class="bg-gray-100 py-12 px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
-                        <h3 class="text-5xl font-medium font-sans! text-black mb-4">
+                    <div
+                        class="bg-gray-100 py-6 md:py-12 px-2 md:px-6 rounded-[20px] text-center transition-all duration-300 hover:shadow-md">
+                        <h3 class="text-3xl md:text-5xl font-medium font-sans! text-black mb-4">
                             {{ $settings['services_stat_4_count'] ?? '10' }}
                         </h3>
-                        <p class="text-gray-500 font-normal text-[15px]">
+                        <p class="text-gray-500 font-normal text-sm md:text-base">
                             {{ $settings['services_stat_4_label'] ?? 'Years of Tradition' }}
                         </p>
                     </div>
@@ -333,3 +338,22 @@
     @endif
 
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('category-tabs-container');
+            if (container) {
+                const activeTab = container.querySelector('.text-secondary.font-medium');
+                if (activeTab) {
+                    // Scroll the container so the active tab is visible (centered) 
+                    const scrollLeft = activeTab.offsetLeft - (container.clientWidth / 2) + (activeTab.clientWidth / 2);
+                    container.scrollTo({
+                        left: scrollLeft,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        });
+    </script>
+@endpush

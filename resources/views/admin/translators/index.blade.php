@@ -3,6 +3,19 @@
 @section('title', 'Translators')
 
 @section('content')
+<style>
+    #translators-table_wrapper .dataTables_filter {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    #translators-table_wrapper .dataTables_filter label {
+        margin-bottom: 0;
+    }
+    #custom-filters-container {
+        margin-bottom: 0 !important;
+    }
+</style>
 <div class="container-fluid">
     <div class="page-title">
         <div class="row">
@@ -31,6 +44,17 @@
                     </button>
                 </div>
                 <div class="card-body">
+                    <div class="d-flex justify-content-start align-items-center mb-3 gap-3 d-none" id="custom-filters-container">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 small fw-bold text-muted">COUNTRY:</label>
+                            <select id="country-filter" class="form-select form-select-sm" style="width: 180px;">
+                                <option value="">All Countries</option>
+                                @foreach($countries as $country)
+                                    <option value="{{ $country->name }}">{{ $country->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div class="row g-3 mb-4 justify-content-end align-items-end">
                         <div class="col-md-2">
                             <label class="form-label">Source Language</label>
@@ -216,8 +240,8 @@
                                             <label class="form-label">Country <span class="text-danger">*</span></label>
                                             <select class="form-select" name="country" required>
                                                 <option value="">Select Country</option>
-                                                @foreach(config('countries') as $country)
-                                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>{{ $country }}</option>
+                                                @foreach($countries as $country)
+                                                <option value="{{ $country->name }}">{{ $country->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -596,9 +620,14 @@
                 ajax: {
                     url: "{{ route('admin.translators.index') }}",
                     data: function(d) {
+                        d.country_filter = $('#country-filter').val();
                         d.source_lang = $('#filter_source_lang').val();
                         d.target_lang = $('#filter_target_lang').val();
                     }
+                },
+                initComplete: function() {
+                    const filterHtml = $('#custom-filters-container').removeClass('d-none').detach();
+                    $('#translators-table_wrapper .dataTables_filter').prepend(filterHtml);
                 },
                 columns: [{
                         data: 'user_id',
@@ -662,7 +691,7 @@
             });
 
             // Filter Event Listeners
-            $('#filter_source_lang, #filter_target_lang').change(function() {
+            $('#filter_source_lang, #filter_target_lang, #country-filter').change(function() {
                 table.draw();
             });
 
@@ -1041,7 +1070,7 @@
                             let html = `
                             <div class="${colClass}">
                                 <div class="form-check checkbox-${type === 'translator_services' ? 'primary' : 'secondary'} d-flex align-items-center">
-                                    <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
+                                    <input class="form-check-input me-2" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
                                     <label class="form-check-label flex-grow-1 mb-0" for="${idPrefix}${newId}">${newName}</label>
                                     <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="${type}"><i class="fa fa-trash"></i></a>
                                 </div>

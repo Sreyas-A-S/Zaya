@@ -1,16 +1,35 @@
 <header class="page-header row">
     <style>
-        .language-menu-list .lang {
+        .language-menu-list .lang,
+        .country-menu-list .lang {
             padding: 8px 12px !important;
             border-radius: 6px;
             transition: all 0.2s ease;
         }
-        .language-menu-list .lang:hover {
+
+        .language-menu-list .lang:hover,
+        .country-menu-list .lang:hover {
             background-color: #f4f4f4 !important;
             color: #97563D !important;
         }
-        .language-menu-list .lang.active {
+
+        .language-menu-list .lang.active,
+        .country-menu-list .lang.active {
             background-color: #f0f0f0;
+        }
+
+        .lang-dropdown-trigger::before,
+        .lang-dropdown-trigger::after,
+        .country-dropdown-trigger::before,
+        .country-dropdown-trigger::after {
+            display: none !important;
+        }
+
+        .header-right>li {
+            position: relative;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
         }
     </style>
     <div class="logo-wrapper d-flex align-items-center col-auto">
@@ -35,108 +54,173 @@
                     $allLanguages = \App\Models\Language::all();
                     $user = auth()->user();
                     $role = $user->roleData();
-                    
+
                     if ($role && $role->name === 'Super Admin') {
-                        $languages = $allLanguages;
+                    $languages = $allLanguages;
                     } else {
-                        $assignedIds = $user->languages;
-                        if (is_array($assignedIds)) {
-                            $languages = $allLanguages->whereIn('id', $assignedIds);
-                        } elseif ($assignedIds) {
-                            $languages = $allLanguages->where('id', $assignedIds);
-                        } else {
-                            $languages = collect();
-                        }
+                    $assignedIds = $user->languages;
+                    if (is_array($assignedIds)) {
+                    $languages = $allLanguages->whereIn('id', $assignedIds);
+                    } elseif ($assignedIds) {
+                    $languages = $allLanguages->where('id', $assignedIds);
+                    } else {
+                    $languages = collect();
+                    }
                     }
 
                     // Filter unique base languages by Name (e.g., only one "English" even if regional variants exist)
                     $languages = $languages->groupBy('name')->map(function($group) {
-                        // Prefer the shortest code (e.g., 'en' over 'en-GB')
-                        return $group->sortBy(fn($l) => strlen($l->code))->first();
+                    // Prefer the shortest code (e.g., 'en' over 'en-GB')
+                    return $group->sortBy(fn($l) => strlen($l->code))->first();
                     });
 
                     if (!function_exists('getCountryCode')) {
-                        function getCountryCode($lang) {
-                            if (!$lang) return 'us';
-                            
-                            // Map language codes to country codes for flags
-                            $mapping = [
-                                'en' => 'us', 'ar' => 'sa', 'zh' => 'cn', 'ja' => 'jp',
-                                'ko' => 'kr', 'hi' => 'in', 'bn' => 'bd', 'uk' => 'ua',
-                                'en-GB' => 'gb', 'en-US' => 'us', 'en-AU' => 'au', 'en-CA' => 'ca',
-                                'fr-FR' => 'fr', 'fr-CA' => 'ca', 'es-ES' => 'es', 'es-US' => 'us',
-                                'pt-PT' => 'pt', 'pt-BR' => 'br',
-                                'el' => 'gr', // Greek -> Greece
-                                'hy' => 'am', // Armenian -> Armenia
-                                'cs' => 'cz', // Czech -> Czech Republic
-                                'sq' => 'al', // Albanian -> Albania
-                                'af' => 'za', // Afrikaans -> South Africa
-                                'am' => 'et', // Amharic -> Ethiopia
-                                'sv' => 'se', // Swedish -> Sweden
-                                'da' => 'dk', // Danish -> Denmark
-                                'nb' => 'no', // Norwegian -> Norway
-                                'nn' => 'no', // Norwegian -> Norway
-                                'no' => 'no', // Norwegian -> Norway
-                                'he' => 'il', // Hebrew -> Israel
-                                'fa' => 'ir', // Persian -> Iran
-                                'ms' => 'my', // Malay -> Malaysia
-                                'vi' => 'vn', // Vietnamese -> Vietnam
-                                'th' => 'th', // Thailand
-                            ];
+                    function getCountryCode($lang) {
+                    if (!$lang) return 'us';
 
-                            $code = $lang->code;
-                            if (isset($mapping[$code])) return $mapping[$code];
-                            
-                            $base = explode('-', $code)[0];
-                            if (isset($mapping[$base])) return $mapping[$base];
+                    // Map language codes to country codes for flags
+                    $mapping = [
+                    'en' => 'us', 'ar' => 'sa', 'zh' => 'cn', 'ja' => 'jp',
+                    'ko' => 'kr', 'hi' => 'in', 'bn' => 'bd', 'uk' => 'ua',
+                    'en-GB' => 'gb', 'en-US' => 'us', 'en-AU' => 'au', 'en-CA' => 'ca',
+                    'fr-FR' => 'fr', 'fr-CA' => 'ca', 'es-ES' => 'es', 'es-US' => 'us',
+                    'pt-PT' => 'pt', 'pt-BR' => 'br',
+                    'el' => 'gr', // Greek -> Greece
+                    'hy' => 'am', // Armenian -> Armenia
+                    'cs' => 'cz', // Czech -> Czech Republic
+                    'sq' => 'al', // Albanian -> Albania
+                    'af' => 'za', // Afrikaans -> South Africa
+                    'am' => 'et', // Amharic -> Ethiopia
+                    'sv' => 'se', // Swedish -> Sweden
+                    'da' => 'dk', // Danish -> Denmark
+                    'nb' => 'no', // Norwegian -> Norway
+                    'nn' => 'no', // Norwegian -> Norway
+                    'no' => 'no', // Norwegian -> Norway
+                    'he' => 'il', // Hebrew -> Israel
+                    'fa' => 'ir', // Persian -> Iran
+                    'ms' => 'my', // Malay -> Malaysia
+                    'vi' => 'vn', // Vietnamese -> Vietnam
+                    'th' => 'th', // Thailand
+                    ];
 
-                            // If mapping fails, try converting emoji if available
-                            if ($lang->flag) {
-                                $emojiIso = emojiToISO($lang->flag);
-                                if ($emojiIso && $emojiIso !== 'us') return $emojiIso;
-                            }
+                    $code = $lang->code;
+                    if (isset($mapping[$code])) return $mapping[$code];
 
-                            return strtolower($base);
-                        }
+                    $base = explode('-', $code)[0];
+                    if (isset($mapping[$base])) return $mapping[$base];
+
+                    // If mapping fails, try converting emoji if available
+                    if ($lang->flag) {
+                    $emojiIso = emojiToISO($lang->flag);
+                    if ($emojiIso && $emojiIso !== 'us') return $emojiIso;
+                    }
+
+                    return strtolower($base);
+                    }
                     }
 
                     if (!function_exists('emojiToISO')) {
-                        function emojiToISO($emoji) {
-                            if (!$emoji) return 'us';
-                            $chars = preg_split('//u', $emoji, -1, PREG_SPLIT_NO_EMPTY);
-                            $iso = '';
-                            foreach ($chars as $char) {
-                                $code = mb_ord($char, 'UTF-8') - 127397;
-                                if ($code >= 65 && $code <= 90) {
-                                    $iso .= chr($code);
-                                }
-                            }
-                            return strtolower($iso) ?: 'us';
+                    function emojiToISO($emoji) {
+                    if (!$emoji) return 'us';
+                    $chars = preg_split('//u', $emoji, -1, PREG_SPLIT_NO_EMPTY);
+                    $iso = '';
+                    foreach ($chars as $char) {
+                    $code = mb_ord($char, 'UTF-8') - 127397;
+                    if ($code >= 65 && $code <= 90) {
+                        $iso .=chr($code);
                         }
-                    }
-                    $currentLocale = session('locale', config('app.locale', 'en'));
-                    $currentLanguage = $allLanguages->where('code', $currentLocale)->first();
-                    @endphp
+                        }
+                        return strtolower($iso) ?: 'us' ;
+                        }
+                        }
+                        $currentLocale=session('locale', config('app.locale', 'en' ));
+                        $currentLanguage=$allLanguages->where('code', $currentLocale)->first();
 
-                    <a class="lang lang-dropdown-trigger" href="javascript:void(0)" style="min-width: 80px; display: flex; align-items: center; text-decoration: none; padding: 10px 0;">
-                        <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentLanguage ? getCountryCode($currentLanguage) : 'us') . '.svg') }}" style="width: 20px; height: 15px; margin-right: 8px; border: 1px solid #eee;" alt="flag">
-                        <h6 class="lang-txt f-w-700 mb-0" style="color: #2b2b2b;">{{ $currentLanguage ? strtoupper($currentLanguage->code) : 'ENG' }}</h6>
+                        $allCountries = \App\Models\Country::all();
+                        if ($role && $role->name === 'Super Admin') {
+                        $userCountries = $allCountries;
+                        } else {
+                        $assignedCountryIds = $user->national_id;
+                        if (is_array($assignedCountryIds)) {
+                        $userCountries = $allCountries->whereIn('id', $assignedCountryIds);
+                        } elseif ($assignedCountryIds) {
+                        $userCountries = $allCountries->where('id', $assignedCountryIds);
+                        } else {
+                        $userCountries = collect();
+                        }
+                        }
+
+                        $currentCountryCode = session('admin_country', 'us');
+                        // Fallback to first assigned country if current session country is not in assigned list
+                        if (!$userCountries->where('code', strtoupper($currentCountryCode))->first()) {
+                        $firstAssigned = $userCountries->first();
+                        $currentCountryCode = $firstAssigned ? strtolower($firstAssigned->code) : 'us';
+                        session(['admin_country' => $currentCountryCode]);
+                        }
+                        $currentCountry = $userCountries->where('code', strtoupper($currentCountryCode))->first();
+                        @endphp
+
+                        <a class="lang lang-dropdown-trigger" href="javascript:void(0)" style="min-width: 100px; display: flex; align-items: center; text-decoration: none; padding: 10px 0; gap: 6px; background: none !important; border-radius: 0 !important;">
+                            <i class="fa-solid fa-language text-muted" style="font-size: 14px;"></i>
+                            <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentLanguage ? getCountryCode($currentLanguage) : 'us') . '.svg') }}" style="width: 20px; height: 14px; border: 1px solid #eee; border-radius: 2px;" alt="flag">
+                            <h6 class="lang-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentLanguage ? strtoupper($currentLanguage->code) : 'EN' }}</h6>
+                        </a>
+
+                        <div class="custom-menu overflow-hidden">
+                            <div class="dropdown-header py-2 px-3 border-bottom bg-light">
+                                <span class="f-w-700 text-dark small">SELECT LANGUAGE</span>
+                            </div>
+                            <ul class="profile-body language-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
+                                @if($languages->isEmpty())
+                                <li class="p-3 text-center text-muted small">No assigned languages</li>
+                                @endif
+                                @foreach($languages as $lang)
+                                <li class="d-flex align-items-center last-0" style="cursor: pointer;">
+                                    <a href="javascript:void(0)"
+                                        class="lang d-flex align-items-center w-100 {{ $currentLocale == $lang->code ? 'active text-primary' : '' }}"
+                                        data-value="{{ $lang->code }}"
+                                        data-flag="{{ asset('admiro/assets/fonts/flag-icon/' . getCountryCode($lang) . '.svg') }}"
+                                        onclick="changeLanguage(this)"
+                                        style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
+                                        <img src="{{ asset('admiro/assets/fonts/flag-icon/' . getCountryCode($lang) . '.svg') }}" style="width: 18px; height: 13px; margin-right: 10px; border: 1px solid #f0f0f0; border-radius: 1px;" alt="flag">
+                                        <span class="f-w-600 small">{{ strtoupper($lang->name) }}</span>
+                                        @if($currentLocale == $lang->code)
+                                        <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                                        @endif
+                                    </a>
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                </li>
+
+                <li class="custom-dropdown">
+                    <a class="lang country-dropdown-trigger" href="javascript:void(0)" style="min-width: 100px; display: flex; align-items: center; text-decoration: none; padding: 10px 0; gap: 6px; background: none !important; border-radius: 0 !important;">
+                        <i class="fa-solid fa-earth-americas text-muted" style="font-size: 14px;"></i>
+                        <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentCountry ? strtolower($currentCountry->code) : 'us') . '.svg') }}" style="width: 20px; height: 14px; border: 1px solid #eee; border-radius: 2px;" alt="flag">
+                        <h6 class="country-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentCountry ? strtoupper($currentCountry->code) : 'US' }}</h6>
                     </a>
 
                     <div class="custom-menu overflow-hidden">
-                        <ul class="profile-body language-menu-list" style="max-height: 350px; overflow-y: auto; padding: 10px;">
-                            @foreach($languages as $lang)
+                        <div class="dropdown-header py-2 px-3 border-bottom bg-light">
+                            <span class="f-w-700 text-dark small">SELECT REGION</span>
+                        </div>
+                        <ul class="profile-body country-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
+                            @if($userCountries->isEmpty())
+                            <li class="p-3 text-center text-muted small">No assigned regions</li>
+                            @endif
+                            @foreach($userCountries as $country)
                             <li class="d-flex align-items-center last-0" style="cursor: pointer;">
-                                <a href="javascript:void(0)" 
-                                   class="lang d-flex align-items-center w-100 {{ $currentLocale == $lang->code ? 'active text-primary' : '' }}" 
-                                   data-value="{{ $lang->code }}"
-                                   data-flag="{{ asset('admiro/assets/fonts/flag-icon/' . getCountryCode($lang) . '.svg') }}"
-                                   onclick="changeLanguage(this)"
-                                   style="text-decoration: none; color: inherit;">
-                                    <img src="{{ asset('admiro/assets/fonts/flag-icon/' . getCountryCode($lang) . '.svg') }}" style="width: 18px; height: 13px; margin-right: 10px; border: 1px solid #f0f0f0;" alt="flag">
-                                    <span class="f-w-600">{{ strtoupper($lang->name) }}</span>
-                                    @if($currentLocale == $lang->code)
-                                        <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                                <a href="javascript:void(0)"
+                                    class="lang d-flex align-items-center w-100 {{ strtoupper($currentCountryCode) == $country->code ? 'active text-primary' : '' }}"
+                                    data-value="{{ $country->code }}"
+                                    data-flag="{{ asset('admiro/assets/fonts/flag-icon/' . strtolower($country->code) . '.svg') }}"
+                                    onclick="changeCountry(this)"
+                                    style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
+                                    <img src="{{ asset('admiro/assets/fonts/flag-icon/' . strtolower($country->code) . '.svg') }}" style="width: 18px; height: 13px; margin-right: 10px; border: 1px solid #f0f0f0; border-radius: 1px;" alt="flag">
+                                    <span class="f-w-600 small">{{ strtoupper($country->name) }}</span>
+                                    @if(strtoupper($currentCountryCode) == $country->code)
+                                    <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
                                     @endif
                                 </a>
                             </li>
@@ -147,55 +231,45 @@
                 <li class="custom-dropdown"><a href="javascript:void(0)">
                         <svg>
                             <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#notification') }}"></use>
-                        </svg></a><span class="badge rounded-pill badge-primary">4</span>
+                        </svg></a>
+                    @php
+                        $unreadNotificationsCount = auth()->user()->unreadNotifications->count();
+                        $recentNotifications = auth()->user()->notifications()->latest()->take(5)->get();
+                    @endphp
+                    @if($unreadNotificationsCount > 0)
+                    <span class="badge rounded-pill badge-primary">{{ $unreadNotificationsCount }}</span>
+                    @endif
                     <div class="custom-menu notification-dropdown py-0 overflow-hidden">
-                        <h3 class="title bg-primary-light dropdown-title">Notification <span class="font-primary">View all</span></h3>
+                        <h3 class="title bg-primary-light dropdown-title">Notification <a href="{{ route('admin.notifications.index') }}"><span class="font-primary">View all</span></a></h3>
                         <ul class="activity-timeline">
+                            @forelse($recentNotifications as $notification)
                             <li class="d-flex align-items-start">
                                 <div class="activity-line"></div>
-                                <div class="activity-dot-primary"></div>
+                                <div class="activity-dot-{{ $notification->unread() ? 'primary' : 'secondary' }}"></div>
                                 <div class="flex-grow-1">
-                                    <h6 class="f-w-600 font-primary">30-04-2024<span>Today</span><span class="circle-dot-primary float-end">
+                                    <h6 class="f-w-600 font-{{ $notification->unread() ? 'primary' : 'secondary' }}">
+                                        {{ $notification->created_at->format('d-m-Y') }}
+                                        <span>{{ $notification->created_at->diffForHumans() }}</span>
+                                        <span class="circle-dot-{{ $notification->unread() ? 'primary' : 'secondary' }} float-end">
                                             <svg class="circle-color">
                                                 <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#circle') }}"></use>
-                                            </svg></span></h6>
-                                    <h5>Alice Goodwin</h5>
-                                    <p class="mb-0">Fashion should be fun. It shouldn't be labelled intellectual.</p>
+                                            </svg>
+                                        </span>
+                                    </h6>
+                                    @php
+                                        $data = $notification->data;
+                                        $title = $data['title'] ?? 'New Notification';
+                                        $message = $data['message'] ?? '';
+                                    @endphp
+                                    <h5>{{ $title }}</h5>
+                                    <p class="mb-0">{{ Str::limit($message, 50) }}</p>
                                 </div>
                             </li>
-                            <li class="d-flex align-items-start">
-                                <div class="activity-dot-secondary"></div>
-                                <div class="flex-grow-1">
-                                    <h6 class="f-w-600 font-secondary">28-06-2024<span>1 hour ago</span><span class="float-end circle-dot-secondary">
-                                            <svg class="circle-color">
-                                                <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#circle') }}"></use>
-                                            </svg></span></h6>
-                                    <h5>Herry Venter</h5>
-                                    <p>I am convinced that there can be luxury in simplicity.</p>
-                                </div>
+                            @empty
+                            <li class="d-flex align-items-start p-3 text-center">
+                                <p class="mb-0 text-muted">No notifications found.</p>
                             </li>
-                            <li class="d-flex align-items-start">
-                                <div class="activity-dot-primary"></div>
-                                <div class="flex-grow-1">
-                                    <h6 class="f-w-600 font-primary">04-08-2024<span>Today</span><span class="float-end circle-dot-primary">
-                                            <svg class="circle-color">
-                                                <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#circle') }}"></use>
-                                            </svg></span></h6>
-                                    <h5>Loain Deo</h5>
-                                    <p>I feel that things happen for open new opportunities.</p>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-start">
-                                <div class="activity-dot-secondary"></div>
-                                <div class="flex-grow-1">
-                                    <h6 class="f-w-600 font-secondary">12-11-2024<span>Yesterday</span><span class="float-end circle-dot-secondary">
-                                            <svg class="circle-color">
-                                                <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#circle') }}"></use>
-                                            </svg></span></h6>
-                                    <h5>Fenter Jessy</h5>
-                                    <p>Sometimes the simplest things are the most profound.</p>
-                                </div>
-                            </li>
+                            @endforelse
                         </ul>
                     </div>
                 </li>
@@ -254,7 +328,7 @@
                     // 1. Update Navbar UI Immediately
                     const currentLangImg = document.querySelector('.lang-dropdown-trigger img');
                     const currentLangText = document.querySelector('.lang-dropdown-trigger .lang-txt');
-                    
+
                     if (currentLangImg && flagUrl) currentLangImg.src = flagUrl;
                     if (currentLangText) currentLangText.textContent = langName;
 
@@ -267,44 +341,32 @@
                         const checkIcon = el.querySelector('.fa-check');
                         if (checkIcon) checkIcon.remove();
                     });
-                    
+
                     element.classList.add('active', 'text-primary');
                     element.insertAdjacentHTML('beforeend', '<i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>');
 
                     // 4. DYNAMIC FIELD UPDATES:
-                    // If we are on a settings page, clear all relevant inputs first
-                    // then populate with available data.
+                    // We can only update form fields dynamically on "Settings" pages.
+                    // For the rest of the admin panel (sidebar, dashboard, etc.), 
+                    // a page reload is required because those elements are server-side rendered.
                     const settingsForm = document.querySelector('form[id*="SettingsForm"]');
                     if (settingsForm) {
-                        const inputs = settingsForm.querySelectorAll('input[type="text"], textarea');
+                        const inputs = settingsForm.querySelectorAll('input[type="text"], input[type="number"], textarea');
                         inputs.forEach(input => {
-                            // Clear existing values
                             input.value = '';
-                            
-                            // If data exists for this key, fill it
                             if (data.data && data.data[input.name] !== undefined) {
                                 input.value = data.data[input.name];
                             }
                         });
 
-                        // Special handling for images: hide previews or update them
-                        const imagePreviews = settingsForm.querySelectorAll('.img-thumbnail');
-                        imagePreviews.forEach(preview => {
-                            // Find corresponding data (this is trickier as image keys vary)
-                            // For now, let's keep images as they are or mark them as "Needs Update"
-                            // If data has the key, we could try to update SRC but usually images 
-                            // need proper path handling.
-                        });
-                        
                         if (typeof showToast === 'function') {
                             showToast(`Switched to ${langName} successfully.`);
                         }
                     } else {
-                        // If not on a settings page, a reload might still be needed 
-                        // to translate the whole UI (sidebar, etc.)
+                        // For standard CRUD pages, we must reload to refresh the translated UI
                         location.reload();
                     }
-                    
+
                     console.log("Language changed dynamically to:", id);
                 } else {
                     console.warn(data.message);
@@ -313,12 +375,42 @@
             .catch(error => console.error('Error changing language:', error));
     }
 
-    document.querySelectorAll(".lang").forEach(function(element) {
-        element.addEventListener("click", function(e) {
-            if (this.hasAttribute("data-value")) {
-                e.preventDefault();
-                changeLanguage(this);
-            }
-        });
-    });
+    function changeCountry(element) {
+        let code = element.getAttribute("data-value");
+        let flagUrl = element.getAttribute("data-flag");
+        if (!code) return;
+
+        fetch(`{{ url('admin/change-country') }}/${code}`, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    const currentImg = document.querySelector('.country-dropdown-trigger img');
+                    const currentTxt = document.querySelector('.country-dropdown-trigger .country-txt');
+
+                    if (currentImg && flagUrl) currentImg.src = flagUrl;
+                    if (currentTxt) currentTxt.textContent = code.toUpperCase();
+
+                    // Update active state
+                    document.querySelectorAll('.country-menu-list .lang').forEach(el => {
+                        el.classList.remove('active', 'text-primary');
+                        const checkIcon = el.querySelector('.fa-check');
+                        if (checkIcon) checkIcon.remove();
+                    });
+
+                    element.classList.add('active', 'text-primary');
+                    element.insertAdjacentHTML('beforeend', '<i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>');
+
+                    if (typeof showToast === 'function') {
+                        showToast(`Country changed to ${code.toUpperCase()} successfully.`);
+                    }
+                }
+            })
+            .catch(error => console.error('Error changing country:', error));
+    }
 </script>
