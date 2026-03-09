@@ -2157,7 +2157,7 @@
                     let newCheckbox = `
                         <div class="${colClass}">
                             <div class="form-check checkbox-primary d-flex align-items-center">
-                                <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${type}_${newId}" checked>
+                                <input class="form-check-input me-2" type="checkbox" name="${checkboxName}" value="${newName}" id="${type}_${newId}" checked>
                                 <label class="form-check-label flex-grow-1 mb-0" for="${type}_${newId}">${newName}</label>
                                 <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="${type}"><i class="fa fa-trash"></i></a>
                             </div>

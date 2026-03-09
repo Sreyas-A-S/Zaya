@@ -230,6 +230,7 @@
                     const pill = document.getElementById('lang-toggle-pill');
                     const langTexts = document.querySelectorAll('[id^="lang-text-"]');
                     
+                    @if(isset($available_languages) && $available_languages->count() >= 2)
                     if (pill) {
                         if (targetLocale === '{{ $lang2->code }}') {
                             pill.classList.remove('translate-x-0');
@@ -256,6 +257,7 @@
                         const nextLocale = targetLocale === '{{ $lang1->code }}' ? '{{ $lang2->code }}' : '{{ $lang1->code }}';
                         toggleBtn.setAttribute('onclick', `toggleLanguage('${nextLocale}')`);
                     }
+                    @endif
 
                     console.log("Language changed dynamically to:", targetLocale);
                 }
