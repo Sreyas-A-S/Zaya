@@ -31,18 +31,18 @@
                     </button>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="display" id="doctors-table">
+                    <div class="table-responsive doctors-table-wrapper">
+                        <table class="display w-100" id="doctors-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th class="text-center">ID</th>
                                     <th>Name</th>
-                                    <th>Gender</th>
+                                    <th class="text-center">Gender</th>
                                     <th>Email</th>
                                     <th>Phone number</th>
                                     <th>Nationality</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -141,19 +141,45 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="mobile_number" required maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter mobile number">
-                                        </div>
+                                           <input type="tel" class="form-control phone-input" name="mobile_number" id="mobile_number" placeholder="Enter mobile number" required>
+                                      </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Email ID <span class="text-danger">*</span></label>
                                             <input type="email" class="form-control" name="email" required maxlength="255" placeholder="Enter email id">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Password <span class="small text-muted" id="password-hint">(Required for new)</span></label>
-                                            <input type="password" class="form-control" name="password" id="password-input" minlength="6">
+                                            <label class="form-label">
+                                                Password <span class="small text-muted" id="password-hint">(Required for new)</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="password"
+                                                    class="form-control"
+                                                    name="password"
+                                                    id="password-input"
+                                                    minlength="6"
+                                                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+                                                    title="Password must contain at least 1 uppercase, 1 lowercase, 1 number and no spaces"
+                                                    required>
+                                                <span class="input-group-text toggle-password" data-target="password-input" style="cursor:pointer;">
+                                                    <i class="fa fa-eye"></i>
+                                                </span>
+                                            </div>
                                         </div>
+
                                         <div class="col-md-4">
                                             <label class="form-label">Confirm Password</label>
-                                            <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input" minlength="6">
+                                            <div class="input-group">
+                                                <input type="password"
+                                                    class="form-control"
+                                                    name="password_confirmation"
+                                                    id="password-confirm-input"
+                                                    minlength="6"
+                                                    required>
+                                                <span class="input-group-text toggle-password" data-target="password-confirm-input" style="cursor:pointer;">
+                                                    <i class="fa fa-eye"></i>
+                                                </span>
+                                            </div>
+                                            <small id="password-error" class="text-danger"></small>
                                         </div>
 
 
@@ -215,9 +241,15 @@
                                                 @foreach($specializations as $spec)
                                                 <div class="col-md-3">
                                                     <div class="form-check checkbox-primary d-flex align-items-center">
-                                                        <input class="form-check-input spec-checkbox" type="checkbox" name="specialization[]" value="{{ $spec->name }}" id="spec_{{ $spec->id }}">
-                                                        <label class="form-check-label flex-grow-1 mb-0" for="spec_{{ $spec->id }}">{{ $spec->name }}</label>
-                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $spec->id }}" data-type="specializations"><i class="fa fa-trash"></i></a>
+                                                        <input class="form-check-input spec-checkbox me-2" type="checkbox" name="specialization[]" value="{{ $spec->name }}" id="spec_{{ $spec->id }}">
+                                                        
+                                                        <label class="form-check-label flex-grow-1 mb-0" for="spec_{{ $spec->id }}">
+                                                            {{ $spec->name }}
+                                                        </label>
+
+                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $spec->id }}" data-type="specializations">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -228,7 +260,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Degree Certificates (Upload multiple) <span class="file-keep-note d-none text-muted">(Upload to replace/add)</span></label>
+                                            <label class="form-label">Degree Certificates (Upload multiple) <small class="text-muted fs-9">Ctrl + click to select multiple</small><span class="file-keep-note d-none text-muted">(Upload to replace/add)</span></label>
                                             <input type="file" class="form-control" name="degree_certificates[]" multiple>
                                             <div id="current-degree-certs" class="mt-2 d-none"></div>
                                         </div>
@@ -261,15 +293,14 @@
                                             <input type="text" class="form-control" name="zip_code" required maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Pincode">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Country <span class="text-danger">*</span></label>
-                                            <select class="form-select" name="country" required>
-                                                <option value="">Select Country</option>
-                                                @foreach(config('countries') as $country)
-                                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>{{ $country }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
+                                             <label class="form-label">Country <span class="text-danger">*</span></label>
+                                             <select class="form-select" name="country" id="country" required>
+                                                 <option value="">Select Country</option>
+                                                 @foreach(config('countries') as $code => $name)
+                                                 <option value="{{ $name }}" data-flag="{{ strtolower($code) }}" {{ $name == 'India' ? 'selected' : '' }}>{{ $name }}</option>
+                                                 @endforeach
+                                             </select>
+                                         </div>                                        <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
                                             <button type="button" class="btn btn-outline-dark prev-step" data-prev="1"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
                                             <button type="button" class="btn btn-primary next-step" data-next="3">Next Step <i class="iconly-Arrow-Right icli ms-2"></i></button>
                                         </div>
@@ -283,43 +314,86 @@
                                             <h5 class="f-w-600 mb-3">D. Ayurveda Consultation Expertise</h5>
                                         </div>
                                         <div class="col-md-12">
-                                            <div class="row">
-                                                @foreach($expertises as $skill)
-                                                <div class="col-md-4">
-                                                    <div class="form-check checkbox-primary d-flex align-items-center">
-                                                        <input class="form-check-input skill-checkbox" type="checkbox" name="consultation_expertise[]" value="{{ $skill->name }}" id="skill_{{ $skill->id }}">
-                                                        <label class="form-check-label flex-grow-1 mb-0" for="skill_{{ $skill->id }}">{{ $skill->name }}</label>
-                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $skill->id }}" data-type="expertises"><i class="fa fa-trash"></i></a>
-                                                    </div>
-                                                </div>
-                                                @endforeach
-                                            </div>
-                                            <div class="input-group mt-2" style="max-width: 300px;">
-                                                <input type="text" class="form-control form-control-sm new-master-data-input" placeholder="Type new expertise..." data-type="expertises">
-                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
-                                            </div>
-                                        </div>
+    <div class="row">
+        @foreach($expertises as $skill)
+        <div class="col-md-4">
+            <div class="form-check checkbox-primary d-flex align-items-center">
+                
+                <input class="form-check-input skill-checkbox me-2" 
+                       type="checkbox" 
+                       name="consultation_expertise[]" 
+                       value="{{ $skill->name }}" 
+                       id="skill_{{ $skill->id }}">
+
+                <label class="form-check-label flex-grow-1 mb-0" for="skill_{{ $skill->id }}">
+                    {{ $skill->name }}
+                </label>
+
+                <a href="javascript:void(0)" 
+                   class="text-danger ms-2 delete-master-data-btn" 
+                   data-id="{{ $skill->id }}" 
+                   data-type="expertises">
+                   <i class="fa fa-trash"></i>
+                </a>
+
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    <div class="input-group mt-2" style="max-width: 300px;">
+        <input type="text" class="form-control form-control-sm new-master-data-input" 
+               placeholder="Type new expertise..." data-type="expertises">
+
+        <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button">
+            <i class="fa fa-plus"></i>
+        </button>
+    </div>
+</div>
 
                                         <div class="col-12 mt-4">
                                             <h5 class="f-w-600 mb-3">E. Health Conditions Treated</h5>
                                         </div>
                                         <div class="col-md-12">
-                                            <div class="row">
-                                                @foreach($healthConditions as $cond)
-                                                <div class="col-md-3">
-                                                    <div class="form-check checkbox-primary d-flex align-items-center">
-                                                        <input class="form-check-input cond-checkbox" type="checkbox" name="health_conditions[]" value="{{ $cond->name }}" id="cond_{{ $cond->id }}">
-                                                        <label class="form-check-label flex-grow-1 mb-0" for="cond_{{ $cond->id }}">{{ $cond->name }}</label>
-                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $cond->id }}" data-type="conditions"><i class="fa fa-trash"></i></a>
-                                                    </div>
-                                                </div>
-                                                @endforeach
-                                            </div>
-                                            <div class="input-group mt-2" style="max-width: 300px;">
-                                                <input type="text" class="form-control form-control-sm new-master-data-input" placeholder="Type new condition..." data-type="conditions">
-                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
-                                            </div>
-                                        </div>
+    <div class="row">
+        @foreach($healthConditions as $cond)
+        <div class="col-md-3">
+            <div class="form-check checkbox-primary d-flex align-items-center">
+
+                <input class="form-check-input cond-checkbox me-2"
+                       type="checkbox"
+                       name="health_conditions[]"
+                       value="{{ $cond->name }}"
+                       id="cond_{{ $cond->id }}">
+
+                <label class="form-check-label flex-grow-1 mb-0"
+                       for="cond_{{ $cond->id }}">
+                       {{ $cond->name }}
+                </label>
+
+                <a href="javascript:void(0)"
+                   class="text-danger ms-2 delete-master-data-btn"
+                   data-id="{{ $cond->id }}"
+                   data-type="conditions">
+                   <i class="fa fa-trash"></i>
+                </a>
+
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    <div class="input-group mt-2" style="max-width: 300px;">
+        <input type="text"
+               class="form-control form-control-sm new-master-data-input"
+               placeholder="Type new condition..."
+               data-type="conditions">
+
+        <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button">
+            <i class="fa fa-plus"></i>
+        </button>
+    </div>
+</div>
 
                                         <div class="col-12 mt-4">
                                             <h5 class="f-w-600 mb-3">F. Therapy Skills</h5>
@@ -344,12 +418,28 @@
                                             <div class="row">
                                                 @foreach($externalTherapies as $ther)
                                                 <div class="col-md-4">
-                                                    <div class="form-check checkbox-primary d-flex align-items-center">
-                                                        <input class="form-check-input ther-checkbox" type="checkbox" name="external_therapies[]" value="{{ $ther->name }}" id="ther_{{ $ther->id }}">
-                                                        <label class="form-check-label flex-grow-1 mb-0" for="ther_{{ $ther->id }}">{{ $ther->name }}</label>
-                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $ther->id }}" data-type="therapies"><i class="fa fa-trash"></i></a>
-                                                    </div>
-                                                </div>
+    <div class="form-check checkbox-primary d-flex align-items-center">
+
+        <input class="form-check-input ther-checkbox me-2"
+               type="checkbox"
+               name="external_therapies[]"
+               value="{{ $ther->name }}"
+               id="ther_{{ $ther->id }}">
+
+        <label class="form-check-label flex-grow-1 mb-0"
+               for="ther_{{ $ther->id }}">
+               {{ $ther->name }}
+        </label>
+
+        <a href="javascript:void(0)"
+           class="text-danger ms-2 delete-master-data-btn"
+           data-id="{{ $ther->id }}"
+           data-type="therapies">
+           <i class="fa fa-trash"></i>
+        </a>
+
+    </div>
+</div>
                                                 @endforeach
                                             </div>
                                             <div class="input-group mt-2" style="max-width: 300px;">
@@ -664,11 +754,52 @@
 
 
 @section('scripts')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 <style>
+    .doctors-table-wrapper {
+        overflow-x: auto;
+    }
+
+    #doctors-table {
+        width: 100% !important;
+    }
+
+    #doctors-table thead th {
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    #doctors-table tbody td {
+        vertical-align: middle;
+    }
+
+    #doctors-table th.text-center,
+    #doctors-table td.text-center {
+        text-align: center;
+    }
+
+    #doctors-table th:last-child,
+    #doctors-table td:last-child {
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    #doctors-table td:last-child .d-flex {
+        justify-content: center;
+        flex-wrap: nowrap;
+    }
+
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 1rem;
+    }
+
     /* Stepper Styling */
     .stepper-horizontal {
         display: flex;
@@ -884,6 +1015,41 @@
     let table;
     let toastInstance;
     let languageChoices;
+    let iti;
+
+    $(document).ready(function() {
+        const phoneInput = document.querySelector("#mobile_number");
+        if (phoneInput) {
+            iti = window.intlTelInput(phoneInput, {
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                separateDialCode: true,
+                initialCountry: "in",
+                preferredCountries: ["in", "ae", "us", "gb"]
+            });
+        }
+    });
+
+    //password
+    document.querySelectorAll(".toggle-password").forEach(function (element) {
+
+    element.addEventListener("click", function () {
+
+        let target = document.getElementById(this.dataset.target);
+        let icon = this.querySelector("i");
+
+        if (target.type === "password") {
+            target.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            target.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+
+    });
+
+});
 
     function showToast(message, type = 'success') {
         const toastEl = document.getElementById('liveToast');
@@ -906,6 +1072,35 @@
         messageEl.innerText = message;
         toastInstance.show();
     }
+    
+
+   $(document).ready(function () {
+
+    function formatCountry(country) {
+        if (!country.id) {
+            return country.text;
+        }
+
+        var flag = $(country.element).data('flag');
+
+        if (!flag) {
+            return country.text;
+        }
+
+        var $country = $(
+            '<span><span class="fi fi-' + flag + '" style="margin-right:8px"></span>' + country.text + '</span>'
+        );
+
+        return $country;
+    }
+
+    $('#country').select2({
+        templateResult: formatCountry,
+        templateSelection: formatCountry,
+        width: '100%'
+    });
+
+});
 
     function validatePasswordMatch() {
         const password = $('#password-input').val();
@@ -924,12 +1119,16 @@
         table = $('#doctors-table').DataTable({
             processing: true,
             serverSide: true,
+            autoWidth: false,
+            responsive: false,
+            scrollX: true,
             ajax: "{{ route('admin.doctors.index') }}",
             columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
                     orderable: false,
-                    searchable: false
+                    searchable: false,
+                    className: 'text-center'
                 },
                 {
                     data: 'name',
@@ -941,6 +1140,7 @@
                 {
                     data: 'gender',
                     name: 'doctors.gender',
+                    className: 'text-center',
                     render: function(data) {
                         return data ? data.charAt(0).toUpperCase() + data.slice(1) : 'N/A';
                     }
@@ -969,9 +1169,25 @@
                     className: 'text-center'
                 },
             ],
+            columnDefs: [
+                { targets: 0, width: '60px' },
+                { targets: 2, width: '100px' },
+                { targets: 4, width: '170px' },
+                { targets: 5, width: '140px' },
+                { targets: 6, width: '120px', className: 'text-center' },
+                { targets: 7, width: '120px' }
+            ],
             order: [
                 [0, 'desc']
             ] // Default sort by column 0 (which is the Row Index/ID logically here)
+        });
+
+        table.columns.adjust();
+
+        $(window).on('resize', function() {
+            if (table) {
+                table.columns.adjust();
+            }
         });
 
 
@@ -1109,6 +1325,9 @@
 
     function openCreateModal() {
         $('#doctor-form')[0].reset();
+        if (iti) {
+            iti.setNumber('');
+        }
         $('#doctor_id').val('');
         $('#form-method').val('POST');
         $('#form-modal-title').text('Register New Doctor');
@@ -1148,6 +1367,21 @@
         $('#doctor-form-modal').modal('show');
     }
 
+    // Handle Password Visibility Toggle
+    $(document).on('click', '.toggle-password', function() {
+        const targetId = $(this).data('target');
+        const input = $('#' + targetId);
+        const icon = $(this).find('i');
+
+        if (input.attr('type') === 'password') {
+            input.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            input.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+
     function editDoctor(id) {
         $('#doctor-form')[0].reset();
         $('.is-invalid').removeClass('is-invalid');
@@ -1183,7 +1417,11 @@
             $('[name="last_name"]').val(lastName || '');
             $('[name="gender"]').val(profile.gender);
             $('[name="dob"]').val(profile.dob ? profile.dob.substring(0, 10) : '');
-            $('[name="mobile_number"]').val((profile.phone || '').replace(/[^0-9]/g, ''));
+            if (profile.phone && iti) {
+                iti.setNumber(profile.phone);
+            } else if (iti) {
+                iti.setNumber('');
+            }
             $('[name="email"]').val(doctor.email);
 
             // Update Image Preview
@@ -1532,6 +1770,10 @@
         const url = doctor_id ? "{{ url('admin/doctors') }}/" + doctor_id : "{{ route('admin.doctors.store') }}";
         const formData = new FormData(this);
 
+        if (iti) {
+            formData.set('mobile_number', iti.getNumber());
+        }
+
         if (croppedFile) {
             formData.set('profile_photo', croppedFile, 'profile_photo.png');
         }
@@ -1629,9 +1871,10 @@
                 selector: 'input[name="mobile_number"]',
                 check: (el) => {
                     if (!el.val()) return true;
-                    return /^[0-9]{10,15}$/.test(el.val());
+                    const val = el.val().replace(/[\s\-\(\)\+]/g, '');
+                    return val.length >= 7 && val.length <= 15;
                 },
-                message: 'Please enter a valid phone number (10-15 digits)'
+                message: 'Please enter a valid phone number'
             },
             {
                 selector: 'input[name="pan_number"]',
@@ -1662,7 +1905,6 @@
         validations.forEach(v => {
             stepContainer.find(v.selector).each(function() {
                 const el = $(this);
-                if (el.is(':hidden')) return; // ignore hidden field validation
                 if (!v.check(el)) {
                     el.addClass('is-invalid');
                     if (el.next('.invalid-feedback').length === 0) {
@@ -2032,6 +2274,13 @@
             });
         }
     };
+
+    const passwordInput = document.getElementById('password-input');
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function () {
+            this.value = this.value.replace(/\s/g, '');
+        });
+    }
 </script>
 <!-- Master Data Delete Modal -->
 <div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">

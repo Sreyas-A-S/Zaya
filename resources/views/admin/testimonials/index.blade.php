@@ -587,8 +587,8 @@
         $('body').on('click', '.toggle-status', function() {
             var id = $(this).data('id');
             var currentStatus = $(this).data('status');
-            var newStatus = (currentStatus === 'active') ? 0 : 1;
-            var newStatusText = (currentStatus === 'active') ? 'Disapproved' : 'Approved';
+            var newStatus = (currentStatus === 'approved') ? 'pending' : 'approved';
+            var newStatusText = (currentStatus === 'approved') ? 'Pending' : 'Approved';
 
             $('#status-testimonial-id').val(id);
             $('#status-new-value').val(newStatus);

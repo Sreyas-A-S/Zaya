@@ -29,7 +29,7 @@ class WebController extends Controller
             ->latest()
             ->take(8)
             ->get();
-        $testimonials = \App\Models\Testimonial::withCount(['likes', 'replies'])->where('status', true)->latest()->get();
+        $testimonials = \App\Models\Testimonial::withCount(['likes', 'replies'])->where('status', 'approved')->latest()->get();
         $ip = request()->ip();
         $testimonials->each(function($testimonial) use ($ip) {
             $testimonial->is_liked = $testimonial->likes()->where('ip_address', $ip)->exists();
@@ -60,7 +60,7 @@ class WebController extends Controller
             $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
         }
         
-        $testimonials = \App\Models\Testimonial::withCount(['likes', 'replies'])->where('status', true)->latest()->get();
+        $testimonials = \App\Models\Testimonial::withCount(['likes', 'replies'])->where('status', 'approved')->latest()->get();
         $ip = request()->ip();
         $testimonials->each(function($testimonial) use ($ip) {
             $testimonial->is_liked = $testimonial->likes()->where('ip_address', $ip)->exists();

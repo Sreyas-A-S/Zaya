@@ -5,6 +5,9 @@
 @section('content')
 <!-- Add Cropper.js CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css">
 
 <div class="container-fluid">
     <div class="page-title">
@@ -168,7 +171,7 @@
                             <label class="form-label">Country <span class="text-danger">*</span></label>
                             <select name="country[]" id="country" class="form-control select2" multiple required>
                                 @foreach($countries as $country)
-                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    <option value="{{ $country->id }}" data-flag="{{ strtolower($country->code) }}">{{ $country->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -526,14 +529,40 @@
 <!-- Add Cropper.js JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="{{ asset('admiro/assets/js/select2/select2.full.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 
 <script>
 $(document).ready(function () {
-    // Initialize Select2
-    $('.select2').select2({
+    // Flag formatting for Select2
+    function formatCountry(country) {
+        if (!country.id) return country.text;
+        var flag = $(country.element).data('flag');
+        if (!flag) return country.text;
+        return $('<span><span class="fi fi-' + flag + ' me-2"></span>' + country.text + '</span>');
+    }
+
+    // Initialize Select2 with flags
+    $('#country').select2({
+        placeholder: "Select Country",
+        allowClear: true,
+        dropdownParent: $('#financeManagerModal'),
+        templateResult: formatCountry,
+        templateSelection: formatCountry
+    });
+
+    $('.select2:not(#country)').select2({
         placeholder: "Select options",
         allowClear: true,
         dropdownParent: $('#financeManagerModal')
+    });
+
+    // Initialize intl-tel-input
+    const phoneInput = document.querySelector("#phone");
+    window.iti = window.intlTelInput(phoneInput, {
+        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+        separateDialCode: true,
+        initialCountry: "in",
+        preferredCountries: ["in", "ae", "us", "gb"]
     });
 
     let table = $('#finance-managers-table').DataTable({
@@ -669,7 +698,11 @@ $(document).ready(function () {
             $('#firstname').val(user.first_name);
             $('#lastname').val(user.last_name);
             $('#email').val(user.email);
-            $('#phone').val(user.phone);
+            if (user.phone) {
+                window.iti.setNumber(user.phone);
+            } else {
+                $('#phone').val('');
+            }
             
             // Set Select2 Multiple values for Country
             if (user.national_id) {
@@ -746,6 +779,7 @@ $(document).ready(function () {
     $('#financeManagerForm').on('submit', function(e) {
         e.preventDefault();
         let formData = new FormData(this);
+        formData.set('phone', window.iti.getNumber());
         
         $.ajax({
             url: $(this).attr('action'),
@@ -863,6 +897,9 @@ $(document).ready(function () {
 function openCreateModal() {
     $('#fm-modal-title').text('Register Finance Managers');
     $('#financeManagerForm')[0].reset();
+    if (typeof iti !== 'undefined') {
+        iti.setNumber('');
+    }
     $('#country, #language').val([]).trigger('change');
     $('#userId').val('');
     $('#croppedImage').val('');

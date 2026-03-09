@@ -131,12 +131,36 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Password <span class="text-danger">*</span> <span class="small text-muted" id="password-hint">(New Only)</span></label>
-                                            <input type="password" class="form-control" name="password" id="password-input">
-                                        </div>
+<div class="input-group">
+        <input type="password"
+               class="form-control"
+               name="password"
+               id="password"
+               minlength="6"
+               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+               title="Password must contain uppercase, lowercase, number and no spaces"
+               required>
+
+        <span class="input-group-text toggle-password" data-target="password">
+            <i class="fa fa-eye"></i>
+        </span>
+    </div>                                      </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                            <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input">
-                                            <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
+<div class="input-group">
+        <input type="password"
+               class="form-control"
+               name="password"
+               id="password"
+               minlength="6"
+               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+               title="Password must contain uppercase, lowercase, number and no spaces"
+               required>
+
+        <span class="input-group-text toggle-password" data-target="password">
+            <i class="fa fa-eye"></i>
+        </span>
+    </div>                                            <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Gender <span class="text-danger">*</span></label>
@@ -157,7 +181,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="phone" required  pattern="^\+\d{1,3}\s\d{10,15}$" title="Phone number must contain 10 to 15 digits" placeholder="Phone Number">
+                                            <input type="text" class="form-control" name="phone" id="phone" required placeholder="Phone Number">
                                         </div>
                                         <div class="col-12 mt-3">
                                             <h6 class="f-w-600 mb-3">Address Information</h6>
@@ -184,10 +208,10 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Country <span class="text-danger">*</span></label>
-                                            <select class="form-select" name="country" required>
+                                            <select class="form-select" name="country" id="country" required>
                                                 <option value="">Select Country</option>
-                                                @foreach(config('countries') as $country)
-                                                <option value="{{ $country }}" {{ $country == 'India' ? 'selected' : '' }}>{{ $country }}</option>
+                                                @foreach(config('countries') as $code => $name)
+                                                <option value="{{ $name }}" data-flag="{{ strtolower($code) }}" {{ $name == 'India' ? 'selected' : '' }}>{{ $name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -210,9 +234,25 @@
                                                 @foreach($wellnessConsultations as $item)
                                                 <div class="col-md-4">
                                                     <div class="form-check checkbox-primary d-flex align-items-center">
-                                                        <input class="form-check-input cons-checkbox" type="checkbox" name="consultations[]" value="{{ $item->name }}" id="cons_{{ $item->id }}">
-                                                        <label class="form-check-label flex-grow-1 mb-0" for="cons_{{ $item->id }}">{{ $item->name }}</label>
-                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $item->id }}" data-type="wellness_consultations"><i class="fa fa-trash"></i></a>
+
+                                                        <input class="form-check-input cons-checkbox me-2"
+                                                            type="checkbox"
+                                                            name="consultations[]"
+                                                            value="{{ $item->name }}"
+                                                            id="cons_{{ $item->id }}">
+
+                                                        <label class="form-check-label flex-grow-1 mb-0"
+                                                            for="cons_{{ $item->id }}">
+                                                            {{ $item->name }}
+                                                        </label>
+
+                                                        <a href="javascript:void(0)"
+                                                        class="text-danger ms-2 delete-master-data-btn"
+                                                        data-id="{{ $item->id }}"
+                                                        data-type="wellness_consultations">
+                                                        <i class="fa fa-trash"></i>
+                                                        </a>
+
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -228,9 +268,25 @@
                                                 @foreach($bodyTherapies as $item)
                                                 <div class="col-md-4">
                                                     <div class="form-check checkbox-primary d-flex align-items-center">
-                                                        <input class="form-check-input body-checkbox" type="checkbox" name="body_therapies[]" value="{{ $item->name }}" id="body_{{ $item->id }}">
-                                                        <label class="form-check-label flex-grow-1 mb-0" for="body_{{ $item->id }}">{{ $item->name }}</label>
-                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $item->id }}" data-type="body_therapies"><i class="fa fa-trash"></i></a>
+
+                                                        <input class="form-check-input body-checkbox me-2"
+                                                            type="checkbox"
+                                                            name="body_therapies[]"
+                                                            value="{{ $item->name }}"
+                                                            id="body_{{ $item->id }}">
+
+                                                        <label class="form-check-label flex-grow-1 mb-0"
+                                                            for="body_{{ $item->id }}">
+                                                            {{ $item->name }}
+                                                        </label>
+
+                                                        <a href="javascript:void(0)"
+                                                        class="text-danger ms-2 delete-master-data-btn"
+                                                        data-id="{{ $item->id }}"
+                                                        data-type="body_therapies">
+                                                        <i class="fa fa-trash"></i>
+                                                        </a>
+
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -245,10 +301,25 @@
                                             <div class="row g-2">
                                                 @foreach($practitionerModalities as $item)
                                                 <div class="col-md-4">
-                                                    <div class="form-check checkbox-primary d-flex align-items-center">
-                                                        <input class="form-check-input mod-checkbox" type="checkbox" name="other_modalities[]" value="{{ $item->name }}" id="mod_{{ $item->id }}">
-                                                        <label class="form-check-label flex-grow-1 mb-0" for="mod_{{ $item->id }}">{{ $item->name }}</label>
-                                                        <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $item->id }}" data-type="practitioner_modalities"><i class="fa fa-trash"></i></a>
+                                                 <div class="form-check checkbox-primary d-flex align-items-center">    
+                                                        <input class="form-check-input mod-checkbox me-2"
+                                                            type="checkbox"
+                                                            name="other_modalities[]"
+                                                            value="{{ $item->name }}"
+                                                            id="mod_{{ $item->id }}">
+
+                                                        <label class="form-check-label flex-grow-1 mb-0"
+                                                            for="mod_{{ $item->id }}">
+                                                            {{ $item->name }}
+                                                        </label>
+
+                                                        <a href="javascript:void(0)"
+                                                        class="text-danger ms-2 delete-master-data-btn"
+                                                        data-id="{{ $item->id }}"
+                                                        data-type="practitioner_modalities">
+                                                        <i class="fa fa-trash"></i>
+                                                        </a>
+
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -320,35 +391,42 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Website</label>
-                                            <input type="url" class="form-control" name="social_links[website]" placeholder="https://">
+                                            <input type="url" class="form-control" name="social_links[website]" placeholder="https://" pattern="https://.*" title="Please enter a valid website URL starting with https://">
                                         </div>
+
                                         <div class="col-md-3">
                                             <label class="form-label">Facebook</label>
-                                            <input type="url" class="form-control" name="social_links[facebook]" placeholder="https://">
+                                            <input type="url" class="form-control" name="social_links[facebook]" placeholder="https://" pattern="https://.*" title="Please enter a valid Facebook URL starting with https://">
                                         </div>
+
                                         <div class="col-md-3">
                                             <label class="form-label">Instagram</label>
-                                            <input type="url" class="form-control" name="social_links[instagram]" placeholder="https://">
+                                            <input type="url" class="form-control" name="social_links[instagram]" placeholder="https://" pattern="https://.*" title="Please enter a valid Instagram URL starting with https://">
                                         </div>
+
                                         <div class="col-md-3">
                                             <label class="form-label">LinkedIn</label>
-                                            <input type="url" class="form-control" name="social_links[linkedin]" placeholder="https://">
+                                            <input type="url" class="form-control" name="social_links[linkedin]" placeholder="https://" pattern="https://.*" title="Please enter a valid LinkedIn URL starting with https://">
                                         </div>
+
                                         <div class="col-md-3">
                                             <label class="form-label">YouTube</label>
-                                            <input type="url" class="form-control" name="social_links[youtube]" placeholder="https://">
+                                            <input type="url" class="form-control" name="social_links[youtube]" placeholder="https://" pattern="https://.*" title="Please enter a valid YouTube URL starting with https://">
                                         </div>
+
                                         <div class="col-md-12">
                                             <label class="form-label">Additional Courses</label>
-                                            <textarea class="form-control" name="additional_courses" rows="2"></textarea>
+                                            <textarea class="form-control" name="additional_courses" rows="2" maxlength="500" placeholder="Enter additional courses (max 500 characters)"></textarea>
                                         </div>
+
                                         <div class="col-md-8">
                                             <label class="form-label">Languages Spoken</label>
-                                            <select class="form-select" id="languages_select" multiple>
+                                            <select class="form-select" name="languages[]" id="languages_select" multiple required>
                                                 @foreach($languages as $lang)
                                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
                                                 @endforeach
                                             </select>
+
                                             <div id="languages_capabilities_container"></div>
                                         </div>
                                         <div class="col-md-4">
@@ -538,6 +616,9 @@
 
 
 @section('scripts')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
@@ -729,6 +810,19 @@
     let qualCount = 1;
     let cropper;
     let croppedFile;
+    let iti;
+
+    $(document).ready(function() {
+        const phoneInput = document.querySelector("#phone");
+        if (phoneInput) {
+            iti = window.intlTelInput(phoneInput, {
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                separateDialCode: true,
+                initialCountry: "in",
+                preferredCountries: ["in", "ae", "us", "gb"]
+            });
+        }
+    });
 
     function showToast(message, type = 'success') {
         const toastEl = document.getElementById('liveToast');
@@ -914,8 +1008,8 @@
         stepContainer.find('.is-invalid').removeClass('is-invalid');
         stepContainer.find('.invalid-feedback').remove();
         
-        // Find all required fields and those with patterns
-        const inputs = stepContainer.find('input[required], select[required], textarea[required], input[pattern]').not(':hidden');
+        // Find all required fields and those with patterns (including hidden ones as they might be stylized)
+        const inputs = stepContainer.find('input[required], select[required], textarea[required], input[pattern]');
         
         inputs.each(function() {
             const el = $(this);
@@ -1088,6 +1182,9 @@
 
     function openCreateModal() {
         $('#practitioner-form')[0].reset();
+        if (iti) {
+            iti.setNumber('');
+        }
         $('#practitioner_id').val('');
         $('#form-method').val('POST');
 
@@ -1157,7 +1254,11 @@
             $('[name="gender"]').val(p.gender || '');
             $('[name="dob"]').val(p.dob ? p.dob.substring(0, 10) : '');
             $('[name="nationality"]').val(p.nationality || '');
-            $('[name="phone"]').val(p.phone || '');
+            if (iti) {
+                iti.setNumber(p.phone || '');
+            } else {
+                $('[name="phone"]').val(p.phone || '');
+            }
             $('[name="address_line_1"]').val(p.address_line_1 || '');
             $('[name="address_line_2"]').val(p.address_line_2 || '');
             $('[name="city"]').val(p.city || '');
@@ -1315,6 +1416,10 @@
         const id = $('#practitioner_id').val();
         const url = id ? "{{ url('admin/practitioners') }}/" + id : "{{ route('admin.practitioners.store') }}";
         const formData = new FormData(this);
+
+        if (iti) {
+            formData.set('phone', iti.getNumber());
+        }
 
         if (croppedFile) {
             formData.set('profile_photo', croppedFile, 'profile_photo.jpg');
@@ -1585,6 +1690,13 @@
             }
         });
     });
+
+
+
+     document.getElementById("password").addEventListener("input", function () {
+    this.value = this.value.replace(/\s/g, '');
+});
+
 </script>
 
 <!-- Call Confirmation Modal -->
@@ -1630,6 +1742,7 @@
         </div>
     </div>
 </div>
+
 
 
 <style>
