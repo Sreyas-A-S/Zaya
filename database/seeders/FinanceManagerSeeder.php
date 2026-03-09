@@ -34,7 +34,6 @@ class FinanceManagerSeeder extends Seeder
                 'languages' => !empty($languageIds) ? [$faker->randomElement($languageIds)] : [],
                 'role' => 'finance_manager',
                 'phone' => $faker->numerify('##########'),
-                'status' => 'active',
             ]);
         }
     }
