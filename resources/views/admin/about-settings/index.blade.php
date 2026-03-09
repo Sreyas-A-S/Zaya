@@ -84,7 +84,7 @@
                                     @php
                                     $bannerSettings = $settings->filter(fn($s) => Str::contains($s->key, 'banner'));
                                     $teamSettings = $settings->filter(fn($s) => Str::contains($s->key, 'team'));
-                                    $generalSettings = $settings->diff($bannerSettings)->diff($teamSettings);
+                                    $generalSettings = $settings->filter(fn($s) => !Str::contains($s->key, 'banner') && !Str::contains($s->key, 'team'));
                                     @endphp
 
                                     <!-- General Tab -->

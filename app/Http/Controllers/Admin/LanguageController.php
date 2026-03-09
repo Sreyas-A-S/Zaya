@@ -99,11 +99,16 @@ class LanguageController extends Controller
     public function change($code)
     {
         $code = strtolower((string) $code);
-        $normalized = explode('-', $code)[0] ?? $code;
+        $baseCode = explode('-', $code)[0];
 
-        $language = Language::where('code', $code)
-            ->orWhere('code', $normalized)
-            ->first();
+        // Find the language by exact code or by base code (preferring shorter code)
+        $language = Language::where('code', $code)->first();
+        
+        if (!$language) {
+            $language = Language::where('code', 'like', $baseCode . '%')
+                ->orderByRaw('LENGTH(code) ASC')
+                ->first();
+        }
 
         if (!$language) {
             return response()->json([
@@ -113,18 +118,19 @@ class LanguageController extends Controller
         }
 
         $locale = $language->code;
-        if (strpos($locale, '-') !== false) {
-            $locale = explode('-', $locale)[0];
-        }
+        // For Laravel locale, usually we just want the base code (e.g., 'en')
+        // unless we have specific regional translations.
+        $laravelLocale = explode('-', $locale)[0];
 
-        Session::put('locale', $locale);
+        Session::put('locale', $laravelLocale);
+        session(['locale' => $laravelLocale]);
 
-        $settings = HomepageSetting::where('language', $locale)
+        $settings = HomepageSetting::where('language', $laravelLocale)
             ->pluck('value', 'key');
 
         return response()->json([
             'status' => true,
-            'language' => $locale,
+            'language' => $laravelLocale,
             'data' => $settings,
         ]);
     }
