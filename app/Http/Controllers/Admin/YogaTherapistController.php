@@ -51,7 +51,7 @@ class YogaTherapistController extends Controller
                 ]);
 
             // Role-based country restriction
-            if (!$isSuperAdmin) {
+            if (!$isSuperAdmin && !empty($user->national_id)) {
                 $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
                 $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
                 $query->whereIn('yoga_therapists.country', $assignedCountryNames);

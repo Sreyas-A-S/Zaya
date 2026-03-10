@@ -44,7 +44,7 @@ class AdminsController extends Controller
                 ]);
 
             // Role-based country restriction for the query
-            if (!$isSuperAdmin) {
+            if (!$isSuperAdmin && !empty($user->national_id)) {
                 $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
                 $query->whereIn('users.national_id', $assignedCountryIds);
             }
@@ -117,7 +117,7 @@ class AdminsController extends Controller
         $allCountries = Country::all();
         $languages = Language::all();
 
-        if ($isSuperAdmin) {
+        if ($isSuperAdmin || empty($user->national_id)) {
             $countries = $allCountries;
         } else {
             $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];

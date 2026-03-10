@@ -27,7 +27,7 @@ class FinanceManagerController extends Controller
                         ->select('users.*');
 
             // Role-based country restriction
-            if (!$isSuperAdmin) {
+            if (!$isSuperAdmin && !empty($user->national_id)) {
                 $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
                 $data->where(function($q) use ($assignedCountryIds) {
                     foreach ($assignedCountryIds as $id) {
@@ -134,7 +134,7 @@ class FinanceManagerController extends Controller
         $allCountries = Country::all();
         $languages = Language::all();
 
-        if ($isSuperAdmin) {
+        if ($isSuperAdmin || empty($user->national_id)) {
             $countries = $allCountries;
         } else {
             $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];

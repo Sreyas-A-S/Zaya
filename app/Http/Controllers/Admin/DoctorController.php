@@ -59,7 +59,7 @@ class DoctorController extends Controller
                 ]);
 
             // Role-based country restriction
-            if (!$isSuperAdmin) {
+            if (!$isSuperAdmin && !empty($user->national_id)) {
                 $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
                 $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
                 $query->whereIn('doctors.country', $assignedCountryNames);
@@ -143,7 +143,7 @@ class DoctorController extends Controller
         $languages = \App\Models\Language::all();
 
         $allCountries = \App\Models\Country::all();
-        if ($isSuperAdmin) {
+        if ($isSuperAdmin || empty($user->national_id)) {
             $countries = $allCountries;
         } else {
             $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
