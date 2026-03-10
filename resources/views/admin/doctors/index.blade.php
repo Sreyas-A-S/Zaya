@@ -221,34 +221,6 @@
                                             </div>
                                         </div>
 
-        <span class="input-group-text toggle-password" data-target="password">
-            <i class="fa fa-eye"></i>
-        </span>
-    </div>
-</div>
-
-<div class="col-md-4">
-    <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-
-    <div class="input-group">
-        <input type="password"
-               class="form-control"
-               name="password_confirmation"
-               id="password-confirm-input"
-               minlength="6"
-               required>
-
-        <span class="input-group-text toggle-password" data-target="password-confirm-input">
-            <i class="fa fa-eye"></i>
-        </span>
-    </div>
-
-    <div class="invalid-feedback" id="password-confirm-error">
-        Passwords do not match
-    </div>
-</div>
-
-
                                         <div class="col-12 mt-4">
                                             <h5 class="f-w-600 mb-3">B. Medical Registration</h5>
                                         </div>
