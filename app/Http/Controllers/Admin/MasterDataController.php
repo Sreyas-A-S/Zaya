@@ -102,7 +102,7 @@ class MasterDataController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[a-zA-Z0-9\s\-\&\(\)\.\,\/\+]+$/',
+                'regex:/^[a-zA-Z\s\-\&\(\)\.\,\/\+]+$/',
             ],
             'status' => 'required|boolean',
         ], [
@@ -142,7 +142,7 @@ class MasterDataController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[a-zA-Z0-9\s\-\&\(\)\.\,\/\+]+$/',
+                'regex:/^[a-zA-Z\s\-\&\(\)\.\,\/\+]+$/',
             ],
             'status' => 'required|boolean',
         ], [
