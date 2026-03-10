@@ -179,41 +179,47 @@
                                             <label class="form-label">Email ID <span class="text-danger">*</span></label>
                                             <input type="email" class="form-control" name="email" required maxlength="255" placeholder="Enter email id">
                                         </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">
-                                                Password <span class="small text-muted" id="password-hint">(Required for new)</span>
-                                            </label>
-                                            <div class="input-group">
-                                                <input type="password"
-                                                    class="form-control"
-                                                    name="password"
-                                                    id="password-input"
-                                                    minlength="6"
-                                                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
-                                                    title="Password must contain at least 1 uppercase, 1 lowercase, 1 number and no spaces"
-                                                    required>
-                                                <span class="input-group-text toggle-password" data-target="password-input" style="cursor:pointer;">
-                                                    <i class="fa fa-eye"></i>
-                                                </span>
-                                            </div>
-                                        </div>
+                                       <div class="col-md-4">
+    <label class="form-label">
+        Password <span class="small text-muted" id="password-hint"></span>
+    </label>
 
-                                        <div class="col-md-4">
-                                            <label class="form-label">Confirm Password</label>
-                                            <div class="input-group">
-                                                <input type="password"
-                                                    class="form-control"
-                                                    name="password_confirmation"
-                                                    id="password-confirm-input"
-                                                    minlength="6"
-                                                    required>
-                                                <span class="input-group-text toggle-password" data-target="password-confirm-input" style="cursor:pointer;">
-                                                    <i class="fa fa-eye"></i>
-                                                </span>
-                                            </div>
-                                            <small id="password-error" class="text-danger"></small>
-                                        </div>
+    <div class="input-group">
+        <input type="password"
+               class="form-control"
+               name="password"
+               id="password"
+               minlength="6"
+               pattern="^[A-Z](?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$"
+               title="Password must start with a capital letter, contain lowercase, number, special character and be at least 6 characters"
+               required>
 
+        <span class="input-group-text toggle-password" data-target="password">
+            <i class="fa fa-eye"></i>
+        </span>
+    </div>
+</div>
+
+<div class="col-md-4">
+    <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+
+    <div class="input-group">
+        <input type="password"
+               class="form-control"
+               name="password_confirmation"
+               id="password-confirm-input"
+               minlength="6"
+               required>
+
+        <span class="input-group-text toggle-password" data-target="password-confirm-input">
+            <i class="fa fa-eye"></i>
+        </span>
+    </div>
+
+    <div class="invalid-feedback" id="password-confirm-error">
+        Passwords do not match
+    </div>
+</div>
 
 
                                         <div class="col-12 mt-4">
@@ -287,8 +293,10 @@
                                                 @endforeach
                                             </div>
                                             <div class="input-group mt-2" style="max-width: 300px;">
-                                                <input type="text" class="form-control form-control-sm new-master-data-input" placeholder="Type new specialization..." data-type="specializations">
-                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
+<input type="text"
+       class="form-control form-control-sm new-master-data-input"
+       placeholder="Type new specialization..."
+       data-type="specializations">                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -1094,6 +1102,21 @@
 
         messageEl.innerText = message;
         toastInstance.show();
+    }
+
+
+
+    function validatePasswordMatch() {
+        const password = $('#password-input').val();
+        const confirmPassword = $('#password-confirm-input').val();
+
+        if (confirmPassword && password !== confirmPassword) {
+            $('#password-confirm-input').addClass('is-invalid');
+            $('#submit-btn').prop('disabled', true);
+        } else {
+            $('#password-confirm-input').removeClass('is-invalid');
+            $('#submit-btn').prop('disabled', false);
+        }
     }
 
 

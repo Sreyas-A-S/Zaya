@@ -3,8 +3,9 @@
 @section('title', 'Finance Managers')
 
 @section('content')
-<!-- Add Cropper.js CSS -->
+<!-- Add Cropper.js CSS and intl-tel-input CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
 <style>
     #finance-managers-table_wrapper .dataTables_filter {
         display: flex;
@@ -16,6 +17,24 @@
     }
     #custom-filters-container {
         margin-bottom: 0 !important;
+    }
+
+    /* intl-tel-input fixes */
+    .iti {
+        width: 100% !important;
+        display: block;
+    }
+    .iti__flag-container {
+        z-index: 10;
+        background: transparent !important;
+    }
+    .iti__country-list {
+        z-index: 100 !important;
+    }
+    .iti--separate-dial-code .iti__selected-dial-code {
+        font-size: 14px;
+        color: #333;
+        margin-left: 4px;
     }
 </style>
 
@@ -95,9 +114,9 @@
                 <input type="hidden" name="cropped_image" id="croppedImage">
 
                 <div class="modal-body p-4">
-                    <div class="row g-3">
-                        <!-- Profile Photo -->
-                        <div class="col-md-12 text-center mb-4">
+                    <div class="row g-3 align-items-center">
+                        <!-- Profile Photo on the Left -->
+                        <div class="col-md-4 text-center">
                             <div class="avatar-upload">
                                 <div class="avatar-edit">
                                     <input type='file' id="imageUpload" accept=".png, .jpg, .jpeg" />
@@ -111,116 +130,75 @@
                             <label class="form-label mt-2">Profile Photo</label>
                         </div>
 
-                                            <!-- Fields -->
-                                            <div class="col-sm-6 col-md-4">
-                        <label class="form-label">
-                            First Name <span class="text-danger">*</span>
-                        </label>
-                        <input 
-                            class="form-control @error('firstname') is-invalid @enderror"
-                            type="text"
-                            name="firstname"
-                            id="firstname"
-                            value="{{ old('firstname') }}"
-                            required
-                            placeholder="First Name"
-                        >
-                        @error('firstname')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                        <!-- Right Column with other fields -->
+                        <div class="col-md-8">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label">
+                                        First Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input class="form-control" type="text" pattern="^[A-Za-z]+$"
+           title="First name must contain only letters" name="firstname" id="firstname" required placeholder="First Name">
+                                </div>
 
+                                <div class="col-sm-6">
+                                    <label class="form-label">
+                                        Last Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input class="form-control" type="text"  pattern="^[A-Za-z]+$"
+           title="Last name must contain only letters" name="lastname" id="lastname" required placeholder="Last Name">
+                                </div>
 
-                    <div class="col-sm-6 col-md-4">
-                        <label class="form-label">
-                            Last Name <span class="text-danger">*</span>
-                        </label>
-                        <input 
-                            class="form-control @error('lastname') is-invalid @enderror"
-                            type="text"
-                            name="lastname"
-                            id="lastname"
-                            value="{{ old('lastname') }}"
-                            required
-                            pattern="^[A-Z][a-z]*$"
-                            title="First letter must be capital and only letters allowed"
-                            placeholder="Last Name"
-                        >
-                        @error('lastname')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label">
+                                        Email Address <span class="text-danger">*</span>
+                                    </label>
+                                    <input class="form-control" type="email" name="email" id="email" required placeholder="Email">
+                                </div>
 
+                                <div class="col-sm-6">
+                                    <label class="form-label">
+                                        Phone Number <span class="text-danger">*</span>
+                                    </label>
+                                    <input class="form-control" type="text" name="phone" id="phone" required placeholder="Phone Number">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label">Country <span class="text-danger">*</span></label>
+                                    <select name="country[]" id="country" class="form-control select2" multiple required>
+                                        @foreach($countries as $country)
+                                            <option value="{{ $country->id }}" data-flag="{{ strtolower($country->code) }}">{{ $country->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label">Language <span class="text-danger">*</span></label>
+                                    <select name="language[]" id="language" class="form-control select2" multiple required>
+                                        @foreach($languages as $language)
+                                            <option value="{{ $language->id }}">{{ $language->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label">Status <span class="text-danger">*</span></label>
+                                    <select name="status" id="status" class="form-control" required>
+                                        <option value="pending">Pending</option>
+                                        <option value="active">Active</option>
+                                        <option value="rejected">Rejected</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
 
-                    <div class="col-sm-6 col-md-4">
-                        <label class="form-label">
-                            Email Address <span class="text-danger">*</span>
-                        </label>
-                        <input 
-                            class="form-control @error('email') is-invalid @enderror"
-                            type="email"
-                            name="email"
-                            id="email"
-                            value="{{ old('email') }}"
-                            required
-                            placeholder="Email"
-                        >
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-
-                    <div class="col-sm-6 col-md-4">
-                        <label class="form-label">
-                            Phone Number <span class="text-danger">*</span>
-                        </label>
-                        <input 
-                            class="form-control @error('phone') is-invalid @enderror"
-                            type="text"
-                            name="phone"
-                            id="phone"
-                            value="{{ old('phone') }}"
-                            required
-                            placeholder="Phone Number"
-                        >
-                        @error('phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                        <div class="col-sm-6 col-md-4">
-                            <label class="form-label">Country <span class="text-danger">*</span></label>
-                            <select name="country[]" id="country" class="form-control select2" multiple required>
-                                @foreach($countries as $country)
-                                    <option value="{{ $country->id }}" data-flag="{{ strtolower($country->code) }}">{{ $country->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-sm-6 col-md-4">
-                            <label class="form-label">Language <span class="text-danger">*</span></label>
-                            <select name="language[]" id="language" class="form-control select2" multiple required>
-                                @foreach($languages as $language)
-                                    <option value="{{ $language->id }}">{{ $language->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-sm-6 col-md-4">
-                            <label class="form-label">Status <span class="text-danger">*</span></label>
-                            <select name="status" id="status" class="form-control" required>
-                                <option value="pending">Pending</option>
-                                <option value="active">Active</option>
-                                <option value="rejected">Rejected</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-
-                        <div class="col-sm-6 col-md-4 password-field">
-                            <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password" id="password" required placeholder="Password">
-                        </div>
-                        <div class="col-sm-6 col-md-4 password-field">
-                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password_confirmation" id="password_confirmation" required placeholder="Confirm Password">
+                                <div class="col-sm-6 password-field">
+                                    <label class="form-label">Password <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="password" name="password" id="password" required placeholder="Password"
+                                        pattern="(?=^[A-Z])[A-Za-z0-9]{6,}" 
+                                        title="Password must start with a capital letter, be alphanumeric and at least 6 characters long">
+                                </div>
+                                <div class="col-sm-6 password-field">
+                                    <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="password" name="password_confirmation" id="password_confirmation" required placeholder="Confirm Password">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -582,6 +560,8 @@ $(document).ready(function () {
     window.iti = window.intlTelInput(phoneInput, {
         utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
         separateDialCode: true,
+        showSelectedDialCode: true,
+        autoPlaceholder: 'aggressive',
         initialCountry: "in",
         preferredCountries: ["in", "ae", "us", "gb"]
     });

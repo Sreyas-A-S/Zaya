@@ -98,15 +98,15 @@ class AdminsController extends Controller
                 ->addColumn('action', function ($row) {
                     return '
                         <div class="d-flex align-items-center gap-2">
-                            <button type="button" 
-                                class="btn btn-sm btn-secondary btn-outline-secondary editUser" 
-                                data-id="' . $row->id . '">
-                                <i class="bi bi-pencil-square me-1"></i> Edit
-                            </button>
-
-                            <button type="button" class="btn btn-sm btn-danger deleteUser" data-id="' . $row->id . '">
-                                Delete
-                            </button>
+                            <a href="javascript:void(0)" data-id="' . $row->id . '" class="text-info viewUser" title="View">
+                                <i class="iconly-Show icli" style="font-size: 20px;"></i>
+                            </a>
+                            <a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editUser" title="Edit">
+                                <i class="iconly-Edit-Square icli" style="font-size: 20px;"></i>
+                            </a>
+                            <a href="javascript:void(0)" data-id="' . $row->id . '" class="text-danger deleteUser" title="Delete">
+                                <i class="iconly-Delete icli" style="font-size: 20px;"></i>
+                            </a>
                         </div>
                     ';
                 })
@@ -131,13 +131,17 @@ class AdminsController extends Controller
     {
         $request->validate([
             'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'firstname'   => 'required|string|max:255',
-            'lastname'    => 'required|string|max:255',
+            'firstname' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$/'],
+            'lastname'  => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$/'],
             'email'       => 'required|email|unique:users,email',
             'phone'       => 'required|string|max:20',
             'country'     => 'required|string',
             'language'    => 'required|string',
-            'password'    => 'required|min:6|confirmed',
+            'password'    => ['required', 'min:6', 'confirmed', 'regex:/^[A-Z][A-Za-z0-9]{5,}$/'],
+        ], [
+            'password.regex' => 'Password must start with a capital letter and be alphanumeric.',
+            'firstname.regex' => 'The first name contains invalid characters.',
+            'lastname.regex' => 'The last name contains invalid characters.',
         ]);
 
         $imagePath = null;
@@ -165,7 +169,19 @@ class AdminsController extends Controller
 
     public function edit($id)
     {
-        $admin = User::findOrFail($id);
+        $admin = DB::table('users')
+            ->leftJoin('countries', 'countries.id', '=', 'users.national_id')
+            ->select('users.*', 'countries.name as nationality_name')
+            ->where('users.id', $id)
+            ->first();
+
+        if ($admin) {
+            // Ensure languages is treated as array for JSON response if needed
+            if (is_string($admin->languages)) {
+                $admin->languages = json_decode($admin->languages, true);
+            }
+        }
+
         return response()->json($admin);
     }
 
@@ -174,22 +190,39 @@ class AdminsController extends Controller
         $admin = User::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $admin->id,
-            'phone' => 'required|string|max:20',
+            'name'    => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$/'],
+            'email'   => 'required|email|unique:users,email,' . $admin->id,
+            'phone'   => 'required|string|max:20',
             'country' => 'nullable|string',
-            'language' => 'nullable|string',
-            'status' => 'required',
+            'language'=> 'nullable|string',
+            'status'  => 'required',
+            'password'=> ['nullable', 'min:6', 'confirmed', 'regex:/^[A-Z][A-Za-z0-9]{5,}$/'],
+        ], [
+            'password.regex' => 'Password must start with a capital letter and be alphanumeric.',
+            'name.regex' => 'The name contains invalid characters.',
         ]);
 
-        $admin->update([
+        $data = [
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'national_id' => $request->country,
             'languages' => [$request->language],
             'status' => $request->status,
-        ]);
+        ];
+
+        // If name is updated, try to split it for first_name and last_name
+        if ($request->filled('name')) {
+            $parts = explode(' ', $request->name, 2);
+            $data['first_name'] = $parts[0];
+            $data['last_name'] = $parts[1] ?? '';
+        }
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $admin->update($data);
 
         return response()->json(['success' => true]);
     }

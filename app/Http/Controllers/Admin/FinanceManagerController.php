@@ -150,10 +150,10 @@ class FinanceManagerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'firstname' => ['required', 'string', 'max:255'],
-            'lastname'  => ['required', 'string', 'max:255'],
+            'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
+                        'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
             'email'     => 'required|email|unique:users,email',
-            'password'  => 'required|confirmed|min:6',
+            'password'  => ['required', 'confirmed', 'min:6', 'regex:/^[A-Z][A-Za-z0-9]{5,}$/'],
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',
             'language'  => 'required|array',
@@ -164,6 +164,7 @@ class FinanceManagerController extends Controller
         ], [
             'firstname.regex' => 'First name must start with a capital letter and contain only letters.',
             'lastname.regex'  => 'Last name must start with a capital letter and contain only letters.',
+            'password.regex'  => 'Password must start with a capital letter and be alphanumeric.'
         ]);
 
         $profilePic = null;
@@ -207,8 +208,8 @@ class FinanceManagerController extends Controller
         $user = User::where('role', 'finance_manager')->findOrFail($id);
 
         $request->validate([
-            'firstname' => ['required', 'string', 'max:255'],
-            'lastname'  => ['required', 'string', 'max:255'],
+            'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
+                        'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
             'email'     => 'required|email|unique:users,email,' . $id,
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',
@@ -216,10 +217,12 @@ class FinanceManagerController extends Controller
             'language.*'=> 'exists:languages,id',
             'phone'     => ['required', 'string', 'min:10', 'max:20'],
             'cropped_image' => 'nullable|string',
-            'status'    => 'required|string|in:pending,active,rejected,inactive'
+            'status'    => 'required|string|in:pending,active,rejected,inactive',
+            'password'  => ['nullable', 'confirmed', 'min:6', 'regex:/^[A-Z][A-Za-z0-9]{5,}$/'],
         ], [
             'firstname.regex' => 'First name must start with a capital letter and contain only letters.',
             'lastname.regex'  => 'Last name must start with a capital letter and contain only letters.',
+            'password.regex'  => 'Password must start with a capital letter and be alphanumeric.'
         ]);
 
         if ($request->filled('cropped_image')) {
@@ -228,7 +231,7 @@ class FinanceManagerController extends Controller
             $user->profile_pic = $request->file('profile_picture')->store('profiles', 'public');
         }
 
-        $user->update([
+        $data = [
             'name'       => $request->firstname . ' ' . $request->lastname,
             'first_name' => $request->firstname,
             'last_name'  => $request->lastname,
@@ -237,7 +240,13 @@ class FinanceManagerController extends Controller
             'languages'  => $request->language,
             'phone'      => $request->phone,
             'status'     => $request->status,
-        ]);
+        ];
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user->update($data);
 
         return response()->json(['success' => true, 'message' => 'Finance Manager Updated Successfully']);
     }

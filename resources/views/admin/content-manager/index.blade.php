@@ -114,12 +114,13 @@
                         <!-- Fields -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="firstname" id="firstname" required placeholder="First Name">
+                            <input class="form-control" type="text" pattern="^[A-Za-z]+$"
+           title="First name must contain only letters" name="firstname" id="firstname" required placeholder="First Name">
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="lastname" id="lastname" required placeholder="Last Name">
+                            <input class="form-control" type="text" pattern="^[A-Za-z]+$" title="Last name must contain only letters" name="lastname" id="lastname" required placeholder="Last Name">
                         </div>
 
                         <div class="col-md-6 mb-3">

@@ -127,6 +127,16 @@
                                     <option value="inactive">Inactive</option>
                                 </select>
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Password (Leave blank to keep current)</label>
+                                <input type="password" id="edit_password" class="form-control" 
+                                    pattern="(?=^[A-Z])[A-Za-z0-9]{6,}" 
+                                    title="Password must start with a capital letter, be alphanumeric and at least 6 characters long">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Confirm Password</label>
+                                <input type="password" id="edit_password_confirmation" class="form-control">
+                            </div>
                         </div>
                         <div class="text-end mt-3">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -139,6 +149,85 @@
     </div>
 
     <!-- Status Confirmation Modal -->
+    <div class="modal fade" id="viewAdminModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-white border-bottom-0">
+                    <h5 class="modal-title fw-bold">Admin Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="row g-0">
+                        <!-- Left Sidebar (Profile) -->
+                        <div class="col-md-4 border-end bg-light p-4 text-center">
+                            <div class="position-relative d-inline-block mb-3">
+                                <img id="view-profile-pic" src="{{ asset('admiro/assets/images/user/user.png') }}" 
+                                     class="rounded-circle shadow-sm"
+                                     style="width: 150px; height: 150px; object-fit: cover; border: 5px solid white;">
+                                <div id="view-status-badge-overlay" class="position-absolute translate-middle-x start-50" style="bottom: -10px;">
+                                    <!-- Badge injected by JS -->
+                                </div>
+                            </div>
+                            
+                            <h4 class="fw-bold mb-1" id="view-name">-</h4>
+                            <div class="text-muted mb-3">Administrator</div>
+                            
+                            <div class="d-flex flex-column align-items-center gap-2 mb-4">
+                                <div class="d-flex align-items-center gap-2 text-dark">
+                                    <i class="iconly-Message icli"></i>
+                                    <span id="view-email">-</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 text-dark">
+                                    <i class="iconly-Call icli"></i>
+                                    <span id="view-phone">-</span>
+                                </div>
+                            </div>
+
+                            <div class="text-start px-3 mb-4">
+                                <h6 class="fw-bold mb-2">Languages</h6>
+                                <div id="view-languages-container" class="d-flex flex-wrap gap-1">
+                                    <!-- Tags injected by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Content (Details) -->
+                        <div class="col-md-8 p-4">
+                            <div class="section-title mb-3">
+                                <h6 class="text-dark fw-bold border-bottom pb-2">Account Information</h6>
+                            </div>
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label class="text-muted small d-block mb-1">First Name</label>
+                                    <div class="fw-bold" id="view-fname">-</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small d-block mb-1">Last Name</label>
+                                    <div class="fw-bold" id="view-lname">-</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small d-block mb-1">Nationality</label>
+                                    <div class="fw-bold" id="view-nationality">-</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small d-block mb-1">Role</label>
+                                    <div class="fw-bold text-capitalize">Admin</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small d-block mb-1">Created At</label>
+                                    <div class="fw-bold" id="view-created-at">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-outline-dark px-4" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -183,11 +272,11 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">First Name</label>
-                                <input type="text" name="firstname" class="form-control" required>
+                                <input type="text" pattern="^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$" title="First name contains invalid characters" name="firstname" class="form-control" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Last Name</label>
-                                <input type="text" name="lastname" class="form-control" required>
+                                <input type="text" pattern="^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$" title="Last name contains invalid characters" name="lastname" class="form-control" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Email</label>
@@ -217,7 +306,9 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Password</label>
-                                <input type="password" name="password" class="form-control" required>
+                                <input type="password" name="password" class="form-control" required
+                                    pattern="(?=^[A-Z])[A-Za-z0-9]{6,}" 
+                                    title="Password must start with a capital letter, be alphanumeric and at least 6 characters long">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Confirm Password</label>
@@ -332,6 +423,14 @@
             $('#editAdminForm').submit(function(e) {
                 e.preventDefault();
                 let id = $('#edit_id').val();
+                let password = $('#edit_password').val();
+                let password_confirmation = $('#edit_password_confirmation').val();
+
+                if (password && password !== password_confirmation) {
+                    alert('Passwords do not match');
+                    return;
+                }
+
                 $.ajax({
                     url: '/admin/admins/' + id,
                     type: 'PUT',
@@ -342,14 +441,27 @@
                         phone: $('#edit_phone').val(),
                         country: $('#edit_country').val(),
                         language: $('#edit_language').val(),
-                        status: $('#edit_status').val()
+                        status: $('#edit_status').val(),
+                        password: password,
+                        password_confirmation: password_confirmation
                     },
                     success: function(response) {
                         $('#editAdminModal').modal('hide');
+                        $('#edit_password').val('');
+                        $('#edit_password_confirmation').val('');
                         $('#Admins-table').DataTable().ajax.reload(null, false);
                     },
                     error: function(xhr) {
-                        alert('Something went wrong');
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let errorMsg = '';
+                            for (let key in errors) {
+                                errorMsg += errors[key][0] + '\n';
+                            }
+                            alert(errorMsg);
+                        } else {
+                            alert('Something went wrong');
+                        }
                     }
                 });
             });
@@ -412,6 +524,66 @@
                     });
                 }
             });
+
+            // View User Details
+            $(document).on('click', '.viewUser', function() {
+                let id = $(this).data('id');
+                $.get("{{ url('admin/admins') }}/" + id + "/edit", function(user) {
+                    $('#view-name').text(user.name);
+                    $('#view-fname').text(user.first_name || '-');
+                    $('#view-lname').text(user.last_name || '-');
+                    $('#view-email').text(user.email);
+                    $('#view-phone').text(user.phone || 'N/A');
+                    $('#view-created-at').text(new Date(user.created_at).toLocaleString());
+                    $('#view-nationality').text(user.nationality_name || 'N/A');
+                    
+                    // Languages
+                    let languageNames = [];
+                    if (user.languages) {
+                        let languages = user.languages;
+                        if (typeof languages === 'string') {
+                            try { 
+                                languages = JSON.parse(languages); 
+                            } catch(e) { languages = [languages]; }
+                        }
+                        let lIds = Array.isArray(languages) ? languages : [languages];
+                        lIds.forEach(lid => {
+                            let name = $('#edit_language option[value="'+lid+'"]').text();
+                            if(name) languageNames.push(name);
+                        });
+                    }
+                    
+                    if(languageNames.length) {
+                        let html = languageNames.map(name => `<span class="badge bg-light text-dark border me-1">${name}</span>`).join('');
+                        $('#view-languages-container').html(html);
+                    } else {
+                        $('#view-languages-container').html('<span class="text-muted small">No languages specified</span>');
+                    }
+                    
+                    // Status
+                    let status = (user.status || 'inactive').toLowerCase();
+                    let badgeClass = 'bg-success';
+                    if (status !== 'active') badgeClass = 'bg-danger';
+                    
+                    $('#view-status-badge-overlay').html('<span class="badge ' + badgeClass + ' status-badge-view">' + status + '</span>');
+                    
+                    let avatar = user.profile_pic ? "{{ asset('storage') }}/" + user.profile_pic : "{{ asset('admiro/assets/images/user/user.png') }}";
+                    $('#view-profile-pic').attr('src', avatar);
+                    
+                    $('#viewAdminModal').modal('show');
+                });
+            });
         </script>
+        <style>
+            .status-badge-view {
+                padding: 2px 10px;
+                border-radius: 20px;
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                border: 2px solid white;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+        </style>
     @endpush
 @endsection

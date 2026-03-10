@@ -150,8 +150,8 @@ class ContentManagerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'firstname' => ['required', 'string', 'max:255'],
-            'lastname'  => ['required', 'string', 'max:255'],
+            'firstname' => ['required', 'string', 'max:40', 'regex:/^[A-Za-z]+$/'],
+            'lastname'  => ['required', 'string', 'max:40', 'regex:/^[A-Za-z]+$/'],
             'email'     => 'required|email|unique:users,email',
             'password'  => 'required|confirmed|min:6',
             'country'   => 'required|array',
@@ -207,8 +207,8 @@ class ContentManagerController extends Controller
         $user = User::where('role', 'content_manager')->findOrFail($id);
 
         $request->validate([
-            'firstname' => ['required', 'string', 'max:255'],
-            'lastname'  => ['required', 'string', 'max:255'],
+            'firstname' => ['required', 'string', 'max:40', 'regex:/^[A-Za-z]+$/'],
+            'lastname'  => ['required', 'string', 'max:40', 'regex:/^[A-Za-z]+$/'],
             'email'     => 'required|email|unique:users,email,' . $id,
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',
