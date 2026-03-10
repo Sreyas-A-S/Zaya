@@ -3,15 +3,23 @@
 @section('title', 'Doctors Management')
 
 @section('content')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css">
+<link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/select2.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
+<script src="{{ asset('admiro/assets/js/select2/select2.full.min.js') }}"></script>
+
 <style>
     #doctors-table_wrapper .dataTables_filter {
         display: flex;
         align-items: center;
         gap: 15px;
     }
+
     #doctors-table_wrapper .dataTables_filter label {
         margin-bottom: 0;
     }
+
     #custom-filters-container {
         margin-bottom: 0 !important;
     }
@@ -50,7 +58,7 @@
                             <select id="country-filter" class="form-select form-select-sm" style="width: 180px;">
                                 <option value="">All Countries</option>
                                 @foreach($countries as $country)
-                                    <option value="{{ $country->name }}">{{ $country->name }}</option>
+                                <option value="{{ $country->name }}">{{ $country->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -165,8 +173,8 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                                           <input type="tel" class="form-control phone-input" name="mobile_number" id="mobile_number" placeholder="Enter mobile number" required>
-                                      </div>
+                                            <input type="tel" class="form-control phone-input" name="mobile_number" id="mobile_number" placeholder="Enter mobile number" required>
+                                        </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Email ID <span class="text-danger">*</span></label>
                                             <input type="email" class="form-control" name="email" required maxlength="255" placeholder="Enter email id">
@@ -266,7 +274,7 @@
                                                 <div class="col-md-3">
                                                     <div class="form-check checkbox-primary d-flex align-items-center">
                                                         <input class="form-check-input spec-checkbox me-2" type="checkbox" name="specialization[]" value="{{ $spec->name }}" id="spec_{{ $spec->id }}">
-                                                        
+
                                                         <label class="form-check-label flex-grow-1 mb-0" for="spec_{{ $spec->id }}">
                                                             {{ $spec->name }}
                                                         </label>
@@ -317,14 +325,15 @@
                                             <input type="text" class="form-control" name="zip_code" required maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Pincode">
                                         </div>
                                         <div class="col-md-6">
-                                             <label class="form-label">Country <span class="text-danger">*</span></label>
-                                             <select class="form-select" name="country" id="country" required>
-                                                 <option value="">Select Country</option>
-                                                 @foreach(config('countries') as $code => $name)
-                                                 <option value="{{ $name }}" data-flag="{{ strtolower($code) }}" {{ $name == 'India' ? 'selected' : '' }}>{{ $name }}</option>
-                                                 @endforeach
-                                             </select>
-                                         </div>                                        <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
+                                            <label class="form-label">Country <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="country" id="country" required>
+                                                <option value="">Select Country</option>
+                                                @foreach(config('countries') as $code => $name)
+                                                <option value="{{ $name }}" data-flag="{{ strtolower($code) }}" {{ $name == 'India' ? 'selected' : '' }}>{{ $name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
                                             <button type="button" class="btn btn-outline-dark prev-step" data-prev="1"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
                                             <button type="button" class="btn btn-primary next-step" data-next="3">Next Step <i class="iconly-Arrow-Right icli ms-2"></i></button>
                                         </div>
@@ -338,86 +347,86 @@
                                             <h5 class="f-w-600 mb-3">D. Ayurveda Consultation Expertise</h5>
                                         </div>
                                         <div class="col-md-12">
-    <div class="row">
-        @foreach($expertises as $skill)
-        <div class="col-md-4">
-            <div class="form-check checkbox-primary d-flex align-items-center">
-                
-                <input class="form-check-input skill-checkbox me-2" 
-                       type="checkbox" 
-                       name="consultation_expertise[]" 
-                       value="{{ $skill->name }}" 
-                       id="skill_{{ $skill->id }}">
+                                            <div class="row">
+                                                @foreach($expertises as $skill)
+                                                <div class="col-md-4">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center">
 
-                <label class="form-check-label flex-grow-1 mb-0" for="skill_{{ $skill->id }}">
-                    {{ $skill->name }}
-                </label>
+                                                        <input class="form-check-input skill-checkbox me-2"
+                                                            type="checkbox"
+                                                            name="consultation_expertise[]"
+                                                            value="{{ $skill->name }}"
+                                                            id="skill_{{ $skill->id }}">
 
-                <a href="javascript:void(0)" 
-                   class="text-danger ms-2 delete-master-data-btn" 
-                   data-id="{{ $skill->id }}" 
-                   data-type="expertises">
-                   <i class="fa fa-trash"></i>
-                </a>
+                                                        <label class="form-check-label flex-grow-1 mb-0" for="skill_{{ $skill->id }}">
+                                                            {{ $skill->name }}
+                                                        </label>
 
-            </div>
-        </div>
-        @endforeach
-    </div>
+                                                        <a href="javascript:void(0)"
+                                                            class="text-danger ms-2 delete-master-data-btn"
+                                                            data-id="{{ $skill->id }}"
+                                                            data-type="expertises">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
 
-    <div class="input-group mt-2" style="max-width: 300px;">
-        <input type="text" class="form-control form-control-sm new-master-data-input" 
-               placeholder="Type new expertise..." data-type="expertises">
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
 
-        <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button">
-            <i class="fa fa-plus"></i>
-        </button>
-    </div>
-</div>
+                                            <div class="input-group mt-2" style="max-width: 300px;">
+                                                <input type="text" class="form-control form-control-sm new-master-data-input"
+                                                    placeholder="Type new expertise..." data-type="expertises">
+
+                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
 
                                         <div class="col-12 mt-4">
                                             <h5 class="f-w-600 mb-3">E. Health Conditions Treated</h5>
                                         </div>
                                         <div class="col-md-12">
-    <div class="row">
-        @foreach($healthConditions as $cond)
-        <div class="col-md-3">
-            <div class="form-check checkbox-primary d-flex align-items-center">
+                                            <div class="row">
+                                                @foreach($healthConditions as $cond)
+                                                <div class="col-md-3">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center">
 
-                <input class="form-check-input cond-checkbox me-2"
-                       type="checkbox"
-                       name="health_conditions[]"
-                       value="{{ $cond->name }}"
-                       id="cond_{{ $cond->id }}">
+                                                        <input class="form-check-input cond-checkbox me-2"
+                                                            type="checkbox"
+                                                            name="health_conditions[]"
+                                                            value="{{ $cond->name }}"
+                                                            id="cond_{{ $cond->id }}">
 
-                <label class="form-check-label flex-grow-1 mb-0"
-                       for="cond_{{ $cond->id }}">
-                       {{ $cond->name }}
-                </label>
+                                                        <label class="form-check-label flex-grow-1 mb-0"
+                                                            for="cond_{{ $cond->id }}">
+                                                            {{ $cond->name }}
+                                                        </label>
 
-                <a href="javascript:void(0)"
-                   class="text-danger ms-2 delete-master-data-btn"
-                   data-id="{{ $cond->id }}"
-                   data-type="conditions">
-                   <i class="fa fa-trash"></i>
-                </a>
+                                                        <a href="javascript:void(0)"
+                                                            class="text-danger ms-2 delete-master-data-btn"
+                                                            data-id="{{ $cond->id }}"
+                                                            data-type="conditions">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
 
-            </div>
-        </div>
-        @endforeach
-    </div>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
 
-    <div class="input-group mt-2" style="max-width: 300px;">
-        <input type="text"
-               class="form-control form-control-sm new-master-data-input"
-               placeholder="Type new condition..."
-               data-type="conditions">
+                                            <div class="input-group mt-2" style="max-width: 300px;">
+                                                <input type="text"
+                                                    class="form-control form-control-sm new-master-data-input"
+                                                    placeholder="Type new condition..."
+                                                    data-type="conditions">
 
-        <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button">
-            <i class="fa fa-plus"></i>
-        </button>
-    </div>
-</div>
+                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
 
                                         <div class="col-12 mt-4">
                                             <h5 class="f-w-600 mb-3">F. Therapy Skills</h5>
@@ -442,28 +451,28 @@
                                             <div class="row">
                                                 @foreach($externalTherapies as $ther)
                                                 <div class="col-md-4">
-    <div class="form-check checkbox-primary d-flex align-items-center">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center">
 
-        <input class="form-check-input ther-checkbox me-2"
-               type="checkbox"
-               name="external_therapies[]"
-               value="{{ $ther->name }}"
-               id="ther_{{ $ther->id }}">
+                                                        <input class="form-check-input ther-checkbox me-2"
+                                                            type="checkbox"
+                                                            name="external_therapies[]"
+                                                            value="{{ $ther->name }}"
+                                                            id="ther_{{ $ther->id }}">
 
-        <label class="form-check-label flex-grow-1 mb-0"
-               for="ther_{{ $ther->id }}">
-               {{ $ther->name }}
-        </label>
+                                                        <label class="form-check-label flex-grow-1 mb-0"
+                                                            for="ther_{{ $ther->id }}">
+                                                            {{ $ther->name }}
+                                                        </label>
 
-        <a href="javascript:void(0)"
-           class="text-danger ms-2 delete-master-data-btn"
-           data-id="{{ $ther->id }}"
-           data-type="therapies">
-           <i class="fa fa-trash"></i>
-        </a>
+                                                        <a href="javascript:void(0)"
+                                                            class="text-danger ms-2 delete-master-data-btn"
+                                                            data-id="{{ $ther->id }}"
+                                                            data-type="therapies">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
 
-    </div>
-</div>
+                                                    </div>
+                                                </div>
                                                 @endforeach
                                             </div>
                                             <div class="input-group mt-2" style="max-width: 300px;">
@@ -970,14 +979,17 @@
     #view-modal-content::-webkit-scrollbar {
         width: 5px;
     }
+
     #view-modal-content::-webkit-scrollbar-track {
         background: #f1f1f1;
         border-radius: 10px;
     }
+
     #view-modal-content::-webkit-scrollbar-thumb {
         background: #ccc;
         border-radius: 10px;
     }
+
     #view-modal-content::-webkit-scrollbar-thumb:hover {
         background: var(--theme-default);
     }
@@ -995,7 +1007,8 @@
         -webkit-line-clamp: 4;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        max-height: 6.4em; /* 4 lines * 1.6 line-height */
+        max-height: 6.4em;
+        /* 4 lines * 1.6 line-height */
     }
 
     .bio-content:not(.collapsed) {
@@ -1009,17 +1022,20 @@
     .bio-content::-webkit-scrollbar {
         width: 6px;
     }
+
     #view-modal-content::-webkit-scrollbar-track,
     .bio-content::-webkit-scrollbar-track {
         background: #f8f9fa;
         border-radius: 10px;
     }
+
     #view-modal-content::-webkit-scrollbar-thumb,
     .bio-content::-webkit-scrollbar-thumb {
         background: #ced4da;
         border-radius: 10px;
         border: 1px solid #f8f9fa;
     }
+
     #view-modal-content::-webkit-scrollbar-thumb:hover,
     .bio-content::-webkit-scrollbar-thumb:hover {
         background: var(--theme-default);
@@ -1079,35 +1095,35 @@
         messageEl.innerText = message;
         toastInstance.show();
     }
-    
 
-   $(document).ready(function () {
 
-    function formatCountry(country) {
-        if (!country.id) {
-            return country.text;
+    $(document).ready(function() {
+
+        function formatCountry(country) {
+            if (!country.id) {
+                return country.text;
+            }
+
+            var flag = $(country.element).data('flag');
+
+            if (!flag) {
+                return country.text;
+            }
+
+            var $country = $(
+                '<span><span class="fi fi-' + flag + '" style="margin-right:8px"></span>' + country.text + '</span>'
+            );
+
+            return $country;
         }
 
-        var flag = $(country.element).data('flag');
+        $('#country').select2({
+            templateResult: formatCountry,
+            templateSelection: formatCountry,
+            width: '100%'
+        });
 
-        if (!flag) {
-            return country.text;
-        }
-
-        var $country = $(
-            '<span><span class="fi fi-' + flag + '" style="margin-right:8px"></span>' + country.text + '</span>'
-        );
-
-        return $country;
-    }
-
-    $('#country').select2({
-        templateResult: formatCountry,
-        templateSelection: formatCountry,
-        width: '100%'
     });
-
-});
 
     function validatePasswordMatch() {
         const password = $('#password-input').val();
@@ -1128,7 +1144,7 @@
             serverSide: true,
             ajax: {
                 url: "{{ route('admin.doctors.index') }}",
-                data: function (d) {
+                data: function(d) {
                     d.country_filter = $('#country-filter').val();
                 }
             },
@@ -1182,13 +1198,31 @@
                     className: 'text-center'
                 },
             ],
-            columnDefs: [
-                { targets: 0, width: '60px' },
-                { targets: 2, width: '100px' },
-                { targets: 4, width: '170px' },
-                { targets: 5, width: '140px' },
-                { targets: 6, width: '120px', className: 'text-center' },
-                { targets: 7, width: '120px' }
+            columnDefs: [{
+                    targets: 0,
+                    width: '60px'
+                },
+                {
+                    targets: 2,
+                    width: '100px'
+                },
+                {
+                    targets: 4,
+                    width: '170px'
+                },
+                {
+                    targets: 5,
+                    width: '140px'
+                },
+                {
+                    targets: 6,
+                    width: '120px',
+                    className: 'text-center'
+                },
+                {
+                    targets: 7,
+                    width: '120px'
+                }
             ],
             order: [
                 [0, 'desc']
@@ -1236,11 +1270,11 @@
         $(document).off('click', '.read-more-link').on('click', '.read-more-link', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
+
             const $link = $(this);
             const $wrapper = $link.closest('.bio-wrapper');
             const $content = $wrapper.find('.bio-content');
-            
+
             if ($content.hasClass('collapsed')) {
                 $content.removeClass('collapsed');
                 $link.text('Read less');
@@ -1403,7 +1437,7 @@
         $('#doctor-form')[0].reset();
         $('.is-invalid').removeClass('is-invalid');
         $('.invalid-feedback').remove();
-        
+
         // Clear all current file indicators
         $('#current-reg-cert, #current-signature, #current-pan, #current-aadhaar, #current-cheque, #current-degree-certs, #current-profile-photo').addClass('d-none').empty();
         $('.file-keep-note').addClass('d-none');
@@ -1519,7 +1553,11 @@
 
             let social = profile.social_links || {};
             if (typeof social === 'string') {
-                try { social = JSON.parse(social); } catch (e) { social = {}; }
+                try {
+                    social = JSON.parse(social);
+                } catch (e) {
+                    social = {};
+                }
             }
             $('[name="website"]').val(social.website || '');
             $('[name="facebook"]').val(social.facebook || '');
@@ -1607,8 +1645,8 @@
                 $.each(arr, function(key, caps) {
                     const langName = caps.language || key;
                     if (typeof caps === 'string') {
-                         badgeHtml += `<span class="badge bg-light text-dark border me-1 mb-1">${caps}</span>`;
-                         return;
+                        badgeHtml += `<span class="badge bg-light text-dark border me-1 mb-1">${caps}</span>`;
+                        return;
                     }
                     let capsList = [];
                     if (caps.read) capsList.push('Read');
@@ -1625,17 +1663,23 @@
                 if (!dateStr) return 'N/A';
                 try {
                     const date = new Date(dateStr);
-                    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-                } catch (e) { return dateStr; }
+                    return date.toLocaleDateString('en-US', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                } catch (e) {
+                    return dateStr;
+                }
             };
 
             let social = p.social_links || {};
             if (typeof social === 'string') {
-                try { 
-                    social = JSON.parse(social); 
-                } catch (e) { 
+                try {
+                    social = JSON.parse(social);
+                } catch (e) {
                     console.error("Error parsing social_links:", e);
-                    social = {}; 
+                    social = {};
                 }
             }
             const fullName = (p.first_name && p.last_name) ? `${p.first_name} ${p.last_name}` : (d.name || 'N/A');
@@ -1775,10 +1819,10 @@
         e.preventDefault();
         const form = $(this);
         const doctor_id = $('#doctor_id').val();
-        
+
         // Final front-end check for all steps
-        for(let i=1; i<=5; i++) {
-            if(!validateStep(i)) {
+        for (let i = 1; i <= 5; i++) {
+            if (!validateStep(i)) {
                 updateStep(i);
                 return;
             }
@@ -1836,14 +1880,13 @@
     function validateStep(step) {
         let valid = true;
         const stepContainer = $('#step' + step);
-        
+
         // Clear previous errors
         stepContainer.find('.is-invalid').removeClass('is-invalid');
         stepContainer.find('.invalid-feedback').remove();
-        
+
         // Validation rules mapping
-        const validations = [
-            {
+        const validations = [{
                 selector: 'input[required], select[required], textarea[required]',
                 check: (el) => {
                     if (el.is(':checkbox')) return el.is(':checked');
@@ -1935,10 +1978,13 @@
         if (!valid) {
             const firstError = stepContainer.find('.is-invalid').first();
             if (firstError.length) {
-                firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError[0].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
             }
         }
-        
+
         return valid;
     }
 
@@ -2040,7 +2086,7 @@
         const $this = $(this);
         const id = $this.data('id');
         const currentStatus = String($this.data('status')).toLowerCase();
-        
+
         $('#status-doctor-id').val(id);
         $('#status-select-input').val(currentStatus); // Pre-select current status
         $('#status-confirmation-modal').modal('show');
@@ -2294,7 +2340,7 @@
 
     const passwordInput = document.getElementById('password');
     if (passwordInput) {
-        passwordInput.addEventListener('input', function () {
+        passwordInput.addEventListener('input', function() {
             this.value = this.value.replace(/\s/g, '');
         });
     }

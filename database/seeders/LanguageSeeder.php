@@ -13,7 +13,7 @@ class LanguageSeeder extends Seeder
      */
     public function run(): void
     {
-        $json = File::get('database/data/languages.json');
+        $json = File::get(database_path('data/languages.json'));
         $languages = json_decode($json, true);
 
         foreach ($languages as $language) {
