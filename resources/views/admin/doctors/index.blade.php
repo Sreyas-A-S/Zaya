@@ -1197,6 +1197,8 @@
 
         $('#country-filter').on('change', function() {
             table.ajax.reload();
+        });
+
         table.columns.adjust();
 
         $(window).on('resize', function() {

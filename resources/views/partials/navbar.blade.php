@@ -53,12 +53,12 @@
                     @php
                     $allLanguages = \App\Models\Language::all();
                     $user = auth()->user();
-                    $role = $user->roleData();
+                    $role = $user ? $user->roleData() : null;
 
                     if ($role && $role->name === 'Super Admin') {
                     $languages = $allLanguages;
                     } else {
-                    $assignedIds = $user->languages;
+                    $assignedIds = $user?->languages;
                     if (is_array($assignedIds)) {
                     $languages = $allLanguages->whereIn('id', $assignedIds);
                     } elseif ($assignedIds) {
@@ -140,7 +140,7 @@
                         if ($role && $role->name === 'Super Admin') {
                         $userCountries = $allCountries;
                         } else {
-                        $assignedCountryIds = $user->national_id;
+                        $assignedCountryIds = $user?->national_id;
                         if (is_array($assignedCountryIds)) {
                         $userCountries = $allCountries->whereIn('id', $assignedCountryIds);
                         } elseif ($assignedCountryIds) {
@@ -233,8 +233,9 @@
                             <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#notification') }}"></use>
                         </svg></a>
                     @php
-                        $unreadNotificationsCount = auth()->user()->unreadNotifications->count();
-                        $recentNotifications = auth()->user()->notifications()->latest()->take(5)->get();
+                        $authUser = auth()->user();
+                        $unreadNotificationsCount = $authUser ? $authUser->unreadNotifications()->count() : 0;
+                        $recentNotifications = $authUser ? $authUser->notifications()->latest()->take(5)->get() : collect();
                     @endphp
                     @if($unreadNotificationsCount > 0)
                     <span class="badge rounded-pill badge-primary">{{ $unreadNotificationsCount }}</span>
@@ -277,8 +278,8 @@
                     <div class="user-wrap">
                         <div class="user-img"><img src="{{ asset('admiro/assets/images/profile.png') }}" alt="user" /></div>
                         <div class="user-content">
-                            <h6>{{ auth()->user()->name ?? 'Guest' }}</h6>
-                            <p class="mb-0 text-capitalize">{{ auth()->user()->role ?? 'User' }}<i class="fa-solid fa-chevron-down"></i></p>
+                            <h6>{{ $user?->name ?? 'Guest' }}</h6>
+                            <p class="mb-0 text-capitalize">{{ $user?->role ?? 'User' }}<i class="fa-solid fa-chevron-down"></i></p>
                         </div>
                     </div>
                     <div class="custom-menu overflow-hidden">
