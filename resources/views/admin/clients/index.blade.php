@@ -201,45 +201,49 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="first_name" required 
-                                maxlength="50" pattern="^[A-Z][a-zA-Z\s]{1,49}$" 
+                            <input type="text" class="form-control validate-char-limit" name="first_name" required 
+                                maxlength="50" data-max="50" pattern="^[A-Z][a-zA-Z\s]{1,49}$" 
                                 title="First letter must be capital (Example: John)"
                                 oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)"
                                 placeholder="Enter first name">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Middle Name</label>
-                            <input type="text" class="form-control" name="middle_name" 
-                                maxlength="50" pattern="^[A-Z]?[a-zA-Z\s]{0,49}$"
+                            <input type="text" class="form-control validate-char-limit" name="middle_name" 
+                                maxlength="50" data-max="50" pattern="^[A-Z]?[a-zA-Z\s]{0,49}$"
                                 title="Optional middle name"
                                 placeholder="Enter middle name">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="last_name" required 
-                                maxlength="50" pattern="^[A-Z][a-zA-Z\s]{1,49}$" 
+                            <input type="text" class="form-control validate-char-limit" name="last_name" required 
+                                maxlength="50" data-max="50" pattern="^[A-Z][a-zA-Z\s]{1,49}$" 
                                 title="First letter must be capital (Example: Smith)"
                                 oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)"
                                 placeholder="Enter last name">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" name="email" required 
-                                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                            <input type="email" class="form-control validate-char-limit" name="email" required 
+                                maxlength="255" data-max="255" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
                                 title="Enter a valid email address (Example: user@example.com)"
                                 placeholder="Enter email address">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Date of Birth</label>
-                            <input type="date" max="{{ date('Y-m-d') }}" class="form-control" name="dob" id="dob_input">
+                            <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                            <input type="date" max="{{ date('Y-m-d') }}" class="form-control" name="dob" id="dob_input" required>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Age</label>
                             <input type="text" class="form-control" id="age_display" readonly disabled placeholder="Auto-calculated">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Gender</label>
-                            <select class="form-select" name="gender">
+                            <label class="form-label">Gender <span class="text-danger">*</span></label>
+                            <select class="form-select" name="gender" required>
                                 <option value="">Select Gender</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -247,36 +251,43 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Occupation / Lifestyle</label>
-                            <input type="text" class="form-control" name="occupation" placeholder="Enter occupation" required>
+                            <label class="form-label">Occupation / Lifestyle <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control validate-char-limit" name="occupation" placeholder="Enter occupation" required maxlength="100" data-max="100">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
                             <input type="hidden" name="mobile_country_code">
-                            <input type="tel" class="form-control phone-input" name="phone" id="client_phone"
-                                placeholder="Enter mobile number" required title="Enter a valid phone number">
+                            <input type="tel" class="form-control phone-input validate-char-limit" name="phone" id="client_phone"
+                                placeholder="Enter mobile number" required maxlength="20" data-max="20" title="Enter a valid phone number">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 20 characters allowed.</div>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street">
+                            <input type="text" class="form-control validate-char-limit" name="address_line_1" required maxlength="255" data-max="255" placeholder="House No, Building, Street">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">Address Line 2</label>
-                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark">
+                            <input type="text" class="form-control validate-char-limit" name="address_line_2" maxlength="255" data-max="255" placeholder="Locality, Landmark">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">City <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="city" required placeholder="City">
+                            <input type="text" class="form-control validate-char-limit" name="city" required maxlength="100" data-max="100" placeholder="City">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">State <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="state" required placeholder="State">
+                            <input type="text" class="form-control validate-char-limit" name="state" required maxlength="100" data-max="100" placeholder="State">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="zip_code" required 
-                                pattern="^[0-9]{5,10}$" title="Enter valid zip code (5-10 digits)"
+                            <input type="text" class="form-control validate-char-limit" name="zip_code" required 
+                                maxlength="10" data-max="10" pattern="^[0-9]{5,10}$" title="Enter valid zip code (5-10 digits)"
                                 placeholder="Pincode" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 10 characters allowed.</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Country <span class="text-danger">*</span></label>
@@ -288,16 +299,17 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Password <span class="text-muted small" id="password-hint">(New clients only)</span></label>
+                            <label class="form-label">Password <span class="text-danger">*</span> <span class="text-muted small" id="password-hint">(New clients only)</span></label>
                             <input type="password" class="form-control" name="password" id="password-input"
-                                minlength="6" pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$"
-                                title="Password must be at least 6 characters and include at least one number">
+                                minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                oninput="validatePasswordMatch()">
+                            <div id="password-requirements" class="text-danger small mt-1">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Confirm Password</label>
+                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
                             <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input"
-                                minlength="6">
-                            <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
+                                minlength="8" oninput="validatePasswordMatch()">
+                            <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                         </div>
                     </div>
 
@@ -582,6 +594,49 @@
         const ageDate = new Date(diff);
         return Math.abs(ageDate.getUTCFullYear() - 1970);
     }
+
+    function validatePasswordMatch() {
+        const password = $('#password-input');
+        const confirm = $('#password-confirm-input');
+        const requirements = $('#password-requirements');
+        const matchError = $('#password-match-error');
+        
+        const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
+        
+        // Check requirements
+        if (password.val() === '') {
+            requirements.removeClass('d-none');
+        } else if (pattern.test(password.val())) {
+            requirements.addClass('d-none');
+        } else {
+            requirements.removeClass('d-none');
+        }
+        
+        // Check match
+        if (confirm.val() !== '') {
+            if (confirm.val() !== password.val()) {
+                matchError.removeClass('d-none');
+                confirm.addClass('is-invalid');
+            } else {
+                matchError.addClass('d-none');
+                confirm.removeClass('is-invalid');
+            }
+        } else {
+            matchError.addClass('d-none');
+            confirm.removeClass('is-invalid');
+        }
+    }
+
+    $(document).on('input', '.validate-char-limit', function() {
+        const el = $(this);
+        const max = parseInt(el.data('max'));
+        const msgDiv = el.siblings('.char-limit-msg');
+        if (el.val().length >= max) {
+            msgDiv.removeClass('d-none');
+        } else {
+            msgDiv.addClass('d-none');
+        }
+    });
 
     $(document).ready(function() {
         const clientPhoneInput = document.querySelector('#client_phone');

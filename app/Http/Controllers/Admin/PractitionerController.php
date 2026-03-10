@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Str;
 
 class PractitionerController extends Controller
@@ -148,30 +149,30 @@ class PractitionerController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'required|image|max:2048',
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
-            'nationality' => 'required|string|max:255',
+            'nationality' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
-            'country' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
+            'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
+            'phone' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'website_url' => 'nullable|url|max:255',
             'social_links' => 'nullable|array',
             'consultations' => 'nullable|array',
             'body_therapies' => 'nullable|array',
             'other_modalities' => 'nullable|array',
-            'additional_courses' => 'nullable|string',
+            'additional_courses' => 'nullable|string|max:1000',
             'languages_spoken' => 'nullable|array',
             'can_translate_english' => 'boolean',
-            'profile_bio' => 'nullable|string',
+            'profile_bio' => 'nullable|string|max:1000',
             // Documents
             'doc_cover_letter' => 'required|file|mimes:pdf,doc,docx,jpeg,png,jpg|max:2048',
             'doc_certificates' => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
@@ -271,30 +272,30 @@ class PractitionerController extends Controller
         $practitioner = $user->practitioner;
 
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => 'nullable|string|min:6|confirmed',
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
-            'nationality' => 'required|string|max:255',
+            'nationality' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
-            'country' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
+            'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
+            'phone' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'website_url' => 'nullable|url|max:255',
             'social_links' => 'nullable|array',
             'consultations' => 'nullable|array',
             'body_therapies' => 'nullable|array',
             'other_modalities' => 'nullable|array',
-            'additional_courses' => 'nullable|string',
+            'additional_courses' => 'nullable|string|max:1000',
             'languages_spoken' => 'nullable|array',
             'can_translate_english' => 'boolean',
-            'profile_bio' => 'nullable|string',
+            'profile_bio' => 'nullable|string|max:1000',
 
             // Documents
             'doc_cover_letter' => 'nullable|file|mimes:pdf,doc,docx,jpeg,png,jpg|max:2048',

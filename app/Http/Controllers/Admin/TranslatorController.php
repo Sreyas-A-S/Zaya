@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class TranslatorController extends Controller
 {
@@ -179,34 +180,34 @@ class TranslatorController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255',
 
-            'native_language' => 'nullable|string',
+            'native_language' => 'nullable|string|max:100',
             'source_languages' => 'nullable|array',
             'target_languages' => 'nullable|array',
             'additional_languages' => 'nullable|array',
 
-            'translator_type' => 'nullable|string',
+            'translator_type' => 'nullable|string|max:255',
             'years_of_experience' => 'nullable|integer',
             'fields_of_specialization' => 'nullable|array',
-            'previous_clients_projects' => 'nullable|string',
-            'portfolio_link' => 'nullable|url',
+            'previous_clients_projects' => 'nullable|string|max:1000',
+            'portfolio_link' => 'nullable|url|max:255',
 
-            'highest_education' => 'nullable|string',
-            'certification_details' => 'nullable|string',
+            'highest_education' => 'nullable|string|max:255',
+            'certification_details' => 'nullable|string|max:1000',
             'certificates' => 'nullable|array',
             'certificates.*' => 'file|max:2048',
             'sample_work' => 'nullable|array',
@@ -214,15 +215,15 @@ class TranslatorController extends Controller
 
             'services_offered' => 'nullable|array',
 
-            'gov_id_type' => 'nullable|string',
+            'gov_id_type' => 'nullable|string|max:255',
             'gov_id_upload' => 'nullable|file|max:2048',
-            'pan_number' => 'nullable|string',
-            'bank_holder_name' => 'nullable|string',
-            'bank_name' => 'nullable|string',
-            'account_number' => 'nullable|string',
-            'ifsc_code' => 'nullable|string',
-            'swift_code' => 'nullable|string',
-            'upi_id' => 'nullable|string',
+            'pan_number' => 'nullable|string|max:20',
+            'bank_holder_name' => 'nullable|string|max:255',
+            'bank_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255',
+            'ifsc_code' => 'nullable|string|max:20',
+            'swift_code' => 'nullable|string|max:20',
+            'upi_id' => 'nullable|string|max:255',
             'cancelled_cheque' => 'nullable|file|max:2048',
         ]);
 
@@ -315,34 +316,34 @@ class TranslatorController extends Controller
         $translator = $user->translator;
 
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => 'nullable|string|min:6|confirmed',
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255',
 
-            'native_language' => 'nullable|string',
+            'native_language' => 'nullable|string|max:100',
             'source_languages' => 'nullable|array',
             'target_languages' => 'nullable|array',
             'additional_languages' => 'nullable|array',
 
-            'translator_type' => 'nullable|string',
+            'translator_type' => 'nullable|string|max:255',
             'years_of_experience' => 'nullable|integer',
             'fields_of_specialization' => 'nullable|array',
-            'previous_clients_projects' => 'nullable|string',
-            'portfolio_link' => 'nullable|url',
+            'previous_clients_projects' => 'nullable|string|max:1000',
+            'portfolio_link' => 'nullable|url|max:255',
 
-            'highest_education' => 'nullable|string',
-            'certification_details' => 'nullable|string',
+            'highest_education' => 'nullable|string|max:255',
+            'certification_details' => 'nullable|string|max:1000',
             'certificates' => 'nullable|array',
             'certificates.*' => 'file|max:2048',
             'sample_work' => 'nullable|array',
@@ -350,15 +351,15 @@ class TranslatorController extends Controller
 
             'services_offered' => 'nullable|array',
 
-            'gov_id_type' => 'nullable|string',
+            'gov_id_type' => 'nullable|string|max:255',
             'gov_id_upload' => 'nullable|file|max:2048',
-            'pan_number' => 'nullable|string',
-            'bank_holder_name' => 'nullable|string',
-            'bank_name' => 'nullable|string',
-            'account_number' => 'nullable|string',
-            'ifsc_code' => 'nullable|string',
-            'swift_code' => 'nullable|string',
-            'upi_id' => 'nullable|string',
+            'pan_number' => 'nullable|string|max:20',
+            'bank_holder_name' => 'nullable|string|max:255',
+            'bank_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255',
+            'ifsc_code' => 'nullable|string|max:20',
+            'swift_code' => 'nullable|string|max:20',
+            'upi_id' => 'nullable|string|max:255',
             'cancelled_cheque' => 'nullable|file|max:2048',
         ]);
 

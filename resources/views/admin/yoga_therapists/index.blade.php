@@ -152,38 +152,44 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 <!-- First Name -->
                                 <div class="col-md-4">
                                     <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="text" name="first_name" required maxlength="50" 
+                                    <input class="form-control validate-char-limit" type="text" name="first_name" required maxlength="50" data-max="50"
                                         pattern="^[A-Z][a-zA-Z\s]{1,49}$" title="First letter must be capital (Example: John)"
                                         oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)">
+                                    <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                 </div>
 
                                 <!-- Last Name -->
                                 <div class="col-md-4">
                                     <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="text" name="last_name" required maxlength="50" 
+                                    <input class="form-control validate-char-limit" type="text" name="last_name" required maxlength="50" data-max="50"
                                         pattern="^[A-Z][a-zA-Z\s]{1,49}$" title="First letter must be capital (Example: Smith)"
                                         oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)">
+                                    <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                 </div>
 
                                 <!-- Email -->
                                 <div class="col-md-4">
                                     <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="email" name="email" required 
+                                    <input class="form-control validate-char-limit" type="email" name="email" required maxlength="255" data-max="255"
                                         pattern="^[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Enter a valid email address">
+                                    <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
                                 </div>
 
                                 <!-- Password -->
                                 <div class="col-md-4 password-field">
                                     <label class="form-label">Password <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="password" name="password" id="password-input" required minlength="6" 
-                                        pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$"
-                                        title="Password must contain at least 6 characters including a number">
+                                    <input class="form-control" type="password" name="password" id="password-input" required minlength="8" 
+                                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                        oninput="validatePasswordMatch()">
+                                    <div id="password-requirements" class="text-danger small mt-1">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
                                 </div>
 
                                 <!-- Confirm Password -->
                                 <div class="col-md-4 password-field">
                                     <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="password" name="password_confirmation" id="password-confirm-input" required minlength="6">
+                                    <input class="form-control" type="password" name="password_confirmation" id="password-confirm-input" required minlength="8"
+                                        oninput="validatePasswordMatch()">
+                                    <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                                 </div>
 
                                 <!-- Phone -->
@@ -200,8 +206,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
                                 <!-- Gender -->
                                 <div class="col-md-4">
-                                <label class="form-label">Gender</label>
-                                <select class="form-select" name="gender">
+                                <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                <select class="form-select" name="gender" required>
                                 <option value="">Select Gender</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
@@ -211,10 +217,11 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
                                 <!-- DOB -->
                                 <div class="col-md-4">
-                                <label class="form-label">Date of Birth</label>
+                                <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
                                 <input class="form-control"
                                 type="date"
                                 name="dob"
+                                required
                                 max="{{ date('Y-m-d') }}">
                                 </div>
 
@@ -244,34 +251,42 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 <div class="col-md-6">
                                 <label class="form-label">City <span class="text-danger">*</span></label>
                                 <input type="text"
-                                class="form-control"
+                                class="form-control validate-char-limit"
                                 name="city"
                                 required
+                                maxlength="100"
+                                data-max="100"
                                 pattern="^[A-Za-z\s]{2,100}$"
                                 title="City should contain only letters">
+                                <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                 </div>
 
                                 <!-- State -->
                                 <div class="col-md-6">
                                 <label class="form-label">State <span class="text-danger">*</span></label>
                                 <input type="text"
-                                class="form-control"
+                                class="form-control validate-char-limit"
                                 name="state"
                                 required
+                                maxlength="100"
+                                data-max="100"
                                 pattern="^[A-Za-z\s]{2,100}$"
                                 title="State should contain only letters">
+                                <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                 </div>
 
                                 <!-- Zip Code -->
                                 <div class="col-md-6">
                                 <label class="form-label">Zip Code <span class="text-danger">*</span></label>
                                 <input type="text"
-                                class="form-control"
+                                class="form-control validate-char-limit"
                                 name="zip_code"
                                 required
                                 pattern="^[0-9]{4,10}$"
                                 maxlength="10"
+                                data-max="10"
                                 title="Enter valid zip code">
+                                <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 10 characters allowed.</div>
                                 </div>
 
                                 <!-- Country -->
@@ -289,8 +304,6 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
                                 </div>
                                 </div>
-                        </div>
-                    </div>
                     <style>
                         .language-capability-row {
                             background: #f8f9fa;
@@ -324,7 +337,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             <!-- Step 2: Professional Identity & Registration -->
             <div class="step-content d-none" id="step-2">
                 <div class="row g-3">
-                    <h6 class="text-primary border-bottom pb-2">Professional Details</h6>
+                    <div class="col-12">
+                        <h6 class="text-primary border-bottom pb-2 mt-2">Professional Details</h6>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label">Yoga Therapist Type <span class="text-danger">*</span></label>
                         <select class="form-select" name="yoga_therapist_type" required>
@@ -372,7 +387,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         </div>
                     </div>
 
-                    <h6 class="text-primary border-bottom pb-2 mt-4">Registration & Affiliation</h6>
+                    <div class="col-12">
+                        <h6 class="text-primary border-bottom pb-2 mt-4">Registration & Affiliation</h6>
+                    </div>
                     <div class="col-md-4">
                         <label class="form-label">Registration No <span class="text-danger">*</span></label>
                         <input class="form-control" type="text" name="registration_number" required>
@@ -392,6 +409,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             <!-- Step 3: Qualifications -->
             <div class="step-content d-none" id="step-3">
                 <div class="row g-3">
+                    <div class="col-12">
+                        <h6 class="text-primary border-bottom pb-2 mt-2">Certifications & Qualifications</h6>
+                    </div>
                     <div class="col-md-12">
                         <label class="form-label">Yoga Therapy Certification Details <span class="text-danger">*</span></label>
                         <textarea class="form-control" name="certification_details" rows="3" required placeholder="List key certifications"></textarea>
@@ -411,6 +431,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             <!-- Step 4: Expertise & Setup -->
             <div class="step-content d-none" id="step-4">
                 <div class="row g-3">
+                    <div class="col-12">
+                        <h6 class="text-primary border-bottom pb-2 mt-2">Expertise & Session Setup</h6>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Areas of Expertise <span class="text-danger">*</span></label>
                         <div class="row" style="max-height: 300px; overflow-y:auto;">
@@ -460,6 +483,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             <!-- Step 5: Profile -->
             <div class="step-content d-none" id="step-5">
                 <div class="row g-3">
+                    <div class="col-12">
+                        <h6 class="text-primary border-bottom pb-2 mt-2">Public Profile Details</h6>
+                    </div>
                     <div class="col-md-12">
                         <label class="form-label">Short Bio <span class="text-danger">*</span></label>
                         <textarea class="form-control" name="short_bio" rows="4" required placeholder="Brief introduction"></textarea>
@@ -474,7 +500,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             <!-- Step 6: Identity & Payment -->
             <div class="step-content d-none" id="step-6">
                 <div class="row g-3">
-                    <h6 class="text-primary">Identity Proof</h6>
+                    <div class="col-12">
+                        <h6 class="text-primary border-bottom pb-2 mt-2">Identity Proof</h6>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label">Government ID Type <span class="text-danger">*</span></label>
                         <input class="form-control" type="text" name="gov_id_type" required placeholder="Aadhar, Passport, etc.">
@@ -492,7 +520,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                             oninput="this.value = this.value.toUpperCase()">
                     </div>
                     <hr>
-                    <h6 class="text-primary">Banking Details</h6>
+                    <div class="col-12">
+                        <h6 class="text-primary border-bottom pb-2 mt-2">Banking Details</h6>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label">Bank Holder Name <span class="text-danger">*</span></label>
                         <input class="form-control" type="text" name="bank_holder_name" required pattern="^[A-Z\s]{2,100}$" title="First letter capital" oninput="this.value = this.value.toUpperCase()">
@@ -667,7 +697,50 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             $('#therapist-form-modal').modal('show');
         }
 
-        function updateStepper() {
+        $(document).on('input', '.validate-char-limit', function() {
+        const el = $(this);
+        const max = parseInt(el.data('max'));
+        const msgDiv = el.siblings('.char-limit-msg');
+        if (el.val().length >= max) {
+            msgDiv.removeClass('d-none');
+        } else {
+            msgDiv.addClass('d-none');
+        }
+    });
+
+    function validatePasswordMatch() {
+        const password = $('#password-input');
+        const confirm = $('#password-confirm-input');
+        const requirements = $('#password-requirements');
+        const matchError = $('#password-match-error');
+        
+        const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
+        
+        // Check requirements
+        if (password.val() === '') {
+            requirements.removeClass('d-none');
+        } else if (pattern.test(password.val())) {
+            requirements.addClass('d-none');
+        } else {
+            requirements.removeClass('d-none');
+        }
+        
+        // Check match
+        if (confirm.val() !== '') {
+            if (confirm.val() !== password.val()) {
+                matchError.removeClass('d-none');
+                confirm.addClass('is-invalid');
+            } else {
+                matchError.addClass('d-none');
+                confirm.removeClass('is-invalid');
+            }
+        } else {
+            matchError.addClass('d-none');
+            confirm.removeClass('is-invalid');
+        }
+    }
+
+    function updateStepper() {
             $('.step-content').addClass('d-none');
             $('#step-' + currentStep).removeClass('d-none');
 
@@ -1016,8 +1089,14 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         }
                     },
                     error: function(xhr) {
+                        let errorMessage = 'Error adding item';
+                        if (xhr.status === 422 && xhr.responseJSON.error) {
+                            errorMessage = xhr.responseJSON.error;
+                        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
                         if (typeof showToast === 'function') {
-                            showToast('Error: ' + (xhr.responseJSON?.error || 'Could not add item'), 'error');
+                            showToast(errorMessage, 'error');
                         }
                     },
                     complete: function() {

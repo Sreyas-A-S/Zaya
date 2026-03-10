@@ -13,6 +13,7 @@ use App\Models\ExternalTherapy;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
@@ -167,13 +168,13 @@ class DoctorController extends Controller
     {
         $validatedData = $request->validate([
             // A. Personal Details
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
-            'mobile_number' => 'required|string|max:20',
+            'mobile_number' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // B. Medical Registration
@@ -195,10 +196,10 @@ class DoctorController extends Controller
             'current_workplace' => 'required|string|max:255',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
-            'country' => 'required|string|max:255',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
+            'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
 
             // D. Ayurveda Consultation Expertise
             'consultation_expertise' => 'nullable|array',
@@ -233,10 +234,10 @@ class DoctorController extends Controller
             'upi_id' => 'nullable|string|max:255',
 
             // I. Platform Profile
-            'short_bio' => 'required|string|min:50|max:1500',
-            'key_expertise' => 'required|string|min:50|max:1500',
-            'services_offered' => 'required|string|min:50|max:1500',
-            'awards_recognitions' => 'nullable|string|min:50|max:1500',
+            'short_bio' => 'required|string|min:50|max:1000',
+            'key_expertise' => 'required|string|min:50|max:1000',
+            'services_offered' => 'required|string|min:50|max:1000',
+            'awards_recognitions' => 'nullable|string|min:50|max:1000',
             'website' => 'nullable|url|max:255',
             'facebook' => 'nullable|url|max:255',
             'instagram' => 'nullable|url|max:255',
@@ -373,13 +374,13 @@ class DoctorController extends Controller
 
         $validatedData = $request->validate([
             // A. Personal Details
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
-            'mobile_number' => 'required|string|max:20',
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => 'nullable|string|min:6|confirmed',
+            'mobile_number' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // B. Medical Registration
@@ -401,10 +402,10 @@ class DoctorController extends Controller
             'current_workplace' => 'required|string|max:255',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
-            'country' => 'required|string|max:255',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
+            'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
 
             // D. Ayurveda Consultation Expertise
             'consultation_expertise' => 'nullable|array',
@@ -439,10 +440,10 @@ class DoctorController extends Controller
             'upi_id' => 'nullable|string|max:255',
 
             // I. Platform Profile
-            'short_bio' => 'required|string|min:50|max:1500',
-            'key_expertise' => 'required|string|min:50|max:1500',
-            'services_offered' => 'required|string|min:50|max:1500',
-            'awards_recognitions' => 'nullable|string|min:50|max:1500',
+            'short_bio' => 'required|string|min:50|max:1000',
+            'key_expertise' => 'required|string|min:50|max:1000',
+            'services_offered' => 'required|string|min:50|max:1000',
+            'awards_recognitions' => 'nullable|string|min:50|max:1000',
             'website' => 'nullable|url|max:255',
             'facebook' => 'nullable|url|max:255',
             'instagram' => 'nullable|url|max:255',

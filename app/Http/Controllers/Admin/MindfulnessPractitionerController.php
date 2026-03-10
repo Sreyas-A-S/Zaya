@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class MindfulnessPractitionerController extends Controller
 {
@@ -141,30 +142,30 @@ class MindfulnessPractitionerController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
-            'country' => 'required|string|max:255',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
+            'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
 
             'practitioner_type' => 'nullable|array',
             'practitioner_type.*' => 'string',
             'years_of_experience' => 'nullable|integer',
-            'current_workplace' => 'nullable|string',
+            'current_workplace' => 'nullable|string|max:255',
             'website_social_links' => 'nullable|array',
 
-            'highest_education' => 'nullable|string',
-            'mindfulness_training_details' => 'nullable|string',
-            'additional_certifications' => 'nullable|string',
+            'highest_education' => 'nullable|string|max:255',
+            'mindfulness_training_details' => 'nullable|string|max:1000',
+            'additional_certifications' => 'nullable|string|max:1000',
             'certificates' => 'nullable|array',
             'certificates.*' => 'file|max:2048',
 
@@ -174,19 +175,19 @@ class MindfulnessPractitionerController extends Controller
 
             'languages_spoken' => 'nullable|array',
 
-            'gov_id_type' => 'nullable|string',
+            'gov_id_type' => 'nullable|string|max:255',
             'gov_id_upload' => 'nullable|file|max:2048',
-            'pan_number' => 'nullable|string',
-            'bank_holder_name' => 'nullable|string',
-            'bank_name' => 'nullable|string',
-            'account_number' => 'nullable|string',
-            'ifsc_code' => 'nullable|string',
-            'upi_id' => 'nullable|string',
+            'pan_number' => 'nullable|string|max:20',
+            'bank_holder_name' => 'nullable|string|max:255',
+            'bank_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255',
+            'ifsc_code' => 'nullable|string|max:20',
+            'upi_id' => 'nullable|string|max:255',
             'cancelled_cheque' => 'nullable|file|max:2048',
 
-            'short_bio' => 'nullable|string',
-            'coaching_style' => 'nullable|string',
-            'target_audience' => 'nullable|string',
+            'short_bio' => 'nullable|string|max:1000',
+            'coaching_style' => 'nullable|string|max:1000',
+            'target_audience' => 'nullable|string|max:1000',
         ]);
 
         DB::beginTransaction();
@@ -257,30 +258,30 @@ class MindfulnessPractitionerController extends Controller
         $practitioner = $user->mindfulnessPractitioner;
 
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => 'nullable|string|min:6|confirmed',
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
-            'country' => 'required|string|max:255',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
+            'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
 
             'practitioner_type' => 'nullable|array',
             'practitioner_type.*' => 'string',
             'years_of_experience' => 'nullable|integer',
-            'current_workplace' => 'nullable|string',
+            'current_workplace' => 'nullable|string|max:255',
             'website_social_links' => 'nullable|array',
 
-            'highest_education' => 'nullable|string',
-            'mindfulness_training_details' => 'nullable|string',
-            'additional_certifications' => 'nullable|string',
+            'highest_education' => 'nullable|string|max:255',
+            'mindfulness_training_details' => 'nullable|string|max:1000',
+            'additional_certifications' => 'nullable|string|max:1000',
             'certificates' => 'nullable|array',
             'certificates.*' => 'file|max:2048', // If uploading new ones
 
@@ -289,19 +290,19 @@ class MindfulnessPractitionerController extends Controller
             'consultation_modes' => 'nullable|array',
             'languages_spoken' => 'nullable|array',
 
-            'gov_id_type' => 'nullable|string',
+            'gov_id_type' => 'nullable|string|max:255',
             'gov_id_upload' => 'nullable|file|max:2048',
-            'pan_number' => 'nullable|string',
-            'bank_holder_name' => 'nullable|string',
-            'bank_name' => 'nullable|string',
-            'account_number' => 'nullable|string',
-            'ifsc_code' => 'nullable|string',
-            'upi_id' => 'nullable|string',
+            'pan_number' => 'nullable|string|max:20',
+            'bank_holder_name' => 'nullable|string|max:255',
+            'bank_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255',
+            'ifsc_code' => 'nullable|string|max:20',
+            'upi_id' => 'nullable|string|max:255',
             'cancelled_cheque' => 'nullable|file|max:2048',
 
-            'short_bio' => 'nullable|string',
-            'coaching_style' => 'nullable|string',
-            'target_audience' => 'nullable|string',
+            'short_bio' => 'nullable|string|max:1000',
+            'coaching_style' => 'nullable|string|max:1000',
+            'target_audience' => 'nullable|string|max:1000',
         ]);
 
         DB::beginTransaction();

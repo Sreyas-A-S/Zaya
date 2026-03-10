@@ -78,6 +78,13 @@ class LoginController extends Controller
                 return redirect()->intended('/admin');
             }
 
+            // Explicitly block non-admin roles from the Admin Portal
+            $nonAdminRoles = ['doctor', 'practitioner', 'mindfulness-practitioner', 'yoga-therapist', 'client', 'patient', 'translator'];
+            if (in_array(auth()->user()->role, $nonAdminRoles)) {
+                auth()->logout();
+                return redirect()->route('admin.login')->with('error', 'Access denied. Doctors, Practitioners, Clients and Translators must login via their respective portals.');
+            }
+
             auth()->logout();
             return back()->with('error', 'You do not have admin access.');
         }
@@ -94,9 +101,11 @@ class LoginController extends Controller
      */
     protected function authenticated(Request $request, $user)
     {
-        // This method is called by the standard 'login' route (Client Login)
+        // This method is called by the standard 'login' route (Client/User Login)
         // If an admin tries to login via the client login page, log them out and redirect.
-        if (in_array($user->role, ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin'])) {
+        $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
+        
+        if (in_array($user->role, $adminRoles)) {
             auth()->logout();
             return redirect()->route('admin.login')->with('error', 'Admins must login via the Admin Portal.');
         }

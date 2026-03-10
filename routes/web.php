@@ -92,6 +92,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::delete('/admin/admins/{id}', [AdminsController::class, 'destroy']);
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
+    Route::post('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [AdminController::class, 'updatePassword'])->name('profile.password.update');
     Route::resource('countries', CountryController::class);
     Route::resource('doctors', DoctorController::class);
