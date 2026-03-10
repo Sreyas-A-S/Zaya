@@ -143,46 +143,53 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="first_name" required pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="First Name">
+                                            <input type="text" class="form-control validate-char-limit" name="first_name" required maxlength="50" data-max="50" pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="First Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="last_name" required pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="Last Name">
+                                            <input type="text" class="form-control validate-char-limit" name="last_name" required maxlength="50" data-max="50" pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="Last Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                                            <input type="email" class="form-control" name="email" required placeholder="Email Address">
+                                            <input type="email" class="form-control validate-char-limit" name="email" required maxlength="255" data-max="255" placeholder="Email Address">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Password <span class="text-danger">*</span> <span class="small text-muted" id="password-hint">(New Only)</span></label>
-<div class="input-group">
-        <input type="password"
-               class="form-control"
-               name="password"
-               id="password-input"
-               minlength="6"
-               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
-               title="Password must contain uppercase, lowercase, number and no spaces"
-               required>
+                                            <div class="input-group">
+                                                <input type="password"
+                                                    class="form-control"
+                                                    name="password"
+                                                    id="password-input"
+                                                    minlength="8"
+                                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                                    oninput="validatePasswordMatch()"
+                                                    required>
 
-        <span class="input-group-text toggle-password" data-target="password-input">
-            <i class="fa fa-eye"></i>
-        </span>
-    </div>                                      </div>
+                                                <span class="input-group-text toggle-password" data-target="password-input">
+                                                    <i class="fa fa-eye"></i>
+                                                </span>
+                                            </div>
+                                            <div id="password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
+                                        </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-<div class="input-group">
-        <input type="password"
-               class="form-control"
-               name="password_confirmation"
-               id="password-confirm-input"
-               minlength="6"
-               required>
+                                            <div class="input-group">
+                                                <input type="password"
+                                                    class="form-control"
+                                                    name="password_confirmation"
+                                                    id="password-confirm-input"
+                                                    minlength="8"
+                                                    oninput="validatePasswordMatch()"
+                                                    required>
 
-        <span class="input-group-text toggle-password" data-target="password-confirm-input">
-            <i class="fa fa-eye"></i>
-        </span>
-    </div>                                            <div class="invalid-feedback" id="password-confirm-error">Passwords do not match</div>
+                                                <span class="input-group-text toggle-password" data-target="password-confirm-input">
+                                                    <i class="fa fa-eye"></i>
+                                                </span>
+                                            </div>
+                                            <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Gender <span class="text-danger">*</span></label>
@@ -199,34 +206,41 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Nationality <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="nationality" required pattern="^[a-zA-Z\s]+$" title="Only letters and spaces allowed" placeholder="Nationality">
+                                            <input type="text" class="form-control validate-char-limit" name="nationality" required maxlength="50" data-max="50" pattern="^[a-zA-Z\s]+$" title="Only letters and spaces allowed" placeholder="Nationality">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="phone" id="phone" required placeholder="Phone Number">
+                                            <input type="text" class="form-control validate-char-limit" name="phone" id="phone" required maxlength="20" data-max="20" placeholder="Phone Number">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 20 characters allowed.</div>
                                         </div>
                                         <div class="col-12 mt-3">
                                             <h6 class="f-w-600 mb-3">Address Information</h6>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="address_line_1" required placeholder="House No, Building, Street">
+                                            <input type="text" class="form-control validate-char-limit" name="address_line_1" required maxlength="255" data-max="255" placeholder="House No, Building, Street">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Address Line 2</label>
-                                            <input type="text" class="form-control" name="address_line_2" placeholder="Locality, Landmark">
+                                            <input type="text" class="form-control validate-char-limit" name="address_line_2" maxlength="255" data-max="255" placeholder="Locality, Landmark">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">City <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="city" required placeholder="City">
+                                            <input type="text" class="form-control validate-char-limit" name="city" required maxlength="100" data-max="100" placeholder="City">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">State <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="state" required placeholder="State">
+                                            <input type="text" class="form-control validate-char-limit" name="state" required maxlength="100" data-max="100" placeholder="State">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="zip_code" required     pattern="^[A-Za-z0-9\s\-]{3,10}$" placeholder="Pincode">
+                                            <input type="text" class="form-control validate-char-limit" name="zip_code" required maxlength="10" data-max="10" pattern="^[A-Za-z0-9\s\-]{3,10}$" placeholder="Pincode">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 10 characters allowed.</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Country <span class="text-danger">*</span></label>
@@ -442,7 +456,7 @@
                                         </div>
 
                                         <div class="col-md-8">
-                                            <label class="form-label">Languages Spoken</label>
+                                            <label class="form-label">Languages Spoken <span class="text-danger">*</span></label>
                                             <select class="form-select" name="languages[]" id="languages_select" multiple required>
                                                 @foreach($languages as $lang)
                                                 <option value="{{ $lang->name }}">{{ $lang->name }}</option>
@@ -491,7 +505,7 @@
                                         @endphp
                                         @foreach($docs as $name => $label)
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-bold">{{ $label }}</label>
+                                            <label class="form-label small fw-bold">{{ $label }} <span class="text-danger">*</span></label>
                                             <input type="file" class="form-control form-control-sm" name="{{ $name }}"
                                                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                                                 required>
@@ -834,6 +848,17 @@
     let croppedFile;
     let iti;
 
+    $(document).on('input', '.validate-char-limit', function() {
+        const el = $(this);
+        const max = parseInt(el.data('max'));
+        const msgDiv = el.siblings('.char-limit-msg');
+        if (el.val().length >= max) {
+            msgDiv.removeClass('d-none');
+        } else {
+            msgDiv.addClass('d-none');
+        }
+    });
+
     $(document).ready(function() {
         const phoneInput = document.querySelector("#phone");
         if (phoneInput) {
@@ -864,17 +889,47 @@
     }
 
     function validatePasswordMatch() {
-        const password = $('#password-input').val();
-        const confirmPassword = $('#password-confirm-input').val();
-
-        if (confirmPassword && password !== confirmPassword) {
-            $('#password-confirm-input').addClass('is-invalid');
-            $('#submit-btn').prop('disabled', true);
+        const password = $('#password-input');
+        const confirm = $('#password-confirm-input');
+        const requirements = $('#password-requirements');
+        const matchError = $('#password-match-error');
+        
+        const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
+        
+        // Check requirements
+        if (password.val() === '') {
+            requirements.addClass('d-none');
+        } else if (pattern.test(password.val())) {
+            requirements.addClass('d-none');
         } else {
-            $('#password-confirm-input').removeClass('is-invalid');
-            $('#submit-btn').prop('disabled', false);
+            requirements.removeClass('d-none');
+        }
+        
+        // Check match
+        if (confirm.val() !== '') {
+            if (confirm.val() !== password.val()) {
+                matchError.removeClass('d-none');
+                confirm.addClass('is-invalid');
+            } else {
+                matchError.addClass('d-none');
+                confirm.removeClass('is-invalid');
+            }
+        } else {
+            matchError.addClass('d-none');
+            confirm.removeClass('is-invalid');
         }
     }
+
+    $(document).on('input', '.validate-char-limit', function() {
+        const el = $(this);
+        const max = parseInt(el.data('max'));
+        const msgDiv = el.siblings('.char-limit-msg');
+        if (el.val().length >= max) {
+            msgDiv.removeClass('d-none');
+        } else {
+            msgDiv.addClass('d-none');
+        }
+    });
 
     $(document).ready(function() {
         table = $('#practitioners-table').DataTable({
@@ -1669,7 +1724,13 @@
                 }
             },
             error: function(xhr) {
-                showToast(xhr.responseJSON?.error || 'Error adding item', 'error');
+                let errorMessage = 'Error adding item';
+                if (xhr.status === 422 && xhr.responseJSON.error) {
+                    errorMessage = xhr.responseJSON.error;
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                showToast(errorMessage, 'error');
             },
             complete: function() {
                 btn.prop('disabled', false).html('<i class="fa fa-plus"></i>');
@@ -1746,7 +1807,7 @@
 
 
 
-     document.getElementById("password").addEventListener("input", function () {
+     document.getElementById("password-input").addEventListener("input", function () {
     this.value = this.value.replace(/\s/g, '');
 });
 

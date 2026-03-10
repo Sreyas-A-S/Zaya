@@ -1020,7 +1020,13 @@
                     }
                 },
                 error: function(xhr) {
-                    alert('Failed to add item');
+                    let errorMessage = 'Error adding item';
+                    if (xhr.status === 422 && xhr.responseJSON.error) {
+                        errorMessage = xhr.responseJSON.error;
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    alert(errorMessage);
                 },
                 complete: function() {
                     btn.prop('disabled', false);
@@ -1081,7 +1087,13 @@
                     }
                 },
                 error: function(xhr) {
-                    alert('Failed to add item');
+                    let errorMessage = 'Error adding item';
+                    if (xhr.status === 422 && xhr.responseJSON.error) {
+                        errorMessage = xhr.responseJSON.error;
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    alert(errorMessage);
                 },
                 complete: function() {
                     btn.prop('disabled', false);

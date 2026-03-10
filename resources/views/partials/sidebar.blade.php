@@ -1,8 +1,8 @@
 <aside class="page-sidebar">
     <div class="logo-wrapper d-flex align-items-center gap-2 p-3 d-lg-none">
         <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
-            <img src="{{ asset('admiro/assets/images/logo/zaya-logo-admin.svg') }}" alt="logo" style="width: 40px;">
-            <h4 class="mb-0 d-none text-white f-w-700">ZAYA</h4>
+            <img src="{{ asset('admiro/assets/images/favicon.png') }}" alt="logo" style="width: 35px;">
+            <h4 class="mb-0 text-white f-w-700">ZAYA</h4>
         </a>
         <a class="close-btn toggle-sidebar ms-auto" href="javascript:void(0)">
             <svg class="svg-color">
@@ -62,24 +62,26 @@
                     @if(auth()->user()->hasPermission('doctors-view'))
                     <li> <a href="{{ route('admin.doctors.index') }}">Doctors</a></li>
                     @endif
+
                     @if(auth()->user()->hasPermission('practitioners-view'))
                     <li> <a href="{{ route('admin.practitioners.index') }}">Practitioners</a></li>
                     @endif
+
                     @if(auth()->user()->hasPermission('mindfulness-practitioners-view'))
-                    <li> <a href="{{ route('admin.mindfulness-practitioners.index') }}">Mindfulness Practitioners</a>
-                    </li>
+                    <li> <a href="{{ route('admin.mindfulness-practitioners.index') }}">Mindfulness Practitioners</a></li>
                     @endif
+
                     @if(auth()->user()->hasPermission('yoga-therapists-view'))
                     <li> <a href="{{ route('admin.yoga-therapists.index') }}">Yoga Therapists</a></li>
                     @endif
+
                     @if(auth()->user()->hasPermission('clients-view'))
                     <li> <a href="{{ route('admin.clients.index') }}">Clients</a></li>
                     @endif
+
                     @if(auth()->user()->hasPermission('translators-view'))
                     <li> <a href="{{ route('admin.translators.index') }}">Translators</a></li>
                     @endif
-
-
                 </ul>
             </li>
             @endif
@@ -102,7 +104,7 @@
             </li>
 
             @if(auth()->user()->hasPermission('credentials-view'))
-            <li class="sidebar-list"> <a class="sidebar-link" href="{{ route('admin.credentials.index') }}">
+            <li class="sidebar-list d-none"> <a class="sidebar-link" href="{{ route('admin.credentials.index') }}">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Password') }}"></use>
                     </svg>
@@ -122,12 +124,18 @@
             @endif
 
             @if(auth()->user()->hasPermission('services-view'))
-            <li class="sidebar-list"> <a class="sidebar-link" href="{{ route('admin.services.index') }}">
+            <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Category') }}"></use>
                     </svg>
-                    <h6 class="f-w-600">Services</h6>
+                    <h6 class="f-w-600">Services</h6><i class="iconly-Arrow-Right-2 icli"> </i>
                 </a>
+                <ul class="sidebar-submenu">
+                    <li> <a href="{{ route('admin.services.index') }}">All Services</a></li>
+                    @if(auth()->user()->hasPermission('master-data-view'))
+                    <li> <a href="{{ route('admin.master-data.index', 'service_categories') }}">Service Categories</a></li>
+                    @endif
+                </ul>
             </li>
             @endif
 
@@ -186,14 +194,10 @@
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
-                            <li><a href="{{ route('admin.master-data.index', 'specializations') }}">Specializations</a>
-                            </li>
-                            <li><a href="{{ route('admin.master-data.index', 'expertises') }}">Ayurveda Expertises</a>
-                            </li>
-                            <li><a href="{{ route('admin.master-data.index', 'conditions') }}">Health Conditions</a>
-                            </li>
-                            <li><a href="{{ route('admin.master-data.index', 'therapies') }}">External Therapies</a>
-                            </li>
+                            <li><a href="{{ route('admin.master-data.index', 'specializations') }}">Specializations</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'expertises') }}">Ayurveda Expertises</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'conditions') }}">Health Conditions</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'therapies') }}">External Therapies</a></li>
                         </ul>
                     </li>
 
@@ -204,12 +208,9 @@
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
-                            <li><a href="{{ route('admin.master-data.index', 'wellness_consultations') }}">Wellness
-                                    Consultations</a></li>
-                            <li><a href="{{ route('admin.master-data.index', 'body_therapies') }}">Massage & Body
-                                    Therapies</a></li>
-                            <li><a href="{{ route('admin.master-data.index', 'practitioner_modalities') }}">Other
-                                    Modalities</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'wellness_consultations') }}">Wellness Consultations</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'body_therapies') }}">Massage & Body Therapies</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'practitioner_modalities') }}">Other Modalities</a></li>
                         </ul>
                     </li>
 
@@ -220,8 +221,7 @@
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
-                            <li><a href="{{ route('admin.master-data.index', 'client_consultation_preferences') }}">Consultation
-                                    Preferences</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'client_consultation_preferences') }}">Consultation Preferences</a></li>
                         </ul>
                     </li>
 
@@ -232,10 +232,8 @@
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
-                            <li><a href="{{ route('admin.master-data.index', 'mindfulness_services') }}">Services
-                                    Offered</a></li>
-                            <li><a href="{{ route('admin.master-data.index', 'client_concerns') }}">Client Concerns</a>
-                            </li>
+                            <li><a href="{{ route('admin.master-data.index', 'mindfulness_services') }}">Services Offered</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'client_concerns') }}">Client Concerns</a></li>
                         </ul>
                     </li>
 
@@ -246,11 +244,8 @@
                             <div class="according-menu"><i class="fa fa-angle-right"></i></div>
                         </a>
                         <ul class="according-submenu ps-3" style="display: none;">
-                            <li><a href="{{ route('admin.master-data.index', 'translator_services') }}">Services
-                                    Offered</a></li>
-                            <li><a
-                                    href="{{ route('admin.master-data.index', 'translator_specializations') }}">Specializations</a>
-                            </li>
+                            <li><a href="{{ route('admin.master-data.index', 'translator_services') }}">Services Offered</a></li>
+                            <li><a href="{{ route('admin.master-data.index', 'translator_specializations') }}">Specializations</a></li>
                         </ul>
                     </li>
 
@@ -264,6 +259,7 @@
                             <li><a href="{{ route('admin.master-data.index', 'yoga_expertises') }}">Expertise</a></li>
                         </ul>
                     </li>
+
                     <li>
                         <a href="{{ route('admin.countries.index') }}">Countries</a>
                     </li>

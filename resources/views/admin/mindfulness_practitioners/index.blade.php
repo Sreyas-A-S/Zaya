@@ -148,53 +148,62 @@
                                 <!-- First Name -->
                                 <div class="col-md-4">
                                     <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="text" name="first_name" required maxlength="50" 
+                                    <input class="form-control validate-char-limit" type="text" name="first_name" required maxlength="50" data-max="50"
                                         pattern="^[A-Za-z\s]{2,50}$" title="Only letters allowed (2-50 characters)">
+                                    <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                 </div>
 
                                 <!-- Last Name -->
                                 <div class="col-md-4">
                                     <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="text" name="last_name" required maxlength="50" 
+                                    <input class="form-control validate-char-limit" type="text" name="last_name" required maxlength="50" data-max="50"
                                         pattern="^[A-Za-z\s]{2,50}$" title="Only letters allowed (2-50 characters)">
+                                    <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                 </div>
 
                                 <!-- Email -->
                                 <div class="col-md-4">
                                     <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="email" name="email" required 
+                                    <input class="form-control validate-char-limit" type="email" name="email" required maxlength="255" data-max="255"
                                         pattern="^[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Enter a valid email address">
+                                    <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
                                 </div>
 
                                 <!-- Password -->
                                 <div class="col-md-4 password-field">
                                     <label class="form-label">Password <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="password" name="password" id="password-input" required minlength="6" 
-                                        pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$"
-                                        title="Password must contain at least 6 characters including a number">
+                                    <input class="form-control" type="password" name="password" id="password-input" required minlength="8" 
+                                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                        oninput="validatePasswordMatch()">
+                                    <div id="password-requirements" class="text-danger small mt-1">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
                                 </div>
 
                                 <!-- Confirm Password -->
                                 <div class="col-md-4 password-field">
                                     <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="password" name="password_confirmation" id="password-confirm-input" required minlength="6">
+                                    <input class="form-control" type="password" name="password_confirmation" id="password-confirm-input" required minlength="8"
+                                        oninput="validatePasswordMatch()">
+                                    <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                                 </div>
 
                                 <!-- Phone -->
                                 <div class="col-md-4">
                                 <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                <input class="form-control"
+                                <input class="form-control validate-char-limit"
                                 type="text"
                                 name="phone"
                                 id="phone"
                                 required
+                                maxlength="20"
+                                data-max="20"
                                 placeholder="Enter phone number">
+                                <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 20 characters allowed.</div>
                                 </div>
 
                                 <!-- Gender -->
                                 <div class="col-md-4">
-                                <label class="form-label">Gender</label>
-                                <select class="form-select" name="gender">
+                                <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                <select class="form-select" name="gender" required>
                                 <option value="">Select Gender</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
@@ -204,10 +213,11 @@
 
                                 <!-- DOB -->
                                 <div class="col-md-4">
-                                <label class="form-label">Date of Birth</label>
+                                <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
                                 <input class="form-control"
                                 type="date"
                                 name="dob"
+                                required
                                 max="{{ date('Y-m-d') }}">
                                 </div>
 
@@ -215,56 +225,68 @@
                                 <div class="col-md-12">
                                 <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
                                 <input type="text"
-                                class="form-control"
+                                class="form-control validate-char-limit"
                                 name="address_line_1"
                                 required
                                 maxlength="255"
+                                data-max="255"
                                 pattern="^[A-Za-z0-9\s,./-]{5,255}$"
                                 title="Enter a valid address">
+                                <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
                                 </div>
 
                                 <!-- Address Line 2 -->
                                 <div class="col-md-12">
                                 <label class="form-label">Address Line 2</label>
                                 <input type="text"
-                                class="form-control"
+                                class="form-control validate-char-limit"
                                 name="address_line_2"
                                 maxlength="255"
+                                data-max="255"
                                 pattern="^[A-Za-z0-9\s,./-]{0,255}$">
+                                <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
                                 </div>
 
                                 <!-- City -->
                                 <div class="col-md-6">
                                 <label class="form-label">City <span class="text-danger">*</span></label>
                                 <input type="text"
-                                class="form-control"
+                                class="form-control validate-char-limit"
                                 name="city"
                                 required
+                                maxlength="100"
+                                data-max="100"
                                 pattern="^[A-Za-z\s]{2,100}$"
                                 title="City should contain only letters">
+                                <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                 </div>
 
                                 <!-- State -->
                                 <div class="col-md-6">
                                 <label class="form-label">State <span class="text-danger">*</span></label>
                                 <input type="text"
-                                class="form-control"
+                                class="form-control validate-char-limit"
                                 name="state"
                                 required
+                                maxlength="100"
+                                data-max="100"
                                 pattern="^[A-Za-z\s]{2,100}$"
                                 title="State should contain only letters">
+                                <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                 </div>
 
                                 <!-- Zip Code -->
                                 <div class="col-md-6">
                                 <label class="form-label">Zip Code <span class="text-danger">*</span></label>
                                 <input type="text"
-                                class="form-control"
+                                class="form-control validate-char-limit"
                                 name="zip_code"
                                 required
                                 pattern="^[0-9]{4,10}$"
                                 maxlength="10"
+                                data-max="10"
                                 title="Enter valid zip code">
+                                <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 10 characters allowed.</div>
                                 </div>
 
                                 <!-- Country -->
@@ -289,7 +311,7 @@
 
                                 <!-- Practitioner Type -->
                                 <div class="col-md-6">
-                                <label class="form-label">Practitioner Type 
+                                <label class="form-label">Practitioner Type <span class="text-danger">*</span>
                                 <span class="small text-muted">(Select Multiple)</span></label>
 
                                 <select class="form-select multiple-select"
@@ -400,19 +422,19 @@
                                 <div class="step-content d-none" id="step-3">
                                     <div class="row g-3">
                                         <div class="col-md-12">
-                                            <label class="form-label">Highest Education</label>
+                                            <label class="form-label">Highest Education <span class="text-danger">*</span></label>
                                             <input class="form-control" type="text" name="highest_education" maxlength="255" required>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Mindfulness Training Details</label>
+                                            <label class="form-label">Mindfulness Training Details <span class="text-danger">*</span></label>
                                             <textarea class="form-control" name="mindfulness_training_details" rows="3" required></textarea>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label">Upload Certificates <small class="text-muted fs-9">Ctrl + click to select multiple</small><span class="small text-muted">(Format: PDF/JPG/PNG, Max 2MB each)</span></label>
+                                            <label class="form-label">Upload Certificates <span class="text-danger">*</span> <small class="text-muted fs-9">Ctrl + click to select multiple</small><span class="small text-muted">(Format: PDF/JPG/PNG, Max 2MB each)</span></label>
                                             <input class="form-control" type="file" name="certificates[]" multiple accept=".pdf,.jpg,.jpeg,.png" required>                                        </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Additional Certifications (Optional)</label>
-                                            <textarea class="form-control" name="additional_certifications" rows="2" required></textarea>
+                                            <textarea class="form-control" name="additional_certifications" rows="2"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -728,6 +750,17 @@
     const totalSteps = 6;
     let iti;
 
+    $(document).on('input', '.validate-char-limit', function() {
+        const el = $(this);
+        const max = parseInt(el.data('max'));
+        const msgDiv = el.siblings('.char-limit-msg');
+        if (el.val().length >= max) {
+            msgDiv.removeClass('d-none');
+        } else {
+            msgDiv.addClass('d-none');
+        }
+    });
+
     $(document).ready(function() {
         const phoneInput = document.querySelector("#phone");
         if (phoneInput) {
@@ -957,8 +990,14 @@
                     }
                 },
                 error: function(xhr) {
+                    let errorMessage = 'Error adding item';
+                    if (xhr.status === 422 && xhr.responseJSON.error) {
+                        errorMessage = xhr.responseJSON.error;
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
                     if (typeof showToast === 'function') {
-                        showToast('Error: ' + (xhr.responseJSON?.error || 'Could not add item'), 'error');
+                        showToast(errorMessage, 'error');
                     }
                 },
                 complete: function() {
@@ -1521,6 +1560,38 @@
         });
     
 
+    function validatePasswordMatch() {
+        const password = $('#password-input');
+        const confirm = $('#password-confirm-input');
+        const requirements = $('#password-requirements');
+        const matchError = $('#password-match-error');
+        
+        const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
+        
+        // Check requirements
+        if (password.val() === '') {
+            requirements.removeClass('d-none');
+        } else if (pattern.test(password.val())) {
+            requirements.addClass('d-none');
+        } else {
+            requirements.removeClass('d-none');
+        }
+        
+        // Check match
+        if (confirm.val() !== '') {
+            if (confirm.val() !== password.val()) {
+                matchError.removeClass('d-none');
+                confirm.addClass('is-invalid');
+            } else {
+                matchError.addClass('d-none');
+                confirm.removeClass('is-invalid');
+            }
+        } else {
+            matchError.addClass('d-none');
+            confirm.removeClass('is-invalid');
+        }
+    }
+
     function updateStepper() {
         $('.step-content').addClass('d-none');
         $('#step-' + currentStep).removeClass('d-none');
@@ -1634,9 +1705,10 @@
                 selector: 'input[name="password"]',
                 check: (el) => {
                     if ($('#practitioner_id').val() || !el.val()) return true;
-                    return el.val().length >= 6;
+                    const val = el.val();
+                    return val.length >= 8 && /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])/.test(val);
                 },
-                message: 'Password must be at least 6 characters'
+                message: 'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character'
             },
             {
                 selector: 'input[name="password_confirmation"]',

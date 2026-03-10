@@ -286,7 +286,7 @@
                             <li class="d-flex">
                                 <svg class="svg-color">
                                     <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Profile') }}"></use>
-                                </svg><a class="ms-2" href="{{ route('admin.dashboard') }}">Profile</a>
+                                </svg><a class="ms-2" href="{{ route('admin.profile') }}">My Profile</a>
                             </li>
                             <li class="d-flex">
                                 <svg class="svg-color">

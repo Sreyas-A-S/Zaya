@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -151,26 +152,26 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed', // Required for new clients
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'middle_name' => 'nullable|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'dob' => 'nullable|date',
             'gender' => 'nullable|string',
-            'occupation' => 'nullable|string',
+            'occupation' => 'nullable|string|max:255',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255',
             'mobile_country_code' => 'nullable|string',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'consultation_preferences' => 'nullable|array',
             'languages_spoken' => 'nullable|array',
             'referral_type' => 'nullable|string',
-            'referrer_name' => 'nullable|string',
+            'referrer_name' => 'nullable|string|max:255',
             'profile_photo' => 'nullable|image|max:2048',
         ]);
 
@@ -224,26 +225,26 @@ class ClientController extends Controller
         $user = User::findOrFail($id);
 
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => 'nullable|string|min:6|confirmed',
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'middle_name' => 'nullable|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'dob' => 'nullable|date',
             'gender' => 'nullable|string',
-            'occupation' => 'nullable|string',
+            'occupation' => 'nullable|string|max:255',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255',
             'mobile_country_code' => 'nullable|string',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'consultation_preferences' => 'nullable|array',
             'languages_spoken' => 'nullable|array',
             'referral_type' => 'nullable|string',
-            'referrer_name' => 'nullable|string',
+            'referrer_name' => 'nullable|string|max:255',
             'profile_photo' => 'nullable|image|max:2048',
         ]);
 

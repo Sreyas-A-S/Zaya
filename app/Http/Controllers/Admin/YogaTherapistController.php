@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class YogaTherapistController extends Controller
 {
@@ -143,34 +144,34 @@ class YogaTherapistController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
-            'country' => 'required|string|max:255',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
+            'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
 
-            'yoga_therapist_type' => 'nullable|string',
+            'yoga_therapist_type' => 'nullable|string|max:255',
             'years_of_experience' => 'nullable|integer',
-            'current_organization' => 'nullable|string',
-            'workplace_address' => 'nullable|string',
+            'current_organization' => 'nullable|string|max:255',
+            'workplace_address' => 'nullable|string|max:255',
             'website_social_links' => 'nullable|array',
 
-            'certification_details' => 'nullable|string',
+            'certification_details' => 'nullable|string|max:1000',
             'certificates' => 'nullable|array',
             'certificates.*' => 'file|max:2048',
-            'additional_certifications' => 'nullable|string',
+            'additional_certifications' => 'nullable|string|max:1000',
 
-            'registration_number' => 'nullable|string',
-            'affiliated_body' => 'nullable|string',
+            'registration_number' => 'nullable|string|max:255',
+            'affiliated_body' => 'nullable|string|max:255',
             'registration_proof' => 'nullable|file|max:2048',
 
             'areas_of_expertise' => 'nullable|array',
@@ -178,18 +179,18 @@ class YogaTherapistController extends Controller
 
             'languages_spoken' => 'nullable|array',
 
-            'gov_id_type' => 'nullable|string',
+            'gov_id_type' => 'nullable|string|max:255',
             'gov_id_upload' => 'nullable|file|max:2048',
-            'pan_number' => 'nullable|string',
-            'bank_holder_name' => 'nullable|string',
-            'bank_name' => 'nullable|string',
-            'account_number' => 'nullable|string',
-            'ifsc_code' => 'nullable|string',
-            'upi_id' => 'nullable|string',
+            'pan_number' => 'nullable|string|max:20',
+            'bank_holder_name' => 'nullable|string|max:255',
+            'bank_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255',
+            'ifsc_code' => 'nullable|string|max:20',
+            'upi_id' => 'nullable|string|max:255',
             'cancelled_cheque' => 'nullable|file|max:2048',
 
-            'short_bio' => 'nullable|string',
-            'therapy_approach' => 'nullable|string',
+            'short_bio' => 'nullable|string|max:1000',
+            'therapy_approach' => 'nullable|string|max:1000',
         ]);
 
         DB::beginTransaction();
@@ -271,34 +272,34 @@ class YogaTherapistController extends Controller
         $therapist = $user->yogaTherapist;
 
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => 'nullable|string|min:6|confirmed',
+            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'zip_code' => 'required|string|max:20',
-            'country' => 'required|string|max:255',
+            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
+            'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
 
-            'yoga_therapist_type' => 'nullable|string',
+            'yoga_therapist_type' => 'nullable|string|max:255',
             'years_of_experience' => 'nullable|integer',
-            'current_organization' => 'nullable|string',
-            'workplace_address' => 'nullable|string',
+            'current_organization' => 'nullable|string|max:255',
+            'workplace_address' => 'nullable|string|max:255',
             'website_social_links' => 'nullable|array',
 
-            'certification_details' => 'nullable|string',
+            'certification_details' => 'nullable|string|max:1000',
             'certificates' => 'nullable|array',
             'certificates.*' => 'file|max:2048',
-            'additional_certifications' => 'nullable|string',
+            'additional_certifications' => 'nullable|string|max:1000',
 
-            'registration_number' => 'nullable|string',
-            'affiliated_body' => 'nullable|string',
+            'registration_number' => 'nullable|string|max:255',
+            'affiliated_body' => 'nullable|string|max:255',
             'registration_proof' => 'nullable|file|max:2048',
 
             'areas_of_expertise' => 'nullable|array',
@@ -306,18 +307,18 @@ class YogaTherapistController extends Controller
 
             'languages_spoken' => 'nullable|array',
 
-            'gov_id_type' => 'nullable|string',
+            'gov_id_type' => 'nullable|string|max:255',
             'gov_id_upload' => 'nullable|file|max:2048',
-            'pan_number' => 'nullable|string',
-            'bank_holder_name' => 'nullable|string',
-            'bank_name' => 'nullable|string',
-            'account_number' => 'nullable|string',
-            'ifsc_code' => 'nullable|string',
-            'upi_id' => 'nullable|string',
+            'pan_number' => 'nullable|string|max:20',
+            'bank_holder_name' => 'nullable|string|max:255',
+            'bank_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255',
+            'ifsc_code' => 'nullable|string|max:20',
+            'upi_id' => 'nullable|string|max:255',
             'cancelled_cheque' => 'nullable|file|max:2048',
 
-            'short_bio' => 'nullable|string',
-            'therapy_approach' => 'nullable|string',
+            'short_bio' => 'nullable|string|max:1000',
+            'therapy_approach' => 'nullable|string|max:1000',
         ]);
 
         DB::beginTransaction();

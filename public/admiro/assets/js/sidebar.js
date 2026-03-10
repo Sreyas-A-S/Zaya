@@ -1,51 +1,52 @@
+// active menu js
+let slideUp = (target, duration = 500) => {
+  if (target) {
+    target.style.transitionProperty = "height, padding";
+    target.style.transitionDuration = duration + "ms";
+    target.style.boxSizing = "border-box";
+    target.style.height = target.offsetHeight + "px";
+    target.offsetHeight;
+    target.style.overflow = "hidden";
+    target.style.height = 0;
+    target.style.paddingTop = 0;
+    window.setTimeout(() => {
+      target.style.display = "none";
+      target.style.removeProperty("height");
+      target.style.removeProperty("padding-top");
+      target.style.removeProperty("overflow");
+      target.style.removeProperty("transition-duration");
+      target.style.removeProperty("transition-property");
+    }, duration);
+  }
+};
+let slideDown = (target, duration = 500) => {
+  if (target) {
+    target.style.removeProperty("display");
+    let display = window.getComputedStyle(target).display;
+    if (display === "none") display = "block";
+    target.style.display = display;
+    let height = target.offsetHeight;
+    target.style.overflow = "hidden";
+    target.style.height = 0;
+    target.style.paddingTop = 0;
+    target.offsetHeight;
+    target.style.boxSizing = "border-box";
+    target.style.transitionProperty = "height, padding";
+    target.style.transitionDuration = duration + "ms";
+    target.style.height = height + "px";
+    target.style.removeProperty("padding-top");
+    window.setTimeout(() => {
+      target.style.removeProperty("height");
+      target.style.removeProperty("overflow");
+      target.style.removeProperty("transition-duration");
+      target.style.removeProperty("transition-property");
+    }, duration);
+  }
+};
+
 (function () {
   const body = document.querySelector("body");
   const wrapper = document.querySelector(".page-wrapper");
-  // active menu js
-  let slideUp = (target, duration = 500) => {
-    if (target) {
-      target.style.transitionProperty = "height, padding";
-      target.style.transitionDuration = duration + "ms";
-      target.style.boxSizing = "border-box";
-      target.style.height = target.offsetHeight + "px";
-      target.offsetHeight;
-      target.style.overflow = "hidden";
-      target.style.height = 0;
-      target.style.paddingTop = 0;
-      window.setTimeout(() => {
-        target.style.display = "none";
-        target.style.removeProperty("height");
-        target.style.removeProperty("padding-top");
-        target.style.removeProperty("overflow");
-        target.style.removeProperty("transition-duration");
-        target.style.removeProperty("transition-property");
-      }, duration);
-    }
-  };
-  let slideDown = (target, duration = 500) => {
-    if (target) {
-      target.style.removeProperty("display");
-      let display = window.getComputedStyle(target).display;
-      if (display === "none") display = "flex";
-      target.style.display = display;
-      let height = target.offsetHeight;
-      target.style.overflow = "hidden";
-      target.style.height = 0;
-      target.style.paddingTop = 0;
-      target.offsetHeight;
-      target.style.boxSizing = "border-box";
-      target.style.transitionProperty = "height, padding";
-      target.style.transitionDuration = duration + "ms";
-      target.style.height = height + "px";
-      target.style.removeProperty("padding-top");
-      window.setTimeout(() => {
-        target.style.removeProperty("height");
-        target.style.removeProperty("overflow");
-        target.style.removeProperty("transition-duration");
-        target.style.removeProperty("transition-property");
-      }, duration);
-    }
-  };
 
 const sidebarListItems = document.querySelectorAll(".sidebar-link");
 // Add onclick event listener to each sidebar-list item
@@ -73,6 +74,36 @@ sidebarListItems.forEach((item) => {
         if (otherSubmenu && otherList.classList.contains("active")) {
           slideUp(otherSubmenu, 300);
           otherList.classList.remove("active");
+        }
+      }
+    });
+  });
+});
+
+const submenuTitles = document.querySelectorAll(".submenu-title");
+// Add onclick event listener to each submenu-title item
+submenuTitles.forEach((title) => {
+  title.addEventListener("click", () => {
+    const parentLi = title.closest("li");
+    const submenu = parentLi.querySelector(".according-submenu");
+    
+    if (submenu) {
+      if (parentLi.classList.contains("active")) {
+        slideUp(submenu, 300);
+        parentLi.classList.remove("active");
+      } else {
+        slideDown(submenu, 300);
+        parentLi.classList.add("active");
+      }
+    }
+
+    submenuTitles.forEach((otherTitle) => {
+      if (otherTitle !== title) {
+        const otherParentLi = otherTitle.closest("li");
+        const otherSubmenu = otherParentLi.querySelector(".according-submenu");
+        if (otherSubmenu && otherParentLi.classList.contains("active")) {
+          slideUp(otherSubmenu, 300);
+          otherParentLi.classList.remove("active");
         }
       }
     });
@@ -172,35 +203,6 @@ if (
     1000
   );
 }
-});
-const submenuTitles = document.querySelectorAll(".submenu-title");
-// Add onclick event listener to each submenu-title item
-submenuTitles.forEach((title) => {
-  title.addEventListener("click", () => {
-    const parentLi = title.closest("li");
-    const submenu = parentLi.querySelector(".according-submenu");
-    
-    if (submenu) {
-      if (parentLi.classList.contains("active")) {
-        slideUp(submenu, 300);
-        parentLi.classList.remove("active");
-      } else {
-        slideDown(submenu, 300);
-        parentLi.classList.add("active");
-      }
-    }
-
-    submenuTitles.forEach((otherTitle) => {
-      if (otherTitle !== title) {
-        const otherParentLi = otherTitle.closest("li");
-        const otherSubmenu = otherParentLi.querySelector(".according-submenu");
-        if (otherSubmenu && otherParentLi.classList.contains("active")) {
-          slideUp(otherSubmenu, 300);
-          otherParentLi.classList.remove("active");
-        }
-      }
-    });
-  });
 });
 var url = window.location.href;
 const urlLink = url.includes("#") ? url.split("#")[0] : url;
