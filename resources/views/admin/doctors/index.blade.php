@@ -294,10 +294,10 @@
                                                 @endforeach
                                             </div>
                                             <div class="input-group mt-2" style="max-width: 300px;">
-<input type="text"
-       class="form-control form-control-sm new-master-data-input"
-       placeholder="Type new specialization..."
-       data-type="specializations">                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
+                                                <input type="text"
+                                                    class="form-control form-control-sm new-master-data-input"
+                                                    placeholder="Type new specialization..."
+                                                    data-type="specializations"> <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -468,7 +468,7 @@
                                             <div class="row">
                                                 @foreach($externalTherapies as $ther)
                                                 <div class="col-md-4">
-                                                    <div class="form-check checkbox-primary d-flex align-items-center">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center w-100">
 
                                                         <input class="form-check-input ther-checkbox me-2"
                                                             type="checkbox"
@@ -816,13 +816,19 @@
     .iti__flag {
         background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags.png") !important;
     }
-    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+
+    @media (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
         .iti__flag {
             background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags@2x.png") !important;
         }
     }
-    .iti { width: 100% !important; display: block !important; }
-    
+
+    .iti {
+        width: 100% !important;
+        display: block !important;
+    }
+
     .doctors-table-wrapper {
         overflow-x: auto;
     }
@@ -1094,7 +1100,7 @@
         const el = $(this);
         const max = parseInt(el.data('max'));
         const msgDiv = el.siblings('.char-limit-msg');
-        
+
         if (el.val().length >= max) {
             msgDiv.removeClass('d-none');
         } else {
@@ -1106,10 +1112,10 @@
         const el = $(this);
         const pattern = el.attr('pattern');
         if (!pattern) return;
-        
+
         const regex = new RegExp(pattern);
         const errorDiv = el.siblings('.format-error');
-        
+
         if (el.val() !== '' && !regex.test(el.val())) {
             errorDiv.removeClass('d-none');
         } else {
@@ -1174,7 +1180,7 @@
         const el = $(this);
         const max = parseInt(el.data('max'));
         const msgDiv = el.siblings('.char-limit-msg');
-        
+
         if (el.val().length >= max) {
             msgDiv.removeClass('d-none');
         } else {
@@ -1186,10 +1192,10 @@
         const el = $(this);
         const pattern = el.attr('pattern');
         if (!pattern) return;
-        
+
         const regex = new RegExp(pattern);
         const errorDiv = el.siblings('.format-error');
-        
+
         if (el.val() !== '' && !regex.test(el.val())) {
             errorDiv.removeClass('d-none');
         } else {
@@ -1202,9 +1208,9 @@
         const confirm = $('#password-confirm-input');
         const requirements = $('#password-requirements');
         const matchError = $('#password-match-error');
-        
+
         const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
-        
+
         // Check requirements
         if (password.val() === '') {
             requirements.addClass('d-none');
@@ -1213,7 +1219,7 @@
         } else {
             requirements.removeClass('d-none');
         }
-        
+
         // Check match
         if (confirm.val() !== '') {
             if (confirm.val() !== password.val()) {
@@ -1233,7 +1239,7 @@
         const el = $(this);
         const max = parseInt(el.data('max'));
         const msgDiv = el.siblings('.char-limit-msg');
-        
+
         if (el.val().length >= max) {
             msgDiv.removeClass('d-none');
         } else {
@@ -1245,10 +1251,10 @@
         const el = $(this);
         const pattern = el.attr('pattern');
         if (!pattern) return;
-        
+
         const regex = new RegExp(pattern);
         const errorDiv = el.siblings('.format-error');
-        
+
         if (el.val() !== '' && !regex.test(el.val())) {
             errorDiv.removeClass('d-none');
         } else {
@@ -1987,7 +1993,7 @@
                         if (input.length > 0) {
                             input.addClass('is-invalid');
                             input.after(`<div class="invalid-feedback">${messages[0]}</div>`);
-                            
+
                             let stepContent = input.closest('.step-content');
                             if (stepContent.length > 0 && !firstErrorStep) {
                                 let stepId = stepContent.attr('id');
