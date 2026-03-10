@@ -102,11 +102,11 @@ class MasterDataController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$/',
+                'regex:/^[a-zA-Z0-9\s\-\&\(\)\.\,\/\+]+$/',
             ],
             'status' => 'required|boolean',
         ], [
-            'name.regex' => 'The name may only contain letters, numbers, spaces, and common symbols (., &, -, (, ), /, +).',
+            'name.regex' => 'The name contains invalid characters.',
         ]);
 
         $data = [
@@ -142,11 +142,11 @@ class MasterDataController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$/',
+                'regex:/^[a-zA-Z0-9\s\-\&\(\)\.\,\/\+]+$/',
             ],
             'status' => 'required|boolean',
         ], [
-            'name.regex' => 'The name may only contain letters, numbers, spaces, and common symbols (., &, -, (, ), /, +).',
+            'name.regex' => 'The name contains invalid characters.',
         ]);
 
         $model = $this->types[$type];

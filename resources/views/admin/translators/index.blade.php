@@ -1714,6 +1714,17 @@
         });
     </script>
     <style>
+        /* Fix for intl-tel-input flags showing wrong/misaligned in Admiro theme */
+        .iti__flag {
+            background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags.png") !important;
+        }
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .iti__flag {
+                background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags@2x.png") !important;
+            }
+        }
+        .iti { width: 100% !important; display: block !important; }
+
         /* Stepper Styling */
         .stepper-horizontal {
             display: flex;

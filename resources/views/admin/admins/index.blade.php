@@ -404,12 +404,41 @@
                         $('#edit_name').val(data.name);
                         $('#edit_email').val(data.email);
                         $('#edit_phone').val(data.phone);
-                        $('#edit_country').val(data.national_id);
-                        if (Array.isArray(data.languages) && data.languages.length > 0) {
-                            $('#edit_language').val(data.languages[0]);
-                        } else {
-                            $('#edit_language').val(data.languages);
+                        
+                        // Handle Country (national_id) which could be an array due to casting
+                        if (data.national_id) {
+                            let national_id = data.national_id;
+                            if (typeof national_id === 'string') {
+                                try {
+                                    if (national_id.startsWith('[') || national_id.startsWith('{')) {
+                                        national_id = JSON.parse(national_id);
+                                    }
+                                } catch(e) {}
+                            }
+                            if (Array.isArray(national_id) && national_id.length > 0) {
+                                $('#edit_country').val(national_id[0]);
+                            } else {
+                                $('#edit_country').val(national_id);
+                            }
                         }
+
+                        // Handle Language
+                        if (data.languages) {
+                            let languages = data.languages;
+                            if (typeof languages === 'string') {
+                                try {
+                                    if (languages.startsWith('[') || languages.startsWith('{')) {
+                                        languages = JSON.parse(languages);
+                                    }
+                                } catch(e) {}
+                            }
+                            if (Array.isArray(languages) && languages.length > 0) {
+                                $('#edit_language').val(languages[0]);
+                            } else {
+                                $('#edit_language').val(languages);
+                            }
+                        }
+
                         $('#edit_status').val(data.status);
                         $('#editAdminModal').modal('show');
                     },
