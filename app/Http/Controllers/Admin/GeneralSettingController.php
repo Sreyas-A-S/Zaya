@@ -12,7 +12,7 @@ class GeneralSettingController extends Controller
 
     public function index()
     {
-        $settings = HomepageSetting::where('section', 'general')->get();
+        $settings = HomepageSetting::whereIn('section', ['general', 'social_links', 'finance'])->get();
         return view('admin.general-settings.index', compact('settings'));
     }
 

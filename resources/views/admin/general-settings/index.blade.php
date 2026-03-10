@@ -39,6 +39,12 @@
                                 @if($setting->type === 'text')
                                 <input type="text" name="{{ $setting->key }}" value="{{ $setting->value }}" class="form-control" placeholder="Enter {{ str_replace('_', ' ', $setting->key) }}..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>
 
+                                @elseif($setting->type === 'number')
+                                <input type="number" name="{{ $setting->key }}" value="{{ $setting->value }}" class="form-control" placeholder="Enter {{ str_replace('_', ' ', $setting->key) }}...">
+
+                                @elseif($setting->type === 'url')
+                                <input type="url" name="{{ $setting->key }}" value="{{ $setting->value }}" class="form-control" placeholder="Enter {{ str_replace('_', ' ', $setting->key) }}...">
+
                                 @elseif($setting->type === 'textarea')
                                 <textarea name="{{ $setting->key }}" class="form-control" rows="3" placeholder="Enter {{ str_replace('_', ' ', $setting->key) }}..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>{{ $setting->value }}</textarea>
 
