@@ -1118,6 +1118,7 @@
     });
 
     $(document).ready(function() {
+        // Initialize intl-tel-input
         const phoneInput = document.querySelector("#mobile_number");
         if (phoneInput) {
             iti = window.intlTelInput(phoneInput, {
@@ -1125,6 +1126,23 @@
                 separateDialCode: true,
                 initialCountry: "in",
                 preferredCountries: ["in", "ae", "us", "gb"]
+            });
+        }
+
+        // Initialize Select2 with safe formatting function
+        function formatCountry(country) {
+            if (!country.id) return country.text;
+            var flag = $(country.element).data('flag');
+            if (!flag) return country.text;
+            return $('<span><span class="fi fi-' + flag + '" style="margin-right:8px"></span>' + country.text + '</span>');
+        }
+
+        if ($.fn.select2) {
+            $('#country').select2({
+                templateResult: formatCountry,
+                templateSelection: formatCountry,
+                width: '100%',
+                dropdownParent: $('#doctor-form-modal')
             });
         }
     });
@@ -1177,34 +1195,6 @@
         } else {
             errorDiv.addClass('d-none');
         }
-    });
-
-    $(document).ready(function() {
-
-        function formatCountry(country) {
-            if (!country.id) {
-                return country.text;
-            }
-
-            var flag = $(country.element).data('flag');
-
-            if (!flag) {
-                return country.text;
-            }
-
-            var $country = $(
-                '<span><span class="fi fi-' + flag + '" style="margin-right:8px"></span>' + country.text + '</span>'
-            );
-
-            return $country;
-        }
-
-        $('#country').select2({
-            templateResult: formatCountry,
-            templateSelection: formatCountry,
-            width: '100%'
-        });
-
     });
 
     function validatePasswordMatch() {
@@ -1452,7 +1442,10 @@
 
     function initFormNavigation() {
         $('.next-step').on('click', function() {
-            var stepNum = $(this).closest('.step-content').attr('id').replace('step', '');
+            var stepContent = $(this).closest('.step-content');
+            var stepId = stepContent.attr('id');
+            if (!stepId) return;
+            var stepNum = stepId.replace('step', '');
             if (!validateStep(stepNum)) return;
             updateStep($(this).data('next'));
         });
@@ -1994,8 +1987,12 @@
                         if (input.length > 0) {
                             input.addClass('is-invalid');
                             input.after(`<div class="invalid-feedback">${messages[0]}</div>`);
-                            const stepId = input.closest('.step-content').attr('id').replace('step', '');
-                            if (!firstErrorStep) firstErrorStep = stepId;
+                            
+                            let stepContent = input.closest('.step-content');
+                            if (stepContent.length > 0 && !firstErrorStep) {
+                                let stepId = stepContent.attr('id');
+                                if (stepId) firstErrorStep = stepId.replace('step', '');
+                            }
                         }
                     });
                     if (firstErrorStep) updateStep(firstErrorStep);
@@ -2477,7 +2474,7 @@
         }
     };
 
-    const passwordInput = document.getElementById('password');
+    const passwordInput = document.getElementById('password-input');
     if (passwordInput) {
         passwordInput.addEventListener('input', function() {
             this.value = this.value.replace(/\s/g, '');
