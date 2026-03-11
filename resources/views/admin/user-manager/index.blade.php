@@ -160,14 +160,22 @@
 
                         <div class="col-md-6 mb-3 password-field">
                             <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password" id="password"  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
-       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number" required placeholder="Password">
+                            <input class="form-control" type="password" name="password" id="password-input"
+                                minlength="8"
+                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                required placeholder="Password" oninput="validatePasswordMatch()">
+                            <div id="password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
                         </div>
 
                         <div class="col-md-6 mb-3 password-field">
                             <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password_confirmation"  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
-       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number"  id="password_confirmation" required placeholder="Confirm Password">
+                            <input class="form-control" type="password" name="password_confirmation" id="password-confirm-input"
+                                minlength="8"
+                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                required placeholder="Confirm Password" oninput="validatePasswordMatch()">
+                            <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                         </div>
                     </div>
                 </div>
@@ -518,6 +526,36 @@
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 
 <script>
+function validatePasswordMatch() {
+    const password = $('#password-input');
+    const confirm = $('#password-confirm-input');
+    const requirements = $('#password-requirements');
+    const matchError = $('#password-match-error');
+
+    const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
+
+    if (password.val() === '') {
+        requirements.addClass('d-none');
+    } else if (pattern.test(password.val())) {
+        requirements.addClass('d-none');
+    } else {
+        requirements.removeClass('d-none');
+    }
+
+    if (confirm.val() !== '') {
+        if (confirm.val() !== password.val()) {
+            matchError.removeClass('d-none');
+            confirm.addClass('is-invalid');
+        } else {
+            matchError.addClass('d-none');
+            confirm.removeClass('is-invalid');
+        }
+    } else {
+        matchError.addClass('d-none');
+        confirm.removeClass('is-invalid');
+    }
+}
+
 $(document).ready(function () {
     // Initialize Select2
     $('.select2').select2({
@@ -675,7 +713,7 @@ $(document).ready(function () {
         $('#um-modal-title').text('Register User Manager');
         $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
         $('.password-field').show();
-        $('#password, #password_confirmation').attr('required', 'required');
+        $('#password-input, #password-confirm-input').attr('required', 'required');
         if (typeof window.iti !== 'undefined') {
             window.iti.setNumber('');
         }
@@ -741,7 +779,7 @@ $(document).ready(function () {
 
             // Show password fields on edit but make them optional
             $('.password-field').show();
-            $('#password, #password_confirmation').removeAttr('required');
+            $('#password-input, #password-confirm-input').removeAttr('required');
 
             $('#methodPlaceholder').html('@method("PUT")');
             $('#userManagerForm').attr('action', "{{ url('admin/user-managers') }}/" + id);
@@ -902,7 +940,7 @@ function openCreateModal() {
     $('#saveBtn').text('Create User Manager');
     $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
     $('.password-field').show();
-    $('#password, #password_confirmation').attr('required', 'required');
+    $('#password-input, #password-confirm-input').attr('required', 'required');
     $('#userManagerModal').modal('show');
 }
 </script>

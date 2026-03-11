@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Translator;
+use App\Mail\WelcomeUserMail;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
@@ -237,6 +240,11 @@ class TranslatorController extends Controller
                 'password' => Hash::make($validatedData['password']),
                 'role' => 'translator',
             ]);
+
+            $plainPassword = $validatedData['password'];
+            Session::put('welcome_password_' . $user->id, $plainPassword);
+            Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));
+            Session::forget('welcome_password_' . $user->id);
 
             $translatorData = array_merge($validatedData, [
                 'full_name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],

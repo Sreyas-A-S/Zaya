@@ -37,6 +37,7 @@
   <!-- App css -->
   <link rel="stylesheet" href="{{ asset('admiro/assets/css/style.css') }}" />
   <link id="color" rel="stylesheet" href="{{ asset('admiro/assets/css/color-1.css') }}" media="screen" />
+  @stack('css')
 </head>
 
 <body>
@@ -171,6 +172,32 @@
     .simplebar-track.simplebar-vertical:hover .simplebar-scrollbar:before {
       background-color: rgba(151, 86, 61, 0.7) !important;
     }
+
+    .password-toggle-wrap {
+      position: relative;
+    }
+
+    .password-toggle-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #6c757d;
+      z-index: 2;
+    }
+
+    .password-toggle-btn i {
+      pointer-events: none;
+    }
+
+    .page-body .avatar-upload .avatar-preview,
+    .page-body .avatar-upload .avatar-preview > div {
+      border-radius: 100% !important;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+    }
   </style>
   <div class="page-wrapper compact-wrapper" id="pageWrapper">
 
@@ -264,6 +291,78 @@
   </script>
   <!-- custom script -->
   <script src="{{ asset('admiro/assets/js/script.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      let counter = 0;
+
+      function ensureId(input) {
+        if (!input.id) {
+          counter += 1;
+          input.id = 'pwd-input-' + counter;
+        }
+        return input.id;
+      }
+
+      function addToggleToInput(input) {
+        if (!input) return;
+
+        const existingToggle = input.parentElement && input.parentElement.querySelector('.toggle-password');
+        if (existingToggle) return;
+
+        const inputGroup = input.closest('.input-group');
+        if (inputGroup) {
+          if (!inputGroup.querySelector('.toggle-password')) {
+            const span = document.createElement('span');
+            span.className = 'input-group-text toggle-password';
+            span.setAttribute('data-target', ensureId(input));
+            span.style.cursor = 'pointer';
+            span.innerHTML = '<i class="fa fa-eye"></i>';
+            inputGroup.appendChild(span);
+          }
+          return;
+        }
+
+        if (!input.closest('.password-toggle-wrap')) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'password-toggle-wrap';
+          input.parentNode.insertBefore(wrapper, input);
+          wrapper.appendChild(input);
+
+          const btn = document.createElement('span');
+          btn.className = 'password-toggle-btn toggle-password';
+          btn.setAttribute('data-target', ensureId(input));
+          btn.innerHTML = '<i class="fa fa-eye"></i>';
+          wrapper.appendChild(btn);
+        }
+      }
+
+      const passwordInputs = document.querySelectorAll('input[type="password"]');
+      passwordInputs.forEach(addToggleToInput);
+
+      document.addEventListener('click', function(e) {
+        const toggle = e.target.closest('.toggle-password');
+        if (!toggle) return;
+
+        const targetId = toggle.getAttribute('data-target');
+        let input = targetId ? document.getElementById(targetId) : null;
+        if (!input) {
+          const group = toggle.closest('.input-group');
+          if (group) {
+            input = group.querySelector('input[type="password"], input[type="text"]');
+          }
+        }
+        if (!input) return;
+
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        const icon = toggle.querySelector('i');
+        if (icon) {
+          icon.classList.toggle('fa-eye', !isPassword);
+          icon.classList.toggle('fa-eye-slash', isPassword);
+        }
+      });
+    });
+  </script>
   @yield('scripts')
 </body>
 @stack('scripts')

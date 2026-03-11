@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Mail\WelcomeUserMail;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Str;
@@ -184,6 +187,11 @@ class ClientController extends Controller
             'password' => Hash::make($validatedData['password']),
             'role' => 'client'
         ]);
+
+        $plainPassword = $validatedData['password'];
+        Session::put('welcome_password_' . $user->id, $plainPassword);
+        Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));
+        Session::forget('welcome_password_' . $user->id);
 
         $age = $validatedData['dob'] ? Carbon::parse($validatedData['dob'])->age : null;
         $clientId = 'CL-' . strtoupper(Str::random(8));

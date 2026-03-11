@@ -25,16 +25,16 @@ class FinanceManagerController extends Controller
         if ($request->ajax()) {
 
             $data = User::where('role', 'finance_manager')
-                        ->select('users.*');
+                ->select('users.*');
 
             // Role-based country restriction
             if (!$isSuperAdmin && !empty($user->national_id)) {
                 $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
-                $data->where(function($q) use ($assignedCountryIds) {
+                $data->where(function ($q) use ($assignedCountryIds) {
                     foreach ($assignedCountryIds as $id) {
                         $q->orWhereJsonContains('users.national_id', (int)$id)
-                          ->orWhereJsonContains('users.national_id', (string)$id)
-                          ->orWhere('users.national_id', $id);
+                            ->orWhereJsonContains('users.national_id', (string)$id)
+                            ->orWhere('users.national_id', $id);
                     }
                 });
             }
@@ -44,10 +44,10 @@ class FinanceManagerController extends Controller
                 ->filter(function ($query) use ($request) {
                     if ($request->has('country_filter') && !empty($request->country_filter)) {
                         $cid = $request->country_filter;
-                        $query->where(function($q) use ($cid) {
+                        $query->where(function ($q) use ($cid) {
                             $q->whereJsonContains('users.national_id', (int)$cid)
-                              ->orWhereJsonContains('users.national_id', (string)$cid)
-                              ->orWhere('users.national_id', $cid);
+                                ->orWhereJsonContains('users.national_id', (string)$cid)
+                                ->orWhere('users.national_id', $cid);
                         });
                     }
 
@@ -74,7 +74,7 @@ class FinanceManagerController extends Controller
                             $nationalIds = $decoded;
                         }
                     }
-                    
+
                     if (is_array($nationalIds) && !empty($nationalIds)) {
                         return \App\Models\Country::whereIn('id', $nationalIds)->pluck('name')->implode(', ');
                     } elseif (!is_array($nationalIds) && $nationalIds && is_numeric($nationalIds)) {
@@ -116,7 +116,7 @@ class FinanceManagerController extends Controller
                         $label = 'Inactive';
                     }
 
-                    return '<span class="badge '.$class.' status-badge" style="cursor: pointer;" data-id="'.$row->id.'" data-status="'.$status.'">'.$label.'</span>';
+                    return '<span class="badge ' . $class . ' status-badge" style="cursor: pointer;" data-id="' . $row->id . '" data-status="' . $status . '">' . $label . '</span>';
                 })
 
                 ->addColumn('action', function ($row) {
@@ -135,7 +135,9 @@ class FinanceManagerController extends Controller
         $allCountries = Country::all();
         $languages = Language::all();
 
-        if ($isSuperAdmin || empty($user->national_id)) {
+        $isAdminRole = ($role && in_array($role->name, ['Super Admin', 'Admin']));
+
+        if ($isAdminRole || empty($user->national_id)) {
             $countries = $allCountries;
         } else {
             $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
@@ -152,20 +154,20 @@ class FinanceManagerController extends Controller
     {
         $request->validate([
             'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
-                        'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
+            'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
             'email'     => 'required|email|unique:users,email',
-            'password'  => ['required', 'confirmed', 'min:6', 'regex:/^[A-Z][A-Za-z0-9]{5,}$/'],
+            'password'  => ['required', 'confirmed', 'min:8', 'regex:/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/'],
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',
             'language'  => 'required|array',
-            'language.*'=> 'exists:languages,id',
+            'language.*' => 'exists:languages,id',
             'phone'     => ['required', 'string', 'min:10', 'max:20'],
             'cropped_image' => 'nullable|string',
             'status'    => 'nullable|string|in:pending,active,rejected,inactive'
         ], [
             'firstname.regex' => 'First name must start with a capital letter and contain only letters.',
             'lastname.regex'  => 'Last name must start with a capital letter and contain only letters.',
-            'password.regex'  => 'Password must start with a capital letter and be alphanumeric.'
+            'password.regex'  => 'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.'
         ]);
 
         $profilePic = null;
@@ -181,11 +183,11 @@ class FinanceManagerController extends Controller
             'last_name'  => $request->lastname,
             'email'      => $request->email,
             'password'   => Hash::make($request->password),
-            'national_id'=> $request->country,
-            'languages'  => $request->language, 
+            'national_id' => $request->country,
+            'languages'  => $request->language,
             'role'       => 'finance_manager',
             'status'     => $request->status ?? 'pending',
-            'profile_pic'=> $profilePic,
+            'profile_pic' => $profilePic,
             'phone'      => $request->phone,
         ]);
 
@@ -210,12 +212,12 @@ class FinanceManagerController extends Controller
 
         $request->validate([
             'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*'],
-                        'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*'],
+            'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*'],
             'email'     => 'required|email|unique:users,email,' . $id,
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',
             'language'  => 'required|array',
-            'language.*'=> 'exists:languages,id',
+            'language.*' => 'exists:languages,id',
             'phone'     => ['required', 'string', 'min:10', 'max:20'],
             'cropped_image' => 'nullable|string',
             'status'    => 'required|string|in:pending,active,rejected,inactive',
@@ -236,7 +238,7 @@ class FinanceManagerController extends Controller
             'first_name' => $request->firstname,
             'last_name'  => $request->lastname,
             'email'      => $request->email,
-            'national_id'=> $request->country,
+            'national_id' => $request->country,
             'languages'  => $request->language,
             'phone'      => $request->phone,
             'status'     => $request->status,
