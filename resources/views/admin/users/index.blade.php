@@ -71,7 +71,21 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="password">Password</label>
-                            <input class="form-control" id="password" type="password" name="password" placeholder="Enter password" required>
+                            <input class="form-control" id="password-input-inline" type="password" name="password"
+                                   minlength="8"
+                                   pattern="(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                   title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                   placeholder="Enter password" required oninput="validatePasswordMatchUser()">
+                            <div id="password-requirements-inline" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="password_confirmation">Confirm Password</label>
+                            <input class="form-control" id="password-confirm-input-inline" type="password" name="password_confirmation"
+                                   minlength="8"
+                                   pattern="(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                   title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                   placeholder="Confirm password" required oninput="validatePasswordMatchUser()">
+                            <div id="password-match-error-inline" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                         </div>
                         <div class="text-end">
                             <button class="btn btn-primary" type="button" id="saveBtnInline">Save</button>
@@ -106,7 +120,21 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="password">Password</label>
-                        <input class="form-control" id="password" type="password" name="password" placeholder="Enter password" required>
+                        <input class="form-control" id="password-input" type="password" name="password"
+                               minlength="8"
+                               pattern="(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                               title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                               placeholder="Enter password" required oninput="validatePasswordMatchUser()">
+                        <div id="password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="password_confirmation">Confirm Password</label>
+                        <input class="form-control" id="password-confirm-input" type="password" name="password_confirmation"
+                               minlength="8"
+                               pattern="(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                               title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                               placeholder="Confirm password" required oninput="validatePasswordMatchUser()">
+                        <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                     </div>
                 </form>
             </div>
@@ -122,6 +150,66 @@
 
 @section('scripts')
 <script>
+    function validatePasswordMatchUser() {
+        const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
+
+        const passwordInline = $('#password-input-inline');
+        const confirmInline = $('#password-confirm-input-inline');
+        const requirementsInline = $('#password-requirements-inline');
+        const matchErrorInline = $('#password-match-error-inline');
+
+        const password = $('#password-input');
+        const confirm = $('#password-confirm-input');
+        const requirements = $('#password-requirements');
+        const matchError = $('#password-match-error');
+
+        if (passwordInline.length) {
+            if (passwordInline.val() === '') {
+                requirementsInline.addClass('d-none');
+            } else if (pattern.test(passwordInline.val())) {
+                requirementsInline.addClass('d-none');
+            } else {
+                requirementsInline.removeClass('d-none');
+            }
+
+            if (confirmInline.val() !== '') {
+                if (confirmInline.val() !== passwordInline.val()) {
+                    matchErrorInline.removeClass('d-none');
+                    confirmInline.addClass('is-invalid');
+                } else {
+                    matchErrorInline.addClass('d-none');
+                    confirmInline.removeClass('is-invalid');
+                }
+            } else {
+                matchErrorInline.addClass('d-none');
+                confirmInline.removeClass('is-invalid');
+            }
+        }
+
+        if (password.length) {
+            if (password.val() === '') {
+                requirements.addClass('d-none');
+            } else if (pattern.test(password.val())) {
+                requirements.addClass('d-none');
+            } else {
+                requirements.removeClass('d-none');
+            }
+
+            if (confirm.val() !== '') {
+                if (confirm.val() !== password.val()) {
+                    matchError.removeClass('d-none');
+                    confirm.addClass('is-invalid');
+                } else {
+                    matchError.addClass('d-none');
+                    confirm.removeClass('is-invalid');
+                }
+            } else {
+                matchError.addClass('d-none');
+                confirm.removeClass('is-invalid');
+            }
+        }
+    }
+
     $(document).ready(function() {
         var table = $('#data-table').DataTable({
             processing: true,
@@ -196,7 +284,7 @@
                 $('#user_id').val(data.id);
                 $('#createModal #name').val(data.name);
                 $('#createModal #email').val(data.email);
-                $('#createModal #password').val(''); // Clear password field
+                $('#createModal #password-input').val(''); // Clear password field
                 $('#createModal').modal('show');
             })
         });

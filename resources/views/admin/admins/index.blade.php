@@ -129,13 +129,17 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Password (Leave blank to keep current)</label>
-                                <input type="password" id="edit_password" class="form-control" 
-                                    pattern="(?=^[A-Z])[A-Za-z0-9]{6,}" 
-                                    title="Password must start with a capital letter, be alphanumeric and at least 6 characters long">
+                                <input type="password" id="edit_password" class="form-control"
+                                    minlength="8"
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                    title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                    oninput="validatePasswordMatchAdmin()">
+                                <div id="edit-password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Confirm Password</label>
-                                <input type="password" id="edit_password_confirmation" class="form-control">
+                                <input type="password" id="edit_password_confirmation" class="form-control" minlength="8" oninput="validatePasswordMatchAdmin()">
+                                <div id="edit-password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                             </div>
                         </div>
                         <div class="text-end mt-3">
@@ -306,14 +310,21 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Password</label>
-                                <input type="password" name="password" class="form-control" 
-                                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
-       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number" required>
+                                <input type="password" name="password" id="password-input" class="form-control"
+                                    minlength="8"
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                    title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                    required oninput="validatePasswordMatchAdmin()">
+                                <div id="password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Confirm Password</label>
-                                <input type="password" name="password_confirmation"  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
-       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number" class="form-control" required>
+                                <input type="password" name="password_confirmation" id="password-confirm-input" class="form-control"
+                                    minlength="8"
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                    title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                    required oninput="validatePasswordMatchAdmin()">
+                                <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                             </div>
                             <div class="col-12 text-end mt-4">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -328,6 +339,66 @@
 
     @push('scripts')
         <script>
+            function validatePasswordMatchAdmin() {
+                const password = $('#password-input');
+                const confirm = $('#password-confirm-input');
+                const requirements = $('#password-requirements');
+                const matchError = $('#password-match-error');
+
+                const editPassword = $('#edit_password');
+                const editConfirm = $('#edit_password_confirmation');
+                const editRequirements = $('#edit-password-requirements');
+                const editMatchError = $('#edit-password-match-error');
+
+                const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
+
+                if (password.length) {
+                    if (password.val() === '') {
+                        requirements.addClass('d-none');
+                    } else if (pattern.test(password.val())) {
+                        requirements.addClass('d-none');
+                    } else {
+                        requirements.removeClass('d-none');
+                    }
+
+                    if (confirm.val() !== '') {
+                        if (confirm.val() !== password.val()) {
+                            matchError.removeClass('d-none');
+                            confirm.addClass('is-invalid');
+                        } else {
+                            matchError.addClass('d-none');
+                            confirm.removeClass('is-invalid');
+                        }
+                    } else {
+                        matchError.addClass('d-none');
+                        confirm.removeClass('is-invalid');
+                    }
+                }
+
+                if (editPassword.length) {
+                    if (editPassword.val() === '') {
+                        editRequirements.addClass('d-none');
+                    } else if (pattern.test(editPassword.val())) {
+                        editRequirements.addClass('d-none');
+                    } else {
+                        editRequirements.removeClass('d-none');
+                    }
+
+                    if (editConfirm.val() !== '') {
+                        if (editConfirm.val() !== editPassword.val()) {
+                            editMatchError.removeClass('d-none');
+                            editConfirm.addClass('is-invalid');
+                        } else {
+                            editMatchError.addClass('d-none');
+                            editConfirm.removeClass('is-invalid');
+                        }
+                    } else {
+                        editMatchError.addClass('d-none');
+                        editConfirm.removeClass('is-invalid');
+                    }
+                }
+            }
+
             $(document).ready(function() {
 
                 const table = $('#Admins-table').DataTable({

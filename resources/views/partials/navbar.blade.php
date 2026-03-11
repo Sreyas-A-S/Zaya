@@ -228,52 +228,6 @@
                         </ul>
                     </div>
                 </li>
-                <li class="custom-dropdown"><a href="javascript:void(0)">
-                        <svg>
-                            <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#notification') }}"></use>
-                        </svg></a>
-                    @php
-                        $authUser = auth()->user();
-                        $unreadNotificationsCount = $authUser ? $authUser->unreadNotifications()->count() : 0;
-                        $recentNotifications = $authUser ? $authUser->notifications()->latest()->take(5)->get() : collect();
-                    @endphp
-                    @if($unreadNotificationsCount > 0)
-                    <span class="badge rounded-pill badge-primary">{{ $unreadNotificationsCount }}</span>
-                    @endif
-                    <div class="custom-menu notification-dropdown py-0 overflow-hidden">
-                        <h3 class="title bg-primary-light dropdown-title">Notification <a href="{{ route('admin.notifications.index') }}"><span class="font-primary">View all</span></a></h3>
-                        <ul class="activity-timeline">
-                            @forelse($recentNotifications as $notification)
-                            <li class="d-flex align-items-start">
-                                <div class="activity-line"></div>
-                                <div class="activity-dot-{{ $notification->unread() ? 'primary' : 'secondary' }}"></div>
-                                <div class="flex-grow-1">
-                                    <h6 class="f-w-600 font-{{ $notification->unread() ? 'primary' : 'secondary' }}">
-                                        {{ $notification->created_at->format('d-m-Y') }}
-                                        <span>{{ $notification->created_at->diffForHumans() }}</span>
-                                        <span class="circle-dot-{{ $notification->unread() ? 'primary' : 'secondary' }} float-end">
-                                            <svg class="circle-color">
-                                                <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#circle') }}"></use>
-                                            </svg>
-                                        </span>
-                                    </h6>
-                                    @php
-                                        $data = $notification->data;
-                                        $title = $data['title'] ?? 'New Notification';
-                                        $message = $data['message'] ?? '';
-                                    @endphp
-                                    <h5>{{ $title }}</h5>
-                                    <p class="mb-0">{{ Str::limit($message, 50) }}</p>
-                                </div>
-                            </li>
-                            @empty
-                            <li class="d-flex align-items-start p-3 text-center">
-                                <p class="mb-0 text-muted">No notifications found.</p>
-                            </li>
-                            @endforelse
-                        </ul>
-                    </div>
-                </li>
                 <li class="profile-nav custom-dropdown">
                     <div class="user-wrap">
                         <div class="user-img"><img src="{{ asset('admiro/assets/images/profile.png') }}" alt="user" /></div>

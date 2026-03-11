@@ -314,7 +314,7 @@
                             <input type="password" class="form-control" name="password" id="password-input"
                                 minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
                                 oninput="validatePasswordMatch()">
-                            <div id="password-requirements" class="text-danger small mt-1">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
+                            <div id="password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
@@ -616,7 +616,7 @@
         
         // Check requirements
         if (password.val() === '') {
-            requirements.removeClass('d-none');
+            requirements.addClass('d-none');
         } else if (pattern.test(password.val())) {
             requirements.addClass('d-none');
         } else {

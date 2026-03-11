@@ -192,9 +192,10 @@
                                                     name="password"
                                                     id="password-input"
                                                     minlength="8"
-                                                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
-       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number"
-                                                    required>
+                                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                                    title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                                    required
+                                                    oninput="validatePasswordMatch()">
                                                 <span class="input-group-text toggle-password" data-target="password-input" style="cursor:pointer;">
                                                     <i class="fa fa-eye"></i>
                                                 </span>
@@ -212,9 +213,10 @@
                                                     name="password_confirmation"
                                                     id="password-confirm-input"
                                                     minlength="8"
-                                                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
-       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number"
-                                                    required>
+                                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                                    title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                                    required
+                                                    oninput="validatePasswordMatch()">
                                                 <span class="input-group-text toggle-password" data-target="password-confirm-input" style="cursor:pointer;">
                                                     <i class="fa fa-eye"></i>
                                                 </span>
@@ -572,6 +574,36 @@
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 
 <script>
+function validatePasswordMatch() {
+    const password = $('#password-input');
+    const confirm = $('#password-confirm-input');
+    const requirements = $('#password-requirements');
+    const matchError = $('#password-match-error');
+
+    const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
+
+    if (password.val() === '') {
+        requirements.addClass('d-none');
+    } else if (pattern.test(password.val())) {
+        requirements.addClass('d-none');
+    } else {
+        requirements.removeClass('d-none');
+    }
+
+    if (confirm.val() !== '') {
+        if (confirm.val() !== password.val()) {
+            matchError.removeClass('d-none');
+            confirm.addClass('is-invalid');
+        } else {
+            matchError.addClass('d-none');
+            confirm.removeClass('is-invalid');
+        }
+    } else {
+        matchError.addClass('d-none');
+        confirm.removeClass('is-invalid');
+    }
+}
+
 $(document).ready(function () {
     // Initialize Select2
     $('.select2').select2({

@@ -185,6 +185,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // General Settings
     Route::get('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'index'])->name('general-settings.index');
     Route::post('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'update'])->name('general-settings.update');
+
      
     Route::resource('finance-managers', \App\Http\Controllers\Admin\FinanceManagerController::class);
     Route::get('finance-manager', function() { return redirect()->route('admin.finance-managers.index'); });
@@ -253,4 +254,22 @@ Route::get('/preview-otp-mail', function () {
     return new App\Mail\AdminOTPMail('123456');
 });
 
+Route::get('/preview-mail-template', function () {
+    $messageData = (object) [
+        'first_name' => 'Aarav',
+        'last_name' => 'Sharma',
+        'email' => 'aarav@example.com',
+        'phone' => '+91 98765 43210',
+        'user_type' => ['client'],
+        'message' => "Hello,\nI would like to know more about your services."
+    ];
 
+    return view('emails.default', [
+        'title' => 'Email Template Preview',
+        'intro' => 'This is a preview of the unified email template.',
+        'otp' => '123456',
+        'expiration' => 'This OTP will expire in 5 minutes for your security.',
+        'messageData' => $messageData,
+        'outro' => 'If you did not request this email, please ignore it.',
+    ]);
+});

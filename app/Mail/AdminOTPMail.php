@@ -39,7 +39,14 @@ class AdminOTPMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.admin-otp',
+            view: 'emails.default',
+            with: [
+                'title' => 'Password Reset OTP',
+                'intro' => 'You are receiving this email because we received a password reset request for your account.',
+                'otp' => $this->otp,
+                'expiration' => 'This OTP will expire in 5 minutes for your security.',
+                'outro' => 'If you did not request a password reset, please ignore this email or contact support if you have concerns.',
+            ],
         );
     }
 
