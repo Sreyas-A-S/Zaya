@@ -13,11 +13,16 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('frontend/assets/apple-touch-icon.png') }}" />
     <meta name="apple-mobile-web-app-title" content="Zaya Wellness" />
     <link rel="manifest" href="{{ asset('frontend/assets/site.webmanifest') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 
     <title>Zaya Wellness - Embrace Wellness</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
+        .bg-green-600 {
+            background-color: #10b981;
+        }
         /* Preloader Styles */
         #global-preloader {
             position: fixed;
