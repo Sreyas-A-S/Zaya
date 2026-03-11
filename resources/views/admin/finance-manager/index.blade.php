@@ -48,7 +48,7 @@
     <div class="page-title">
         <div class="row">
             <div class="col-sm-6">
-                <h3>Finance Managers</h3>
+                <!-- Removed duplicate page title; keeping "Finance Managers List" in card header -->
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb">
