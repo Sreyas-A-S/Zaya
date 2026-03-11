@@ -529,28 +529,6 @@
             });
         });
 
-        // Edit
-        $('body').on('click', '.editTestimonial', function() {
-            let id = $(this).data('id');
-            $.get("{{ url('admin/testimonials') }}/" + id + "/edit", function(data) {
-                $('#form-modal-title').text('Edit Testimonial');
-                $('#form-method').val('PUT');
-                $('#testimonial_id').val(data.id);
-                $('input[name="name"]').val(data.name);
-                $('input[name="role"]').val(data.role);
-                $('textarea[name="message"]').val(data.message);
-                $('input[name="rating"][value="' + data.rating + '"]').prop('checked', true);
-
-                if (data.image) {
-                    $('#imagePreview').css('background-image', "url('{{ asset('storage') }}/" + data.image + "')");
-                } else {
-                    $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
-                }
-
-                $('#testimonial-form-modal').modal('show');
-            });
-        });
-
         // Delete
         $('body').on('click', '.deleteTestimonial', function() {
             let id = $(this).data('id');
