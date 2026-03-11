@@ -141,12 +141,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Testimonial Slider
         if (document.querySelector('.testimonial-slider')) {
-            const slidesCount = document.querySelectorAll('.testimonial-slider .swiper-slide').length;
+            // const slidesCount = document.querySelectorAll('.testimonial-slider .swiper-slide').length;
             new SwiperLib('.testimonial-slider', {
-                slidesPerView: '1', 
+                slidesPerView: '1',
                 spaceBetween: 40,
-                centeredSlides: true,
-                loop: slidesCount >= 2,
+                centeredSlides: false,
+                // loop: slidesCount >= 2,
                 speed: 800,
                 autoplay: {
                     delay: 3000,
@@ -163,21 +163,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     640: {
                         slidesPerView: '2',
                         spaceBetween: 50,
-                        centeredSlides: true,
-                        loop: slidesCount >= 4,
+                        centeredSlides: false,
+                        // loop: slidesCount >= 4,
                     },
                     768: {
-                        slidesPerView: '3',
-                        spaceBetween: 50,
-                        centeredSlides: true,
-                        loop: slidesCount >= 6,
+                        slidesPerView: '2',
+                        spaceBetween: 30,
+                        centeredSlides: false,
+                        // loop: slidesCount >= 6,
                     },
                     1024: {
+                        slidesPerView: '3',
+                        spaceBetween: 50,
+                        centeredSlides: false,
+                        // loop: slidesCount >= 8,
+                    },
+                    1280: {
                         slidesPerView: '4',
                         spaceBetween: 50,
                         centeredSlides: false,
-                        loop: slidesCount >= 8,
-                    }
+                        // loop: slidesCount >= 8,
+                    },
+                    1536: {
+                        slidesPerView: '5',
+                        spaceBetween: 50,
+                        centeredSlides: false,
+                        // loop: slidesCount >= 8,
+                    },
                 }
             });
         }
@@ -209,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Testimonial Like Functionality (using event delegation for Swiper compatibility)
-    document.addEventListener('click', async function(e) {
+    document.addEventListener('click', async function (e) {
         const btn = e.target.closest('.testimonial-like-btn');
         if (!btn) return;
 
@@ -217,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = btn.getAttribute('data-id');
         const countSpan = btn.querySelector('span');
         const icon = btn.querySelector('i');
-        
+
         try {
             const response = await fetch(`/testimonial/${id}/like`, {
                 method: 'POST',
@@ -227,9 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
-            
+
             const data = await response.json();
-            
+
             if (data.status === 'success') {
                 // Update all instances of this testimonial's like count (for Swiper clones)
                 document.querySelectorAll(`.testimonial-like-btn[data-id="${id}"]`).forEach(instance => {
@@ -257,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newsletterBtn = document.getElementById('footer-newsletter-btn');
 
     if (newsletterBtn && newsletterInput) {
-        newsletterBtn.addEventListener('click', async function(e) {
+        newsletterBtn.addEventListener('click', async function (e) {
             e.preventDefault();
             const email = newsletterInput.value;
 
@@ -424,8 +436,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // Practitioner Modal Logic
 function openPractitionerModal() {
     const modal = document.getElementById('practitionerModal');
-    if(!modal) return;
-    
+    if (!modal) return;
+
     // Initialize swiper if not already done
     if (!modal.classList.contains('swiper-initialized-custom')) {
         modal.classList.add('swiper-initialized-custom');
@@ -434,16 +446,16 @@ function openPractitionerModal() {
             spaceBetween: 28,
             grabCursor: true,
             freeMode: true,
-            slidesOffsetBefore:40,           
+            slidesOffsetBefore: 40,
 
         });
     }
 
     const backdrop = modal.querySelector('.popup-backdrop');
     const content = modal.querySelector('.popup-content');
-    
+
     modal.classList.remove('hidden');
-    
+
     // Trigger animations
     setTimeout(() => {
         backdrop.classList.remove('opacity-0');
@@ -455,17 +467,17 @@ function openPractitionerModal() {
 
 function closePractitionerModal() {
     const modal = document.getElementById('practitionerModal');
-    if(!modal) return;
-    
+    if (!modal) return;
+
     const backdrop = modal.querySelector('.popup-backdrop');
     const content = modal.querySelector('.popup-content');
-    
+
     // Trigger closing animations
     backdrop.classList.remove('opacity-100');
     backdrop.classList.add('opacity-0');
     content.classList.remove('opacity-100', 'scale-100');
     content.classList.add('opacity-0', 'scale-95');
-    
+
     setTimeout(() => {
         modal.classList.add('hidden');
     }, 300);
@@ -475,13 +487,13 @@ function closePractitionerModal() {
 // Payment Success Modal Logic
 function openSuccessModal() {
     const modal = document.getElementById('successModal');
-    if(!modal) return;
-    
+    if (!modal) return;
+
     const backdrop = modal.querySelector('.popup-backdrop');
     const content = modal.querySelector('.popup-content');
-    
+
     modal.classList.remove('hidden');
-    
+
     // Trigger animations
     setTimeout(() => {
         backdrop.classList.remove('opacity-0');
@@ -493,17 +505,17 @@ function openSuccessModal() {
 
 function closeSuccessModal() {
     const modal = document.getElementById('successModal');
-    if(!modal) return;
-    
+    if (!modal) return;
+
     const backdrop = modal.querySelector('.popup-backdrop');
     const content = modal.querySelector('.popup-content');
-    
+
     // Trigger closing animations
     backdrop.classList.remove('opacity-100');
     backdrop.classList.add('opacity-0');
     content.classList.remove('opacity-100', 'scale-100');
     content.classList.add('opacity-0', 'scale-95');
-    
+
     setTimeout(() => {
         modal.classList.add('hidden');
     }, 300);
