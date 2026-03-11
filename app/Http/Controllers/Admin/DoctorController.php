@@ -168,11 +168,11 @@ class DoctorController extends Controller
     {
         $validatedData = $request->validate([
             // A. Personal Details
-            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
-            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'first_name' => 'required|string|max:40|regex:/^[a-zA-Z\s\-]+$/u',
+            'last_name' => 'required|string|max:40|regex:/^[a-zA-Z\s\-]+$/u',
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
-            'mobile_number' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
+            'mobile_number' => 'required|string|max:15|regex:/^[0-9\s\-\+\(\)]+$/',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
@@ -378,7 +378,7 @@ class DoctorController extends Controller
             'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
-            'mobile_number' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
+            'mobile_number' => 'required|string|max:15|regex:/^[0-9\s\-\+\(\)]+$/',
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',

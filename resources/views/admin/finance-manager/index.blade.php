@@ -127,27 +127,25 @@
                                     </div>
                                 </div>
                             </div>
-                            <label class="form-label mt-2">Profile Photo</label>
+                            <label class="form-label mt-2">Profile Photo <span class="text-danger">*</span> <span class="small text-muted">(Max 2MB)</span></label>
+                            <div id="current-profile-photo" class="d-none"></div>
                         </div>
 
                         <!-- Right Column with other fields -->
                         <div class="col-md-8">
                             <div class="row g-3">
-                                <div class="col-sm-6">
-                                    <label class="form-label">
-                                        First Name <span class="text-danger">*</span>
-                                    </label>
-                                    <input class="form-control" type="text" pattern="^[A-Za-z]+$"
-           title="First name must contain only letters" name="firstname" id="firstname" required placeholder="First Name">
-                                </div>
-
-                                <div class="col-sm-6">
-                                    <label class="form-label">
-                                        Last Name <span class="text-danger">*</span>
-                                    </label>
-                                    <input class="form-control" type="text"  pattern="^[A-Za-z]+$"
-           title="Last name must contain only letters" name="lastname" id="lastname" required placeholder="Last Name">
-                                </div>
+                                 <div class="col-md-4">
+                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="first_name" required maxlength="50" data-max="50" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="First Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="last_name" required maxlength="50" data-max="50" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="Last Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                                        </div>
 
                                 <div class="col-sm-6">
                                     <label class="form-label">
@@ -188,16 +186,44 @@
                                     </select>
                                 </div>
 
-                                <div class="col-sm-6 password-field">
-                                    <label class="form-label">Password <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="password" name="password" id="password" required placeholder="Password"
-                                        pattern="(?=^[A-Z])[A-Za-z0-9]{6,}" 
-                                        title="Password must start with a capital letter, be alphanumeric and at least 6 characters long">
-                                </div>
-                                <div class="col-sm-6 password-field">
-                                    <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                    <input class="form-control" type="password" name="password_confirmation" id="password_confirmation" required placeholder="Confirm Password">
-                                </div>
+                               <div class="col-md-4">
+                                            <label class="form-label">
+                                                Password <span class="text-danger">*</span> <span class="small text-muted" id="password-hint">(Required for new)</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="password"
+                                                    class="form-control"
+                                                    name="password"
+                                                    id="password-input"
+                                                    minlength="8"
+                                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                                    required>
+                                                <span class="input-group-text toggle-password" data-target="password-input" style="cursor:pointer;">
+                                                    <i class="fa fa-eye"></i>
+                                                </span>
+                                            </div>
+                                            <div id="password-requirements" class="text-danger small mt-1 d-none">
+                                                Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="password"
+                                                    class="form-control"
+                                                    name="password_confirmation"
+                                                    id="password-confirm-input"
+                                                    minlength="8"
+                                                    required>
+                                                <span class="input-group-text toggle-password" data-target="password-confirm-input" style="cursor:pointer;">
+                                                    <i class="fa fa-eye"></i>
+                                                </span>
+                                            </div>
+                                            <div id="password-match-error" class="text-danger small mt-1 d-none">
+                                                Passwords do not match.
+                                            </div>
+                                        </div>
                             </div>
                         </div>
                     </div>
@@ -385,15 +411,32 @@
     .select2-container--default .select2-selection--multiple {
         border-color: #dee2e6;
         min-height: 38px;
-        resize: none !important;
-    }
-    textarea.select2-search__field {
-        resize: none !important;
     }
     .select2-container {
         width: 100% !important;
-        resize: none !important;
     }
+    /* Fix Select2 Multiple Alignment */
+    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+        display: flex !important;
+        flex-wrap: wrap;
+        padding: 0 5px !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        margin-top: 5px !important;
+        margin-bottom: 5px !important;
+        background-color: #2a8e88 !important;
+        border: none !important;
+        color: #fff !important;
+        padding: 1px 8px !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #fff !important;
+        margin-right: 5px !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+        margin-top: 7px !important;
+    }
+    
     .avatar-upload {
         position: relative;
         max-width: 150px;
@@ -618,6 +661,8 @@ $(document).ready(function () {
             reader.onload = function(event) {
                 cropperImage.src = event.target.result;
                 $('#cropperModal').modal('show');
+                // Reset the input so the same file can be selected again
+                e.target.value = '';
             };
             reader.readAsDataURL(files[0]);
         }
@@ -714,11 +759,29 @@ $(document).ready(function () {
         });
     });
 
+    // Reset modal on hidden
+    $('#financeManagerModal').on('hidden.bs.modal', function() {
+        $('#financeManagerForm')[0].reset();
+        $('#userId').val('');
+        $('#country, #language').val([]).trigger('change');
+        $('#croppedImage').val('');
+        $('#methodPlaceholder').html('');
+        $('#financeManagerForm').attr('action', "{{ route('admin.finance-managers.store') }}");
+        $('#saveBtn').text('Create Finance Manager');
+        $('#fm-modal-title').text('Register Finance Manager');
+        $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+        $('.password-field').show();
+        $('#password, #password_confirmation').attr('required', 'required');
+        if (typeof window.iti !== 'undefined') {
+            window.iti.setNumber('');
+        }
+    });
+
     // Edit User
     $(document).on('click', '.editUser', function() {
         let id = $(this).data('id');
         $.get("{{ url('admin/finance-managers') }}/" + id + "/edit", function(user) {
-            $('#fm-modal-title').text('Edit Finance Managers');
+            $('#fm-modal-title').text('Edit Finance Manager');
             $('#userId').val(user.id);
             $('#firstname').val(user.first_name);
             $('#lastname').val(user.last_name);
@@ -726,7 +789,7 @@ $(document).ready(function () {
             if (user.phone) {
                 window.iti.setNumber(user.phone);
             } else {
-                $('#phone').val('');
+                window.iti.setNumber('');
             }
             
             // Set Select2 Multiple values for Country
@@ -772,13 +835,13 @@ $(document).ready(function () {
             $('#imagePreview').css('background-image', 'url(' + avatar + ')');
             $('#croppedImage').val(''); // Reset cropped image on edit unless changed
 
-            // Hide password fields on edit
-            $('.password-field').hide();
+            // Show password fields on edit but make them optional
+            $('.password-field').show();
             $('#password, #password_confirmation').removeAttr('required');
 
             $('#methodPlaceholder').html('@method("PUT")');
             $('#financeManagerForm').attr('action', "{{ url('admin/finance-managers') }}/" + id);
-            $('#saveBtn').text('Update Finance Managers');
+            $('#saveBtn').text('Update Finance Manager');
             $('#financeManagerModal').modal('show');
         });
     });
@@ -920,17 +983,17 @@ $(document).ready(function () {
 });
 
 function openCreateModal() {
-    $('#fm-modal-title').text('Register Finance Managers');
+    $('#fm-modal-title').text('Register Finance Manager');
     $('#financeManagerForm')[0].reset();
-    if (typeof iti !== 'undefined') {
-        iti.setNumber('');
+    if (typeof window.iti !== 'undefined') {
+        window.iti.setNumber('');
     }
     $('#country, #language').val([]).trigger('change');
     $('#userId').val('');
     $('#croppedImage').val('');
     $('#methodPlaceholder').html('');
     $('#financeManagerForm').attr('action', "{{ route('admin.finance-managers.store') }}");
-    $('#saveBtn').text('Create Finance Managers');
+    $('#saveBtn').text('Create Finance Manager');
     $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
     $('.password-field').show();
     $('#password, #password_confirmation').attr('required', 'required');
