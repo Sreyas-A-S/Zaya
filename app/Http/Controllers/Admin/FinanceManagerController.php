@@ -156,7 +156,7 @@ class FinanceManagerController extends Controller
             'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
             'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
             'email'     => 'required|email|unique:users,email',
-            'password'  => ['required', 'confirmed', 'min:6', 'regex:/^[A-Z][A-Za-z0-9]{5,}$/'],
+            'password'  => ['required', 'confirmed', 'min:8', 'regex:/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/'],
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',
             'language'  => 'required|array',
@@ -167,7 +167,7 @@ class FinanceManagerController extends Controller
         ], [
             'firstname.regex' => 'First name must start with a capital letter and contain only letters.',
             'lastname.regex'  => 'Last name must start with a capital letter and contain only letters.',
-            'password.regex'  => 'Password must start with a capital letter and be alphanumeric.'
+            'password.regex'  => 'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.'
         ]);
 
         $profilePic = null;
