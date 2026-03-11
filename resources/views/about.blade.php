@@ -70,7 +70,8 @@
 
             <!-- Left Line -->
             <img src="{{ asset('frontend/assets/what-we-do-left-line.png') }}"
-                class="absolute left-0 top-5 lg:top-10 xl:top-1/2 lg:-translate-y-1/2  w-[15vw] lg:w-[10vw] xl:w-[15vw] max-w-[250px]" alt="">
+                class="absolute left-0 top-5 lg:top-10 xl:top-1/2 lg:-translate-y-1/2  w-[15vw] lg:w-[10vw] xl:w-[15vw] max-w-[250px]"
+                alt="">
 
             <!-- Right Plant -->
             <img src="{{ asset('frontend/assets/what-we-do-img-01.png') }}"
@@ -102,7 +103,8 @@
 
             <!-- Right Line -->
             <img src="{{ asset('frontend/assets/what-we-do-right-line.png') }}"
-                class="absolute right-0 top-4 lg:top-1/2 lg:-translate-y-1/2 w-[15vw] lg:w-[10vw] xl:w-[15vw] max-w-[250px]" alt="Mission Line">
+                class="absolute right-0 top-4 lg:top-1/2 lg:-translate-y-1/2 w-[15vw] lg:w-[10vw] xl:w-[15vw] max-w-[250px]"
+                alt="Mission Line">
         </div>
     </section>
 
@@ -356,7 +358,7 @@
     </section>
 
     <!-- Help Banner Section -->
-    <section class="py-4 bg-[#FDF6E9]">
+    <section class="py-4 bg-[#F9EBD6]">
         <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
             <p id="about-help-title"
                 class="text-lg lg:text-xl text-[#121212] text-center lg:text-start font-sans! font-regular mb-0">
