@@ -108,16 +108,18 @@
                         </div>
 
                         <!-- Fields -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="firstname" id="firstname" required placeholder="First Name">
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="lastname" id="lastname" required placeholder="Last Name">
-                        </div>
-
+                        <div class="col-md-6">
+                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="firstname" id="firstname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="First Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="lastname" id="lastname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="Last Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                                        </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
                             <input class="form-control" type="email" name="email" id="email" required placeholder="Email">
@@ -125,7 +127,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="phone" id="phone" required placeholder="Phone Number">
+                            <input class="form-control" type="text" name="phone" id="phone" pattern="^[0-9]{1,15}$" title="Only numbers are allowed" required placeholder="Phone Number">
                         </div>
 
                         <div class="col-md-12 mb-3">
@@ -158,12 +160,14 @@
 
                         <div class="col-md-6 mb-3 password-field">
                             <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password" id="password" required placeholder="Password">
+                            <input class="form-control" type="password" name="password" id="password"  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number" required placeholder="Password">
                         </div>
 
                         <div class="col-md-6 mb-3 password-field">
                             <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password_confirmation" id="password_confirmation" required placeholder="Confirm Password">
+                            <input class="form-control" type="password" name="password_confirmation"  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number"  id="password_confirmation" required placeholder="Confirm Password">
                         </div>
                     </div>
                 </div>

@@ -209,8 +209,8 @@ class FinanceManagerController extends Controller
         $user = User::where('role', 'finance_manager')->findOrFail($id);
 
         $request->validate([
-            'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
-                        'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
+            'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*'],
+                        'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*'],
             'email'     => 'required|email|unique:users,email,' . $id,
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',

@@ -127,22 +127,24 @@
                                     </div>
                                 </div>
                             </div>
-                            <label class="form-label mt-2">Profile Photo <span class="text-danger">*</span> <span class="small text-muted">(Max 2MB)</span></label>
+                            <label class="form-label mt-2 required">Profile Photo <span class="text-danger">*</span> <span class="small text-muted">(Max 2MB)</span></label>
+                            
+
                             <div id="current-profile-photo" class="d-none"></div>
                         </div>
 
                         <!-- Right Column with other fields -->
                         <div class="col-md-8">
                             <div class="row g-3">
-                                 <div class="col-md-4">
+                                 <div class="col-md-6">
                                             <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                            <input class="form-control validate-char-limit validate-format" type="text" name="first_name" required maxlength="50" data-max="50" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="First Name">
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="firstname" id="firstname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="First Name">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                             <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                            <input class="form-control validate-char-limit validate-format" type="text" name="last_name" required maxlength="50" data-max="50" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="Last Name">
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="lastname" id="lastname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="Last Name">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                             <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
                                         </div>
@@ -158,7 +160,7 @@
                                     <label class="form-label">
                                         Phone Number <span class="text-danger">*</span>
                                     </label>
-                                    <input class="form-control" type="text" name="phone" id="phone" required placeholder="Phone Number">
+                                    <input class="form-control" type="text" name="phone" id="phone" pattern="^[0-9]{1,15}$" title="Only numbers are allowed" required placeholder="Phone Number">
                                 </div>
                                 <div class="col-sm-6">
                                     <label class="form-label">Country <span class="text-danger">*</span></label>
@@ -188,7 +190,7 @@
 
                                <div class="col-md-4">
                                             <label class="form-label">
-                                                Password <span class="text-danger">*</span> <span class="small text-muted" id="password-hint">(Required for new)</span>
+                                                Password <span class="text-danger">*</span> <span class="small text-muted" id="password-hint"></span>
                                             </label>
                                             <div class="input-group">
                                                 <input type="password"
@@ -196,7 +198,8 @@
                                                     name="password"
                                                     id="password-input"
                                                     minlength="8"
-                                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number"
                                                     required>
                                                 <span class="input-group-text toggle-password" data-target="password-input" style="cursor:pointer;">
                                                     <i class="fa fa-eye"></i>
@@ -215,6 +218,8 @@
                                                     name="password_confirmation"
                                                     id="password-confirm-input"
                                                     minlength="8"
+                                                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number"
                                                     required>
                                                 <span class="input-group-text toggle-password" data-target="password-confirm-input" style="cursor:pointer;">
                                                     <i class="fa fa-eye"></i>
