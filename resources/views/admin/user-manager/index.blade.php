@@ -5,6 +5,26 @@
 @section('content')
 <!-- Add Cropper.js CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+<style>
+    /* intl-tel-input fixes */
+    .iti {
+        width: 100% !important;
+        display: block;
+    }
+    .iti__flag-container {
+        z-index: 10;
+        background: transparent !important;
+    }
+    .iti__country-list {
+        z-index: 100 !important;
+    }
+    .iti--separate-dial-code .iti__selected-dial-code {
+        font-size: 14px;
+        color: #333;
+        margin-left: 4px;
+    }
+</style>
 
 <div class="container-fluid">
     <div class="page-title">
@@ -84,20 +104,22 @@
                                     </div>
                                 </div>
                             </div>
-                            <label class="form-label mt-2 d-block">Profile Photo</label>
+                            <label class="form-label mt-2 d-block" required>Profile Photo</label>
                         </div>
 
                         <!-- Fields -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="firstname" id="firstname" required placeholder="First Name">
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="lastname" id="lastname" required placeholder="Last Name">
-                        </div>
-
+                        <div class="col-md-6">
+                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="firstname" id="firstname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="First Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="lastname" id="lastname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="Last Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                                        </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
                             <input class="form-control" type="email" name="email" id="email" required placeholder="Email">
@@ -105,7 +127,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="phone" id="phone" required placeholder="Phone Number">
+                            <input class="form-control" type="text" name="phone" id="phone" pattern="^[0-9]{1,15}$" title="Only numbers are allowed" required placeholder="Phone Number">
                         </div>
 
                         <div class="col-md-12 mb-3">
@@ -138,12 +160,14 @@
 
                         <div class="col-md-6 mb-3 password-field">
                             <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password" id="password" required placeholder="Password">
+                            <input class="form-control" type="password" name="password" id="password"  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number" required placeholder="Password">
                         </div>
 
                         <div class="col-md-6 mb-3 password-field">
                             <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password_confirmation" id="password_confirmation" required placeholder="Confirm Password">
+                            <input class="form-control" type="password" name="password_confirmation"  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number"  id="password_confirmation" required placeholder="Confirm Password">
                         </div>
                     </div>
                 </div>
@@ -323,6 +347,28 @@
     .select2-container {
         width: 100% !important;
     }
+    /* Fix Select2 Multiple Alignment */
+    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+        display: flex !important;
+        flex-wrap: wrap;
+        padding: 0 5px !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        margin-top: 5px !important;
+        margin-bottom: 5px !important;
+        background-color: #2a8e88 !important;
+        border: none !important;
+        color: #fff !important;
+        padding: 1px 8px !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #fff !important;
+        margin-right: 5px !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+        margin-top: 7px !important;
+    }
+
     .avatar-upload {
         position: relative;
         max-width: 150px;
@@ -469,6 +515,7 @@
 <!-- Add Cropper.js JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="{{ asset('admiro/assets/js/select2/select2.full.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 
 <script>
 $(document).ready(function () {
@@ -477,6 +524,17 @@ $(document).ready(function () {
         placeholder: "Select options",
         allowClear: true,
         dropdownParent: $('#userManagerModal')
+    });
+
+    // Initialize intl-tel-input
+    const phoneInput = document.querySelector("#phone");
+    window.iti = window.intlTelInput(phoneInput, {
+        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+        separateDialCode: true,
+        showSelectedDialCode: true,
+        autoPlaceholder: 'aggressive',
+        initialCountry: "in",
+        preferredCountries: ["in", "ae", "us", "gb"]
     });
 
     let table = $('#user-managers-table').DataTable({
@@ -507,6 +565,8 @@ $(document).ready(function () {
             reader.onload = function(event) {
                 cropperImage.src = event.target.result;
                 $('#cropperModal').modal('show');
+                // Reset the input so the same file can be selected again
+                e.target.value = '';
             };
             reader.readAsDataURL(files[0]);
         }
@@ -603,16 +663,38 @@ $(document).ready(function () {
         });
     });
 
+    // Reset modal on hidden
+    $('#userManagerModal').on('hidden.bs.modal', function() {
+        $('#userManagerForm')[0].reset();
+        $('#userId').val('');
+        $('#country, #language').val([]).trigger('change');
+        $('#croppedImage').val('');
+        $('#methodPlaceholder').html('');
+        $('#userManagerForm').attr('action', "{{ route('admin.user-managers.store') }}");
+        $('#saveBtn').text('Create User Manager');
+        $('#um-modal-title').text('Register User Manager');
+        $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+        $('.password-field').show();
+        $('#password, #password_confirmation').attr('required', 'required');
+        if (typeof window.iti !== 'undefined') {
+            window.iti.setNumber('');
+        }
+    });
+
     // Edit User
     $(document).on('click', '.editUser', function() {
         let id = $(this).data('id');
         $.get("{{ url('admin/user-managers') }}/" + id + "/edit", function(user) {
-            $('#um-modal-title').text('Edit User Managers');
+            $('#um-modal-title').text('Edit User Manager');
             $('#userId').val(user.id);
             $('#firstname').val(user.first_name);
             $('#lastname').val(user.last_name);
             $('#email').val(user.email);
-            $('#phone').val(user.phone);
+            if (user.phone) {
+                window.iti.setNumber(user.phone);
+            } else {
+                window.iti.setNumber('');
+            }
             
             // Set Select2 Multiple values for Country
             if (user.national_id) {
@@ -657,13 +739,13 @@ $(document).ready(function () {
             $('#imagePreview').css('background-image', 'url(' + avatar + ')');
             $('#croppedImage').val(''); // Reset cropped image on edit unless changed
 
-            // Hide password fields on edit
-            $('.password-field').hide();
+            // Show password fields on edit but make them optional
+            $('.password-field').show();
             $('#password, #password_confirmation').removeAttr('required');
 
             $('#methodPlaceholder').html('@method("PUT")');
             $('#userManagerForm').attr('action', "{{ url('admin/user-managers') }}/" + id);
-            $('#saveBtn').text('Update User Managers');
+            $('#saveBtn').text('Update User Manager');
             $('#userManagerModal').modal('show');
         });
     });
@@ -689,6 +771,9 @@ $(document).ready(function () {
     $('#userManagerForm').on('submit', function(e) {
         e.preventDefault();
         let formData = new FormData(this);
+        if (typeof window.iti !== 'undefined') {
+            formData.set('phone', window.iti.getNumber());
+        }
         
         $.ajax({
             url: $(this).attr('action'),
@@ -804,14 +889,17 @@ $(document).ready(function () {
 });
 
 function openCreateModal() {
-    $('#um-modal-title').text('Register User Managers');
+    $('#um-modal-title').text('Register User Manager');
     $('#userManagerForm')[0].reset();
+    if (typeof window.iti !== 'undefined') {
+        window.iti.setNumber('');
+    }
     $('#country, #language').val([]).trigger('change');
     $('#userId').val('');
     $('#croppedImage').val('');
     $('#methodPlaceholder').html('');
     $('#userManagerForm').attr('action', "{{ route('admin.user-managers.store') }}");
-    $('#saveBtn').text('Create User Managers');
+    $('#saveBtn').text('Create User Manager');
     $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
     $('.password-field').show();
     $('#password, #password_confirmation').attr('required', 'required');

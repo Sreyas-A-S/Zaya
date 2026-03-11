@@ -8,6 +8,7 @@ use App\Models\Country;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Yajra\DataTables\Facades\DataTables;
 
 class FinanceManagerController extends Controller
@@ -208,8 +209,8 @@ class FinanceManagerController extends Controller
         $user = User::where('role', 'finance_manager')->findOrFail($id);
 
         $request->validate([
-            'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
-                        'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
+            'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*'],
+                        'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*'],
             'email'     => 'required|email|unique:users,email,' . $id,
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',
@@ -218,11 +219,10 @@ class FinanceManagerController extends Controller
             'phone'     => ['required', 'string', 'min:10', 'max:20'],
             'cropped_image' => 'nullable|string',
             'status'    => 'required|string|in:pending,active,rejected,inactive',
-            'password'  => ['nullable', 'confirmed', 'min:6', 'regex:/^[A-Z][A-Za-z0-9]{5,}$/'],
+            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ], [
             'firstname.regex' => 'First name must start with a capital letter and contain only letters.',
             'lastname.regex'  => 'Last name must start with a capital letter and contain only letters.',
-            'password.regex'  => 'Password must start with a capital letter and be alphanumeric.'
         ]);
 
         if ($request->filled('cropped_image')) {

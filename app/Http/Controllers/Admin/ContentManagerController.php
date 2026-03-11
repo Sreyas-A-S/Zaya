@@ -8,6 +8,7 @@ use App\Models\Country;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Yajra\DataTables\Facades\DataTables;
 
 class ContentManagerController extends Controller
@@ -207,16 +208,17 @@ class ContentManagerController extends Controller
         $user = User::where('role', 'content_manager')->findOrFail($id);
 
         $request->validate([
-            'firstname' => ['required', 'string', 'max:40', 'regex:/^[A-Za-z]+$/'],
-            'lastname'  => ['required', 'string', 'max:40', 'regex:/^[A-Za-z]+$/'],
+            'firstname' => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s\-]+$/u'],
+            'lastname'  => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s\-]+$/u'],
             'email'     => 'required|email|unique:users,email,' . $id,
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',
             'language'  => 'required|array',
             'language.*'=> 'exists:languages,id',
-            'phone'     => ['required', 'string', 'min:10', 'max:20'],
+            'phone'     => ['required', 'string', 'min:10', 'max:50', 'regex:/^[0-9\s\-\+\(\)]+$/'],
             'cropped_image' => 'nullable|string',
-            'status'    => 'required|string|in:pending,active,rejected,inactive'
+            'status'    => 'required|string|in:pending,active,rejected,inactive',
+            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ], [
             'firstname.regex' => 'First name must start with a capital letter and contain only letters.',
             'lastname.regex'  => 'Last name must start with a capital letter and contain only letters.',
@@ -228,7 +230,7 @@ class ContentManagerController extends Controller
             $user->profile_pic = $request->file('profile_picture')->store('profiles', 'public');
         }
 
-        $user->update([
+        $data = [
             'name'       => $request->firstname . ' ' . $request->lastname,
             'first_name' => $request->firstname,
             'last_name'  => $request->lastname,
@@ -237,7 +239,13 @@ class ContentManagerController extends Controller
             'languages'  => $request->language,
             'phone'      => $request->phone,
             'status'     => $request->status,
-        ]);
+        ];
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user->update($data);
 
         return response()->json(['success' => true, 'message' => 'Content Manager Updated Successfully']);
     }

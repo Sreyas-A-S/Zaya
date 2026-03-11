@@ -5,6 +5,7 @@
 @section('content')
 <!-- Add Cropper.js CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
 <style>
     #content-managers-table_wrapper .dataTables_filter {
         display: flex;
@@ -16,6 +17,24 @@
     }
     #custom-filters-container {
         margin-bottom: 0 !important;
+    }
+
+    /* intl-tel-input fixes */
+    .iti {
+        width: 100% !important;
+        display: block;
+    }
+    .iti__flag-container {
+        z-index: 10;
+        background: transparent !important;
+    }
+    .iti__country-list {
+        z-index: 100 !important;
+    }
+    .iti--separate-dial-code .iti__selected-dial-code {
+        font-size: 14px;
+        color: #333;
+        margin-left: 4px;
     }
 </style>
 
@@ -112,16 +131,18 @@
                         </div>
 
                         <!-- Fields -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" pattern="^[A-Za-z]+$"
-           title="First name must contain only letters" name="firstname" id="firstname" required placeholder="First Name">
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" pattern="^[A-Za-z]+$" title="Last name must contain only letters" name="lastname" id="lastname" required placeholder="Last Name">
-                        </div>
+                       <div class="col-md-6">
+                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="firstname" id="firstname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="First Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="lastname" id="lastname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="Last Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                                        </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
@@ -130,7 +151,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="phone" id="phone" required placeholder="Phone Number">
+                            <input class="form-control" type="text" name="phone" id="phone" pattern="^[0-9]{1,15}$" title="Only numbers are allowed" required placeholder="Phone Number">
                         </div>
 
                         <div class="col-md-12 mb-3">
@@ -161,15 +182,47 @@
                             </select>
                         </div>
 
-                        <div class="col-md-6 mb-3 password-field">
-                            <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password" id="password" required placeholder="Password">
-                        </div>
+                        <div class="col-md-4">
+                                            <label class="form-label">
+                                                Password <span class="text-danger">*</span> <span class="small text-muted" id="password-hint">(Required for new)</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="password"
+                                                    class="form-control"
+                                                    name="password"
+                                                    id="password-input"
+                                                    minlength="8"
+                                                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number"
+                                                    required>
+                                                <span class="input-group-text toggle-password" data-target="password-input" style="cursor:pointer;">
+                                                    <i class="fa fa-eye"></i>
+                                                </span>
+                                            </div>
+                                            <div id="password-requirements" class="text-danger small mt-1 d-none">
+                                                Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.
+                                            </div>
+                                        </div>
 
-                        <div class="col-md-6 mb-3 password-field">
-                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password_confirmation" id="password_confirmation" required placeholder="Confirm Password">
-                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="password"
+                                                    class="form-control"
+                                                    name="password_confirmation"
+                                                    id="password-confirm-input"
+                                                    minlength="8"
+                                                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number"
+                                                    required>
+                                                <span class="input-group-text toggle-password" data-target="password-confirm-input" style="cursor:pointer;">
+                                                    <i class="fa fa-eye"></i>
+                                                </span>
+                                            </div>
+                                            <div id="password-match-error" class="text-danger small mt-1 d-none">
+                                                Passwords do not match.
+                                            </div>
+                                        </div>
                     </div>
                 </div>
 
@@ -348,6 +401,28 @@
     .select2-container {
         width: 100% !important;
     }
+    /* Fix Select2 Multiple Alignment */
+    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+        display: flex !important;
+        flex-wrap: wrap;
+        padding: 0 5px !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        margin-top: 5px !important;
+        margin-bottom: 5px !important;
+        background-color: #2a8e88 !important;
+        border: none !important;
+        color: #fff !important;
+        padding: 1px 8px !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #fff !important;
+        margin-right: 5px !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+        margin-top: 7px !important;
+    }
+
     .avatar-upload {
         position: relative;
         max-width: 150px;
@@ -494,6 +569,7 @@
 <!-- Add Cropper.js JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="{{ asset('admiro/assets/js/select2/select2.full.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 
 <script>
 $(document).ready(function () {
@@ -502,6 +578,17 @@ $(document).ready(function () {
         placeholder: "Select options",
         allowClear: true,
         dropdownParent: $('#contentManagerModal')
+    });
+
+    // Initialize intl-tel-input
+    const phoneInput = document.querySelector("#phone");
+    window.iti = window.intlTelInput(phoneInput, {
+        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+        separateDialCode: true,
+        showSelectedDialCode: true,
+        autoPlaceholder: 'aggressive',
+        initialCountry: "in",
+        preferredCountries: ["in", "ae", "us", "gb"]
     });
 
     let table = $('#content-managers-table').DataTable({
@@ -545,6 +632,8 @@ $(document).ready(function () {
             reader.onload = function(event) {
                 cropperImage.src = event.target.result;
                 $('#cropperModal').modal('show');
+                // Reset the input so the same file can be selected again
+                e.target.value = '';
             };
             reader.readAsDataURL(files[0]);
         }
@@ -641,16 +730,38 @@ $(document).ready(function () {
         });
     });
 
+    // Reset modal on hidden
+    $('#contentManagerModal').on('hidden.bs.modal', function() {
+        $('#contentManagerForm')[0].reset();
+        $('#userId').val('');
+        $('#country, #language').val([]).trigger('change');
+        $('#croppedImage').val('');
+        $('#methodPlaceholder').html('');
+        $('#contentManagerForm').attr('action', "{{ route('admin.content-managers.store') }}");
+        $('#saveBtn').text('Create Content Manager');
+        $('#cm-modal-title').text('Register Content Manager');
+        $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+        $('.password-field').show();
+        $('#password, #password_confirmation').attr('required', 'required');
+        if (typeof window.iti !== 'undefined') {
+            window.iti.setNumber('');
+        }
+    });
+
     // Edit User
     $(document).on('click', '.editUser', function() {
         let id = $(this).data('id');
         $.get("{{ url('admin/content-managers') }}/" + id + "/edit", function(user) {
-            $('#cm-modal-title').text('Edit Content Managers');
+            $('#cm-modal-title').text('Edit Content Manager');
             $('#userId').val(user.id);
             $('#firstname').val(user.first_name);
             $('#lastname').val(user.last_name);
             $('#email').val(user.email);
-            $('#phone').val(user.phone);
+            if (user.phone) {
+                window.iti.setNumber(user.phone);
+            } else {
+                window.iti.setNumber('');
+            }
             
             // Set Select2 Multiple values for Country
             if (user.national_id) {
@@ -695,13 +806,13 @@ $(document).ready(function () {
             $('#imagePreview').css('background-image', 'url(' + avatar + ')');
             $('#croppedImage').val(''); // Reset cropped image on edit unless changed
 
-            // Hide password fields on edit
-            $('.password-field').hide();
+            // Show password fields on edit but make them optional
+            $('.password-field').show();
             $('#password, #password_confirmation').removeAttr('required');
 
             $('#methodPlaceholder').html('@method("PUT")');
             $('#contentManagerForm').attr('action', "{{ url('admin/content-managers') }}/" + id);
-            $('#saveBtn').text('Update Content Managers');
+            $('#saveBtn').text('Update Content Manager');
             $('#contentManagerModal').modal('show');
         });
     });
@@ -727,6 +838,9 @@ $(document).ready(function () {
     $('#contentManagerForm').on('submit', function(e) {
         e.preventDefault();
         let formData = new FormData(this);
+        if (typeof window.iti !== 'undefined') {
+            formData.set('phone', window.iti.getNumber());
+        }
         
         $.ajax({
             url: $(this).attr('action'),
@@ -842,14 +956,17 @@ $(document).ready(function () {
 });
 
 function openCreateModal() {
-    $('#cm-modal-title').text('Register Content Managers');
+    $('#cm-modal-title').text('Register Content Manager');
     $('#contentManagerForm')[0].reset();
+    if (typeof window.iti !== 'undefined') {
+        window.iti.setNumber('');
+    }
     $('#country, #language').val([]).trigger('change');
     $('#userId').val('');
     $('#croppedImage').val('');
     $('#methodPlaceholder').html('');
     $('#contentManagerForm').attr('action', "{{ route('admin.content-managers.store') }}");
-    $('#saveBtn').text('Create Content Managers');
+    $('#saveBtn').text('Create Content Manager');
     $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
     $('.password-field').show();
     $('#password, #password_confirmation').attr('required', 'required');

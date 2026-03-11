@@ -306,13 +306,14 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Password</label>
-                                <input type="password" name="password" class="form-control" required
-                                    pattern="(?=^[A-Z])[A-Za-z0-9]{6,}" 
-                                    title="Password must start with a capital letter, be alphanumeric and at least 6 characters long">
+                                <input type="password" name="password" class="form-control" 
+                                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Confirm Password</label>
-                                <input type="password" name="password_confirmation" class="form-control" required>
+                                <input type="password" name="password_confirmation"  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)\S{6,}$"
+       title="Password must contain at least 1 uppercase, 1 lowercase, and 1 number" class="form-control" required>
                             </div>
                             <div class="col-12 text-end mt-4">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

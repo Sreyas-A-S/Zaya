@@ -8,6 +8,7 @@ use App\Models\Country;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserManagerController extends Controller
@@ -171,9 +172,10 @@ class UserManagerController extends Controller
             'country.*' => 'exists:countries,id',
             'language'  => 'required|array',
             'language.*'=> 'exists:languages,id',
-            'phone'     => ['required', 'string', 'min:10', 'max:20'],
+            'phone'     => ['required', 'string', 'min:10', 'max:15'],
             'cropped_image' => 'nullable|string',
-            'status'    => 'required|string|in:pending,active,rejected,inactive'
+            'status'    => 'required|string|in:pending,active,rejected,inactive',
+            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ], [
             'firstname.regex' => 'First name must start with a capital letter and contain only letters.',
             'lastname.regex'  => 'Last name must start with a capital letter and contain only letters.',
@@ -185,7 +187,7 @@ class UserManagerController extends Controller
             $user->profile_pic = $request->file('profile_picture')->store('profiles', 'public');
         }
 
-        $user->update([
+        $data = [
             'name'       => $request->firstname . ' ' . $request->lastname,
             'first_name' => $request->firstname,
             'last_name'  => $request->lastname,
@@ -194,7 +196,13 @@ class UserManagerController extends Controller
             'languages'  => $request->language,
             'phone'      => $request->phone,
             'status'     => $request->status,
-        ]);
+        ];
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user->update($data);
 
         return response()->json(['success' => true, 'message' => 'User Manager Updated Successfully']);
     }
