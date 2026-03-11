@@ -145,8 +145,8 @@
                 <p class="expiration">{{ $expiration }}</p>
             @endif
 
-            @if(!empty($messageData))
-                <table class="table">
+        @if(!empty($messageData))
+            <table class="table">
                     <tr>
                         <td class="label">Name:</td>
                         <td>{{ $messageData->first_name }} {{ $messageData->last_name }}</td>
@@ -169,13 +169,30 @@
                             @endif
                         </td>
                     </tr>
-                </table>
+            </table>
 
-                <div class="message-box">
-                    <label class="message-label">Message:</label>
-                    <div class="message-text">{{ $messageData->message }}</div>
-                </div>
-            @endif
+            <div class="message-box">
+                <label class="message-label">Message:</label>
+                <div class="message-text">{{ $messageData->message }}</div>
+            </div>
+        @endif
+
+        @if(!empty($credentials))
+            <table class="table">
+                <tr>
+                    <td class="label">Login URL:</td>
+                    <td>{{ $credentials['login_url'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Email:</td>
+                    <td>{{ $credentials['email'] ?? '' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Password:</td>
+                    <td>{{ $credentials['password'] ?? '' }}</td>
+                </tr>
+            </table>
+        @endif
 
             @if(!empty($outro))
                 <p>{{ $outro }}</p>

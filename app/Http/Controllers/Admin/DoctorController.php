@@ -10,8 +10,11 @@ use App\Models\Specialization;
 use App\Models\AyurvedaExpertise;
 use App\Models\HealthCondition;
 use App\Models\ExternalTherapy;
+use App\Mail\WelcomeUserMail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
@@ -261,6 +264,11 @@ class DoctorController extends Controller
             'password' => Hash::make($validatedData['password']),
             'role' => 'doctor',
         ]);
+
+        $plainPassword = $validatedData['password'];
+        Session::put('welcome_password_' . $user->id, $plainPassword);
+        Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));
+        Session::forget('welcome_password_' . $user->id);
 
         $profilePhotoPath = $request->hasFile('profile_photo') ? $request->file('profile_photo')->store('doctor_documents/profile_photos', 'public') : null;
         $regCertificatePath = $request->hasFile('reg_certificate') ? $request->file('reg_certificate')->store('doctor_documents/registration_certificates', 'public') : null;

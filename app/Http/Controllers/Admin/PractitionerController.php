@@ -9,11 +9,14 @@ use App\Models\PractitionerQualification;
 use App\Models\WellnessConsultation;
 use App\Models\BodyTherapy;
 use App\Models\PractitionerModality;
+use App\Mail\WelcomeUserMail;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Str;
@@ -193,6 +196,11 @@ class PractitionerController extends Controller
                 'password' => Hash::make($validatedData['password']),
                 'role' => 'practitioner',
             ]);
+
+            $plainPassword = $validatedData['password'];
+            Session::put('welcome_password_' . $user->id, $plainPassword);
+            Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));
+            Session::forget('welcome_password_' . $user->id);
 
             $practitionerData = [
                 'first_name' => $validatedData['first_name'],
