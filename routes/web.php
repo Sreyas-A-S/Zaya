@@ -198,20 +198,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('user-manager', function() { return redirect()->route('admin.user-managers.index'); });
     Route::post('user-managers/{id}/status', [\App\Http\Controllers\Admin\UserManagerController::class, 'updateStatus'])->name('user-managers.status');
 
-    });
-
-    // Pincode (Public)
-    Route::post('/pincode/store', [\App\Http\Controllers\Admin\PincodeController::class, 'store'])->name('admin.pincode.store');
-    Route::get('/pincode/get', [\App\Http\Controllers\Admin\PincodeController::class, 'getPincode'])->name('admin.pincode.get');
-    Route::delete('/pincode/delete', [\App\Http\Controllers\Admin\PincodeController::class, 'destroy'])->name('admin.pincode.delete');
-
-
     Route::resource('languages', \App\Http\Controllers\Admin\LanguageController::class);
     Route::post('/change-language/{id}', [LanguageController::class, 'change'])->name('change-language');
     Route::post('/change-country/{code}', function ($code) {
         session(['admin_country' => strtolower($code)]);
         return response()->json(['status' => true]);
     })->name('change-country');
+
+    });
+
+    // Pincode (Public)
+    Route::post('/pincode/store', [\App\Http\Controllers\Admin\PincodeController::class, 'store'])->name('admin.pincode.store');
+    Route::get('/pincode/get', [\App\Http\Controllers\Admin\PincodeController::class, 'getPincode'])->name('admin.pincode.get');
+    Route::delete('/pincode/delete', [\App\Http\Controllers\Admin\PincodeController::class, 'destroy'])->name('admin.pincode.delete');
 
 
 // Route to run artisan optimize
