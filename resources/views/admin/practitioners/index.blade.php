@@ -1579,7 +1579,19 @@
         $.get("{{ url('admin/practitioners') }}/" + id, function(data) {
             const u = data.user;
             const p = data.practitioner || {};
-            const badges = (arr) => (arr || []).map(i => `<span class="badge bg-light text-dark border me-1 mb-1">${i}</span>`).join('');
+            const badges = (arr) => {
+                if (!arr) return '';
+                let data = arr;
+                if (typeof arr === 'string') {
+                    try {
+                        data = JSON.parse(arr);
+                    } catch (e) {
+                        data = [arr];
+                    }
+                }
+                if (!Array.isArray(data)) data = [data];
+                return data.map(i => `<span class="badge bg-light text-dark border me-1 mb-1">${i}</span>`).join('');
+            };
 
             let qualsHtml = (p.qualifications || []).map(q => `
                 <div class="col-12 mb-2 p-2 border rounded bg-light small">

@@ -59,7 +59,7 @@ class DoctorController extends Controller
                 ]);
 
             // Role-based country restriction
-            if (!$isSuperAdmin) {
+            if (!$isSuperAdmin && !empty($user->national_id)) {
                 $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
                 $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
                 $query->whereIn('doctors.country', $assignedCountryNames);
@@ -143,7 +143,7 @@ class DoctorController extends Controller
         $languages = \App\Models\Language::all();
 
         $allCountries = \App\Models\Country::all();
-        if ($isSuperAdmin) {
+        if ($isSuperAdmin || empty($user->national_id)) {
             $countries = $allCountries;
         } else {
             $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
@@ -234,10 +234,10 @@ class DoctorController extends Controller
             'upi_id' => 'nullable|string|max:255',
 
             // I. Platform Profile
-            'short_bio' => 'required|string|min:50|max:1000',
-            'key_expertise' => 'required|string|min:50|max:1000',
-            'services_offered' => 'required|string|min:50|max:1000',
-            'awards_recognitions' => 'nullable|string|min:50|max:1000',
+            'short_bio' => 'required|string|min:50|max:1500',
+            'key_expertise' => 'required|string|min:50|max:1500',
+            'services_offered' => 'required|string|min:50|max:1500',
+            'awards_recognitions' => 'nullable|string|min:50|max:1500',
             'website' => 'nullable|url|max:255',
             'facebook' => 'nullable|url|max:255',
             'instagram' => 'nullable|url|max:255',
@@ -440,10 +440,10 @@ class DoctorController extends Controller
             'upi_id' => 'nullable|string|max:255',
 
             // I. Platform Profile
-            'short_bio' => 'required|string|min:50|max:1000',
-            'key_expertise' => 'required|string|min:50|max:1000',
-            'services_offered' => 'required|string|min:50|max:1000',
-            'awards_recognitions' => 'nullable|string|min:50|max:1000',
+            'short_bio' => 'required|string|min:50|max:1500',
+            'key_expertise' => 'required|string|min:50|max:1500',
+            'services_offered' => 'required|string|min:50|max:1500',
+            'awards_recognitions' => 'nullable|string|min:50|max:1500',
             'website' => 'nullable|url|max:255',
             'facebook' => 'nullable|url|max:255',
             'instagram' => 'nullable|url|max:255',

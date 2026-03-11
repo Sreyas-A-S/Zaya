@@ -221,34 +221,6 @@
                                             </div>
                                         </div>
 
-        <span class="input-group-text toggle-password" data-target="password">
-            <i class="fa fa-eye"></i>
-        </span>
-    </div>
-</div>
-
-<div class="col-md-4">
-    <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-
-    <div class="input-group">
-        <input type="password"
-               class="form-control"
-               name="password_confirmation"
-               id="password-confirm-input"
-               minlength="6"
-               required>
-
-        <span class="input-group-text toggle-password" data-target="password-confirm-input">
-            <i class="fa fa-eye"></i>
-        </span>
-    </div>
-
-    <div class="invalid-feedback" id="password-confirm-error">
-        Passwords do not match
-    </div>
-</div>
-
-
                                         <div class="col-12 mt-4">
                                             <h5 class="f-w-600 mb-3">B. Medical Registration</h5>
                                         </div>
@@ -322,10 +294,10 @@
                                                 @endforeach
                                             </div>
                                             <div class="input-group mt-2" style="max-width: 300px;">
-<input type="text"
-       class="form-control form-control-sm new-master-data-input"
-       placeholder="Type new specialization..."
-       data-type="specializations">                                                <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
+                                                <input type="text"
+                                                    class="form-control form-control-sm new-master-data-input"
+                                                    placeholder="Type new specialization..."
+                                                    data-type="specializations"> <button class="btn btn-outline-primary btn-sm add-master-data-btn" type="button"><i class="fa fa-plus"></i></button>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -496,7 +468,7 @@
                                             <div class="row">
                                                 @foreach($externalTherapies as $ther)
                                                 <div class="col-md-4">
-                                                    <div class="form-check checkbox-primary d-flex align-items-center">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center w-100">
 
                                                         <input class="form-check-input ther-checkbox me-2"
                                                             type="checkbox"
@@ -844,13 +816,19 @@
     .iti__flag {
         background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags.png") !important;
     }
-    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+
+    @media (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
         .iti__flag {
             background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags@2x.png") !important;
         }
     }
-    .iti { width: 100% !important; display: block !important; }
-    
+
+    .iti {
+        width: 100% !important;
+        display: block !important;
+    }
+
     .doctors-table-wrapper {
         overflow-x: auto;
     }
@@ -1122,7 +1100,7 @@
         const el = $(this);
         const max = parseInt(el.data('max'));
         const msgDiv = el.siblings('.char-limit-msg');
-        
+
         if (el.val().length >= max) {
             msgDiv.removeClass('d-none');
         } else {
@@ -1134,10 +1112,10 @@
         const el = $(this);
         const pattern = el.attr('pattern');
         if (!pattern) return;
-        
+
         const regex = new RegExp(pattern);
         const errorDiv = el.siblings('.format-error');
-        
+
         if (el.val() !== '' && !regex.test(el.val())) {
             errorDiv.removeClass('d-none');
         } else {
@@ -1146,6 +1124,7 @@
     });
 
     $(document).ready(function() {
+        // Initialize intl-tel-input
         const phoneInput = document.querySelector("#mobile_number");
         if (phoneInput) {
             iti = window.intlTelInput(phoneInput, {
@@ -1153,6 +1132,23 @@
                 separateDialCode: true,
                 initialCountry: "in",
                 preferredCountries: ["in", "ae", "us", "gb"]
+            });
+        }
+
+        // Initialize Select2 with safe formatting function
+        function formatCountry(country) {
+            if (!country.id) return country.text;
+            var flag = $(country.element).data('flag');
+            if (!flag) return country.text;
+            return $('<span><span class="fi fi-' + flag + '" style="margin-right:8px"></span>' + country.text + '</span>');
+        }
+
+        if ($.fn.select2) {
+            $('#country').select2({
+                templateResult: formatCountry,
+                templateSelection: formatCountry,
+                width: '100%',
+                dropdownParent: $('#doctor-form-modal')
             });
         }
     });
@@ -1184,7 +1180,7 @@
         const el = $(this);
         const max = parseInt(el.data('max'));
         const msgDiv = el.siblings('.char-limit-msg');
-        
+
         if (el.val().length >= max) {
             msgDiv.removeClass('d-none');
         } else {
@@ -1196,10 +1192,10 @@
         const el = $(this);
         const pattern = el.attr('pattern');
         if (!pattern) return;
-        
+
         const regex = new RegExp(pattern);
         const errorDiv = el.siblings('.format-error');
-        
+
         if (el.val() !== '' && !regex.test(el.val())) {
             errorDiv.removeClass('d-none');
         } else {
@@ -1207,42 +1203,14 @@
         }
     });
 
-    $(document).ready(function() {
-
-        function formatCountry(country) {
-            if (!country.id) {
-                return country.text;
-            }
-
-            var flag = $(country.element).data('flag');
-
-            if (!flag) {
-                return country.text;
-            }
-
-            var $country = $(
-                '<span><span class="fi fi-' + flag + '" style="margin-right:8px"></span>' + country.text + '</span>'
-            );
-
-            return $country;
-        }
-
-        $('#country').select2({
-            templateResult: formatCountry,
-            templateSelection: formatCountry,
-            width: '100%'
-        });
-
-    });
-
     function validatePasswordMatch() {
         const password = $('#password-input');
         const confirm = $('#password-confirm-input');
         const requirements = $('#password-requirements');
         const matchError = $('#password-match-error');
-        
+
         const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
-        
+
         // Check requirements
         if (password.val() === '') {
             requirements.addClass('d-none');
@@ -1251,7 +1219,7 @@
         } else {
             requirements.removeClass('d-none');
         }
-        
+
         // Check match
         if (confirm.val() !== '') {
             if (confirm.val() !== password.val()) {
@@ -1271,7 +1239,7 @@
         const el = $(this);
         const max = parseInt(el.data('max'));
         const msgDiv = el.siblings('.char-limit-msg');
-        
+
         if (el.val().length >= max) {
             msgDiv.removeClass('d-none');
         } else {
@@ -1283,10 +1251,10 @@
         const el = $(this);
         const pattern = el.attr('pattern');
         if (!pattern) return;
-        
+
         const regex = new RegExp(pattern);
         const errorDiv = el.siblings('.format-error');
-        
+
         if (el.val() !== '' && !regex.test(el.val())) {
             errorDiv.removeClass('d-none');
         } else {
@@ -1480,7 +1448,10 @@
 
     function initFormNavigation() {
         $('.next-step').on('click', function() {
-            var stepNum = $(this).closest('.step-content').attr('id').replace('step', '');
+            var stepContent = $(this).closest('.step-content');
+            var stepId = stepContent.attr('id');
+            if (!stepId) return;
+            var stepNum = stepId.replace('step', '');
             if (!validateStep(stepNum)) return;
             updateStep($(this).data('next'));
         });
@@ -2022,8 +1993,12 @@
                         if (input.length > 0) {
                             input.addClass('is-invalid');
                             input.after(`<div class="invalid-feedback">${messages[0]}</div>`);
-                            const stepId = input.closest('.step-content').attr('id').replace('step', '');
-                            if (!firstErrorStep) firstErrorStep = stepId;
+
+                            let stepContent = input.closest('.step-content');
+                            if (stepContent.length > 0 && !firstErrorStep) {
+                                let stepId = stepContent.attr('id');
+                                if (stepId) firstErrorStep = stepId.replace('step', '');
+                            }
                         }
                     });
                     if (firstErrorStep) updateStep(firstErrorStep);
@@ -2505,7 +2480,7 @@
         }
     };
 
-    const passwordInput = document.getElementById('password');
+    const passwordInput = document.getElementById('password-input');
     if (passwordInput) {
         passwordInput.addEventListener('input', function() {
             this.value = this.value.replace(/\s/g, '');

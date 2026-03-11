@@ -9,9 +9,11 @@
         align-items: center;
         gap: 15px;
     }
+
     #translators-table_wrapper .dataTables_filter label {
         margin-bottom: 0;
     }
+
     #custom-filters-container {
         margin-bottom: 0 !important;
     }
@@ -50,7 +52,7 @@
                             <select id="country-filter" class="form-select form-select-sm" style="width: 180px;">
                                 <option value="">All Countries</option>
                                 @foreach($countries as $country)
-                                    <option value="{{ $country->name }}">{{ $country->name }}</option>
+                                <option value="{{ $country->name }}">{{ $country->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -168,8 +170,8 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                            <input class="form-control validate-char-limit validate-format" type="text" name="first_name" required 
-                                                maxlength="50" data-max="50" pattern="^[a-zA-Z\s\-]+$" 
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="first_name" required
+                                                maxlength="50" data-max="50" pattern="^[a-zA-Z\s\-]+$"
                                                 title="Only letters, spaces, and hyphens allowed"
                                                 oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
@@ -177,8 +179,8 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                            <input class="form-control validate-char-limit validate-format" type="text" name="last_name" required 
-                                                maxlength="50" data-max="50" pattern="^[a-zA-Z\s\-]+$" 
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="last_name" required
+                                                maxlength="50" data-max="50" pattern="^[a-zA-Z\s\-]+$"
                                                 title="Only letters, spaces, and hyphens allowed"
                                                 oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
@@ -193,7 +195,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                            <input class="form-control phone-input validate-char-limit validate-format" type="tel" name="phone" id="translator_phone" required 
+                                            <input class="form-control phone-input validate-char-limit validate-format" type="tel" name="phone" id="translator_phone" required
                                                 maxlength="20" data-max="20" pattern="^[0-9\s\-\+\(\)]+$" title="Enter a valid phone number">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 20 characters allowed.</div>
                                             <div class="text-danger small mt-1 format-error d-none">Invalid phone format.</div>
@@ -247,7 +249,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control validate-char-limit" name="zip_code" required placeholder="Pincode" 
+                                            <input type="text" class="form-control validate-char-limit" name="zip_code" required placeholder="Pincode"
                                                 maxlength="10" data-max="10" pattern="^[0-9]{5,10}$" title="Enter valid zip code (5-10 digits)"
                                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 10 characters allowed.</div>
@@ -323,47 +325,47 @@
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label fw-bold">Fields of Specialization <span class="text-danger">*</span></label>
-                                           <div class="row">
-    @foreach($specializations as $spec)
-    <div class="col-md-4">
-        <div class="form-check checkbox-secondary d-flex align-items-center">
+                                            <div class="row">
+                                                @foreach($specializations as $spec)
+                                                <div class="col-md-4">
+                                                    <div class="form-check checkbox-secondary d-flex align-items-center w-100">
 
-            <input class="form-check-input group-required me-2"
-                   type="checkbox"
-                   name="fields_of_specialization[]"
-                   value="{{ $spec->name }}"
-                   id="spec_{{ $spec->id }}"
-                   data-group="specialization">
+                                                        <input class="form-check-input group-required me-2"
+                                                            type="checkbox"
+                                                            name="fields_of_specialization[]"
+                                                            value="{{ $spec->name }}"
+                                                            id="spec_{{ $spec->id }}"
+                                                            data-group="specialization">
 
-            <label class="form-check-label flex-grow-1 mb-0"
-                   for="spec_{{ $spec->id }}">
-                   {{ $spec->name }}
-            </label>
+                                                        <label class="form-check-label flex-grow-1 mb-0"
+                                                            for="spec_{{ $spec->id }}">
+                                                            {{ $spec->name }}
+                                                        </label>
 
-            <a href="javascript:void(0)"
-               class="text-danger ms-2 delete-master-data-btn"
-               data-id="{{ $spec->id }}"
-               data-type="translator_specializations">
-               <i class="fa fa-trash"></i>
-            </a>
+                                                        <a href="javascript:void(0)"
+                                                            class="text-danger ms-2 delete-master-data-btn"
+                                                            data-id="{{ $spec->id }}"
+                                                            data-type="translator_specializations">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
 
-        </div>
-    </div>
-    @endforeach
+                                                    </div>
+                                                </div>
+                                                @endforeach
 
-    <div class="col-12 mt-2">
-        <div class="input-group input-group-sm">
-            <input type="text"
-                   class="form-control new-master-data-input"
-                   data-type="translator_specializations"
-                   placeholder="Add New Specialization">
+                                                <div class="col-12 mt-2">
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text"
+                                                            class="form-control new-master-data-input"
+                                                            data-type="translator_specializations"
+                                                            placeholder="Add New Specialization">
 
-            <button class="btn btn-primary add-master-data-btn" type="button">
-                <i class="iconly-Plus icli"></i>
-            </button>
-        </div>
-    </div>
-</div>
+                                                        <button class="btn btn-primary add-master-data-btn" type="button">
+                                                            <i class="iconly-Plus icli"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label" required>Previous Clients / Projects</label>
@@ -408,29 +410,29 @@
                                             <div class="row">
                                                 @foreach($servicesOffered as $service)
                                                 <div class="col-md-6">
-    <div class="form-check checkbox-primary d-flex align-items-center">
+                                                    <div class="form-check checkbox-primary d-flex align-items-center w-100">
 
-        <input class="form-check-input group-required me-2"
-               type="checkbox"
-               name="services_offered[]"
-               value="{{ $service->name }}"
-               id="service_{{ $service->id }}"
-               data-group="services">
+                                                        <input class="form-check-input group-required me-2"
+                                                            type="checkbox"
+                                                            name="services_offered[]"
+                                                            value="{{ $service->name }}"
+                                                            id="service_{{ $service->id }}"
+                                                            data-group="services">
 
-        <label class="form-check-label flex-grow-1 mb-0"
-               for="service_{{ $service->id }}">
-               {{ $service->name }}
-        </label>
+                                                        <label class="form-check-label flex-grow-1 mb-0"
+                                                            for="service_{{ $service->id }}">
+                                                            {{ $service->name }}
+                                                        </label>
 
-        <a href="javascript:void(0)"
-           class="text-danger ms-2 delete-master-data-btn"
-           data-id="{{ $service->id }}"
-           data-type="translator_services">
-           <i class="fa fa-trash"></i>
-        </a>
+                                                        <a href="javascript:void(0)"
+                                                            class="text-danger ms-2 delete-master-data-btn"
+                                                            data-id="{{ $service->id }}"
+                                                            data-type="translator_services">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
 
-    </div>
-</div>
+                                                    </div>
+                                                </div>
                                                 @endforeach
                                                 <div class="col-12 mt-2">
                                                     <div class="input-group input-group-sm">
@@ -457,8 +459,8 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">PAN Number</label>
-                                            <input class="form-control" type="text" name="pan_number" 
-                                               pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                                            <input class="form-control" type="text" name="pan_number"
+                                                pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
                                                 title="Enter valid PAN Number (Example: ABCDE1234F)"
                                                 maxlength="10"
                                                 style="text-transform:uppercase;"
@@ -474,24 +476,24 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Account Number <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="account_number" required 
+                                            <input class="form-control" type="text" name="account_number" required
                                                 pattern="^[0-9]{9,18}$" title="Enter valid account number (9-18 digits)"
                                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="ifsc_code" required 
+                                            <input class="form-control" type="text" name="ifsc_code" required
                                                 pattern="^[A-Z]{4}0[A-Z0-9]{6}$" title="Enter valid IFSC (Example: SBIN0123456)"
                                                 oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">SWIFT Code</label>
-                                            <input class="form-control" type="text" name="swift_code" pattern="^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$"maxlength="11"oninput="this.value=this.value.toUpperCase()"title="Enter valid SWIFT Code (Example: HDFCINBBXXX)" required>
+                                            <input class="form-control" type="text" name="swift_code" pattern="^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$" maxlength="11" oninput="this.value=this.value.toUpperCase()" title="Enter valid SWIFT Code (Example: HDFCINBBXXX)" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">UPI ID (optional)</label>
-                                            <input class="form-control" type="text" name="upi_id" 
-                                                pattern="^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$" 
+                                            <input class="form-control" type="text" name="upi_id"
+                                                pattern="^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$"
                                                 title="Enter valid UPI ID (Example: user@upi)" required>
                                         </div>
                                         <div class="col-md-6">
@@ -619,39 +621,39 @@
         let sourceLangChoices, targetLangChoices, addLangChoices;
 
         $(document).on('input', '.validate-char-limit', function() {
-        const el = $(this);
-        const max = parseInt(el.data('max'));
-        const msgDiv = el.siblings('.char-limit-msg');
-        if (el.val().length >= max) {
-            msgDiv.removeClass('d-none');
-        } else {
-            msgDiv.addClass('d-none');
-        }
-    });
+            const el = $(this);
+            const max = parseInt(el.data('max'));
+            const msgDiv = el.siblings('.char-limit-msg');
+            if (el.val().length >= max) {
+                msgDiv.removeClass('d-none');
+            } else {
+                msgDiv.addClass('d-none');
+            }
+        });
 
-    $(document).on('input', '.validate-format', function() {
-        const el = $(this);
-        const pattern = el.attr('pattern');
-        if (!pattern) return;
-        
-        const regex = new RegExp(pattern);
-        const errorDiv = el.siblings('.format-error');
-        
-        if (el.val() !== '' && !regex.test(el.val())) {
-            errorDiv.removeClass('d-none');
-        } else {
-            errorDiv.addClass('d-none');
-        }
-    });
+        $(document).on('input', '.validate-format', function() {
+            const el = $(this);
+            const pattern = el.attr('pattern');
+            if (!pattern) return;
 
-    function validatePasswordMatch() {
+            const regex = new RegExp(pattern);
+            const errorDiv = el.siblings('.format-error');
+
+            if (el.val() !== '' && !regex.test(el.val())) {
+                errorDiv.removeClass('d-none');
+            } else {
+                errorDiv.addClass('d-none');
+            }
+        });
+
+        function validatePasswordMatch() {
             const password = $('#password-input');
             const confirm = $('#password-confirm-input');
             const requirements = $('#password-requirements');
             const matchError = $('#password-match-error');
-            
+
             const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
-            
+
             // Check requirements
             if (password.val() === '') {
                 requirements.removeClass('d-none');
@@ -660,7 +662,7 @@
             } else {
                 requirements.removeClass('d-none');
             }
-            
+
             // Check match
             if (confirm.val() !== '') {
                 if (confirm.val() !== password.val()) {
@@ -677,207 +679,207 @@
         }
 
         $(document).ready(function() {
-            const translatorPhoneInput = document.querySelector('#translator_phone');
-            if (translatorPhoneInput) {
-                translatorIti = window.intlTelInput(translatorPhoneInput, {
-                    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
-                    separateDialCode: true,
-                    initialCountry: 'in',
-                    preferredCountries: ['in', 'ae', 'us', 'gb']
-                });
-            }
-
-            // DataTable
-            table = $('#translators-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "{{ route('admin.translators.index') }}",
-                    data: function(d) {
-                        d.country_filter = $('#country-filter').val();
-                        d.source_lang = $('#filter_source_lang').val();
-                        d.target_lang = $('#filter_target_lang').val();
+                    const translatorPhoneInput = document.querySelector('#translator_phone');
+                    if (translatorPhoneInput) {
+                        translatorIti = window.intlTelInput(translatorPhoneInput, {
+                            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                            separateDialCode: true,
+                            initialCountry: 'in',
+                            preferredCountries: ['in', 'ae', 'us', 'gb']
+                        });
                     }
-                },
-                initComplete: function() {
-                    const filterHtml = $('#custom-filters-container').removeClass('d-none').detach();
-                    $('#translators-table_wrapper .dataTables_filter').prepend(filterHtml);
-                },
-                columns: [{
-                        data: 'user_id',
-                        name: 'users.id',
-                        render: function(data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
+
+                    // DataTable
+                    table = $('#translators-table').DataTable({
+                        processing: true,
+                        serverSide: true,
+                        ajax: {
+                            url: "{{ route('admin.translators.index') }}",
+                            data: function(d) {
+                                d.country_filter = $('#country-filter').val();
+                                d.source_lang = $('#filter_source_lang').val();
+                                d.target_lang = $('#filter_target_lang').val();
+                            }
+                        },
+                        initComplete: function() {
+                            const filterHtml = $('#custom-filters-container').removeClass('d-none').detach();
+                            $('#translators-table_wrapper .dataTables_filter').prepend(filterHtml);
+                        },
+                        columns: [{
+                                data: 'user_id',
+                                name: 'users.id',
+                                render: function(data, type, row, meta) {
+                                    return meta.row + meta.settings._iDisplayStart + 1;
+                                }
+                            },
+                            {
+                                data: 'name',
+                                name: 'users.name',
+                                render: function(data, type, row) {
+                                    return data;
+                                }
+                            },
+                            {
+                                data: 'gender',
+                                name: 'translators.gender',
+                                render: function(data) {
+                                    return data ? data.charAt(0).toUpperCase() + data.slice(1) : 'N/A';
+                                }
+                            },
+                            {
+                                data: 'email',
+                                name: 'users.email'
+                            },
+                            {
+                                data: 'phone',
+                                name: 'translators.phone'
+                            },
+                            {
+                                data: 'country',
+                                name: 'translators.country'
+                            },
+                            {
+                                data: 'source_languages',
+                                name: 'source_languages',
+                                orderable: false,
+                                searchable: false
+                            },
+                            {
+                                data: 'target_languages',
+                                name: 'target_languages',
+                                orderable: false,
+                                searchable: false
+                            },
+                            {
+                                data: 'status',
+                                name: 'translators.status'
+                            },
+                            {
+                                data: 'action',
+                                name: 'action',
+                                orderable: false,
+                                searchable: false
+                            },
+                        ],
+                        order: [
+                            [0, 'desc']
+                        ]
+                    });
+
+                    // Filter Event Listeners
+                    $('#filter_source_lang, #filter_target_lang, #country-filter').change(function() {
+                        table.draw();
+                    });
+
+                    $('#reset_filters').click(function() {
+                        $('#filter_source_lang').val('');
+                        $('#filter_target_lang').val('');
+                        table.draw();
+                    });
+
+                    // Initialize Choices.js
+                    const sourceSelect = document.getElementById('source_languages_select');
+                    const targetSelect = document.getElementById('target_languages_select');
+                    const additionalSelect = document.getElementById('additional_languages_select');
+
+                    function initChoices(element, fieldName) {
+                        if (!element) return null; // Handle cases where element might not exist
+
+                        const choices = new Choices(element, {
+                            removeItemButton: true,
+                            searchEnabled: true,
+                            placeholderValue: 'Select Languages',
+                            itemSelectText: '',
+                        });
+
+                        element.addEventListener('addItem', function(event) {
+                            addLanguageCapabilityRow(event.detail.value, event.detail.label, fieldName);
+                        });
+
+                        element.addEventListener('removeItem', function(event) {
+                            $(`#lang-row-${fieldName}-${event.detail.value.replace(/\s+/g, '_')}`).remove();
+                        });
+
+                        return choices;
+                    }
+
+                    const sourceChoices = initChoices(sourceSelect, 'source_languages');
+                    const targetChoices = initChoices(targetSelect, 'target_languages');
+                    const additionalChoices = initChoices(additionalSelect, 'additional_languages');
+
+                    window.translatorChoices = {
+                        source: sourceChoices,
+                        target: targetChoices,
+                        additional: additionalChoices
+                    };
+
+                    // Stepper Logic
+                    $('#next-btn').click(function() {
+                        if (validateStep(currentStep)) {
+                            if (currentStep < totalSteps) {
+                                currentStep++;
+                                updateStepper();
+                            }
                         }
-                    },
-                    {
-                        data: 'name',
-                        name: 'users.name',
-                        render: function(data, type, row) {
-                            return data;
+                    });
+
+                    $('#prev-btn').click(function() {
+                        if (currentStep > 1) {
+                            currentStep--;
+                            updateStepper();
                         }
-                    },
-                    {
-                        data: 'gender',
-                        name: 'translators.gender',
-                        render: function(data) {
-                            return data ? data.charAt(0).toUpperCase() + data.slice(1) : 'N/A';
-                        }
-                    },
-                    {
-                        data: 'email',
-                        name: 'users.email'
-                    },
-                    {
-                        data: 'phone',
-                        name: 'translators.phone'
-                    },
-                    {
-                        data: 'country',
-                        name: 'translators.country'
-                    },
-                    {
-                        data: 'source_languages',
-                        name: 'source_languages',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'target_languages',
-                        name: 'target_languages',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'status',
-                        name: 'translators.status'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },
-                ],
-                order: [
-                    [0, 'desc']
-                ]
-            });
+                    });
 
-            // Filter Event Listeners
-            $('#filter_source_lang, #filter_target_lang, #country-filter').change(function() {
-                table.draw();
-            });
-
-            $('#reset_filters').click(function() {
-                $('#filter_source_lang').val('');
-                $('#filter_target_lang').val('');
-                table.draw();
-            });
-
-            // Initialize Choices.js
-            const sourceSelect = document.getElementById('source_languages_select');
-            const targetSelect = document.getElementById('target_languages_select');
-            const additionalSelect = document.getElementById('additional_languages_select');
-
-            function initChoices(element, fieldName) {
-                if (!element) return null; // Handle cases where element might not exist
-
-                const choices = new Choices(element, {
-                    removeItemButton: true,
-                    searchEnabled: true,
-                    placeholderValue: 'Select Languages',
-                    itemSelectText: '',
-                });
-
-                element.addEventListener('addItem', function(event) {
-                    addLanguageCapabilityRow(event.detail.value, event.detail.label, fieldName);
-                });
-
-                element.addEventListener('removeItem', function(event) {
-                    $(`#lang-row-${fieldName}-${event.detail.value.replace(/\s+/g, '_')}`).remove();
-                });
-
-                return choices;
-            }
-
-            const sourceChoices = initChoices(sourceSelect, 'source_languages');
-            const targetChoices = initChoices(targetSelect, 'target_languages');
-            const additionalChoices = initChoices(additionalSelect, 'additional_languages');
-
-            window.translatorChoices = {
-                source: sourceChoices,
-                target: targetChoices,
-                additional: additionalChoices
-            };
-
-            // Stepper Logic
-            $('#next-btn').click(function() {
-                if (validateStep(currentStep)) {
-                    if (currentStep < totalSteps) {
-                        currentStep++;
+                    $('.stepper-item').click(function() {
+                        // Optional: Add validation before jumping
+                        let step = $(this).data('step');
+                        currentStep = step;
                         updateStepper();
+                    });
+
+                    function updateStepper() {
+                        $('.step-content').addClass('d-none');
+                        $('#step-' + currentStep).removeClass('d-none');
+
+                        $('.stepper-item').removeClass('active completed');
+                        for (let i = 1; i <= totalSteps; i++) {
+                            if (i === currentStep) {
+                                $('.stepper-item[data-step="' + i + '"]').addClass('active');
+                            } else if (i < currentStep) {
+                                $('.stepper-item[data-step="' + i + '"]').addClass('completed');
+                            }
+                        }
+
+                        // Scroll to top of stepper
+                        document.getElementById('translator-stepper').scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+
+                        if (currentStep === 1) {
+                            $('#prev-btn').hide();
+                        } else {
+                            $('#prev-btn').show();
+                        }
+
+                        if (currentStep === totalSteps) {
+                            $('#next-btn').hide();
+                            $('#submit-btn').show();
+                        } else {
+                            $('#next-btn').show();
+                            $('#submit-btn').hide();
+                        }
                     }
-                }
-            });
 
-            $('#prev-btn').click(function() {
-                if (currentStep > 1) {
-                    currentStep--;
-                    updateStepper();
-                }
-            });
+                    function addLanguageCapabilityRow(value, label, fieldName, caps = null) {
+                        const rowId = `lang-row-${fieldName}-${value.replace(/\s+/g, '_')}`;
+                        if ($(`#${rowId}`).length > 0) return;
 
-            $('.stepper-item').click(function() {
-                // Optional: Add validation before jumping
-                let step = $(this).data('step');
-                currentStep = step;
-                updateStepper();
-            });
+                        const isRead = caps && caps.read ? 'checked' : '';
+                        const isWrite = caps && caps.write ? 'checked' : '';
+                        const isSpeak = caps && caps.speak ? 'checked' : '';
 
-            function updateStepper() {
-                $('.step-content').addClass('d-none');
-                $('#step-' + currentStep).removeClass('d-none');
-
-                $('.stepper-item').removeClass('active completed');
-                for (let i = 1; i <= totalSteps; i++) {
-                    if (i === currentStep) {
-                        $('.stepper-item[data-step="' + i + '"]').addClass('active');
-                    } else if (i < currentStep) {
-                        $('.stepper-item[data-step="' + i + '"]').addClass('completed');
-                    }
-                }
-
-                // Scroll to top of stepper
-                document.getElementById('translator-stepper').scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-
-                if (currentStep === 1) {
-                    $('#prev-btn').hide();
-                } else {
-                    $('#prev-btn').show();
-                }
-
-                if (currentStep === totalSteps) {
-                    $('#next-btn').hide();
-                    $('#submit-btn').show();
-                } else {
-                    $('#next-btn').show();
-                    $('#submit-btn').hide();
-                }
-            }
-
-            function addLanguageCapabilityRow(value, label, fieldName, caps = null) {
-                const rowId = `lang-row-${fieldName}-${value.replace(/\s+/g, '_')}`;
-                if ($(`#${rowId}`).length > 0) return;
-
-                const isRead = caps && caps.read ? 'checked' : '';
-                const isWrite = caps && caps.write ? 'checked' : '';
-                const isSpeak = caps && caps.speak ? 'checked' : '';
-
-                const html = `
+                        const html = `
                     <div class="language-capability-row" id="${rowId}">
                         <div class="row align-items-center">
                             <div class="col-md-4">
@@ -903,504 +905,507 @@
                         </div>
                     </div>
                 `;
-                $(`#${fieldName}_capabilities_container`).append(html);
-            }
+                        $(`#${fieldName}_capabilities_container`).append(html);
+                    }
 
-            function validateStep(step) {
-                let isValid = true;
-                let $step = $('#step-' + step);
-                
-                // Clear previous errors in this step
-                $step.find('.is-invalid').removeClass('is-invalid');
-                $step.find('.invalid-feedback').remove();
+                    function validateStep(step) {
+                        let isValid = true;
+                        let $step = $('#step-' + step);
 
-                // Track which checkbox groups have been validated
-                let validatedGroups = [];
+                        // Clear previous errors in this step
+                        $step.find('.is-invalid').removeClass('is-invalid');
+                        $step.find('.invalid-feedback').remove();
 
-                $step.find('input, select, textarea').each(function() {
-                    const el = $(this);
-                    
-                    // Skip disabled
-                    if (el.prop('disabled')) return;
-                    
-                    // Skip hidden UNLESS it's a select (which might be hidden by Choices.js)
-                    if (el.is(':hidden') && !el.is('select')) return;
+                        // Track which checkbox groups have been validated
+                        let validatedGroups = [];
 
-                    let fieldValid = true;
-                    let errorMessage = '';
+                        $step.find('input, select, textarea').each(function() {
+                            const el = $(this);
 
-                    // Group Checkbox Validation (Select at least one)
-                    if (el.hasClass('group-required')) {
-                        const groupName = el.data('group');
-                        if (validatedGroups.indexOf(groupName) !== -1) return; // Already validated this group
-                        
-                        const checkboxes = $step.find(`.group-required[data-group="${groupName}"]`);
-                        if (checkboxes.filter(':checked').length === 0) {
-                            fieldValid = false;
-                            errorMessage = 'Please select at least one option';
-                            // Target the container to show error
-                            const container = el.closest('.row');
-                            container.after(`<div class="invalid-feedback d-block mt-n2 mb-3">${errorMessage}</div>`);
-                            checkboxes.addClass('is-invalid');
-                        }
-                        validatedGroups.push(groupName);
-                    } else {
-                        // 1. Native HTML5 Validation
-                        if (!this.checkValidity()) {
-                            fieldValid = false;
-                            errorMessage = el.attr('title') || this.validationMessage || 'This field is required';
-                        }
+                            // Skip disabled
+                            if (el.prop('disabled')) return;
 
-                        // 2. Custom Validations
-                        if (fieldValid) {
-                            // Password Confirmation Match
-                            if (el.attr('id') === 'password-confirm-input') {
-                                const password = $('#password-input').val();
-                                if (el.val() !== password) {
+                            // Skip hidden UNLESS it's a select (which might be hidden by Choices.js)
+                            if (el.is(':hidden') && !el.is('select')) return;
+
+                            let fieldValid = true;
+                            let errorMessage = '';
+
+                            // Group Checkbox Validation (Select at least one)
+                            if (el.hasClass('group-required')) {
+                                const groupName = el.data('group');
+                                if (validatedGroups.indexOf(groupName) !== -1) return; // Already validated this group
+
+                                const checkboxes = $step.find(`.group-required[data-group="${groupName}"]`);
+                                if (checkboxes.filter(':checked').length === 0) {
                                     fieldValid = false;
-                                    errorMessage = 'Passwords do not match';
+                                    errorMessage = 'Please select at least one option';
+                                    // Target the container to show error
+                                    const container = el.closest('.row');
+                                    container.after(`<div class="invalid-feedback d-block mt-n2 mb-3">${errorMessage}</div>`);
+                                    checkboxes.addClass('is-invalid');
+                                }
+                                validatedGroups.push(groupName);
+                            } else {
+                                // 1. Native HTML5 Validation
+                                if (!this.checkValidity()) {
+                                    fieldValid = false;
+                                    errorMessage = el.attr('title') || this.validationMessage || 'This field is required';
+                                }
+
+                                // 2. Custom Validations
+                                if (fieldValid) {
+                                    // Password Confirmation Match
+                                    if (el.attr('id') === 'password-confirm-input') {
+                                        const password = $('#password-input').val();
+                                        if (el.val() !== password) {
+                                            fieldValid = false;
+                                            errorMessage = 'Passwords do not match';
+                                        }
+                                    }
+                                }
+
+                                if (!fieldValid) {
+                                    el.addClass('is-invalid');
+                                    // Handle error message placement
+                                    if (el.next('.invalid-feedback').length === 0) {
+                                        if (el.parent().hasClass('input-group')) {
+                                            el.parent().after(`<div class="invalid-feedback d-block">${errorMessage}</div>`);
+                                        } else if (el.parent().hasClass('choices')) {
+                                            el.parent().after(`<div class="invalid-feedback d-block">${errorMessage}</div>`);
+                                        } else {
+                                            el.after(`<div class="invalid-feedback">${errorMessage}</div>`);
+                                        }
+                                    }
                                 }
                             }
-                        }
 
-                        if (!fieldValid) {
-                            el.addClass('is-invalid');
-                            // Handle error message placement
-                            if (el.next('.invalid-feedback').length === 0) {
-                                if (el.parent().hasClass('input-group')) {
-                                    el.parent().after(`<div class="invalid-feedback d-block">${errorMessage}</div>`);
-                                } else if (el.parent().hasClass('choices')) {
-                                    el.parent().after(`<div class="invalid-feedback d-block">${errorMessage}</div>`);
-                                } else {
-                                    el.after(`<div class="invalid-feedback">${errorMessage}</div>`);
-                                }
-                            }
-                        }
-                    }
+                            if (!fieldValid) isValid = false;
+                        });
 
-                    if (!fieldValid) isValid = false;
-                });
-
-                if (!isValid) {
-                    const firstError = $step.find('.is-invalid').first();
-                    if (firstError.length) {
-                        firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                }
-
-                return isValid;
-            }
-
-            // Real-time validation clearance
-            $(document).on('input change', '#translator-form input, #translator-form select, #translator-form textarea', function() {
-                const el = $(this);
-                if (el.hasClass('is-invalid')) {
-                    el.removeClass('is-invalid');
-                    if (el.parent().hasClass('input-group')) {
-                        el.parent().next('.invalid-feedback').remove();
-                    } else {
-                        el.next('.invalid-feedback').remove();
-                    }
-                }
-            });
-
-            // Image Preview and Validation
-            $("#imageUpload").change(function() {
-                if (this.files && this.files[0]) {
-                    if (this.files[0].size > 2 * 1024 * 1024) { // 2MB
-                        alert('Profile photo size must be less than 2MB');
-                        $(this).val(''); // Clear input
-                        return;
-                    }
-                    readURL(this);
-                }
-            });
-
-            function readURL(input) {
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
-                        $('#imagePreview').hide();
-                        $('#imagePreview').fadeIn(650);
-                    }
-                    reader.readAsDataURL(input.files[0]);
-                }
-            }
-
-            function openCreateModal() {
-                $('#translator-form')[0].reset();
-                $('#translator_id').val('');
-                $('#form-method').val('POST');
-                $('#form-modal-title').text('Register Translator');
-                $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
-
-                // Show password fields
-                $('.password-field').show();
-                $('input[name="password"]').attr('required', 'required');
-                $('input[name="password_confirmation"]').attr('required', 'required');
-
-                // Reset Choices
-                if (window.translatorChoices) {
-                    window.translatorChoices.source.removeActiveItems();
-                    window.translatorChoices.target.removeActiveItems();
-                    window.translatorChoices.additional.removeActiveItems();
-                }
-                if (translatorIti) {
-                    translatorIti.setNumber('');
-                }
-                $('#source_languages_capabilities_container, #target_languages_capabilities_container, #additional_languages_capabilities_container').empty();
-
-                currentStep = 1;
-                updateStepper();
-                $('#translator-form-modal').modal('show');
-            }
-            window.openCreateModal = openCreateModal; // Expose to global scope for button click
-
-            let deleteMasterBtnRef = null;
-
-            // Handle Delete Master Data
-            $(document).on('click', '.delete-master-data-btn', function() {
-                deleteMasterBtnRef = $(this);
-                let id = $(this).data('id');
-                let type = $(this).data('type');
-
-                $('#delete-master-id').val(id);
-                $('#delete-master-type').val(type);
-                $('#master-data-delete-modal').modal('show');
-            });
-
-            // Confirm Master Data Delete
-            $('#confirm-master-delete-btn').click(function() {
-                let btn = $(this);
-                let id = $('#delete-master-id').val();
-                let type = $('#delete-master-type').val();
-
-                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
-
-                $.ajax({
-                    url: "{{ url('admin/master-data') }}/" + type + "/" + id,
-                    type: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $('#master-data-delete-modal').modal('hide');
-                            if (deleteMasterBtnRef) {
-                                deleteMasterBtnRef.closest('[class^="col-"]').fadeOut(300, function() {
-                                    $(this).remove();
+                        if (!isValid) {
+                            const firstError = $step.find('.is-invalid').first();
+                            if (firstError.length) {
+                                firstError[0].scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center'
                                 });
                             }
-                            if (typeof showToast === 'function') showToast('Item deleted successfully');
-                        } else {
-                            alert('Failed to delete item');
                         }
-                    },
-                    error: function(xhr) {
-                        alert('Error: ' + (xhr.responseJSON?.error || 'Could not delete item'));
-                    },
-                    complete: function() {
-                        btn.prop('disabled', false).html('Delete Now');
+
+                        return isValid;
                     }
-                });
-            });
 
-            // Master Data Quick Add
-            $(document).off('click', '.add-master-data-btn').on('click', '.add-master-data-btn', function() {
-                let btn = $(this);
-                let input = btn.siblings('.new-master-data-input');
-                let type = input.data('type');
-                let value = input.val().trim();
-                // Container logic similar to previous implementation
-                // Assuming structure: <div class="col-12/md-x"> <div class="row"> ...checkboxes... <div class="col-12 mt-2">...input...</div> </div> </div>
-                let container = null;
-                if (type === 'translator_specializations') {
-                    container = btn.closest('.row').find('.col-md-4').parent();
-                } else {
-                    container = btn.closest('.row').find('.col-md-6').parent();
-                }
+                    // Real-time validation clearance
+                    $(document).on('input change', '#translator-form input, #translator-form select, #translator-form textarea', function() {
+                        const el = $(this);
+                        if (el.hasClass('is-invalid')) {
+                            el.removeClass('is-invalid');
+                            if (el.parent().hasClass('input-group')) {
+                                el.parent().next('.invalid-feedback').remove();
+                            } else {
+                                el.next('.invalid-feedback').remove();
+                            }
+                        }
+                    });
 
-                if (!value) return;
+                    // Image Preview and Validation
+                    $("#imageUpload").change(function() {
+                        if (this.files && this.files[0]) {
+                            if (this.files[0].size > 2 * 1024 * 1024) { // 2MB
+                                alert('Profile photo size must be less than 2MB');
+                                $(this).val(''); // Clear input
+                                return;
+                            }
+                            readURL(this);
+                        }
+                    });
 
-                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+                    function readURL(input) {
+                        if (input.files && input.files[0]) {
+                            var reader = new FileReader();
+                            reader.onload = function(e) {
+                                $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
+                                $('#imagePreview').hide();
+                                $('#imagePreview').fadeIn(650);
+                            }
+                            reader.readAsDataURL(input.files[0]);
+                        }
+                    }
 
-                $.ajax({
-                    url: "{{ url('admin/master-data') }}/" + type,
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        name: value,
-                        status: 1
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            let checkboxName = type === 'translator_services' ? 'services_offered[]' : 'fields_of_specialization[]';
-                            let idPrefix = type === 'translator_services' ? 'service_' : 'spec_';
-                            let colClass = type === 'translator_services' ? 'col-md-6' : 'col-md-4';
-                            let newId = response.data.id;
-                            let newName = response.data.name;
+                    function openCreateModal() {
+                        $('#translator-form')[0].reset();
+                        $('#translator_id').val('');
+                        $('#form-method').val('POST');
+                        $('#form-modal-title').text('Register Translator');
+                        $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
 
-                            let html = `
+                        // Show password fields
+                        $('.password-field').show();
+                        $('input[name="password"]').attr('required', 'required');
+                        $('input[name="password_confirmation"]').attr('required', 'required');
+
+                        // Reset Choices
+                        if (window.translatorChoices) {
+                            window.translatorChoices.source.removeActiveItems();
+                            window.translatorChoices.target.removeActiveItems();
+                            window.translatorChoices.additional.removeActiveItems();
+                        }
+                        if (translatorIti) {
+                            translatorIti.setNumber('');
+                        }
+                        $('#source_languages_capabilities_container, #target_languages_capabilities_container, #additional_languages_capabilities_container').empty();
+
+                        currentStep = 1;
+                        updateStepper();
+                        $('#translator-form-modal').modal('show');
+                    }
+                    window.openCreateModal = openCreateModal; // Expose to global scope for button click
+
+                    let deleteMasterBtnRef = null;
+
+                    // Handle Delete Master Data
+                    $(document).on('click', '.delete-master-data-btn', function() {
+                        deleteMasterBtnRef = $(this);
+                        let id = $(this).data('id');
+                        let type = $(this).data('type');
+
+                        $('#delete-master-id').val(id);
+                        $('#delete-master-type').val(type);
+                        $('#master-data-delete-modal').modal('show');
+                    });
+
+                    // Confirm Master Data Delete
+                    $('#confirm-master-delete-btn').click(function() {
+                        let btn = $(this);
+                        let id = $('#delete-master-id').val();
+                        let type = $('#delete-master-type').val();
+
+                        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+                        $.ajax({
+                            url: "{{ url('admin/master-data') }}/" + type + "/" + id,
+                            type: 'DELETE',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    $('#master-data-delete-modal').modal('hide');
+                                    if (deleteMasterBtnRef) {
+                                        deleteMasterBtnRef.closest('[class^="col-"]').fadeOut(300, function() {
+                                            $(this).remove();
+                                        });
+                                    }
+                                    if (typeof showToast === 'function') showToast('Item deleted successfully');
+                                } else {
+                                    alert('Failed to delete item');
+                                }
+                            },
+                            error: function(xhr) {
+                                alert('Error: ' + (xhr.responseJSON?.error || 'Could not delete item'));
+                            },
+                            complete: function() {
+                                btn.prop('disabled', false).html('Delete Now');
+                            }
+                        });
+                    });
+
+                    // Master Data Quick Add
+                    $(document).off('click', '.add-master-data-btn').on('click', '.add-master-data-btn', function() {
+                        let btn = $(this);
+                        let input = btn.siblings('.new-master-data-input');
+                        let type = input.data('type');
+                        let value = input.val().trim();
+                        // Container logic similar to previous implementation
+                        // Assuming structure: <div class="col-12/md-x"> <div class="row"> ...checkboxes... <div class="col-12 mt-2">...input...</div> </div> </div>
+                        let container = null;
+                        if (type === 'translator_specializations') {
+                            container = btn.closest('.row').find('.col-md-4').parent();
+                        } else {
+                            container = btn.closest('.row').find('.col-md-6').parent();
+                        }
+
+                        if (!value) return;
+
+                        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+                        $.ajax({
+                            url: "{{ url('admin/master-data') }}/" + type,
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                name: value,
+                                status: 1
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    let checkboxName = type === 'translator_services' ? 'services_offered[]' : 'fields_of_specialization[]';
+                                    let idPrefix = type === 'translator_services' ? 'service_' : 'spec_';
+                                    let colClass = type === 'translator_services' ? 'col-md-6' : 'col-md-4';
+                                    let newId = response.data.id;
+                                    let newName = response.data.name;
+
+                                    let html = `
                             <div class="${colClass}">
-                                <div class="form-check checkbox-${type === 'translator_services' ? 'primary' : 'secondary'} d-flex align-items-center">
+                                <div class="form-check checkbox-${type === 'translator_services' ? 'primary' : 'secondary'} d-flex align-items-center w-100">
                                     <input class="form-check-input me-2" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
                                     <label class="form-check-label flex-grow-1 mb-0" for="${idPrefix}${newId}">${newName}</label>
                                     <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="${type}"><i class="fa fa-trash"></i></a>
                                 </div>
                             </div>
                         `;
-                            // Insert before the input container (col-12 mt-2)
-                            btn.closest('.col-12').before(html);
-                            input.val('');
-                            if (typeof showToast === 'function') showToast(response.success);
-                        }
-                    },
-                    error: function(xhr) {
-                        let errorMessage = 'Error adding item';
-                        if (xhr.status === 422 && xhr.responseJSON.error) {
-                            errorMessage = xhr.responseJSON.error;
-                        } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        }
-                        if (typeof showToast === 'function') showToast(errorMessage, 'error');
-                    },
-                    complete: function() {
-                        btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
-                    }
-                });
-            });
-
-            // Form Submit
-            $('#translator-form').on('submit', function(e) {
-                e.preventDefault();
-                
-                if (!validateStep(currentStep)) return;
-
-                let id = $('#translator_id').val();
-                let url = id ? "{{ url('admin/translators') }}/" + id : "{{ route('admin.translators.store') }}";
-                let formData = new FormData(this);
-                if (translatorIti) {
-                    formData.set('phone', translatorIti.getNumber());
-                }
-
-                let btn = $('#submit-btn');
-                btn.prop('disabled', true).html('Saving...');
-
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        $('#translator-form-modal').modal('hide');
-                        table.draw();
-                        if (typeof showToast === 'function') showToast(response.success);
-                    },
-                    error: function(xhr) {
-                        let msg = xhr.responseJSON ? xhr.responseJSON.error || xhr.responseJSON.message : 'Error occurred';
-                        if (typeof showToast === 'function') showToast(msg, 'error');
-                        else alert(msg);
-                    },
-                    complete: function() {
-                        btn.prop('disabled', false).html('Submit');
-                    }
-                });
-            });
-
-            // Edit
-            $('body').on('click', '.editTranslator', function() {
-                let id = $(this).data('id');
-                openCreateModal(); // Reset form first
-                $('#translator_id').val(id);
-                $('#form-method').val('PUT');
-                $('#form-modal-title').text('Edit Translator');
-
-                $('.password-field').hide();
-                $('input[name="password"]').removeAttr('required');
-                $('input[name="password_confirmation"]').removeAttr('required');
-                $('[id^="current-"]').addClass('d-none').html(''); // Clear existing previews
-
-                $.get("{{ url('admin/translators') }}/" + id + "/edit", function(response) {
-                    let u = response.user;
-                    let t = response.translator;
-
-                    $('input[name="first_name"]').val(t.first_name || u.first_name || '');
-                    $('input[name="last_name"]').val(t.last_name || u.last_name || '');
-                    $('input[name="email"]').val(u.email);
-                    if (translatorIti) {
-                        translatorIti.setNumber(t.phone || '');
-                    } else {
-                        $('input[name="phone"]').val(t.phone || '');
-                    }
-                    $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
-                    $('input[name="address_line_1"]').val(t.address_line_1);
-                    $('input[name="address_line_2"]').val(t.address_line_2);
-                    $('input[name="city"]').val(t.city);
-                    $('input[name="state"]').val(t.state);
-                    $('input[name="zip_code"]').val(t.zip_code);
-                    $('select[name="country"]').val(t.country || 'India');
-                    $('select[name="gender"]').val(t.gender);
-
-                    if (t.profile_photo_path) {
-                        $('#imagePreview').css('background-image', 'url(' + storageBase + t.profile_photo_path + ')');
-                        $('#current-profile_photo').removeClass('d-none').html(`<a href="${storageBase}${t.profile_photo_path}" target="_blank" class="text-primary">View Current Photo</a>`);
-                    }
-
-                    $('select[name="native_language"]').val(t.native_language);
-
-                    // Handle Languages
-                    const handleLangs = (field, containerId, choicesInstance) => {
-                        $(`#${containerId}`).empty();
-                        if (t[field]) {
-                            const langs = Array.isArray(t[field]) ? t[field] : [];
-                            if (langs.length > 0 && typeof langs[0] === 'string') {
-                                choicesInstance.setChoiceByValue(langs);
-                                langs.forEach(l => addLanguageCapabilityRow(l, l, field));
-                            } else {
-                                const langValues = [];
-                                $.each(t[field], function(key, caps) {
-                                    const langName = caps.language || key;
-                                    langValues.push(langName);
-                                    addLanguageCapabilityRow(langName, langName, field, caps);
-                                });
-                                choicesInstance.setChoiceByValue(langValues);
+                                    // Insert before the input container (col-12 mt-2)
+                                    btn.closest('.col-12').before(html);
+                                    input.val('');
+                                    if (typeof showToast === 'function') showToast(response.success);
+                                }
+                            },
+                            error: function(xhr) {
+                                let errorMessage = 'Error adding item';
+                                if (xhr.status === 422 && xhr.responseJSON.error) {
+                                    errorMessage = xhr.responseJSON.error;
+                                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                }
+                                if (typeof showToast === 'function') showToast(errorMessage, 'error');
+                            },
+                            complete: function() {
+                                btn.prop('disabled', false).html('<i class="iconly-Plus icli"></i>');
                             }
-                        } else {
-                            choicesInstance.removeActiveItems();
+                        });
+                    });
+
+                    // Form Submit
+                    $('#translator-form').on('submit', function(e) {
+                        e.preventDefault();
+
+                        if (!validateStep(currentStep)) return;
+
+                        let id = $('#translator_id').val();
+                        let url = id ? "{{ url('admin/translators') }}/" + id : "{{ route('admin.translators.store') }}";
+                        let formData = new FormData(this);
+                        if (translatorIti) {
+                            formData.set('phone', translatorIti.getNumber());
                         }
-                    };
 
-                    handleLangs('source_languages', 'source_languages_capabilities_container', window.translatorChoices.source);
-                    handleLangs('target_languages', 'target_languages_capabilities_container', window.translatorChoices.target);
-                    handleLangs('additional_languages', 'additional_languages_capabilities_container', window.translatorChoices.additional);
+                        let btn = $('#submit-btn');
+                        btn.prop('disabled', true).html('Saving...');
 
-                    $('select[name="translator_type"]').val(t.translator_type);
-                    $('input[name="years_of_experience"]').val(t.years_of_experience);
-
-                    // Checkboxes
-                    if (t.fields_of_specialization) {
-                        t.fields_of_specialization.forEach(val => {
-                            $(`input[name="fields_of_specialization[]"][value="${val}"]`).prop('checked', true);
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                $('#translator-form-modal').modal('hide');
+                                table.draw();
+                                if (typeof showToast === 'function') showToast(response.success);
+                            },
+                            error: function(xhr) {
+                                let msg = xhr.responseJSON ? xhr.responseJSON.error || xhr.responseJSON.message : 'Error occurred';
+                                if (typeof showToast === 'function') showToast(msg, 'error');
+                                else alert(msg);
+                            },
+                            complete: function() {
+                                btn.prop('disabled', false).html('Submit');
+                            }
                         });
-                    }
+                    });
 
-                    $('textarea[name="previous_clients_projects"]').val(t.previous_clients_projects);
-                    $('input[name="portfolio_link"]').val(t.portfolio_link);
+                    // Edit
+                    $('body').on('click', '.editTranslator', function() {
+                        let id = $(this).data('id');
+                        openCreateModal(); // Reset form first
+                        $('#translator_id').val(id);
+                        $('#form-method').val('PUT');
+                        $('#form-modal-title').text('Edit Translator');
 
-                    $('input[name="highest_education"]').val(t.highest_education);
-                    $('textarea[name="certification_details"]').val(t.certification_details);
+                        $('.password-field').hide();
+                        $('input[name="password"]').removeAttr('required');
+                        $('input[name="password_confirmation"]').removeAttr('required');
+                        $('[id^="current-"]').addClass('d-none').html(''); // Clear existing previews
 
-                    if (t.certificates_path && t.certificates_path.length > 0) {
-                        let certsHtml = t.certificates_path.map((path, i) => `<a href="${storageBase}${path}" target="_blank" class="badge bg-primary text-white p-2">Cert ${i+1}</a>`).join('');
-                        $('#current-certificates').removeClass('d-none').html(certsHtml);
-                        $('input[name="certificates[]"]').prop('required', false);
-                    } else {
-                        $('input[name="certificates[]"]').prop('required', true);
-                    }
+                        $.get("{{ url('admin/translators') }}/" + id + "/edit", function(response) {
+                            let u = response.user;
+                            let t = response.translator;
 
-                    if (t.sample_work_path && t.sample_work_path.length > 0) {
-                        let sampleHtml = t.sample_work_path.map((path, i) => `<a href="${storageBase}${path}" target="_blank" class="badge bg-secondary text-white p-2">Sample ${i+1}</a>`).join('');
-                        $('#current-sample_work').removeClass('d-none').html(sampleHtml);
-                        $('input[name="sample_work[]"]').prop('required', false);
-                    } else {
-                        $('input[name="sample_work[]"]').prop('required', true);
-                    }
+                            $('input[name="first_name"]').val(t.first_name || u.first_name || '');
+                            $('input[name="last_name"]').val(t.last_name || u.last_name || '');
+                            $('input[name="email"]').val(u.email);
+                            if (translatorIti) {
+                                translatorIti.setNumber(t.phone || '');
+                            } else {
+                                $('input[name="phone"]').val(t.phone || '');
+                            }
+                            $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
+                            $('input[name="address_line_1"]').val(t.address_line_1);
+                            $('input[name="address_line_2"]').val(t.address_line_2);
+                            $('input[name="city"]').val(t.city);
+                            $('input[name="state"]').val(t.state);
+                            $('input[name="zip_code"]').val(t.zip_code);
+                            $('select[name="country"]').val(t.country || 'India');
+                            $('select[name="gender"]').val(t.gender);
 
-                    if (t.services_offered) {
-                        t.services_offered.forEach(val => {
-                            $(`input[name="services_offered[]"][value="${val}"]`).prop('checked', true);
+                            if (t.profile_photo_path) {
+                                $('#imagePreview').css('background-image', 'url(' + storageBase + t.profile_photo_path + ')');
+                                $('#current-profile_photo').removeClass('d-none').html(`<a href="${storageBase}${t.profile_photo_path}" target="_blank" class="text-primary">View Current Photo</a>`);
+                            }
+
+                            $('select[name="native_language"]').val(t.native_language);
+
+                            // Handle Languages
+                            const handleLangs = (field, containerId, choicesInstance) => {
+                                $(`#${containerId}`).empty();
+                                if (t[field]) {
+                                    const langs = Array.isArray(t[field]) ? t[field] : [];
+                                    if (langs.length > 0 && typeof langs[0] === 'string') {
+                                        choicesInstance.setChoiceByValue(langs);
+                                        langs.forEach(l => addLanguageCapabilityRow(l, l, field));
+                                    } else {
+                                        const langValues = [];
+                                        $.each(t[field], function(key, caps) {
+                                            const langName = caps.language || key;
+                                            langValues.push(langName);
+                                            addLanguageCapabilityRow(langName, langName, field, caps);
+                                        });
+                                        choicesInstance.setChoiceByValue(langValues);
+                                    }
+                                } else {
+                                    choicesInstance.removeActiveItems();
+                                }
+                            };
+
+                            handleLangs('source_languages', 'source_languages_capabilities_container', window.translatorChoices.source);
+                            handleLangs('target_languages', 'target_languages_capabilities_container', window.translatorChoices.target);
+                            handleLangs('additional_languages', 'additional_languages_capabilities_container', window.translatorChoices.additional);
+
+                            $('select[name="translator_type"]').val(t.translator_type);
+                            $('input[name="years_of_experience"]').val(t.years_of_experience);
+
+                            // Checkboxes
+                            if (t.fields_of_specialization) {
+                                t.fields_of_specialization.forEach(val => {
+                                    $(`input[name="fields_of_specialization[]"][value="${val}"]`).prop('checked', true);
+                                });
+                            }
+
+                            $('textarea[name="previous_clients_projects"]').val(t.previous_clients_projects);
+                            $('input[name="portfolio_link"]').val(t.portfolio_link);
+
+                            $('input[name="highest_education"]').val(t.highest_education);
+                            $('textarea[name="certification_details"]').val(t.certification_details);
+
+                            if (t.certificates_path && t.certificates_path.length > 0) {
+                                let certsHtml = t.certificates_path.map((path, i) => `<a href="${storageBase}${path}" target="_blank" class="badge bg-primary text-white p-2">Cert ${i+1}</a>`).join('');
+                                $('#current-certificates').removeClass('d-none').html(certsHtml);
+                                $('input[name="certificates[]"]').prop('required', false);
+                            } else {
+                                $('input[name="certificates[]"]').prop('required', true);
+                            }
+
+                            if (t.sample_work_path && t.sample_work_path.length > 0) {
+                                let sampleHtml = t.sample_work_path.map((path, i) => `<a href="${storageBase}${path}" target="_blank" class="badge bg-secondary text-white p-2">Sample ${i+1}</a>`).join('');
+                                $('#current-sample_work').removeClass('d-none').html(sampleHtml);
+                                $('input[name="sample_work[]"]').prop('required', false);
+                            } else {
+                                $('input[name="sample_work[]"]').prop('required', true);
+                            }
+
+                            if (t.services_offered) {
+                                t.services_offered.forEach(val => {
+                                    $(`input[name="services_offered[]"][value="${val}"]`).prop('checked', true);
+                                });
+                            }
+
+                            $('input[name="gov_id_type"]').val(t.gov_id_type);
+                            if (t.gov_id_upload_path) {
+                                $('#current-gov_id_upload').removeClass('d-none').html(`<a href="${storageBase}${t.gov_id_upload_path}" target="_blank" class="text-primary">View Current ID</a>`);
+                                $('input[name="gov_id_upload"]').prop('required', false);
+                            } else {
+                                $('input[name="gov_id_upload"]').prop('required', true);
+                            }
+
+                            $('input[name="pan_number"]').val(t.pan_number);
+                            $('input[name="bank_holder_name"]').val(t.bank_holder_name);
+                            $('input[name="bank_name"]').val(t.bank_name);
+                            $('input[name="account_number"]').val(t.account_number);
+                            $('input[name="ifsc_code"]').val(t.ifsc_code);
+                            $('input[name="swift_code"]').val(t.swift_code);
+                            $('input[name="upi_id"]').val(t.upi_id);
+
+                            if (t.cancelled_cheque_path) {
+                                $('#current-cancelled_cheque').removeClass('d-none').html(`<a href="${storageBase}${t.cancelled_cheque_path}" target="_blank" class="text-primary">View Current Cheque</a>`);
+                                $('input[name="cancelled_cheque"]').prop('required', false);
+                            } else {
+                                $('input[name="cancelled_cheque"]').prop('required', true);
+                            }
                         });
-                    }
+                    });
 
-                    $('input[name="gov_id_type"]').val(t.gov_id_type);
-                    if (t.gov_id_upload_path) {
-                        $('#current-gov_id_upload').removeClass('d-none').html(`<a href="${storageBase}${t.gov_id_upload_path}" target="_blank" class="text-primary">View Current ID</a>`);
-                        $('input[name="gov_id_upload"]').prop('required', false);
-                    } else {
-                        $('input[name="gov_id_upload"]').prop('required', true);
-                    }
-
-                    $('input[name="pan_number"]').val(t.pan_number);
-                    $('input[name="bank_holder_name"]').val(t.bank_holder_name);
-                    $('input[name="bank_name"]').val(t.bank_name);
-                    $('input[name="account_number"]').val(t.account_number);
-                    $('input[name="ifsc_code"]').val(t.ifsc_code);
-                    $('input[name="swift_code"]').val(t.swift_code);
-                    $('input[name="upi_id"]').val(t.upi_id);
-
-                    if (t.cancelled_cheque_path) {
-                        $('#current-cancelled_cheque').removeClass('d-none').html(`<a href="${storageBase}${t.cancelled_cheque_path}" target="_blank" class="text-primary">View Current Cheque</a>`);
-                        $('input[name="cancelled_cheque"]').prop('required', false);
-                    } else {
-                        $('input[name="cancelled_cheque"]').prop('required', true);
-                    }
-                });
-            });
-
-            // Delete
-            $('body').on('click', '.deleteTranslator', function() {
-                $('#delete-translator-id').val($(this).data('id'));
-                var modalEl = document.getElementById('translator-delete-modal');
-                var modal = bootstrap.Modal.getInstance(modalEl);
-                if (!modal) {
-                    modal = new bootstrap.Modal(modalEl);
-                }
-                modal.show();
-            });
-
-            $('#confirm-delete-btn').click(function() {
-                let id = $('#delete-translator-id').val();
-                $.ajax({
-                    url: "{{ url('admin/translators') }}/" + id,
-                    type: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(res) {
+                    // Delete
+                    $('body').on('click', '.deleteTranslator', function() {
+                        $('#delete-translator-id').val($(this).data('id'));
                         var modalEl = document.getElementById('translator-delete-modal');
                         var modal = bootstrap.Modal.getInstance(modalEl);
-                        if (modal) {
-                            modal.hide();
+                        if (!modal) {
+                            modal = new bootstrap.Modal(modalEl);
                         }
-                        table.draw();
-                        if (typeof showToast === 'function') showToast(res.success);
-                    }
-                });
-            });
+                        modal.show();
+                    });
 
-            // View
-            $('body').on('click', '.viewTranslator', function() {
-                let id = $(this).data('id');
-                let btn = $(this);
-                let originalHtml = btn.html();
-                btn.html('<i class="fa fa-spinner fa-spin"></i>');
-
-                $.get("{{ url('admin/translators') }}/" + id, function(response) {
-                    btn.html(originalHtml);
-                    let u = response.user;
-                    let t = response.translator;
-
-                    if (!t) {
-                        if (typeof showToast === 'function') showToast('Translator profile details not found.', 'error');
-                        return;
-                    }
-
-                    const formatDate = (dateString) => {
-                        if (!dateString) return 'N/A';
-                        const date = new Date(dateString);
-                        if (isNaN(date.getTime())) return dateString;
-                        return date.toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric'
+                    $('#confirm-delete-btn').click(function() {
+                        let id = $('#delete-translator-id').val();
+                        $.ajax({
+                            url: "{{ url('admin/translators') }}/" + id,
+                            type: 'DELETE',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(res) {
+                                var modalEl = document.getElementById('translator-delete-modal');
+                                var modal = bootstrap.Modal.getInstance(modalEl);
+                                if (modal) {
+                                    modal.hide();
+                                }
+                                table.draw();
+                                if (typeof showToast === 'function') showToast(res.success);
+                            }
                         });
-                    };
+                    });
 
-                    const defaultProfile = "{{ asset('admiro/assets/images/user/user.png') }}";
+                    // View
+                    $('body').on('click', '.viewTranslator', function() {
+                        let id = $(this).data('id');
+                        let btn = $(this);
+                        let originalHtml = btn.html();
+                        btn.html('<i class="fa fa-spinner fa-spin"></i>');
 
-                    let html = `
+                        $.get("{{ url('admin/translators') }}/" + id, function(response) {
+                            btn.html(originalHtml);
+                            let u = response.user;
+                            let t = response.translator;
+
+                            if (!t) {
+                                if (typeof showToast === 'function') showToast('Translator profile details not found.', 'error');
+                                return;
+                            }
+
+                            const formatDate = (dateString) => {
+                                if (!dateString) return 'N/A';
+                                const date = new Date(dateString);
+                                if (isNaN(date.getTime())) return dateString;
+                                return date.toLocaleDateString('en-GB', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric'
+                                });
+                            };
+
+                            const defaultProfile = "{{ asset('admiro/assets/images/user/user.png') }}";
+
+                            let html = `
                     <div class="row g-4">
                         <div class="col-md-3 text-center border-end pe-3">
                             <div class="position-relative d-inline-block mb-3">
@@ -1494,150 +1499,237 @@
                                                     // Handle both array of strings and objects/indexed arrays
                                                     return Object.values(langs).map(l => {
                                                         const name = (typeof l === 'object' && l !== null) ? (l.language || JSON.stringify(l)) : l;
-                                                        return `<span class="badge bg-secondary">${name}</span>`;
-                                                    }).join('') || 'None';
-                                                })()}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p class="text-muted small mb-1">Target Languages</p>
-                                            <div class="d-flex flex-wrap gap-1">
-                                                ${(() => {
-                                                    let langs = t.target_languages;
-                                                    if (typeof langs === 'string') {
-                                                        try { langs = JSON.parse(langs); } catch(e) { return 'None'; }
-                                                    }
-                                                    if (!langs) return 'None';
-                                                    
-                                                    return Object.values(langs).map(l => {
-                                                        const name = (typeof l === 'object' && l !== null) ? (l.language || JSON.stringify(l)) : l;
-                                                        return `<span class="badge bg-primary">${name}</span>`;
-                                                    }).join('') || 'None';
-                                                })()}
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <p class="text-muted small mb-1">Additional Languages</p>
-                                            <div class="d-flex flex-wrap gap-1">
-                                                ${(() => {
-                                                    let langs = t.additional_languages;
-                                                    if (typeof langs === 'string') {
-                                                        try { langs = JSON.parse(langs); } catch(e) { return 'None'; }
-                                                    }
-                                                    if (!langs) return 'None';
-                                                    
-                                                    return Object.values(langs).map(l => {
-                                                        const name = (typeof l === 'object' && l !== null) ? (l.language || JSON.stringify(l)) : l;
-                                                        return `<span class="badge bg-info text-dark">${name}</span>`;
-                                                    }).join('') || 'None';
-                                                })()}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                                        return ` < span class = "badge bg-secondary" > $ {
+                                name
+                            } < /span>`;
+                        }).join('') || 'None';
+                    })()
+                } <
+                /div> <
+                /div> <
+                div class = "col-md-6" >
+                <
+                p class = "text-muted small mb-1" > Target Languages < /p> <
+                div class = "d-flex flex-wrap gap-1" >
+                $ {
+                    (() => {
+                        let langs = t.target_languages;
+                        if (typeof langs === 'string') {
+                            try {
+                                langs = JSON.parse(langs);
+                            } catch (e) {
+                                return 'None';
+                            }
+                        }
+                        if (!langs) return 'None';
 
-                                <!-- Professional -->
-                                <div class="tab-pane fade" id="pro" role="tabpanel">
-                                    <h6 class="text-primary fw-bold mb-3">Professional Profile</h6>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <div class="p-3 border rounded bg-light">
-                                                <p class="text-muted small mb-1">Translator Type</p>
-                                                <p class="fw-bold h6 mb-0">${t.translator_type || 'N/A'}</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                             <div class="p-3 border rounded bg-light">
-                                                <p class="text-muted small mb-1">Experience</p>
-                                                <p class="fw-bold h6 mb-0">${t.years_of_experience || '0'} Years</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-12 mt-4">
-                                            <p class="text-muted small mb-2">Fields of Specialization</p>
-                                            <div class="d-flex flex-wrap gap-2">
-                                                ${t.fields_of_specialization ? (Array.isArray(t.fields_of_specialization) ? t.fields_of_specialization : JSON.parse(t.fields_of_specialization || '[]')).map(s => `<span class="badge rounded-pill bg-light text-dark border">${s}</span>`).join('') : 'None'}
-                                            </div>
-                                        </div>
-                                         <div class="col-12">
-                                            <p class="text-muted small mb-2">Services Offered</p>
-                                            <div class="d-flex flex-wrap gap-2">
-                                                ${t.services_offered ? (Array.isArray(t.services_offered) ? t.services_offered : JSON.parse(t.services_offered || '[]')).map(s => `<span class="badge rounded-pill bg-light text-dark border">${s}</span>`).join('') : 'None'}
-                                            </div>
-                                        </div>
-                                        <div class="col-12 mt-3">
-                                            <p class="text-muted small mb-1">Portfolio</p>
-                                            ${t.portfolio_link ? `<a href="${t.portfolio_link}" target="_blank" class="d-inline-flex align-items-center text-primary text-break"><i class="fa fa-link me-2"></i> ${t.portfolio_link}</a>` : 'N/A'}
-                                        </div>
-                                        <div class="col-12">
-                                            <p class="text-muted small mb-1">Client History</p>
-                                            <p class="text-dark bg-light p-3 rounded small text-break">${t.previous_clients_projects || 'N/A'}</p>
-                                        </div>
-                                    </div>
-                                </div>
+                        return Object.values(langs).map(l => {
+                            const name = (typeof l === 'object' && l !== null) ? (l.language || JSON.stringify(l)) : l;
+                            return `<span class="badge bg-primary">${name}</span>`;
+                        }).join('') || 'None';
+                    })()
+                } <
+                /div> <
+                /div> <
+                div class = "col-12" >
+                <
+                p class = "text-muted small mb-1" > Additional Languages < /p> <
+                div class = "d-flex flex-wrap gap-1" >
+                $ {
+                    (() => {
+                        let langs = t.additional_languages;
+                        if (typeof langs === 'string') {
+                            try {
+                                langs = JSON.parse(langs);
+                            } catch (e) {
+                                return 'None';
+                            }
+                        }
+                        if (!langs) return 'None';
 
-                                <!-- Identity & Payment -->
-                                <div class="tab-pane fade" id="payment" role="tabpanel">
-                                    <div class="row g-4">
-                                        <div class="col-12">
-                                            <h6 class="text-primary fw-bold mb-3">Identity Verification</h6>
-                                            <div class="card bg-light border-0">
-                                                <div class="card-body">
-                                                    <div class="row g-3">
-                                                        <div class="col-md-6">
-                                                            <p class="text-muted small mb-1">Government ID Type</p>
-                                                            <p class="fw-medium">${t.gov_id_type || 'N/A'}</p>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <p class="text-muted small mb-1">PAN Number</p>
-                                                            <p class="fw-medium">${t.pan_number || 'N/A'}</p>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <p class="text-muted small mb-2">Uploaded Document</p>
-                                                            ${t.gov_id_upload_path ? `<a href="/storage/${t.gov_id_upload_path}" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-eye me-2"></i> View ID Proof</a>` : '<span class="badge bg-warning text-dark">Not Uploaded</span>'}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="col-12">
-                                            <h6 class="text-primary fw-bold mb-3 border-top pt-3">Banking Information</h6>
-                                            <div class="row g-3">
-                                                <div class="col-md-6">
-                                                    <p class="text-muted small mb-1">Bank Name</p>
-                                                    <p class="fw-medium">${t.bank_name || 'N/A'}</p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <p class="text-muted small mb-1">Account Holder</p>
-                                                    <p class="fw-medium">${t.bank_holder_name || 'N/A'}</p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <p class="text-muted small mb-1">Account Number</p>
-                                                    <p class="fw-medium font-monospace">${t.account_number || 'N/A'}</p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <p class="text-muted small mb-1">IFSC Code</p>
-                                                    <p class="fw-medium font-monospace">${t.ifsc_code || 'N/A'}</p>
-                                                </div>
-                                                 <div class="col-md-6">
-                                                    <p class="text-muted small mb-1">SWIFT Code</p>
-                                                    <p class="fw-medium">${t.swift_code || 'N/A'}</p>
-                                                </div>
-                                                 <div class="col-md-6">
-                                                    <p class="text-muted small mb-1">UPI ID</p>
-                                                    <p class="fw-medium">${t.upi_id || 'N/A'}</p>
-                                                </div>
-                                                <div class="col-12">
-                                                    <p class="text-muted small mb-2">Cancelled Cheque/Passbook</p>
-                                                     ${t.cancelled_cheque_path ? `<a href="/storage/${t.cancelled_cheque_path}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa fa-file-image-o me-2"></i> View Document</a>` : '<span class="badge bg-warning text-dark">Not Uploaded</span>'}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        return Object.values(langs).map(l => {
+                            const name = (typeof l === 'object' && l !== null) ? (l.language || JSON.stringify(l)) : l;
+                            return `<span class="badge bg-info text-dark">${name}</span>`;
+                        }).join('') || 'None';
+                    })()
+                } <
+                /div> <
+                /div> <
+                /div> <
+                /div>
+
+                <
+                !--Professional-- >
+                <
+                div class = "tab-pane fade"
+                id = "pro"
+                role = "tabpanel" >
+                <
+                h6 class = "text-primary fw-bold mb-3" > Professional Profile < /h6> <
+                div class = "row g-3" >
+                <
+                div class = "col-md-6" >
+                <
+                div class = "p-3 border rounded bg-light" >
+                <
+                p class = "text-muted small mb-1" > Translator Type < /p> <
+                p class = "fw-bold h6 mb-0" > $ {
+                    t.translator_type || 'N/A'
+                } < /p> <
+                /div> <
+                /div> <
+                div class = "col-md-6" >
+                <
+                div class = "p-3 border rounded bg-light" >
+                <
+                p class = "text-muted small mb-1" > Experience < /p> <
+                p class = "fw-bold h6 mb-0" > $ {
+                    t.years_of_experience || '0'
+                }
+                Years < /p> <
+                /div> <
+                /div> <
+                div class = "col-12 mt-4" >
+                <
+                p class = "text-muted small mb-2" > Fields of Specialization < /p> <
+                div class = "d-flex flex-wrap gap-2" >
+                $ {
+                    t.fields_of_specialization ? (Array.isArray(t.fields_of_specialization) ? t.fields_of_specialization : JSON.parse(t.fields_of_specialization || '[]')).map(s => `<span class="badge rounded-pill bg-light text-dark border">${s}</span>`).join('') : 'None'
+                } <
+                /div> <
+                /div> <
+                div class = "col-12" >
+                <
+                p class = "text-muted small mb-2" > Services Offered < /p> <
+                div class = "d-flex flex-wrap gap-2" >
+                $ {
+                    t.services_offered ? (Array.isArray(t.services_offered) ? t.services_offered : JSON.parse(t.services_offered || '[]')).map(s => `<span class="badge rounded-pill bg-light text-dark border">${s}</span>`).join('') : 'None'
+                } <
+                /div> <
+                /div> <
+                div class = "col-12 mt-3" >
+                <
+                p class = "text-muted small mb-1" > Portfolio < /p>
+                $ {
+                    t.portfolio_link ? `<a href="${t.portfolio_link}" target="_blank" class="d-inline-flex align-items-center text-primary text-break"><i class="fa fa-link me-2"></i> ${t.portfolio_link}</a>` : 'N/A'
+                } <
+                /div> <
+                div class = "col-12" >
+                <
+                p class = "text-muted small mb-1" > Client History < /p> <
+                p class = "text-dark bg-light p-3 rounded small text-break" > $ {
+                    t.previous_clients_projects || 'N/A'
+                } < /p> <
+                /div> <
+                /div> <
+                /div>
+
+                <
+                !--Identity & Payment-- >
+                <
+                div class = "tab-pane fade"
+                id = "payment"
+                role = "tabpanel" >
+                <
+                div class = "row g-4" >
+                <
+                div class = "col-12" >
+                <
+                h6 class = "text-primary fw-bold mb-3" > Identity Verification < /h6> <
+                div class = "card bg-light border-0" >
+                <
+                div class = "card-body" >
+                <
+                div class = "row g-3" >
+                <
+                div class = "col-md-6" >
+                <
+                p class = "text-muted small mb-1" > Government ID Type < /p> <
+                p class = "fw-medium" > $ {
+                    t.gov_id_type || 'N/A'
+                } < /p> <
+                /div> <
+                div class = "col-md-6" >
+                <
+                p class = "text-muted small mb-1" > PAN Number < /p> <
+                p class = "fw-medium" > $ {
+                    t.pan_number || 'N/A'
+                } < /p> <
+                /div> <
+                div class = "col-12" >
+                <
+                p class = "text-muted small mb-2" > Uploaded Document < /p>
+                $ {
+                    t.gov_id_upload_path ? `<a href="/storage/${t.gov_id_upload_path}" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-eye me-2"></i> View ID Proof</a>` : '<span class="badge bg-warning text-dark">Not Uploaded</span>'
+                } <
+                /div> <
+                /div> <
+                /div> <
+                /div> <
+                /div>
+
+                <
+                div class = "col-12" >
+                <
+                h6 class = "text-primary fw-bold mb-3 border-top pt-3" > Banking Information < /h6> <
+                div class = "row g-3" >
+                <
+                div class = "col-md-6" >
+                <
+                p class = "text-muted small mb-1" > Bank Name < /p> <
+                p class = "fw-medium" > $ {
+                    t.bank_name || 'N/A'
+                } < /p> <
+                /div> <
+                div class = "col-md-6" >
+                <
+                p class = "text-muted small mb-1" > Account Holder < /p> <
+                p class = "fw-medium" > $ {
+                    t.bank_holder_name || 'N/A'
+                } < /p> <
+                /div> <
+                div class = "col-md-6" >
+                <
+                p class = "text-muted small mb-1" > Account Number < /p> <
+                p class = "fw-medium font-monospace" > $ {
+                    t.account_number || 'N/A'
+                } < /p> <
+                /div> <
+                div class = "col-md-6" >
+                <
+                p class = "text-muted small mb-1" > IFSC Code < /p> <
+                p class = "fw-medium font-monospace" > $ {
+                    t.ifsc_code || 'N/A'
+                } < /p> <
+                /div> <
+                div class = "col-md-6" >
+                <
+                p class = "text-muted small mb-1" > SWIFT Code < /p> <
+                p class = "fw-medium" > $ {
+                    t.swift_code || 'N/A'
+                } < /p> <
+                /div> <
+                div class = "col-md-6" >
+                <
+                p class = "text-muted small mb-1" > UPI ID < /p> <
+                p class = "fw-medium" > $ {
+                    t.upi_id || 'N/A'
+                } < /p> <
+                /div> <
+                div class = "col-12" >
+                <
+                p class = "text-muted small mb-2" > Cancelled Cheque / Passbook < /p>
+                $ {
+                    t.cancelled_cheque_path ? `<a href="/storage/${t.cancelled_cheque_path}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa fa-file-image-o me-2"></i> View Document</a>` : '<span class="badge bg-warning text-dark">Not Uploaded</span>'
+                } <
+                /div> <
+                /div> <
+                /div> <
+                /div> <
+                /div> <
+                /div> <
+                /div> <
+                /div>
                 `;
                     $('#view-modal-content').html(html);
                     var modalEl = document.getElementById('translator-view-modal');
@@ -1718,12 +1810,18 @@
         .iti__flag {
             background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags.png") !important;
         }
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
             .iti__flag {
                 background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags@2x.png") !important;
             }
         }
-        .iti { width: 100% !important; display: block !important; }
+
+        .iti {
+            width: 100% !important;
+            display: block !important;
+        }
 
         /* Stepper Styling */
         .stepper-horizontal {
