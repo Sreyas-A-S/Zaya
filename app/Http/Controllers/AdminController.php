@@ -17,8 +17,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
+use App\Traits\AdminFilterTrait;
+
 class AdminController extends Controller
 {
+    use AdminFilterTrait;
+
     public function __construct()
     {
         $this->middleware('permission:dashboard-view')->only(['index']);
@@ -38,9 +42,9 @@ class AdminController extends Controller
         }
 
         $stats = [
-            'total_users' => User::count(),
-            'total_practitioners' => Practitioner::count(),
-            'total_patients' => Patient::count(),
+            'total_users' => $this->applyAdminFilters(User::query(), 'user')->count(),
+            'total_practitioners' => $this->applyAdminFilters(Practitioner::query(), 'user')->count(),
+            'total_patients' => $this->applyAdminFilters(Patient::query(), 'user')->count(),
             'total_services' => Service::count(),
             'total_packages' => Package::count(),
         ];
