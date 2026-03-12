@@ -6,20 +6,31 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Admiro admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities." />
-  <meta name="keywords" content="admin template, Admiro admin template, dashboard template, flat admin template, responsive admin template, web app" />
-  <meta name="author" content="pixelstrap" />
-  <link rel="icon" href="{{ asset('admiro/assets/images/favicon.png') }}" type="image/x-icon" />
-  <link rel="shortcut icon" href="{{ asset('admiro/assets/images/favicon.png') }}" type="image/x-icon" />
+  <meta name="description" content="Zaya Wellness" />
+  <meta name="keywords" content="Zaya Wellness" />
+  <meta name="author" content="Zaya Wellness" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ asset('admiro/assets/images/favicon-96x96.png') }}" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="{{ asset('admiro/assets/images/favicon.svg') }}" />
+  <link rel="shortcut icon" href="{{ asset('admiro/assets/images/favicon.ico') }}" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('admiro/assets/images/apple-touch-icon.png') }}" />
+  <meta name="apple-mobile-web-app-title" content="Zaya Wellness" />
+  <link rel="manifest" href="{{ asset('admiro/assets/images/site.webmanifest') }}">
+
   <title>@yield('title', 'Zaya Wellness') | Admin Dashboard</title>
   <!-- Google font-->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400;6..12,500;6..12,600;6..12,700;6..12,800;6..12,900;6..12,1000&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400;6..12,500;6..12,600;6..12,700;6..12,800;6..12,900;6..12,1000&amp;display=swap"
+    rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+    rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Modak&amp;display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200;300;400;500;600;700;800&amp;display=swap"
+    rel="stylesheet" />
   <!-- iconly-icon-->
   <link rel="stylesheet" href="{{ asset('admiro/assets/css/iconly-icon.css') }}" />
   <link rel="stylesheet" href="{{ asset('admiro/assets/css/bulk-style.css') }}" />
@@ -28,7 +39,8 @@
   <!--fontawesome-->
   <link rel="stylesheet" href="{{ asset('admiro/assets/css/fontawesome-min.css') }}" />
   <!-- Whether Icon css-->
-  <link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/weather-icons/weather-icons.min.css') }}" />
+  <link rel="stylesheet" type="text/css"
+    href="{{ asset('admiro/assets/css/vendors/weather-icons/weather-icons.min.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/flag-icon.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/scrollbar.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/datatables.css') }}">
@@ -47,7 +59,8 @@
   <!-- tap on tap ends-->
   <!-- loader-->
   <div class="loader-wrapper">
-    <img src="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" alt="loader" style="width: 80px; animation: pulse 1.5s infinite ease-in-out;">
+    <img src="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" alt="loader"
+      style="width: 80px; animation: pulse 1.5s infinite ease-in-out;">
   </div>
   <style>
     @keyframes pulse {
@@ -192,7 +205,7 @@
     }
 
     .page-body .avatar-upload .avatar-preview,
-    .page-body .avatar-upload .avatar-preview > div {
+    .page-body .avatar-upload .avatar-preview>div {
       border-radius: 100% !important;
       overflow: hidden;
       background-size: cover;
@@ -208,7 +221,7 @@
 
       @include('partials.sidebar')
 
-      <div class="page-body">
+      <div class="page-body position-relative z-1">
         @yield('content')
       </div>
 
@@ -218,20 +231,24 @@
   </div>
   <!-- Toast Container -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
-    <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert"
+      aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
         <div class="toast-body">
           Action successful.
         </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
       </div>
     </div>
-    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert"
+      aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
         <div class="toast-body">
           An error occurred.
         </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
       </div>
     </div>
   </div>
@@ -261,11 +278,14 @@
   <!-- data_table-->
   <script src="{{ asset('admiro/assets/js/js-datatables/datatables/jquery.dataTables.min.js') }}"></script>
   <!-- page_datatable-->
-  {{-- <script src="{{ asset('admiro/assets/js/js-datatables/datatables/datatable.custom.js') }}"></script> --}}
+  {{--
+  <script src="{{ asset('admiro/assets/js/js-datatables/datatables/datatable.custom.js') }}"></script> --}}
   <!-- page_datatable1-->
-  {{-- <script src="{{ asset('admiro/assets/js/js-datatables/datatables/datatable.custom1.js') }}"></script> --}}
+  {{--
+  <script src="{{ asset('admiro/assets/js/js-datatables/datatables/datatable.custom1.js') }}"></script> --}}
   <!-- page_datatable-->
-  {{-- <script src="{{ asset('admiro/assets/js/datatable/datatables/datatable.custom.js') }}"></script> --}}
+  {{--
+  <script src="{{ asset('admiro/assets/js/datatable/datatables/datatable.custom.js') }}"></script> --}}
   <!-- theme_customizer-->
   <!-- <script src="{{ asset('admiro/assets/js/theme-customizer/customizer.js') }}"></script> -->
   <!-- tilt-->
@@ -275,7 +295,7 @@
   <!-- dashboard_1-->
   <script src="{{ asset('admiro/assets/js/dashboard/dashboard_1.js') }}"></script>
   <script>
-    window.showToast = function(message, type = 'success') {
+    window.showToast = function (message, type = 'success') {
       const toastId = type === 'success' ? 'liveToast' : 'errorToast';
       const toastEl = document.getElementById(toastId);
       if (!toastEl) return;
@@ -292,7 +312,7 @@
   <!-- custom script -->
   <script src="{{ asset('admiro/assets/js/script.js') }}"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       let counter = 0;
 
       function ensureId(input) {
@@ -339,7 +359,7 @@
       const passwordInputs = document.querySelectorAll('input[type="password"]');
       passwordInputs.forEach(addToggleToInput);
 
-      document.addEventListener('click', function(e) {
+      document.addEventListener('click', function (e) {
         const toggle = e.target.closest('.toggle-password');
         if (!toggle) return;
 
