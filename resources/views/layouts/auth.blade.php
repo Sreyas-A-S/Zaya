@@ -24,11 +24,12 @@
   <meta name="author" content="Zaya Wellness">
   <title>@yield('title', 'Zaya Wellness - Holistic Health & Wellness Platform')</title>
   <!-- Favicon icon-->
-  <link rel="icon" href="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" type="image/svg+xml" />
-  <link rel="shortcut icon" href="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}"
-    type="image/svg+xml" />
-  <!-- favicon -->
-  <link rel="icon" href="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" type="image/svg+xml" />
+  <link rel="icon" type="image/png" href="{{ asset('admiro/assets/images/favicon-96x96.png') }}" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="{{ asset('admiro/assets/images/favicon.svg') }}" />
+  <link rel="shortcut icon" href="{{ asset('admiro/assets/images/favicon.ico') }}" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('admiro/assets/images/apple-touch-icon.png') }}" />
+  <meta name="apple-mobile-web-app-title" content="Zaya Wellness" />
+  <link rel="manifest" href="{{ asset('admiro/assets/images/site.webmanifest') }}">
   <!-- Google font-->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
