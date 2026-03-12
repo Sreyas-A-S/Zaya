@@ -18,19 +18,23 @@
     localStorage.setItem('layout_version', 'light');
   </script>
 
-  <meta name="description" content="Zaya Wellness is a comprehensive holistic health and wellness platform that connects practitioners with patients for meaningful healthcare experiences.">
+  <meta name="description"
+    content="Zaya Wellness is a comprehensive holistic health and wellness platform that connects practitioners with patients for meaningful healthcare experiences.">
   <meta name="keywords" content="holistic health, wellness, Ayurveda, yoga, Zaya Wellness, healthcare platform">
   <meta name="author" content="Zaya Wellness">
   <title>@yield('title', 'Zaya Wellness - Holistic Health & Wellness Platform')</title>
   <!-- Favicon icon-->
   <link rel="icon" href="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" type="image/svg+xml" />
-  <link rel="shortcut icon" href="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" type="image/svg+xml" />
+  <link rel="shortcut icon" href="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}"
+    type="image/svg+xml" />
   <!-- favicon -->
   <link rel="icon" href="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" type="image/svg+xml" />
   <!-- Google font-->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400;6..12,500;6..12,600;6..12,700;6..12,800;6..12,900;6..12,1000&amp;display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400;6..12,500;6..12,600;6..12,700;6..12,800;6..12,900;6..12,1000&amp;display=swap"
+    rel="stylesheet">
   <!-- Flag icon css -->
   <link rel="stylesheet" href="{{ asset('admiro/assets/css/vendors/flag-icon.css') }}">
   <!-- iconly-icon-->
@@ -41,7 +45,8 @@
   <!--fontawesome-->
   <link rel="stylesheet" href="{{ asset('admiro/assets/css/fontawesome-min.css') }}">
   <!-- Whether Icon css-->
-  <link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/weather-icons/weather-icons.min.css') }}">
+  <link rel="stylesheet" type="text/css"
+    href="{{ asset('admiro/assets/css/vendors/weather-icons/weather-icons.min.css') }}">
   <!-- App css -->
   <link rel="stylesheet" href="{{ asset('admiro/assets/css/style.css') }}">
   <link id="color" rel="stylesheet" href="{{ asset('admiro/assets/css/color-1.css') }}" media="screen">
@@ -53,7 +58,8 @@
   <!-- tap on tap ends-->
   <!-- loader-->
   <div class="loader-wrapper">
-    <img src="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" alt="loader" style="width: 80px; animation: pulse 1.5s infinite ease-in-out;">
+    <img src="{{ asset('admiro/assets/images/logo/zaya wellness logo icon.svg') }}" alt="loader"
+      style="width: 80px; animation: pulse 1.5s infinite ease-in-out;">
   </div>
   <style>
     @keyframes pulse {
