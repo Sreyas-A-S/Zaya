@@ -132,6 +132,15 @@
     .select2-results__option--highlighted[aria-selected] {
         background-color: #2a8e88 !important;
     }
+    .select2-container--default .select2-results__option--selected[aria-selected="true"] {
+        background-color: #e6f4f2 !important;
+        color: #1f6f6a !important;
+        font-weight: 600 !important;
+    }
+    .select2-container--default .select2-results__option--highlighted.select2-results__option--selected[aria-selected="true"] {
+        background-color: #d7f0ed !important;
+        color: #1f6f6a !important;
+    }
 
     .iti {
         width: 100% !important;
@@ -649,6 +658,8 @@
             selects.select2({
                 placeholder: "Select options",
                 allowClear: true,
+                tags: false,
+                minimumResultsForSearch: Infinity,
                 width: '100%',
                 dropdownParent: $('#adminModal')
             });
@@ -663,27 +674,9 @@
         window.iti = window.intlTelInput(phoneInput, {
             utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
             separateDialCode: true,
-            initialCountry: "auto",
-            geoIpLookup: function(callback) {
-                fetch("https://ipapi.co/json/")
-                    .then((resp) => resp.json())
-                    .then((data) => callback((data && data.country_code) ? data.country_code.toLowerCase() : "us"))
-                    .catch(() => callback("us"));
-            },
-            preferredCountries: ["us", "gb", "ae", "in"]
+            initialCountry: "in",
+            preferredCountries: ["in", "ae", "us", "gb"]
         });
-
-        const countrySelect = $('#edit_country');
-        const setPhoneCountryFromSelection = () => {
-            const selected = countrySelect.find('option:selected').first();
-            const iso2 = selected.data('flag');
-            if (iso2) {
-                window.iti.setCountry(iso2);
-            }
-        };
-
-        setPhoneCountryFromSelection();
-        countrySelect.on('change', setPhoneCountryFromSelection);
 
         const table = $('#Admins-table').DataTable({
             processing: true,
@@ -814,7 +807,11 @@
             $('#edit_lastname').val(user.last_name);
             $('#edit_email').val(user.email);
             if (user.phone) {
-                window.iti.setNumber(user.phone);
+                let rawNumber = String(user.phone).trim();
+                if (rawNumber && rawNumber[0] !== '+') {
+                    rawNumber = '+' + rawNumber;
+                }
+                window.iti.setNumber(rawNumber);
             } else {
                 window.iti.setNumber('');
             }

@@ -12,13 +12,16 @@
         width: 100% !important;
         display: block;
     }
+
     .iti__flag-container {
         z-index: 10;
         background: transparent !important;
     }
+
     .iti__country-list {
         z-index: 100 !important;
     }
+
     .iti--separate-dial-code .iti__selected-dial-code {
         font-size: 14px;
         color: #333;
@@ -109,17 +112,17 @@
 
                         <!-- Fields -->
                         <div class="col-md-6">
-                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                            <input class="form-control validate-char-limit validate-format" type="text" name="firstname" id="firstname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="First Name">
-                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
-                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                            <input class="form-control validate-char-limit validate-format" type="text" name="lastname" id="lastname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="Last Name">
-                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
-                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
-                                        </div>
+                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                            <input class="form-control validate-char-limit validate-format" type="text" name="firstname" id="firstname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="First Name">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <input class="form-control validate-char-limit validate-format" type="text" name="lastname" id="lastname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="Last Name">
+                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                        </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
                             <input class="form-control" type="email" name="email" id="email" required placeholder="Email">
@@ -134,7 +137,7 @@
                             <label class="form-label">Country <span class="text-danger">*</span></label>
                             <select name="country[]" id="country" class="form-control select2" multiple required>
                                 @foreach($countries as $country)
-                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                <option value="{{ $country->id }}">{{ $country->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -143,7 +146,7 @@
                             <label class="form-label">Language <span class="text-danger">*</span></label>
                             <select name="language[]" id="language" class="form-control select2" multiple required>
                                 @foreach($languages as $language)
-                                    <option value="{{ $language->id }}">{{ $language->name }}</option>
+                                <option value="{{ $language->id }}">{{ $language->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -202,17 +205,17 @@
                     <!-- Left Sidebar (Profile) -->
                     <div class="col-md-4 border-end bg-light p-4 text-center">
                         <div class="position-relative d-inline-block mb-3">
-                            <img id="view-profile-pic" src="{{ asset('admiro/assets/images/user/user.png') }}" 
-                                 class="rounded-circle shadow-sm"
-                                 style="width: 150px; height: 150px; object-fit: cover; border: 5px solid white;">
+                            <img id="view-profile-pic" src="{{ asset('admiro/assets/images/user/user.png') }}"
+                                class="rounded-circle shadow-sm"
+                                style="width: 150px; height: 150px; object-fit: cover; border: 5px solid white;">
                             <div id="view-status-badge-overlay" class="position-absolute translate-middle-x start-50" style="bottom: -10px;">
                                 <!-- Badge injected by JS -->
                             </div>
                         </div>
-                        
+
                         <h4 class="fw-bold mb-1" id="view-name">-</h4>
                         <div class="text-muted mb-3">User Manager</div>
-                        
+
                         <div class="d-flex flex-column align-items-center gap-2 mb-4">
                             <div class="d-flex align-items-center gap-2 text-dark">
                                 <i class="iconly-Message icli"></i>
@@ -224,10 +227,10 @@
                             </div>
                         </div>
 
-                        
 
-                
-                        
+
+
+
                         <div class="text-start px-3 mb-4">
                             <h6 class="fw-bold mb-2">Languages</h6>
                             <div id="view-languages-container" class="d-flex flex-wrap gap-1">
@@ -346,35 +349,116 @@
     </div>
 </div>
 
-    <link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/select2.css') }}">
-    <style>
-    .select2-container--default .select2-selection--multiple {
-        border-color: #dee2e6;
-        min-height: 38px;
-    }
+<link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/select2.css') }}">
+<style>
+    /* Select2 and intl-tel-input fixes */
     .select2-container {
         width: 100% !important;
     }
-    /* Fix Select2 Multiple Alignment */
-    .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #dee2e6 !important;
+        min-height: 42px !important;
+        border-radius: 8px !important;
+        padding: 4px 35px 4px 8px !important;
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         display: flex !important;
-        flex-wrap: wrap;
-        padding: 0 5px !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        background: #fff !important;
     }
+
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border-color: #2a8e88 !important;
+        box-shadow: 0 0 0 0.25rem rgba(42, 142, 136, 0.25) !important;
+        outline: none !important;
+    }
+
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        margin-top: 5px !important;
-        margin-bottom: 5px !important;
         background-color: #2a8e88 !important;
         border: none !important;
         color: #fff !important;
-        padding: 1px 8px !important;
+        padding: 4px 12px 4px 28px !important;
+        border-radius: 6px !important;
+        margin: 4px 6px 4px 0 !important;
+        position: relative !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        line-height: 1.4 !important;
+        display: inline-flex !important;
+        align-items: center !important;
     }
+
     .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        color: #fff !important;
-        margin-right: 5px !important;
+        color: rgba(255, 255, 255, 0.8) !important;
+        background: transparent !important;
+        border: none !important;
+        position: absolute !important;
+        left: 8px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 18px !important;
+        line-height: 1 !important;
+        cursor: pointer !important;
+        transition: color 0.2s !important;
     }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        color: #fff !important;
+        background: transparent !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__clear {
+        position: absolute !important;
+        right: 12px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #f8f9fa !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 4px !important;
+        width: 20px !important;
+        height: 20px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: #6c757d !important;
+        font-size: 14px !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+        box-shadow: none !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__clear:hover {
+        background: #e9ecef !important;
+        color: #dc3545 !important;
+        border-color: #ced4da !important;
+    }
+
     .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
-        margin-top: 7px !important;
+        margin-top: 0 !important;
+        height: 26px !important;
+        font-family: inherit !important;
+        border: none !important;
+        background: transparent !important;
+        outline: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        resize: none !important;
+    }
+
+    .select2-dropdown {
+        border: 1px solid #dee2e6 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        z-index: 1061 !important;
+    }
+
+    .select2-results__option--highlighted[aria-selected] {
+        background-color: #2a8e88 !important;
     }
 
     .avatar-upload {
@@ -383,15 +467,18 @@
         margin: 0 auto;
         display: block;
     }
+
     .avatar-upload .avatar-edit {
         position: absolute;
         right: 12px;
         z-index: 1;
         top: 10px;
     }
+
     .avatar-upload .avatar-edit input {
         display: none;
     }
+
     .avatar-upload .avatar-edit label {
         display: inline-block;
         width: 34px;
@@ -405,10 +492,12 @@
         justify-content: center;
         transition: all 0.2s ease-in-out;
     }
+
     .avatar-upload .avatar-edit label:hover {
         background: #f1f1f1;
         transform: scale(1.1);
     }
+
     .avatar-preview {
         width: 150px;
         height: 150px;
@@ -418,7 +507,8 @@
         box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
         overflow: hidden;
     }
-    .avatar-preview > div {
+
+    .avatar-preview>div {
         width: 100%;
         height: 100%;
         border-radius: 100%;
@@ -438,10 +528,12 @@
         .avatar-upload {
             max-width: 120px;
         }
+
         .avatar-preview {
             width: 120px;
             height: 120px;
         }
+
         .img-container {
             min-height: 200px;
         }
@@ -458,12 +550,32 @@
         min-width: 80px;
         text-align: center;
     }
-    
-    .status-badge.bg-warning { background-color: #df9110 !important; color: white; } /* Pending - Orange */
-    .status-badge.bg-success { background-color: #2a8e88 !important; color: white; } /* Active - Teal/Green */
-    .status-badge.bg-danger { background-color: #e34e32 !important; color: white; }  /* Rejected - Red */
-    .status-badge.bg-secondary { background-color: #e34e32 !important; color: white; } /* Inactive - Red (Danger) */
-    
+
+    .status-badge.bg-warning {
+        background-color: #df9110 !important;
+        color: white;
+    }
+
+    /* Pending - Orange */
+    .status-badge.bg-success {
+        background-color: #2a8e88 !important;
+        color: white;
+    }
+
+    /* Active - Teal/Green */
+    .status-badge.bg-danger {
+        background-color: #e34e32 !important;
+        color: white;
+    }
+
+    /* Rejected - Red */
+    .status-badge.bg-secondary {
+        background-color: #e34e32 !important;
+        color: white;
+    }
+
+    /* Inactive - Red (Danger) */
+
     .action {
         list-style: none;
         padding: 0;
@@ -471,6 +583,7 @@
         display: flex;
         gap: 8px;
     }
+
     .action li a {
         width: 30px;
         height: 30px;
@@ -481,6 +594,7 @@
         background: #f1f1f1;
         transition: all 0.3s ease;
     }
+
     .action li a:hover {
         background: #e8e8e8;
         transform: translateY(-2px);
@@ -494,18 +608,22 @@
         margin-right: 20px;
         padding: 10px 0;
     }
+
     .nav-tabs-primary .nav-link.active {
         color: #2a8e88;
         border-bottom: 2px solid #2a8e88;
         background: transparent;
     }
+
     .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
     }
+
     .custom-scrollbar::-webkit-scrollbar-thumb {
         background: #eee;
         border-radius: 10px;
     }
+
     .status-badge-view {
         padding: 2px 10px;
         border-radius: 20px;
@@ -513,7 +631,7 @@
         font-weight: 700;
         text-transform: uppercase;
         border: 2px solid white;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 </style>
 
@@ -526,424 +644,476 @@
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 
 <script>
-function validatePasswordMatch() {
-    const password = $('#password-input');
-    const confirm = $('#password-confirm-input');
-    const requirements = $('#password-requirements');
-    const matchError = $('#password-match-error');
+    function validatePasswordMatch() {
+        const password = $('#password-input');
+        const confirm = $('#password-confirm-input');
+        const requirements = $('#password-requirements');
+        const matchError = $('#password-match-error');
 
-    const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
+        const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
 
-    if (password.val() === '') {
-        requirements.addClass('d-none');
-    } else if (pattern.test(password.val())) {
-        requirements.addClass('d-none');
-    } else {
-        requirements.removeClass('d-none');
-    }
+        if (password.val() === '') {
+            requirements.addClass('d-none');
+        } else if (pattern.test(password.val())) {
+            requirements.addClass('d-none');
+        } else {
+            requirements.removeClass('d-none');
+        }
 
-    if (confirm.val() !== '') {
-        if (confirm.val() !== password.val()) {
-            matchError.removeClass('d-none');
-            confirm.addClass('is-invalid');
+        if (confirm.val() !== '') {
+            if (confirm.val() !== password.val()) {
+                matchError.removeClass('d-none');
+                confirm.addClass('is-invalid');
+            } else {
+                matchError.addClass('d-none');
+                confirm.removeClass('is-invalid');
+            }
         } else {
             matchError.addClass('d-none');
             confirm.removeClass('is-invalid');
         }
-    } else {
-        matchError.addClass('d-none');
-        confirm.removeClass('is-invalid');
     }
-}
 
-$(document).ready(function () {
-    // Initialize Select2
-    $('.select2').select2({
-        placeholder: "Select options",
-        allowClear: true,
-        dropdownParent: $('#userManagerModal')
-    });
-
-    // Initialize intl-tel-input
-    const phoneInput = document.querySelector("#phone");
-    window.iti = window.intlTelInput(phoneInput, {
-        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
-        separateDialCode: true,
-        showSelectedDialCode: true,
-        autoPlaceholder: 'aggressive',
-        initialCountry: "in",
-        preferredCountries: ["in", "ae", "us", "gb"]
-    });
-
-    let table = $('#user-managers-table').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{{ route('admin.user-managers.index') }}",
-        columns: [
-            { data: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'name' },
-            { data: 'email' },
-            { data: 'phone'},
-            { data: 'nationality' },
-            { data: 'languages', orderable: false },
-            { data: 'status' },
-            { data: 'action', orderable: false, searchable: false }
-        ]
-    });
-
-    // Cropper Variable
-    let cropper;
-    let cropperImage = document.getElementById('cropperImage');
-
-    // Image upload handler
-    $("#imageUpload").change(function(e) {
-        let files = e.target.files;
-        if (files && files.length > 0) {
-            let reader = new FileReader();
-            reader.onload = function(event) {
-                cropperImage.src = event.target.result;
-                $('#cropperModal').modal('show');
-                // Reset the input so the same file can be selected again
-                e.target.value = '';
-            };
-            reader.readAsDataURL(files[0]);
-        }
-    });
-
-    // Initialize Cropper when modal opens
-    $('#cropperModal').on('shown.bs.modal', function() {
-        cropper = new Cropper(cropperImage, {
-            aspectRatio: 1,
-            viewMode: 1,
-            guides: true,
-            background: false,
-            autoCropArea: 1,
-            responsive: true,
+    $(document).ready(function() {
+        // Initialize Select2
+        $('.select2').select2({
+            placeholder: "Select options",
+            allowClear: true,
+            dropdownParent: $('#userManagerModal')
         });
-    }).on('hidden.bs.modal', function() {
-        cropper.destroy();
-        cropper = null;
-    });
 
-    // Handle Crop & Save
-    $('#cropSave').click(function() {
-        let canvas = cropper.getCroppedCanvas({
-            width: 300,
-            height: 300
+        // Re-initialize or fix Select2 when modal is shown to ensure correct width and layout
+        $('#userManagerModal').on('shown.bs.modal', function() {
+            $('.select2').each(function() {
+                $(this).select2({
+                    dropdownParent: $('#userManagerModal'),
+                    width: '100%',
+                    placeholder: $(this).attr('placeholder') || "Select options",
+                    allowClear: true
+                });
+            });
         });
-        let base64data = canvas.toDataURL();
-        
-        // Update preview and hidden input
-        $('#imagePreview').css('background-image', 'url(' + base64data + ')');
-        $('#croppedImage').val(base64data);
-        
-        $('#cropperModal').modal('hide');
-    });
 
-    // Handle status badge click
-    $(document).on('click', '.status-badge', function() {
-        let id = $(this).data('id');
-        let currentStatus = String($(this).data('status')).toLowerCase();
-        let nextStatus = 'active';
-        let label = 'Active';
+        // Initialize intl-tel-input
+        const phoneInput = document.querySelector("#phone");
+        window.iti = window.intlTelInput(phoneInput, {
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+            separateDialCode: true,
+            showSelectedDialCode: true,
+            autoPlaceholder: 'aggressive',
+            initialCountry: "in",
+            preferredCountries: ["in", "ae", "us", "gb"]
+        });
 
-        // If currently active (active, approved, or 1), toggle to inactive
-        if (currentStatus === 'active' || currentStatus === 'approved' || currentStatus === '1') {
-            nextStatus = 'inactive';
-            label = 'Inactive';
-        } else {
-            nextStatus = 'active';
-            label = 'Active';
-        }
-
-        $('#statusTargetId').val(id);
-        $('#statusTargetValue').val(nextStatus);
-        $('#statusConfirmText').text('Are you sure you want to change the status to ' + label + '?');
-        
-        // Dynamic Button Color
-        if (nextStatus === 'active') {
-            $('#confirmStatusBtn').css({'background-color': '#2a8e88', 'border-color': '#2a8e88'});
-        } else {
-            $('#confirmStatusBtn').css({'background-color': '#e34e32', 'border-color': '#e34e32'});
-        }
-        
-        $('#statusConfirmModal').modal('show');
-    });
-
-    // Confirm Status Change
-    $('#confirmStatusBtn').click(function() {
-        let btn = $(this);
-        let id = $('#statusTargetId').val();
-        let status = $('#statusTargetValue').val();
-
-        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Updating...');
-
-        $.ajax({
-            url: "{{ url('admin/user-managers') }}/" + id + "/status",
-            type: 'POST',
-            data: {
-                _token: "{{ csrf_token() }}",
-                status: status
-            },
-            success: function(resp) {
-                if(resp.success) {
-                    $('#statusConfirmModal').modal('hide');
-                    table.ajax.reload(null, false); // false to stay on current page
-                    window.showToast(resp.message);
+        let table = $('#user-managers-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('admin.user-managers.index') }}",
+            columns: [{
+                    data: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'name'
+                },
+                {
+                    data: 'email'
+                },
+                {
+                    data: 'phone'
+                },
+                {
+                    data: 'nationality'
+                },
+                {
+                    data: 'languages',
+                    orderable: false
+                },
+                {
+                    data: 'status'
+                },
+                {
+                    data: 'action',
+                    orderable: false,
+                    searchable: false
                 }
-            },
-            error: function() {
-                window.showToast('Failed to update status', 'error');
-            },
-            complete: function() {
-                btn.prop('disabled', false).text('Confirm Change');
+            ]
+        });
+
+        // Cropper Variable
+        let cropper;
+        let cropperImage = document.getElementById('cropperImage');
+
+        // Image upload handler
+        $("#imageUpload").change(function(e) {
+            let files = e.target.files;
+            if (files && files.length > 0) {
+                let reader = new FileReader();
+                reader.onload = function(event) {
+                    cropperImage.src = event.target.result;
+                    $('#cropperModal').modal('show');
+                    // Reset the input so the same file can be selected again
+                    e.target.value = '';
+                };
+                reader.readAsDataURL(files[0]);
             }
         });
+
+        // Initialize Cropper when modal opens
+        $('#cropperModal').on('shown.bs.modal', function() {
+            cropper = new Cropper(cropperImage, {
+                aspectRatio: 1,
+                viewMode: 1,
+                guides: true,
+                background: false,
+                autoCropArea: 1,
+                responsive: true,
+            });
+        }).on('hidden.bs.modal', function() {
+            cropper.destroy();
+            cropper = null;
+        });
+
+        // Handle Crop & Save
+        $('#cropSave').click(function() {
+            let canvas = cropper.getCroppedCanvas({
+                width: 300,
+                height: 300
+            });
+            let base64data = canvas.toDataURL();
+
+            // Update preview and hidden input
+            $('#imagePreview').css('background-image', 'url(' + base64data + ')');
+            $('#croppedImage').val(base64data);
+
+            $('#cropperModal').modal('hide');
+        });
+
+        // Handle status badge click
+        $(document).on('click', '.status-badge', function() {
+            let id = $(this).data('id');
+            let currentStatus = String($(this).data('status')).toLowerCase();
+            let nextStatus = 'active';
+            let label = 'Active';
+
+            // If currently active (active, approved, or 1), toggle to inactive
+            if (currentStatus === 'active' || currentStatus === 'approved' || currentStatus === '1') {
+                nextStatus = 'inactive';
+                label = 'Inactive';
+            } else {
+                nextStatus = 'active';
+                label = 'Active';
+            }
+
+            $('#statusTargetId').val(id);
+            $('#statusTargetValue').val(nextStatus);
+            $('#statusConfirmText').text('Are you sure you want to change the status to ' + label + '?');
+
+            // Dynamic Button Color
+            if (nextStatus === 'active') {
+                $('#confirmStatusBtn').css({
+                    'background-color': '#2a8e88',
+                    'border-color': '#2a8e88'
+                });
+            } else {
+                $('#confirmStatusBtn').css({
+                    'background-color': '#e34e32',
+                    'border-color': '#e34e32'
+                });
+            }
+
+            $('#statusConfirmModal').modal('show');
+        });
+
+        // Confirm Status Change
+        $('#confirmStatusBtn').click(function() {
+            let btn = $(this);
+            let id = $('#statusTargetId').val();
+            let status = $('#statusTargetValue').val();
+
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Updating...');
+
+            $.ajax({
+                url: "{{ url('admin/user-managers') }}/" + id + "/status",
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    status: status
+                },
+                success: function(resp) {
+                    if (resp.success) {
+                        $('#statusConfirmModal').modal('hide');
+                        table.ajax.reload(null, false); // false to stay on current page
+                        window.showToast(resp.message);
+                    }
+                },
+                error: function() {
+                    window.showToast('Failed to update status', 'error');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).text('Confirm Change');
+                }
+            });
+        });
+
+        // Reset modal on hidden
+        $('#userManagerModal').on('hidden.bs.modal', function() {
+            $('#userManagerForm')[0].reset();
+            $('#userId').val('');
+            $('#country, #language').val([]).trigger('change');
+            $('#croppedImage').val('');
+            $('#methodPlaceholder').html('');
+            $('#userManagerForm').attr('action', "{{ route('admin.user-managers.store') }}");
+            $('#saveBtn').text('Create User Manager');
+            $('#um-modal-title').text('Register User Manager');
+            $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+            $('.password-field').show();
+            $('#password-input, #password-confirm-input').attr('required', 'required');
+            if (typeof window.iti !== 'undefined') {
+                window.iti.setNumber('');
+            }
+        });
+
+        // Edit User
+        $(document).on('click', '.editUser', function() {
+            let id = $(this).data('id');
+            $.get("{{ url('admin/user-managers') }}/" + id + "/edit", function(user) {
+                $('#um-modal-title').text('Edit User Manager');
+                $('#userId').val(user.id);
+                $('#firstname').val(user.first_name);
+                $('#lastname').val(user.last_name);
+                $('#email').val(user.email);
+                if (user.phone) {
+                    let rawNumber = String(user.phone).trim();
+                    if (rawNumber && rawNumber[0] !== '+') {
+                        rawNumber = '+' + rawNumber;
+                    }
+                    window.iti.setNumber(rawNumber);
+                } else {
+                    window.iti.setNumber('');
+                }
+
+                // Set Select2 Multiple values for Country
+                if (user.national_id) {
+                    let countries = user.national_id;
+                    if (typeof countries === 'string') {
+                        try {
+                            if (countries.startsWith('[') || countries.startsWith('{')) {
+                                countries = JSON.parse(countries);
+                            } else {
+                                countries = [countries];
+                            }
+                        } catch (e) {
+                            countries = [countries];
+                        }
+                    }
+                    if (!Array.isArray(countries)) countries = [countries];
+                    countries = countries.map(String);
+                    $('#country').val(countries).trigger('change');
+                } else {
+                    $('#country').val([]).trigger('change');
+                }
+
+                // Set Select2 Multiple values for Language
+                if (user.languages) {
+                    let languages = user.languages;
+                    if (typeof languages === 'string') {
+                        try {
+                            if (languages.startsWith('[') || languages.startsWith('{')) {
+                                languages = JSON.parse(languages);
+                            } else {
+                                languages = [languages];
+                            }
+                        } catch (e) {
+                            languages = [languages];
+                        }
+                    }
+                    if (!Array.isArray(languages)) languages = [languages];
+                    languages = languages.map(String);
+                    $('#language').val(languages).trigger('change');
+                } else {
+                    $('#language').val([]).trigger('change');
+                }
+
+                $('#status').val(user.status || 'pending');
+
+                // Handle profile pic preview
+                let avatar = user.profile_pic ? "{{ asset('storage') }}/" + user.profile_pic : "{{ asset('admiro/assets/images/user/user.png') }}";
+                $('#imagePreview').css('background-image', 'url(' + avatar + ')');
+                $('#croppedImage').val(''); // Reset cropped image on edit unless changed
+
+                // Show password fields on edit but make them optional
+                $('.password-field').show();
+                $('#password-input, #password-confirm-input').removeAttr('required');
+
+                $('#methodPlaceholder').html('@method("PUT")');
+                $('#userManagerForm').attr('action', "{{ url('admin/user-managers') }}/" + id);
+                $('#saveBtn').text('Update User Manager');
+                $('#userManagerModal').modal('show');
+            });
+        });
+
+        // Delete User
+        $(document).on('click', '.deleteUser', function() {
+            if (confirm('Are you sure you want to delete this user?')) {
+                let id = $(this).data('id');
+                $.ajax({
+                    url: "{{ url('admin/user-managers') }}/" + id,
+                    type: 'DELETE',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(resp) {
+                        if (resp.success) {
+                            table.ajax.reload();
+                        }
+                    }
+                });
+            }
+        });
+
+        // Form Submit
+        $('#userManagerForm').on('submit', function(e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+            if (typeof window.iti !== 'undefined') {
+                formData.set('phone', window.iti.getNumber());
+            }
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(resp) {
+                    if (resp.success) {
+                        $('#userManagerModal').modal('hide');
+                        table.ajax.reload();
+                        window.showToast(resp.message || 'Operation successful');
+                    }
+                },
+                error: function(xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        let errors = xhr.responseJSON.errors;
+                        let firstError = Object.values(errors)[0][0];
+                        window.showToast(firstError, 'error');
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        window.showToast(xhr.responseJSON.message, 'error');
+                    } else {
+                        window.showToast('Something went wrong', 'error');
+                    }
+                }
+            });
+        });
+
+        // View User Details
+        $(document).on('click', '.viewUser', function() {
+            let id = $(this).data('id');
+            $.get("{{ url('admin/user-managers') }}/" + id + "/edit", function(user) {
+                $('#view-name').text(user.first_name + ' ' + user.last_name);
+                $('#view-fname').text(user.first_name);
+                $('#view-lname').text(user.last_name);
+                $('#view-email').text(user.email);
+                $('#view-phone').text(user.phone || 'N/A');
+                $('#view-created-at').text(new Date(user.created_at).toLocaleString());
+
+                // Country and Language Lookups (Multiple)
+                let countryNames = [];
+                if (user.national_id) {
+                    let countries = user.national_id;
+                    if (typeof countries === 'string') {
+                        try {
+                            if (countries.startsWith('[') || countries.startsWith('{')) {
+                                countries = JSON.parse(countries);
+                            } else {
+                                countries = [countries];
+                            }
+                        } catch (e) {
+                            countries = [countries];
+                        }
+                    }
+                    let cIds = Array.isArray(countries) ? countries : [countries];
+                    cIds.forEach(cid => {
+                        let name = $('#country option[value="' + cid + '"]').text();
+                        if (name) countryNames.push(name);
+                    });
+                }
+                $('#view-country-full').text(countryNames.length ? countryNames.join(', ') : 'N/A');
+
+                let languageNames = [];
+                if (user.languages) {
+                    let languages = user.languages;
+                    if (typeof languages === 'string') {
+                        try {
+                            if (languages.startsWith('[') || languages.startsWith('{')) {
+                                languages = JSON.parse(languages);
+                            } else {
+                                languages = [languages];
+                            }
+                        } catch (e) {
+                            languages = [languages];
+                        }
+                    }
+                    let lIds = Array.isArray(languages) ? languages : [languages];
+                    lIds.forEach(lid => {
+                        let name = $('#language option[value="' + lid + '"]').text();
+                        if (name) languageNames.push(name);
+                    });
+                }
+                $('#view-language-full').text(languageNames.length ? languageNames.join(', ') : 'N/A');
+
+                // Languages Badge Section
+                if (languageNames.length) {
+                    let html = languageNames.map(name => `<span class="badge bg-light text-dark border me-1">${name}</span>`).join('');
+                    $('#view-languages-container').html(html);
+                } else {
+                    $('#view-languages-container').html('<span class="text-muted small">No languages specified</span>');
+                }
+
+                // Status Overlay
+                let status = (user.status || 'pending').toLowerCase();
+                let badgeClass = 'bg-warning';
+                let label = 'Pending';
+
+                if (status === 'active' || status === 'approved' || status === '1') {
+                    badgeClass = 'bg-success';
+                    label = 'Active';
+                } else if (status === 'rejected') {
+                    badgeClass = 'bg-danger';
+                    label = 'Rejected';
+                } else if (status === 'inactive' || status === '0') {
+                    badgeClass = 'bg-danger'; // Updated to danger color
+                    label = 'Inactive';
+                }
+
+                $('#view-status-badge-overlay').html('<span class="badge ' + badgeClass + ' status-badge-view">' + label + '</span>');
+
+                let avatar = user.profile_pic ? "{{ asset('storage') }}/" + user.profile_pic : "{{ asset('admiro/assets/images/user/user.png') }}";
+                $('#view-profile-pic').attr('src', avatar);
+
+                $('#viewUserManagerModal').modal('show');
+            });
+        });
     });
 
-    // Reset modal on hidden
-    $('#userManagerModal').on('hidden.bs.modal', function() {
+    function openCreateModal() {
+        $('#um-modal-title').text('Register User Manager');
         $('#userManagerForm')[0].reset();
-        $('#userId').val('');
+        if (typeof window.iti !== 'undefined') {
+            window.iti.setNumber('');
+        }
         $('#country, #language').val([]).trigger('change');
+        $('#userId').val('');
         $('#croppedImage').val('');
         $('#methodPlaceholder').html('');
         $('#userManagerForm').attr('action', "{{ route('admin.user-managers.store') }}");
         $('#saveBtn').text('Create User Manager');
-        $('#um-modal-title').text('Register User Manager');
         $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
         $('.password-field').show();
         $('#password-input, #password-confirm-input').attr('required', 'required');
-        if (typeof window.iti !== 'undefined') {
-            window.iti.setNumber('');
-        }
-    });
-
-    // Edit User
-    $(document).on('click', '.editUser', function() {
-        let id = $(this).data('id');
-        $.get("{{ url('admin/user-managers') }}/" + id + "/edit", function(user) {
-            $('#um-modal-title').text('Edit User Manager');
-            $('#userId').val(user.id);
-            $('#firstname').val(user.first_name);
-            $('#lastname').val(user.last_name);
-            $('#email').val(user.email);
-            if (user.phone) {
-                window.iti.setNumber(user.phone);
-            } else {
-                window.iti.setNumber('');
-            }
-            
-            // Set Select2 Multiple values for Country
-            if (user.national_id) {
-                let countries = user.national_id;
-                if (typeof countries === 'string') {
-                    try { 
-                        if (countries.startsWith('[') || countries.startsWith('{')) {
-                            countries = JSON.parse(countries); 
-                        } else {
-                            countries = [countries];
-                        }
-                    } catch(e) { countries = [countries]; }
-                }
-                if (!Array.isArray(countries)) countries = [countries];
-                countries = countries.map(String);
-                $('#country').val(countries).trigger('change');
-            } else {
-                $('#country').val([]).trigger('change');
-            }
-
-            // Set Select2 Multiple values for Language
-            if (user.languages) {
-                let languages = user.languages;
-                if (typeof languages === 'string') {
-                    try { 
-                        if (languages.startsWith('[') || languages.startsWith('{')) {
-                            languages = JSON.parse(languages); 
-                        } else {
-                            languages = [languages];
-                        }
-                    } catch(e) { languages = [languages]; }
-                }
-                if (!Array.isArray(languages)) languages = [languages];
-                languages = languages.map(String);
-                $('#language').val(languages).trigger('change');
-            } else {
-                $('#language').val([]).trigger('change');
-            }
-
-            $('#status').val(user.status || 'pending');
-            
-            // Handle profile pic preview
-            let avatar = user.profile_pic ? "{{ asset('storage') }}/" + user.profile_pic : "{{ asset('admiro/assets/images/user/user.png') }}";
-            $('#imagePreview').css('background-image', 'url(' + avatar + ')');
-            $('#croppedImage').val(''); // Reset cropped image on edit unless changed
-
-            // Show password fields on edit but make them optional
-            $('.password-field').show();
-            $('#password-input, #password-confirm-input').removeAttr('required');
-
-            $('#methodPlaceholder').html('@method("PUT")');
-            $('#userManagerForm').attr('action', "{{ url('admin/user-managers') }}/" + id);
-            $('#saveBtn').text('Update User Manager');
-            $('#userManagerModal').modal('show');
-        });
-    });
-
-    // Delete User
-    $(document).on('click', '.deleteUser', function() {
-        if(confirm('Are you sure you want to delete this user?')) {
-            let id = $(this).data('id');
-            $.ajax({
-                url: "{{ url('admin/user-managers') }}/" + id,
-                type: 'DELETE',
-                data: { _token: "{{ csrf_token() }}" },
-                success: function(resp) {
-                    if(resp.success) {
-                        table.ajax.reload();
-                    }
-                }
-            });
-        }
-    });
-
-    // Form Submit
-    $('#userManagerForm').on('submit', function(e) {
-        e.preventDefault();
-        let formData = new FormData(this);
-        if (typeof window.iti !== 'undefined') {
-            formData.set('phone', window.iti.getNumber());
-        }
-        
-        $.ajax({
-            url: $(this).attr('action'),
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(resp) {
-                if(resp.success) {
-                    $('#userManagerModal').modal('hide');
-                    table.ajax.reload();
-                    window.showToast(resp.message || 'Operation successful');
-                }
-            },
-            error: function(xhr) {
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    let errors = xhr.responseJSON.errors;
-                    let firstError = Object.values(errors)[0][0];
-                    window.showToast(firstError, 'error');
-                } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                    window.showToast(xhr.responseJSON.message, 'error');
-                } else {
-                    window.showToast('Something went wrong', 'error');
-                }
-            }
-        });
-    });
-
-    // View User Details
-    $(document).on('click', '.viewUser', function() {
-        let id = $(this).data('id');
-        $.get("{{ url('admin/user-managers') }}/" + id + "/edit", function(user) {
-            $('#view-name').text(user.first_name + ' ' + user.last_name);
-            $('#view-fname').text(user.first_name);
-            $('#view-lname').text(user.last_name);
-            $('#view-email').text(user.email);
-            $('#view-phone').text(user.phone || 'N/A');
-            $('#view-created-at').text(new Date(user.created_at).toLocaleString());
-            
-            // Country and Language Lookups (Multiple)
-            let countryNames = [];
-            if (user.national_id) {
-                let countries = user.national_id;
-                if (typeof countries === 'string') {
-                    try { 
-                        if (countries.startsWith('[') || countries.startsWith('{')) {
-                            countries = JSON.parse(countries); 
-                        } else {
-                            countries = [countries];
-                        }
-                    } catch(e) { countries = [countries]; }
-                }
-                let cIds = Array.isArray(countries) ? countries : [countries];
-                cIds.forEach(cid => {
-                    let name = $('#country option[value="'+cid+'"]').text();
-                    if(name) countryNames.push(name);
-                });
-            }
-            $('#view-country-full').text(countryNames.length ? countryNames.join(', ') : 'N/A');
-
-            let languageNames = [];
-            if (user.languages) {
-                let languages = user.languages;
-                if (typeof languages === 'string') {
-                    try { 
-                        if (languages.startsWith('[') || languages.startsWith('{')) {
-                            languages = JSON.parse(languages); 
-                        } else {
-                            languages = [languages];
-                        }
-                    } catch(e) { languages = [languages]; }
-                }
-                let lIds = Array.isArray(languages) ? languages : [languages];
-                lIds.forEach(lid => {
-                    let name = $('#language option[value="'+lid+'"]').text();
-                    if(name) languageNames.push(name);
-                });
-            }
-            $('#view-language-full').text(languageNames.length ? languageNames.join(', ') : 'N/A');
-            
-            // Languages Badge Section
-            if(languageNames.length) {
-                let html = languageNames.map(name => `<span class="badge bg-light text-dark border me-1">${name}</span>`).join('');
-                $('#view-languages-container').html(html);
-            } else {
-                $('#view-languages-container').html('<span class="text-muted small">No languages specified</span>');
-            }
-            
-            // Status Overlay
-            let status = (user.status || 'pending').toLowerCase();
-            let badgeClass = 'bg-warning';
-            let label = 'Pending';
-            
-            if (status === 'active' || status === 'approved' || status === '1') {
-                badgeClass = 'bg-success';
-                label = 'Active';
-            } else if (status === 'rejected') {
-                badgeClass = 'bg-danger';
-                label = 'Rejected';
-            } else if (status === 'inactive' || status === '0') {
-                badgeClass = 'bg-danger'; // Updated to danger color
-                label = 'Inactive';
-            }
-            
-            $('#view-status-badge-overlay').html('<span class="badge ' + badgeClass + ' status-badge-view">' + label + '</span>');
-            
-            let avatar = user.profile_pic ? "{{ asset('storage') }}/" + user.profile_pic : "{{ asset('admiro/assets/images/user/user.png') }}";
-            $('#view-profile-pic').attr('src', avatar);
-            
-            $('#viewUserManagerModal').modal('show');
-        });
-    });
-});
-
-function openCreateModal() {
-    $('#um-modal-title').text('Register User Manager');
-    $('#userManagerForm')[0].reset();
-    if (typeof window.iti !== 'undefined') {
-        window.iti.setNumber('');
+        $('#userManagerModal').modal('show');
     }
-    $('#country, #language').val([]).trigger('change');
-    $('#userId').val('');
-    $('#croppedImage').val('');
-    $('#methodPlaceholder').html('');
-    $('#userManagerForm').attr('action', "{{ route('admin.user-managers.store') }}");
-    $('#saveBtn').text('Create User Manager');
-    $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
-    $('.password-field').show();
-    $('#password-input, #password-confirm-input').attr('required', 'required');
-    $('#userManagerModal').modal('show');
-}
 </script>
 @endsection

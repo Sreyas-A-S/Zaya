@@ -172,7 +172,7 @@
                                     <label class="form-label">Country <span class="text-danger">*</span></label>
                                     <select name="country[]" id="fm-countries" class="form-control select2" multiple required>
                                         @foreach($countries as $country)
-                                            <option value="{{ $country->id }}" data-flag="{{ strtolower($country->code) }}">{{ $country->name }}</option>
+                                        <option value="{{ $country->id }}" data-flag="{{ strtolower($country->code) }}">{{ $country->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -180,10 +180,11 @@
                                     <label class="form-label">Language <span class="text-danger">*</span></label>
                                     <select name="language[]" id="fm-languages" class="form-control select2" multiple required>
                                         @foreach($languages as $language)
-                                            <option value="{{ $language->id }}">{{ $language->name }}</option>
+                                        <option value="{{ $language->id }}">{{ $language->name }}</option>
                                         @endforeach
                                     </select>
-                                </div>                                <div class="col-md-6">
+                                </div>
+                                <div class="col-md-6">
                                     <label class="form-label">Status <span class="text-danger">*</span></label>
                                     <select name="status" id="status" class="form-control" required>
                                         <option value="pending">Pending</option>
@@ -426,59 +427,124 @@
         display: block !important;
     }
 
-    #financeManagerModal .select2-container--default .select2-selection--multiple {
-        border-color: #dee2e6;
-        min-height: 38px;
-    }
-
-    #financeManagerModal .select2-container {
+    /* Select2 and intl-tel-input fixes */
+    .select2-container {
         width: 100% !important;
     }
 
-    /* Fix Select2 Multiple Alignment and Growth */
-    #financeManagerModal .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #dee2e6 !important;
+        min-height: 42px !important;
+        border-radius: 8px !important;
+        padding: 4px 35px 4px 8px !important;
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         display: flex !important;
-        flex-wrap: wrap;
-        padding: 0 5px !important;
-        max-height: 120px !important;
-        overflow-y: auto !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        background: #fff !important;
     }
 
-    #financeManagerModal .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        margin-top: 5px !important;
-        margin-bottom: 5px !important;
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border-color: #2a8e88 !important;
+        box-shadow: 0 0 0 0.25rem rgba(42, 142, 136, 0.25) !important;
+        outline: none !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background-color: #2a8e88 !important;
         border: none !important;
         color: #fff !important;
-        padding: 1px 8px !important;
+        padding: 4px 12px 4px 28px !important;
+        border-radius: 6px !important;
+        margin: 4px 6px 4px 0 !important;
+        position: relative !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        line-height: 1.4 !important;
+        display: inline-flex !important;
+        align-items: center !important;
     }
 
-    #financeManagerModal .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: rgba(255, 255, 255, 0.8) !important;
+        background: transparent !important;
+        border: none !important;
+        position: absolute !important;
+        left: 8px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 18px !important;
+        line-height: 1 !important;
+        cursor: pointer !important;
+        transition: color 0.2s !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
         color: #fff !important;
-        margin-right: 5px !important;
+        background: transparent !important;
     }
 
-    #financeManagerModal .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
-        margin-top: 7px !important;
+    .select2-container--default .select2-selection--multiple .select2-selection__clear {
+        position: absolute !important;
+        right: 12px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #f8f9fa !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 4px !important;
+        width: 20px !important;
+        height: 20px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: #6c757d !important;
+        font-size: 14px !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+        box-shadow: none !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__clear:hover {
+        background: #e9ecef !important;
+        color: #dc3545 !important;
+        border-color: #ced4da !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+        margin-top: 0 !important;
+        height: 26px !important;
+        font-family: inherit !important;
+        border: none !important;
+        background: transparent !important;
+        outline: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        resize: none !important;
+    }
+
+    .select2-dropdown {
+        border: 1px solid #dee2e6 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        z-index: 1061 !important;
+    }
+
+    .select2-results__option--highlighted[aria-selected] {
+        background-color: #2a8e88 !important;
+    }
+
+    .iti {
+        width: 100% !important;
+        display: block !important;
     }
 
     /* Ensure dropdown is above modal */
     .select2-container--open {
         z-index: 9999 !important;
-    }
-
-    @media (max-width: 576px) {
-        #financeManagerModal .select2-container--default .select2-selection--multiple {
-            min-height: 42px;
-        }
-
-        #financeManagerModal .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-            max-height: 90px !important;
-        }
-
-        #financeManagerModal .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            font-size: 12px;
-        }
     }
 
     .avatar-upload {
@@ -719,6 +785,18 @@
             dropdownParent: $('#financeManagerModal')
         });
 
+        // Re-initialize or fix Select2 when modal is shown to ensure correct width and layout
+        $('#financeManagerModal').on('shown.bs.modal', function() {
+            $('.select2').each(function() {
+                $(this).select2({
+                    dropdownParent: $('#financeManagerModal'),
+                    width: '100%',
+                    placeholder: $(this).attr('placeholder') || "Select options",
+                    allowClear: true
+                });
+            });
+        });
+
         // Initialize intl-tel-input
         const phoneInput = document.querySelector("#phone");
         window.iti = window.intlTelInput(phoneInput, {
@@ -900,7 +978,8 @@
             $('#financeManagerForm')[0].reset();
             $('#userId').val('');
             $('#fm-countries, #fm-languages').val([]).trigger('change');
-            $('#croppedImage').val('');            $('#methodPlaceholder').html('');
+            $('#croppedImage').val('');
+            $('#methodPlaceholder').html('');
             $('#financeManagerForm').attr('action', "{{ route('admin.finance-managers.store') }}");
             $('#saveBtn').text('Create Finance Manager');
             $('#fm-modal-title').text('Register Finance Manager');

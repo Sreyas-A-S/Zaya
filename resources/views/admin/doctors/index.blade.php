@@ -1150,6 +1150,16 @@
                 width: '100%',
                 dropdownParent: $('#doctor-form-modal')
             });
+
+            // Re-initialize or fix Select2 when modal is shown to ensure correct width and layout
+            $('#doctor-form-modal').on('shown.bs.modal', function() {
+                $('#country').select2({
+                    templateResult: formatCountry,
+                    templateSelection: formatCountry,
+                    width: '100%',
+                    dropdownParent: $('#doctor-form-modal')
+                });
+            });
         }
     });
 
@@ -2512,6 +2522,79 @@
 
 
 <style>
+    /* Select2 Modern Design */
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .select2-container--default .select2-selection--multiple,
+    .select2-container--default .select2-selection--single {
+        border: 1px solid #dee2e6 !important;
+        min-height: 42px !important;
+        border-radius: 8px !important;
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        background: #fff !important;
+    }
+
+    .select2-container--default .select2-selection--single {
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--multiple,
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #2a8e88 !important;
+        box-shadow: 0 0 0 0.25rem rgba(42, 142, 136, 0.25) !important;
+        outline: none !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #2a8e88 !important;
+        border: none !important;
+        color: #fff !important;
+        padding: 4px 12px 4px 28px !important;
+        border-radius: 6px !important;
+        margin: 4px 6px 4px 0 !important;
+        position: relative !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        line-height: 1.4 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: rgba(255, 255, 255, 0.8) !important;
+        background: transparent !important;
+        border: none !important;
+        position: absolute !important;
+        left: 8px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 18px !important;
+        line-height: 1 !important;
+        cursor: pointer !important;
+        transition: color 0.2s !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        color: #fff !important;
+        background: transparent !important;
+    }
+
+    .select2-dropdown {
+        border: 1px solid #dee2e6 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        z-index: 1061 !important;
+    }
+
+    .select2-results__option--highlighted[aria-selected] {
+        background-color: #2a8e88 !important;
+    }
+
     /* Fix for browser validation on hidden file input */
     .avatar-upload .avatar-edit input {
         display: block !important;

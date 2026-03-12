@@ -21,6 +21,13 @@ class LanguageController extends Controller
             $languages = Language::query();
 
             return DataTables::of($languages)
+                ->addColumn('status', function ($row) {
+                    $status = strtolower($row->status ?? 'active');
+                    $label = $status === 'inactive' ? 'Inactive' : 'Active';
+                    $badgeClass = $status === 'inactive' ? 'bg-secondary' : 'bg-success';
+
+                    return '<span class="badge status-badge ' . $badgeClass . '" data-id="' . $row->id . '" data-status="' . $status . '">' . $label . '</span>';
+                })
                 ->addColumn('action', function ($row) {
                     return '
                         <button type="button" class="btn btn-sm btn-warning editLanguage" data-id="'.$row->id.'">
@@ -32,7 +39,7 @@ class LanguageController extends Controller
                         </button>
                     ';
                 })
-                ->rawColumns(['action'])
+                ->rawColumns(['status', 'action'])
                 ->make(true);
         }
 
@@ -52,6 +59,7 @@ class LanguageController extends Controller
         $language = Language::create([
             'code' => strtolower($request->code),
             'name' => $request->name,
+            'status' => 'active',
         ]);
 
         return response()->json([
@@ -168,6 +176,25 @@ class LanguageController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Language deleted successfully'
+        ]);
+    }
+
+    /**
+     * Update language status (active/inactive)
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        $language = Language::findOrFail($id);
+        $language->status = $request->status;
+        $language->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Status updated successfully',
         ]);
     }
 }

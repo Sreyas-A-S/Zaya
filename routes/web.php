@@ -204,6 +204,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('user-managers/{id}/status', [\App\Http\Controllers\Admin\UserManagerController::class, 'updateStatus'])->name('user-managers.status');
 
     Route::resource('languages', \App\Http\Controllers\Admin\LanguageController::class);
+    Route::post('languages/{id}/status', [\App\Http\Controllers\Admin\LanguageController::class, 'updateStatus'])->name('languages.status');
     Route::post('/change-language/{id}', [LanguageController::class, 'change'])->name('change-language');
     Route::post('/change-country/{code}', function ($code) {
         session(['admin_country' => strtolower($code)]);

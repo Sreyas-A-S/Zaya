@@ -9,35 +9,50 @@
 <link rel="stylesheet" href="{{ asset('admiro/assets/css/vendors/intltelinput.min.css') }}">
 <style>
     /* Select2 Modern Design */
-    .select2-container--open {
-        z-index: 9999 !important;
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .select2-container--default .select2-selection--single {
+        border: 1px solid #dee2e6 !important;
+        height: 42px !important;
+        border-radius: 8px !important;
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        background: #fff !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #2a8e88 !important;
+        box-shadow: 0 0 0 0.25rem rgba(42, 142, 136, 0.25) !important;
+        outline: none !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 40px !important;
+        padding-left: 12px !important;
+        color: #333 !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 40px !important;
+        right: 8px !important;
     }
 
     .select2-dropdown {
         border: 1px solid #dee2e6 !important;
         border-radius: 8px !important;
-        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        z-index: 1061 !important;
     }
 
-    .select2-container {
-        width: 100% !important;
+    .select2-results__option--highlighted[aria-selected] {
+        background-color: #2a8e88 !important;
     }
 
-    .select2-selection--single {
-        height: 42px !important;
-        border: 1px solid #dee2e6 !important;
-        display: flex !important;
-        align-items: center !important;
-        border-radius: 8px !important;
-    }
-
-    .select2-selection__rendered {
-        line-height: 42px !important;
-        padding-left: 12px !important;
-    }
-
-    .select2-selection__arrow {
-        height: 40px !important;
+    .select2-container--open {
+        z-index: 9999 !important;
     }
 
     /* intl-tel-input fixes */
@@ -426,7 +441,7 @@
                                     <select name="national_id" class="form-select select2">
                                         <option value="">Select Nationality</option>
                                         @foreach($countries as $country)
-                                            <option value="{{ $country->id }}" {{ $user->national_id == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
+                                        <option value="{{ $country->id }}" {{ $user->national_id == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -673,19 +688,19 @@
             const inputs = form.querySelectorAll('input, select');
             inputs.forEach(input => {
                 input.addEventListener('input', () => {
-                if (input.id === 'phone') {
-                    const digitsOnly = input.value.replace(/\D/g, '').slice(0, 15);
-                    if (input.value !== digitsOnly) {
-                        input.value = digitsOnly;
+                    if (input.id === 'phone') {
+                        const digitsOnly = input.value.replace(/\D/g, '').slice(0, 15);
+                        if (input.value !== digitsOnly) {
+                            input.value = digitsOnly;
+                        }
+                        if (typeof window.itiProfile !== 'undefined') {
+                            const isValidPhone = window.itiProfile.isValidNumber();
+                            input.setCustomValidity(isValidPhone ? '' : 'Invalid phone number');
+                        }
                     }
-                    if (typeof window.itiProfile !== 'undefined') {
-                        const isValidPhone = window.itiProfile.isValidNumber();
-                        input.setCustomValidity(isValidPhone ? '' : 'Invalid phone number');
-                    }
-                }
-                input.classList.toggle('is-invalid', !input.checkValidity());
+                    input.classList.toggle('is-invalid', !input.checkValidity());
+                });
             });
-        });
         });
     });
 </script>
