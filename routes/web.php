@@ -222,10 +222,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
 
 
     // Profile page settings
-    Route::get('/profilepage-settings', [\App\Http\Controllers\Admin\ProfilePageSettingController::class, 'index'])->name('admin.profilepage-settings.index');
-    Route::get('/profilepage-settings/edit', [\App\Http\Controllers\Admin\ProfilePageSettingController::class, 'edit'])->name('admin.profilepage-settings.edit');
-    Route::post('/profilepage-settings/update', [\App\Http\Controllers\Admin\ProfilePageSettingController::class, 'update'])->name('admin.profilepage-settings.update');
-    Route::post('/profilepage-settings/change-password', [\App\Http\Controllers\Admin\ProfilePageSettingController::class, 'changePassword'])->name('admin.profilepage-settings.change-password');
+    Route::get('/admin-panel-settings', [\App\Http\Controllers\Admin\AdminPanelSettingController::class, 'index'])->name('admin.admin-panel-settings.index');
+    Route::get('/admin-panel-settings/edit', [\App\Http\Controllers\Admin\AdminPanelSettingController::class, 'edit'])->name('admin.admin-panel-settings.edit');
+    Route::post('/admin-panel-settings/update', [\App\Http\Controllers\Admin\AdminPanelSettingController::class, 'update'])->name('admin.admin-panel-settings.update');
+    Route::post('/admin-panel-settings/change-password', [\App\Http\Controllers\Admin\AdminPanelSettingController::class, 'changePassword'])->name('admin.admin-panel-settings.change-password');
 
 // Route to run artisan optimize
 Route::get('/optimize', function () {

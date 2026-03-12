@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             PractitionerReviewSeeder::class,
             CountriesSeeder::class,
             HomepageSettingSeeder::class,
+            AdminPanelSettingSeeder::class,
             FinanceManagerSeeder::class,
             ContentManagerSeeder::class,
             UserManagerSeeder::class,

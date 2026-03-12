@@ -15,6 +15,34 @@ class HomepageSetting extends Model
         'max_length',
         'language',
     ];
-  
+
+    /**
+     * Get all settings for a section and language with English fallback.
+     */
+    public static function getSectionValues(string $section, string $language = 'en'): array
+    {
+        static $cache = [];
+
+        $langKey = $section . '|' . $language;
+        if (!isset($cache[$langKey])) {
+            $cache[$langKey] = self::where('section', $section)
+                ->where('language', $language)
+                ->pluck('value', 'key')
+                ->toArray();
+        }
+
+        if ($language !== 'en') {
+            $enKey = $section . '|en';
+            if (!isset($cache[$enKey])) {
+                $cache[$enKey] = self::where('section', $section)
+                    ->where('language', 'en')
+                    ->pluck('value', 'key')
+                    ->toArray();
+            }
+            return array_merge($cache[$enKey], $cache[$langKey]);
+        }
+
+        return $cache[$langKey];
+    }
 
 }
