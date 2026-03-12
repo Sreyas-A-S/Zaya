@@ -110,11 +110,11 @@
       },
     ],
   };
-  var chartvisitor = new ApexCharts(
-    document.querySelector("#earnings-chart"),
-    optionsvisitor
-  );
-  chartvisitor.render();
+  var earningsChartEl = document.querySelector("#earnings-chart");
+  if (earningsChartEl) {
+    var chartvisitor = new ApexCharts(earningsChartEl, optionsvisitor);
+    chartvisitor.render();
+  }
   var options = {
     series: [76, 67, 61, 90],
     chart: {
@@ -245,8 +245,11 @@
       },
     ],
   };
-  var chart = new ApexCharts(document.querySelector("#investment"), options);
-  chart.render();
+  var investmentChartEl = document.querySelector("#investment");
+  if (investmentChartEl) {
+    var chart = new ApexCharts(investmentChartEl, options);
+    chart.render();
+  }
   ///growth-chart
   var options = {
     series: [
@@ -445,8 +448,11 @@
       },
     ],
   };
-  var chart = new ApexCharts(document.querySelector("#growth-chart"), options);
-  chart.render();
+  var growthChartEl = document.querySelector("#growth-chart");
+  if (growthChartEl) {
+    var chart = new ApexCharts(growthChartEl, options);
+    chart.render();
+  }
   // income chart
   var income = {
     series: [46],
@@ -550,9 +556,9 @@
       },
     ],
   };
-  var IncomechrtchartEl = new ApexCharts(
-    document.querySelector("#Incomechrt"),
-    income
-  );
-  IncomechrtchartEl.render();
+  var incomeChartEl = document.querySelector("#Incomechrt");
+  if (incomeChartEl) {
+    var IncomechrtchartEl = new ApexCharts(incomeChartEl, income);
+    IncomechrtchartEl.render();
+  }
 })();
