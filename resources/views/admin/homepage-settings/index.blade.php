@@ -58,9 +58,16 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="card">
-                <div class="card-header pb-0 card-no-border">
-                    <h3>Manage Homepage Content</h3>
-                    <p>Update titles, subtitles, and images for different sections of the landing page.</p>
+                <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3>Manage Homepage Content</h3>
+                        <p>Update titles, subtitles, and images for different sections of the landing page.</p>
+                    </div>
+                    <div class="current-lang-badge">
+                        <span class="badge badge-light-primary text-uppercase" style="font-size: 14px; padding: 8px 15px; border-radius: 5px; border: 1px solid var(--theme-default);">
+                            <i class="fa-solid fa-language me-2"></i> Editing: <strong id="current-editing-lang">{{ session('locale', env('APP_LOCALE', 'en')) }}</strong>
+                        </span>
+                    </div>
                 </div>
 
                 <div class="card-body">

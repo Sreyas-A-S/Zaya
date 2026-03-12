@@ -306,6 +306,9 @@
                     // a page reload is required because those elements are server-side rendered.
                     const settingsForm = document.querySelector('form[id*="SettingsForm"]');
                     if (settingsForm) {
+                        const editingLangBadge = document.getElementById('current-editing-lang');
+                        if (editingLangBadge) editingLangBadge.textContent = id.toUpperCase();
+
                         const inputs = settingsForm.querySelectorAll('input[type="text"], input[type="number"], textarea');
                         inputs.forEach(input => {
                             input.value = '';
