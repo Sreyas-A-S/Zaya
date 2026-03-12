@@ -140,7 +140,16 @@ class FinanceManagerController extends Controller
         if ($isAdminRole || empty($user->national_id)) {
             $countries = $allCountries;
         } else {
-            $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+            $assignedCountryIds = $user->national_id;
+            if (is_string($assignedCountryIds)) {
+                $decoded = json_decode($assignedCountryIds, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $assignedCountryIds = $decoded;
+                }
+            }
+            if (!is_array($assignedCountryIds)) {
+                $assignedCountryIds = [$assignedCountryIds];
+            }
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 

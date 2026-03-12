@@ -217,16 +217,60 @@
 @endpush
 
 @section('content')
+<style>
+    .nav-pills .nav-link {
+        color: #555;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        padding: 12px 20px;
+        margin-bottom: 5px;
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: var(--theme-default) !important;
+        color: #fff !important;
+    }
+
+    .nav-pills .nav-link:hover:not(.active) {
+        background-color: var(--bs-gray-100);
+    }
+
+    .btn-primary {
+        background-color: var(--theme-default) !important;
+        border-color: var(--theme-default) !important;
+    }
+
+    .btn-primary:hover {
+        opacity: 0.9;
+        background-color: var(--theme-default) !important;
+        border-color: var(--theme-default) !important;
+    }
+
+    .tab-content {
+        border-left: 1px solid #eee;
+        min-height: 400px;
+    }
+
+    .avatar-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #eee;
+    }
+</style>
+
 <div class="container-fluid">
     <div class="page-title">
         <div class="row">
             <div class="col-sm-6">
-                <h3>Account Overview</h3>
+                <h3>Admin Panel Settings</h3>
             </div>
             <div class="col-sm-6 text-end">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="iconly-Home icli"></i></a></li>
-                    <li class="breadcrumb-item active">Profile</li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="fa-solid fa-house"></i></a></li>
+                    <li class="breadcrumb-item">Settings</li>
+                    <li class="breadcrumb-item active">Admin Panel Settings</li>
                 </ol>
             </div>
         </div>
@@ -290,29 +334,58 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="text-muted small d-block mb-1">Phone Number</label>
-                            <div class="d-flex align-items-center">
-                                <i class="fa fa-phone text-primary me-2"></i>
-                                <span class="f-w-500">{{ $user->phone ?: 'Not provided' }}</span>
-                            </div>
-                        </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted">Phone Number</label>
+                                                <input type="text" name="phone" class="form-control" value="{{ old('phone', $user->phone) }}" pattern="[0-9\s\-\+\(\)]{7,20}">
+                                                <div class="invalid-feedback">Please enter a valid phone number (7-20 characters).</div>
+                                            </div>
 
-                        <div class="col-md-6">
-                            <label class="text-muted small d-block mb-1">Nationality</label>
-                            <div class="d-flex align-items-center">
-                                <i class="fa fa-globe text-primary me-2"></i>
-                                <span class="f-w-500">{{ $user->nationality ? $user->nationality->name : 'Not specified' }}</span>
-                            </div>
-                        </div>
+                                            <div class="col-12 mt-4 text-end">
+                                                <button type="submit" class="btn btn-primary px-5">Save Information</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
 
-                        <div class="col-md-6">
-                            <label class="text-muted small d-block mb-1">Account Status</label>
-                            <div class="d-flex align-items-center">
-                                <i class="fa fa-check-circle text-success me-2"></i>
-                                <span class="f-w-500 text-capitalize">{{ $user->status ?: 'Active' }}</span>
-                            </div>
-                        </div>
+                                <!-- Security Tab -->
+                                <div class="tab-pane fade p-3" id="v-pills-security" role="tabpanel" aria-labelledby="v-pills-security-tab">
+                                    <form action="{{ route('admin.profile.password.update') }}" method="POST" class="needs-validation" novalidate>
+                                        @csrf
+                                        <div class="row g-4">
+                                            <div class="col-12">
+                                                <p class="text-muted small mb-3">To ensure your account's security, please choose a strong password that you don't use elsewhere.</p>
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                <label class="form-label text-muted">Current Password <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light border-end-0"><i class="fa fa-key text-muted"></i></span>
+                                                    <input type="password" name="current_password" class="form-control border-start-0" required>
+                                                    <div class="invalid-feedback">Please enter your current password.</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted">New Password <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light border-end-0"><i class="fa fa-shield text-muted"></i></span>
+                                                    <input type="password" name="password" id="new_password" class="form-control border-start-0" required minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}">
+                                                </div>
+                                                <div class="text-danger small mt-1 d-none" id="password-requirements">
+                                                    Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted">Confirm New Password <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light border-end-0"><i class="fa fa-check-square-o text-muted"></i></span>
+                                                    <input type="password" name="password_confirmation" id="confirm_password" class="form-control border-start-0" required minlength="8">
+                                                </div>
+                                                <div class="text-danger small mt-1 d-none" id="password-match-error">
+                                                    Passwords do not match.
+                                                </div>
+                                            </div>
 
                         <div class="col-12 mt-4">
                             <h6 class="border-bottom pb-2 mb-3 fw-bold">Assigned Languages</h6>
@@ -486,7 +559,7 @@
 <script src="{{ asset('admiro/assets/js/select2/select2.full.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 <script>
-    function validatePassword() {
+    document.addEventListener('DOMContentLoaded', function() {
         const password = document.getElementById('new_password');
         const confirm = document.getElementById('confirm_password');
         const requirements = document.getElementById('password-requirements');

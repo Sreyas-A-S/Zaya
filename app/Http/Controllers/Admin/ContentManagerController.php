@@ -138,7 +138,16 @@ class ContentManagerController extends Controller
         if ($isSuperAdmin) {
             $countries = $allCountries;
         } else {
-            $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+            $assignedCountryIds = $user->national_id;
+            if (is_string($assignedCountryIds)) {
+                $decoded = json_decode($assignedCountryIds, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $assignedCountryIds = $decoded;
+                }
+            }
+            if (!is_array($assignedCountryIds)) {
+                $assignedCountryIds = [$assignedCountryIds];
+            }
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
@@ -218,7 +227,6 @@ class ContentManagerController extends Controller
             'phone'     => ['required', 'string', 'min:10', 'max:50', 'regex:/^[0-9\s\-\+\(\)]+$/'],
             'cropped_image' => 'nullable|string',
             'status'    => 'required|string|in:pending,active,rejected,inactive',
-            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ], [
             'firstname.regex' => 'First name must start with a capital letter and contain only letters.',
             'lastname.regex'  => 'Last name must start with a capital letter and contain only letters.',

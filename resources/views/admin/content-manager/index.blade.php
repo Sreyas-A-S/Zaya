@@ -808,6 +808,7 @@ $(document).ready(function () {
                     } catch(e) { countries = [countries]; }
                 }
                 if (!Array.isArray(countries)) countries = [countries];
+                countries = countries.map(String);
                 $('#country').val(countries).trigger('change');
             } else {
                 $('#country').val([]).trigger('change');
@@ -826,6 +827,7 @@ $(document).ready(function () {
                     } catch(e) { languages = [languages]; }
                 }
                 if (!Array.isArray(languages)) languages = [languages];
+                languages = languages.map(String);
                 $('#language').val(languages).trigger('change');
             } else {
                 $('#language').val([]).trigger('change');
@@ -840,7 +842,7 @@ $(document).ready(function () {
 
             // Show password fields on edit but make them optional
             $('.password-field').show();
-            $('#password, #password_confirmation').removeAttr('required');
+            $('#password-input, #password-confirm-input').removeAttr('required').removeAttr('pattern').removeAttr('minlength');
 
             $('#methodPlaceholder').html('@method("PUT")');
             $('#contentManagerForm').attr('action', "{{ url('admin/content-managers') }}/" + id);
@@ -1001,7 +1003,7 @@ function openCreateModal() {
     $('#saveBtn').text('Create Content Manager');
     $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
     $('.password-field').show();
-    $('#password, #password_confirmation').attr('required', 'required');
+    $('#password-input, #password-confirm-input').attr('required', 'required').attr('minlength', '8').attr('pattern', '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d)\\\\S{6,}$');
     $('#contentManagerModal').modal('show');
 }
 </script>
