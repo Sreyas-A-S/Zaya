@@ -247,13 +247,19 @@
                                     <option value="inactive">Inactive</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 password-field">
-                                <label class="form-label">Password</label>
-                                <input type="password" name="password" id="edit_password" class="form-control">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Password (Leave blank to keep current)</label>
+                                <input type="password" id="edit_password" class="form-control"
+                                    minlength="8"
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                    title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                    oninput="validatePasswordMatchAdmin()">
+                                <div id="edit-password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
                             </div>
                             <div class="col-md-6 password-field">
                                 <label class="form-label">Confirm Password</label>
-                                <input type="password" name="password_confirmation" id="edit_password_confirmation" class="form-control">
+                                <input type="password" id="edit_password_confirmation" class="form-control" minlength="8" oninput="validatePasswordMatchAdmin()">
+                                <div id="edit-password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                             </div>
                         </div>
                     </div>
@@ -395,6 +401,84 @@
         </div>
     </div>
 
+    <div class="modal fade" id="admin-form-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Register New Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form action="{{ route('admin.admins.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Profile Picture</label>
+                                <input type="file" name="profile_picture" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">First Name</label>
+                                <input type="text" pattern="^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$" title="First name contains invalid characters" name="firstname" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" pattern="^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$" title="Last name contains invalid characters" name="lastname" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone number</label>
+                                <input type="text" name="phone" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Country</label>
+                                <select name="country" class="form-select" required>
+                                    <option selected disabled>Select a Country</option>
+                                    @foreach ($countries as $country)
+                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Language</label>
+                                <select name="language" class="form-select" required>
+                                    <option selected disabled>Select a Language</option>
+                                    @foreach ($languages as $language)
+                                        <option value="{{ $language->id }}">{{ $language->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Password</label>
+                                <input type="password" name="password" id="password-input" class="form-control"
+                                    minlength="8"
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                    title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                    required oninput="validatePasswordMatchAdmin()">
+                                <div id="password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Confirm Password</label>
+                                <input type="password" name="password_confirmation" id="password-confirm-input" class="form-control"
+                                    minlength="8"
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                    title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                    required oninput="validatePasswordMatchAdmin()">
+                                <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
+                            </div>
+                            <div class="col-12 text-end mt-4">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Create Admin</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
         <!-- Add Cropper.js JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -402,6 +486,66 @@
         <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 
         <script>
+            function validatePasswordMatchAdmin() {
+                const password = $('#password-input');
+                const confirm = $('#password-confirm-input');
+                const requirements = $('#password-requirements');
+                const matchError = $('#password-match-error');
+
+                const editPassword = $('#edit_password');
+                const editConfirm = $('#edit_password_confirmation');
+                const editRequirements = $('#edit-password-requirements');
+                const editMatchError = $('#edit-password-match-error');
+
+                const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
+
+                if (password.length) {
+                    if (password.val() === '') {
+                        requirements.addClass('d-none');
+                    } else if (pattern.test(password.val())) {
+                        requirements.addClass('d-none');
+                    } else {
+                        requirements.removeClass('d-none');
+                    }
+
+                    if (confirm.val() !== '') {
+                        if (confirm.val() !== password.val()) {
+                            matchError.removeClass('d-none');
+                            confirm.addClass('is-invalid');
+                        } else {
+                            matchError.addClass('d-none');
+                            confirm.removeClass('is-invalid');
+                        }
+                    } else {
+                        matchError.addClass('d-none');
+                        confirm.removeClass('is-invalid');
+                    }
+                }
+
+                if (editPassword.length) {
+                    if (editPassword.val() === '') {
+                        editRequirements.addClass('d-none');
+                    } else if (pattern.test(editPassword.val())) {
+                        editRequirements.addClass('d-none');
+                    } else {
+                        editRequirements.removeClass('d-none');
+                    }
+
+                    if (editConfirm.val() !== '') {
+                        if (editConfirm.val() !== editPassword.val()) {
+                            editMatchError.removeClass('d-none');
+                            editConfirm.addClass('is-invalid');
+                        } else {
+                            editMatchError.addClass('d-none');
+                            editConfirm.removeClass('is-invalid');
+                        }
+                    } else {
+                        editMatchError.addClass('d-none');
+                        editConfirm.removeClass('is-invalid');
+                    }
+                }
+            }
+
             $(document).ready(function() {
                 // Initialize Select2
                 $('.select2').select2({

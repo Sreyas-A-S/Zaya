@@ -36,6 +36,7 @@
                     </div>
                     <p class="mb-4">Welcome back! Let’s start from where you left.</p>
 
+                    @if($user->role !== 'super-admin')
                     <div class="d-flex flex-wrap gap-4 mb-4">
                         <div class="d-flex align-items-center gap-2">
                             <div class="flex-shrink-0 bg-light-primary p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
@@ -71,6 +72,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     <div class="d-flex align-center justify-content-between mt-auto">
                         <span> 

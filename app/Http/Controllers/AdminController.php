@@ -74,18 +74,25 @@ class AdminController extends Controller
             'first_name' => 'required|string|min:2|max:50|regex:/^[a-zA-Z\s\-]+$/',
             'last_name' => 'required|string|min:2|max:50|regex:/^[a-zA-Z\s\-]+$/',
             'email' => 'required|email:rfc,dns|max:255|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|min:7|max:20|regex:/^([0-9\s\-\+\(\)]*)$/',
+            'phone' => 'nullable|string|min:7|max:20',
+            'national_id' => 'nullable|exists:countries,id',
             'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'cropped_image' => 'nullable|string',
         ], [
             'first_name.regex' => 'First name can only contain letters, spaces, and hyphens.',
             'last_name.regex' => 'Last name can only contain letters, spaces, and hyphens.',
-            'phone.regex' => 'Please enter a valid phone number format.',
+            'national_id.exists' => 'Selected nationality is invalid.',
         ]);
 
         $data = $request->only(['first_name', 'last_name', 'email', 'phone', 'national_id']);
-        $data['name'] = $request->first_name . ' ' . $request->last_name;
+        $data['name'] = trim($request->first_name . ' ' . $request->last_name);
 
-        if ($request->hasFile('profile_pic')) {
+        if ($request->filled('cropped_image')) {
+            if ($user->profile_pic) {
+                Storage::disk('public')->delete($user->profile_pic);
+            }
+            $data['profile_pic'] = $this->uploadBase64($request->cropped_image);
+        } elseif ($request->hasFile('profile_pic')) {
             if ($user->profile_pic) {
                 Storage::disk('public')->delete($user->profile_pic);
             }
@@ -96,6 +103,22 @@ class AdminController extends Controller
         $user->update($data);
 
         return back()->with('status', 'Profile updated successfully!');
+    }
+
+    /**
+     * Helper to upload base64 image
+     */
+    protected function uploadBase64($base64String)
+    {
+        $image_parts = explode(";base64,", $base64String);
+        $image_type_aux = explode("image/", $image_parts[0]);
+        $image_type = $image_type_aux[1];
+        $image_base64 = base64_decode($image_parts[1]);
+        $fileName = 'profile_pics/' . uniqid() . '.' . $image_type;
+
+        Storage::disk('public')->put($fileName, $image_base64);
+
+        return $fileName;
     }
 
     public function updatePassword(Request $request)

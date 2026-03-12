@@ -344,6 +344,14 @@ h6 {
 }
 
 .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+@layer components {
+    .swiper-button-disabled {
+        @apply opacity-40 cursor-not-allowed pointer-events-none bg-transparent text-primary;
+    }
 }

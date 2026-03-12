@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\MindfulnessPractitioner;
+use App\Mail\WelcomeUserMail;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
@@ -200,6 +203,11 @@ class MindfulnessPractitionerController extends Controller
                 'password' => Hash::make($validatedData['password']),
                 'role' => 'mindfulness_practitioner',
             ]);
+
+            $plainPassword = $validatedData['password'];
+            Session::put('welcome_password_' . $user->id, $plainPassword);
+            Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));
+            Session::forget('welcome_password_' . $user->id);
 
             $practitionerData = $validatedData;
             unset($practitionerData['email'], $practitionerData['password'], $practitionerData['certificates'], $practitionerData['gov_id_upload'], $practitionerData['cancelled_cheque']);

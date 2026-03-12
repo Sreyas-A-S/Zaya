@@ -39,7 +39,13 @@ class ContactUsMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.contact-us',
+            view: 'emails.default',
+            with: [
+                'title' => 'New Contact Message Received',
+                'intro' => 'You have received a new inquiry from the Zaya Wellness contact form.',
+                'messageData' => $this->messageData,
+                'outro' => 'This is an automated notification from the Zaya Wellness Platform.',
+            ],
         );
     }
 
