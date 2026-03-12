@@ -95,6 +95,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [AdminController::class, 'updatePassword'])->name('profile.password.update');
     Route::resource('countries', CountryController::class);
+    Route::post('countries/{id}/status', [CountryController::class, 'updateStatus'])->name('countries.status');
     Route::resource('doctors', DoctorController::class);
     Route::post('doctors/{id}/status', [DoctorController::class, 'updateStatus'])->name('doctors.status');
     Route::resource('practitioners', PractitionerController::class);

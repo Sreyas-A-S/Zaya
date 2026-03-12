@@ -30,13 +30,12 @@ class LanguageController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     return '
-                        <button type="button" class="btn btn-sm btn-warning editLanguage" data-id="'.$row->id.'">
-                            Edit
-                        </button>
-
-                        <button type="button" class="btn btn-sm btn-danger deleteLanguage" data-id="'.$row->id.'">
-                            Delete
-                        </button>
+                        <a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editLanguage" title="Edit">
+                            <i class="iconly-Edit-Square icli" style="font-size: 20px;"></i>
+                        </a>
+                        <a href="javascript:void(0)" data-id="' . $row->id . '" class="text-danger deleteLanguage ms-2" title="Delete">
+                            <i class="iconly-Delete icli" style="font-size: 20px;"></i>
+                        </a>
                     ';
                 })
                 ->rawColumns(['status', 'action'])

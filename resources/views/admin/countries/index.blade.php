@@ -37,7 +37,8 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Country Name</th>
-                                    <th>Flag</th>    
+                                    <th>Flag</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -159,8 +160,8 @@
             <div class="modal-body text-center p-4">
                 <i class="iconly-Info-Square icli text-primary mb-3" style="font-size: 50px;"></i>
                 <h5>Update Status?</h5>
-                <p id="status-confirmation-text">Are you sure you want to change the status of this doctor?</p>
-                <input type="hidden" id="status-doctor-id">
+                <p id="status-confirmation-text">Are you sure you want to change the status of this country?</p>
+                <input type="hidden" id="status-country-id">
                 <input type="hidden" id="status-new-value">
             </div>
             <div class="modal-footer justify-content-center">
@@ -436,21 +437,23 @@
                 },
                 {
                     data: 'name',
-                    name: 'users.name',
-                    render: function(data, type, row) {
-                        console.log(data);
-                        return data;
+                    name: 'countries.name'
+                },
+                {
+                    data: 'flag',
+                    name: 'countries.flag',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data) {
+                        return data ? data : '-';
                     }
                 },
-                
-                
-                
                 {
-                data: 'name',
-                name: 'countries.name'
+                    data: 'status',
+                    name: 'countries.status',
+                    orderable: false,
+                    searchable: false
                 },
-
-                
                 {   
                     data: 'action',
                     name: 'action',
@@ -462,6 +465,48 @@
             order: [
                 [0, 'desc']
             ] // Default sort by column 0 (which is the Row Index/ID logically here)
+        });
+
+        // Handle status badge click
+        $(document).on('click', '.status-badge', function() {
+            let id = $(this).data('id');
+            let currentStatus = String($(this).data('status')).toLowerCase();
+            let nextStatus = (currentStatus === 'active' || currentStatus === '1') ? 'inactive' : 'active';
+            let label = nextStatus === 'active' ? 'Active' : 'Inactive';
+
+            $('#status-country-id').val(id);
+            $('#status-new-value').val(nextStatus);
+            $('#status-confirmation-text').text('Are you sure you want to change the status of this country to ' + label + '?');
+            $('#status-confirmation-modal').modal('show');
+        });
+
+        // Confirm status change
+        $(document).on('click', '#confirm-status-btn', function() {
+            let btn = $(this);
+            let id = $('#status-country-id').val();
+            let status = $('#status-new-value').val();
+
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+            $.ajax({
+                url: "{{ url('admin/countries') }}/" + id + "/status",
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    status: status
+                },
+                success: function(response) {
+                    $('#status-confirmation-modal').modal('hide');
+                    $('#countries-table').DataTable().ajax.reload(null, false);
+                    if (typeof showToast === 'function') showToast(response.message || 'Status updated');
+                },
+                error: function() {
+                    if (typeof showToast === 'function') showToast('Failed to update status', 'error');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).text('Confirm Change');
+                }
+            });
         });
 
 
@@ -1406,6 +1451,11 @@ $(document).on('submit', '#editCountryForm', function (e) {
         font-weight: 600;
         color: #2c3e50;
         font-size: 0.95rem;
+    }
+
+    .status-badge {
+        cursor: pointer;
+        padding: 0.35rem 0.6rem;
     }
 
     .capability-checkboxes .form-check-input {
