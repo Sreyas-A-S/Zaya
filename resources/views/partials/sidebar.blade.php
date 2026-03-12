@@ -293,14 +293,6 @@
                 </a>
             </li>
             <li class="sidebar-list">
-                <a class="sidebar-link" href="{{ route('admin.email-logs.index') }}">
-                    <svg class="stroke-icon">
-                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Document') }}"></use>
-                    </svg>
-                    <h6 class="f-w-600">Email Logs</h6>
-                </a>
-            </li>
-            <li class="sidebar-list">
                 <a class="sidebar-link" href="{{ route('admin.newsletters.index') }}">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Message') }}"></use>
