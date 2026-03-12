@@ -1,0 +1,18 @@
+# Deployment ignores (FTP)
+.git/
+.github/
+.env
+.env.*
+/auth.json
+/.idea/
+/.vscode/
+/.fleet/
+/.nova/
+/.zed/
+/node_modules/
+/public/hot
+/storage/logs/
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/views/
+/tests/
