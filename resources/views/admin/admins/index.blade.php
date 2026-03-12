@@ -30,8 +30,13 @@
         border: 1px solid #dee2e6 !important;
         min-height: 42px !important;
         border-radius: 8px !important;
-        padding: 2px 8px !important;
+        padding: 4px 35px 4px 8px !important;
+        /* Added right padding for clear button */
         transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        background: #fff !important;
     }
 
     .select2-container--default.select2-container--focus .select2-selection--multiple {
@@ -44,41 +49,77 @@
         background-color: #2a8e88 !important;
         border: none !important;
         color: #fff !important;
-        padding: 2px 10px 2px 25px !important;
-        border-radius: 4px !important;
-        margin: 4px 4px 4px 0 !important;
+        padding: 4px 12px 4px 28px !important;
+        border-radius: 6px !important;
+        margin: 4px 6px 4px 0 !important;
         position: relative !important;
         font-size: 13px !important;
+        font-weight: 500 !important;
+        line-height: 1.4 !important;
+        display: inline-flex !important;
+        align-items: center !important;
     }
 
     .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        color: #fff !important;
+        color: rgba(255, 255, 255, 0.8) !important;
         background: transparent !important;
         border: none !important;
         position: absolute !important;
-        left: 5px !important;
+        left: 8px !important;
         top: 50% !important;
         transform: translateY(-50%) !important;
         margin: 0 !important;
         padding: 0 !important;
-        font-size: 16px !important;
+        font-size: 18px !important;
         line-height: 1 !important;
         cursor: pointer !important;
+        transition: color 0.2s !important;
     }
 
     .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
-        color: #f8d7da !important;
+        color: #fff !important;
         background: transparent !important;
     }
 
+    /* Fix Clear Button Aesthetics */
+    .select2-container--default .select2-selection--multiple .select2-selection__clear {
+        position: absolute !important;
+        right: 12px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #f8f9fa !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 4px !important;
+        width: 20px !important;
+        height: 20px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: #6c757d !important;
+        font-size: 14px !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+        box-shadow: none !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__clear:hover {
+        background: #e9ecef !important;
+        color: #dc3545 !important;
+        border-color: #ced4da !important;
+    }
+
     .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
-        margin-top: 5px !important;
+        margin-top: 0 !important;
         height: 26px !important;
         font-family: inherit !important;
         border: none !important;
         background: transparent !important;
         outline: none !important;
         box-shadow: none !important;
+        padding: 0 !important;
+        resize: none !important;
     }
 
     .select2-dropdown {
