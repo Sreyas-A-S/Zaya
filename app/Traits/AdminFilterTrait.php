@@ -96,7 +96,7 @@ trait AdminFilterTrait
                         $tableName = $q->getQuery()->from;
                         if ($tableName === 'users') {
                             $q->whereJsonContains('languages', (string)$language->id)
-                              ->orWhereJsonContains('languages', (int)$id);
+                              ->orWhereJsonContains('languages', (int)$language->id);
                         }
                     });
                 } elseif ($type === 'homepage_setting') {

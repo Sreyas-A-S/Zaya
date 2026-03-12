@@ -334,58 +334,21 @@
                             </div>
                         </div>
 
-                                            <div class="col-md-6">
-                                                <label class="form-label text-muted">Phone Number</label>
-                                                <input type="text" name="phone" class="form-control" value="{{ old('phone', $user->phone) }}" pattern="[0-9\s\-\+\(\)]{7,20}">
-                                                <div class="invalid-feedback">Please enter a valid phone number (7-20 characters).</div>
-                                            </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small d-block mb-1">Phone Number</label>
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-phone text-primary me-2"></i>
+                                <span class="f-w-500">{{ $user->phone ?? 'Not specified' }}</span>
+                            </div>
+                        </div>
 
-                                            <div class="col-12 mt-4 text-end">
-                                                <button type="submit" class="btn btn-primary px-5">Save Information</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-
-                                <!-- Security Tab -->
-                                <div class="tab-pane fade p-3" id="v-pills-security" role="tabpanel" aria-labelledby="v-pills-security-tab">
-                                    <form action="{{ route('admin.profile.password.update') }}" method="POST" class="needs-validation" novalidate>
-                                        @csrf
-                                        <div class="row g-4">
-                                            <div class="col-12">
-                                                <p class="text-muted small mb-3">To ensure your account's security, please choose a strong password that you don't use elsewhere.</p>
-                                            </div>
-
-                                            <div class="col-md-12">
-                                                <label class="form-label text-muted">Current Password <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text bg-light border-end-0"><i class="fa fa-key text-muted"></i></span>
-                                                    <input type="password" name="current_password" class="form-control border-start-0" required>
-                                                    <div class="invalid-feedback">Please enter your current password.</div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <label class="form-label text-muted">New Password <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text bg-light border-end-0"><i class="fa fa-shield text-muted"></i></span>
-                                                    <input type="password" name="password" id="new_password" class="form-control border-start-0" required minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}">
-                                                </div>
-                                                <div class="text-danger small mt-1 d-none" id="password-requirements">
-                                                    Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <label class="form-label text-muted">Confirm New Password <span class="text-danger">*</span></label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text bg-light border-end-0"><i class="fa fa-check-square-o text-muted"></i></span>
-                                                    <input type="password" name="password_confirmation" id="confirm_password" class="form-control border-start-0" required minlength="8">
-                                                </div>
-                                                <div class="text-danger small mt-1 d-none" id="password-match-error">
-                                                    Passwords do not match.
-                                                </div>
-                                            </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small d-block mb-1">Nationality</label>
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-globe text-primary me-2"></i>
+                                <span class="f-w-500">{{ $user->nationality->name ?? 'Not specified' }}</span>
+                            </div>
+                        </div>
 
                         <div class="col-12 mt-4">
                             <h6 class="border-bottom pb-2 mb-3 fw-bold">Assigned Languages</h6>
@@ -395,7 +358,7 @@
                                 @empty
                                 <span class="text-muted font-italic">No specific languages assigned.</span>
                                 @endforelse
-                                @if(empty($myLanguages) && $user->role === 'super-admin')
+                                @if(count($myLanguages) == 0 && $user->role === 'super-admin')
                                 <span class="badge badge-light-success border text-success px-3 py-2">All Access (Super Admin)</span>
                                 @endif
                             </div>
@@ -453,10 +416,19 @@
                                     <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
                                     <div class="invalid-feedback">Please enter a valid email address.</div>
                                 </div>
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <label class="form-label">Phone Number</label>
-                                    <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone', $user->phone) }}" required pattern="^[0-9]{7,11}$" title="Only numbers allowed (7-11 digits)" maxlength="11" inputmode="numeric">
-                                    <div class="invalid-feedback">Please enter 7-11 digits. Only numbers allowed.</div>
+                                    <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone', $user->phone) }}" required pattern="^[0-9]{7,15}$" title="Only numbers allowed" maxlength="15" inputmode="numeric">
+                                    <div class="invalid-feedback">Please enter a valid phone number.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Nationality</label>
+                                    <select name="national_id" class="form-select select2">
+                                        <option value="">Select Nationality</option>
+                                        @foreach($countries as $country)
+                                            <option value="{{ $country->id }}" {{ $user->national_id == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -586,7 +558,7 @@
             matchError.classList.add('d-none');
             confirm.setCustomValidity('');
         }
-    }
+    });
 
     document.addEventListener('DOMContentLoaded', function() {
         // Cropper Logic
@@ -596,6 +568,11 @@
         // Initialize intl-tel-input when modal opens (prevents layout issues)
         const phoneInput = document.querySelector("#phone");
         $('#editProfileModal').on('shown.bs.modal', function() {
+            // Initialize Select2
+            $('.select2').select2({
+                dropdownParent: $('#editProfileModal')
+            });
+
             if (phoneInput && !window.itiProfile) {
                 window.itiProfile = window.intlTelInput(phoneInput, {
                     utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
