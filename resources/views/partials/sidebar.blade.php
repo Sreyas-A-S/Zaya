@@ -275,8 +275,9 @@
                     @if(auth()->user()->hasPermission('settings-view'))
                     <li> <a href="{{ route('admin.contact-us.index') }}">Contact Us Settings</a></li>
                     @endif
-                    <li> <a href="{{ route('admin.profilepage-settings.index') }}">Admin pannel  Settings</a></li>
+                    <li> <a href="{{ route('admin.profilepage-settings.index') }}">Admin Pannel Settings</a></li>
                     
+                    <li> <a href="{{ route('admin.footer-settings.index') }}">Footer Page Settings</a></li>
                 </ul>
             </li>
             @endif

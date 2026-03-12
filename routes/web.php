@@ -160,6 +160,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // Services Page Settings
     Route::get('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'index'])->name('services-settings.index');
     Route::post('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'update'])->name('services-settings.update');
+    
+    // Footer Page Settings
+    Route::get('footer-settings', [\App\Http\Controllers\Admin\FooterPageController::class, 'index'])->name('footer-settings.index');
+    Route::post('footer-settings', [\App\Http\Controllers\Admin\FooterPageController::class, 'update'])->name('footer-settings.update');
     Route::get('/contact-settings', [\App\Http\Controllers\Admin\ContactusController::class, 'index'])->name('contact-us.index');
     Route::post('/contact-settings/update', [\App\Http\Controllers\Admin\ContactusController::class, 'update'])->name('contact-settings.update');
     // Contact Messages

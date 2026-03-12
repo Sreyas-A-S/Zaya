@@ -133,12 +133,18 @@
                         return strtolower($iso) ?: 'us' ;
                         }
                         }
-                        $currentLocale=session('locale', config('app.locale', 'en' ));
+                        if ($role && $role->name === 'Super Admin') {
+                        $currentLocale = session('locale', 'all');
+                        } else {
+                        $currentLocale = session('locale', config('app.locale', 'en'));
+                        }
+                        
                         $currentLanguage=$allLanguages->where('code', $currentLocale)->first();
 
                         $allCountries = \App\Models\Country::all();
                         if ($role && $role->name === 'Super Admin') {
                         $userCountries = $allCountries;
+                        $currentCountryCode = session('admin_country', 'all');
                         } else {
                         $assignedCountryIds = $user?->national_id;
                         if (is_array($assignedCountryIds)) {
@@ -148,11 +154,11 @@
                         } else {
                         $userCountries = collect();
                         }
+                        $currentCountryCode = session('admin_country', 'us');
                         }
 
-                        $currentCountryCode = session('admin_country', 'us');
-                        // Fallback to first assigned country if current session country is not in assigned list
-                        if (!$userCountries->where('code', strtoupper($currentCountryCode))->first()) {
+                        // Fallback logic
+                        if ($currentCountryCode !== 'all' && !$userCountries->where('code', strtoupper($currentCountryCode))->first()) {
                         $firstAssigned = $userCountries->first();
                         $currentCountryCode = $firstAssigned ? strtolower($firstAssigned->code) : 'us';
                         session(['admin_country' => $currentCountryCode]);
@@ -162,8 +168,10 @@
 
                         <a class="lang lang-dropdown-trigger" href="javascript:void(0)" style="min-width: 100px; display: flex; align-items: center; text-decoration: none; padding: 10px 0; gap: 6px; background: none !important; border-radius: 0 !important;">
                             <i class="fa-solid fa-language text-muted" style="font-size: 14px;"></i>
+                            @if($currentLocale !== 'all')
                             <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentLanguage ? getCountryCode($currentLanguage) : 'us') . '.svg') }}" style="width: 20px; height: 14px; border: 1px solid #eee; border-radius: 2px;" alt="flag">
-                            <h6 class="lang-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentLanguage ? strtoupper($currentLanguage->code) : 'EN' }}</h6>
+                            @endif
+                            <h6 class="lang-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentLocale === 'all' ? 'ALL' : ($currentLanguage ? strtoupper($currentLanguage->code) : 'EN') }}</h6>
                         </a>
 
                         <div class="custom-menu overflow-hidden">
@@ -171,7 +179,23 @@
                                 <span class="f-w-700 text-dark small">SELECT LANGUAGE</span>
                             </div>
                             <ul class="profile-body language-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
-                                @if($languages->isEmpty())
+                                @if(in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
+                                <li class="d-flex align-items-center last-0" style="cursor: pointer;">
+                                    <a href="javascript:void(0)"
+                                        class="lang d-flex align-items-center w-100 {{ $currentLocale == 'all' ? 'active text-primary' : '' }}"
+                                        data-value="all"
+                                        data-flag="{{ asset('admiro/assets/images/dashboard/all-countries.png') }}"
+                                        onclick="changeLanguage(this)"
+                                        style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
+                                        <i class="fa fa-globe ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
+                                        <span class="f-w-600 small">ALL LANGUAGES</span>
+                                        @if($currentLocale == 'all')
+                                        <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                                        @endif
+                                    </a>
+                                </li>
+                                @endif
+                                @if($languages->isEmpty() && !in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
                                 <li class="p-3 text-center text-muted small">No assigned languages</li>
                                 @endif
                                 @foreach($languages as $lang)
@@ -197,8 +221,10 @@
                 <li class="custom-dropdown">
                     <a class="lang country-dropdown-trigger" href="javascript:void(0)" style="min-width: 100px; display: flex; align-items: center; text-decoration: none; padding: 10px 0; gap: 6px; background: none !important; border-radius: 0 !important;">
                         <i class="fa-solid fa-earth-americas text-muted" style="font-size: 14px;"></i>
+                        @if($currentCountryCode !== 'all')
                         <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentCountry ? strtolower($currentCountry->code) : 'us') . '.svg') }}" style="width: 20px; height: 14px; border: 1px solid #eee; border-radius: 2px;" alt="flag">
-                        <h6 class="country-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentCountry ? strtoupper($currentCountry->code) : 'US' }}</h6>
+                        @endif
+                        <h6 class="country-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentCountryCode === 'all' ? 'ALL' : ($currentCountry ? strtoupper($currentCountry->code) : 'US') }}</h6>
                     </a>
 
                     <div class="custom-menu overflow-hidden">
@@ -206,7 +232,23 @@
                             <span class="f-w-700 text-dark small">SELECT REGION</span>
                         </div>
                         <ul class="profile-body country-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
-                            @if($userCountries->isEmpty())
+                            @if(in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
+                            <li class="d-flex align-items-center last-0" style="cursor: pointer;">
+                                <a href="javascript:void(0)"
+                                    class="lang d-flex align-items-center w-100 {{ $currentCountryCode == 'all' ? 'active text-primary' : '' }}"
+                                    data-value="all"
+                                    data-flag="{{ asset('admiro/assets/images/dashboard/all-countries.png') }}"
+                                    onclick="changeCountry(this)"
+                                    style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
+                                    <i class="fa fa-earth-americas ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
+                                    <span class="f-w-600 small">ALL REGIONS</span>
+                                    @if($currentCountryCode == 'all')
+                                    <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                                    @endif
+                                </a>
+                            </li>
+                            @endif
+                            @if($userCountries->isEmpty() && !in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
                             <li class="p-3 text-center text-muted small">No assigned regions</li>
                             @endif
                             @foreach($userCountries as $country)
@@ -284,7 +326,14 @@
                     const currentLangImg = document.querySelector('.lang-dropdown-trigger img');
                     const currentLangText = document.querySelector('.lang-dropdown-trigger .lang-txt');
 
-                    if (currentLangImg && flagUrl) currentLangImg.src = flagUrl;
+                    if (id === 'all') {
+                        if (currentLangImg) currentLangImg.style.display = 'none';
+                    } else {
+                        if (currentLangImg) {
+                            currentLangImg.src = flagUrl;
+                            currentLangImg.style.display = 'block';
+                        }
+                    }
                     if (currentLangText) currentLangText.textContent = langName;
 
                     // 2. Update localStorage
@@ -300,29 +349,8 @@
                     element.classList.add('active', 'text-primary');
                     element.insertAdjacentHTML('beforeend', '<i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>');
 
-                    // 4. DYNAMIC FIELD UPDATES:
-                    // We can only update form fields dynamically on "Settings" pages.
-                    // For the rest of the admin panel (sidebar, dashboard, etc.), 
-                    // a page reload is required because those elements are server-side rendered.
-                    const settingsForm = document.querySelector('form[id*="SettingsForm"]');
-                    if (settingsForm) {
-                        const inputs = settingsForm.querySelectorAll('input[type="text"], input[type="number"], textarea');
-                        inputs.forEach(input => {
-                            input.value = '';
-                            if (data.data && data.data[input.name] !== undefined) {
-                                input.value = data.data[input.name];
-                            }
-                        });
-
-                        if (typeof showToast === 'function') {
-                            showToast(`Switched to ${langName} successfully.`);
-                        }
-                    } else {
-                        // For standard CRUD pages, we must reload to refresh the translated UI
-                        location.reload();
-                    }
-
-                    console.log("Language changed dynamically to:", id);
+                    // 4. Reload to refresh the translated UI
+                    location.reload();
                 } else {
                     console.warn(data.message);
                 }
@@ -348,7 +376,14 @@
                     const currentImg = document.querySelector('.country-dropdown-trigger img');
                     const currentTxt = document.querySelector('.country-dropdown-trigger .country-txt');
 
-                    if (currentImg && flagUrl) currentImg.src = flagUrl;
+                    if (code === 'all') {
+                        if (currentImg) currentImg.style.display = 'none';
+                    } else {
+                        if (currentImg) {
+                            currentImg.src = flagUrl;
+                            currentImg.style.display = 'block';
+                        }
+                    }
                     if (currentTxt) currentTxt.textContent = code.toUpperCase();
 
                     // Update active state
@@ -364,6 +399,8 @@
                     if (typeof showToast === 'function') {
                         showToast(`Country changed to ${code.toUpperCase()} successfully.`);
                     }
+                    
+                    location.reload();
                 }
             })
             .catch(error => console.error('Error changing country:', error));

@@ -16,8 +16,12 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
+use App\Traits\AdminFilterTrait;
+
 class TranslatorController extends Controller
 {
+    use AdminFilterTrait;
+
     public function __construct()
     {
         $this->middleware('permission:translators-view')->only(['index', 'show']);
@@ -56,12 +60,8 @@ class TranslatorController extends Controller
                     'translators.state'
                 ]);
 
-            // Role-based country restriction
-            if (!$isSuperAdmin) {
-                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
-                $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
-                $query->whereIn('translators.country', $assignedCountryNames);
-            }
+            // Apply Admin Filters (Country & Language)
+            $query = $this->applyAdminFilters($query, 'user');
 
             $query->orderBy('users.created_at', 'desc');
 

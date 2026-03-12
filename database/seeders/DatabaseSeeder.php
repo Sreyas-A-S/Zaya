@@ -37,6 +37,7 @@ class DatabaseSeeder extends Seeder
             FinanceManagerSeeder::class,
             ContentManagerSeeder::class,
             UserManagerSeeder::class,
+            FooterSettingSeeder::class,
         ]);
 
         User::updateOrCreate(

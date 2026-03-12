@@ -16,8 +16,12 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
+use App\Traits\AdminFilterTrait;
+
 class ClientController extends Controller
 {
+    use AdminFilterTrait;
+
     public function __construct()
     {
         $this->middleware('permission:clients-view')->only(['index', 'show']);
@@ -58,12 +62,8 @@ class ClientController extends Controller
                     'patients.status'
                 ]);
 
-            // Role-based country restriction
-            if (!$isSuperAdmin) {
-                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
-                $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
-                $query->whereIn('patients.country', $assignedCountryNames);
-            }
+            // Apply Admin Filters (Country & Language)
+            $query = $this->applyAdminFilters($query, 'user');
 
             $query->orderBy('users.created_at', 'desc');
 
