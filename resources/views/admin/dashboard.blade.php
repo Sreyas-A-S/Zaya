@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="container-fluid">
+    <div class="container-fluid ">
         <div class="page-title">
             <div class="row">
                 <div class="col-sm-6 col-12">
@@ -23,7 +23,7 @@
     </div>
 
     <!-- Container-fluid starts-->
-    <div class="container-fluid default-dashboard">
+    <div class="container-fluid default-dashboard position-relative z-2">
         <div class="row">
             <!-- Welcome Card -->
             <div class="col-xl-4 proorder-xxl-1 col-sm-6 box-col-6">
@@ -187,7 +187,4 @@
             </div>
         </div>
     </div>
-
-    <!-- Leaves Images -->
-    <img src="{{ asset('admiro/assets/images/admin-dash-img.webp') }}" alt="logo" class="img-fluid admin-dash-img">
 @endsection
