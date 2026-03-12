@@ -221,10 +221,13 @@
 
       @include('partials.sidebar')
 
-      <div class="page-body position-relative z-1">
+      <div class="page-body">
         @yield('content')
       </div>
-
+      @if(Route::is('admin.dashboard'))
+        <!-- Leaves Images -->
+        <img src="{{ asset('admiro/assets/images/admin-dash-img.webp') }}" alt="logo" class="img-fluid admin-dash-img">
+      @endif
       @include('partials.footer')
 
     </div>

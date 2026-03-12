@@ -5,5 +5,5 @@
                 <p class="mb-0">Copyright {{ date('Y') }} © Zaya.</p>
             </div>
         </div>
-    </div>
+    </div>    
 </footer>

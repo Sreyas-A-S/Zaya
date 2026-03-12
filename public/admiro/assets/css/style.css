@@ -32465,10 +32465,12 @@ header ul[class*=header-]>li .badge {
 }
 
 footer {
+  position: relative;
   background-color: var(--white);
   bottom: 0;
   left: 0;
-  padding: 19px 15px
+  padding: 19px 15px;
+  height: 60px;
 }
 
 footer p {
@@ -53373,8 +53375,15 @@ label {
 
 .admin-dash-img {
   position: absolute;
-  bottom: 0;
+  bottom: 60px;
   right: 0;
-  z-index: -1;
-  width: auto;
+  z-index: 1;
+  width: 520px;
+  height: auto;
 }
+
+@media (max-width: 575.98px) { 
+  .admin-dash-img {
+  width: 220px;
+  }
+ }
