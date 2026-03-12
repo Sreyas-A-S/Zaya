@@ -13,6 +13,7 @@ use Yajra\DataTables\DataTables;
 
 
 use App\Traits\AdminFilterTrait;
+use Illuminate\Validation\Rules\Password;
 
 class AdminsController extends Controller
 {
@@ -33,18 +34,16 @@ class AdminsController extends Controller
         $isSuperAdmin = ($role && $role->name === 'Super Admin');
 
         if ($request->ajax()) {
-            $query = DB::table('users')
-                ->where('users.role', 'admin')
-                ->leftJoin('countries', 'countries.id', '=', 'users.national_id')
+            $query = User::where('role', 'admin')
                 ->select([
                     'users.id',
                     'users.name',
                     'users.email',
                     'users.phone',
-                    'countries.name as nationality',
                     'users.languages',
                     'users.status',
-                    'users.national_id'
+                    'users.national_id',
+                    'users.profile_pic'
                 ]);
 
             // Apply Admin Filters (Country & Language)
@@ -54,7 +53,12 @@ class AdminsController extends Controller
                 ->addIndexColumn()
                 ->filter(function ($query) use ($request) {
                     if ($request->has('country_filter') && !empty($request->country_filter)) {
-                        $query->where('users.national_id', $request->country_filter);
+                        $cid = $request->country_filter;
+                        $query->where(function($q) use ($cid) {
+                            $q->whereJsonContains('users.national_id', (int)$cid)
+                              ->orWhereJsonContains('users.national_id', (string)$cid)
+                              ->orWhere('users.national_id', $cid);
+                        });
                     }
 
                     if ($request->has('search') && !is_null($request->get('search')['value'])) {
@@ -64,28 +68,41 @@ class AdminsController extends Controller
                             $q->where('users.name', 'LIKE', "%{$search}%")
                                 ->orWhere('users.email', 'LIKE', "%{$search}%")
                                 ->orWhere('users.phone', 'LIKE', "%{$search}%")
-                                ->orWhere('countries.name', 'LIKE', "%{$search}%")
                                 ->orWhere('users.status', 'LIKE', "%{$search}%");
                         });
                     }
                 })
-                ->editColumn('nationality', function ($row) {
-                    return $row->nationality ?? 'N/A';
-                })
-                ->editColumn('languages', function ($row) {
-                    if (empty($row->languages)) {
-                        return 'N/A';
+                ->addColumn('nationality', function ($row) {
+                    $nationalIds = $row->national_id;
+                    if (is_string($nationalIds)) {
+                        $decoded = json_decode($nationalIds, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $nationalIds = $decoded;
+                        }
                     }
                     
-                    $langs = is_string($row->languages) ? json_decode($row->languages, true) : $row->languages;
-                    
-                    if (empty($langs)) return 'N/A';
-                    
-                    // Fetch language names from the database
-                    $langIds = is_array($langs) ? $langs : [$langs];
-                    $langNames = Language::whereIn('id', $langIds)->pluck('name')->toArray();
-                    
-                    return !empty($langNames) ? implode(', ', $langNames) : 'N/A';
+                    if (is_array($nationalIds) && !empty($nationalIds)) {
+                        return \App\Models\Country::whereIn('id', $nationalIds)->pluck('name')->implode(', ');
+                    } elseif (!is_array($nationalIds) && $nationalIds && is_numeric($nationalIds)) {
+                        return optional(\App\Models\Country::find($nationalIds))->name;
+                    }
+                    return 'N/A';
+                })
+                ->editColumn('languages', function ($row) {
+                    $langs = $row->languages;
+                    if (is_string($langs)) {
+                        $decoded = json_decode($langs, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $langs = $decoded;
+                        }
+                    }
+
+                    if (is_array($langs) && !empty($langs)) {
+                        return \App\Models\Language::whereIn('id', $langs)->pluck('name')->implode(', ');
+                    } elseif (!is_array($langs) && $langs && is_numeric($langs)) {
+                        return optional(\App\Models\Language::find($langs))->name;
+                    }
+                    return 'N/A';
                 })
                 ->editColumn('status', function ($row) {
                     $badgeClass = ($row->status == 1 || $row->status === 'active') ? 'bg-success' : 'bg-danger';
@@ -132,22 +149,25 @@ class AdminsController extends Controller
     {
         $request->validate([
             'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'firstname' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$/'],
-            'lastname'  => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$/'],
+            'cropped_image' => 'nullable|string',
+            'firstname' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.\&\-\(\)\,\/\+]+$/'],
+            'lastname'  => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.\&\-\(\)\,\/\+]+$/'],
             'email'       => 'required|email|unique:users,email',
-            'phone'       => 'required|string|max:20',
-            'country'     => 'required|string',
-            'language'    => 'required|string',
-            'password'    => ['required', 'min:6', 'confirmed', 'regex:/^[A-Z][A-Za-z0-9]{5,}$/'],
+            'phone'       => 'required|string|max:50',
+            'country'     => 'required|array',
+            'country.*'   => 'exists:countries,id',
+            'language'    => 'required|array',
+            'language.*'  => 'exists:languages,id',
+            'password'    => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ], [
-            'password.regex' => 'Password must start with a capital letter and be alphanumeric.',
             'firstname.regex' => 'The first name contains invalid characters.',
             'lastname.regex' => 'The last name contains invalid characters.',
         ]);
 
         $imagePath = null;
-
-        if ($request->hasFile('profile_picture')) {
+        if ($request->filled('cropped_image')) {
+            $imagePath = $this->uploadBase64($request->cropped_image);
+        } elseif ($request->hasFile('profile_picture')) {
             $imagePath = $request->file('profile_picture')->store('profiles', 'public');
         }
 
@@ -159,30 +179,18 @@ class AdminsController extends Controller
             'email'       => $request->email,
             'phone'       => $request->phone,
             'national_id' => $request->country,
-            'languages'   => [$request->language], 
+            'languages'   => $request->language, 
             'password'    => Hash::make($request->password),
             'role'        => 'admin',
             'status'      => 'active',
         ]);
 
-        return redirect()->back()->with('success', 'Admin created successfully.');
+        return response()->json(['success' => true, 'message' => 'Admin created successfully.']);
     }
 
     public function edit($id)
     {
-        $admin = DB::table('users')
-            ->leftJoin('countries', 'countries.id', '=', 'users.national_id')
-            ->select('users.*', 'countries.name as nationality_name')
-            ->where('users.id', $id)
-            ->first();
-
-        if ($admin) {
-            // Ensure languages is treated as array for JSON response if needed
-            if (is_string($admin->languages)) {
-                $admin->languages = json_decode($admin->languages, true);
-            }
-        }
-
+        $admin = User::findOrFail($id);
         return response()->json($admin);
     }
 
@@ -191,32 +199,35 @@ class AdminsController extends Controller
         $admin = User::findOrFail($id);
 
         $request->validate([
-            'name'    => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$/'],
+            'firstname' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.\&\-\(\)\,\/\+]+$/'],
+            'lastname'  => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.\&\-\(\)\,\/\+]+$/'],
             'email'   => 'required|email|unique:users,email,' . $admin->id,
-            'phone'   => 'required|string|max:20',
-            'country' => 'nullable|string',
-            'language'=> 'nullable|string',
+            'phone'   => 'required|string|max:50',
+            'country' => 'required|array',
+            'country.*' => 'exists:countries,id',
+            'language'=> 'required|array',
+            'language.*' => 'exists:languages,id',
             'status'  => 'required',
-            'password'=> ['nullable', 'min:6', 'confirmed', 'regex:/^[A-Z][A-Za-z0-9]{5,}$/'],
+            'cropped_image' => 'nullable|string',
+            'password'=> ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ], [
-            'password.regex' => 'Password must start with a capital letter and be alphanumeric.',
-            'name.regex' => 'The name contains invalid characters.',
+            'firstname.regex' => 'The first name contains invalid characters.',
+            'lastname.regex' => 'The last name contains invalid characters.',
         ]);
 
         $data = [
-            'name' => $request->name,
+            'name' => $request->firstname . ' ' . $request->lastname,
+            'first_name' => $request->firstname,
+            'last_name' => $request->lastname,
             'email' => $request->email,
             'phone' => $request->phone,
             'national_id' => $request->country,
-            'languages' => [$request->language],
+            'languages' => $request->language,
             'status' => $request->status,
         ];
 
-        // If name is updated, try to split it for first_name and last_name
-        if ($request->filled('name')) {
-            $parts = explode(' ', $request->name, 2);
-            $data['first_name'] = $parts[0];
-            $data['last_name'] = $parts[1] ?? '';
+        if ($request->filled('cropped_image')) {
+            $data['profile_pic'] = $this->uploadBase64($request->cropped_image);
         }
 
         if ($request->filled('password')) {
@@ -225,7 +236,20 @@ class AdminsController extends Controller
 
         $admin->update($data);
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => 'Admin updated successfully.']);
+    }
+
+    protected function uploadBase64($base64String)
+    {
+        $image_parts = explode(";base64,", $base64String);
+        $image_type_aux = explode("image/", $image_parts[0]);
+        $image_type = $image_type_aux[1];
+        $image_base64 = base64_decode($image_parts[1]);
+        $fileName = 'profiles/' . uniqid() . '.' . $image_type;
+
+        \Illuminate\Support\Facades\Storage::disk('public')->put($fileName, $image_base64);
+
+        return $fileName;
     }
 
     public function updateStatus(Request $request, $id)

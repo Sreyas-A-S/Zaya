@@ -214,6 +214,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::delete('/pincode/delete', [\App\Http\Controllers\Admin\PincodeController::class, 'destroy'])->name('admin.pincode.delete');
 
 
+
+    // Profile page settings
+    Route::get('/profilepage-settings', [\App\Http\Controllers\Admin\ProfilePageSettingController::class, 'index'])->name('admin.profilepage-settings.index');
+    Route::get('/profilepage-settings/edit', [\App\Http\Controllers\Admin\ProfilePageSettingController::class, 'edit'])->name('admin.profilepage-settings.edit');
+    Route::post('/profilepage-settings/update', [\App\Http\Controllers\Admin\ProfilePageSettingController::class, 'update'])->name('admin.profilepage-settings.update');
+    Route::post('/profilepage-settings/change-password', [\App\Http\Controllers\Admin\ProfilePageSettingController::class, 'changePassword'])->name('admin.profilepage-settings.change-password');
+
 // Route to run artisan optimize
 Route::get('/optimize', function () {
     Artisan::call('optimize:clear');
