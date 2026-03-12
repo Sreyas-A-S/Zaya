@@ -140,11 +140,7 @@ class LanguageController extends Controller
 
         $settings = HomepageSetting::where('language', $laravelLocale)
             ->pluck('value', 'key');
-            
-        // Fallback to English if no settings found for current language
-        if ($settings->isEmpty() && $laravelLocale !== 'en') {
-            $settings = HomepageSetting::where('language', 'en')->pluck('value', 'key');
-        }
+
 
         // Fetch translations from JSON files
         $translations = [];

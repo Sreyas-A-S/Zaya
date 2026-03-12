@@ -38,7 +38,7 @@ class ServicesSettingController extends Controller
             
             $newSetting = $setting->replicate();
             $newSetting->language = $language;
-            $newSetting->value = ($setting->type === 'image') ? $setting->value : ''; 
+            $newSetting->value = ''; 
             return $newSetting;
         });
 

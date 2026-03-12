@@ -4,45 +4,45 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\HomepageSetting;
+use App\Models\FooterPageSetting;
 use Illuminate\Support\Facades\Storage;
 
-class HomepageSettingController extends Controller
+class FooterPageController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('permission:home-page-view')->only(['index']);
-        $this->middleware('permission:home-page-edit')->only(['update']);
-    }
 
     public function index()
     {
         $language = session('locale', 'en');
-        
+
+        $sections = ['newsletter', 'general', 'headings', 'social_links', 'quick_links', 'legal'];
+
         // Get all settings for current language
-        $currentSettings = HomepageSetting::whereNotIn('section', ['about_page', 'services_page', 'contact', 'general'])
-            ->where('language', $language)
+        $currentSettings = FooterPageSetting::where('language', $language)
+            ->whereIn('section', $sections)
             ->get()
             ->keyBy('key');
 
         // Get all setting structure from English (default)
-        $defaultSettings = HomepageSetting::whereNotIn('section', ['about_page', 'services_page', 'contact', 'general'])
-            ->where('language', 'en')
+        $defaultSettings = FooterPageSetting::where('language', 'en')
+            ->whereIn('section', $sections)
             ->get();
 
-        $settings = $defaultSettings->map(function($setting) use ($currentSettings, $language) {
+        $settings = $defaultSettings->map(function ($setting) use ($currentSettings, $language) {
+
             if ($currentSettings->has($setting->key)) {
                 return $currentSettings->get($setting->key);
             }
-            
-            // Return a "dummy" model instance for the form
+
+            // Dummy model instance for form
             $newSetting = $setting->replicate();
             $newSetting->language = $language;
-            $newSetting->value = ''; 
+            $newSetting->value = ''; // Always empty if not exists for this language
+
             return $newSetting;
+
         })->groupBy('section');
 
-        return view('admin.homepage-settings.index', compact('settings'));
+        return view('admin.footer-settings.index', compact('settings'));
     }
 
     public function update(Request $request)
@@ -51,38 +51,64 @@ class HomepageSettingController extends Controller
         $data = $request->except('_token');
 
         foreach ($data as $key => $value) {
-            $setting = HomepageSetting::where('key', $key)
+
+            $setting = FooterPageSetting::where('key', $key)
                 ->where('language', $language)
                 ->first();
+
             if ($setting) {
-                // Validate max length if applicable
+
+                // Validate max length
                 if ($setting->max_length && is_string($value) && strlen($value) > $setting->max_length) {
+
                     if ($request->ajax()) {
-                        return response()->json(['success' => false, 'message' => "The {$key} field cannot be longer than {$setting->max_length} characters."], 422);
+                        return response()->json([
+                            'success' => false,
+                            'message' => "The {$key} field cannot be longer than {$setting->max_length} characters."
+                        ], 422);
                     }
-                    return redirect()->back()->withErrors(["{$key}" => "The {$key} field cannot be longer than {$setting->max_length} characters."]);
+
+                    return redirect()->back()->withErrors([
+                        $key => "The {$key} field cannot be longer than {$setting->max_length} characters."
+                    ]);
                 }
+
+                // Image upload
                 if ($setting->type === 'image' && $request->hasFile($key)) {
-                    // Delete old image if exists
+
                     if ($setting->value && Storage::disk('public')->exists($setting->value)) {
                         Storage::disk('public')->delete($setting->value);
                     }
+
                     $path = $request->file($key)->store('homepage', 'public');
-                    $setting->update(['value' => $path]);
-                } else if ($setting->type !== 'image') {
-                    $setting->update(['value' => $value]);
+
+                    $setting->update([
+                        'value' => $path
+                    ]);
                 }
+                else if ($setting->type !== 'image') {
+
+                    $setting->update([
+                        'value' => $value
+                    ]);
+                }
+
             } else {
-                // If setting doesn't exist for this language, we might want to create it if it exists for 'en'
-                $originalSetting = HomepageSetting::where('key', $key)->where('language', 'en')->first();
+
+                // Create setting for other language
+                $originalSetting = FooterPageSetting::where('key', $key)
+                    ->where('language', 'en')
+                    ->first();
+
                 if ($originalSetting) {
+
                     $val = is_string($value) ? $value : $originalSetting->value;
-                    
+
                     if ($originalSetting->type === 'image' && $request->hasFile($key)) {
                         $val = $request->file($key)->store('homepage', 'public');
                     }
 
-                    HomepageSetting::create([
+                    FooterPageSetting::create([
                         'key' => $key,
                         'value' => $val,
                         'type' => $originalSetting->type,
@@ -95,9 +121,12 @@ class HomepageSettingController extends Controller
         }
 
         if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Homepage settings updated successfully.']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Footer page settings updated successfully.'
+            ]);
         }
 
-        return redirect()->back()->with('success', 'Homepage settings updated successfully.');
+        return redirect()->back()->with('success', 'Footer page settings updated successfully.');
     }
 }

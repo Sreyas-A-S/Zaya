@@ -4,8 +4,8 @@
         <!-- Newsletter Section -->
         <div class="bg-[#79584B] px-6 py-8 md:px-12 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
             <h3 id="footer-newsletter-title"
-                class="text-white text-sm sm:text-base md:text-xl font-normal text-center md:text-left font-sans!" data-i18n="Join our newsletter for weekly wellness tips.">
-                {{ __('Join our newsletter for weekly wellness tips.') }}
+                class="text-white text-sm sm:text-base md:text-xl font-normal text-center md:text-left font-sans!" data-i18n="{{ $site_settings['newsletter_title'] ?? 'Join our newsletter for weekly wellness tips.' }}">
+                {{ $site_settings['newsletter_title'] ?? __('Join our newsletter for weekly wellness tips.') }}
             </h3>
             <div class="flex w-full md:w-auto gap-2">
                 <input id="footer-newsletter-input" type="email" placeholder="{{ __('Your email...') }}" data-i18n="Your email..."
@@ -30,16 +30,16 @@
                         <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness"
                             class="h-16 md:h-24 w-auto object-contain">
                     </a>
-                    <p id="footer-tagline" class="text-[#2E2E2E] text-center xl:text-start opacity-80 text-xs md:text-base leading-relaxed max-w-xs" data-i18n="Empowering your wellness journey through ancient wisdom and modern science.">
-                        {{ __('Empowering your wellness journey through ancient wisdom and modern science.') }}
+                    <p id="footer-tagline" class="text-[#2E2E2E] text-center xl:text-start opacity-80 text-xs md:text-base leading-relaxed max-w-xs" data-i18n="{{ $site_settings['footer_description'] ?? 'Empowering your wellness journey through ancient wisdom and modern science.' }}">
+                        {{ $site_settings['footer_description'] ?? __('Empowering your wellness journey through ancient wisdom and modern science.') }}
                     </p>
                 </div>
 
                 <!-- Column 2: Quick Links -->
                 <div class="order-first border-b border-[#DABEA2] md:border-none pb-4 md:pb-0">
                     <div class="flex justify-between items-center cursor-pointer md:cursor-auto" onclick="toggleFooterMenu('quick-links')">
-                        <h4 id="footer-quick-links-title" class="font-medium font-sans! mb-0 md:mb-6 text-xl text-[#2E2E2E]" data-i18n="Quick Links">
-                            {{ __('Quick Links') }}</h4>
+                        <h4 id="footer-quick-links-title" class="font-medium font-sans! mb-0 md:mb-6 text-xl text-[#2E2E2E]" data-i18n="{{ $site_settings['quick_links_heading'] ?? 'Quick Links' }}">
+                            {{ $site_settings['quick_links_heading'] ?? __('Quick Links') }}</h4>
                         <i class="ri-add-line text-2xl md:hidden text-[#2E2E2E]" id="quick-links-icon"></i>
                     </div>
                     <ul id="quick-links-menu" class="hidden md:block! space-y-4 text-base font-regular text-[#2E2E2E]/80 pt-6 md:pt-0">
@@ -63,8 +63,8 @@
                 <!-- Column 3: Conditions -->
                 <div class="order-2 z-1 pb-4 md:pb-0">
                     <div class="flex justify-between items-center cursor-pointer md:cursor-auto" onclick="toggleFooterMenu('conditions')">
-                        <h4 id="footer-conditions-title" class="font-medium font-sans! mb-0 md:mb-6 text-xl text-[#2E2E2E]" data-i18n="Conditions We Support">
-                            {{ __('Conditions We Support') }}</h4>
+                        <h4 id="footer-conditions-title" class="font-medium font-sans! mb-0 md:mb-6 text-xl text-[#2E2E2E]" data-i18n="{{ $site_settings['conditions_heading'] ?? 'Conditions We Support' }}">
+                            {{ $site_settings['conditions_heading'] ?? __('Conditions We Support') }}</h4>
                         <i class="ri-add-line text-2xl md:hidden text-[#2E2E2E]" id="conditions-icon"></i>
                     </div>
                     <ul id="conditions-menu" class="hidden md:block! space-y-4 text-base font-regular text-[#2E2E2E]/80 pt-6 md:pt-0">
@@ -85,8 +85,8 @@
 
                 <!-- Column 4: Pincode & Socials -->
                 <div class="order-3 z-1 md:col-span-2 lg:col-span-1">
-                    <h4 id="footer-pincode-title" class="font-sans! text-base font-medium text-[#252525] mb-4 text-center lg:text-start" data-i18n="Save your pincode & find nearby care.">
-                        {{ __('Save your pincode & find nearby care.') }}</h4>                  
+                    <h4 id="footer-pincode-title" class="font-sans! text-base font-medium text-[#252525] mb-4 text-center lg:text-start" data-i18n="{{ $site_settings['pincode_heading'] ?? 'Save your pincode & find nearby care.' }}">
+                        {{ $site_settings['pincode_heading'] ?? __('Save your pincode & find nearby care.') }}</h4>                  
                     
                     <form class="flex gap-2 mb-2 items-center">
                         <div class="relative flex-1">
@@ -114,19 +114,19 @@
                     <div id="pincode-message" class="min-h-[24px] mb-2 text-xs font-bold"></div>
 
                     <div class="flex flex-wrap gap-3 xl:gap-8 justify-center lg:justify-start">
-                        <a href="#" target="_blank"
+                        <a href="{{ $site_settings['social_facebook'] ?? '#' }}" target="_blank"
                             class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
                             <i class="ri-facebook-fill text-lg"></i>
                         </a>
-                        <a href="#" target="_blank"
+                        <a href="{{ $site_settings['social_instagram'] ?? '#' }}" target="_blank"
                             class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
                             <i class="ri-instagram-line text-lg"></i>
                         </a>
-                        <a href="#" target="_blank"
+                        <a href="{{ $site_settings['social_youtube'] ?? '#' }}" target="_blank"
                             class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
                             <i class="ri-youtube-fill text-lg"></i>
                         </a>
-                        <a href="#" target="_blank"
+                        <a href="{{ $site_settings['social_linkedin'] ?? '#' }}" target="_blank"
                             class="w-10 h-10 border border-primary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:border-primary hover:text-white transition-all duration-300">
                             <i class="ri-linkedin-fill text-lg"></i>
                         </a>
@@ -144,7 +144,9 @@
             </div>
 
             <div class="text-center text-[10px] md:text-sm text-[#252525] cursor-default lg:border-t border-[#252525]/80 py-4"> 
-                <p id="footer-all-rights" data-i18n="All rights reserved.">{{ __('All rights reserved.') }} &copy; {{ date('Y') }} Zaya Wellness</p>
+                <p id="footer-all-rights" data-i18n="{{ $site_settings['copyright_text'] ?? 'All rights reserved.' }}">
+                    {{ $site_settings['copyright_text'] ?? __('All rights reserved.') }} &copy; {{ date('Y') }} Zaya Wellness
+                </p>
             </div>
         </div>
 
