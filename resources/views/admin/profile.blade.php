@@ -435,7 +435,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning px-4" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
@@ -650,6 +650,11 @@
         const forms = document.querySelectorAll('.needs-validation');
         forms.forEach(form => {
             form.addEventListener('submit', event => {
+                if (form.id === 'editProfileForm' && typeof window.itiProfile !== 'undefined') {
+                    const isValidPhone = window.itiProfile.isValidNumber();
+                    phoneInput.setCustomValidity(isValidPhone ? '' : 'Invalid phone number');
+                }
+
                 const isValid = form.checkValidity();
                 if (!isValid) {
                     event.preventDefault();
@@ -668,15 +673,19 @@
             const inputs = form.querySelectorAll('input, select');
             inputs.forEach(input => {
                 input.addEventListener('input', () => {
-                    if (input.id === 'phone') {
-                        const digitsOnly = input.value.replace(/\D/g, '').slice(0, 11);
-                        if (input.value !== digitsOnly) {
-                            input.value = digitsOnly;
-                        }
+                if (input.id === 'phone') {
+                    const digitsOnly = input.value.replace(/\D/g, '').slice(0, 15);
+                    if (input.value !== digitsOnly) {
+                        input.value = digitsOnly;
                     }
-                    input.classList.toggle('is-invalid', !input.checkValidity());
-                });
+                    if (typeof window.itiProfile !== 'undefined') {
+                        const isValidPhone = window.itiProfile.isValidNumber();
+                        input.setCustomValidity(isValidPhone ? '' : 'Invalid phone number');
+                    }
+                }
+                input.classList.toggle('is-invalid', !input.checkValidity());
             });
+        });
         });
     });
 </script>

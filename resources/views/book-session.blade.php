@@ -16,24 +16,42 @@
     <div class="flex-1 relative">
         <div class="container-fluid mx-auto">
 
+            @php
+                $isLoggedIn = auth()->check();
+                $activePractitioner = $selectedPractitioner ?? null;
+                $practitionerName = 'Practitioner';
+                if ($activePractitioner) {
+                    $practitionerName = trim(($activePractitioner->first_name ?? '') . ' ' . ($activePractitioner->last_name ?? ''));
+                    if ($practitionerName === '') {
+                        $practitionerName = $activePractitioner->user->name ?? 'Practitioner';
+                    }
+                }
+                $practitionerImage = $activePractitioner && $activePractitioner->profile_photo_path
+                    ? asset('storage/' . $activePractitioner->profile_photo_path)
+                    : asset('frontend/assets/lilly-profile-pic.png');
+                $practitionerRole = $activePractitioner->other_modalities[0] ?? 'Practitioner';
+                $practitionerRating = $activePractitioner ? number_format($activePractitioner->average_rating, 1) : '0.0';
+                $practitionerLocation = $activePractitioner ? $activePractitioner->city_state : 'Location not set';
+            @endphp
+
             <!-- Step Indicator -->
             <div
                 class="sticky top-0 z-50 flex justify-center pb-6 md:pb-8 pt-6 md:pt-8 bg-white border-b border-[#D0D0D0] px-4">
                 <div class="flex items-start justify-center gap-0 w-full max-w-3xl" id="step-indicator">
                     <div class="flex flex-col items-center relative z-2 px-1 sm:px-4 md:px-8">
-                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 bg-[#60E48C] text-white"
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 {{ $isLoggedIn ? 'bg-[#E6E6E6] text-[#8B8B8B]' : 'bg-[#60E48C] text-white' }}"
                             id="step-circle-1">1</div>
                         <span
-                            class="text-xs md:text-base text-gray-700 mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
+                            class="text-xs md:text-base {{ $isLoggedIn ? 'text-gray-400' : 'text-gray-700' }} mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
                             id="step-label-1">Login</span>
                     </div>
                     <div class="w-10 sm:w-16 md:w-[100px] lg:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]"
                         id="step-line-1"></div>
                     <div class="flex flex-col items-center relative z-2 px-1 sm:px-4 md:px-8">
-                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]"
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 {{ $isLoggedIn ? 'bg-[#60E48C] text-white' : 'bg-[#E6E6E6] text-[#8B8B8B]' }}"
                             id="step-circle-2">2</div>
                         <span
-                            class="text-xs md:text-base text-gray-400 mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
+                            class="text-xs md:text-base {{ $isLoggedIn ? 'text-gray-700' : 'text-gray-400' }} mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
                             id="step-label-2">Schedule booking</span>
                     </div>
                     <div class="w-10 sm:w-16 md:w-[100px] lg:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]"
@@ -49,7 +67,7 @@
             </div>
 
             <!-- Welcome Section - Step 1 -->
-            <div class="relative" id="step-1-content">
+            <div class="relative {{ $isLoggedIn ? 'hidden' : '' }}" id="step-1-content">
                 <!-- Gradient Background -->
                 <div class="relative overflow-hidden h-[calc(100vh-100px)]"
                     style="background-image: url('{{ asset('frontend/assets/book-session-bg.jpg') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -73,21 +91,21 @@
 
                         <!-- Action Buttons -->
                         <div class="flex flex-col sm:flex-row items-center gap-4">
-                            <a href="{{ route('client-register') }}"
+                            <a href="{{ route('client-register', ['redirect' => request()->fullUrl()]) }}"
                                 class="bg-[#F5A623] text-[#423131] px-10 py-3.5 rounded-full font-medium text-base transition-all duration-300 hover:bg-[#E09518] hover:-translate-y-0.5 shadow-md">
                                 Register Now
                             </a>
-                            <button type="button" onclick="nextStep()"
+                            <a href="{{ route('login', ['redirect' => request()->fullUrl()]) }}"
                                 class="text-gray-700 px-10 py-3.5 rounded-full font-medium text-base border border-[#423131] transition-all duration-300 hover:bg-[#423131] hover:text-white cursor-pointer">
                                 Login
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Schedule Booking - Step 2 (Hidden by default) -->
-            <div class="hidden" id="step-2-content">
+            <div class="{{ $isLoggedIn ? '' : 'hidden' }}" id="step-2-content">
                 <div class="max-w-4xl mx-auto px-4 py-8">
 
                     <!-- Select Session Mode -->
@@ -108,23 +126,23 @@
                     <div
                         class="bg-[#F5F5F5] rounded-2xl p-6 mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
                         <div class="flex items-center gap-4">
-                            <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}" alt="Lily Marie"
+                            <img src="{{ $practitionerImage }}" alt="{{ $practitionerName }}"
                                 class="lg:w-[127px] lg:h-[127px] w-[80px] h-[80px] rounded-full object-cover">
                             <div>
                                 <div class="flex items-center gap-4 mb-2">
                                     <h3 class="font-medium font-sans! text-gray-900 lg:text-2xl text-xl  leading-none">
-                                        Lily Marie
+                                        {{ $practitionerName }}
                                     </h3>
                                     <div>
                                         <i class="ri-star-fill text-base text-[#29724C] leading-none"></i>
                                         <span
-                                            class="text-base leading-none text-[#29724C] align-middle font-medium">4.6</span>
+                                            class="text-base leading-none text-[#29724C] align-middle font-medium">{{ $practitionerRating }}</span>
                                     </div>
                                 </div>
-                                <p class="text-[#252525] text-base">Art Therapist</p>
+                                <p class="text-[#252525] text-base">{{ $practitionerRole }}</p>
                                 <p class="text-[#7D7D7D] text-sm flex items-center gap-1 mt-2"><i
                                         class="ri-map-pin-line"></i>
-                                    Kazhakuttam, Trivandrum</p>
+                                    {{ $practitionerLocation }}</p>
                             </div>
                         </div>
                         <button type="button" onclick="openPractitionerModal()"
@@ -218,402 +236,177 @@
 
                         <!-- Service Tags -->
                         <div class="flex flex-wrap gap-3" id="available-services-container">
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Life Coach">
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Life Coach
-                                </div>
-                            </label>
-
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Yoga Therapy">
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Yoga Therapy
-                                </div>
-                            </label>
-
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Naturopathy">
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Naturopathy
-                                </div>
-                            </label>
-
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Body Massage" checked>
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Body Massage
-                                </div>
-                            </label>
-
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Sophrology">
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Sophrology
-                                </div>
-                            </label>
-
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Psychotherapy">
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Psychotherapy
-                                </div>
-                            </label>
-
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Panchakarma">
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Panchakarma
-                                </div>
-                            </label>
-
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Marma Therapy">
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Marma Therapy
-                                </div>
-                            </label>
-
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Life Coach 2">
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Life Coach
-                                </div>
-                            </label>
-
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Yoga Therapy 2">
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Yoga Therapy
-                                </div>
-                            </label>
-
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Naturopathy 2">
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Naturopathy
-                                </div>
-                            </label>
-
-                            <label class="service-tag-label inline-block cursor-pointer select-none">
-                                <input type="checkbox" class="peer hidden" value="Body Massage 2">
-                                <div
-                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                    Body Massage
-                                </div>
-                            </label>
+                            @forelse($services as $service)
+                                <label class="service-tag-label inline-block cursor-pointer select-none" data-service-name="{{ strtolower($service->title) }}">
+                                    <input type="checkbox" class="peer hidden" value="{{ $service->title }}" {{ $loop->first ? 'checked' : '' }}>
+                                    <div
+                                        class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
+                                        {{ $service->title }}
+                                    </div>
+                                </label>
+                            @empty
+                                <div class="text-sm text-gray-400">No services available.</div>
+                            @endforelse
                         </div>
+                        <div id="service-search-empty" class="text-sm text-gray-400 mt-3 hidden">No services found.</div>
                     </div>
 
                     <!-- Scheduling Section -->
-                    <div class="grid grid-cols-1 gap-6 mb-8">
-                        <div>
-                            <h4 class="font-normal text-gray-400 mb-4">Service 1</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <div class="relative flex-1">
-                                    <input type="text" name="yoga_therapy_service" value="Life Coach" disabled
-                                        class="w-full h-full py-2 px-4 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-[#252525] font-medium cursor-not-allowed">
-                                </div>
-                                <div class="relative flex-1" id="duration-dropdown-container">
-                                    <div class="duration-picker-trigger h-full py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
-                                        onclick="
-                                            const dd = this.nextElementSibling.nextElementSibling; 
-                                            dd.classList.toggle('hidden'); 
-                                            const icon = this.querySelector('i'); 
-                                            // Close all other duration dropdowns
-                                            document.querySelectorAll('.duration-dropdown').forEach(d => {
-                                                if(d !== dd) { d.classList.add('hidden'); }
-                                            });
-                                            if(dd.classList.contains('hidden')) { 
-                                                icon.className='ri-arrow-down-s-line text-gray-700 text-lg';
-                                                dd.classList.remove('cal-open-top', 'cal-open-bottom');
-                                            } else { 
-                                                icon.className='ri-arrow-up-s-line text-gray-700 text-lg'; 
-                                                if(typeof smartPosition !== 'undefined') { smartPosition(this, dd); } 
-                                            }">
-                                        <span class="text-sm text-gray-700 font-normal duration-label">Duration</span>
-                                        <i class="ri-arrow-down-s-line text-gray-700 text-lg"></i>
+                    <div class="grid grid-cols-1 gap-6 mb-8" id="service-schedule-container">
+                        @forelse($services as $service)
+                            <div class="service-schedule-item" data-service-name="{{ strtolower($service->title) }}" data-service-id="{{ $service->id }}">
+                                <h4 class="font-normal text-gray-400 mb-4">Service <span class="service-index">{{ $loop->iteration }}</span></h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <div class="relative flex-1">
+                                        <input type="text" value="{{ $service->title }}" disabled
+                                            class="w-full h-full py-2 px-4 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-[#252525] font-medium cursor-not-allowed">
+                                        <input type="hidden" name="services[{{ $service->id }}][id]" value="{{ $service->id }}">
+                                        <input type="hidden" name="services[{{ $service->id }}][title]" value="{{ $service->title }}">
                                     </div>
-                                    <input type="hidden" name="yoga_therapy_duration" class="duration-value">
-
-                                    <!-- Dropdown Menu -->
-                                    <div
-                                        class="duration-dropdown hidden absolute left-0 w-72 bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 z-50">
-                                        <div class="p-2">
-                                            <!-- Option 1 -->
-                                            <label
-                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
-                                                <div class="flex items-center gap-3">
-                                                    <input type="radio" name="temp_duration" value="45 Mins"
-                                                        class="peer hidden">
-                                                    <div
-                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
-                                                        <div
-                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
-                                                        </div>
-                                                    </div>
-                                                    <span class="text-[15px] text-[#404040]">45 Mins</span>
-                                                </div>
-                                                <span class="text-[15px] font-medium text-[#29724C]">€ 50</span>
-                                            </label>
-
-                                            <!-- Option 2 -->
-                                            <label
-                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
-                                                <div class="flex items-center gap-3">
-                                                    <input type="radio" name="temp_duration" value="1 Hour"
-                                                        class="peer hidden" checked>
-                                                    <div
-                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
-                                                        <div
-                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
-                                                        </div>
-                                                    </div>
-                                                    <span class="text-[15px] text-[#404040]">1 Hour</span>
-                                                </div>
-                                                <span class="text-[15px] font-medium text-[#29724C]">€ 100</span>
-                                            </label>
-
-                                            <!-- Option 3 -->
-                                            <label
-                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
-                                                <div class="flex items-center gap-3">
-                                                    <input type="radio" name="temp_duration" value="2 Hours"
-                                                        class="peer hidden">
-                                                    <div
-                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
-                                                        <div
-                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
-                                                        </div>
-                                                    </div>
-                                                    <span class="text-[15px] text-[#404040]">2 Hours</span>
-                                                </div>
-                                                <span class="text-[15px] font-medium text-[#29724C]">€ 150</span>
-                                            </label>
+                                    <div class="relative flex-1">
+                                        <div class="duration-picker-trigger h-full py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
+                                            onclick="
+                                                const dd = this.nextElementSibling.nextElementSibling; 
+                                                dd.classList.toggle('hidden'); 
+                                                const icon = this.querySelector('i'); 
+                                                // Close all other duration dropdowns
+                                                document.querySelectorAll('.duration-dropdown').forEach(d => {
+                                                    if(d !== dd) { d.classList.add('hidden'); }
+                                                });
+                                                if(dd.classList.contains('hidden')) { 
+                                                    icon.className='ri-arrow-down-s-line text-gray-700 text-lg';
+                                                    dd.classList.remove('cal-open-top', 'cal-open-bottom');
+                                                } else { 
+                                                    icon.className='ri-arrow-up-s-line text-gray-700 text-lg'; 
+                                                    if(typeof smartPosition !== 'undefined') { smartPosition(this, dd); } 
+                                                }">
+                                            <span class="text-sm text-gray-700 font-normal duration-label">Duration</span>
+                                            <i class="ri-arrow-down-s-line text-gray-700 text-lg"></i>
                                         </div>
+                                        <input type="hidden" name="services[{{ $service->id }}][duration]" class="duration-value">
 
-                                        <hr class="border-gray-100 m-0">
+                                        <!-- Dropdown Menu -->
+                                        <div
+                                            class="duration-dropdown hidden absolute left-0 w-72 bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 z-50">
+                                            <div class="p-2">
+                                                <!-- Option 1 -->
+                                                <label
+                                                    class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
+                                                    <div class="flex items-center gap-3">
+                                                        <input type="radio" name="temp_duration_{{ $service->id }}" value="45 Mins"
+                                                            class="peer hidden">
+                                                        <div
+                                                            class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
+                                                            <div
+                                                                class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
+                                                            </div>
+                                                        </div>
+                                                        <span class="text-[15px] text-[#404040]">45 Mins</span>
+                                                    </div>
+                                                    <span class="text-[15px] font-medium text-[#29724C]">??? 50</span>
+                                                </label>
 
-                                        <!-- Footer -->
-                                        <div class="p-3.5 flex items-center justify-end gap-3 rounded-b-2xl bg-white">
-                                            <button type="button"
-                                                class="text-[15px] text-[#594B4B] font-medium px-4 py-2 hover:bg-gray-50 rounded-full cursor-pointer transition-colors border-none bg-transparent"
-                                                onclick="
-                                                let dd = this.closest('.duration-dropdown');
-                                                let active = dd.querySelector('input[type=radio]:checked');
-                                                if (active) active.checked = false;
-                                                dd.previousElementSibling.value = '';
-                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = 'Duration';
-                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-gray-600');
-                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-[#252525]');
-                                                dd.classList.add('hidden');
-                                                dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
-                                            ">
-                                                Clear
-                                            </button>
-                                            <button type="button"
-                                                class="bg-[#41B882] text-white px-6 py-2 rounded-full text-[15px] font-medium hover:bg-[#38A172] cursor-pointer transition-colors shadow-sm border-none"
-                                                onclick="
-                                                let dd = this.closest('.duration-dropdown');
-                                                let checked = dd.querySelector('input[type=radio]:checked');
-                                                if(checked) {
-                                                    let val = checked.value;
-                                                    dd.previousElementSibling.value = val;
-                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = val;
-                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-gray-600');
-                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-[#252525]', 'font-medium');
-                                                }
-                                                dd.classList.add('hidden');
-                                                dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
-                                            ">
-                                                Set
-                                            </button>
+                                                <!-- Option 2 -->
+                                                <label
+                                                    class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
+                                                    <div class="flex items-center gap-3">
+                                                        <input type="radio" name="temp_duration_{{ $service->id }}" value="1 Hour"
+                                                            class="peer hidden" checked>
+                                                        <div
+                                                            class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
+                                                            <div
+                                                                class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
+                                                            </div>
+                                                        </div>
+                                                        <span class="text-[15px] text-[#404040]">1 Hour</span>
+                                                    </div>
+                                                    <span class="text-[15px] font-medium text-[#29724C]">??? 100</span>
+                                                </label>
+
+                                                <!-- Option 3 -->
+                                                <label
+                                                    class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
+                                                    <div class="flex items-center gap-3">
+                                                        <input type="radio" name="temp_duration_{{ $service->id }}" value="2 Hours"
+                                                            class="peer hidden">
+                                                        <div
+                                                            class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
+                                                            <div
+                                                                class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
+                                                            </div>
+                                                        </div>
+                                                        <span class="text-[15px] text-[#404040]">2 Hours</span>
+                                                    </div>
+                                                    <span class="text-[15px] font-medium text-[#29724C]">??? 150</span>
+                                                </label>
+                                            </div>
+
+                                            <hr class="border-gray-100 m-0">
+
+                                            <!-- Footer -->
+                                            <div class="p-3.5 flex items-center justify-end gap-3 rounded-b-2xl bg-white">
+                                                <button type="button"
+                                                    class="text-[15px] text-[#594B4B] font-medium px-4 py-2 hover:bg-gray-50 rounded-full cursor-pointer transition-colors border-none bg-transparent"
+                                                    onclick="
+                                                    let dd = this.closest('.duration-dropdown');
+                                                    let active = dd.querySelector('input[type=radio]:checked');
+                                                    if (active) active.checked = false;
+                                                    dd.previousElementSibling.value = '';
+                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = 'Duration';
+                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-gray-600');
+                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-[#252525]');
+                                                    dd.classList.add('hidden');
+                                                    dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
+                                                ">
+                                                    Clear
+                                                </button>
+                                                <button type="button"
+                                                    class="bg-[#41B882] text-white px-6 py-2 rounded-full text-[15px] font-medium hover:bg-[#38A172] cursor-pointer transition-colors shadow-sm border-none"
+                                                    onclick="
+                                                    let dd = this.closest('.duration-dropdown');
+                                                    let checked = dd.querySelector('input[type=radio]:checked');
+                                                    if(checked) {
+                                                        let val = checked.value;
+                                                        dd.previousElementSibling.value = val;
+                                                        dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = val;
+                                                        dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-gray-600');
+                                                        dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-[#252525]', 'font-medium');
+                                                    }
+                                                    dd.classList.add('hidden');
+                                                    dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
+                                                ">
+                                                    Set
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="relative flex-1">
-                                    <div class="day-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
-                                        onclick="toggleCalendar(this)">
-                                        <span class="text-sm text-gray-700 day-label">Day</span>
-                                        <i class="ri-calendar-line text-gray-700 text-lg"></i>
+                                    <div class="relative flex-1">
+                                        <div class="day-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
+                                            onclick="toggleCalendar(this)">
+                                            <span class="text-sm text-gray-700 day-label">Day</span>
+                                            <i class="ri-calendar-line text-gray-700 text-lg"></i>
+                                        </div>
+                                        <input type="hidden" name="services[{{ $service->id }}][day]" class="day-value">
+                                        <div class="calendar-dropdown hidden">
+                                            <div class="calendar-wrapper"></div>
+                                        </div>
                                     </div>
-                                    <input type="hidden" name="yoga_therapy_day" class="day-value">
-                                    <div class="calendar-dropdown hidden">
-                                        <div class="calendar-wrapper"></div>
-                                    </div>
-                                </div>
-                                <div class="relative flex-1">
-                                    <div class="time-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
-                                        onclick="toggleTimePicker(this)">
-                                        <span class="text-sm text-gray-700 time-label">Time</span>
-                                        <i class="ri-time-line text-gray-700 text-lg"></i>
-                                    </div>
-                                    <input type="hidden" name="yoga_therapy_time" class="time-value">
-                                    <div class="time-picker-dropdown hidden">
-                                        <div class="time-picker-content"></div>
+                                    <div class="relative flex-1">
+                                        <div class="time-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
+                                            onclick="toggleTimePicker(this)">
+                                            <span class="text-sm text-gray-700 time-label">Time</span>
+                                            <i class="ri-time-line text-gray-700 text-lg"></i>
+                                        </div>
+                                        <input type="hidden" name="services[{{ $service->id }}][time]" class="time-value">
+                                        <div class="time-picker-dropdown hidden">
+                                            <div class="time-picker-content"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div>
-                            <h4 class="font-normal text-gray-400 mb-4">Service 2</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <div class="relative flex-1">
-                                    <input type="text" name="yoga_therapy_service" value="Body Massage" disabled
-                                        class="w-full h-full py-2 px-4 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-[#252525] font-medium cursor-not-allowed">
-                                </div>
-                                <div class="relative flex-1" id="duration-dropdown-container">
-                                    <div class="duration-picker-trigger h-full py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
-                                        onclick="
-                                            const dd = this.nextElementSibling.nextElementSibling; 
-                                            dd.classList.toggle('hidden'); 
-                                            const icon = this.querySelector('i'); 
-                                            // Close all other duration dropdowns
-                                            document.querySelectorAll('.duration-dropdown').forEach(d => {
-                                                if(d !== dd) { d.classList.add('hidden'); }
-                                            });
-                                            if(dd.classList.contains('hidden')) { 
-                                                icon.className='ri-arrow-down-s-line text-gray-700 text-lg';
-                                                dd.classList.remove('cal-open-top', 'cal-open-bottom');
-                                            } else { 
-                                                icon.className='ri-arrow-up-s-line text-gray-700 text-lg'; 
-                                                if(typeof smartPosition !== 'undefined') { smartPosition(this, dd); } 
-                                            }">
-                                        <span class="text-sm text-gray-700 font-normal duration-label">Duration</span>
-                                        <i class="ri-arrow-down-s-line text-gray-700 text-lg"></i>
-                                    </div>
-                                    <input type="hidden" name="yoga_therapy_duration" class="duration-value">
-
-                                    <!-- Dropdown Menu -->
-                                    <div
-                                        class="duration-dropdown hidden absolute left-0 w-72 bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 z-50">
-                                        <div class="p-2">
-                                            <!-- Option 1 -->
-                                            <label
-                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
-                                                <div class="flex items-center gap-3">
-                                                    <input type="radio" name="temp_duration" value="45 Mins"
-                                                        class="peer hidden">
-                                                    <div
-                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
-                                                        <div
-                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
-                                                        </div>
-                                                    </div>
-                                                    <span class="text-[15px] text-[#404040]">45 Mins</span>
-                                                </div>
-                                                <span class="text-[15px] font-medium text-[#29724C]">€ 50</span>
-                                            </label>
-
-                                            <!-- Option 2 -->
-                                            <label
-                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
-                                                <div class="flex items-center gap-3">
-                                                    <input type="radio" name="temp_duration" value="1 Hour"
-                                                        class="peer hidden" checked>
-                                                    <div
-                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
-                                                        <div
-                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
-                                                        </div>
-                                                    </div>
-                                                    <span class="text-[15px] text-[#404040]">1 Hour</span>
-                                                </div>
-                                                <span class="text-[15px] font-medium text-[#29724C]">€ 100</span>
-                                            </label>
-
-                                            <!-- Option 3 -->
-                                            <label
-                                                class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
-                                                <div class="flex items-center gap-3">
-                                                    <input type="radio" name="temp_duration" value="2 Hours"
-                                                        class="peer hidden">
-                                                    <div
-                                                        class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
-                                                        <div
-                                                            class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
-                                                        </div>
-                                                    </div>
-                                                    <span class="text-[15px] text-[#404040]">2 Hours</span>
-                                                </div>
-                                                <span class="text-[15px] font-medium text-[#29724C]">€ 150</span>
-                                            </label>
-                                        </div>
-
-                                        <hr class="border-gray-100 m-0">
-
-                                        <!-- Footer -->
-                                        <div class="p-3.5 flex items-center justify-end gap-3 rounded-b-2xl bg-white">
-                                            <button type="button"
-                                                class="text-[15px] text-[#594B4B] font-medium px-4 py-2 hover:bg-gray-50 rounded-full cursor-pointer transition-colors border-none bg-transparent"
-                                                onclick="
-                                                let dd = this.closest('.duration-dropdown');
-                                                let active = dd.querySelector('input[type=radio]:checked');
-                                                if (active) active.checked = false;
-                                                dd.previousElementSibling.value = '';
-                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = 'Duration';
-                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-gray-600');
-                                                dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-[#252525]');
-                                                dd.classList.add('hidden');
-                                                dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
-                                            ">
-                                                Clear
-                                            </button>
-                                            <button type="button"
-                                                class="bg-[#41B882] text-white px-6 py-2 rounded-full text-[15px] font-medium hover:bg-[#38A172] cursor-pointer transition-colors shadow-sm border-none"
-                                                onclick="
-                                                let dd = this.closest('.duration-dropdown');
-                                                let checked = dd.querySelector('input[type=radio]:checked');
-                                                if(checked) {
-                                                    let val = checked.value;
-                                                    dd.previousElementSibling.value = val;
-                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = val;
-                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-gray-600');
-                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-[#252525]', 'font-medium');
-                                                }
-                                                dd.classList.add('hidden');
-                                                dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
-                                            ">
-                                                Set
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="relative flex-1">
-                                    <div class="day-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
-                                        onclick="toggleCalendar(this)">
-                                        <span class="text-sm text-gray-700 day-label">Day</span>
-                                        <i class="ri-calendar-line text-gray-700 text-lg"></i>
-                                    </div>
-                                    <input type="hidden" name="yoga_therapy_day" class="day-value">
-                                    <div class="calendar-dropdown hidden">
-                                        <div class="calendar-wrapper"></div>
-                                    </div>
-                                </div>
-                                <div class="relative flex-1">
-                                    <div class="time-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
-                                        onclick="toggleTimePicker(this)">
-                                        <span class="text-sm text-gray-700 time-label">Time</span>
-                                        <i class="ri-time-line text-gray-700 text-lg"></i>
-                                    </div>
-                                    <input type="hidden" name="yoga_therapy_time" class="time-value">
-                                    <div class="time-picker-dropdown hidden">
-                                        <div class="time-picker-content"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @empty
+                            <div class="text-sm text-gray-400">No services selected.</div>
+                        @endforelse
                     </div>
                 </div>
                 <!-- Footer Navigation -->
@@ -646,23 +439,22 @@
                 <div
                     class="bg-[#F5F5F5] rounded-2xl p-6 mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
-                        <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}" alt="Lily Marie"
+                        <img src="{{ $practitionerImage }}" alt="{{ $practitionerName }}"
                             class="w-[127px] h-[127px] rounded-full object-cover">
                         <div>
                             <div class="flex items-center gap-4 mb-2">
-                                <h3 class="font-medium font-sans! text-gray-900 lg:text-2xl text-xl leading-none">Lily
-                                    Marie
+                                <h3 class="font-medium font-sans! text-gray-900 lg:text-2xl text-xl leading-none">{{ $practitionerName }}
                                 </h3>
                                 <div>
                                     <i class="ri-star-fill text-base text-[#29724C] leading-none"></i>
                                     <span
-                                        class="text-base leading-none text-[#29724C] align-middle font-medium">4.6</span>
+                                        class="text-base leading-none text-[#29724C] align-middle font-medium">{{ $practitionerRating }}</span>
                                 </div>
                             </div>
-                            <p class="text-[#252525] text-base">Art Therapist</p>
+                            <p class="text-[#252525] text-base">{{ $practitionerRole }}</p>
                             <p class="text-[#7D7D7D] text-sm flex items-center gap-1 mt-2"><i
                                     class="ri-map-pin-line"></i>
-                                Kazhakuttam, Trivandrum</p>
+                                {{ $practitionerLocation }}</p>
                         </div>
                     </div>
                     <button type="button" onclick="openPractitionerModal()"
@@ -856,7 +648,8 @@
     </div>
 
     <script>
-        let currentStep = 1;
+        const isLoggedIn = @json($isLoggedIn);
+        let currentStep = isLoggedIn ? 2 : 1;
         const totalSteps = 3;
 
         function updateStepIndicator() {
@@ -864,6 +657,16 @@
                 const circle = document.getElementById(`step-circle-${i}`);
                 const label = document.getElementById(`step-label-${i}`);
                 const line = document.getElementById(`step-line-${i}`);
+
+                if (isLoggedIn && i === 1) {
+                    circle.className = 'w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]';
+                    circle.textContent = i;
+                    label.className = 'text-xs md:text-base text-gray-400 mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight';
+                    if (line) {
+                        line.className = 'w-10 sm:w-16 md:w-[100px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]';
+                    }
+                    continue;
+                }
 
                 if (i < currentStep) {
                     // Completed step
@@ -894,6 +697,9 @@
         }
 
         function showStep(stepNumber) {
+            if (isLoggedIn && stepNumber === 1) {
+                stepNumber = 2;
+            }
             for (let i = 1; i <= totalSteps; i++) {
                 const content = document.getElementById(`step-${i}-content`);
                 if (i === stepNumber) {
@@ -914,6 +720,9 @@
         }
 
         function previousStep() {
+            if (isLoggedIn && currentStep === 2) {
+                return;
+            }
             if (currentStep > 1) {
                 showStep(currentStep - 1);
             }
@@ -921,10 +730,15 @@
 
         // Translator checkbox toggle
         document.addEventListener('DOMContentLoaded', function () {
+            showStep(currentStep);
             // Service tags selection and syncing with search box
             const selectedServicesContainer = document.getElementById('selected-services-container');
-            // const searchDivider = document.getElementById('service-search-divider');
+            const searchDivider = document.getElementById('service-search-divider');
             const serviceSearchInputWrapper = document.getElementById('service-search-input-wrapper');
+            const serviceSearchInput = document.getElementById('service-search-input');
+            const serviceTags = Array.from(document.querySelectorAll('.service-tag-label'));
+            const scheduleItems = Array.from(document.querySelectorAll('.service-schedule-item'));
+            const serviceSearchEmpty = document.getElementById('service-search-empty');
 
             function renderSelectedServices() {
                 const checkedBoxes = document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked');
@@ -932,10 +746,13 @@
 
                 if (checkedBoxes.length > 0) {
                     // searchDivider.style.display = 'block';
+                    if (searchDivider) {
+                        searchDivider.style.display = 'block';
+                    }
                     serviceSearchInputWrapper.style.flex = '0 0 160px'; // ensure input space
 
                     checkedBoxes.forEach(box => {
-                        const val = box.value.replace(/ \d+$/, ''); // Handle demo duplicates
+                        const val = box.value;
                         const pill = document.createElement('div');
                         pill.className = 'px-4 py-2 rounded-full border border-gray-300 bg-transparent text-gray-700 text-sm font-normal whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1 hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] transition-colors';
                         pill.textContent = val;
@@ -948,9 +765,70 @@
                         selectedServicesContainer.appendChild(pill);
                     });
                 } else {
-                    searchDivider.style.display = 'none';
+                    if (searchDivider) {
+                        searchDivider.style.display = 'none';
+                    }
                     serviceSearchInputWrapper.style.flex = '1';
                 }
+
+                syncScheduleWithSelection(checkedBoxes);
+            }
+
+            function resetScheduleItem(item) {
+                item.querySelectorAll('.duration-value, .day-value, .time-value').forEach(input => {
+                    input.value = '';
+                });
+
+                item.querySelectorAll('.duration-dropdown input[type="radio"]').forEach(radio => {
+                    radio.checked = false;
+                });
+
+                item.querySelectorAll('.duration-label').forEach(label => {
+                    label.textContent = 'Duration';
+                    label.classList.add('text-gray-600');
+                    label.classList.remove('text-[#252525]', 'font-medium');
+                });
+
+                item.querySelectorAll('.day-label').forEach(label => {
+                    label.textContent = 'Day';
+                    label.classList.add('text-gray-700');
+                    label.classList.remove('text-gray-400');
+                });
+
+                item.querySelectorAll('.time-label').forEach(label => {
+                    label.textContent = 'Time';
+                    label.classList.add('text-gray-700');
+                    label.classList.remove('text-gray-400');
+                });
+            }
+
+            function updateScheduleIndices() {
+                let idx = 1;
+                scheduleItems.forEach(item => {
+                    const label = item.querySelector('.service-index');
+                    if (!label) return;
+                    if (item.classList.contains('hidden')) return;
+                    label.textContent = idx;
+                    idx += 1;
+                });
+            }
+
+            function syncScheduleWithSelection(checkedBoxes) {
+                const selectedSet = new Set(
+                    Array.from(checkedBoxes).map(box => box.value.trim().toLowerCase())
+                );
+
+                scheduleItems.forEach(item => {
+                    const name = item.dataset.serviceName || '';
+                    if (selectedSet.has(name)) {
+                        item.classList.remove('hidden');
+                    } else {
+                        item.classList.add('hidden');
+                        resetScheduleItem(item);
+                    }
+                });
+
+                updateScheduleIndices();
             }
 
             document.querySelectorAll('.service-tag-label input[type="checkbox"]').forEach(box => {
@@ -959,6 +837,31 @@
 
             // Initial render
             renderSelectedServices();
+
+            // Service search filter
+            if (serviceSearchInput) {
+                serviceSearchInput.addEventListener('input', function () {
+                    const query = this.value.trim().toLowerCase();
+                    let visibleCount = 0;
+
+                    serviceTags.forEach(tag => {
+                        const name = tag.dataset.serviceName || '';
+                        const checkbox = tag.querySelector('input[type="checkbox"]');
+                        const isChecked = checkbox ? checkbox.checked : false;
+
+                        if (isChecked || !query || name.includes(query)) {
+                            tag.classList.remove('hidden');
+                            visibleCount += 1;
+                        } else {
+                            tag.classList.add('hidden');
+                        }
+                    });
+
+                    if (serviceSearchEmpty) {
+                        serviceSearchEmpty.classList.toggle('hidden', !query || visibleCount > 0);
+                    }
+                });
+            }
 
 
             const translatorCheckbox = document.getElementById('need-translator');
