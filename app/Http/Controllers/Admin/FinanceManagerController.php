@@ -138,7 +138,16 @@ class FinanceManagerController extends Controller
         if ($isSuperAdmin || empty($user->national_id)) {
             $countries = $allCountries;
         } else {
-            $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+            $assignedCountryIds = $user->national_id;
+            if (is_string($assignedCountryIds)) {
+                $decoded = json_decode($assignedCountryIds, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $assignedCountryIds = $decoded;
+                }
+            }
+            if (!is_array($assignedCountryIds)) {
+                $assignedCountryIds = [$assignedCountryIds];
+            }
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
@@ -209,8 +218,8 @@ class FinanceManagerController extends Controller
         $user = User::where('role', 'finance_manager')->findOrFail($id);
 
         $request->validate([
-            'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*'],
-                        'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*'],
+            'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
+                        'lastname'  => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
             'email'     => 'required|email|unique:users,email,' . $id,
             'country'   => 'required|array',
             'country.*' => 'exists:countries,id',

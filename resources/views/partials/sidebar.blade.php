@@ -292,9 +292,12 @@
                     @if(auth()->user()->hasPermission('settings-view'))
                     <li> <a href="{{ route('admin.contact-us.index') }}">Contact Us Settings</a></li>
                     @endif
+                    <li> <a href="{{ route('admin.profilepage-settings.index') }}">Admin pannel  Settings</a></li>
+                    
                 </ul>
             </li>
             @endif
+            
 
             @if(auth()->user()->hasPermission('contact-messages-view'))
             <li class="sidebar-list">
