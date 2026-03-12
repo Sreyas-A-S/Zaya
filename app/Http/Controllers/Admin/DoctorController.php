@@ -21,8 +21,12 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 
+use App\Traits\AdminFilterTrait;
+
 class DoctorController extends Controller
 {
+    use AdminFilterTrait;
+
     public function __construct()
     {
         $this->middleware('permission:doctors-view')->only(['index', 'show']);
@@ -61,12 +65,8 @@ class DoctorController extends Controller
                     'doctors.last_name'
                 ]);
 
-            // Role-based country restriction
-            if (!$isSuperAdmin && !empty($user->national_id)) {
-                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
-                $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
-                $query->whereIn('doctors.country', $assignedCountryNames);
-            }
+            // Apply Admin Filters (Country & Language)
+            $query = $this->applyAdminFilters($query, 'user');
 
             $query->orderBy('users.created_at', 'desc');
 

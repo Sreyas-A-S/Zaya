@@ -21,8 +21,12 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Str;
 
+use App\Traits\AdminFilterTrait;
+
 class PractitionerController extends Controller
 {
+    use AdminFilterTrait;
+
     public function __construct()
     {
         $this->middleware('permission:practitioners-view')->only(['index', 'show']);
@@ -58,12 +62,8 @@ class PractitionerController extends Controller
                     'practitioners.country'
                 ]);
 
-            // Role-based country restriction
-            if (!$isSuperAdmin && !empty($user->national_id)) {
-                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
-                $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
-                $query->whereIn('practitioners.country', $assignedCountryNames);
-            }
+            // Apply Admin Filters (Country & Language)
+            $query = $this->applyAdminFilters($query, 'user');
 
             $query->orderBy('users.created_at', 'desc');
 

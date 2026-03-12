@@ -11,8 +11,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Yajra\DataTables\Facades\DataTables;
 
+use App\Traits\AdminFilterTrait;
+
 class UserManagerController extends Controller
 {
+    use AdminFilterTrait;
+
     /**
      * Display listing (DataTable)
      */
@@ -22,6 +26,9 @@ class UserManagerController extends Controller
 
             $data = User::where('role', 'user_manager')
                         ->select('users.*');
+
+            // Apply Admin Filters (Country & Language)
+            $data = $this->applyAdminFilters($data, 'user');
 
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -96,8 +103,19 @@ class UserManagerController extends Controller
                 ->make(true);
         }
 
-        $countries = Country::all();
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $role = $user->roleData();
+        $isSuperAdmin = ($role && $role->name === 'Super Admin');
+
+        $allCountries = Country::all();
         $languages = Language::all();
+
+        if ($isSuperAdmin) {
+            $countries = $allCountries;
+        } else {
+            $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
+            $countries = $allCountries->whereIn('id', $assignedCountryIds);
+        }
 
         return view('admin.user-manager.index', compact('countries', 'languages'));
     }

@@ -12,8 +12,12 @@ use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\DataTables;
 
 
+use App\Traits\AdminFilterTrait;
+
 class AdminsController extends Controller
 {
+    use AdminFilterTrait;
+
     public function __construct()
     {
         $this->middleware('permission:admins-view')->only(['index', 'show']);
@@ -43,11 +47,8 @@ class AdminsController extends Controller
                     'users.national_id'
                 ]);
 
-            // Role-based country restriction for the query
-            if (!$isSuperAdmin && !empty($user->national_id)) {
-                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
-                $query->whereIn('users.national_id', $assignedCountryIds);
-            }
+            // Apply Admin Filters (Country & Language)
+            $query = $this->applyAdminFilters($query, 'user');
 
             return DataTables::of($query)
                 ->addIndexColumn()

@@ -99,6 +99,19 @@ class LanguageController extends Controller
     public function change($code)
     {
         $code = strtolower((string) $code);
+
+        if ($code === 'all') {
+            Session::put('locale', 'all');
+            session(['locale' => 'all']);
+            
+            return response()->json([
+                'status' => true,
+                'language' => 'all',
+                'data' => [],
+                'translations' => [],
+            ]);
+        }
+
         $baseCode = explode('-', $code)[0];
 
         // Find the language by exact code or by base code (preferring shorter code)

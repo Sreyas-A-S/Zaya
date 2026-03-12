@@ -11,8 +11,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Yajra\DataTables\Facades\DataTables;
 
+use App\Traits\AdminFilterTrait;
+
 class ContentManagerController extends Controller
 {
+    use AdminFilterTrait;
+
     /**
      * Display listing (DataTable)
      */
@@ -27,17 +31,8 @@ class ContentManagerController extends Controller
             $data = User::where('role', 'content_manager')
                         ->select('users.*');
 
-            // Role-based country restriction
-            if (!$isSuperAdmin) {
-                $assignedCountryIds = is_array($user->national_id) ? $user->national_id : [$user->national_id];
-                $data->where(function($q) use ($assignedCountryIds) {
-                    foreach ($assignedCountryIds as $id) {
-                        $q->orWhereJsonContains('users.national_id', (int)$id)
-                          ->orWhereJsonContains('users.national_id', (string)$id)
-                          ->orWhere('users.national_id', $id);
-                    }
-                });
-            }
+            // Apply Admin Filters (Country & Language)
+            $data = $this->applyAdminFilters($data, 'user');
 
             return DataTables::of($data)
                 ->addIndexColumn()
