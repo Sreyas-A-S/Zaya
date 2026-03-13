@@ -3,7 +3,7 @@
 @section('content')
 
     <!-- Hero Banner Section -->
-    <section class="pt-[144px] md:pt-[150px] pb-12 px-4 md:px-6 bg-white">
+    <section class="pt-[144px] md:pt-[150px] pb-4 md:pb-12 px-4 md:px-6 bg-white">
         <div
             class="container mx-auto relative h-[280px] md:h-[484px] rounded-[30px] overflow-hidden flex items-center justify-center">
             <!-- Background Image -->
@@ -16,7 +16,7 @@
                 <h1 id="contact_banner_title" class="text-4xl md:text-5xl font-serif font-bold text-white mb-4 tracking-wide">
                     {!! $settings['contact_banner_title'] ?? 'Contact Us' !!}
                 </h1>
-                <p id="contact_banner_subtitle" class="text-white/80 text-base md:text-xl max-w-3xl mx-auto leading-[35px]">
+                <p id="contact_banner_subtitle" class="text-white/80 text-base md:text-xl max-w-3xl mx-auto leading-relaxed font-normal">
                     {!! $settings['contact_banner_subtitle'] ?? 'Zaya connects you with trusted Ayurvedic practitioners for personalized wellness guidance, treatments, and ongoing practitioner or client support.' !!}
                 </p>
             </div>
@@ -31,7 +31,7 @@
                 <div
                     class="bg-[#FFFFFF] rounded-2xl p-6 flex flex-col items-center text-center gap-3 shadow-[0_30px_82px_rgba(186,186,186,0.29)] transition-all duration-300 group">
                     <div
-                        class="w-14 h-14 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
+                        class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-accent transition-colors">
                         <i class="ri-map-pin-line text-primary text-2xl"></i>
                     </div>
                     <h3 id="contact-info-location-label" class="text-primary font-bold font-sans! text-sm tracking-wider">{{ __('Location') }}</h3>
@@ -42,7 +42,7 @@
                 <div
                     class="bg-[#FFFFFF] rounded-2xl p-6 flex flex-col items-center text-center gap-3 shadow-[0_30px_82px_rgba(186,186,186,0.29)] transition-all duration-300 group">
                     <div
-                        class="w-14 h-14 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
+                        class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-accent transition-colors">
                         <i class="ri-phone-line text-primary text-2xl"></i>
                     </div>
                     <h3 id="contact-info-phone-label" class="text-primary font-bold font-sans! text-sm tracking-wider">{{ __('Contact') }}</h3>
@@ -53,7 +53,7 @@
                 <div
                     class="bg-[#FFFFFF] rounded-2xl p-6 flex flex-col items-center text-center gap-3 shadow-[0_30px_82px_rgba(186,186,186,0.29)] transition-all duration-300 group">
                     <div
-                        class="w-14 h-14 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
+                        class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-accent transition-colors">
                         <i class="ri-mail-line text-primary text-2xl"></i>
                     </div>
                     <h3 id="contact-info-email-label" class="text-primary font-bold font-sans! text-sm tracking-wider">{{ __('Email') }}</h3>
@@ -64,7 +64,7 @@
                 <div
                     class="bg-[#FFFFFF] rounded-2xl p-6 flex flex-col items-center text-center gap-3 shadow-[0_30px_82px_rgba(186,186,186,0.29)] transition-all duration-300 group">
                     <div
-                        class="w-14 h-14 rounded-full bg-[#97563D]/10 flex items-center justify-center group-hover:bg-accent transition-colors">
+                        class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-accent transition-colors">
                         <i class="ri-time-line text-primary text-2xl"></i>
                     </div>
                     <h3 id="contact-info-working-hours-label" class="text-primary font-bold font-sans! text-sm tracking-wider">{{ __('Working Hours') }}</h3>
@@ -75,18 +75,18 @@
     </section>
 
     <!-- Send Us A Message Section -->
-    <section class="py-12 md:py-20 px-4 md:px-6 relative overflow-hidden">
+    <section class="py-12 md:py-20 px-8 relative overflow-hidden">
         <!-- Decorative Leaves -->
         <img src="{{ asset('frontend/assets/otoo-img.png') }}" alt="Leaf"
-            class="absolute top-16 left-0 w-24 md:w-44 pointer-events-none z-0 hidden md:block">
+            class="absolute lg:top-1/4 md:top-16 top-0 left-0 w-18 sm:w-30 md:w-34 xl:w-44 pointer-events-none z-0">
 
         <img src="{{ asset('frontend/assets/otoo-img-02.png') }}" alt="Leaf"
-            class="absolute bottom-50 right-0 w-28 md:w-44 pointer-events-none z-0 hidden md:block">
+            class="absolute md:bottom-50 bottom-0 right-0 w-18 sm:w-30 lg:w-34 xl:w-44 pointer-events-none z-0">
 
-        <div class="container mx-auto max-w-3xl relative z-10">
+        <div class="container mx-auto max-w-lg xl:max-w-2xl relative z-10">
             <!-- Section Heading -->
             <div class="text-center mb-10 md:mb-14">
-                <h2 id="contact_form_title" class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-secondary mb-3">{!! $settings['contact_form_title'] ?? 'Send Us A Message' !!}</h2>
+                <h2 id="contact_form_title" class="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-secondary mb-5">{!! $settings['contact_form_title'] ?? 'Send Us A Message' !!}</h2>
                 <p id="contact_form_subtitle" class="text-secondary text-base md:text-lg">{!! $settings['contact_form_subtitle'] ?? 'Your Pathway to Wellness Starts with a Conversation' !!}</p>
             </div>
 
@@ -173,7 +173,7 @@
                 </div>
 
                 <!-- Submit Button -->
-                <div class="flex justify-end pt-6">
+                <div class="flex md:justify-end justify-center pt-6">
                     <button id="contact-btn-submit" type="submit"
                         class="bg-[#E6E6E6] text-[#888888] px-10 py-3 rounded-full font-medium hover:bg-primary hover:text-white transition-all text-base cursor-pointer">
                         {{ __('Submit') }}
