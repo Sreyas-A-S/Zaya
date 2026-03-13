@@ -5,49 +5,55 @@ document.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector('header');
 
     // Toggle Mobile Menu
-    mobileMenuBtn.addEventListener('click', () => {
-        // Toggle animation classes
-        if (mobileMenu.classList.contains('max-h-0')) {
-            // Open
-            mobileMenu.classList.remove('max-h-0', 'opacity-0', 'invisible', '-translate-y-4');
-            mobileMenu.classList.add('max-h-[80vh]', 'opacity-100', 'visible', 'translate-y-0');
+    if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', () => {
+            // Toggle animation classes
+            if (mobileMenu.classList.contains('max-h-0')) {
+                // Open
+                mobileMenu.classList.remove('max-h-0', 'opacity-0', 'invisible', '-translate-y-4');
+                mobileMenu.classList.add('max-h-[80vh]', 'opacity-100', 'visible', 'translate-y-0');
 
-            // Wait for transition to finish before allowing scroll
-            setTimeout(() => {
-                mobileMenu.classList.remove('overflow-hidden');
-                mobileMenu.classList.add('overflow-y-auto');
-            }, 300);
-        } else {
-            // Close
-            mobileMenu.classList.remove('overflow-y-auto');
-            mobileMenu.classList.add('overflow-hidden');
+                // Wait for transition to finish before allowing scroll
+                setTimeout(() => {
+                    mobileMenu.classList.remove('overflow-hidden');
+                    mobileMenu.classList.add('overflow-y-auto');
+                }, 300);
+            } else {
+                // Close
+                mobileMenu.classList.remove('overflow-y-auto');
+                mobileMenu.classList.add('overflow-hidden');
 
-            mobileMenu.classList.add('max-h-0', 'opacity-0', 'invisible', '-translate-y-4');
-            mobileMenu.classList.remove('max-h-[80vh]', 'opacity-100', 'visible', 'translate-y-0');
-        }
-    });
+                mobileMenu.classList.add('max-h-0', 'opacity-0', 'invisible', '-translate-y-4');
+                mobileMenu.classList.remove('max-h-[80vh]', 'opacity-100', 'visible', 'translate-y-0');
+            }
+        });
+    }
 
     // Close mobile menu when clicking a link
-    mobileMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-            mobileMenu.classList.remove('overflow-y-auto');
-            mobileMenu.classList.add('overflow-hidden');
+    if (mobileMenu) {
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('overflow-y-auto');
+                mobileMenu.classList.add('overflow-hidden');
 
-            mobileMenu.classList.add('max-h-0', 'opacity-0', 'invisible', '-translate-y-4');
-            mobileMenu.classList.remove('max-h-[80vh]', 'opacity-100', 'visible', 'translate-y-0');
+                mobileMenu.classList.add('max-h-0', 'opacity-0', 'invisible', '-translate-y-4');
+                mobileMenu.classList.remove('max-h-[80vh]', 'opacity-100', 'visible', 'translate-y-0');
+            });
         });
-    });
+    }
 
     // Sticky Header Effect
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            header.classList.add('glass-nav');
-            // header.classList.remove('bg-white/60');
-        } else {
-            header.classList.remove('glass-nav');
-            // header.classList.add('bg-white/60');
-        }
-    });
+    if (header) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('glass-nav');
+                // header.classList.remove('bg-white/60');
+            } else {
+                header.classList.remove('glass-nav');
+                // header.classList.add('bg-white/60');
+            }
+        });
+    }
 
     // Simple fade-in animation for elements on scroll
     const observerOptions = {
@@ -447,7 +453,63 @@ function openPractitionerModal() {
             grabCursor: true,
             freeMode: true,
             slidesOffsetBefore: 40,
+        });
 
+        // Add selection logic once
+        modal.querySelectorAll('.practitioner-select-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Don't select if clicking 'See more' link
+                if (e.target.tagName === 'A') return;
+
+                const id = this.dataset.id;
+                const name = this.dataset.name;
+                const image = this.dataset.image;
+                const role = this.dataset.role;
+                const rating = this.dataset.rating;
+                const location = this.dataset.location;
+
+                // Update all practitioner cards on the page (Step 2 and Step 3)
+                document.querySelectorAll('img[alt$="Practitioner"], img[alt$="Profile Pic"]').forEach(img => {
+                    img.src = image;
+                    img.alt = name;
+                });
+
+                document.querySelectorAll('h3.font-medium.font-sans\\!').forEach(h3 => {
+                    if (h3.innerText.trim() !== 'ZAYA' && !h3.closest('.practitioner-select-card')) {
+                        h3.innerHTML = `${name}`;
+                    }
+                });
+
+                document.querySelectorAll('.ri-star-fill + span').forEach(span => {
+                    span.innerText = rating;
+                });
+
+                document.querySelectorAll('.text-\\[\\#252525\\].text-base').forEach(p => {
+                    if (!p.closest('.practitioner-select-card')) {
+                        p.innerText = role;
+                    }
+                });
+
+                document.querySelectorAll('.ri-map-pin-line').forEach(icon => {
+                    const p = icon.parentElement;
+                    if (p) {
+                        p.innerHTML = `<i class="ri-map-pin-line"></i> ${location}`;
+                    }
+                });
+
+                // Update hidden input for form submission
+                let hiddenInput = document.getElementById('selected-practitioner-id');
+                if (!hiddenInput) {
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = 'selected-practitioner-id';
+                    hiddenInput.name = 'practitioner_id';
+                    document.body.appendChild(hiddenInput);
+                }
+                hiddenInput.value = id;
+
+                closePractitionerModal();
+            });
         });
     }
 

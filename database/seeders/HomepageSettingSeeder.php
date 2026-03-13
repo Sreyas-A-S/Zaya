@@ -500,6 +500,234 @@ class HomepageSettingSeeder extends Seeder
                 'section' => 'contact_page',
                 'max_length' => 100
             ],
+
+            // Find Practitioner Page Settings
+            [
+                'key' => 'find_practitioner_title',
+                'value' => 'Experts in Your Neighborhood',
+                'type' => 'text',
+                'section' => 'find_practitioner_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'find_practitioner_subtitle',
+                'value' => 'Verified practitioners ready to support your journey',
+                'type' => 'text',
+                'section' => 'find_practitioner_page',
+                'max_length' => 150
+            ],
+            [
+                'key' => 'find_practitioner_description',
+                'value' => "Find the support you need, right in your community. Every practitioner listed here is part\nof ZAYA's practitioner-led network, committed to ethical care and holistic healing.",
+                'type' => 'textarea',
+                'section' => 'find_practitioner_page',
+                'max_length' => 500
+            ],
+            [
+                'key' => 'find_practitioner_search_placeholder',
+                'value' => 'Practitioners, Treatments...',
+                'type' => 'text',
+                'section' => 'find_practitioner_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'find_practitioner_pincode_placeholder',
+                'value' => 'Enter Pincode',
+                'type' => 'text',
+                'section' => 'find_practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'find_practitioner_service_placeholder',
+                'value' => 'Select Service',
+                'type' => 'text',
+                'section' => 'find_practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'find_practitioner_mode_placeholder',
+                'value' => 'Select Mode',
+                'type' => 'text',
+                'section' => 'find_practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'find_practitioner_results_heading',
+                'value' => 'Search Results Based on',
+                'type' => 'text',
+                'section' => 'find_practitioner_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'find_practitioner_load_more_btn',
+                'value' => 'Load More Profiles',
+                'type' => 'text',
+                'section' => 'find_practitioner_page',
+                'max_length' => 50
+            ],
+
+            // Practitioner Detail Page Settings
+            [
+                'key' => 'practitioner_book_session_btn',
+                'value' => 'Book a Session',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'practitioner_reviews_label',
+                'value' => "Client's Reviews",
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'practitioner_based_on',
+                'value' => 'Based on',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 30
+            ],
+            [
+                'key' => 'practitioner_reviewers',
+                'value' => 'Reviewers',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 30
+            ],
+            [
+                'key' => 'practitioner_total_sessions',
+                'value' => 'Total No.of Sessions',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'practitioner_total_clients',
+                'value' => 'Total No.of Clients',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'practitioner_legacy_title',
+                'value' => 'A Legacy of Expertise',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'practitioner_legacy_subtitle',
+                'value' => 'Precision and Passion Across Every Field',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 150
+            ],
+            [
+                'key' => 'practitioner_consultations_title',
+                'value' => 'Consultations',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'practitioner_therapies_title',
+                'value' => 'Therapies',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'practitioner_modalities_title',
+                'value' => 'Other Modalities',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'practitioner_glimpse_title',
+                'value' => 'A Glimpse Into My Practice',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'practitioner_glimpse_description',
+                'value' => 'Explore the spaces, rituals, and healing moments that define my approach to Ayurvedic wellness and patient care.',
+                'type' => 'textarea',
+                'section' => 'practitioner_page',
+                'max_length' => 300
+            ],
+            [
+                'key' => 'practitioner_explore_gallery_btn',
+                'value' => 'Explore Our Gallery',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'practitioner_stories_title',
+                'value' => 'Stories of Transformation',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'practitioner_stories_description',
+                'value' => 'The true measure of ZAYA Wellness lies in the journeys of our members. These stories reflect our commitment to authenticity and excellence.',
+                'type' => 'textarea',
+                'section' => 'practitioner_page',
+                'max_length' => 300
+            ],
+            [
+                'key' => 'practitioner_no_reviews',
+                'value' => 'No reviews yet for this practitioner.',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'practitioner_load_more_reviews',
+                'value' => 'Load More',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 30
+            ],
+            [
+                'key' => 'practitioner_cta_text',
+                'value' => 'Ready to start your wellness journey with',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 150
+            ],
+            [
+                'key' => 'practitioner_gallery_sanctuary',
+                'value' => 'Our Sanctuary',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'practitioner_gallery_rituals',
+                'value' => 'Expressive Rituals',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'practitioner_gallery_medium',
+                'value' => 'Medium of the Soul',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
+            [
+                'key' => 'practitioner_gallery_moments',
+                'value' => 'Moments of Clarity',
+                'type' => 'text',
+                'section' => 'practitioner_page',
+                'max_length' => 50
+            ],
         ];
 
         foreach ($settings as $setting) {

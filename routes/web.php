@@ -164,6 +164,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // Services Page Settings
     Route::get('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'index'])->name('services-settings.index');
     Route::post('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'update'])->name('services-settings.update');
+
+    // Find Practitioner Settings
+    Route::get('find-practitioner-settings', [\App\Http\Controllers\Admin\FindPractitionerSettingController::class, 'index'])->name('find-practitioner-settings.index');
+    Route::post('find-practitioner-settings', [\App\Http\Controllers\Admin\FindPractitionerSettingController::class, 'update'])->name('find-practitioner-settings.update');
     
     // Footer Page Settings
     Route::get('footer-settings', [\App\Http\Controllers\Admin\FooterPageController::class, 'index'])->name('footer-settings.index');

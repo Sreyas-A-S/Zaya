@@ -215,8 +215,15 @@ class WebController extends Controller
 
     public function practitionerDetail($slug)
     {
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+        
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+        }
+
         $practitioner = \App\Models\Practitioner::with(['user', 'reviews'])->where('slug', $slug)->firstOrFail();
-        return view('practitioner-detail', compact('practitioner'));
+        return view('practitioner-detail', compact('practitioner', 'settings'));
     }
 
     public function filterPractitioners(Request $request)

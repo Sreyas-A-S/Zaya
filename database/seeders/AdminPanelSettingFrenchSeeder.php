@@ -521,6 +521,14 @@ class AdminPanelSettingFrenchSeeder extends Seeder
                 'language' => 'fr',
             ],
             [
+                'key' => 'admin_panel_sidebar_find_practitioner_settings',
+                'value' => 'Paramètres de recherche de praticiens',
+                'type' => 'text',
+                'section' => 'admin_panel',
+                'max_length' => 70,
+                'language' => 'fr',
+            ],
+            [
                 'key' => 'admin_panel_sidebar_contact_us_settings',
                 'value' => 'Paramètres Contactez-nous',
                 'type' => 'text',

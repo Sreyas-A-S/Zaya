@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book a Session - Zaya Wellness</title>
+    <link rel="icon" type="image/png" href="{{ asset('frontend/assets/favicon-96x96.png') }}" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="{{ asset('frontend/assets/favicon.svg') }}" />
+    <link rel="shortcut icon" href="{{ asset('frontend/assets/favicon.ico') }}" />
     @vite(['resources/css/app.css', 'resources/css/book-session.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.1/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
@@ -281,10 +284,10 @@
                                                     icon.className='ri-arrow-up-s-line text-gray-700 text-lg'; 
                                                     if(typeof smartPosition !== 'undefined') { smartPosition(this, dd); } 
                                                 }">
-                                            <span class="text-sm text-gray-700 font-normal duration-label">Duration</span>
+                                            <span class="text-sm text-[#252525] font-medium duration-label">{{ $loop->first ? '1 Hour' : 'Duration' }}</span>
                                             <i class="ri-arrow-down-s-line text-gray-700 text-lg"></i>
                                         </div>
-                                        <input type="hidden" name="services[{{ $service->id }}][duration]" class="duration-value">
+                                        <input type="hidden" name="services[{{ $service->id }}][duration]" class="duration-value" value="{{ $loop->first ? '1 Hour' : '' }}">
 
                                         <!-- Dropdown Menu -->
                                         <div
@@ -375,6 +378,7 @@
                                                     }
                                                     dd.classList.add('hidden');
                                                     dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
+                                                    if(typeof updateStep3Services === 'function') updateStep3Services();
                                                 ">
                                                     Set
                                                 </button>
@@ -481,87 +485,13 @@
                         </button>
                     </div>
 
-                    <!-- Available Tags (Hidden in View Mode) -->
-                    <div id="condition-available-tags" class="mt-5 flex flex-wrap gap-2 hidden">
-                        <!-- These are just for design purposes, hardcoded based on the images -->
-                        <div class="condition-tag-option cursor-pointer px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm text-normal transition-colors hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"
-                            data-val="Identifying Imbalances">
-                            Identifying Imbalances
-                        </div>
-                        <div class="condition-tag-option cursor-pointer px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm text-normal transition-colors hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"
-                            data-val="Preventative Lifestyle Guidance">
-                            Preventative Lifestyle Guidance
-                        </div>
-                        <div class="condition-tag-option cursor-pointer px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm text-normal transition-colors hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"
-                            data-val="Holistic Restoration">
-                            Holistic Restoration
-                        </div>
-                        <div class="condition-tag-option cursor-pointer px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm text-normal transition-colors hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"
-                            data-val="Natural Healing">
-                            Natural Healing
-                        </div>
-                        <div class="condition-tag-option cursor-pointer px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm text-normal transition-colors hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"
-                            data-val="Prakriti">
-                            Prakriti
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Service List -->
                 <div class="mb-8">
                     <h4 class="text-gray-800 font-medium mb-3">Service</h4>
-                    <div class="flex flex-col gap-4">
-                        <!-- Service Item 1 -->
-                        <div
-                            class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                            <div class="md:col-span-5">
-                                <div class="flex items-center gap-3 mb-1">
-                                    <h3 class="text-lg font-medium text-gray-900">Life Coach</h3>
-                                    <span class="bg-[#FABD4D] text-[#423131] text-xs px-2 py-1 rounded-full">45
-                                        Mins</span>
-                                </div>
-                                <div class="text-gray-500 text-sm">
-                                    February 17, 2026 <span class="mx-2">•</span> 10.00 AM
-                                </div>
-                            </div>
-                            <div
-                                class="md:col-span-4 text-center md:border-l md:border-r border-gray-200 h-full flex items-center justify-start lg:justify-center">
-                                <span class="text-xl font-medium text-gray-900">€ 50.00</span>
-                            </div>
-                            <div class="md:col-span-3 text-right">
-                                <button type="button"
-                                    onclick="showStep(2); setTimeout(() => document.querySelector('#service-search-container').scrollIntoView({behavior: 'smooth', block: 'center'}), 100);"
-                                    class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-8 py-2.5 rounded-full text-sm font-medium transition-colors border-none cursor-pointer">
-                                    Change
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Service Item 2 -->
-                        <div
-                            class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                            <div class="md:col-span-5">
-                                <div class="flex items-center gap-3 mb-1">
-                                    <h3 class="text-lg font-medium text-gray-900">Yoga Therapy</h3>
-                                    <span class="bg-[#FABD4D] text-[423131] text-xs px-2 py-1 rounded-full">45
-                                        Mins</span>
-                                </div>
-                                <div class="text-gray-500 text-sm">
-                                    February 17, 2026 <span class="mx-2">•</span> 10.00 AM
-                                </div>
-                            </div>
-                            <div
-                                class="md:col-span-4 text-center md:border-l md:border-r border-gray-200 h-full flex items-center justify-start lg:justify-center   ">
-                                <span class="text-xl font-medium text-gray-900">€ 50.00</span>
-                            </div>
-                            <div class="md:col-span-3 text-right">
-                                <button type="button"
-                                    onclick="showStep(2); setTimeout(() => document.querySelector('#service-search-container').scrollIntoView({behavior: 'smooth', block: 'center'}), 100);"
-                                    class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-8 py-2.5 rounded-full text-sm font-medium transition-colors border-none cursor-pointer">
-                                    Change
-                                </button>
-                            </div>
-                        </div>
+                    <div class="flex flex-col gap-4" id="step3-services-container">
+                        <!-- Dynamically populated by JS -->
                     </div>
                 </div>
 
@@ -584,39 +514,44 @@
                     </label>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden" id="translator-options">
-                        <!-- Custom Language Dropdown -->
-                        <div class="custom-dropdown relative" id="language-dropdown">
-                            <input type="hidden" name="language" id="language-value">
+                        <!-- From Language Dropdown -->
+                        <div class="custom-dropdown relative" id="from-language-dropdown">
+                            <input type="hidden" name="from_language" id="from-language-value">
                             <button type="button"
                                 class="dropdown-trigger w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-base text-gray-400 flex items-center justify-between cursor-pointer transition-all duration-200 hover:bg-[#EFEFEF]"
-                                onclick="toggleDropdown('language-dropdown')">
-                                <span class="dropdown-label">Select your Language</span>
+                                onclick="toggleDropdown('from-language-dropdown')">
+                                <span class="dropdown-label">Select From Language</span>
                                 <i
                                     class="ri-arrow-down-s-line text-xl text-gray-400 transition-transform duration-200"></i>
                             </button>
                             <div
                                 class="dropdown-menu absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 z-50 hidden max-h-[280px] overflow-y-auto">
                                 <div class="py-2">
-                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="english">English</div>
-                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="french">French</div>
-                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="german">German</div>
-                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="spanish">Spanish</div>
-                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="hindi">Hindi</div>
-                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="bengali">Bengali</div>
-                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="japanese">Japanese</div>
-                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="arabic">Arabic</div>
-                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="mandarin">Mandarin</div>
-                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="portuguese">Portuguese</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="english">English</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="french">French</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="german">German</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="spanish">Spanish</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- To Language Dropdown -->
+                        <div class="custom-dropdown relative" id="to-language-dropdown">
+                            <input type="hidden" name="to_language" id="to-language-value">
+                            <button type="button"
+                                class="dropdown-trigger w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-base text-gray-400 flex items-center justify-between cursor-pointer transition-all duration-200 hover:bg-[#EFEFEF]"
+                                onclick="toggleDropdown('to-language-dropdown')">
+                                <span class="dropdown-label">Select To Language</span>
+                                <i
+                                    class="ri-arrow-down-s-line text-xl text-gray-400 transition-transform duration-200"></i>
+                            </button>
+                            <div
+                                class="dropdown-menu absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 z-50 hidden max-h-[280px] overflow-y-auto">
+                                <div class="py-2">
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="english">English</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="french">French</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="german">German</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="spanish">Spanish</div>
                                 </div>
                             </div>
                         </div>
@@ -764,38 +699,127 @@
             const scheduleItems = Array.from(document.querySelectorAll('.service-schedule-item'));
             const serviceSearchEmpty = document.getElementById('service-search-empty');
 
+            function updateStep3Services() {
+                const container = document.getElementById('step3-services-container');
+                if (!container) return;
+
+                const selectedServices = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
+                container.innerHTML = '';
+
+                if (selectedServices.length === 0) {
+                    container.innerHTML = '<div class="text-sm text-gray-400">No services selected.</div>';
+                    updateTotalPrice(0);
+                    return;
+                }
+
+                let total = 0;
+
+                selectedServices.forEach(checkbox => {
+                    const label = checkbox.closest('.service-tag-label');
+                    const serviceName = checkbox.value;
+                    const serviceNameLower = (label.dataset.serviceName || serviceName).toLowerCase();
+                    
+                    // Find scheduling details in Step 2
+                    const scheduleItem = document.querySelector(`.service-schedule-item[data-service-name="${serviceNameLower}"]`);
+                    let duration = "Duration";
+                    let day = "Day";
+                    let time = "Time";
+                    let price = 100; // Placeholder price logic
+
+                    if (scheduleItem) {
+                        duration = scheduleItem.querySelector('.duration-value').value || "Duration";
+                        day = scheduleItem.querySelector('.day-label').textContent || "Day";
+                        time = scheduleItem.querySelector('.time-label').textContent || "Time";
+                        
+                        // Extract numeric price from duration if possible, otherwise default
+                        const durationRadio = scheduleItem.querySelector('input[type="radio"]:checked');
+                        if (durationRadio) {
+                            const priceSpan = durationRadio.closest('label').querySelector('.text-\\[\\#29724C\\]');
+                            if (priceSpan) {
+                                const priceText = priceSpan.textContent.replace(/[^\d.]/g, '');
+                                price = parseFloat(priceText) || 100;
+                            }
+                        }
+                    }
+
+                    total += price;
+
+                    const html = `
+                        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                            <div class="md:col-span-5">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <h3 class="text-lg font-medium text-gray-900">${serviceName}</h3>
+                                    <span class="bg-[#FABD4D] text-[#423131] text-xs px-2 py-1 rounded-full">${duration}</span>
+                                </div>
+                                <div class="text-gray-500 text-sm">
+                                    ${day} <span class="mx-2">•</span> ${time}
+                                </div>
+                            </div>
+                            <div class="md:col-span-4 text-center md:border-l md:border-r border-gray-200 h-full flex items-center justify-start lg:justify-center">
+                                <span class="text-xl font-medium text-gray-900">€ ${price.toFixed(2)}</span>
+                            </div>
+                            <div class="md:col-span-3 text-right">
+                                <button type="button"
+                                    onclick="showStep(2); setTimeout(() => {
+                                        const target = document.querySelector('.service-schedule-item[data-service-name=\\'${serviceNameLower}\\']');
+                                        if (target) target.scrollIntoView({behavior: 'smooth', block: 'center'});
+                                    }, 100);"
+                                    class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-8 py-2.5 rounded-full text-sm font-medium transition-colors border-none cursor-pointer">
+                                    Change
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', html);
+                });
+
+                updateTotalPrice(total);
+            }
+
+            function updateTotalPrice(total) {
+                const priceContainer = document.querySelector('.text-4xl.font-medium.text-gray-900');
+                if (priceContainer) {
+                    priceContainer.innerHTML = `€ ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ EUR</span>`;
+                }
+            }
+
             function renderSelectedServices() {
                 const checkedBoxes = document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked');
-                selectedServicesContainer.innerHTML = '';
+                if (selectedServicesContainer) {
+                    selectedServicesContainer.innerHTML = '';
+                    
+                    if (checkedBoxes.length > 0) {
+                        if (searchDivider) {
+                            searchDivider.style.display = 'block';
+                        }
+                        if (serviceSearchInputWrapper) {
+                            serviceSearchInputWrapper.style.flex = '0 0 160px';
+                        }
 
-                if (checkedBoxes.length > 0) {
-                    // searchDivider.style.display = 'block';
-                    if (searchDivider) {
-                        searchDivider.style.display = 'block';
+                        checkedBoxes.forEach(box => {
+                            const val = box.value;
+                            const pill = document.createElement('div');
+                            pill.className = 'px-4 py-2 rounded-full border border-gray-300 bg-transparent text-gray-700 text-sm font-normal whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1 hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] transition-colors';
+                            pill.textContent = val;
+                            pill.onclick = (e) => {
+                                e.preventDefault();
+                                box.checked = false;
+                                renderSelectedServices();
+                            };
+                            selectedServicesContainer.appendChild(pill);
+                        });
+                    } else {
+                        if (searchDivider) {
+                            searchDivider.style.display = 'none';
+                        }
+                        if (serviceSearchInputWrapper) {
+                            serviceSearchInputWrapper.style.flex = '1';
+                        }
                     }
-                    serviceSearchInputWrapper.style.flex = '0 0 160px'; // ensure input space
-
-                    checkedBoxes.forEach(box => {
-                        const val = box.value;
-                        const pill = document.createElement('div');
-                        pill.className = 'px-4 py-2 rounded-full border border-gray-300 bg-transparent text-gray-700 text-sm font-normal whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1 hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] transition-colors';
-                        pill.textContent = val;
-                        // Click to remove
-                        pill.onclick = (e) => {
-                            e.preventDefault();
-                            box.checked = false;
-                            renderSelectedServices();
-                        };
-                        selectedServicesContainer.appendChild(pill);
-                    });
-                } else {
-                    if (searchDivider) {
-                        searchDivider.style.display = 'none';
-                    }
-                    serviceSearchInputWrapper.style.flex = '1';
                 }
 
                 syncScheduleWithSelection(checkedBoxes);
+                updateStep3Services(); // Update Step 3 list
             }
 
             function resetScheduleItem(item) {
@@ -861,6 +885,7 @@
 
             // Initial render
             renderSelectedServices();
+            updateConditionsInput();
 
             // Service search filter
             if (serviceSearchInput) {
@@ -920,6 +945,35 @@
                 const checkedBoxes = document.querySelectorAll('.condition-tag input[type="checkbox"]:checked');
                 const values = Array.from(checkedBoxes).map(cb => cb.closest('.condition-tag').textContent.trim());
                 input.value = values.join(',  ');
+
+                // Update Step 3 "Condition" section
+                const step3Container = document.getElementById('condition-selected-tags');
+                if (step3Container) {
+                    step3Container.innerHTML = '';
+                    if (values.length === 0) {
+                        step3Container.innerHTML = '<span class="text-gray-400 text-sm">No conditions selected</span>';
+                    } else {
+                        values.forEach(val => {
+                            const pill = document.createElement('div');
+                            pill.className = 'px-4 py-1.5 rounded-full border border-gray-300 bg-[#FABD4D] text-[#423131] text-sm font-normal';
+                            pill.textContent = val;
+                            step3Container.appendChild(pill);
+                        });
+                    }
+                }
+            }
+
+            const conditionActionBtn = document.getElementById('condition-action-btn');
+            if (conditionActionBtn) {
+                conditionActionBtn.addEventListener('click', function() {
+                    showStep(2);
+                    setTimeout(() => {
+                        const target = document.getElementById('conditions-input');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 300);
+                });
             }
 
             document.querySelectorAll('.condition-tag').forEach(tag => {
@@ -1160,6 +1214,7 @@
             label.classList.add('text-gray-700');
             hiddenInput.value = dateStr;
             dropdown.classList.add('hidden');
+            if(typeof updateStep3Services === 'function') updateStep3Services();
         }
     </script>
 
@@ -1274,6 +1329,7 @@
 
             dropdown.classList.add('hidden');
             dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
+            if(typeof updateStep3Services === 'function') updateStep3Services();
         }
 
         function clearTime(btn) {
@@ -1290,6 +1346,7 @@
 
             dropdown.classList.add('hidden');
             dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
+            if(typeof updateStep3Services === 'function') updateStep3Services();
         }
 
 
@@ -1359,84 +1416,37 @@
                 <!-- Practitioners Slider -->
                 <div class="swiper practitioner-modal-slider">
                     <div class="swiper-wrapper">
-                        <!-- Slide 1 -->
-                        <div class="swiper-slide !w-[140px]">
-                            <div class="flex flex-col items-center group cursor-pointer text-center">
-                                <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
-                                    <img src="{{ asset('frontend/assets/practitioner-1.jpg') }}" alt="Diya"
-                                        onerror="this.src='{{ asset('frontend/assets/lilly-profile-pic.png') }}'"
-                                        class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
+                        @foreach($practitioners as $practitioner)
+                            @php
+                                $pName = trim(($practitioner->first_name ?? '') . ' ' . ($practitioner->last_name ?? ''));
+                                if ($pName === '') {
+                                    $pName = $practitioner->user->name ?? 'Practitioner';
+                                }
+                                $pImage = $practitioner->profile_photo_path
+                                    ? asset('storage/' . $practitioner->profile_photo_path)
+                                    : asset('frontend/assets/lilly-profile-pic.png');
+                                $pRole = $practitioner->other_modalities[0] ?? 'Practitioner';
+                            @endphp
+                            <div class="swiper-slide !w-[140px]">
+                                <div class="flex flex-col items-center group cursor-pointer text-center practitioner-select-card" 
+                                     data-id="{{ $practitioner->id }}" 
+                                     data-name="{{ $pName }}"
+                                     data-image="{{ $pImage }}"
+                                     data-role="{{ $pRole }}"
+                                     data-rating="{{ number_format($practitioner->average_rating, 1) }}"
+                                     data-location="{{ $practitioner->city_state }}">
+                                    <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
+                                        <img src="{{ $pImage }}" alt="{{ $pName }}"
+                                            class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
+                                    </div>
+                                    <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">{{ $pName }}</h3>
+                                    <p class="text-sm text-[#8B8B8B] font-normal mb-3">{{ $pRole }}</p>
+                                    <a href="{{ route('practitioner-detail', $practitioner->slug) }}"
+                                        class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
+                                        more</a>
                                 </div>
-                                <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">Diya</h3>
-                                <p class="text-sm text-[#8B8B8B] font-normal mb-3">Life Coach</p>
-                                <a href="{{ url('practitioner/10') }}"
-                                    class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
-                                    more</a>
                             </div>
-                        </div>
-
-                        <!-- Slide 2 -->
-                        <div class="swiper-slide !w-[140px]">
-                            <div class="flex flex-col items-center group cursor-pointer text-center">
-                                <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
-                                    <img src="{{ asset('frontend/assets/practitioner-2.jpg') }}" alt="Hriday"
-                                        onerror="this.src='{{ asset('frontend/assets/lilly-profile-pic.png') }}'"
-                                        class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
-                                </div>
-                                <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">Hriday</h3>
-                                <p class="text-sm text-[#8B8B8B] font-normal mb-3">Yoga Therapist</p>
-                                <a href="{{ url('practitioner/10') }}"
-                                    class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
-                                    more</a>
-                            </div>
-                        </div>
-
-                        <!-- Slide 3 -->
-                        <div class="swiper-slide !w-[140px]">
-                            <div class="flex flex-col items-center group cursor-pointer text-center">
-                                <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
-                                    <img src="{{ asset('frontend/assets/lilly-profile-pic.png') }}" alt="Lily"
-                                        class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
-                                </div>
-                                <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">Lily</h3>
-                                <p class="text-sm text-[#8B8B8B] font-normal mb-3">Art Therapist</p>
-                                <a href="{{ url('practitioner/10') }}"
-                                    class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
-                                    more</a>
-                            </div>
-                        </div>
-
-                        <!-- Slide 4 -->
-                        <div class="swiper-slide !w-[140px]">
-                            <div class="flex flex-col items-center group cursor-pointer text-center">
-                                <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
-                                    <img src="{{ asset('frontend/assets/practitioner-3.jpg') }}" alt="Jeeva"
-                                        onerror="this.src='{{ asset('frontend/assets/lilly-profile-pic.png') }}'"
-                                        class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
-                                </div>
-                                <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">Jeeva</h3>
-                                <p class="text-sm text-[#8B8B8B] font-normal mb-3">Spiritual Guide</p>
-                                <a href="{{ url('practitioner/10') }}"
-                                    class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
-                                    more</a>
-                            </div>
-                        </div>
-
-                        <!-- Slide 5 -->
-                        <div class="swiper-slide !w-[140px]">
-                            <div class="flex flex-col items-center group cursor-pointer text-center">
-                                <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
-                                    <img src="{{ asset('frontend/assets/practitioner-4.jpg') }}" alt="Mira"
-                                        onerror="this.src='{{ asset('frontend/assets/lilly-profile-pic.png') }}'"
-                                        class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
-                                </div>
-                                <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">Mira</h3>
-                                <p class="text-sm text-[#8B8B8B] font-normal mb-3">Sound Healer</p>
-                                <a href="{{ url('practitioner/10') }}"
-                                    class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
-                                    more</a>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
 
