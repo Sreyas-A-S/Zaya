@@ -4,7 +4,7 @@
 
     <!-- Hero Section -->
     <section class="pt-[144px] md:pt-[150px] px-4 md:px-6 bg-white">
-        <div class="container mx-auto text-center py-10">
+        <div class="container mx-auto text-center lg:py-10">
             <h1 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">A Visual Journey Into Stillness</h1>
             <p class="text-gray-500 max-w-2xl mx-auto text-base">
                 Step inside the world of Zaya. Explore the spaces, rituals and moments of connection that define our path to
@@ -115,7 +115,7 @@
             <h2 class="text-3xl md:text-4xl font-serif font-bold text-secondary text-right mb-10">Community Retreats</h2>
 
             <!-- Row 1: 4 images with varying sizes -->
-            <div class="grid grid-cols-2 md:grid-cols-12 gap-4 md:gap-6 mb-4 md:mb-6 items-end">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-4 md:gap-6 mb-4 md:mb-6 items-end">
                 <div class="md:col-span-3">
                     <img src="{{ asset('frontend/assets/community-retreats-01.jpg') }}" alt="Community Retreats"
                         class="w-full h-full object-cover">
@@ -135,7 +135,7 @@
             </div>
 
             <!-- Row 2: 4 images with varying sizes -->
-            <div class="grid grid-cols-2 md:grid-cols-12 gap-4 md:gap-6 items-start">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-4 md:gap-6 items-start">
                 <div class="md:col-span-2">
                     <img src="{{ asset('frontend/assets/community-retreats-05.jpg') }}" alt="Community Retreats"
                         class="w-full h-full object-cover">
