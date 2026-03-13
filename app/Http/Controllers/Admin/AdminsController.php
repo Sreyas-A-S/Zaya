@@ -34,7 +34,7 @@ class AdminsController extends Controller
         $isSuperAdmin = ($role && $role->name === 'Super Admin');
 
         if ($request->ajax()) {
-            $query = User::where('role', 'admin')
+            $query = User::whereIn('role', ['admin', 'super-admin'])
                 ->select([
                     'users.id',
                     'users.name',
@@ -258,7 +258,7 @@ class AdminsController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $admin = User::where('role', 'admin')->findOrFail($id);
+        $admin = User::whereIn('role', ['admin', 'super-admin'])->findOrFail($id);
 
         $status = $request->status;
         if ($status === '1') $status = 'active';
@@ -273,7 +273,7 @@ class AdminsController extends Controller
 
     public function destroy($id)
         {
-            $admin = User::where('role', 'admin')->findOrFail($id);
+            $admin = User::whereIn('role', ['admin', 'super-admin'])->findOrFail($id);
 
             $admin->delete();
 

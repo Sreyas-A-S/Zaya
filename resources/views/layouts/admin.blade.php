@@ -327,25 +327,21 @@
       }
 
       function addToggleToInput(input) {
-        if (!input) return;
-
-        const existingToggle = input.parentElement && input.parentElement.querySelector('.toggle-password');
-        if (existingToggle) return;
+        if (!input || input.type !== 'password') return;
 
         const inputGroup = input.closest('.input-group');
-        if (inputGroup) {
-          if (!inputGroup.querySelector('.toggle-password')) {
-            const span = document.createElement('span');
-            span.className = 'input-group-text toggle-password';
-            span.setAttribute('data-target', ensureId(input));
-            span.style.cursor = 'pointer';
-            span.innerHTML = '<i class="fa fa-eye"></i>';
-            inputGroup.appendChild(span);
-          }
-          return;
-        }
+        // Check if toggle already exists in parent or input group
+        const container = inputGroup || input.parentElement;
+        if (container && container.querySelector('.toggle-password')) return;
 
-        if (!input.closest('.password-toggle-wrap')) {
+        if (inputGroup) {
+          const span = document.createElement('span');
+          span.className = 'input-group-text toggle-password';
+          span.setAttribute('data-target', ensureId(input));
+          span.style.cursor = 'pointer';
+          span.innerHTML = '<i class="fa fa-eye"></i>';
+          inputGroup.appendChild(span);
+        } else {
           const wrapper = document.createElement('div');
           wrapper.className = 'password-toggle-wrap';
           input.parentNode.insertBefore(wrapper, input);
@@ -359,25 +355,48 @@
         }
       }
 
-      const passwordInputs = document.querySelectorAll('input[type="password"]');
-      passwordInputs.forEach(addToggleToInput);
+      // Initial scan
+      document.querySelectorAll('input[type="password"]').forEach(addToggleToInput);
 
+      // Watch for dynamic password fields
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) {
+              if (node.tagName === 'INPUT' && node.type === 'password') {
+                addToggleToInput(node);
+              } else {
+                node.querySelectorAll('input[type="password"]').forEach(addToggleToInput);
+              }
+            }
+          });
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+
+      // Unified Click Handler
       document.addEventListener('click', function (e) {
         const toggle = e.target.closest('.toggle-password');
         if (!toggle) return;
 
+        e.preventDefault();
+        e.stopPropagation();
+
         const targetId = toggle.getAttribute('data-target');
         let input = targetId ? document.getElementById(targetId) : null;
+        
         if (!input) {
-          const group = toggle.closest('.input-group');
+          const group = toggle.closest('.input-group') || toggle.closest('.password-toggle-wrap');
           if (group) {
-            input = group.querySelector('input[type="password"], input[type="text"]');
+            input = group.querySelector('input');
           }
         }
+        
         if (!input) return;
 
         const isPassword = input.type === 'password';
         input.type = isPassword ? 'text' : 'password';
+        
         const icon = toggle.querySelector('i');
         if (icon) {
           icon.classList.toggle('fa-eye', !isPassword);

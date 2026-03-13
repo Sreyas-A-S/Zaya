@@ -272,7 +272,7 @@
                 </li>
                 <li class="profile-nav custom-dropdown">
                     <div class="user-wrap">
-                        <div class="user-img"><img src="{{ asset('admiro/assets/images/profile.png') }}" alt="user" /></div>
+                        <div class="user-img"><img src="{{ $user?->profile_pic ? '/storage/' . $user->profile_pic : asset('admiro/assets/images/user/user.png') }}" alt="user" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" /></div>
                         <div class="user-content">
                             <h6>{{ $user?->name ?? 'Guest' }}</h6>
                             <p class="mb-0 text-capitalize">{{ $user?->role ?? 'User' }}<i class="fa-solid fa-chevron-down"></i></p>

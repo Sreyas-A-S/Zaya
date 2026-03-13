@@ -166,7 +166,7 @@
                                     <label class="form-label">
                                         Phone Number <span class="text-danger">*</span>
                                     </label>
-                                    <input class="form-control" type="text" name="phone" id="phone" pattern="^[0-9]{1,15}$" title="Only numbers are allowed" required placeholder="Phone Number">
+                                    <input class="form-control" type="text" name="phone" id="phone" required placeholder="Phone Number">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Country <span class="text-danger">*</span></label>
@@ -412,14 +412,7 @@
 <style>
     /* Fix for intl-tel-input flags showing wrong/misaligned in Admiro theme */
     .iti__flag {
-        background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags.png") !important;
-    }
-
-    @media (-webkit-min-device-pixel-ratio: 2),
-    (min-resolution: 192dpi) {
-        .iti__flag {
-            background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags@2x.png") !important;
-        }
+        background-image: url("{{ asset('admiro/assets/css/images/flags.png') }}") !important;
     }
 
     .iti {
@@ -805,7 +798,13 @@
             showSelectedDialCode: true,
             autoPlaceholder: 'aggressive',
             initialCountry: "in",
-            preferredCountries: ["in", "ae", "us", "gb"]
+            preferredCountries: ["in", "ae", "us", "gb"],
+            dropdownContainer: document.body
+        });
+
+        // Add digit-only enforcement
+        phoneInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 15);
         });
 
         let table = $('#finance-managers-table').DataTable({

@@ -84,11 +84,11 @@
                                     @endphp
                                     <!-- General Tab -->
                                     <div class="tab-pane fade show active p-3" id="v-pills-general"        
-       role="tabpanel" aria-labelledby="v-pills-general-tab">
+                                        role="tabpanel" aria-labelledby="v-pills-general-tab">
                                         <div class="row g-4">
                                             @foreach($generalSettings as $setting)
                                                 @include('admin.services-settings.partials.field',
-       ['setting' => $setting])
+                                                            ['setting' => $setting])
                                             @endforeach
                                         </div>
                                     </div>
@@ -97,17 +97,17 @@
                                         <div class="row g-4">
                                             @foreach($sidebarSettings as $setting)
                                                 @include('admin.services-settings.partials.field',
-       ['setting' => $setting])
+                                                            ['setting' => $setting])
                                             @endforeach
                                         </div>
                                     </div>
                                     <!-- Stats Tab -->
                                     <div class="tab-pane fade p-3" id="v-pills-stats" role="tabpanel"
-       aria-labelledby="v-pills-stats-tab">
+                                       aria-labelledby="v-pills-stats-tab">
                                         <div class="row g-4">
                                             @foreach($statsSettings as $setting)
                                                 @include('admin.services-settings.partials.field',
-       ['setting' => $setting])
+                                                            ['setting' => $setting])
                                             @endforeach
                                         </div>
                                     </div>

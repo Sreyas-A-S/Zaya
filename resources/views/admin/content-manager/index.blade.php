@@ -41,6 +41,11 @@
         color: #333;
         margin-left: 4px;
     }
+
+    /* Fix for intl-tel-input flags showing wrong/misaligned in Admiro theme */
+    .iti__flag {
+        background-image: url("{{ asset('admiro/assets/css/images/flags.png') }}") !important;
+    }
 </style>
 
 <div class="container-fluid">
@@ -156,7 +161,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="phone" id="phone" pattern="^[0-9]{1,15}$" title="Only numbers are allowed" required placeholder="Phone Number">
+                            <input class="form-control" type="text" name="phone" id="phone" required placeholder="Phone Number">
                         </div>
 
                         <div class="col-md-12 mb-3">
@@ -752,7 +757,13 @@
             showSelectedDialCode: true,
             autoPlaceholder: 'aggressive',
             initialCountry: "in",
-            preferredCountries: ["in", "ae", "us", "gb"]
+            preferredCountries: ["in", "ae", "us", "gb"],
+            dropdownContainer: document.body
+        });
+
+        // Add digit-only enforcement
+        phoneInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 15);
         });
 
         let table = $('#content-managers-table').DataTable({

@@ -1,10 +1,11 @@
 @extends('layouts.admin')
 @section('title', 'Admins Management')
 @section('content')
-<!-- Add Cropper.js CSS -->
+@push('css')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
 <link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/select2.css') }}">
+@endpush
 
 <style>
     #Admins-table_wrapper .dataTables_filter {
@@ -145,6 +146,11 @@
     .iti {
         width: 100% !important;
         display: block;
+    }
+
+    /* Fix for intl-tel-input flags showing wrong/misaligned in Admiro theme */
+    .iti__flag {
+        background-image: url("{{ asset('admiro/assets/css/images/flags.png') }}") !important;
     }
 
     .avatar-upload {
@@ -320,7 +326,7 @@
                             <input type="text" name="phone" id="edit_phone" class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Country <span class="text-danger">*</span></label>
+                            <label class="form-label">Nationality <span class="text-danger">*</span></label>
                             <select name="country[]" id="edit_country" class="form-control select2 w-100" multiple required>
                                 @foreach($countries as $country)
                                 <option value="{{ $country->id }}" data-flag="{{ strtolower($country->code) }}">
@@ -365,7 +371,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="saveBtn">Create Admin</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">Save Admin</button>
                 </div>
             </form>
         </div>
@@ -501,83 +507,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="admin-form-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Register New Admin</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form action="{{ route('admin.admins.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label">Profile Picture</label>
-                            <input type="file" name="profile_picture" class="form-control">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">First Name</label>
-                            <input type="text" pattern="^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$" title="First name contains invalid characters" name="firstname" class="form-control" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Last Name</label>
-                            <input type="text" pattern="^[a-zA-Z0-9\s\.\&\-\(\)\,\/\+]+$" title="Last name contains invalid characters" name="lastname" class="form-control" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Phone number</label>
-                            <input type="text" name="phone" class="form-control" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Country</label>
-                            <select name="country" class="form-select" required>
-                                <option selected disabled>Select a Country</option>
-                                @foreach ($countries as $country)
-                                <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Language</label>
-                            <select name="language" class="form-select" required>
-                                <option selected disabled>Select a Language</option>
-                                @foreach ($languages as $language)
-                                <option value="{{ $language->id }}">{{ $language->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Password</label>
-                            <input type="password" name="password" id="password-input" class="form-control"
-                                minlength="8"
-                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
-                                title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
-                                required oninput="validatePasswordMatchAdmin()">
-                            <div id="password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Confirm Password</label>
-                            <input type="password" name="password_confirmation" id="password-confirm-input" class="form-control"
-                                minlength="8"
-                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
-                                title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
-                                required oninput="validatePasswordMatchAdmin()">
-                            <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
-                        </div>
-                        <div class="col-12 text-end mt-4">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Create Admin</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 @push('scripts')
 <!-- Add Cropper.js JS -->
@@ -675,7 +605,13 @@
             utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
             separateDialCode: true,
             initialCountry: "in",
-            preferredCountries: ["in", "ae", "us", "gb"]
+            preferredCountries: ["in", "ae", "us", "gb"],
+            dropdownContainer: document.body
+        });
+
+        // Add digit-only enforcement
+        phoneInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 15);
         });
 
         const table = $('#Admins-table').DataTable({

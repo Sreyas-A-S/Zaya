@@ -317,7 +317,7 @@
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body text-center p-4">
                     <div class="mb-3 text-center d-flex justify-content-center">
-                        <img class="rounded-circle border p-1" src="{{ $user->profile_pic ? asset('storage/' . $user->profile_pic) : asset('admiro/assets/images/user/user.png') }}" alt="profile" style="width: 120px; height: 120px; object-fit: cover;">
+                        <img class="rounded-circle border p-1" src="{{ $user->profile_pic ? '/storage/' . $user->profile_pic : asset('admiro/assets/images/user/user.png') }}" alt="profile" style="width: 120px; height: 120px; object-fit: cover;">
                     </div>
                     <h4 class="mb-1 f-w-600">{{ $user->first_name }} {{ $user->last_name }}</h4>
                     <p class="text-muted text-capitalize mb-4">{{ $user->role }}</p>
@@ -406,7 +406,7 @@
                                     <label for="imageUpload"><i class="fa-solid fa-pencil"></i></label>
                                 </div>
                                 <div class="avatar-preview">
-                                    <div id="imagePreview" style="background-image: url('{{ $user->profile_pic ? asset('storage/' . $user->profile_pic) : asset('admiro/assets/images/user/user.png') }}');">
+                                    <div id="imagePreview" style="background-image: url('{{ $user->profile_pic ? '/storage/' . $user->profile_pic : asset('admiro/assets/images/user/user.png') }}');">
                                     </div>
                                 </div>
                             </div>
@@ -433,17 +433,21 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Phone Number</label>
-                                    <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone', $user->phone) }}" required pattern="^[0-9]{7,15}$" title="Only numbers allowed" maxlength="15" inputmode="numeric">
+                                    <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone', $user->phone) }}" required data-initial-value="{{ old('phone', $user->phone) }}" inputmode="numeric">
                                     <div class="invalid-feedback">Please enter a valid phone number.</div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Nationality</label>
-                                    <select name="national_id" class="form-select select2">
+                                    <select name="national_id" class="form-select select2" {{ $user->role === 'super-admin' ? 'disabled' : '' }}>
                                         <option value="">Select Nationality</option>
                                         @foreach($countries as $country)
-                                        <option value="{{ $country->id }}" {{ $user->national_id == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
+                                        <option value="{{ $country->id }}" {{ (is_array($user->national_id) ? in_array($country->id, $user->national_id) : $user->national_id == $country->id) ? 'selected' : '' }}>{{ $country->name }}</option>
                                         @endforeach
                                     </select>
+                                    @if($user->role === 'super-admin')
+                                        <input type="hidden" name="national_id" value="{{ is_array($user->national_id) ? ($user->national_id[0] ?? '') : $user->national_id }}">
+                                        <div class="small text-muted mt-1"><i class="fa fa-info-circle me-1"></i> Super Admins have global access; nationality cannot be changed here.</div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -599,12 +603,17 @@
                     dropdownContainer: document.body
                 });
             }
-            if (phoneInput && window.itiProfile && phoneInput.value) {
-                let rawNumber = phoneInput.value.trim();
-                if (rawNumber && rawNumber[0] !== '+') {
-                    rawNumber = '+' + rawNumber;
+            
+            // Always set to initial full number when opening modal
+            if (phoneInput && window.itiProfile) {
+                let initialValue = phoneInput.getAttribute('data-initial-value') || phoneInput.value;
+                if (initialValue) {
+                    let rawNumber = initialValue.trim();
+                    if (rawNumber && rawNumber[0] !== '+') {
+                        rawNumber = '+' + rawNumber;
+                    }
+                    window.itiProfile.setNumber(rawNumber);
                 }
-                window.itiProfile.setNumber(rawNumber);
             }
         });
 

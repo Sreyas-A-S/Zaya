@@ -211,8 +211,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control validate-char-limit" name="phone" id="phone" required maxlength="20" data-max="20" placeholder="Phone Number">
-                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 20 characters allowed.</div>
+                                            <input type="text" class="form-control" name="phone" id="phone" required placeholder="Phone Number">
                                         </div>
                                         <div class="col-12 mt-3">
                                             <h6 class="f-w-600 mb-3">Address Information</h6>
@@ -662,7 +661,7 @@
 <style>
     /* Fix for intl-tel-input flags showing wrong/misaligned in Admiro theme */
     .iti__flag {
-        background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags.png") !important;
+        background-image: url("{{ asset('admiro/assets/css/images/flags.png') }}") !important;
     }
     @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
         .iti__flag {
@@ -877,7 +876,13 @@
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
                 separateDialCode: true,
                 initialCountry: "in",
-                preferredCountries: ["in", "ae", "us", "gb"]
+                preferredCountries: ["in", "ae", "us", "gb"],
+                dropdownContainer: document.body
+            });
+
+            // Add digit-only enforcement
+            phoneInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').slice(0, 15);
             });
         }
     });
@@ -1041,23 +1046,7 @@
 
         $('#password-input, #password-confirm-input').on('input', validatePasswordMatch);
 
-        $(document).on('click', '.toggle-password', function() {
-            const targetId = $(this).data('target');
-            const input = $('#' + targetId);
-            const icon = $(this).find('i');
 
-            if (!input.length) {
-                return;
-            }
-
-            if (input.attr('type') === 'password') {
-                input.attr('type', 'text');
-                icon.removeClass('fa-eye').addClass('fa-eye-slash');
-            } else {
-                input.attr('type', 'password');
-                icon.removeClass('fa-eye-slash').addClass('fa-eye');
-            }
-        });
 
         // Cropper initialization
         const image = document.getElementById('image-to-crop');
