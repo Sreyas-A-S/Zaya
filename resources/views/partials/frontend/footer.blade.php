@@ -198,6 +198,12 @@ $('#footer-pincode-save').click(function(){
                 $('#find-practitioner-pincode-btn').hide();
                 $('#find-practitioner-pincode-delete').show();
 
+                // Sync with hero search bar postal code input if empty
+                var heroPincodeInput = $('#hero_search_placeholder_2');
+                if (heroPincodeInput.length && !heroPincodeInput.val()) {
+                    heroPincodeInput.val(pincode);
+                }
+
                 $('#pincode-message').html(
                     '<span class="text-green-600 font-bold">'+response.message+'</span>'
                 );
