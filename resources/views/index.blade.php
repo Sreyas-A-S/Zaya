@@ -31,16 +31,24 @@
             <!-- Content (Static - Does not slide) -->
             <div class="relative z-20 text-center px-4 sm:px-16 py-4 max-w-3xl mx-auto animate-on-scroll">
 
-                <!-- Search Bar Mockup -->
+                <!-- Search Bar -->
                 <div
                     class="bg-white/20 backdrop-blur-md rounded-3xl md:rounded-full px-4 md:ps-6 md:pe-2 py-4 md:py-2 mb-6 lg:mb-14 flex flex-col md:flex-row items-center max-w-5xl mx-auto border border-[#FDE2D8] gap-4 md:gap-0">
                     <!-- Section 1 -->
                     <div
-                        class="w-full md:flex-1 flex items-center border-b md:border-b-0 md:border-r border-white/30 pb-3 md:pb-0 md:pr-2">
-                        <i class="ri-search-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg"></i>
-                        <input id="hero_search_placeholder_1" type="text"
-                            placeholder="{{ $settings['hero_search_placeholder_1'] ?? 'Practitioners or Conditions' }}"
+                        class="w-full md:flex-1 flex items-center border-b md:border-b-0 md:border-r border-white/30 pb-3 md:pb-0 md:pr-2 relative search-container">
+                        <i class="ri-search-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg search-icon"></i>
+                        <i class="ri-loader-4-line animate-spin text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg hidden search-loader"></i>
+                        <input id="hero_search_input" type="text"
+                            placeholder="{{ $settings['hero_search_placeholder_1'] ?? 'Practitioners, Treatments...' }}"
+                            autocomplete="off"
                             class="bg-transparent border-none outline-none text-[#FDE2D8] placeholder-[#FDE2D8]/80 w-full text-base font-normal">
+                        <!-- Search Results Dropdown -->
+                        <div id="hero-search-results" class="dropdown-menu absolute z-50 left-0 right-0 top-[calc(100%+16px)] bg-white border border-gray-100 rounded-2xl shadow-[0_5px_30px_rgba(0,0,0,0.1)] py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px] overflow-hidden text-left">
+                            <div class="max-h-[360px] overflow-y-auto px-1 custom-scrollbar flex flex-col gap-0.5">
+                                <!-- Results will be injected here -->
+                            </div>
+                        </div>
                     </div>
                     <!-- Section 2 -->
                     <div class="w-full md:flex-1 flex items-center md:pl-3 pb-2 md:pb-0 md:pr-2">
@@ -56,6 +64,10 @@
                         <i class="ri-search-line text-lg md:text-[26px] text-[#CD8162]"></i>
                     </button>
                 </div>
+
+
+
+                
 
                 <h1 id="hero_title" class="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-white mb-4 lg:mb-6">
                     {{ $settings['hero_title'] ?? 'Where Indian Wisdom Meets Modern Wellness' }}
@@ -163,23 +175,12 @@
         <div class="container-fluid">
             <div class="swiper practitioner-slider pb-15!">
                 <div class="swiper-wrapper">
-                    <!-- Card -->
                     @foreach($practitioners as $practitioner)
                         @php
-                            // Since we are now iterating over Practitioner models
                             $details = $practitioner;
                             $user = $practitioner->user;
                             $name = $user ? $user->name : 'Unknown';
-
-                            // Assuming 'practitioner_type' field exists in practitioners table or use generic
-                            // Or maybe fetch from 'other_modalities' or 'consultations' as a title if type is missing?
-                            // Let's stick to generic for now if field not present, or 'Practitioner'
-                            $roleName = 'Practitioner'; // Default
-
-                            // If there's a specific field like 'designation' or 'specialty' in practitioner model, use it.
-                            // In migration we saw: consultations (json), body_therapies (json) etc.
-                            // Let's us 'first_name' 'last_name' from practitioner table if needed, but user name is fine.
-                            // For role name, maybe use the first item in 'consultations' array if available?
+                            $roleName = 'Practitioner';
                             if (!empty($details->consultations) && is_array($details->consultations) && count($details->consultations) > 0) {
                                 $roleName = $details->consultations[0];
                             }
@@ -474,5 +475,131 @@
         </div>
     </section>
 
+    <!-- Dropdown Styles -->
+    <style>
+        /* Custom Scrollbar for Dropdowns */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #E5E7EB;
+            border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #D1D5DB;
+        }
 
+        /* Open State Classes */
+        .dropdown-open .dropdown-menu {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+        }
+    </style>
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    function setupHeroSearch() {
+        const searchInput = $('#hero_search_input');
+        const resultsDropdown = $('#hero-search-results');
+        const resultsContainer = resultsDropdown.find('.custom-scrollbar');
+        const container = searchInput.closest('.search-container');
+        const loader = container.find('.search-loader');
+        const icon = container.find('.search-icon');
+
+        let currentRequest = null;
+
+        searchInput.on('input', function() {
+            const query = $(this).val();
+
+            if (query.length < 1) {
+                container.removeClass('dropdown-open');
+                setTimeout(() => { if(!container.hasClass('dropdown-open')) resultsContainer.empty(); }, 300);
+                if (currentRequest) currentRequest.abort();
+                loader.addClass('hidden');
+                icon.removeClass('hidden');
+                return;
+            }
+
+            if (currentRequest) currentRequest.abort();
+            loader.removeClass('hidden');
+            icon.addClass('hidden');
+
+            currentRequest = $.ajax({
+                url: "{{ route('search') }}",
+                type: "GET",
+                data: { query: query },
+                success: function(data) {
+                    loader.addClass('hidden');
+                    icon.removeClass('hidden');
+                    resultsContainer.empty();
+
+                    const hasPractitioners = data.practitioners && data.practitioners.length > 0;
+                    const hasTreatments = data.treatments && data.treatments.length > 0;
+
+                    if (hasPractitioners || hasTreatments) {
+                        if (hasPractitioners) {
+                            resultsContainer.append('<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Practitioners</div>');
+                            data.practitioners.forEach(function(item) {
+                                const resultItem = `
+                                    <a href="/practitioner/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                        <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
+                                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        </div>
+                                        <div class="flex flex-col text-left">
+                                            <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
+                                            <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
+                                        </div>
+                                    </a>
+                                `;
+                                resultsContainer.append(resultItem);
+                            });
+                        }
+
+                        if (hasTreatments) {
+                            resultsContainer.append('<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Treatments</div>');
+                            data.treatments.forEach(function(item) {
+                                const resultItem = `
+                                    <a href="/service/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                        <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
+                                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        </div>
+                                        <div class="flex flex-col text-left">
+                                            <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
+                                            <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
+                                        </div>
+                                    </a>
+                                `;
+                                resultsContainer.append(resultItem);
+                            });
+                        }
+                        container.addClass('dropdown-open');
+                    } else {
+                        resultsContainer.html('<div class="px-5 py-4 text-gray-500 italic text-center">No results found</div>');
+                        container.addClass('dropdown-open');
+                    }
+                },
+                error: function() {
+                    loader.addClass('hidden');
+                    icon.removeClass('hidden');
+                }
+            });
+        });
+
+        // Close dropdown when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.search-container').length) {
+                $('.search-container').removeClass('dropdown-open');
+            }
+        });
+    }
+
+    setupHeroSearch();
+});
+</script>
+@endpush
 @endsection

@@ -60,6 +60,8 @@ Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
 Route::get('/gallery', [WebController::class, 'gallery'])->name('gallery');
 Route::get('/find-practitioner', [WebController::class, 'findPractitioner'])->name('find-practitioner');
+Route::get('/search', [WebController::class, 'search'])->name('search');
+Route::get('/search-locations', [WebController::class, 'searchLocations'])->name('search-locations');
 Route::get('/practitioner/{slug}', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
 Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login');
 Route::get('/client-register', [WebController::class, 'clientRegister'])->name('client-register');

@@ -20,8 +20,24 @@
     <section class="px-4 md:px-6 mb-10 md:mb-20 bg-white">
         <div class="container mx-auto max-w-6xl">
             <div class="flex flex-col md:flex-row gap-4 lg:gap-6 items-center">
+                <!-- Search Input -->
+                <div class="relative w-full md:w-1/4 search-container">
+                    <input id="find_practitioner_search_input" type="text" placeholder="Practitioners, Treatments..."
+                        autocomplete="off"
+                        class="w-full border border-[#db8871] rounded-full px-6 py-3.5 pr-12 text-base md:text-lg text-[#db8871] placeholder-[#db8871] focus:outline-none bg-white transition-colors">
+                    <button class="absolute right-[10px] top-1/2 -translate-y-1/2 w-10 h-10 bg-[#db8871] rounded-full flex items-center justify-center hover:opacity-90 transition-all cursor-pointer border-none outline-none">
+                        <i class="ri-search-line text-white text-lg"></i>
+                    </button>
+                    <!-- Search Results Dropdown -->
+                    <div id="find-practitioner-search-results" class="dropdown-menu absolute z-50 left-0 right-0 top-[calc(100%+16px)] bg-white border border-gray-100 rounded-2xl shadow-[0_5px_30px_rgba(0,0,0,0.1)] py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px] overflow-hidden text-left">
+                        <div class="max-h-[360px] overflow-y-auto px-1 custom-scrollbar flex flex-col gap-0.5">
+                            <!-- Results will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Pincode Input -->
-                <div class="relative w-full md:w-1/3">
+                <div class="relative w-full md:w-1/4">
                     <input id="find-practitioner-pincode-input" type="text" placeholder="Enter Pincode"
                         value="{{ session('global_pincode') }}"
                         {{ session('global_pincode') ? 'readonly' : '' }}
@@ -37,7 +53,7 @@
                 </div>
 
                 <!-- Select Service Custom Dropdown -->
-                <div class="relative w-full md:w-1/3 custom-dropdown">
+                <div class="relative w-full md:w-1/4 custom-dropdown">
                     <input type="hidden" name="service" value="">
                     <button type="button"
                         class="dropdown-button w-full border border-[#db8871] rounded-full px-6 py-3.5 text-base md:text-lg text-[#db8871] bg-white flex justify-between items-center transition-colors focus:outline-none shadow-sm cursor-pointer">
@@ -75,7 +91,7 @@
                 </div>
 
                 <!-- Select Mode Custom Dropdown -->
-                <div class="relative w-full md:w-1/3 custom-dropdown">
+                <div class="relative w-full md:w-1/4 custom-dropdown">
                     <input type="hidden" name="mode" value="">
                     <button type="button"
                         class="dropdown-button w-full border border-[#db8871] rounded-full px-6 py-3.5 text-base md:text-lg text-[#db8871] bg-white flex justify-between items-center transition-colors focus:outline-none shadow-sm cursor-pointer">
@@ -244,7 +260,90 @@
                         dropdown.classList.remove('dropdown-open');
                     });
                 }
+                if (!e.target.closest('.search-container')) {
+                    document.querySelectorAll('.search-container').forEach(container => {
+                        container.classList.remove('dropdown-open');
+                    });
+                }
             });
+
+            // Name/Treatment Search Logic
+            function setupSearch(inputId, resultsId) {
+                const searchInput = document.getElementById(inputId);
+                const resultsDropdown = document.getElementById(resultsId);
+                if (!searchInput || !resultsDropdown) return;
+
+                const resultsContainer = resultsDropdown.querySelector('.custom-scrollbar');
+                const container = searchInput.closest('.search-container');
+
+                searchInput.addEventListener('input', function() {
+                    const query = this.value;
+
+                    if (query.length < 1) {
+                        container.classList.remove('dropdown-open');
+                        setTimeout(() => { 
+                            if(!container.classList.contains('dropdown-open')) resultsContainer.innerHTML = ''; 
+                        }, 300);
+                        return;
+                    }
+
+                    $.ajax({
+                        url: "{{ route('search') }}",
+                        type: "GET",
+                        data: { query: query },
+                        success: function(data) {
+                            resultsContainer.innerHTML = '';
+
+                            const hasPractitioners = data.practitioners && data.practitioners.length > 0;
+                            const hasTreatments = data.treatments && data.treatments.length > 0;
+
+                            if (hasPractitioners || hasTreatments) {
+                                if (hasPractitioners) {
+                                    resultsContainer.insertAdjacentHTML('beforeend', '<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Practitioners</div>');
+                                    data.practitioners.forEach(function(item) {
+                                        const resultItem = `
+                                            <a href="/practitioner/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                                <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
+                                                    <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                                </div>
+                                                <div class="flex flex-col text-left">
+                                                    <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
+                                                    <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
+                                                </div>
+                                            </a>
+                                        `;
+                                        resultsContainer.insertAdjacentHTML('beforeend', resultItem);
+                                    });
+                                }
+
+                                if (hasTreatments) {
+                                    resultsContainer.insertAdjacentHTML('beforeend', '<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Treatments</div>');
+                                    data.treatments.forEach(function(item) {
+                                        const resultItem = `
+                                            <a href="/service/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                                <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
+                                                    <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                                </div>
+                                                <div class="flex flex-col text-left">
+                                                    <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
+                                                    <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
+                                                </div>
+                                            </a>
+                                        `;
+                                        resultsContainer.insertAdjacentHTML('beforeend', resultItem);
+                                    });
+                                }
+                                container.classList.add('dropdown-open');
+                            } else {
+                                resultsContainer.innerHTML = '<div class="px-5 py-4 text-gray-500 italic text-center">No results found</div>';
+                                container.classList.add('dropdown-open');
+                            }
+                        }
+                    });
+                });
+            }
+
+            setupSearch('find_practitioner_search_input', 'find-practitioner-search-results');
 
             // Pincode Search Logic
             const pincodeInput = document.getElementById('find-practitioner-pincode-input');
