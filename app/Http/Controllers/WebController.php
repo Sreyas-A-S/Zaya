@@ -219,6 +219,32 @@ class WebController extends Controller
         return view('practitioner-detail', compact('practitioner'));
     }
 
+    public function filterPractitioners(Request $request)
+    {
+        $query = $request->get('query');
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+        
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+        }
+
+        $practitioners = \App\Models\Practitioner::with(['user', 'reviews'])->where('status', 'active');
+
+        if (!empty($query)) {
+            $practitioners->where(function($q) use ($query) {
+                $q->where('first_name', 'LIKE', "%{$query}%")
+                  ->orWhere('last_name', 'LIKE', "%{$query}%")
+                  ->orWhere('consultations', 'LIKE', "%{$query}%")
+                  ->orWhere('other_modalities', 'LIKE', "%{$query}%");
+            });
+        }
+
+        $practitioners = $practitioners->get();
+
+        return view('partials.frontend.practitioner-slides', compact('practitioners', 'settings'))->render();
+    }
+
     public function zayaLogin()
     {
         return view('zaya-login');
