@@ -135,10 +135,114 @@ class WebController extends Controller
         return view('find-practitioner', compact('settings', 'practitioners'));
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->get('query');
+        
+        // Search Practitioners
+        $practitioners = \App\Models\Practitioner::where('status', 'active')
+            ->where(function($q) use ($query) {
+                $q->where('first_name', 'LIKE', "%{$query}%")
+                  ->orWhere('last_name', 'LIKE', "%{$query}%")
+                  ->orWhere('consultations', 'LIKE', "%{$query}%")
+                  ->orWhere('other_modalities', 'LIKE', "%{$query}%");
+            })
+            ->limit(4)
+            ->get();
+
+        // Search Services (Treatments)
+        $services = \App\Models\Service::with('categories')->where('status', 'active')
+            ->where(function($q) use ($query) {
+                $q->where('title', 'LIKE', "%{$query}%")
+                  ->orWhereHas('categories', function($cq) use ($query) {
+                      $cq->where('name', 'LIKE', "%{$query}%");
+                  });
+            })
+            ->limit(4)
+            ->get();
+
+        $results = [
+            'practitioners' => [],
+            'treatments' => []
+        ];
+
+        foreach ($practitioners as $p) {
+            $specialty = !empty($p->consultations) && is_array($p->consultations) ? $p->consultations[0] : 'Practitioner';
+            $results['practitioners'][] = [
+                'name' => $p->first_name . ' ' . $p->last_name,
+                'slug' => $p->slug,
+                'image' => $p->profile_photo_path ? asset('storage/' . $p->profile_photo_path) : asset('frontend/assets/lilly-profile-pic.png'),
+                'subtitle' => $specialty . ($p->city ? ' • ' . $p->city : '')
+            ];
+        }
+
+        foreach ($services as $s) {
+            $category = $s->categories->first() ? $s->categories->first()->name : 'Treatment';
+            $results['treatments'][] = [
+                'name' => $s->title,
+                'slug' => $s->slug,
+                'image' => $s->image ? (str_starts_with($s->image, 'frontend/') ? asset($s->image) : asset('storage/' . $s->image)) : asset('admiro/assets/images/user/user.png'),
+                'subtitle' => $category
+            ];
+        }
+
+        return response()->json($results);
+    }
+
+    public function searchLocations(Request $request)
+    {
+        $query = $request->get('query');
+        if (empty($query)) return response()->json([]);
+
+        $cities = \App\Models\Practitioner::where('status', 'active')
+            ->where('city', 'LIKE', "%{$query}%")
+            ->distinct()
+            ->pluck('city')
+            ->map(function($city) {
+                return ['name' => $city, 'type' => 'city'];
+            });
+
+        $zips = \App\Models\Practitioner::where('status', 'active')
+            ->where('zip_code', 'LIKE', "%{$query}%")
+            ->distinct()
+            ->pluck('zip_code')
+            ->map(function($zip) {
+                return ['name' => $zip, 'type' => 'zip'];
+            });
+
+        return response()->json($cities->concat($zips)->take(8));
+    }
+
     public function practitionerDetail($slug)
     {
         $practitioner = \App\Models\Practitioner::with(['user', 'reviews'])->where('slug', $slug)->firstOrFail();
         return view('practitioner-detail', compact('practitioner'));
+    }
+
+    public function filterPractitioners(Request $request)
+    {
+        $query = $request->get('query');
+        $language = \App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+        
+        if ($settings->isEmpty() && $language !== 'en') {
+            $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+        }
+
+        $practitioners = \App\Models\Practitioner::with(['user', 'reviews'])->where('status', 'active');
+
+        if (!empty($query)) {
+            $practitioners->where(function($q) use ($query) {
+                $q->where('first_name', 'LIKE', "%{$query}%")
+                  ->orWhere('last_name', 'LIKE', "%{$query}%")
+                  ->orWhere('consultations', 'LIKE', "%{$query}%")
+                  ->orWhere('other_modalities', 'LIKE', "%{$query}%");
+            });
+        }
+
+        $practitioners = $practitioners->get();
+
+        return view('partials.frontend.practitioner-slides', compact('practitioners', 'settings'))->render();
     }
 
     public function zayaLogin()

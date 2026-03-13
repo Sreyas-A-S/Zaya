@@ -31,21 +31,23 @@
             <!-- Content (Static - Does not slide) -->
             <div class="relative z-20 text-center px-4 sm:px-16 py-4 max-w-3xl mx-auto animate-on-scroll">
 
-                <!-- Search Bar Mockup -->
+                <!-- Search Bar -->
                 <div
-                    class="bg-white/20 backdrop-blur-md rounded-3xl md:rounded-full px-4 md:ps-6 md:pe-2 py-4 md:py-2 mb-6 lg:mb-14 flex flex-col md:flex-row items-center max-w-5xl mx-auto border border-[#FDE2D8] gap-4 md:gap-0">
+                    class="bg-white/20 backdrop-blur-md rounded-3xl md:rounded-full px-4 md:ps-6 md:pe-2 py-4 md:py-2 mb-6 lg:mb-14 flex flex-col md:flex-row items-center max-w-5xl mx-auto border border-[#FDE2D8] gap-4 md:gap-0 relative search-container">
                     <!-- Section 1 -->
                     <div
                         class="w-full md:flex-1 flex items-center border-b md:border-b-0 md:border-r border-white/30 pb-3 md:pb-0 md:pr-2">
-                        <i class="ri-search-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg"></i>
-                        <input id="hero_search_placeholder_1" type="text"
-                            placeholder="{{ $settings['hero_search_placeholder_1'] ?? 'Practitioners or Conditions' }}"
+                        <i class="ri-search-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg search-icon"></i>
+                        <input id="hero_search_input" type="text"
+                            placeholder="{{ $settings['hero_search_placeholder_1'] ?? 'Practitioners, Treatments...' }}"
+                            autocomplete="off"
                             class="bg-transparent border-none outline-none text-[#FDE2D8] placeholder-[#FDE2D8]/80 w-full text-base font-normal">
                     </div>
                     <!-- Section 2 -->
                     <div class="w-full md:flex-1 flex items-center md:pl-3 pb-2 md:pb-0 md:pr-2">
                         <i class="ri-map-pin-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg"></i>
                         <input id="hero_search_placeholder_2" type="text"
+                            value="{{ session('global_pincode') }}"
                             placeholder="{{ $settings['hero_search_placeholder_2'] ?? 'City, Postal code...' }}"
                             class="bg-transparent border-none outline-none text-[#FDE2D8] placeholder-[#FDE2D8]/80 w-full text-base font-normal">
                     </div>
@@ -55,7 +57,18 @@
                         <span class="md:hidden font-medium text-[#CD8162]">Search</span>
                         <i class="ri-search-line text-lg md:text-[26px] text-[#CD8162]"></i>
                     </button>
+
+                    <!-- Search Results Dropdown -->
+                    <div id="hero-search-results" class="dropdown-menu absolute z-50 left-0 right-0 top-[calc(100%+16px)] bg-white border border-gray-100 rounded-2xl shadow-[0_5px_30px_rgba(0,0,0,0.1)] py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px] overflow-hidden text-left">
+                        <div class="max-h-[360px] overflow-y-auto px-1 custom-scrollbar flex flex-col gap-0.5">
+                            <!-- Results will be injected here -->
+                        </div>
+                    </div>
                 </div>
+
+
+
+                
 
                 <h1 id="hero_title" class="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-white mb-4 lg:mb-6">
                     {{ $settings['hero_title'] ?? 'Where Indian Wisdom Meets Modern Wellness' }}
@@ -162,79 +175,8 @@
         </div>
         <div class="container-fluid">
             <div class="swiper practitioner-slider pb-15!">
-                <div class="swiper-wrapper">
-                    <!-- Card -->
-                    @foreach($practitioners as $practitioner)
-                        @php
-                            // Since we are now iterating over Practitioner models
-                            $details = $practitioner;
-                            $user = $practitioner->user;
-                            $name = $user ? $user->name : 'Unknown';
-
-                            // Assuming 'practitioner_type' field exists in practitioners table or use generic
-                            // Or maybe fetch from 'other_modalities' or 'consultations' as a title if type is missing?
-                            // Let's stick to generic for now if field not present, or 'Practitioner'
-                            $roleName = 'Practitioner'; // Default
-
-                            // If there's a specific field like 'designation' or 'specialty' in practitioner model, use it.
-                            // In migration we saw: consultations (json), body_therapies (json) etc.
-                            // Let's us 'first_name' 'last_name' from practitioner table if needed, but user name is fine.
-                            // For role name, maybe use the first item in 'consultations' array if available?
-                            if (!empty($details->consultations) && is_array($details->consultations) && count($details->consultations) > 0) {
-                                $roleName = $details->consultations[0];
-                            }
-
-                            $image = asset('frontend/assets/dummy-practitioner-img.webp'); // Default image
-                            if ($details->profile_photo_path) {
-                                $image = asset('storage/' . $details->profile_photo_path);
-                            }
-                        @endphp
-                        <div class="swiper-slide h-auto">
-                            <div class="group relative">
-                                <!-- Image Card -->
-                                <div class="relative h-[280px] md:h-[360px] xl:h-[400px] overflow-hidden mb-6">
-                                    <img src="{{ $image }}" alt="{{ $name }}" class="w-full h-full object-cover">
-
-                                    <!-- Rating Badge -->
-                                    <div
-                                        class="absolute top-4 right-4 bg-[#FDFEF3] border-[#E8E8D8] backdrop-blur-sm rounded-full px-3 py-2 flex items-center gap-1 shadow-sm">
-                                        <i class="ri-star-fill text-secondary text-sm leading-none"></i>
-                                        <span
-                                            class="text-secondary text-sm leading-none font-bold">{{ number_format($details->average_rating, 1) }}</span>
-                                    </div>
-
-                                    <!-- Book Now Button -->
-                                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-max z-10">
-                                        <a href="{{ route('book-session', ['practitioner' => $details->slug]) }}"
-                                           class="bg-white text-primary px-8 py-2.5 rounded-full font-medium shadow-lg hover:bg-primary hover:text-white transition-all text-sm block">
-                                            {{ $settings['practitioners_button_text'] ?? 'Book Now' }}
-                                        </a>
-                                    </div>
-
-                                    <!-- Clickable Overlay for Image -->
-                                    <a href="{{ $details->slug ? route('practitioner-detail', ['slug' => $details->slug]) : '#' }}" class="absolute inset-0 z-0"></a>
-                                </div>
-
-                                <!-- Info Section -->
-                                <div class="text-center">
-                                    <h3 class="text-2xl font-serif font-medium text-primary mb-3 leading-none">
-                                        <a href="{{ $details->slug ? route('practitioner-detail', ['slug' => $details->slug]) : '#' }}" class="hover:text-secondary transition-colors">
-                                            {{ $name }}
-                                        </a>
-                                    </h3>
-                                    <p class="text-secondary text-base md:text-lg font-serif italic mb-4 cursor-default">
-                                        {{ $roleName }}
-                                    </p>
-                                    <div
-                                        class="flex items-center justify-center gap-1 text-[#434343] text-sm md:text-base font-regular cursor-default">
-                                        <i class="ri-map-pin-line text-sm md:text-base"></i>
-                                        <span>{{ $details->city ?? 'Zaya' }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-
+                <div class="swiper-wrapper" id="practitioner-results-container">
+                    @include('partials.frontend.practitioner-slides', ['practitioners' => $practitioners, 'settings' => $settings])
                 </div>
             </div>
         </div>
@@ -474,5 +416,230 @@
         </div>
     </section>
 
+    <!-- Dropdown Styles -->
+    <style>
+        /* Custom Scrollbar for Dropdowns */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #E5E7EB;
+            border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #D1D5DB;
+        }
 
+        /* Open State Classes */
+        .dropdown-open .dropdown-menu {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+        }
+    </style>
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    function setupHeroSearch() {
+        const searchInput = $('#hero_search_input');
+        const resultsDropdown = $('#hero-search-results');
+        const resultsContainer = resultsDropdown.find('.custom-scrollbar');
+        const container = searchInput.closest('.search-container');
+        const icon = container.find('.search-icon');
+
+        let currentRequest = null;
+        let searchTimeout = null;
+
+        searchInput.on('input', function() {
+            const query = $(this).val();
+
+            if (searchTimeout) clearTimeout(searchTimeout);
+
+            if (query.length < 1) {
+                container.removeClass('dropdown-open');
+                setTimeout(() => { if(!container.hasClass('dropdown-open')) resultsContainer.empty(); }, 300);
+                if (currentRequest) currentRequest.abort();
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                if (currentRequest) currentRequest.abort();
+                
+                // Show loader inside dropdown
+                resultsContainer.html(`
+                    <div class="flex flex-col items-center justify-center py-12 gap-3">
+                        <i class="ri-loader-4-line animate-spin text-primary text-4xl"></i>
+                        <span class="text-gray-400 text-sm font-medium">Searching for results...</span>
+                    </div>
+                `);
+                container.addClass('dropdown-open');
+
+                currentRequest = $.ajax({
+                url: "{{ route('search') }}",
+                type: "GET",
+                data: { query: query },
+                success: function(data) {
+                    resultsContainer.empty();
+
+                    const hasPractitioners = data.practitioners && data.practitioners.length > 0;
+                    const hasTreatments = data.treatments && data.treatments.length > 0;
+
+                    if (hasPractitioners || hasTreatments) {
+                        if (hasPractitioners) {
+                            resultsContainer.append('<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Practitioners</div>');
+                            data.practitioners.forEach(function(item) {
+                                const resultItem = `
+                                    <a href="/practitioner/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                        <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
+                                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        </div>
+                                        <div class="flex flex-col text-left">
+                                            <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
+                                            <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
+                                        </div>
+                                    </a>
+                                `;
+                                resultsContainer.append(resultItem);
+                            });
+                        }
+
+                        if (hasTreatments) {
+                            resultsContainer.append('<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Treatments</div>');
+                            data.treatments.forEach(function(item) {
+                                const resultItem = `
+                                    <a href="/service/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                        <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
+                                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        </div>
+                                        <div class="flex flex-col text-left">
+                                            <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
+                                            <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
+                                        </div>
+                                    </a>
+                                `;
+                                resultsContainer.append(resultItem);
+                            });
+                        }
+                    } else {
+                        resultsContainer.html('<div class="px-5 py-8 text-gray-500 italic text-center">No results found for "'+query+'"</div>');
+                    }
+                },
+                error: function() {
+                    resultsContainer.html('<div class="px-5 py-8 text-red-400 text-center">Something went wrong. Please try again.</div>');
+                }
+            });
+            }, 300);
+        });
+
+        // Close dropdown when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.search-container').length) {
+                $('.search-container').removeClass('dropdown-open');
+            }
+        });
+    }
+
+    setupHeroSearch();
+
+    let practitionerSwiper = null;
+
+    function initPractitionerSwiper() {
+        if (practitionerSwiper) {
+            practitionerSwiper.destroy(true, true);
+        }
+
+        const slidesCount = document.querySelectorAll('.practitioner-slider .swiper-slide').length;
+        if (slidesCount > 0) {
+            practitionerSwiper = new SwiperLib('.practitioner-slider', {
+                slidesPerView: 1.5,
+                spaceBetween: 20,
+                loop: slidesCount >= 6,
+                centeredSlides: true,
+                autoplay: {
+                    delay: 3500,
+                    pauseOnMouseEnter: true,
+                    pauseOnFocus: true,
+                },
+                navigation: {
+                    nextEl: '.next-practitioner',
+                    prevEl: '.prev-practitioner',
+                },
+                breakpoints: {
+                    512: { slidesPerView: 2.3, centeredSlides: true, loop: slidesCount >= 6 },
+                    768: { slidesPerView: 3, centeredSlides: false, loop: slidesCount >= 6 },
+                    1152: { slidesPerView: 4, centeredSlides: false, loop: slidesCount >= 8 },
+                    1440: { slidesPerView: 4.4, spaceBetween: 40, centeredSlides: false, loop: slidesCount >= 10 },
+                    1920: { slidesPerView: 5, spaceBetween: 80, centeredSlides: false, loop: slidesCount >= 10 },
+                },
+            });
+        }
+    }
+
+    function setupPractitionerFilter() {
+        const searchInput = $('#practitioners_search_placeholder');
+        const resultsContainer = $('#practitioner-results-container');
+        let searchTimeout = null;
+        let currentRequest = null;
+
+        searchInput.on('input', function() {
+            const query = $(this).val();
+
+            if (searchTimeout) clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(() => {
+                if (currentRequest) currentRequest.abort();
+
+                // Show loading state in swiper
+                resultsContainer.html(`
+                    <div class="swiper-slide w-full flex items-center justify-center py-20">
+                        <div class="flex flex-col items-center gap-4">
+                            <i class="ri-loader-4-line animate-spin text-primary text-5xl"></i>
+                            <span class="text-gray-400 font-medium">Filtering practitioners...</span>
+                        </div>
+                    </div>
+                `);
+                
+                if (practitionerSwiper) {
+                    practitionerSwiper.update();
+                }
+
+                currentRequest = $.ajax({
+                    url: "{{ route('filter-practitioners') }}",
+                    type: "GET",
+                    data: { query: query },
+                    success: function(html) {
+                        resultsContainer.html(html);
+                        initPractitionerSwiper();
+                        if (query.length > 0 && resultsContainer.find('.swiper-slide').length === 0) {
+                             resultsContainer.html(`
+                                <div class="swiper-slide w-full flex items-center justify-center py-20">
+                                    <div class="text-gray-400 font-medium">No practitioners found for "${query}"</div>
+                                </div>
+                            `);
+                        }
+                    },
+                    error: function() {
+                        resultsContainer.html(`
+                            <div class="swiper-slide w-full flex items-center justify-center py-20">
+                                <div class="text-red-400 font-medium">Error loading practitioners.</div>
+                            </div>
+                        `);
+                    }
+                });
+            }, 400);
+        });
+    }
+
+    // Initial Swiper setup is handled by script.js, but we might need to take control
+    // if we want to ensure we have the instance. Since script.js runs on DOMContentLoaded,
+    // we can re-init here after a small delay or just wait.
+    setTimeout(initPractitionerSwiper, 500);
+    setupPractitionerFilter();
+});
+</script>
+@endpush
 @endsection
