@@ -18,6 +18,7 @@
 
             @php
                 $isLoggedIn = auth()->check();
+                $isClient = $isLoggedIn && in_array(auth()->user()->role, ['client', 'patient']);
                 $activePractitioner = $selectedPractitioner ?? null;
                 $practitionerName = 'Practitioner';
                 if ($activePractitioner) {
@@ -39,19 +40,19 @@
                 class="sticky top-0 z-50 flex justify-center pb-6 md:pb-8 pt-6 md:pt-8 bg-white border-b border-[#D0D0D0] px-4">
                 <div class="flex items-start justify-center gap-0 w-full max-w-3xl" id="step-indicator">
                     <div class="flex flex-col items-center relative z-2 px-1 sm:px-4 md:px-8">
-                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 {{ $isLoggedIn ? 'bg-[#E6E6E6] text-[#8B8B8B]' : 'bg-[#60E48C] text-white' }}"
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 {{ $isClient ? 'bg-[#E6E6E6] text-[#8B8B8B]' : 'bg-[#60E48C] text-white' }}"
                             id="step-circle-1">1</div>
                         <span
-                            class="text-xs md:text-base {{ $isLoggedIn ? 'text-gray-400' : 'text-gray-700' }} mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
+                            class="text-xs md:text-base {{ $isClient ? 'text-gray-400' : 'text-gray-700' }} mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
                             id="step-label-1">Login</span>
                     </div>
                     <div class="w-10 sm:w-16 md:w-[100px] lg:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]"
                         id="step-line-1"></div>
                     <div class="flex flex-col items-center relative z-2 px-1 sm:px-4 md:px-8">
-                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 {{ $isLoggedIn ? 'bg-[#60E48C] text-white' : 'bg-[#E6E6E6] text-[#8B8B8B]' }}"
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 {{ $isClient ? 'bg-[#60E48C] text-white' : 'bg-[#E6E6E6] text-[#8B8B8B]' }}"
                             id="step-circle-2">2</div>
                         <span
-                            class="text-xs md:text-base {{ $isLoggedIn ? 'text-gray-700' : 'text-gray-400' }} mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
+                            class="text-xs md:text-base {{ $isClient ? 'text-gray-700' : 'text-gray-400' }} mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
                             id="step-label-2">Schedule booking</span>
                     </div>
                     <div class="w-10 sm:w-16 md:w-[100px] lg:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]"
@@ -67,7 +68,7 @@
             </div>
 
             <!-- Welcome Section - Step 1 -->
-            <div class="relative {{ $isLoggedIn ? 'hidden' : '' }}" id="step-1-content">
+            <div class="relative {{ $isClient ? 'hidden' : '' }}" id="step-1-content">
                 <!-- Gradient Background -->
                 <div class="relative overflow-hidden h-[calc(100vh-100px)]"
                     style="background-image: url('{{ asset('frontend/assets/book-session-bg.jpg') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -85,9 +86,18 @@
                         class="relative z-10 flex flex-col items-center justify-center text-center px-6 py-20 md:py-32">
                         <h1 class="text-3xl md:text-4xl lg:text-5xl font-sans! font-medium text-gray-900 mb-6">Welcome
                             to ZAYA</h1>
-                        <p class="text-gray-600 text-lg md:text-xl mb-12 max-w-lg">
-                            Please identify yourself to continue with your booking.
-                        </p>
+                        @if($isLoggedIn && !$isClient)
+                            <p class="text-red-500 text-lg md:text-xl mb-6 max-w-lg">
+                                You are logged in as a <strong>{{ ucfirst(auth()->user()->role) }}</strong>. Only clients can book sessions.
+                            </p>
+                            <p class="text-gray-600 text-lg md:text-xl mb-12 max-w-lg">
+                                Please login with a client account to continue.
+                            </p>
+                        @else
+                            <p class="text-gray-600 text-lg md:text-xl mb-12 max-w-lg">
+                                Please identify yourself to continue with your booking.
+                            </p>
+                        @endif
 
                         <!-- Action Buttons -->
                         <div class="flex flex-col sm:flex-row items-center gap-4">
@@ -105,7 +115,7 @@
             </div>
 
             <!-- Schedule Booking - Step 2 (Hidden by default) -->
-            <div class="{{ $isLoggedIn ? '' : 'hidden' }}" id="step-2-content">
+            <div class="{{ $isClient ? '' : 'hidden' }}" id="step-2-content">
                 <div class="max-w-4xl mx-auto px-4 py-8">
 
                     <!-- Select Session Mode -->
@@ -648,8 +658,8 @@
     </div>
 
     <script>
-        const isLoggedIn = @json($isLoggedIn);
-        let currentStep = isLoggedIn ? 2 : 1;
+        const isClient = @json($isClient);
+        let currentStep = isClient ? 2 : 1;
         const totalSteps = 3;
 
         function updateStepIndicator() {
@@ -657,8 +667,28 @@
                 const circle = document.getElementById(`step-circle-${i}`);
                 const label = document.getElementById(`step-label-${i}`);
                 const line = document.getElementById(`step-line-${i}`);
+                const stepWrapper = circle.parentElement;
 
-                if (isLoggedIn && i === 1) {
+                // Handle clickability and cursor
+                if (isClient) {
+                    if (i === 1) {
+                        stepWrapper.classList.remove('cursor-pointer');
+                        stepWrapper.onclick = null;
+                    } else {
+                        stepWrapper.classList.add('cursor-pointer');
+                        stepWrapper.onclick = () => showStep(i);
+                    }
+                } else {
+                    if (i === 1) {
+                        stepWrapper.classList.add('cursor-pointer');
+                        stepWrapper.onclick = () => showStep(1);
+                    } else {
+                        stepWrapper.classList.remove('cursor-pointer');
+                        stepWrapper.onclick = null;
+                    }
+                }
+
+                if (isClient && i === 1) {
                     circle.className = 'w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]';
                     circle.textContent = i;
                     label.className = 'text-xs md:text-base text-gray-400 mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight';
@@ -697,8 +727,11 @@
         }
 
         function showStep(stepNumber) {
-            if (isLoggedIn && stepNumber === 1) {
+            if (isClient && stepNumber === 1) {
                 stepNumber = 2;
+            }
+            if (!isClient && stepNumber > 1) {
+                stepNumber = 1;
             }
             for (let i = 1; i <= totalSteps; i++) {
                 const content = document.getElementById(`step-${i}-content`);
@@ -720,7 +753,7 @@
         }
 
         function previousStep() {
-            if (isLoggedIn && currentStep === 2) {
+            if (isClient && currentStep === 2) {
                 return;
             }
             if (currentStep > 1) {

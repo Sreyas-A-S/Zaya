@@ -34,11 +34,16 @@ class DatabaseSeeder extends Seeder
             PractitionerReviewSeeder::class,
             CountriesSeeder::class,
             HomepageSettingSeeder::class,
+            HomepageSettingFrenchSeeder::class,
+            ContactSettingSeeder::class,
+            ContactSettingFrenchSeeder::class,
             AdminPanelSettingSeeder::class,
+            AdminPanelSettingFrenchSeeder::class,
             FinanceManagerSeeder::class,
             ContentManagerSeeder::class,
             UserManagerSeeder::class,
             FooterSettingSeeder::class,
+            FooterSettingFrenchSeeder::class,
         ]);
 
         User::updateOrCreate(
