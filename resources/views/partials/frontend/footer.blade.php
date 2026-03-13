@@ -193,6 +193,11 @@ $('#footer-pincode-save').click(function(){
                             .removeClass('bg-[#F9F9F9] border-gray-200')
                             .addClass('bg-green-50 border-green-200');
 
+                // Sync with find-practitioner-pincode-input if it exists on the page
+                $('#find-practitioner-pincode-input').val(pincode).prop('readonly', true);
+                $('#find-practitioner-pincode-btn').hide();
+                $('#find-practitioner-pincode-delete').show();
+
                 $('#pincode-message').html(
                     '<span class="text-green-600 font-bold">'+response.message+'</span>'
                 );
@@ -237,6 +242,12 @@ $('#footer-pincode-delete').click(function(){
                                          .attr('maxlength', '6')
                                          .removeClass('bg-green-50 border-green-200')
                                          .addClass('bg-[#F9F9F9] border-gray-200');
+                
+                // Sync with find-practitioner-pincode-input if it exists on the page
+                $('#find-practitioner-pincode-input').val('').prop('readonly', false);
+                $('#find-practitioner-pincode-btn').show();
+                $('#find-practitioner-pincode-delete').hide();
+
                 $('#footer-pincode-delete').removeClass('bg-green-600').addClass('bg-red-500').hide();
                 $('#footer-pincode-save').removeClass('bg-green-600 hover:bg-green-700').addClass('bg-[#79584B] hover:bg-[#5e4339]').show();
                 
