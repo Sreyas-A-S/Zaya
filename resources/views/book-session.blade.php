@@ -86,18 +86,9 @@
                         class="relative z-10 flex flex-col items-center justify-center text-center px-6 py-20 md:py-32">
                         <h1 class="text-3xl md:text-4xl lg:text-5xl font-sans! font-medium text-gray-900 mb-6">Welcome
                             to ZAYA</h1>
-                        @if($isLoggedIn && !$isClient)
-                            <p class="text-red-500 text-lg md:text-xl mb-6 max-w-lg">
-                                You are logged in as a <strong>{{ ucfirst(auth()->user()->role) }}</strong>. Only clients can book sessions.
-                            </p>
-                            <p class="text-gray-600 text-lg md:text-xl mb-12 max-w-lg">
-                                Please login with a client account to continue.
-                            </p>
-                        @else
-                            <p class="text-gray-600 text-lg md:text-xl mb-12 max-w-lg">
-                                Please identify yourself to continue with your booking.
-                            </p>
-                        @endif
+                        <p class="text-gray-600 text-lg md:text-xl mb-12 max-w-lg">
+                            Please identify yourself to continue with your booking.
+                        </p>
 
                         <!-- Action Buttons -->
                         <div class="flex flex-col sm:flex-row items-center gap-4">
