@@ -22,11 +22,17 @@
             <div class="flex flex-col md:flex-row gap-4 lg:gap-6 items-center">
                 <!-- Pincode Input -->
                 <div class="relative w-full md:w-1/3">
-                    <input type="text" placeholder="Enter Pincode"
+                    <input id="find-practitioner-pincode-input" type="text" placeholder="Enter Pincode"
+                        value="{{ session('global_pincode') }}"
+                        {{ session('global_pincode') ? 'readonly' : '' }}
                         class="w-full border border-[#db8871] rounded-full px-6 py-3.5 pr-12 text-base md:text-lg text-[#db8871] placeholder-[#db8871] focus:outline-none bg-white transition-colors">
-                    <button
+                    <button id="find-practitioner-pincode-btn" style="{{ session('global_pincode') ? 'display:none;' : '' }}"
                         class="absolute right-[10px] top-1/2 -translate-y-1/2 w-10 h-10 bg-[#F39551] rounded-full flex items-center justify-center hover:opacity-90 transition-all cursor-pointer border-none outline-none">
                         <i class="ri-search-line text-white text-lg"></i>
+                    </button>
+                    <button id="find-practitioner-pincode-delete" style="{{ session('global_pincode') ? '' : 'display:none;' }}"
+                        class="absolute right-[10px] top-1/2 -translate-y-1/2 w-10 h-10 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-all cursor-pointer border-none outline-none">
+                        <i class="ri-delete-bin-line text-white text-lg"></i>
                     </button>
                 </div>
 
@@ -239,6 +245,92 @@
                     });
                 }
             });
+
+            // Pincode Search Logic
+            const pincodeInput = document.getElementById('find-practitioner-pincode-input');
+            const pincodeBtn = document.getElementById('find-practitioner-pincode-btn');
+            const pincodeDelete = document.getElementById('find-practitioner-pincode-delete');
+
+            function savePincode(pincode) {
+                if (pincode.length === 6) {
+                    $.ajax({
+                        url: "{{ route('admin.pincode.store') }}",
+                        type: "POST",
+                        data: {
+                            pincode: pincode,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            if (response.status) {
+                                // Sync search input itself
+                                $(pincodeInput).prop('readonly', true);
+                                $(pincodeBtn).hide();
+                                $(pincodeDelete).show();
+
+                                // Sync with footer
+                                const footerInput = $('#footer-pincode-input');
+                                footerInput.val("{{ __('Your Pincode') }}: " + pincode)
+                                    .prop('readonly', true)
+                                    .attr('maxlength', '')
+                                    .removeClass('bg-[#F9F9F9] border-gray-200')
+                                    .addClass('bg-green-50 border-green-200');
+                                
+                                $('#footer-pincode-save').hide();
+                                $('#footer-pincode-delete').show();
+                            }
+                        }
+                    });
+                }
+            }
+
+            function deletePincode() {
+                $.ajax({
+                    url: "{{ route('admin.pincode.delete') }}",
+                    type: "DELETE",
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.status) {
+                            // Sync search input itself
+                            $(pincodeInput).val('').prop('readonly', false);
+                            $(pincodeBtn).show();
+                            $(pincodeDelete).hide();
+
+                            // Sync with footer
+                            const footerInput = $('#footer-pincode-input');
+                            footerInput.val('')
+                                .prop('readonly', false)
+                                .attr('maxlength', '6')
+                                .removeClass('bg-green-50 border-green-200')
+                                .addClass('bg-[#F9F9F9] border-gray-200');
+                            
+                            $('#footer-pincode-delete').hide();
+                            $('#footer-pincode-save').show();
+                        }
+                    }
+                });
+            }
+
+            if (pincodeBtn) {
+                pincodeBtn.addEventListener('click', () => {
+                    savePincode(pincodeInput.value);
+                });
+            }
+
+            if (pincodeDelete) {
+                pincodeDelete.addEventListener('click', () => {
+                    deletePincode();
+                });
+            }
+
+            if (pincodeInput) {
+                pincodeInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        savePincode(pincodeInput.value);
+                    }
+                });
+            }
         });
     </script>
 @endpush
