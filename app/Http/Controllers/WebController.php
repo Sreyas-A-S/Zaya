@@ -355,7 +355,7 @@ class WebController extends Controller
             $services = \App\Models\Service::where('status', true)->get();
         }
 
-        $languages = \App\Models\Language::all();
+        $languages = \App\Models\Language::where('status', 'active')->get();
         $consultationPreferences = \App\Models\ClientConsultationPreference::all();
 
         return view('book-session', compact('practitioners', 'selectedPractitioner', 'services', 'languages', 'consultationPreferences'));
