@@ -128,6 +128,17 @@
                     display: none !important; 
                 }
 
+                /* Ensure absolute transparency for all containers to remove the "rectangle shape" */
+                .custom-pagination nav,
+                .custom-pagination nav > div,
+                .custom-pagination nav > div > div {
+                    background-color: transparent !important;
+                    background: none !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    padding: 0 !important;
+                }
+
                 /* Container for pagination links */
                 .custom-pagination nav > div:last-child {
                     display: flex !important;
@@ -140,7 +151,7 @@
                     display: none !important;
                 }
 
-                /* Individual Pill Styles - Only target the actual links and active spans */
+                /* Individual Pill Styles - Clean, no border, no shadow */
                 .custom-pagination nav a,
                 .custom-pagination nav span[aria-current="page"] > span,
                 .custom-pagination nav span[aria-disabled="true"] > span {
@@ -152,19 +163,20 @@
                     border-radius: 9999px !important;
                     margin: 0 4px !important;
                     padding: 0 !important;
-                    border: 1px solid #E5E7EB !important;
+                    border: none !important; /* Remove stroke */
                     color: #79584B !important;
                     font-weight: 600;
                     text-decoration: none !important;
                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    background-color: white !important;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+                    background-color: transparent !important; /* Remove white background */
+                    box-shadow: none !important; /* Remove shadow/rectangle feel */
                 }
 
                 /* Active Page Pill */
                 .custom-pagination nav span[aria-current="page"] > span {
                     background-color: #db8871 !important;
-                    border-color: #db8871 !important;
+                    border: none !important;
+                    box-shadow: none !important;
                     color: white !important;
                 }
 
@@ -198,10 +210,8 @@
                 /* Hover & Interaction */
                 .custom-pagination nav a:hover {
                     background-color: #FDF2F0 !important;
-                    border-color: #db8871 !important;
                     color: #db8871 !important;
                     transform: translateY(-1px);
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
                 }
 
                 /* SVG (Arrow) Scaling */
@@ -424,13 +434,12 @@
             function fetchResults(url) {
                 if (window.showPreloader) window.showPreloader();
                 
-                // Add ajax parameter to force partial response
-                let ajaxUrl = new URL(url, window.location.origin);
-                ajaxUrl.searchParams.set('ajax', '1');
-                
                 $.ajax({
-                    url: ajaxUrl.toString(),
+                    url: url,
                     type: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
                     success: function (data) {
                         // Check if we accidentally got the full page
                         if (data.indexOf('<!DOCTYPE html>') !== -1) {

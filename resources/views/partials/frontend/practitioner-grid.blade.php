@@ -9,8 +9,9 @@
     </h2>
 </div>
 
-<!-- Practitioner Grid -->
-<div id="practitioner-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-8 md:gap-x-6 md:gap-y-12">
+<!-- Practitioner Items -->
+<div class="container mx-auto">
+    <div id="practitioner-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-8 md:gap-x-6 md:gap-y-12">
     @forelse($practitioners as $p)
         <a href="{{ $p->slug ? route('practitioner-detail', ['slug' => $p->slug]) : '#' }}"
             class="flex flex-col items-center text-center group cursor-pointer animate-on-scroll">
@@ -56,3 +57,4 @@
         {{ $practitioners->links() }}
     </div>
 @endif
+</div>
