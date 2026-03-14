@@ -76,8 +76,10 @@
 
         <!-- Right Actions (Desktop) -->
         <div class="flex items-center gap-6 xl:gap-8 justify-end flex-1">
-            <a id="nav-login" href="{{ route('zaya-login') }}"
-                class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors" data-i18n="Login">{{ __('Login') }}</a>
+            @guest
+                <a id="nav-login" href="{{ route('zaya-login') }}"
+                    class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors" data-i18n="Login">{{ __('Login') }}</a>
+            @endguest
 
             <a id="nav-find-practitioner" href="{{ route('find-practitioner') }}"
                 class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap" data-i18n="Find Practitioner">{{ __('Find Practitioner') }}</a>
@@ -105,22 +107,44 @@
             @endif
 
             <!-- User Profile -->
-            <a href="#" class="relative shrink-0 ml-1 hidden">
+            @auth
                 @php
-                    // NOTE FOR BACKEND: Replace these variables with actual auth/user logic
-                    $mockHasProfilePicture = true; // Toggle to false to see the placeholder design
-                    $mockProfilePictureUrl = 'https://i.pravatar.cc/150?img=48'; // Example profile image
+                    $user = auth()->user();
+                    $profileRoute = '#';
+                    if ($user->role === 'client') {
+                        $profileRoute = route('my-profile');
+                    } elseif ($user->role === 'practitioner') {
+                        $profileRoute = route('practitioner-profile');
+                    } elseif (in_array($user->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'])) {
+                        $profileRoute = route('admin.profile');
+                    }
                 @endphp
-
-                <div
-                    class="w-11 h-11 md:w-12 md:h-12 rounded-full border-2 border-gray-200 overflow-hidden flex items-center justify-center bg-secondary/10 transition-transform duration-300 hover:scale-105 hover:border-gray-300">
-                    @if($mockHasProfilePicture)
-                        <img src="{{ $mockProfilePictureUrl }}" alt="User Profile" class="w-full h-full object-cover">
-                    @else
-                        <i class="ri-user-3-line text-xl text-secondary"></i>
-                    @endif
+                <div class="relative ml-1">
+                    <button id="user-profile-btn" class="relative shrink-0 focus:outline-none block">
+                        <div class="w-11 h-11 md:w-12 md:h-12 rounded-full border-2 border-gray-200 overflow-hidden flex items-center justify-center bg-secondary/10 transition-transform duration-300 hover:scale-105 hover:border-gray-300">
+                            @if($user->profile_pic)
+                                <img src="{{ Str::startsWith($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic) }}" alt="User Profile" class="w-full h-full object-cover">
+                            @else
+                                <i class="ri-user-3-line text-xl text-secondary"></i>
+                            @endif
+                        </div>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="user-dropdown" class="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 hidden z-[60] overflow-hidden transform origin-top-right transition-all duration-200">
+                        <a href="{{ $profileRoute }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50" data-i18n="Profile">
+                            <i class="ri-user-line text-lg"></i> {{ __('Profile') }}
+                        </a>
+                        <a href="{{ route('logout') }}" 
+                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                           class="flex items-center gap-3 px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors" data-i18n="Logout">
+                            <i class="ri-logout-box-r-line text-lg"></i> {{ __('Logout') }}
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+                    </div>
                 </div>
-            </a>
+            @endauth
         </div>
     </div>
 
@@ -168,7 +192,18 @@
 
         <a href="{{ route('contact-us') }}"
             class="text-lg font-medium text-secondary border-b border-gray-50 pb-2" data-i18n="Contact Us">{{ __('Contact Us') }}</a>
-        <a href="{{ route('zaya-login') }}" class="text-lg font-medium text-secondary pb-2" data-i18n="Login">{{ __('Login') }}</a>
+        @guest
+            <a href="{{ route('zaya-login') }}" class="text-lg font-medium text-secondary pb-2" data-i18n="Login">{{ __('Login') }}</a>
+        @endguest
+        @auth
+            <a href="{{ $profileRoute ?? '#' }}" class="text-lg font-medium text-secondary border-b border-gray-50 pb-2" data-i18n="Profile">{{ __('Profile') }}</a>
+            <a href="{{ route('logout') }}" 
+               onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();"
+               class="text-lg font-medium text-red-600 pb-2" data-i18n="Logout">{{ __('Logout') }}</a>
+            <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" class="d-none">
+                @csrf
+            </form>
+        @endauth
 
         <div class="pt-2">
             <a href="{{ route('find-practitioner') }}"
@@ -268,5 +303,24 @@
                 window.location.href = `{{ url('/lang') }}/${targetLocale}`;
             });
         }
+
+        // User Profile Dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileBtn = document.getElementById('user-profile-btn');
+            const userDropdown = document.getElementById('user-dropdown');
+            
+            if (profileBtn && userDropdown) {
+                profileBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                });
+                
+                document.addEventListener('click', function(e) {
+                    if (!userDropdown.contains(e.target) && !profileBtn.contains(e.target)) {
+                        userDropdown.classList.add('hidden');
+                    }
+                });
+            }
+        });
     </script>
 </header>

@@ -262,9 +262,9 @@ Route::get('/seed', function () {
 });
 
 
-Route::get('/client-profile', function () {
+Route::get('/my-profile', function () {
     return view('client-profile');
-})->name('client-profile');
+})->name('my-profile');
 
 Route::get('/practitioner-profile', function () {
     return view('practitioner-profile');
