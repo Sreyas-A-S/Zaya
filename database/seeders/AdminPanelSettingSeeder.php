@@ -466,6 +466,7 @@ class AdminPanelSettingSeeder extends Seeder
                 'max_length' => 70,
                 'language' => 'en',
             ],
+            [
                 'key' => 'admin_panel_sidebar_contact_us_settings',
                 'value' => 'Contact Us Settings',
                 'type' => 'text',
