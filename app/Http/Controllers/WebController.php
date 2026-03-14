@@ -121,7 +121,7 @@ class WebController extends Controller
         return view('gallery', compact('settings'));
     }
 
-    public function findPractitioner()
+    public function findPractitioner(Request $request)
     {
         $language = \App::getLocale();
         $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
@@ -131,8 +131,38 @@ class WebController extends Controller
             $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
         }
 
-        $practitioners = \App\Models\Practitioner::with(['user', 'reviews'])->where('status', 'active')->get();
-        return view('find-practitioner', compact('settings', 'practitioners'));
+        $pincode = session('global_pincode');
+        $query = \App\Models\Practitioner::with(['user', 'reviews'])->where('status', 'active');
+
+        if ($pincode) {
+            $query->where('zip_code', 'LIKE', "%{$pincode}%");
+        }
+
+        if ($request->filled('service')) {
+            $service = $request->service;
+            $query->where(function($q) use ($service) {
+                $q->whereJsonContains('consultations', $service)
+                  ->orWhereJsonContains('body_therapies', $service)
+                  ->orWhereJsonContains('other_modalities', $service);
+            });
+        }
+
+        if ($request->filled('mode')) {
+            $mode = $request->mode;
+            if ($mode === 'online') {
+                // Assuming you have something for this, or just logic
+            } else if ($mode === 'offline') {
+                // ...
+            }
+        }
+
+        $practitioners = $query->paginate(4)->withQueryString();
+
+        if ($request->ajax() || $request->has('ajax')) {
+            return view('partials.frontend.practitioner-grid', compact('practitioners', 'pincode'))->render();
+        }
+
+        return view('find-practitioner', compact('settings', 'practitioners', 'pincode'));
     }
 
     public function practitionerDetail($slug)

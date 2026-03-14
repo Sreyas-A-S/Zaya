@@ -107,52 +107,109 @@
     <section class="px-4 md:px-6 pb-16 md:pb-24 bg-white">
         <div class="container mx-auto max-w-6xl">
             <!-- Results Heading -->
-            <h2 class="text-center text-lg md:text-3xl font-semibold text-primary font-sans! mb-10 md:mb-24">
-                Search Results Based on <span class="font-bold text-gray-900">'Kazhakuttam, Trivandrum, Kerala,
-                    India'</span>
-            </h2>
-
-            <!-- Practitioner Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-8 md:gap-x-6 md:gap-y-12">
-                @foreach($practitioners as $p)
-                    <a href="{{ $p->slug ? route('practitioner-detail', ['slug' => $p->slug]) : '#' }}"
-                        class="flex flex-col items-center text-center group cursor-pointer">
-                        <!-- Avatar -->
-                        <div
-                            class="w-32 h-32 md:w-[150px] md:h-[150px] mb-4 overflow-hidden rounded-full border border-gray-100">
-                            <img src="{{ $p->profile_photo_path ? asset('storage/' . $p->profile_photo_path) : asset('frontend/assets/lilly-profile-pic.png') }}"
-                                alt="{{ $p->first_name }}"
-                                class="w-full h-full object-cover rounded-full transition-transform duration-500 group-hover:scale-110">
-                        </div>
-
-                        <!-- Name -->
-                        <h3
-                            class="font-sans! text-base md:text-lg lg:text-xl font-medium text-primary group-hover:opacity-80 transition-opacity duration-300">
-                            {{ $p->first_name }} {{ $p->last_name }}
-                        </h3>
-
-                        <!-- Role -->
-                        <p class="font-serif text-sm md:text-base lg:text-lg italic text-secondary mt-0.5">
-                            {{ $p->other_modalities[0] ?? ($p->consultations[0] ?? 'Holistic Practitioner') }}
-                        </p>
-
-                        <!-- Location -->
-                        <div class="mt-2 text-xs lg:text-sm text-gray-500">
-                            <i class="ri-map-pin-line text-gray-800"></i>
-                            <span>{{ $p->city_state }}</span>
-                        </div>
-                    </a>
-                @endforeach
+            <!-- Practitioner Results Wrapper -->
+            <div id="practitioner-results-container">
+                @include('partials.frontend.practitioner-grid', ['practitioners' => $practitioners, 'pincode' => $pincode])
             </div>
 
-            <!-- Load More Button -->
-            <!-- ⚠️ Hide this button if full list is loaded -->
-            <div class="text-center mt-16">
-                <button
-                    class="border border-secondary text-secondary px-8 py-2.5 rounded-full text-[15px] font-medium hover:border-primary hover:text-primary transition-all duration-300 cursor-pointer bg-white">
-                    Load More Profiles
-                </button>
-            </div>
+            <style>
+                /* Main Container Fix */
+                .custom-pagination nav {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 1rem;
+                    width: 100%;
+                }
+                
+                /* Hide the 'Showing X to Y of Z results' text and its container */
+                .custom-pagination nav > div:first-child,
+                .custom-pagination nav p { 
+                    display: none !important; 
+                }
+
+                /* Container for pagination links */
+                .custom-pagination nav > div:last-child {
+                    display: flex !important;
+                    justify-content: center !important;
+                    width: 100% !important;
+                }
+
+                /* Mobile-specific: Hide the 'Previous' and 'Next' text buttons from standard desktop view if they appear twice */
+                .custom-pagination nav > div:last-child > div:first-child {
+                    display: none !important;
+                }
+
+                /* Individual Pill Styles - Only target the actual links and active spans */
+                .custom-pagination nav a,
+                .custom-pagination nav span[aria-current="page"] > span,
+                .custom-pagination nav span[aria-disabled="true"] > span {
+                    display: inline-flex !important;
+                    align-items: center;
+                    justify-content: center;
+                    width: 44px !important;
+                    height: 44px !important;
+                    border-radius: 9999px !important;
+                    margin: 0 4px !important;
+                    padding: 0 !important;
+                    border: 1px solid #E5E7EB !important;
+                    color: #79584B !important;
+                    font-weight: 600;
+                    text-decoration: none !important;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    background-color: white !important;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+                }
+
+                /* Active Page Pill */
+                .custom-pagination nav span[aria-current="page"] > span {
+                    background-color: #db8871 !important;
+                    border-color: #db8871 !important;
+                    color: white !important;
+                }
+
+                /* Reset container layout */
+                .custom-pagination nav > div:last-child {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    padding: 0 !important;
+                }
+                
+                .custom-pagination nav > div:last-child > div {
+                    display: flex !important;
+                    gap: 4px;
+                }
+
+                /* Disable circular styles for the 'Showing' summary text */
+                .custom-pagination nav p span {
+                    display: inline !important;
+                    min-width: 0 !important;
+                    height: auto !important;
+                    border-radius: 0 !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: none !important;
+                    background-color: transparent !important;
+                    box-shadow: none !important;
+                    color: inherit !important;
+                }
+
+                /* Hover & Interaction */
+                .custom-pagination nav a:hover {
+                    background-color: #FDF2F0 !important;
+                    border-color: #db8871 !important;
+                    color: #db8871 !important;
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+                }
+
+                /* SVG (Arrow) Scaling */
+                .custom-pagination nav svg {
+                    width: 20px !important;
+                    height: 20px !important;
+                }
+            </style>
         </div>
     </section>
 
@@ -233,9 +290,27 @@
                             i.classList.remove('font-medium', 'text-[#db8871]');
                         });
                         item.classList.add('font-medium', 'text-[#db8871]');
+
+                        updateSearchResults();
                     });
                 });
             });
+
+            function updateSearchResults() {
+                const service = $('input[name="service"]').val();
+                const mode = $('input[name="mode"]').val();
+                let url = new URL(window.location.href);
+                
+                if (service) url.searchParams.set('service', service);
+                else url.searchParams.delete('service');
+                
+                if (mode) url.searchParams.set('mode', mode);
+                else url.searchParams.delete('mode');
+                
+                url.searchParams.delete('page'); // Reset to page 1 on filter change
+                
+                fetchResults(url.toString());
+            }
 
             // Close dropdowns when clicking outside
             document.addEventListener('click', (e) => {
@@ -277,6 +352,9 @@
                                 
                                 $('#footer-pincode-save').hide();
                                 $('#footer-pincode-delete').show();
+
+                                // Reload search results to apply pincode filter
+                                updateSearchResults(); 
                             }
                         }
                     });
@@ -307,6 +385,9 @@
                             
                             $('#footer-pincode-delete').hide();
                             $('#footer-pincode-save').show();
+
+                            // Reload to show all practitioners again
+                            updateSearchResults();
                         }
                     }
                 });
@@ -331,6 +412,99 @@
                     }
                 });
             }
+
+            // AJAX Pagination Handling
+            $(document).on('click', '.custom-pagination a', function (e) {
+                e.preventDefault();
+                e.stopPropagation(); // Prevent app.blade.php global listener from interfering
+                const url = $(this).attr('href');
+                fetchResults(url);
+            });
+
+            function fetchResults(url) {
+                if (window.showPreloader) window.showPreloader();
+                
+                // Add ajax parameter to force partial response
+                let ajaxUrl = new URL(url, window.location.origin);
+                ajaxUrl.searchParams.set('ajax', '1');
+                
+                $.ajax({
+                    url: ajaxUrl.toString(),
+                    type: 'GET',
+                    success: function (data) {
+                        // Check if we accidentally got the full page
+                        if (data.indexOf('<!DOCTYPE html>') !== -1) {
+                            console.warn('Received full page instead of partial. Reloading as fallback.');
+                            window.location.href = url;
+                            return;
+                        }
+
+                        $('#practitioner-results-container').html(data);
+                        
+                        // Push to history (original URL without ajax param)
+                        window.history.pushState({path: url}, '', url);
+                        
+                        // Re-initialize scroll animations
+                        setupScrollAnimations();
+                        
+                        // Scroll to results top smoothly
+                        const container = document.getElementById('practitioner-results-container');
+                        if (container) {
+                            window.scrollTo({
+                                top: container.offsetTop - 150,
+                                behavior: 'smooth'
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('Error fetching search results:', xhr.status);
+                        // Fallback to traditional load on error
+                        window.location.href = url;
+                    },
+                    complete: function() {
+                        if (window.hidePreloader) window.hidePreloader();
+                    }
+                });
+            }
+
+            function setupScrollAnimations() {
+                const observerOptions = {
+                    root: null,
+                    rootMargin: '0px',
+                    threshold: 0.1
+                };
+
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('opacity-100', 'translate-y-0');
+                            entry.target.classList.remove('opacity-0', 'translate-y-10');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, observerOptions);
+
+                document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                    // Start hidden
+                    el.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
+                    el.classList.remove('opacity-100', 'translate-y-0');
+                    
+                    // Observe
+                    observer.observe(el);
+                    
+                    // Safety: Force show after a short delay if it's in viewport but didn't trigger
+                    setTimeout(() => {
+                        const rect = el.getBoundingClientRect();
+                        if (rect.top < window.innerHeight && rect.bottom >= 0) {
+                            el.classList.add('opacity-100', 'translate-y-0');
+                            el.classList.remove('opacity-0', 'translate-y-10');
+                        }
+                    }, 500);
+                });
+            }
+
+            // Initial setup
+            setupScrollAnimations();
         });
     </script>
 @endpush
