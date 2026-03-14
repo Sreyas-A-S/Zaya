@@ -35,8 +35,6 @@ class BookingController extends Controller
             'booking_date' => 'required|date|after_or_equal:today',
             'booking_time' => 'required|string',
             'total_price' => 'required|numeric',
-            'from_language' => 'nullable|string',
-            'to_language' => 'nullable|string',
         ]);
 
         $booking = new Booking();
@@ -47,8 +45,6 @@ class BookingController extends Controller
         $booking->conditions = $request->conditions;
         $booking->situation = $request->situation;
         $booking->need_translator = $request->boolean('need_translator');
-        $booking->from_language = $request->from_language;
-        $booking->to_language = $request->to_language;
         $booking->language_id = $request->language_id;
         $booking->translator_id = $request->translator_id;
         $booking->booking_date = $request->booking_date;

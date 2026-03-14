@@ -527,9 +527,10 @@
                             <div
                                 class="dropdown-menu absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 z-50 hidden max-h-[280px] overflow-y-auto">
                                 <div class="py-2">
-                                    @foreach($languages as $lang)
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="{{ strtolower($lang->name) }}">{{ $lang->name }}</div>
-                                    @endforeach
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="english">English</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="french">French</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="german">German</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="spanish">Spanish</div>
                                 </div>
                             </div>
                         </div>
@@ -547,9 +548,10 @@
                             <div
                                 class="dropdown-menu absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 z-50 hidden max-h-[280px] overflow-y-auto">
                                 <div class="py-2">
-                                    @foreach($languages as $lang)
-                                        <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="{{ strtolower($lang->name) }}">{{ $lang->name }}</div>
-                                    @endforeach
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="english">English</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="french">French</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="german">German</div>
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="spanish">Spanish</div>
                                 </div>
                             </div>
                         </div>
@@ -570,7 +572,7 @@
                     <button type="button"
                         class="text-gray-500 hover:text-gray-800 transition-colors cursor-pointer text-base"
                         onclick="previousStep()">Back</button>
-                    <button type="button" onclick="confirmBooking(event)"
+                    <button type="button" onclick="openSuccessModal()"
                         class="bg-secondary text-white px-10 py-3.5 rounded-full font-normal hover:bg-primary transition-colors cursor-pointer text-base transform duration-200">
                         Confirm Booking
                     </button>
@@ -582,92 +584,6 @@
     </div>
 
     <script>
-        // Confirm Booking Submission
-        function confirmBooking(event) {
-            const selectedServices = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
-            if (selectedServices.length === 0) {
-                alert('Please select at least one service.');
-                return;
-            }
-
-            const practitionerId = document.getElementById('selected-practitioner-id')?.value || "{{ $activePractitioner->id ?? '' }}";
-            const mode = Array.from(document.querySelectorAll('.session-mode-btn')).find(b => b.classList.contains('bg-[#FABD4D]'))?.textContent.trim().toLowerCase() === 'online' ? 'online' : 'in-person';
-            const conditions = document.getElementById('conditions-input')?.value;
-            const situation = ""; // Placeholder if needed
-            const needTranslator = document.getElementById('need-translator')?.checked ? 1 : 0;
-            const fromLanguage = document.getElementById('from-language-value')?.value;
-            const toLanguage = document.getElementById('to-language-value')?.value;
-
-            const serviceIds = selectedServices.map(cb => {
-                const label = cb.closest('.service-tag-label');
-                const nameLower = (label.dataset.serviceName || cb.value).toLowerCase();
-                const scheduleItem = document.querySelector(`.service-schedule-item[data-service-name="${nameLower}"]`);
-                return scheduleItem ? scheduleItem.dataset.serviceId : null;
-            }).filter(id => id);
-
-            const firstServiceLabel = selectedServices[0].closest('.service-tag-label');
-            const firstServiceNameLower = (firstServiceLabel.dataset.serviceName || selectedServices[0].value).toLowerCase();
-            const firstScheduleItem = document.querySelector(`.service-schedule-item[data-service-name="${firstServiceNameLower}"]`);
-            
-            const bookingDate = firstScheduleItem?.querySelector('.day-value')?.value;
-            const bookingTime = firstScheduleItem?.querySelector('.time-value')?.value;
-            const totalPriceText = document.querySelector('.text-4xl.font-medium.text-gray-900')?.textContent.replace(/[^\d.]/g, '');
-            const totalPrice = parseFloat(totalPriceText) || 0;
-
-            if (!bookingDate || !bookingTime) {
-                alert('Please select date and time for your session.');
-                showStep(2);
-                firstScheduleItem?.scrollIntoView({behavior: 'smooth', block: 'center'});
-                return;
-            }
-
-            const data = {
-                _token: "{{ csrf_token() }}",
-                practitioner_id: practitionerId,
-                service_ids: serviceIds,
-                mode: mode,
-                conditions: conditions,
-                situation: situation,
-                need_translator: needTranslator,
-                from_language: fromLanguage,
-                to_language: toLanguage,
-                booking_date: bookingDate,
-                booking_time: bookingTime,
-                total_price: totalPrice
-            };
-
-            const btn = event.currentTarget;
-            const originalHtml = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Processing...';
-
-            $.ajax({
-                url: "{{ route('bookings.store') }}",
-                type: "POST",
-                data: data,
-                success: function(response) {
-                    if (response.success) {
-                        // Redirect to Razorpay
-                        window.location.href = "{{ route('home') }}/payment/razorpay?booking_id=" + response.booking.id;
-                    } else {
-                        alert(response.message || 'Something went wrong. Please try again.');
-                        btn.disabled = false;
-                        btn.innerHTML = originalHtml;
-                    }
-                },
-                error: function(xhr) {
-                    const errors = xhr.responseJSON?.errors;
-                    if (errors) {
-                        const firstError = Object.values(errors)[0][0];
-                        alert(firstError);
-                    } else {
-                        alert('Error: ' + (xhr.responseJSON?.message || 'Server error.'));
-                    }
-                    btn.disabled = false;
-                    btn.innerHTML = originalHtml;
-                }
-            });
-        }
         const isClient = @json($isClient);
         let currentStep = isClient ? 2 : 1;
         const totalSteps = 3;
@@ -1081,64 +997,7 @@
 
         });
         // Custom dropdown functions
-        // Stealth search logic for custom dropdowns
-        let searchBuffer = "";
-        let searchTimeout = null;
-
-        document.addEventListener('keydown', function(e) {
-            // Only search if a dropdown is open
-            const openDropdown = document.querySelector('.custom-dropdown .dropdown-menu:not(.hidden)');
-            if (!openDropdown) return;
-
-            // Only capture single characters (letters/numbers)
-            if (e.key.length === 1) {
-                e.preventDefault();
-                searchBuffer += e.key.toLowerCase();
-                
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    searchBuffer = "";
-                }, 1000);
-
-                const items = openDropdown.querySelectorAll('.dropdown-item');
-                let matches = [];
-                
-                items.forEach(item => {
-                    const text = item.textContent.toLowerCase();
-                    if (text.includes(searchBuffer)) {
-                        item.classList.remove('hidden');
-                        matches.push(item);
-                    } else {
-                        item.classList.add('hidden');
-                    }
-                });
-
-                // If only one match, we could auto-select it? Or just keep filtering.
-                // User said "choose the matching keyword", so let's highlight or filter.
-            } else if (e.key === 'Backspace') {
-                searchBuffer = searchBuffer.slice(0, -1);
-                const items = openDropdown.querySelectorAll('.dropdown-item');
-                items.forEach(item => {
-                    const text = item.textContent.toLowerCase();
-                    if (text.includes(searchBuffer)) {
-                        item.classList.remove('hidden');
-                    } else {
-                        item.classList.add('hidden');
-                    }
-                });
-            } else if (e.key === 'Escape' || e.key === 'Enter') {
-                // Reset on close or confirm
-                searchBuffer = "";
-                if (e.key === 'Enter') {
-                    const firstVisible = openDropdown.querySelector('.dropdown-item:not(.hidden)');
-                    if (firstVisible) firstVisible.click();
-                }
-            }
-        });
-
-        // Reset search buffer when opening/closing dropdowns
         function toggleDropdown(dropdownId) {
-            searchBuffer = "";
             const dropdown = document.getElementById(dropdownId);
             const menu = dropdown.querySelector('.dropdown-menu');
             const icon = dropdown.querySelector('.dropdown-trigger i');
@@ -1150,11 +1009,6 @@
                     d.querySelector('.dropdown-trigger i').style.transform = 'rotate(0deg)';
                 }
             });
-
-            // Show all items when opening
-            if (menu.classList.contains('hidden')) {
-                menu.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('hidden'));
-            }
 
             // Toggle current dropdown
             menu.classList.toggle('hidden');

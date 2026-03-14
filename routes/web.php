@@ -74,8 +74,6 @@ Route::get('/announcement/{slug}', [WebController::class, 'announcementDetail'])
 Route::get('/blog/{slug}', [WebController::class, 'blogDetail'])->name('blog-detail');
 Route::get('/book-session/{practitioner?}', [WebController::class, 'bookSession'])->name('book-session');
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
-Route::get('/payment/razorpay', [\App\Http\Controllers\PaymentController::class, 'redirectToRazorpay'])->name('payment.razorpay');
-Route::get('/payment/callback', [\App\Http\Controllers\PaymentController::class, 'handleCallback'])->name('payment.callback');
 Route::get('/fetch-translators', [BookingController::class, 'fetchTranslators'])->name('fetch-translators');
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
 Route::post('/contact-us', [WebController::class, 'storeContact'])->name('contact-us.store');
