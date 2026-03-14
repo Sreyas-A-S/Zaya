@@ -35,7 +35,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: ty 0.5s ease;opacity 0.5s ease, visibili
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
 
         .preloader-logo {
@@ -80,35 +80,34 @@
     <script src="{{ asset('frontend/script.js') }}?v={{ filemtime(public_path('frontend/script.js')) }}"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        (function() {
             const preloader = document.getElementById('global-preloader');
-
             if (!preloader) return;
 
-            // Helper to Hide - Expose Globally
             window.hidePreloader = () => {
                 preloader.style.opacity = '0';
                 preloader.style.visibility = 'hidden';
             };
 
-            // Helper to Show - Expose Globally
             window.showPreloader = () => {
                 preloader.style.opacity = '1';
                 preloader.style.visibility = 'visible';
             };
 
-            // 1. Hide on initial load
+            // Hide on initial load
             window.addEventListener('load', window.hidePreloader);
 
-            // 2. Handle specific Back/Forward Cache (bfcache) cases
-            // Browser might restore page state without firing 'load'
-            window.addEventListener('pageshow', function (event) {
-                if (event.persisted) {
-                    window.hidePreloader();
-                }
-            });
+            // Safety timeout - hide after 8s no matter what
+            setTimeout(window.hidePreloader, 8000);
 
-            // 3. Instant show on Link Clicks
+            // Handle Back/Forward Cache
+            window.addEventListener('pageshow', function (event) {
+                if (event.persisted) window.hidePreloader();
+            });
+        })();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Instant show on Link Clicks
             document.addEventListener('click', function (e) {
                 const link = e.target.closest('a');
 

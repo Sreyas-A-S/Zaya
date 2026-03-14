@@ -371,10 +371,12 @@
                                 @forelse($myLanguages as $lang)
                                 <span class="badge badge-light-primary border text-primary px-3 py-2">{{ $lang->name }}</span>
                                 @empty
-                                <span class="text-muted font-italic">No specific languages assigned.</span>
+                                    @if($user->role !== 'super-admin')
+                                    <span class="text-muted font-italic">No specific languages assigned.</span>
+                                    @endif
                                 @endforelse
                                 @if(count($myLanguages) == 0 && $user->role === 'super-admin')
-                                <span class="badge badge-light-success border text-success px-3 py-2">All Access (Super Admin)</span>
+                                <span class="badge border px-3 py-2" style="background-color: #E6F7F2 !important; color: #158763 !important; border-color: #B5E4D4 !important; cursor: default; pointer-events: none; opacity: 1;">All Access (Super Admin)</span>
                                 @endif
                             </div>
                         </div>
@@ -515,7 +517,7 @@
                     </div>
                 </div>
                 <div class="modal-footer p-4">
-                    <button type="button" class="btn btn-light border text-dark px-4" data-bs-modal="modal" data-bs-target="#changePasswordModal" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-light border text-dark px-4" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary px-4">Update Password</button>
                 </div>
             </form>
@@ -550,7 +552,7 @@
 <script src="{{ asset('admiro/assets/js/select2/select2.full.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    function validatePassword() {
         const password = document.getElementById('new_password');
         const confirm = document.getElementById('confirm_password');
         const requirements = document.getElementById('password-requirements');
@@ -577,6 +579,10 @@
             matchError.classList.add('d-none');
             confirm.setCustomValidity('');
         }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        validatePassword();
     });
 
     document.addEventListener('DOMContentLoaded', function() {
