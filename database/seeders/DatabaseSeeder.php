@@ -49,6 +49,8 @@ class DatabaseSeeder extends Seeder
             UserManagerSeeder::class,
             FooterSettingSeeder::class,
             FooterSettingFrenchSeeder::class,
+            FindPractitionerPageSeeder::class,
+            FindPractitionerPageFrenchSeeder::class,
         ]);
 
         User::updateOrCreate(

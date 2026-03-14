@@ -331,19 +331,19 @@
         }
 
         function bringIntoView(el) {
-            if (!el) return;
-            const container = getScrollContainer(el);
-            if (!container) return;
+            // if (!el) return;
+            // const container = getScrollContainer(el);
+            // if (!container) return;
 
-            const cRect = container.getBoundingClientRect();
-            const eRect = el.getBoundingClientRect();
-            const padding = 16;
+            // const cRect = container.getBoundingClientRect();
+            // const eRect = el.getBoundingClientRect();
+            // const padding = 16;
 
-            if (eRect.bottom > cRect.bottom) {
-                container.scrollTop += (eRect.bottom - cRect.bottom) + padding;
-            } else if (eRect.top < cRect.top) {
-                container.scrollTop -= (cRect.top - eRect.top) + padding;
-            }
+            // if (eRect.bottom > cRect.bottom) {
+            //     container.scrollTop += (eRect.bottom - cRect.bottom) + padding;
+            // } else if (eRect.top < cRect.top) {
+            //     container.scrollTop -= (cRect.top - eRect.top) + padding;
+            // }
         }
 
         document.addEventListener('click', function(e) {

@@ -5,11 +5,11 @@
     <!-- Hero Section -->
     <section class="pt-[144px] md:pt-[150px] px-4 md:px-6 bg-white">
         <div class="container mx-auto text-center pt-0 pb-8 md:py-10">
-            <h1 class="text-2xl  sm:text-3xl md:text-5xl font-serif font-bold text-primary mb-5">
+            <h1 id="find_practitioner_title" class="text-2xl  sm:text-3xl md:text-5xl font-serif font-bold text-primary mb-5">
                 {{ $settings['find_practitioner_title'] ?? 'Experts in Your Neighborhood' }}</h1>
-            <p class="text-xl md:text-2xl text-secondary font-normal font-serif mb-8">
+            <p id="find_practitioner_subtitle" class="text-xl md:text-2xl text-secondary font-normal font-serif mb-8">
                 {{ $settings['find_practitioner_subtitle'] ?? 'Verified practitioners ready to support your journey' }}</p>
-            <p class="text-sm md:text-base text-gray-500 max-w-2xl mx-auto">
+            <p id="find_practitioner_description" class="text-sm md:text-base text-gray-500 max-w-2xl mx-auto">
                 {{ $settings['find_practitioner_description'] ?? "Find the support you need, right in your community. Every practitioner listed here is part of ZAYA's practitioner-led network, committed to ethical care and holistic healing." }}
             </p>
         </div>
@@ -21,7 +21,7 @@
             <div class="flex flex-col md:flex-row gap-4 lg:gap-6 items-center">
                 <!-- Search Input -->
                 <div class="relative w-full md:w-1/4 search-container">
-                    <input id="find_practitioner_search_input" type="text" 
+                    <input id="find_practitioner_search_placeholder" type="text" 
                         placeholder="{{ $settings['find_practitioner_search_placeholder'] ?? 'Practitioners, Treatments...' }}"
                         autocomplete="off"
                         class="w-full border border-[#db8871] rounded-full px-6 py-3.5 pr-12 text-base md:text-lg text-[#db8871] placeholder-[#db8871] focus:outline-none bg-white transition-colors">
@@ -38,7 +38,7 @@
 
                 <!-- Pincode Input -->
                 <div class="relative w-full md:w-1/4">
-                    <input id="find-practitioner-pincode-input" type="text" 
+                    <input id="find_practitioner_pincode_placeholder" type="text" 
                         maxlength="6"
                         oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
                         placeholder="{{ $settings['find_practitioner_pincode_placeholder'] ?? 'Enter Pincode' }}"
@@ -60,7 +60,7 @@
                     <input type="hidden" name="service" value="">
                     <button type="button"
                         class="dropdown-button w-full border border-[#db8871] rounded-full px-6 py-3.5 text-base md:text-lg text-[#db8871] bg-white flex justify-between items-center transition-colors focus:outline-none shadow-sm cursor-pointer">
-                        <span class="dropdown-selected truncate">{{ $settings['find_practitioner_service_placeholder'] ?? 'Select Service' }}</span>
+                        <span id="find_practitioner_service_placeholder" class="dropdown-selected truncate">{{ $settings['find_practitioner_service_placeholder'] ?? 'Select Service' }}</span>
                         <i
                             class="ri-arrow-down-s-line text-[#db8871] text-xl transition-transform duration-300 pointer-events-none dropdown-icon"></i>
                     </button>
@@ -68,27 +68,27 @@
                     <div
                         class="dropdown-menu absolute z-50 left-0 right-0 top-[calc(100%+16px)] bg-white border border-gray-100 rounded-2xl shadow-[0_5px_30px_rgba(0,0,0,0.1)] py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px]">
                         <div class="max-h-[360px] overflow-y-auto px-1 custom-scrollbar flex flex-col gap-0.5">
-                            <button type="button"
+                            <button id="find_practitioner_service_ayurveda" type="button"
                                 class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="ayurveda">Ayurveda & Panchakarma</button>
-                            <button type="button"
+                                data-value="ayurveda">{{ $settings['find_practitioner_service_ayurveda'] ?? 'Ayurveda & Panchakarma' }}</button>
+                            <button id="find_practitioner_service_mindfulness" type="button"
                                 class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="mindfulness">Mindfulness Practitioner</button>
-                            <button type="button"
+                                data-value="mindfulness">{{ $settings['find_practitioner_service_mindfulness'] ?? 'Mindfulness Practitioner' }}</button>
+                            <button id="find_practitioner_service_yoga" type="button"
                                 class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="yoga">Yoga Therapy</button>
-                            <button type="button"
+                                data-value="yoga">{{ $settings['find_practitioner_service_yoga'] ?? 'Yoga Therapy' }}</button>
+                            <button id="find_practitioner_service_art" type="button"
                                 class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="art">Art Therapy</button>
-                            <button type="button"
+                                data-value="art">{{ $settings['find_practitioner_service_art'] ?? 'Art Therapy' }}</button>
+                            <button id="find_practitioner_service_clinical" type="button"
                                 class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none"
-                                data-value="clinical">Clinical Psychology</button>
-                            <button type="button"
+                                data-value="clinical">{{ $settings['find_practitioner_service_clinical'] ?? 'Clinical Psychology' }}</button>
+                            <button id="find_practitioner_service_sound" type="button"
                                 class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="sound">Sound Therapy</button>
-                            <button type="button"
+                                data-value="sound">{{ $settings['find_practitioner_service_sound'] ?? 'Sound Therapy' }}</button>
+                            <button id="find_practitioner_service_hypno" type="button"
                                 class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="hypno">Hypnotherapy</button>
+                                data-value="hypno">{{ $settings['find_practitioner_service_hypno'] ?? 'Hypnotherapy' }}</button>
                         </div>
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                     <input type="hidden" name="mode" value="">
                     <button type="button"
                         class="dropdown-button w-full border border-[#db8871] rounded-full px-6 py-3.5 text-base md:text-lg text-[#db8871] bg-white flex justify-between items-center transition-colors focus:outline-none shadow-sm cursor-pointer">
-                        <span class="dropdown-selected truncate">{{ $settings['find_practitioner_mode_placeholder'] ?? 'Select Mode' }}</span>
+                        <span id="find_practitioner_mode_placeholder" class="dropdown-selected truncate">{{ $settings['find_practitioner_mode_placeholder'] ?? 'Select Mode' }}</span>
                         <i
                             class="ri-arrow-down-s-line text-[#db8871] text-xl transition-transform duration-300 pointer-events-none dropdown-icon"></i>
                     </button>
@@ -106,12 +106,12 @@
                     <div
                         class="dropdown-menu absolute z-50 left-0 right-0 top-[calc(100%+16px)] bg-white border border-gray-100 rounded-2xl shadow-[0_5px_30px_rgba(0,0,0,0.1)] py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px]">
                         <div class="max-h-[360px] overflow-y-auto px-1 custom-scrollbar flex flex-col gap-0.5">
-                            <button type="button"
+                            <button id="find_practitioner_mode_online" type="button"
                                 class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="online">Online</button>
-                            <button type="button"
+                                data-value="online">{{ $settings['find_practitioner_mode_online'] ?? 'Online' }}</button>
+                            <button id="find_practitioner_mode_offline" type="button"
                                 class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="offline">In-person</button>
+                                data-value="offline">{{ $settings['find_practitioner_mode_offline'] ?? 'In-person' }}</button>
                         </div>
                     </div>
                 </div>
@@ -124,7 +124,7 @@
         <div class="container mx-auto max-w-6xl">
             <!-- Practitioner Results Wrapper -->
             <div id="practitioner-results-container">
-                @include('partials.frontend.practitioner-grid', ['practitioners' => $practitioners, 'pincode' => $pincode])
+                @include('partials.frontend.practitioner-grid', ['practitioners' => $practitioners, 'pincode' => $pincode, 'settings' => $settings])
             </div>
 
             <style>

@@ -1,10 +1,9 @@
-<!-- Results Heading -->
 <div class="text-center mb-10 md:mb-16">
     <h2 class="text-lg md:text-3xl font-semibold text-primary font-sans! mb-2">
         @if(isset($pincode) && $pincode)
-            Search Results Based on <span class="font-bold text-gray-900">'{{ $pincode }}'</span>
+            <span id="find_practitioner_results_heading">{{ $settings['find_practitioner_results_heading'] ?? 'Search Results Based on' }}</span> <span class="font-bold text-gray-900">'{{ $pincode }}'</span>
         @else
-            All Practitioners
+            <span id="find_practitioner_all_label">{{ $settings['find_practitioner_all_label'] ?? 'All Practitioners' }}</span>
         @endif
     </h2>
 </div>
@@ -45,8 +44,8 @@
             <div class="mb-4">
                 <i class="ri-search-line text-5xl text-gray-300"></i>
             </div>
-            <h3 class="text-xl font-medium text-gray-600 mb-2">No practitioners found</h3>
-            <p class="text-gray-400">Try adjusting your filters or searching in a different area.</p>
+            <h3 id="find_practitioner_no_results" class="text-xl font-medium text-gray-600 mb-2">{{ $settings['find_practitioner_no_results'] ?? 'No practitioners found' }}</h3>
+            <p id="find_practitioner_no_results_sub" class="text-gray-400">{{ $settings['find_practitioner_no_results_sub'] ?? 'Try adjusting your filters or searching in a different area.' }}</p>
         </div>
     @endforelse
 </div>

@@ -159,7 +159,7 @@ class WebController extends Controller
         $practitioners = $query->paginate(4)->withQueryString();
 
         if ($request->ajax()) {
-            return view('partials.frontend.practitioner-grid', compact('practitioners', 'pincode'))->render();
+            return view('partials.frontend.practitioner-grid', compact('practitioners', 'pincode', 'settings', 'language'))->render();
         }
 
         return view('find-practitioner', compact('settings', 'practitioners', 'pincode'));
