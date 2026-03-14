@@ -806,7 +806,7 @@ class HomepageSettingFrenchSeeder extends Seeder
                 'type' => 'text',
                 'section' => 'practitioner_page',
                 'max_length' => 100,
-                'language: fr',
+                'language' => 'fr',
             ],
             [
                 'key' => 'practitioner_load_more_reviews',
