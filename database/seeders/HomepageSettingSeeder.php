@@ -315,6 +315,83 @@ class HomepageSettingSeeder extends Seeder
                 'section' => 'about_page',
                 'max_length' => 1000
             ],
+            [
+                'key' => 'about_core_values_title',
+                'value' => 'Core Values',
+                'type' => 'text',
+                'section' => 'about_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'about_core_value_1_title',
+                'value' => 'Trust & Ethics',
+                'type' => 'text',
+                'section' => 'about_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'about_core_value_1_description',
+                'value' => 'We respect the practitioner-client relationship and uphold transparency in every interaction.',
+                'type' => 'textarea',
+                'section' => 'about_page',
+                'max_length' => 500
+            ],
+            [
+                'key' => 'about_core_value_2_title',
+                'value' => 'Holistic Care',
+                'type' => 'text',
+                'section' => 'about_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'about_core_value_2_description',
+                'value' => 'We believe in treating the whole person through Ayurveda, yoga, and mindfulness.',
+                'type' => 'textarea',
+                'section' => 'about_page',
+                'max_length' => 500
+            ],
+            [
+                'key' => 'about_core_value_3_title',
+                'value' => 'Collaboration',
+                'type' => 'text',
+                'section' => 'about_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'about_core_value_3_description',
+                'value' => 'We foster meaningful partnerships between practitioners and specialists.',
+                'type' => 'textarea',
+                'section' => 'about_page',
+                'max_length' => 500
+            ],
+            [
+                'key' => 'about_core_value_4_title',
+                'value' => 'Human-Centered Technology',
+                'type' => 'text',
+                'section' => 'about_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'about_core_value_4_description',
+                'value' => 'We use technology to support care, not to replace it.',
+                'type' => 'textarea',
+                'section' => 'about_page',
+                'max_length' => 500
+            ],
+            [
+                'key' => 'about_core_value_5_title',
+                'value' => 'Accessibility',
+                'type' => 'text',
+                'section' => 'about_page',
+                'max_length' => 100
+            ],
+            [
+                'key' => 'about_core_value_5_description',
+                'value' => 'We strive to make quality wellness services available across borders and languages.',
+                'type' => 'textarea',
+                'section' => 'about_page',
+                'max_length' => 500
+            ],
 
             // Services Page Section
             [

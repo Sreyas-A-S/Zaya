@@ -77,6 +77,9 @@
                                     <button class="nav-link text-start mb-2" id="v-pills-team-tab" data-bs-toggle="pill" data-bs-target="#v-pills-team" type="button" role="tab" aria-controls="v-pills-team" aria-selected="false">
                                         <i class="fa-solid fa-users me-2"></i> Team
                                     </button>
+                                    <button class="nav-link text-start mb-2" id="v-pills-core-values-tab" data-bs-toggle="pill" data-bs-target="#v-pills-core-values" type="button" role="tab" aria-controls="v-pills-core-values" aria-selected="false">
+                                        <i class="fa-solid fa-star me-2"></i> Core Values
+                                    </button>
                                 </ul>
                             </div>
                             <div class="col-md-9 border-start">
@@ -84,7 +87,8 @@
                                     @php
                                     $bannerSettings = $settings->filter(fn($s) => Str::contains($s->key, 'banner'));
                                     $teamSettings = $settings->filter(fn($s) => Str::contains($s->key, 'team'));
-                                    $generalSettings = $settings->filter(fn($s) => !Str::contains($s->key, 'banner') && !Str::contains($s->key, 'team'));
+                                    $coreValuesSettings = $settings->filter(fn($s) => Str::contains($s->key, 'core_value'));
+                                    $generalSettings = $settings->filter(fn($s) => !Str::contains($s->key, 'banner') && !Str::contains($s->key, 'team') && !Str::contains($s->key, 'core_value'));
                                     @endphp
 
                                     <!-- General Tab -->
@@ -93,32 +97,7 @@
                                             @foreach($generalSettings as $setting)
                                             <div class="col-12">
                                                 <label class="form-label fw-bold">{{ str_replace('_', ' ', ucfirst($setting->key)) }}</label>
-
-                                                @if($setting->type === 'text')
-                                                <input type="text" id="{{ $setting->key }}" name="{{ $setting->key }}" value="{{ $setting->value }}" class="form-control" placeholder="Enter content..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>
-                                                @if($setting->max_length)
-                                                <div class="text-end text-muted" style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Max: {{ $setting->max_length }}</div>
-                                                @endif
-
-                                                @elseif($setting->type === 'textarea')
-                                                <textarea id="{{ $setting->key }}" name="{{ $setting->key }}" class="form-control" rows="4" placeholder="Enter long text..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>{{ $setting->value }}</textarea>
-                                                @if($setting->max_length)
-                                                <div class="text-end text-muted" style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Max: {{ $setting->max_length }}</div>
-                                                @endif
-
-                                                @elseif($setting->type === 'image')
-                                                <div class="d-flex align-items-center gap-3">
-                                                    @if($setting->value)
-                                                    <div class="mb-2">
-                                                        <img src="{{ Str::startsWith($setting->value, 'frontend/') ? asset($setting->value) : asset('storage/' . $setting->value) }}" alt="Preview" class="img-thumbnail" style="max-height: 100px;">
-                                                    </div>
-                                                    @endif
-                                                    <div class="flex-grow-1">
-                                                        <input type="file" name="{{ $setting->key }}" class="form-control">
-                                                        <small class="text-muted">Current: {{ $setting->value }}</small>
-                                                    </div>
-                                                </div>
-                                                @endif
+                                                @include('admin.about-settings.partials.input-field', ['setting' => $setting])
                                             </div>
                                             @endforeach
                                         </div>
@@ -130,32 +109,7 @@
                                             @foreach($bannerSettings as $setting)
                                             <div class="col-12">
                                                 <label class="form-label fw-bold">{{ str_replace('_', ' ', ucfirst($setting->key)) }}</label>
-
-                                                @if($setting->type === 'text')
-                                                <input type="text" id="{{ $setting->key }}" name="{{ $setting->key }}" value="{{ $setting->value }}" class="form-control" placeholder="Enter content..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>
-                                                @if($setting->max_length)
-                                                <div class="text-end text-muted" style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Max: {{ $setting->max_length }}</div>
-                                                @endif
-
-                                                @elseif($setting->type === 'textarea')
-                                                <textarea id="{{ $setting->key }}" name="{{ $setting->key }}" class="form-control" rows="4" placeholder="Enter long text..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>{{ $setting->value }}</textarea>
-                                                @if($setting->max_length)
-                                                <div class="text-end text-muted" style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Max: {{ $setting->max_length }}</div>
-                                                @endif
-
-                                                @elseif($setting->type === 'image')
-                                                <div class="d-flex align-items-center gap-3">
-                                                    @if($setting->value)
-                                                    <div class="mb-2">
-                                                        <img src="{{ Str::startsWith($setting->value, 'frontend/') ? asset($setting->value) : asset('storage/' . $setting->value) }}" alt="Preview" class="img-thumbnail" style="max-height: 100px;">
-                                                    </div>
-                                                    @endif
-                                                    <div class="flex-grow-1">
-                                                        <input type="file" name="{{ $setting->key }}" class="form-control">
-                                                        <small class="text-muted">Current: {{ $setting->value }}</small>
-                                                    </div>
-                                                </div>
-                                                @endif
+                                                @include('admin.about-settings.partials.input-field', ['setting' => $setting])
                                             </div>
                                             @endforeach
                                         </div>
@@ -167,32 +121,19 @@
                                             @foreach($teamSettings as $setting)
                                             <div class="col-12">
                                                 <label class="form-label fw-bold">{{ str_replace('_', ' ', ucfirst($setting->key)) }}</label>
+                                                @include('admin.about-settings.partials.input-field', ['setting' => $setting])
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
 
-                                                @if($setting->type === 'text')
-                                                <input type="text" id="{{ $setting->key }}" name="{{ $setting->key }}" value="{{ $setting->value }}" class="form-control" placeholder="Enter content..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>
-                                                @if($setting->max_length)
-                                                <div class="text-end text-muted" style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Max: {{ $setting->max_length }}</div>
-                                                @endif
-
-                                                @elseif($setting->type === 'textarea')
-                                                <textarea id="{{ $setting->key }}" name="{{ $setting->key }}" class="form-control" rows="4" placeholder="Enter long text..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>{{ $setting->value }}</textarea>
-                                                @if($setting->max_length)
-                                                <div class="text-end text-muted" style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Max: {{ $setting->max_length }}</div>
-                                                @endif
-
-                                                @elseif($setting->type === 'image')
-                                                <div class="d-flex align-items-center gap-3">
-                                                    @if($setting->value)
-                                                    <div class="mb-2">
-                                                        <img src="{{ Str::startsWith($setting->value, 'frontend/') ? asset($setting->value) : asset('storage/' . $setting->value) }}" alt="Preview" class="img-thumbnail" style="max-height: 100px;">
-                                                    </div>
-                                                    @endif
-                                                    <div class="flex-grow-1">
-                                                        <input type="file" name="{{ $setting->key }}" class="form-control">
-                                                        <small class="text-muted">Current: {{ $setting->value }}</small>
-                                                    </div>
-                                                </div>
-                                                @endif
+                                    <!-- Core Values Tab -->
+                                    <div class="tab-pane fade p-3" id="v-pills-core-values" role="tabpanel" aria-labelledby="v-pills-core-values-tab">
+                                        <div class="row g-4">
+                                            @foreach($coreValuesSettings as $setting)
+                                            <div class="col-12">
+                                                <label class="form-label fw-bold">{{ str_replace('_', ' ', ucfirst($setting->key)) }}</label>
+                                                @include('admin.about-settings.partials.input-field', ['setting' => $setting])
                                             </div>
                                             @endforeach
                                         </div>

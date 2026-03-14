@@ -1,0 +1,25 @@
+@if($setting->type === 'text')
+<input type="text" id="{{ $setting->key }}" name="{{ $setting->key }}" value="{{ $setting->value }}" class="form-control" placeholder="Enter content..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>
+@if($setting->max_length)
+<div class="text-end text-muted" style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Max: {{ $setting->max_length }}</div>
+@endif
+
+@elseif($setting->type === 'textarea')
+<textarea id="{{ $setting->key }}" name="{{ $setting->key }}" class="form-control" rows="4" placeholder="Enter long text..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>{{ $setting->value }}</textarea>
+@if($setting->max_length)
+<div class="text-end text-muted" style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Max: {{ $setting->max_length }}</div>
+@endif
+
+@elseif($setting->type === 'image')
+<div class="d-flex align-items-center gap-3">
+    @if($setting->value)
+    <div class="mb-2">
+        <img src="{{ Str::startsWith($setting->value, 'frontend/') ? asset($setting->value) : asset('storage/' . $setting->value) }}" alt="Preview" class="img-thumbnail" style="max-height: 100px;">
+    </div>
+    @endif
+    <div class="flex-grow-1">
+        <input type="file" name="{{ $setting->key }}" class="form-control">
+        <small class="text-muted">Current: {{ $setting->value }}</small>
+    </div>
+</div>
+@endif
