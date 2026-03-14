@@ -651,7 +651,7 @@ class HomepageSettingFrenchSeeder extends Seeder
                 'value' => 'Sélectionnez un mode',
                 'type' => 'text',
                 'section' => 'find_practitioner_page',
-                'max_length: 50,
+                'max_length' => 50,
                 'language' => 'fr',
             ],
             [
