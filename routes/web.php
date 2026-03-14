@@ -60,6 +60,9 @@ Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
 Route::get('/gallery', [WebController::class, 'gallery'])->name('gallery');
 Route::get('/find-practitioner', [WebController::class, 'findPractitioner'])->name('find-practitioner');
+Route::get('/search', [WebController::class, 'search'])->name('search');
+Route::get('/filter-practitioners', [WebController::class, 'filterPractitioners'])->name('filter-practitioners');
+Route::get('/search-locations', [WebController::class, 'searchLocations'])->name('search-locations');
 Route::get('/practitioner/{slug}', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
 Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login');
 Route::get('/client-register', [WebController::class, 'clientRegister'])->name('client-register');
@@ -161,6 +164,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // Services Page Settings
     Route::get('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'index'])->name('services-settings.index');
     Route::post('services-settings', [\App\Http\Controllers\Admin\ServicesSettingController::class, 'update'])->name('services-settings.update');
+
+    // Find Practitioner Settings
+    Route::get('find-practitioner-settings', [\App\Http\Controllers\Admin\FindPractitionerSettingController::class, 'index'])->name('find-practitioner-settings.index');
+    Route::post('find-practitioner-settings', [\App\Http\Controllers\Admin\FindPractitionerSettingController::class, 'update'])->name('find-practitioner-settings.update');
     
     // Footer Page Settings
     Route::get('footer-settings', [\App\Http\Controllers\Admin\FooterPageController::class, 'index'])->name('footer-settings.index');

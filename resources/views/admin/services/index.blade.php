@@ -133,7 +133,7 @@
 
                     <div class="row g-3">
                         <!-- Hidden Inputs for logic -->
-                        <input type="hidden" name="main_image_gallery_id" id="main_image_gallery_id" required >
+                        <input type="hidden" name="main_image_gallery_id" id="main_image_gallery_id">
                         <!-- 'image' and 'gallery_images[]' will be handled via FormData logic -->
 
                         <div class="col-md-12">
@@ -156,9 +156,10 @@
                                 @endforeach
                             </div>
                             <div class="mt-2 input-group input-group-sm">
-                                <input type="text" class="form-control new-master-data-input" id="new-root-category-input" title="Please Fill the Category" name="title" required placeholder="Add Category" data-type="service_categories" required>
+                                <input type="text" class="form-control new-master-data-input" id="new-root-category-input" title="Please enter a category name" placeholder="Add Category" data-type="service_categories">
                                 <button class="btn btn-primary" type="button" id="add-root-category-btn"><i class="fa fa-plus"></i></button>
                             </div>
+                            <div class="text-danger small mt-1 d-none" id="root-category-error">Category name is required.</div>
                         </div>
 
                         <div class="col-md-6">
@@ -178,7 +179,7 @@
                                 @endforeach
                             </div>
                             <div class="mt-2 input-group input-group-sm">
-                                <input type="text" class="form-control new-master-data-input" id="new-sub-category-input" title="Please fill the sub category" name="title" required placeholder="Subcategory Name" data-type="service_categories">
+                                <input type="text" class="form-control new-master-data-input" id="new-sub-category-input" title="Please enter a subcategory name" placeholder="Subcategory Name" data-type="service_categories">
                                 <select class="form-select" id="new-subcategory-parent">
                                     <option value="" selected disabled>Parent</option>
                                     @foreach($categories->whereNull('parent_id') as $parent)
@@ -187,6 +188,8 @@
                                 </select>
                                 <button class="btn btn-primary" type="button" id="add-sub-category-btn"><i class="fa fa-plus"></i></button>
                             </div>
+                            <div class="text-danger small mt-1 d-none" id="sub-category-error">Please fill both name and parent.</div>
+                            <div id="main-category-error-msg" class="text-danger small mt-2 d-none">At least one category or subcategory must be selected.</div>
                         </div>
                         <div class="col-md-12">
                            <textarea 
@@ -206,7 +209,7 @@
                                 <button type="button" class="btn btn-light text-dark btn-sm border" onclick="$('#bulk_upload').click()">
                                     <i class="fa fa-cloud-upload me-1"></i> Add Images
                                 </button>
-                                <input type="file" id="bulk_upload" multiple accept="image/*" class="d-none" required>
+                                <input type="file" id="bulk_upload" multiple accept="image/*" class="d-none">
                             </div>
                             <div class="border rounded p-3 bg-white">
                                 <div id="media-grid" class="d-flex flex-wrap gap-2"></div>
@@ -982,9 +985,12 @@
             let name = inputInfo.val();
 
             if (!name) {
-                alert('Please enter a category name');
+                inputInfo.addClass('is-invalid');
+                $('#root-category-error').removeClass('d-none').addClass('d-block');
                 return;
             }
+            inputInfo.removeClass('is-invalid');
+            $('#root-category-error').addClass('d-none').removeClass('d-block');
 
             btn.prop('disabled', true);
 
@@ -1000,7 +1006,7 @@
                     if (response.success && response.data) {
                         let newItem = response.data;
                         let newHtml = `
-                            <div class="col-md-6 category-item" data-id="${newItem.id}">
+                            <div class="col-12 category-item" data-id="${newItem.id}">
                                 <div class="form-check checkbox-primary mb-2 d-flex align-items-center">
                                     <input class="form-check-input" type="checkbox" name="categories[]" value="${newItem.id}" id="cat_${newItem.id}" checked>
                                     <label class="form-check-label flex-grow-1 mb-0 ms-2" for="cat_${newItem.id}">${newItem.name}</label>
@@ -1043,14 +1049,15 @@
             let parentId = $('#new-subcategory-parent').val();
             let parentName = $('#new-subcategory-parent option:selected').text();
 
-            if (!parentId) {
-                alert('Please select a parent category');
+            if (!parentId || !name) {
+                if (!name) inputInfo.addClass('is-invalid');
+                if (!parentId) $('#new-subcategory-parent').addClass('is-invalid');
+                $('#sub-category-error').removeClass('d-none').addClass('d-block');
                 return;
             }
-            if (!name) {
-                alert('Please enter a subcategory name');
-                return;
-            }
+            inputInfo.removeClass('is-invalid');
+            $('#new-subcategory-parent').removeClass('is-invalid');
+            $('#sub-category-error').addClass('d-none').removeClass('d-block');
 
             btn.prop('disabled', true);
 
@@ -1067,7 +1074,7 @@
                     if (response.success && response.data) {
                         let newItem = response.data;
                         let newHtml = `
-                            <div class="col-md-6 category-item" data-id="${newItem.id}">
+                            <div class="col-12 category-item" data-id="${newItem.id}">
                                 <div class="form-check checkbox-secondary mb-2 d-flex align-items-center">
                                     <input class="form-check-input" type="checkbox" name="categories[]" value="${newItem.id}" id="cat_${newItem.id}" checked>
                                     <label class="form-check-label flex-grow-1 mb-0 ms-2" for="cat_${newItem.id}">
@@ -1142,6 +1149,17 @@
                     btn.prop('disabled', false).text('Delete Now');
                 }
             });
+        });
+
+        // Clear validation on input
+        $('#new-root-category-input').on('input', function() {
+            $(this).removeClass('is-invalid');
+            $('#root-category-error').addClass('d-none');
+        });
+
+        $('#new-sub-category-input, #new-subcategory-parent').on('input change', function() {
+            $('#new-sub-category-input, #new-subcategory-parent').removeClass('is-invalid');
+            $('#sub-category-error').addClass('d-none');
         });
 
     });

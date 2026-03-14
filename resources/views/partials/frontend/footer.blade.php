@@ -95,9 +95,9 @@
                                 $displayValue = $savedPincode ? __('Your Pincode') . ': ' . $savedPincode : '';
                             @endphp
                             <input id="footer-pincode-input" type="text" placeholder="{{ __('Enter Pincode') }}" data-i18n="Enter Pincode"
-                                maxlength="{{ $savedPincode ? '' : '6' }}" 
+                                maxlength="{{ $savedPincode ? '20' : '6' }}" 
                                 {{ $savedPincode ? 'readonly' : '' }}
-                                oninput="if(!this.readOnly) this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                                oninput="if(!this.readOnly) this.value = this.value.replace(/[^a-zA-Z0-9]/g, '');"
                                 value="{{ $displayValue }}"
                                 class="{{ $savedPincode ? 'bg-[#4DB286] border-green-200' : 'bg-[#F9F9F9] border-gray-200' }} placeholder-gray-400 text-gray-800 rounded px-4 h-11 w-full text-sm focus:outline-none focus:border-[#79584B] transition-all border">
                         </div>
@@ -106,7 +106,7 @@
                             <span>{{ __('Save') }}</span>
                         </button>
                         <button id="footer-pincode-delete" type="button" style="{{ session('global_pincode') ? '' : 'display:none;' }}"
-                            class="bg-red-500 h-11 text-white font-medium rounded px-4 text-lg hover:bg-red-600 transition-all shadow-sm flex items-center justify-center whitespace-nowrap" title="{{ __('Delete') }}">
+                            class="bg-primary h-11 text-white font-medium rounded px-4 text-lg hover:bg-[#5e4339] transition-all shadow-sm flex items-center justify-center whitespace-nowrap" title="{{ __('Delete') }}">
                             <i class="ri-delete-bin-line"></i>
                         </button>
                     </form>
@@ -198,6 +198,12 @@ $('#footer-pincode-save').click(function(){
                 $('#find-practitioner-pincode-btn').hide();
                 $('#find-practitioner-pincode-delete').show();
 
+                // Sync with hero search bar postal code input if empty
+                var heroPincodeInput = $('#hero_search_placeholder_2');
+                if (heroPincodeInput.length && !heroPincodeInput.val()) {
+                    heroPincodeInput.val(pincode);
+                }
+
                 $('#pincode-message').html(
                     '<span class="text-green-600 font-bold">'+response.message+'</span>'
                 );
@@ -210,7 +216,7 @@ $('#footer-pincode-save').click(function(){
                        .addClass('bg-[#79584B] hover:bg-[#5e4339]')
                        .hide(); 
                     
-                    $('#footer-pincode-delete').removeClass('bg-green-600').addClass('bg-red-500 hover:bg-red-600').show(); 
+                    $('#footer-pincode-delete').removeClass('bg-green-600').addClass('bg-primary hover:bg-[#5e4339]').show(); 
                 }, 2000);
             }
 
@@ -248,7 +254,7 @@ $('#footer-pincode-delete').click(function(){
                 $('#find-practitioner-pincode-btn').show();
                 $('#find-practitioner-pincode-delete').hide();
 
-                $('#footer-pincode-delete').removeClass('bg-green-600').addClass('bg-red-500').hide();
+                $('#footer-pincode-delete').removeClass('bg-green-600').addClass('bg-primary').hide();
                 $('#footer-pincode-save').removeClass('bg-green-600 hover:bg-green-700').addClass('bg-[#79584B] hover:bg-[#5e4339]').show();
                 
                 $('#pincode-message').html(

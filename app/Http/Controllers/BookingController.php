@@ -19,6 +19,14 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+        // Enforce Client/Patient only
+        if (!in_array(auth()->user()->role, ['client', 'patient'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only clients can book sessions. Please login with a client account.'
+            ], 403);
+        }
+
         $request->validate([
             'practitioner_id' => 'required|exists:practitioners,id',
             'service_ids' => 'required|array',
