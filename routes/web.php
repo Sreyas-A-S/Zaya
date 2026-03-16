@@ -74,6 +74,7 @@ Route::get('/announcement/{slug}', [WebController::class, 'announcementDetail'])
 Route::get('/blog/{slug}', [WebController::class, 'blogDetail'])->name('blog-detail');
 Route::get('/book-session/{practitioner?}', [WebController::class, 'bookSession'])->name('book-session');
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+Route::get('/bookings/payment/callback', [BookingController::class, 'paymentCallback'])->name('bookings.payment.callback');
 Route::get('/fetch-translators', [BookingController::class, 'fetchTranslators'])->name('fetch-translators');
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
 Route::post('/contact-us', [WebController::class, 'storeContact'])->name('contact-us.store');
@@ -261,10 +262,6 @@ Route::get('/seed', function () {
     return '<pre>' . Artisan::output() . '</pre>';
 });
 
-
-Route::get('/client-profile', function () {
-    return view('client-profile');
-})->name('client-profile');
 
 Route::get('/practitioner-profile', function () {
     return view('practitioner-profile');

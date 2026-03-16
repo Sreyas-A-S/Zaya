@@ -9,6 +9,7 @@ use App\Models\Translator;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class BookingController extends Controller
 {
@@ -35,6 +36,10 @@ class BookingController extends Controller
             'booking_date' => 'required|date|after_or_equal:today',
             'booking_time' => 'required|string',
             'total_price' => 'required|numeric',
+            'from_language' => 'nullable|string',
+            'to_language' => 'nullable|string',
+            'situation' => 'nullable|string',
+            'conditions' => 'nullable|string',
         ]);
 
         $booking = new Booking();
@@ -45,20 +50,98 @@ class BookingController extends Controller
         $booking->conditions = $request->conditions;
         $booking->situation = $request->situation;
         $booking->need_translator = $request->boolean('need_translator');
+        $booking->from_language = $request->from_language;
+        $booking->to_language = $request->to_language;
         $booking->language_id = $request->language_id;
         $booking->translator_id = $request->translator_id;
         $booking->booking_date = $request->booking_date;
         $booking->booking_time = $request->booking_time;
         $booking->total_price = $request->total_price;
         $booking->status = 'pending';
+        $booking->save(); // Save first to get the ID
+        
+        // --- Razorpay Payment Link Creation ---
+        $razorpayKey = config('services.razorpay.key');
+        $razorpaySecret = config('services.razorpay.secret');
+        
+        $paymentUrl = null;
+        $orderId = 'mock_plink_' . uniqid();
+
+        if ($razorpayKey && $razorpaySecret && !str_contains($razorpayKey, 'dummy')) {
+            $verifySsl = config('services.razorpay.verify_ssl');
+            if ($verifySsl === null) {
+                $verifySsl = !app()->environment('local');
+            }
+            try {
+                $response = Http::withOptions(['verify' => (bool) $verifySsl])
+                    ->withBasicAuth($razorpayKey, $razorpaySecret)
+                    ->post('https://api.razorpay.com/v1/payment_links', [
+                        'amount' => (int)round($request->total_price * 100),
+                        'currency' => 'INR',
+                        'description' => 'Session Booking with ' . ($booking->practitioner->user->name ?? 'Practitioner'),
+                        'customer' => [
+                            'name' => Auth::user()->name,
+                            'email' => Auth::user()->email,
+                            'contact' => Auth::user()->phone ?? '',
+                        ],
+                        'callback_url' => route('bookings.payment.callback'),
+                        'callback_method' => 'get',
+                        'notes' => [
+                            'booking_id' => $booking->id
+                        ]
+                    ]);
+
+                if ($response->successful()) {
+                    $paymentUrl = $response->json('short_url');
+                    $orderId = $response->json('id');
+                } else {
+                    \Log::error('Razorpay Payment Link Error: ' . $response->body());
+                }
+            } catch (\Exception $e) {
+                \Log::error('Razorpay Connection Error: ' . $e->getMessage());
+            }
+        }
+
+        $booking->razorpay_order_id = $orderId;
+        $booking->razorpay_payment_url = $paymentUrl;
         $booking->save();
+
+        if (!$paymentUrl) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment gateway is unavailable. Please try again later.',
+                'booking' => $booking,
+                'redirect_url' => null
+            ], 503);
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Booking created successfully!',
-            'booking' => $booking
+            'message' => 'Booking created! Opening payment gateway...',
+            'booking' => $booking,
+            'redirect_url' => $paymentUrl
         ]);
     }
+
+    public function paymentCallback(Request $request)
+    {
+        $paymentLinkId = $request->razorpay_payment_link_id;
+        $status = $request->razorpay_payment_link_status;
+        $paymentId = $request->razorpay_payment_id;
+
+        $booking = Booking::where('razorpay_order_id', $paymentLinkId)->firstOrFail();
+
+        if ($status === 'paid') {
+            $booking->status = 'confirmed';
+            $booking->razorpay_payment_id = $paymentId;
+            $booking->save();
+
+            return redirect()->route('home')->with('success', 'Payment successful! Your booking is confirmed.');
+        }
+
+        return redirect()->route('home')->with('error', 'Payment was not completed. Please try again or contact support.');
+    }
+
 
     public function fetchTranslators(Request $request)
     {

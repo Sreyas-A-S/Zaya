@@ -26,9 +26,6 @@
             <div class="card">
                 <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
                     <h3>Testimonials List</h3>
-                    <button type="button" class="btn btn-primary" onclick="openCreateModal()">
-                        <i class="fa-solid fa-plus me-2"></i>Add Testimonial
-                    </button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

@@ -24,6 +24,7 @@
         .bg-green-600 {
             background-color: #10b981;
         }
+
         /* Preloader Styles */
         #global-preloader {
             position: fixed;
@@ -72,6 +73,8 @@
         <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="preloader-logo">
     </div>
 
+    @include('partials.frontend.toast')
+    @include('partials.frontend.success-popup')
     @include('partials.frontend.header')
 
     @yield('content')
@@ -102,14 +105,14 @@
             setTimeout(window.hidePreloader, 8000);
 
             // Handle Back/Forward Cache
-            window.addEventListener('pageshow', function (event) {
+            window.addEventListener('pageshow', function(event) {
                 if (event.persisted) window.hidePreloader();
             });
         })();
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Instant show on Link Clicks
-            document.addEventListener('click', function (e) {
+            document.addEventListener('click', function(e) {
                 const link = e.target.closest('a');
 
                 // Allow modifiers (new tab, etc) logic to default
@@ -140,7 +143,7 @@
             });
 
             // 4. Instant show on Form Submit
-            document.addEventListener('submit', function (e) {
+            document.addEventListener('submit', function(e) {
                 const form = e.target;
                 if (!form.target || form.target === '_self') {
                     window.showPreloader();

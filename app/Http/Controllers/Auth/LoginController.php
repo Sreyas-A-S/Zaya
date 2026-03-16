@@ -114,7 +114,7 @@ class LoginController extends Controller
             return redirect($request->redirect);
         }
 
-        return redirect()->intended('/');
+        return redirect()->route('dashboard');
     }
 
     protected function loggedOut(Request $request)
