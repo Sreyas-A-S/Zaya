@@ -420,13 +420,13 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">First Name</label>
-                                    <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $user->first_name) }}" minlength="2" maxlength="50" required>
-                                    <div class="invalid-feedback">Please enter a valid first name (2-50 characters).</div>
+                                    <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $user->first_name) }}" minlength="1" maxlength="50" required>
+                                    <div class="invalid-feedback">Please enter a valid first name (1-50 characters).</div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Last Name</label>
-                                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $user->last_name) }}" minlength="2" maxlength="50" required>
-                                    <div class="invalid-feedback">Please enter a valid last name (2-50 characters).</div>
+                                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $user->last_name) }}" minlength="1" maxlength="50" required>
+                                    <div class="invalid-feedback">Please enter a valid last name (1-50 characters).</div>
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label">Email Address</label>

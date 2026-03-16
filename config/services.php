@@ -47,4 +47,10 @@ return [
         'api_key' => env('CHATBOT_API_KEY'),
     ],
 
+    'razorpay' => [
+        'key' => env('RAZORPAY_KEY_ID'),
+        'secret' => env('RAZORPAY_KEY_SECRET'),
+        'verify_ssl' => env('RAZORPAY_VERIFY_SSL', env('APP_ENV') === 'local' ? false : true),
+    ],
+
 ];

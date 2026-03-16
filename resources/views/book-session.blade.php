@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book a Session - Zaya Wellness</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('frontend/assets/favicon-96x96.png') }}" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="{{ asset('frontend/assets/favicon.svg') }}" />
     <link rel="shortcut icon" href="{{ asset('frontend/assets/favicon.ico') }}" />
@@ -12,11 +13,53 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.1/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <style>
+        /* Toast Styles */
+        #toast-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+        }
+
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 9999px;
+            padding: 16px 24px;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease-in-out;
+            margin-bottom: 10px;
+        }
+
+        .toast.show {
+            visibility: visible;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background-color: #48BB78;
+        }
+
+        .toast.error, .toast.warning {
+            background-color: #F56565;
+        }
+    </style>
 </head>
 
 <body class="min-h-screen flex flex-col">
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
     <!-- Main Content -->
-    <div class="flex-1 relative">
         <div class="container-fluid mx-auto">
 
             @php
@@ -241,7 +284,7 @@
                         <!-- Service Tags -->
                         <div class="flex flex-wrap gap-3" id="available-services-container">
                             @forelse($services as $service)
-                                <label class="service-tag-label inline-block cursor-pointer select-none" data-service-name="{{ strtolower($service->title) }}">
+                                <label class="service-tag-label inline-block cursor-pointer select-none" data-service-name="{{ strtolower($service->title) }}" data-service-id="{{ $service->id }}">
                                     <input type="checkbox" class="peer hidden" value="{{ $service->title }}" {{ $loop->first ? 'checked' : '' }}>
                                     <div
                                         class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
@@ -567,12 +610,20 @@
                     </div>
                 </div>
 
+                <!-- Test Payment Toggle -->
+                <div class="flex items-center justify-center gap-3 mb-6">
+                    <input type="checkbox" id="test-payment-toggle" class="h-4 w-4 accent-[#F5A623] cursor-pointer">
+                    <label for="test-payment-toggle" class="text-sm text-gray-600 cursor-pointer">
+                        Test payment (use INR 1.00)
+                    </label>
+                </div>
+
                 <!-- Navigation Action -->
                 <div class="flex justify-center items-center gap-6 mb-12">
                     <button type="button"
                         class="text-gray-500 hover:text-gray-800 transition-colors cursor-pointer text-base"
                         onclick="previousStep()">Back</button>
-                    <button type="button" onclick="openSuccessModal()"
+                    <button type="button" onclick="submitBooking(this)"
                         class="bg-secondary text-white px-10 py-3.5 rounded-full font-normal hover:bg-primary transition-colors cursor-pointer text-base transform duration-200">
                         Confirm Booking
                     </button>
@@ -582,6 +633,127 @@
         </div>
     </div>
     </div>
+
+    <script>
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+
+            container.appendChild(toast);
+            
+            // Force reflow
+            toast.offsetHeight;
+            
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 5000);
+        }
+
+        let lastComputedTotal = null;
+
+        function getDisplayedTotalPrice() {
+            const totalPriceText = document.querySelector('.text-4xl.font-medium.text-gray-900')?.textContent.replace(/[^\d.]/g, '') || '0';
+            return parseFloat(totalPriceText) || 0;
+        }
+
+        function getEffectiveTotalPrice() {
+            const baseTotal = lastComputedTotal !== null ? lastComputedTotal : getDisplayedTotalPrice();
+            const testToggle = document.getElementById('test-payment-toggle');
+            return testToggle && testToggle.checked ? 1 : baseTotal;
+        }
+
+        async function submitBooking(btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="ri-loader-4-line animate-spin text-xl"></i> Processing...';
+            btn.disabled = true;
+
+            const practitionerId = document.getElementById('selected-practitioner-id')?.value || '{{ $activePractitioner->id ?? '' }}';
+            const selectedServices = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
+            const serviceIds = selectedServices.map(cb => cb.closest('.service-tag-label').dataset.serviceId);
+            
+            const modeButton = document.querySelector('.session-mode-btn.bg-\\[\\#FABD4D\\]');
+            const mode = modeButton?.dataset?.mode || 'online';
+            const conditions = document.getElementById('conditions-input')?.value;
+            const needTranslator = document.getElementById('need-translator')?.checked;
+            const fromLanguage = document.getElementById('from-language-value')?.value;
+            const toLanguage = document.getElementById('to-language-value')?.value;
+            
+            // Get first service schedule info for primary booking
+            const firstServiceName = selectedServices[0]?.value.toLowerCase();
+            const scheduleItem = document.querySelector(`.service-schedule-item[data-service-name="${firstServiceName}"]`);
+            const bookingDate = scheduleItem?.querySelector('.day-value')?.value;
+            const bookingTime = scheduleItem?.querySelector('.time-value')?.value;
+            
+            const totalPrice = getEffectiveTotalPrice();
+
+            if (!bookingDate || !bookingTime || serviceIds.length === 0) {
+                showToast('Please select at least one service and its schedule (Date & Time).', 'warning');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                return;
+            }
+
+            const payload = {
+                practitioner_id: practitionerId,
+                service_ids: serviceIds,
+                mode: mode,
+                conditions: conditions,
+                need_translator: needTranslator,
+                from_language: fromLanguage,
+                to_language: toLanguage,
+                booking_date: bookingDate,
+                booking_time: bookingTime,
+                total_price: totalPrice
+            };
+
+            let paymentWindow = window.open('about:blank', '_blank');
+
+            try {
+                const response = await fetch('{{ route('bookings.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success && data.redirect_url) {
+                    showToast('Booking created! Opening payment gateway...', 'success');
+                    if (paymentWindow && !paymentWindow.closed) {
+                        paymentWindow.location.href = data.redirect_url;
+                        paymentWindow.focus();
+                    } else {
+                        window.location.href = data.redirect_url;
+                    }
+                } else {
+                    if (paymentWindow && !paymentWindow.closed) {
+                        paymentWindow.close();
+                    }
+                    showToast(data.message || 'Error creating booking. Please try again.', 'error');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Booking Error:', error);
+                if (paymentWindow && !paymentWindow.closed) {
+                    paymentWindow.close();
+                }
+                showToast('Something went wrong. Please check console for details.', 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+
 
     <script>
         const isClient = @json($isClient);
@@ -781,6 +953,28 @@
                 if (priceContainer) {
                     priceContainer.innerHTML = `€ ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ EUR</span>`;
                 }
+            }
+
+            function updateTotalPrice(total) {
+                const priceContainer = document.querySelector('.text-4xl.font-medium.text-gray-900');
+                lastComputedTotal = total;
+                const testToggle = document.getElementById('test-payment-toggle');
+                const showTest = testToggle && testToggle.checked;
+                if (priceContainer) {
+                    if (showTest) {
+                        priceContainer.innerHTML = `INR 1.00 <span class="text-xl text-gray-400 font-normal">/ TEST</span>`;
+                    } else {
+                        priceContainer.innerHTML = `â‚¬ ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ EUR</span>`;
+                    }
+                }
+            }
+
+            const testPaymentToggle = document.getElementById('test-payment-toggle');
+            if (testPaymentToggle) {
+                testPaymentToggle.addEventListener('change', () => {
+                    const baseTotal = lastComputedTotal !== null ? lastComputedTotal : getDisplayedTotalPrice();
+                    updateTotalPrice(baseTotal);
+                });
             }
 
             function renderSelectedServices() {
