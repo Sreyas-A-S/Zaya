@@ -31,13 +31,27 @@ class AdminController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $user->load('nationality');
+        $nationalId = $user->national_id;
+        if (is_array($nationalId)) {
+            $countryId = $nationalId[0] ?? null;
+            $user->setRelation('nationality', $countryId ? Country::find($countryId) : null);
+        } else {
+            $user->load('nationality');
+        }
 
         $myLanguages = [];
-        if ($user->languages) {
-            $langIds = is_array($user->languages) ? $user->languages : json_decode($user->languages, true);
-            if ($langIds) {
-                $myLanguages = Language::whereIn('id', $langIds)->get();
+        if (!empty($user->languages)) {
+            $langIds = [];
+            if (is_array($user->languages)) {
+                $langIds = $user->languages;
+            } else {
+                $decoded = json_decode($user->languages, true);
+                if (is_array($decoded)) {
+                    $langIds = $decoded;
+                }
+            }
+            if (!empty($langIds)) {
+                $myLanguages = Language::whereIn('id', array_values($langIds))->get();
             }
         }
 
@@ -55,13 +69,27 @@ class AdminController extends Controller
     public function profile()
     {
         $user = Auth::user();
-        $user->load('nationality');
+        $nationalId = $user->national_id;
+        if (is_array($nationalId)) {
+            $countryId = $nationalId[0] ?? null;
+            $user->setRelation('nationality', $countryId ? Country::find($countryId) : null);
+        } else {
+            $user->load('nationality');
+        }
 
         $myLanguages = [];
-        if ($user->languages) {
-            $langIds = is_array($user->languages) ? $user->languages : json_decode($user->languages, true);
-            if ($langIds) {
-                $myLanguages = Language::whereIn('id', $langIds)->get();
+        if (!empty($user->languages)) {
+            $langIds = [];
+            if (is_array($user->languages)) {
+                $langIds = $user->languages;
+            } else {
+                $decoded = json_decode($user->languages, true);
+                if (is_array($decoded)) {
+                    $langIds = $decoded;
+                }
+            }
+            if (!empty($langIds)) {
+                $myLanguages = Language::whereIn('id', array_values($langIds))->get();
             }
         }
 

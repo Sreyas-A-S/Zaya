@@ -19,6 +19,7 @@
     <title>Zaya Wellness - Embrace Wellness</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    @stack('styles')
     <style>
         .bg-green-600 {
             background-color: #10b981;

@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @push('css')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endpush
@@ -130,6 +131,7 @@
                                 @csrf
                                 <input type="hidden" name="_method" id="form-method" value="POST">
                                 <input type="hidden" name="practitioner_id" id="practitioner_id">
+                                <input type="hidden" name="cropped_image" id="croppedImage">
 
                                 <!-- Step 1: Personal Details -->
                                 <div class="step-content" id="step-1">
@@ -454,7 +456,7 @@
                                             <label class="form-label fw-bold">Services Offered <span class="text-danger">*</span></label>
                                             <div class="row">
                                                 @foreach($servicesOffered as $service)
-                                                <div class="col-12">
+                                                <div class="col-12 mb-2">
                                                     <div class="form-check checkbox-primary d-flex align-items-center w-100">
 
                                                         <input class="form-check-input group-required me-2"
@@ -500,7 +502,7 @@
                                             <label class="form-label fw-bold">Client Concerns Supported <span class="text-danger">*</span></label>
                                             <div class="row">
                                                 @foreach($clientConcerns as $concern)
-                                                <div class="col-12">
+                                                <div class="col-12 mb-2">
                                                     <div class="form-check checkbox-secondary d-flex align-items-center w-100">
 
                                                         <input class="form-check-input group-required me-2"
@@ -745,9 +747,31 @@
     </div>
 </div>
 
+<!-- Cropper Modal -->
+<div class="modal fade" id="cropperModal" tabindex="-1" role="dialog" aria-labelledby="cropperModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel">Crop Profile Photo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="img-container text-center">
+                    <img id="cropperImage" src="" alt="Image to crop" style="max-width: 100%;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="cropSave">Crop & Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
@@ -756,6 +780,8 @@
     let currentStep = 1;
     const totalSteps = 6;
     let iti;
+    let cropper;
+    const cropperImage = document.getElementById('cropperImage');
 
     $(document).on('input', '.validate-char-limit', function() {
         const el = $(this);
@@ -774,8 +800,18 @@
             iti = window.intlTelInput(phoneInput, {
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
                 separateDialCode: true,
+                formatOnDisplay: false,
                 initialCountry: "in",
                 preferredCountries: ["in", "ae", "us", "gb"]
+            });
+
+            // Add digit-only and leading zero removal enforcement
+            phoneInput.addEventListener('input', function() {
+                let val = this.value.replace(/\D/g, '');
+                if (val.startsWith('0')) {
+                    val = val.substring(1);
+                }
+                this.value = val.slice(0, 15);
             });
         }
     });
@@ -898,29 +934,58 @@
         updateStepper();
     });
 
-    // Image Preview
-    $("#imageUpload").change(function() {
-        if (this.files && this.files[0]) {
-            if (this.files[0].size > 2 * 1024 * 1024) { // 2MB
+    // Image Upload & Cropping Logic
+    $("#imageUpload").change(function(e) {
+        let files = e.target.files;
+        if (files && files.length > 0) {
+            if (files[0].size > 2 * 1024 * 1024) { // 2MB
                 alert('Profile photo size must be less than 2MB');
-                $(this).val(''); // Clear input
+                $(this).val('');
                 return;
             }
-            readURL(this);
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                if (cropper) {
+                    cropper.destroy();
+                }
+                cropperImage.src = event.target.result;
+                $('#cropperModal').modal('show');
+            };
+            reader.readAsDataURL(files[0]);
         }
     });
 
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
-                $('#imagePreview').hide();
-                $('#imagePreview').fadeIn(650);
-            }
-            reader.readAsDataURL(input.files[0]);
+    $('#cropperModal').on('shown.bs.modal', function() {
+        cropper = new Cropper(cropperImage, {
+            aspectRatio: 1,
+            viewMode: 1,
+            guides: true,
+            center: true,
+            highlight: false,
+            cropBoxMovable: true,
+            cropBoxResizable: true,
+            toggleDragModeOnDblclick: false,
+        });
+    }).on('hidden.bs.modal', function() {
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
         }
-    }
+    });
+
+    $('#cropSave').click(function() {
+        if (!cropper) return;
+
+        let canvas = cropper.getCroppedCanvas({
+            width: 400,
+            height: 400,
+        });
+
+        let base64data = canvas.toDataURL();
+        $('#imagePreview').css('background-image', 'url(' + base64data + ')');
+        $('#croppedImage').val(base64data);
+        $('#cropperModal').modal('hide');
+    });
 
     // Master Data Quick Add
     $(document).off('click', '.add-master-data-btn').on('click', '.add-master-data-btn', function() {
@@ -981,9 +1046,9 @@
                     let newName = response.data.name;
 
                     let html = `
-                            <div class="col-12">
-                                <div class="form-check checkbox-${type === 'mindfulness_services' ? 'primary' : 'secondary'} d-flex align-items-center">
-                                    <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
+                            <div class="col-12 mb-2">
+                                <div class="form-check checkbox-${type === 'mindfulness_services' ? 'primary' : 'secondary'} d-flex align-items-center w-100">
+                                    <input class="form-check-input group-required me-2" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" data-group="${type === 'mindfulness_services' ? 'services' : 'concerns'}" checked>
                                     <label class="form-check-label flex-grow-1 mb-0" for="${idPrefix}${newId}">${newName}</label>
                                     <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="${type}"><i class="fa fa-trash"></i></a>
                                 </div>
@@ -1149,6 +1214,7 @@
         $('#practitioner-form')[0].reset();
         $('input[type="checkbox"]').prop('checked', false); // Clear all checkboxes
         $('#practitioner_id').val(id);
+        $('#croppedImage').val('');
         $('#form-method').val('PUT');
         $('#form-modal-title').text('Edit Practitioner');
 
@@ -1166,9 +1232,17 @@
             $('input[name="last_name"]').val(p.last_name || u.last_name || '');
             $('input[name="email"]').val(u.email);
             if (iti) {
-                iti.setNumber(p.phone || '');
+                let phone = p.phone || '';
+                iti.setNumber(phone);
+                // After setNumber, manually clean leading zero if it appears in input
+                let currentVal = phoneInput.value.replace(/\D/g, '');
+                if (currentVal.startsWith('0')) {
+                    phoneInput.value = currentVal.substring(1);
+                }
             } else {
-                $('input[name="phone"]').val((p.phone || '').replace(/[^0-9]/g, ''));
+                let val = (p.phone || '').replace(/[^0-9]/g, '');
+                if (val.startsWith('0')) val = val.substring(1);
+                $('input[name="phone"]').val(val);
             }
             $('select[name="gender"]').val(p.gender);
             $('input[name="dob"]').val(p.dob ? p.dob.substring(0, 10) : '');
@@ -1821,6 +1895,7 @@
             iti.setNumber('');
         }
         $('#practitioner_id').val('');
+        $('#croppedImage').val('');
         $('#form-method').val('POST');
         $('#form-modal-title').text('Register Mindfulness Practitioner');
 

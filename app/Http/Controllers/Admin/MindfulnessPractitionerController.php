@@ -17,10 +17,11 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 use App\Traits\AdminFilterTrait;
+use App\Traits\ImageUploadTrait;
 
 class MindfulnessPractitionerController extends Controller
 {
-    use AdminFilterTrait;
+    use AdminFilterTrait, ImageUploadTrait;
 
     public function __construct()
     {
@@ -150,6 +151,7 @@ class MindfulnessPractitionerController extends Controller
             'email' => 'required|email|max:255|unique:users,email',
             'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
+            'cropped_image' => 'nullable|string',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
             'phone' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
@@ -212,7 +214,9 @@ class MindfulnessPractitionerController extends Controller
             $practitionerData = $validatedData;
             unset($practitionerData['email'], $practitionerData['password'], $practitionerData['certificates'], $practitionerData['gov_id_upload'], $practitionerData['cancelled_cheque']);
 
-            if ($request->hasFile('profile_photo')) {
+            if ($request->filled('cropped_image')) {
+                $practitionerData['profile_photo_path'] = $this->uploadBase64($request->cropped_image, 'mindfulness_photos');
+            } elseif ($request->hasFile('profile_photo')) {
                 $practitionerData['profile_photo_path'] = $request->file('profile_photo')->store('mindfulness_photos', 'public');
             }
 
@@ -271,6 +275,7 @@ class MindfulnessPractitionerController extends Controller
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
+            'cropped_image' => 'nullable|string',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
             'phone' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
@@ -330,7 +335,12 @@ class MindfulnessPractitionerController extends Controller
             $practitionerData = $validatedData;
             unset($practitionerData['email'], $practitionerData['password'], $practitionerData['certificates'], $practitionerData['gov_id_upload'], $practitionerData['cancelled_cheque']);
 
-            if ($request->hasFile('profile_photo')) {
+            if ($request->filled('cropped_image')) {
+                if ($practitioner->profile_photo_path) {
+                    Storage::disk('public')->delete($practitioner->profile_photo_path);
+                }
+                $practitionerData['profile_photo_path'] = $this->uploadBase64($request->cropped_image, 'mindfulness_photos');
+            } elseif ($request->hasFile('profile_photo')) {
                 if ($practitioner->profile_photo_path) {
                     Storage::disk('public')->delete($practitioner->profile_photo_path);
                 }

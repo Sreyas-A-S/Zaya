@@ -19,8 +19,11 @@ use App\Models\PractitionerModality;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
+use App\Traits\ImageUploadTrait;
+
 class RegisterController extends Controller
 {
+    use ImageUploadTrait;
     use RegistersUsers;
 
     /**
@@ -124,8 +127,13 @@ class RegisterController extends Controller
 
     protected function createPractitionerProfile($user, $request)
     {
-        // Handle File Uploads
         $filePaths = [];
+        if ($request->filled('cropped_image')) {
+            $filePaths['profile_photo_path'] = $this->uploadBase64($request->cropped_image, 'practitioner_photos');
+        } elseif ($request->hasFile('profile_photo')) {
+            $filePaths['profile_photo_path'] = $request->file('profile_photo')->store('practitioner_photos', 'public');
+        }
+
         $docFields = [
             'doc_cover_letter',
             'doc_certificates',
@@ -142,9 +150,6 @@ class RegisterController extends Controller
             }
         }
 
-        if ($request->hasFile('profile_photo')) {
-            $filePaths['profile_photo_path'] = $request->file('profile_photo')->store('practitioner_photos', 'public');
-        }
 
         // Create Profile
         $profileData = array_merge($request->only([

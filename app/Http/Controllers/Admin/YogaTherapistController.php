@@ -17,10 +17,11 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 use App\Traits\AdminFilterTrait;
+use App\Traits\ImageUploadTrait;
 
 class YogaTherapistController extends Controller
 {
-    use AdminFilterTrait;
+    use AdminFilterTrait, ImageUploadTrait;
 
     public function __construct()
     {
@@ -152,6 +153,7 @@ class YogaTherapistController extends Controller
             'email' => 'required|email|max:255|unique:users,email',
             'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
+            'cropped_image' => 'nullable|string',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
             'phone' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
@@ -222,7 +224,9 @@ class YogaTherapistController extends Controller
                 $therapistData['cancelled_cheque']
             );
 
-            if ($request->hasFile('profile_photo')) {
+            if ($request->filled('cropped_image')) {
+                $therapistData['profile_photo_path'] = $this->uploadBase64($request->cropped_image, 'yoga_photos');
+            } elseif ($request->hasFile('profile_photo')) {
                 $therapistData['profile_photo_path'] = $request->file('profile_photo')->store('yoga_photos', 'public');
             }
 
@@ -285,6 +289,7 @@ class YogaTherapistController extends Controller
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
+            'cropped_image' => 'nullable|string',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
             'dob' => 'nullable|date',
             'phone' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
@@ -353,7 +358,12 @@ class YogaTherapistController extends Controller
                 $therapistData['cancelled_cheque']
             );
 
-            if ($request->hasFile('profile_photo')) {
+            if ($request->filled('cropped_image')) {
+                if ($therapist->profile_photo_path) {
+                    Storage::disk('public')->delete($therapist->profile_photo_path);
+                }
+                $therapistData['profile_photo_path'] = $this->uploadBase64($request->cropped_image, 'yoga_photos');
+            } elseif ($request->hasFile('profile_photo')) {
                 if ($therapist->profile_photo_path) {
                     Storage::disk('public')->delete($therapist->profile_photo_path);
                 }

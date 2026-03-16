@@ -17,10 +17,11 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 use App\Traits\AdminFilterTrait;
+use App\Traits\ImageUploadTrait;
 
 class TranslatorController extends Controller
 {
-    use AdminFilterTrait;
+    use AdminFilterTrait, ImageUploadTrait;
 
     public function __construct()
     {

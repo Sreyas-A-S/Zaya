@@ -732,20 +732,19 @@
 
         if (password.val() === '') {
             requirements.addClass('d-none');
+            matchError.addClass('d-none');
+            confirm.removeClass('is-invalid');
+            return;
         } else if (pattern.test(password.val())) {
             requirements.addClass('d-none');
         } else {
             requirements.removeClass('d-none');
         }
 
-        if (confirm.val() !== '') {
-            if (confirm.val() !== password.val()) {
-                matchError.removeClass('d-none');
-                confirm.addClass('is-invalid');
-            } else {
-                matchError.addClass('d-none');
-                confirm.removeClass('is-invalid');
-            }
+        // If password is being entered (create or edit), confirm must match (including empty confirm).
+        if (confirm.val() !== password.val()) {
+            matchError.removeClass('d-none');
+            confirm.addClass('is-invalid');
         } else {
             matchError.addClass('d-none');
             confirm.removeClass('is-invalid');
@@ -983,8 +982,12 @@
             $('#saveBtn').text('Create Finance Manager');
             $('#fm-modal-title').text('Register Finance Manager');
             $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
-            $('.password-field').show();
-            $('#password, #password_confirmation').attr('required', 'required');
+            $('#password-hint').text('');
+            $('#password-input, #password-confirm-input')
+                .val('')
+                .attr('required', 'required');
+            $('#password-requirements, #password-match-error').addClass('d-none');
+            $('#password-confirm-input').removeClass('is-invalid');
             if (typeof window.iti !== 'undefined') {
                 window.iti.setNumber('');
             }
@@ -999,6 +1002,10 @@
                 $('#firstname').val(user.first_name);
                 $('#lastname').val(user.last_name);
                 $('#email').val(user.email);
+                $('#password-hint').text('(Leave blank to keep current password)');
+                $('#password-input, #password-confirm-input').val('');
+                $('#password-requirements, #password-match-error').addClass('d-none');
+                $('#password-confirm-input').removeClass('is-invalid');
                 if (user.phone) {
                     window.iti.setNumber(user.phone);
                 } else {
@@ -1053,8 +1060,7 @@
                 $('#croppedImage').val(''); // Reset cropped image on edit unless changed
 
                 // Show password fields on edit but make them optional
-                $('.password-field').show();
-                $('#password, #password_confirmation').removeAttr('required');
+                $('#password-input, #password-confirm-input').removeAttr('required');
 
                 $('#methodPlaceholder').html('@method("PUT")');
                 $('#financeManagerForm').attr('action', "{{ url('admin/finance-managers') }}/" + id);

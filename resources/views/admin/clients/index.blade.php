@@ -361,7 +361,7 @@
                        class="form-control new-master-data-input"
                        data-type="client_consultation_preferences"
                        placeholder="Add New Preference"
-                       required>
+                       >
 
                 <button class="btn btn-primary add-master-data-btn" type="button">
                     <i class="iconly-Plus icli"></i>
@@ -1207,7 +1207,7 @@
                     let html = `
                             <div class="col-md-6">
                                 <div class="form-check checkbox-primary mb-2 d-flex align-items-center">
-                                    <input class="form-check-input pref-checkbox" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
+                                    <input class="form-check-input pref-checkbox me-2" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
                                     <label class="form-check-label flex-grow-1 mb-0" for="${idPrefix}${newId}">${newName}</label>
                                     <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="client_consultation_preferences"><i class="fa fa-trash"></i></a>
                                 </div>

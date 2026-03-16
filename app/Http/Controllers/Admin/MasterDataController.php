@@ -97,6 +97,11 @@ class MasterDataController extends Controller
             return response()->json(['error' => 'Invalid type'], 404);
         }
 
+        // Normalize spacing to avoid "Yoga  therapist" / trailing-space duplicates.
+        $request->merge([
+            'name' => preg_replace('/\s+/', ' ', trim((string) $request->input('name', ''))),
+        ]);
+
         $request->validate([
             'name' => [
                 'required',
@@ -120,8 +125,9 @@ class MasterDataController extends Controller
 
         $model = $this->types[$type];
 
-        // Check for duplicates (case-insensitive if DB allows, but simple where is usually enough)
-        $exists = $model::where('name', $request->name)->exists();
+        // Check for duplicates (normalized, case-insensitive).
+        $normalized = $request->name;
+        $exists = $model::whereRaw('LOWER(name) = ?', [Str::lower($normalized)])->exists();
         if ($exists) {
             return response()->json(['error' => 'This item already exists.'], 422);
         }
@@ -136,6 +142,10 @@ class MasterDataController extends Controller
         if (!isset($this->types[$type])) {
             return response()->json(['error' => 'Invalid type'], 404);
         }
+
+        $request->merge([
+            'name' => preg_replace('/\s+/', ' ', trim((string) $request->input('name', ''))),
+        ]);
 
         $request->validate([
             'name' => [

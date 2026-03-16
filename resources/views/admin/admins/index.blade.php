@@ -325,6 +325,15 @@
                             <label class="form-label">Phone <span class="text-danger">*</span></label>
                             <input type="text" name="phone" id="edit_phone" class="form-control" required>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Gender</label>
+                            <select name="gender" id="edit_gender" class="form-select">
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Nationality <span class="text-danger">*</span></label>
                             <select name="country[]" id="edit_country" class="form-control select2 w-100" multiple required>
@@ -355,7 +364,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Password (Leave blank to keep current)</label>
-                            <input type="password" id="edit_password" class="form-control"
+                            <input type="password" id="edit_password" name="password" class="form-control"
                                 minlength="8"
                                 pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
                                 title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
@@ -364,7 +373,7 @@
                         </div>
                         <div class="col-md-6 password-field">
                             <label class="form-label">Confirm Password</label>
-                            <input type="password" id="edit_password_confirmation" class="form-control" minlength="8" oninput="validatePasswordMatchAdmin()">
+                            <input type="password" id="edit_password_confirmation" name="password_confirmation" class="form-control" minlength="8" oninput="validatePasswordMatchAdmin()">
                             <div id="edit-password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                         </div>
                     </div>
@@ -457,6 +466,10 @@
                                 <div class="fw-bold" id="view-lname">-</div>
                             </div>
                             <div class="col-md-6">
+                                <label class="text-muted small d-block mb-1">Gender</label>
+                                <div class="fw-bold" id="view-gender">-</div>
+                            </div>
+                            <div class="col-md-6">
                                 <label class="text-muted small d-block mb-1">Nationality</label>
                                 <div class="fw-bold" id="view-nationality">-</div>
                             </div>
@@ -538,7 +551,7 @@
                 requirements.removeClass('d-none');
             }
 
-            if (confirm.val() !== '') {
+            if (password.val() !== '') {
                 if (confirm.val() !== password.val()) {
                     matchError.removeClass('d-none');
                     confirm.addClass('is-invalid');
@@ -561,7 +574,7 @@
                 editRequirements.removeClass('d-none');
             }
 
-            if (editConfirm.val() !== '') {
+            if (editPassword.val() !== '') {
                 if (editConfirm.val() !== editPassword.val()) {
                     editMatchError.removeClass('d-none');
                     editConfirm.addClass('is-invalid');
@@ -677,13 +690,19 @@
             $('#edit_id').val('');
             $('#edit_country, #edit_language').val([]).trigger('change');
             $('#croppedImage').val('');
+            $('#edit-password-requirements, #edit-password-match-error').addClass('d-none');
+            $('#edit_password_confirmation').removeClass('is-invalid');
             $('#methodPlaceholder').html('');
             $('#adminForm').attr('action', "{{ route('admin.admins.store') }}");
             $('#saveBtn').text('Create Admin');
             $('#admin-modal-title').text('Register Admin');
             $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
             $('.password-field').show();
-            $('#edit_password, #edit_password_confirmation').attr('required', 'required').attr('minlength', '8').attr('pattern', '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d)\\\\S{6,}$');
+            $('#edit_password, #edit_password_confirmation')
+                .attr('required', 'required')
+                .attr('minlength', '8')
+                .attr('pattern', '(?=.*\\\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}')
+                .attr('title', 'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.');
             if (typeof window.iti !== 'undefined') {
                 window.iti.setNumber('');
             }
@@ -742,6 +761,10 @@
             $('#edit_firstname').val(user.first_name);
             $('#edit_lastname').val(user.last_name);
             $('#edit_email').val(user.email);
+            $('#edit_gender').val((user.gender || '').toString().trim().toLowerCase());
+            $('#edit_password, #edit_password_confirmation').val('');
+            $('#edit-password-requirements, #edit-password-match-error').addClass('d-none');
+            $('#edit_password_confirmation').removeClass('is-invalid');
             if (user.phone) {
                 let rawNumber = String(user.phone).trim();
                 if (rawNumber && rawNumber[0] !== '+') {
@@ -797,7 +820,7 @@
 
             // Show password fields on edit but make them optional
             $('.password-field').show();
-            $('#edit_password, #edit_password_confirmation').removeAttr('required').removeAttr('pattern').removeAttr('minlength');
+            $('#edit_password, #edit_password_confirmation').removeAttr('required');
 
             $('#methodPlaceholder').html('@method("PUT")');
             $('#adminForm').attr('action', "{{ url('admin/admins') }}/" + id);
@@ -905,6 +928,12 @@
             $('#view-name').text(user.name);
             $('#view-fname').text(user.first_name || '-');
             $('#view-lname').text(user.last_name || '-');
+            if (user.gender) {
+                const g = String(user.gender).trim();
+                $('#view-gender').text(g ? (g.charAt(0).toUpperCase() + g.slice(1)) : '-');
+            } else {
+                $('#view-gender').text('-');
+            }
             $('#view-email').text(user.email);
             $('#view-phone').text(user.phone || 'N/A');
             $('#view-created-at').text(new Date(user.created_at).toLocaleString());

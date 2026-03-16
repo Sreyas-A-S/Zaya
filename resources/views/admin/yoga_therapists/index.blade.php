@@ -443,9 +443,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         <label class="form-label fw-bold">Areas of Expertise <span class="text-danger">*</span></label>
                         <div class="row" style="max-height: 300px; overflow-y:auto;">
                             @foreach($areasOfExpertise as $area)
-                            <div class="col-12">
+                            <div class="col-12 mb-2">
                                 <div class="form-check checkbox-primary d-flex align-items-center">
-                                    <input class="form-check-input group-required" type="checkbox" name="areas_of_expertise[]" value="{{ $area->name }}" id="area_{{ $area->id }}" data-group="expertise">
+                                    <input class="form-check-input group-required me-2" type="checkbox" name="areas_of_expertise[]" value="{{ $area->name }}" id="area_{{ $area->id }}" data-group="expertise">
                                     <label class="form-check-label flex-grow-1 mb-0" for="area_{{ $area->id }}">{{ $area->name }}</label>
                                     <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="{{ $area->id }}" data-type="yoga_expertises"><i class="fa fa-trash"></i></a>
                                 </div>
@@ -882,8 +882,18 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 therapistIti = window.intlTelInput(therapistPhoneInput, {
                     utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
                     separateDialCode: true,
+                    formatOnDisplay: false,
                     initialCountry: 'in',
                     preferredCountries: ['in', 'ae', 'us', 'gb']
+                });
+
+                // Add digit-only and leading zero removal enforcement
+                therapistPhoneInput.addEventListener('input', function() {
+                    let val = this.value.replace(/\D/g, '');
+                    if (val.startsWith('0')) {
+                        val = val.substring(1);
+                    }
+                    this.value = val.slice(0, 15);
                 });
             }
 
@@ -1077,9 +1087,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                             let newName = response.data.name;
 
                             let html = `
-                            <div class="col-12">
-                                <div class="form-check checkbox-primary d-flex align-items-center">
-                                    <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
+                            <div class="col-12 mb-2">
+                                <div class="form-check checkbox-primary d-flex align-items-center w-100">
+                                    <input class="form-check-input group-required me-2" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" data-group="expertise" checked>
                                     <label class="form-check-label flex-grow-1 mb-0" for="${idPrefix}${newId}">${newName}</label>
                                     <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="yoga_expertises"><i class="fa fa-trash"></i></a>
                                 </div>
@@ -1223,10 +1233,19 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     $('input[name="last_name"]').val(t.last_name || u.last_name || '');
                     $('input[name="email"]').val(u.email);
                     if (therapistIti) {
-                        therapistIti.setNumber(t.phone || '');
+                        let phone = t.phone || '';
+                        therapistIti.setNumber(phone);
+                        // After setNumber, manually clean leading zero if it appears in input
+                        let currentVal = therapistPhoneInput.value.replace(/\D/g, '');
+                        if (currentVal.startsWith('0')) {
+                            therapistPhoneInput.value = currentVal.substring(1);
+                        }
                     } else {
-                        $('input[name="phone"]').val(t.phone || '');
+                        let val = (t.phone || '').replace(/[^0-9]/g, '');
+                        if (val.startsWith('0')) val = val.substring(1);
+                        $('input[name="phone"]').val(val);
                     }
+
                     $('select[name="gender"]').val(t.gender);
                     $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
                     $('input[name="address_line_1"]').val(t.address_line_1);

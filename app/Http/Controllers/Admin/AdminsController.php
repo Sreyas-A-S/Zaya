@@ -14,6 +14,8 @@ use Yajra\DataTables\DataTables;
 
 use App\Traits\AdminFilterTrait;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Schema;
 
 class AdminsController extends Controller
 {
@@ -147,7 +149,7 @@ class AdminsController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'cropped_image' => 'nullable|string',
             'firstname' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.\&\-\(\)\,\/\+]+$/'],
@@ -159,7 +161,14 @@ class AdminsController extends Controller
             'language'    => 'required|array',
             'language.*'  => 'exists:languages,id',
             'password'    => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
-        ], [
+        ];
+
+        // Backward-compatible: only accept gender if the column exists (migration might not be run yet).
+        if (Schema::hasColumn('users', 'gender')) {
+            $rules['gender'] = ['nullable', Rule::in(['male', 'female', 'other'])];
+        }
+
+        $request->validate($rules, [
             'firstname.regex' => 'The first name contains invalid characters.',
             'lastname.regex' => 'The last name contains invalid characters.',
         ]);
@@ -171,7 +180,7 @@ class AdminsController extends Controller
             $imagePath = $request->file('profile_picture')->store('profiles', 'public');
         }
 
-        User::create([
+        $payload = [
             'name'        => $request->firstname . ' ' . $request->lastname,
             'profile_pic' => $imagePath,
             'first_name'  => $request->firstname,
@@ -183,7 +192,12 @@ class AdminsController extends Controller
             'password'    => Hash::make($request->password),
             'role'        => 'admin',
             'status'      => 'active',
-        ]);
+        ];
+        if (Schema::hasColumn('users', 'gender')) {
+            $payload['gender'] = $request->filled('gender') ? strtolower(trim((string) $request->gender)) : null;
+        }
+
+        User::create($payload);
 
         return response()->json(['success' => true, 'message' => 'Admin created successfully.']);
     }
@@ -198,7 +212,7 @@ class AdminsController extends Controller
     {
         $admin = User::findOrFail($id);
 
-        $request->validate([
+        $rules = [
             'firstname' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.\&\-\(\)\,\/\+]+$/'],
             'lastname'  => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.\&\-\(\)\,\/\+]+$/'],
             'email'   => 'required|email|unique:users,email,' . $admin->id,
@@ -210,7 +224,13 @@ class AdminsController extends Controller
             'status'  => 'required',
             'cropped_image' => 'nullable|string',
             'password'=> ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
-        ], [
+        ];
+
+        if (Schema::hasColumn('users', 'gender')) {
+            $rules['gender'] = ['nullable', Rule::in(['male', 'female', 'other'])];
+        }
+
+        $request->validate($rules, [
             'firstname.regex' => 'The first name contains invalid characters.',
             'lastname.regex' => 'The last name contains invalid characters.',
         ]);
@@ -225,6 +245,9 @@ class AdminsController extends Controller
             'languages' => $request->language,
             'status' => $request->status,
         ];
+        if (Schema::hasColumn('users', 'gender')) {
+            $data['gender'] = $request->filled('gender') ? strtolower(trim((string) $request->gender)) : null;
+        }
 
         if ($request->filled('cropped_image')) {
             $data['profile_pic'] = $this->uploadBase64($request->cropped_image);

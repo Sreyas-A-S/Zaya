@@ -99,19 +99,28 @@
                     <label id="contact-label-first-name" for="first_name" class="block text-base text-secondary font-normal mb-2">
                         {{ __('First Name') }} <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" id="first_name" name="first_name" placeholder="{{ __('Your First Name') }}"
-                        class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
-                        required>
-                </div>
+                   <input type="text"
+                            required
+                            maxlength="50"
+                            data-max="50"
+                            pattern="^[A-Z][a-zA-Z\s]*$"
+                            title="First letter must be capital. Only letters and spaces allowed. Numbers and special characters are not allowed."
+                            id="first_name"
+                            name="first_name"
+                            placeholder="{{ __('Your First Name') }}"
+                            class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base">
 
                 <!-- Last Name -->
                 <div>
                     <label id="contact-label-last-name" for="last_name" class="block text-base text-secondary font-normal mb-2">
                         {{ __('Last Name') }} <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" id="last_name" name="last_name" placeholder="{{ __('Your Last Name') }}"
-                        class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
-                        required>
+                    <input type="text"  required
+                            maxlength="50"
+                            data-max="50"
+                            pattern="^[A-Z][a-zA-Z\s]*$"
+                            title="First letter must be capital. Only letters and spaces allowed. Numbers and special characters are not allowed." id="last_name" name="last_name" placeholder="{{ __('Your Last Name') }}"
+                        class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base">
                 </div>
 
                 <!-- Email -->
@@ -125,14 +134,21 @@
                 </div>
 
                 <!-- Phone No -->
-                <div>
-                    <label id="contact-label-phone" for="phone" class="block text-base text-secondary font-normal mb-2">
-                        {{ __('Phone No') }} <span class="text-red-500">*</span>
-                    </label>
-                    <input type="tel" id="phone" name="phone" placeholder="{{ __('Your Phone No.') }}"
-                        class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
-                        required>
-                </div>
+               <div>
+    <label id="contact-label-phone" for="phone" class="block text-base text-secondary font-normal mb-2">
+        {{ __('Phone No') }} <span class="text-red-500">*</span>
+    </label>
+
+    <input type="tel"
+        id="phone"
+        name="phone"
+        placeholder="{{ __('Your Phone No.') }}"
+        pattern="^[0-9]+$"
+        inputmode="numeric"
+        title="Only numbers are allowed"
+        class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
+        required>
+</div>
 
                 <!-- I am a -->
                 <div>
@@ -154,13 +170,18 @@
 
                 <!-- Message -->
                 <div>
-                    <label id="contact-label-message" for="message" class="block text-base text-secondary font-normal mb-2">
-                        {{ __('Message') }} <span class="text-red-500">*</span>
-                    </label>
-                    <textarea id="message" name="message" rows="6" placeholder="{{ __('Your Message') }}"
-                        class="w-full border border-[#C5C5C5] rounded-4xl px-6 py-4 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base resize-none"
-                        required></textarea>
-                </div>
+    <label id="contact-label-message" for="message" class="block text-base text-secondary font-normal mb-2">
+        {{ __('Message') }} <span class="text-red-500">*</span>
+    </label>
+
+    <textarea id="message"
+        name="message"
+        rows="6"
+        maxlength="2500"
+        placeholder="{{ __('Your Message') }}"
+        class="w-full border border-[#C5C5C5] rounded-4xl px-6 py-4 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base resize-none"
+        required></textarea>
+</div>
 
                 <!-- Consent Checkbox -->
                 <div class="flex items-start gap-3 mt-2">
@@ -175,7 +196,8 @@
                 <!-- Submit Button -->
                 <div class="flex md:justify-end justify-center pt-6">
                     <button id="contact-btn-submit" type="submit"
-                        class="bg-[#E6E6E6] text-[#888888] px-10 py-3 rounded-full font-medium hover:bg-primary hover:text-white transition-all text-base cursor-pointer">
+                        class="bg-[#E6E6E6] text-[#888888] px-10 py-3 rounded-full font-medium transition-all text-base"
+                        disabled>
                         {{ __('Submit') }}
                     </button>
                 </div>
@@ -421,80 +443,182 @@
         </div>
     </section>
 
-    <!-- FAQ Toggle Script -->
-    <script>
-        document.getElementById('contact-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const form = this;
-            const submitBtn = form.querySelector('button[type=\"submit\"]');
-            const originalBtnText = submitBtn.innerText;
+@endsection
 
-            submitBtn.disabled = true;
-            submitBtn.innerText = 'Sending...';
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+    <style>
+        /* Ensure intl-tel-input matches the full-width Tailwind input layout. */
+        .iti {
+            width: 100%;
+        }
 
-            try {
-                const formData = new FormData(form);
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    if (window.showToast) {
-                        window.showToast(data.success, 'success');
-                    } else {
-                        alert(data.success);
-                    }
-                    form.reset();
-                } else {
-                    const errorMsg = data.message || 'Something went wrong. Please try again.';
-                    if (window.showToast) {
-                        window.showToast(errorMsg, 'error');
-                    } else {
-                        alert(errorMsg);
-                    }
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = originalBtnText;
-            }
-        });
-
-        function toggleFaq(button) {
-            const faqItem = button.closest('.faq-item');
-            const content = faqItem.querySelector('.faq-content');
-            const icon = button.querySelector('.faq-icon');
-
-            // Check if this FAQ is currently open
-            const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
-
-            // Close all FAQs first
-            document.querySelectorAll('.faq-item').forEach(item => {
-                const c = item.querySelector('.faq-content');
-                const i = item.querySelector('.faq-icon');
-                c.style.maxHeight = '0px';
-                i.classList.remove('rotate-45');
-                item.classList.remove('border-primary/30', 'bg-surface/30');
-                item.classList.add('border-gray-200');
-            });
-
-            // If it was closed, open it
-            if (!isOpen) {
-                content.style.maxHeight = content.scrollHeight + 'px';
-                icon.classList.add('rotate-45');
-                faqItem.classList.add('border-primary/30', 'bg-surface/30');
-                faqItem.classList.remove('border-gray-200');
+        /* Avoid sticky hover on touch devices by only applying hover styles when supported. */
+        @media (hover: hover) and (pointer: fine) {
+            #contact-btn-submit.is-enabled:hover {
+                filter: brightness(0.95);
             }
         }
-    </script>
+    </style>
+@endpush
 
-@endsection
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
+    <script>
+        (function() {
+            // Expose for inline onclick handlers in the FAQ items.
+            window.toggleFaq = function(button) {
+                const faqItem = button.closest('.faq-item');
+                const content = faqItem.querySelector('.faq-content');
+                const icon = button.querySelector('.faq-icon');
+
+                // Check if this FAQ is currently open
+                const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+
+                // Close all FAQs first
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    const c = item.querySelector('.faq-content');
+                    const i = item.querySelector('.faq-icon');
+                    c.style.maxHeight = '0px';
+                    i.classList.remove('rotate-45');
+                    item.classList.remove('border-primary/30', 'bg-surface/30');
+                    item.classList.add('border-gray-200');
+                });
+
+                // If it was closed, open it
+                if (!isOpen) {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    icon.classList.add('rotate-45');
+                    faqItem.classList.add('border-primary/30', 'bg-surface/30');
+                    faqItem.classList.remove('border-gray-200');
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', function() {
+                // Initialize intl-tel-input (match Doctors behavior)
+                const phoneInput = document.querySelector('#phone');
+                if (phoneInput && window.intlTelInput) {
+                    window.contactIti = window.intlTelInput(phoneInput, {
+                        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                        separateDialCode: true,
+                        formatOnDisplay: false,
+                        initialCountry: "in",
+                        preferredCountries: ["in", "ae", "us", "gb"]
+                    });
+
+                    phoneInput.addEventListener('input', function() {
+                        let val = this.value.replace(/\\D/g, '');
+                        if (val.startsWith('0')) val = val.substring(1);
+                        this.value = val.slice(0, 15);
+                    });
+                }
+
+                const form = document.getElementById('contact-form');
+                if (!form) return;
+
+                // Consent gates submit. Also prevents "sticky hover" looking enabled forever on touch.
+                const consent = document.getElementById('consent');
+                const submitBtn = document.getElementById('contact-btn-submit');
+                const setSubmitState = () => {
+                    const enabled = !!(consent && consent.checked);
+                    if (!submitBtn) return;
+                    submitBtn.disabled = !enabled;
+                    submitBtn.classList.toggle('is-enabled', enabled);
+                    submitBtn.classList.toggle('bg-primary', enabled);
+                    submitBtn.classList.toggle('text-white', enabled);
+                    submitBtn.classList.toggle('cursor-pointer', enabled);
+                    submitBtn.classList.toggle('bg-[#E6E6E6]', !enabled);
+                    submitBtn.classList.toggle('text-[#888888]', !enabled);
+                    submitBtn.classList.toggle('cursor-not-allowed', !enabled);
+                };
+
+                if (consent) consent.addEventListener('change', setSubmitState);
+                setSubmitState();
+
+                const resetContactPage = () => {
+                    form.reset();
+
+                    // Reset intl-tel-input UI and the underlying input.
+                    if (window.contactIti && phoneInput) {
+                        try {
+                            window.contactIti.setNumber('');
+                        } catch (e) {
+                            // ignore
+                        }
+                        phoneInput.value = '';
+                    }
+
+                    // Close all FAQs (if any are open)
+                    document.querySelectorAll('.faq-item').forEach(item => {
+                        const c = item.querySelector('.faq-content');
+                        const i = item.querySelector('.faq-icon');
+                        if (c) c.style.maxHeight = '0px';
+                        if (i) i.classList.remove('rotate-45');
+                        item.classList.remove('border-primary/30', 'bg-surface/30');
+                        item.classList.add('border-gray-200');
+                    });
+
+                    setSubmitState();
+
+                    if (submitBtn) submitBtn.blur();
+                };
+
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const submitBtn = document.getElementById('contact-btn-submit');
+                    const originalBtnText = submitBtn ? submitBtn.innerText : '';
+
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerText = 'Sending...';
+                    }
+
+                    try {
+                        // Ensure we submit a consistent phone format when intl-tel-input is enabled.
+                        if (window.contactIti && phoneInput) {
+                            phoneInput.value = window.contactIti.getNumber() || phoneInput.value;
+                        }
+
+                        const formData = new FormData(form);
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            if (window.showToast) window.showToast(data.success, 'success');
+                            else alert(data.success);
+                            resetContactPage();
+
+                            // Some mobile browsers keep stale focus/hover/intl-tel-input state.
+                            // A soft reload guarantees the page returns to the initial state.
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, window.showToast ? 900 : 0);
+                        } else {
+                            const errorMsg = data.message || 'Something went wrong. Please try again.';
+                            if (window.showToast) window.showToast(errorMsg, 'error');
+                            else alert(errorMsg);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    } finally {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerText = originalBtnText;
+                            submitBtn.blur(); // helps avoid sticky focus/hover styles on mobile
+                        }
+                        setSubmitState();
+                    }
+                });
+            });
+        })();
+    </script>
+@endpush

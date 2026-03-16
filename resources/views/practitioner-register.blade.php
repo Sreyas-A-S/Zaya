@@ -15,6 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.1/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 </head>
 
 <body class="bg-white min-h-screen flex flex-col">
@@ -69,6 +70,7 @@
                 id="practitioner-form">
                 @csrf
                 <input type="hidden" name="type" value="practitioner">
+                <input type="hidden" name="cropped_image" id="croppedImage">
 
                 <!-- Tab 1: Basic Details -->
                 <div class="block" id="tab-1">
@@ -275,7 +277,7 @@
                         <h3 class="text-2xl font-medium text-gray-900 mb-6">Professional Practice Details</h3>
 
                         <!-- Ayurvedic Wellness Consultation -->
-                        <div class="mb-12 practice-group" data-input="ayurvedic-input">
+                        <div class="mb-8 practice-group" data-input="ayurvedic-input">
                             <h4 class="font-medium text-gray-900 mb-4 text-xl">Ayurvedic Wellness Consultation:</h4>
                             <p class="text-gray-700 text-lg mb-4">Focuses on nutritional and lifestyle guidance rooted
                                 in Ayurvedic principles:</p>
@@ -303,7 +305,7 @@
                         </div>
 
                         <!-- Massage & Body Therapists -->
-                        <div class="mb-12 practice-group" data-input="massage-input">
+                        <div class="mb-8 practice-group" data-input="massage-input">
                             <h4 class="text-xl font-medium text-gray-900 mb-4">Massage & Body Therapists:</h4>
                             <p class="text-gray-700 text-lg mb-4">Includes specific traditional physical treatments and
                                 specialized care:</p>
@@ -356,7 +358,7 @@
                         </div>
 
                         <!-- Other Modalities -->
-                        <div class="mb-12 practice-group" data-input="modalities-input">
+                        <div class="mb-8 practice-group" data-input="modalities-input">
                             <h4 class="text-xl font-medium text-gray-900 mb-4">Other Modalities:</h4>
                             <input type="text" name="other_modalities_custom" id="modalities-input" readonly
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
@@ -709,9 +711,40 @@
         </div>
     </div>
 
+    <!-- Cropper Modal -->
+    <div id="cropper-modal" class="fixed inset-0 bg-black/60 z-[110] hidden items-center justify-center backdrop-blur-md px-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-[popIn_0.3s_ease-out_forwards]">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-medium text-gray-900 font-sans!">Crop Profile Photo</h3>
+                <button type="button" onclick="closeCropperModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
+            </div>
+            <div class="p-4 flex items-center justify-center overflow-hidden bg-gray-50">
+                <div class="w-full max-h-[60vh] flex items-center justify-center">
+                    <img id="cropperImage" src="" alt="Image to crop" class="max-w-full block">
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-100 flex justify-end gap-3">
+                <button type="button" onclick="closeCropperModal()" 
+                    class="px-6 py-2.5 rounded-full border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-all duration-200">
+                    Cancel
+                </button>
+                <button type="button" id="cropSave" 
+                    class="px-8 py-2.5 rounded-full bg-[#F5A623] text-[#423131] font-medium hover:bg-[#E09518] transition-all duration-200 shadow-sm shadow-[#F5A623]/20">
+                    Crop & Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script>
         let currentTab = 1;
         const totalTabs = 3;
+        let cropper;
+        const cropperImage = document.getElementById('cropperImage');
+        const cropperModal = document.getElementById('cropper-modal');
 
         function updateStepIndicator() {
             for (let i = 1; i <= totalTabs; i++) {
@@ -857,19 +890,66 @@
             });
         });
 
-        // Photo upload preview
+        // Photo upload preview with cropping
         document.getElementById('profile-photo').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
                 const reader = new FileReader();
-                reader.onload = function (e) {
-                    const label = document.querySelector('label[for="profile-photo"]');
-                    label.style.backgroundImage = `url(${e.target.result})`;
-                    label.style.backgroundSize = 'cover';
-                    label.style.backgroundPosition = 'center';
-                    label.innerHTML = '';
+                reader.onload = function (event) {
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    cropperImage.src = event.target.result;
+                    cropperModal.classList.remove('hidden');
+                    cropperModal.classList.add('flex');
+                    
+                    cropper = new Cropper(cropperImage, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        guides: true,
+                        center: true,
+                        highlight: false,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false,
+                    });
                 };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(files[0]);
+            }
+        });
+
+        function closeCropperModal() {
+            cropperModal.classList.add('hidden');
+            cropperModal.classList.remove('flex');
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            document.getElementById('profile-photo').value = '';
+        }
+
+        document.getElementById('cropSave').addEventListener('click', function() {
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas({
+                width: 400,
+                height: 400,
+            });
+
+            const base64data = canvas.toDataURL('image/jpeg');
+            const label = document.querySelector('label[for="profile-photo"]');
+            label.style.backgroundImage = `url(${base64data})`;
+            label.style.backgroundSize = 'cover';
+            label.style.backgroundPosition = 'center';
+            label.innerHTML = '';
+            
+            document.getElementById('croppedImage').value = base64data;
+            
+            cropperModal.classList.add('hidden');
+            cropperModal.classList.remove('flex');
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
             }
         });
 

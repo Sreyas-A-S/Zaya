@@ -327,7 +327,7 @@
                                             <label class="form-label fw-bold">Fields of Specialization <span class="text-danger">*</span></label>
                                             <div class="row">
                                                 @foreach($specializations as $spec)
-                                                <div class="col-md-4">
+                                                <div class="col-md-4 mb-2">
                                                     <div class="form-check checkbox-secondary d-flex align-items-center w-100">
 
                                                         <input class="form-check-input group-required me-2"
@@ -409,7 +409,7 @@
                                             <label class="form-label fw-bold">Select Services Offered <span class="text-danger">*</span></label>
                                             <div class="row">
                                                 @foreach($servicesOffered as $service)
-                                                <div class="col-md-6">
+                                                <div class="col-md-6 mb-2">
                                                     <div class="form-check checkbox-primary d-flex align-items-center w-100">
 
                                                         <input class="form-check-input group-required me-2"
@@ -608,8 +608,10 @@
     @endsection
 
     @section('scripts')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <script>
@@ -619,6 +621,11 @@
         let currentStep = 1;
         const totalSteps = 6;
         let sourceLangChoices, targetLangChoices, addLangChoices;
+        let cropper;
+        let croppedFile = null;
+        let cropperDidApply = false;
+        let cropperPrevBg = null;
+        let cropperPrevCroppedFile = null;
 
         $(document).on('input', '.validate-char-limit', function() {
             const el = $(this);
@@ -681,14 +688,23 @@
         $(document).ready(function() {
                     const translatorPhoneInput = document.querySelector('#translator_phone');
                     if (translatorPhoneInput) {
-                        translatorIti = window.intlTelInput(translatorPhoneInput, {
-                            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
-                            separateDialCode: true,
-                            initialCountry: 'in',
-                            preferredCountries: ['in', 'ae', 'us', 'gb']
-                        });
-                    }
+                       translatorIti = window.intlTelInput(translatorPhoneInput, {
+                           utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                           separateDialCode: true,
+                           formatOnDisplay: false,
+                           initialCountry: 'in',
+                           preferredCountries: ['in', 'ae', 'us', 'gb']
+                       });
 
+                       // Add digit-only and leading zero removal enforcement
+                       translatorPhoneInput.addEventListener('input', function() {
+                           let val = this.value.replace(/\D/g, '');
+                           if (val.startsWith('0')) {
+                               val = val.substring(1);
+                           }
+                           this.value = val.slice(0, 15);
+                       });
+                    }
                     // DataTable
                     table = $('#translators-table').DataTable({
                         processing: true,
@@ -1009,29 +1025,66 @@
                         }
                     });
 
-                    // Image Preview and Validation
+                    // Profile photo cropper
                     $("#imageUpload").change(function() {
-                        if (this.files && this.files[0]) {
-                            if (this.files[0].size > 2 * 1024 * 1024) { // 2MB
-                                alert('Profile photo size must be less than 2MB');
-                                $(this).val(''); // Clear input
-                                return;
-                            }
-                            readURL(this);
+                        if (!this.files || !this.files[0]) return;
+
+                        const file = this.files[0];
+                        if (file.size > 2 * 1024 * 1024) { // 2MB
+                            alert('Profile photo size must be less than 2MB');
+                            $(this).val('');
+                            return;
                         }
+
+                        cropperDidApply = false;
+                        cropperPrevBg = $('#imagePreview').css('background-image');
+                        cropperPrevCroppedFile = croppedFile;
+
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            $('#image-to-crop').attr('src', e.target.result);
+                            $('#crop-modal').modal('show');
+                        };
+                        reader.readAsDataURL(file);
                     });
 
-                    function readURL(input) {
-                        if (input.files && input.files[0]) {
-                            var reader = new FileReader();
-                            reader.onload = function(e) {
-                                $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
-                                $('#imagePreview').hide();
-                                $('#imagePreview').fadeIn(650);
+                    $('#crop-modal')
+                        .on('shown.bs.modal', function() {
+                            if (cropper) cropper.destroy();
+                            const image = document.getElementById('image-to-crop');
+                            if (!image) return;
+                            cropper = new Cropper(image, {
+                                aspectRatio: 1,
+                                viewMode: 1,
+                                minContainerWidth: 400,
+                                minContainerHeight: 400,
+                            });
+                        })
+                        .on('hidden.bs.modal', function() {
+                            if (cropper) {
+                                cropper.destroy();
+                                cropper = null;
                             }
-                            reader.readAsDataURL(input.files[0]);
-                        }
-                    }
+                            // Clear the raw file input so we don't accidentally upload the uncropped file.
+                            $('#imageUpload').val('');
+                            if (!cropperDidApply) {
+                                if (cropperPrevBg) $('#imagePreview').css('background-image', cropperPrevBg);
+                                croppedFile = cropperPrevCroppedFile;
+                            }
+                        });
+
+                    $('#crop-btn').on('click', function() {
+                        if (!cropper) return;
+                        const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+                        if (!canvas) return;
+
+                        $('#imagePreview').css('background-image', 'url(' + canvas.toDataURL() + ')');
+                        canvas.toBlob(function(blob) {
+                            cropperDidApply = true;
+                            croppedFile = blob;
+                            $('#crop-modal').modal('hide');
+                        }, 'image/png');
+                    });
 
                     function openCreateModal() {
                         $('#translator-form')[0].reset();
@@ -1039,6 +1092,8 @@
                         $('#form-method').val('POST');
                         $('#form-modal-title').text('Register Translator');
                         $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+                        $('#imageUpload').val('');
+                        croppedFile = null;
 
                         // Show password fields
                         $('.password-field').show();
@@ -1147,9 +1202,9 @@
                                     let newName = response.data.name;
 
                                     let html = `
-                            <div class="${colClass}">
+                            <div class="${colClass} mb-2">
                                 <div class="form-check checkbox-${type === 'translator_services' ? 'primary' : 'secondary'} d-flex align-items-center w-100">
-                                    <input class="form-check-input me-2" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" checked>
+                                    <input class="form-check-input group-required me-2" type="checkbox" name="${checkboxName}" value="${newName}" id="${idPrefix}${newId}" data-group="${type === 'translator_services' ? 'services' : 'specialization'}" checked>
                                     <label class="form-check-label flex-grow-1 mb-0" for="${idPrefix}${newId}">${newName}</label>
                                     <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="${type}"><i class="fa fa-trash"></i></a>
                                 </div>
@@ -1187,6 +1242,9 @@
                         let formData = new FormData(this);
                         if (translatorIti) {
                             formData.set('phone', translatorIti.getNumber());
+                        }
+                        if (croppedFile) {
+                            formData.set('profile_photo', croppedFile, 'profile_photo.png');
                         }
 
                         let btn = $('#submit-btn');
@@ -1235,10 +1293,19 @@
                             $('input[name="last_name"]').val(t.last_name || u.last_name || '');
                             $('input[name="email"]').val(u.email);
                             if (translatorIti) {
-                                translatorIti.setNumber(t.phone || '');
+                                let phone = t.phone || '';
+                                translatorIti.setNumber(phone);
+                                // After setNumber, manually clean leading zero if it appears in input
+                                let currentVal = translatorPhoneInput.value.replace(/\D/g, '');
+                                if (currentVal.startsWith('0')) {
+                                    translatorPhoneInput.value = currentVal.substring(1);
+                                }
                             } else {
-                                $('input[name="phone"]').val(t.phone || '');
+                                let val = (t.phone || '').replace(/[^0-9]/g, '');
+                                if (val.startsWith('0')) val = val.substring(1);
+                                $('input[name="phone"]').val(val);
                             }
+
                             $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
                             $('input[name="address_line_1"]').val(t.address_line_1);
                             $('input[name="address_line_2"]').val(t.address_line_2);
@@ -1252,6 +1319,8 @@
                                 $('#imagePreview').css('background-image', 'url(' + storageBase + t.profile_photo_path + ')');
                                 $('#current-profile_photo').removeClass('d-none').html(`<a href="${storageBase}${t.profile_photo_path}" target="_blank" class="text-primary">View Current Photo</a>`);
                             }
+                            $('#imageUpload').val('');
+                            croppedFile = null;
 
                             $('select[name="native_language"]').val(t.native_language);
 
@@ -1925,6 +1994,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Cropper Modal -->
+    <div class="modal fade" id="crop-modal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static" style="z-index: 1060;">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Crop Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="img-container" style="height: 400px; width: 100%; overflow: hidden;">
+                        <img id="image-to-crop" src="#" alt="Picture" style="display: block; max-width: 100%; max-height: 100%;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="crop-btn">Crop & Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Master Data Delete Modal -->
     <div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">

@@ -659,20 +659,21 @@
 
         if (password.val() === '') {
             requirements.addClass('d-none');
-        } else if (pattern.test(password.val())) {
+            matchError.addClass('d-none');
+            confirm.removeClass('is-invalid');
+            return;
+        }
+
+        if (pattern.test(password.val())) {
             requirements.addClass('d-none');
         } else {
             requirements.removeClass('d-none');
         }
 
-        if (confirm.val() !== '') {
-            if (confirm.val() !== password.val()) {
-                matchError.removeClass('d-none');
-                confirm.addClass('is-invalid');
-            } else {
-                matchError.addClass('d-none');
-                confirm.removeClass('is-invalid');
-            }
+        // If password is being entered (create or edit), confirm must match (including empty confirm).
+        if (confirm.val() !== password.val()) {
+            matchError.removeClass('d-none');
+            confirm.addClass('is-invalid');
         } else {
             matchError.addClass('d-none');
             confirm.removeClass('is-invalid');
@@ -881,6 +882,9 @@
             $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
             $('.password-field').show();
             $('#password-input, #password-confirm-input').attr('required', 'required');
+            $('#password-input, #password-confirm-input').val('');
+            $('#password-requirements, #password-match-error').addClass('d-none');
+            $('#password-confirm-input').removeClass('is-invalid');
             if (typeof window.iti !== 'undefined') {
                 window.iti.setNumber('');
             }
@@ -895,6 +899,9 @@
                 $('#firstname').val(user.first_name);
                 $('#lastname').val(user.last_name);
                 $('#email').val(user.email);
+                $('#password-input, #password-confirm-input').val('');
+                $('#password-requirements, #password-match-error').addClass('d-none');
+                $('#password-confirm-input').removeClass('is-invalid');
                 if (user.phone) {
                     let rawNumber = String(user.phone).trim();
                     if (rawNumber && rawNumber[0] !== '+') {

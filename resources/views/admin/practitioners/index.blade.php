@@ -116,7 +116,7 @@
                                 </div>
                             </div>
 
-                            <form id="practitioner-form" method="POST" enctype="multipart/form-data" class="theme-form">
+                            <form id="practitioner-form" method="POST" enctype="multipart/form-data" class="theme-form" novalidate>
                                 @csrf
                                 <input type="hidden" name="_method" id="form-method" value="POST">
                                 <input type="hidden" name="practitioner_id" id="practitioner_id">
@@ -139,6 +139,7 @@
                                                 </div>
                                             </div>
                                             <label class="form-label mt-2">Profile Photo <span class="text-danger">*</span></label>
+                                            <div id="photo-error-message" class="text-danger small mt-1"></div>
                                             <div id="current-profile_photo" class="d-none"></div>
                                         </div>
                                         <div class="col-md-4">
@@ -260,34 +261,22 @@
                                 <!-- Step 2: Practice Details -->
                                 <div class="step-content d-none" id="step2">
                                     <div class="row g-3">
-                                        <div class="col-12">
-                                            <h6 class="f-w-600 mb-3">B. Professional Practice Details</h6>
+                                        <div class="col-12 mb-3">
+                                            <h5 class="f-w-600 mb-2 border-bottom pb-2">B. Professional Practice Details</h5>
                                         </div>
                                         <div class="col-12">
                                             <label class="form-label f-w-500">Ayurvedic Wellness Consultations</label>
-                                            <div class="row g-2">
+                                            <div class="row g-3 items-container">
                                                 @foreach($wellnessConsultations as $item)
-                                                <div class="col-md-4">
-                                                    <div class="form-check checkbox-primary d-flex align-items-center">
-
-                                                        <input class="form-check-input cons-checkbox me-2"
-                                                            type="checkbox"
-                                                            name="consultations[]"
-                                                            value="{{ $item->name }}"
-                                                            id="cons_{{ $item->id }}">
-
-                                                        <label class="form-check-label flex-grow-1 mb-0"
-                                                            for="cons_{{ $item->id }}">
-                                                            {{ $item->name }}
-                                                        </label>
-
-                                                        <a href="javascript:void(0)"
-                                                        class="text-danger ms-2 delete-master-data-btn"
-                                                        data-id="{{ $item->id }}"
-                                                        data-type="wellness_consultations">
-                                                        <i class="fa fa-trash"></i>
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded border">
+                                                        <div class="form-check checkbox-primary mb-0 d-flex align-items-center">
+                                                            <input class="form-check-input cons-checkbox" type="checkbox" name="consultations[]" value="{{ $item->name }}" id="cons_{{ $item->id }}">
+                                                            <label class="form-check-label ms-2 mb-0" for="cons_{{ $item->id }}">{{ $item->name }}</label>
+                                                        </div>
+                                                        <a href="javascript:void(0)" class="text-danger delete-master-data-btn" data-id="{{ $item->id }}" data-type="wellness_consultations">
+                                                            <i class="fa fa-trash"></i>
                                                         </a>
-
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -299,29 +288,17 @@
                                         </div>
                                         <div class="col-12 mt-3">
                                             <label class="form-label f-w-500">Massage and Body Therapies</label>
-                                            <div class="row g-2">
+                                            <div class="row g-3 items-container">
                                                 @foreach($bodyTherapies as $item)
-                                                <div class="col-md-4">
-                                                    <div class="form-check checkbox-primary d-flex align-items-center">
-
-                                                        <input class="form-check-input body-checkbox me-2"
-                                                            type="checkbox"
-                                                            name="body_therapies[]"
-                                                            value="{{ $item->name }}"
-                                                            id="body_{{ $item->id }}">
-
-                                                        <label class="form-check-label flex-grow-1 mb-0"
-                                                            for="body_{{ $item->id }}">
-                                                            {{ $item->name }}
-                                                        </label>
-
-                                                        <a href="javascript:void(0)"
-                                                        class="text-danger ms-2 delete-master-data-btn"
-                                                        data-id="{{ $item->id }}"
-                                                        data-type="body_therapies">
-                                                        <i class="fa fa-trash"></i>
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded border">
+                                                        <div class="form-check checkbox-primary mb-0 d-flex align-items-center">
+                                                            <input class="form-check-input body-checkbox" type="checkbox" name="body_therapies[]" value="{{ $item->name }}" id="body_{{ $item->id }}">
+                                                            <label class="form-check-label ms-2 mb-0" for="body_{{ $item->id }}">{{ $item->name }}</label>
+                                                        </div>
+                                                        <a href="javascript:void(0)" class="text-danger delete-master-data-btn" data-id="{{ $item->id }}" data-type="body_therapies">
+                                                            <i class="fa fa-trash"></i>
                                                         </a>
-
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -333,28 +310,17 @@
                                         </div>
                                         <div class="col-12 mt-3">
                                             <label class="form-label f-w-500">Other Modalities</label>
-                                            <div class="row g-2">
+                                            <div class="row g-3 items-container">
                                                 @foreach($practitionerModalities as $item)
-                                                <div class="col-md-4">
-                                                 <div class="form-check checkbox-primary d-flex align-items-center">    
-                                                        <input class="form-check-input mod-checkbox me-2"
-                                                            type="checkbox"
-                                                            name="other_modalities[]"
-                                                            value="{{ $item->name }}"
-                                                            id="mod_{{ $item->id }}">
-
-                                                        <label class="form-check-label flex-grow-1 mb-0"
-                                                            for="mod_{{ $item->id }}">
-                                                            {{ $item->name }}
-                                                        </label>
-
-                                                        <a href="javascript:void(0)"
-                                                        class="text-danger ms-2 delete-master-data-btn"
-                                                        data-id="{{ $item->id }}"
-                                                        data-type="practitioner_modalities">
-                                                        <i class="fa fa-trash"></i>
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded border">
+                                                        <div class="form-check checkbox-primary mb-0 d-flex align-items-center">
+                                                            <input class="form-check-input mod-checkbox" type="checkbox" name="other_modalities[]" value="{{ $item->name }}" id="mod_{{ $item->id }}">
+                                                            <label class="form-check-label ms-2 mb-0" for="mod_{{ $item->id }}">{{ $item->name }}</label>
+                                                        </div>
+                                                        <a href="javascript:void(0)" class="text-danger delete-master-data-btn" data-id="{{ $item->id }}" data-type="practitioner_modalities">
+                                                            <i class="fa fa-trash"></i>
                                                         </a>
-
                                                     </div>
                                                 </div>
                                                 @endforeach
@@ -693,7 +659,14 @@
     }
 
     .avatar-upload .avatar-edit input {
-        display: none;
+        display: block !important;
+        opacity: 0 !important;
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        top: 0 !important;
+        left: 0 !important;
+        pointer-events: none;
     }
 
     .avatar-upload .avatar-edit label {
@@ -730,6 +703,7 @@
         border-radius: 100%;
         border: 4px solid #F8F8F8;
         box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
     }
 
     .avatar-preview>div {
@@ -1053,6 +1027,7 @@
         const cropModal = new bootstrap.Modal(document.getElementById('crop-modal'));
 
         document.getElementById('imageUpload').addEventListener('change', function(e) {
+            $('#photo-error-message').text(''); // Clear previous error
             const files = e.target.files;
             if (files && files.length > 0) {
                 croppedFile = null; // Reset previous crop
@@ -1062,6 +1037,18 @@
                     cropModal.show();
                 };
                 reader.readAsDataURL(files[0]);
+            }
+        });
+
+        // Make whole preview clickable
+        $('#imagePreview').on('click', function() {
+            $('#imageUpload').click();
+        });
+
+        // Accessibility: Allow enter/space on preview if focused (though it's a div)
+        $('#imagePreview').attr('tabindex', '0').on('keypress', function(e) {
+            if (e.which === 13 || e.which === 32) {
+                $('#imageUpload').click();
             }
         });
 
@@ -1115,6 +1102,8 @@
         // Clear previous errors
         stepContainer.find('.is-invalid').removeClass('is-invalid');
         stepContainer.find('.invalid-feedback').remove();
+        $('#photo-error-message').text('');
+        $('.avatar-upload').removeClass('is-invalid-border');
         
         // Find all required fields and those with patterns (including hidden ones as they might be stylized)
         const inputs = stepContainer.find('input[required], select[required], textarea[required], input[pattern]');
@@ -1130,7 +1119,12 @@
                 } else if (el.is('select')) {
                     if (!el.val() || el.val() === '') fieldValid = false;
                 } else {
-                    if (!el.val() || el.val().trim() === '') fieldValid = false;
+                    if (!el.val() || el.val().trim() === '') {
+                        fieldValid = false;
+                        if (el.attr('id') === 'imageUpload') {
+                            message = 'Please upload a profile photo.';
+                        }
+                    }
                 }
             }
 
@@ -1143,9 +1137,14 @@
             }
 
             if (!fieldValid) {
-                el.addClass('is-invalid');
-                if (el.next('.invalid-feedback').length === 0) {
-                    el.after(`<div class="invalid-feedback d-block">${message}</div>`);
+                if (el.attr('id') === 'imageUpload') {
+                    $('#photo-error-message').text(message);
+                    el.closest('.avatar-upload').addClass('is-invalid-border');
+                } else {
+                    el.addClass('is-invalid');
+                    if (el.next('.invalid-feedback').length === 0) {
+                        el.after(`<div class="invalid-feedback d-block">${message}</div>`);
+                    }
                 }
                 valid = false;
             }
@@ -1718,14 +1717,16 @@
 
                     let newId = response.data.id;
                     let newName = response.data.name;
-                    let colClass = (type === 'wellness_consultations') ? 'col-md-6' : 'col-md-4';
+                    let colClass = 'col-md-6';
 
                     let newCheckbox = `
-                        <div class="${colClass}">
-                            <div class="form-check checkbox-primary d-flex align-items-center">
-                                <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${type}_${newId}" checked>
-                                <label class="form-check-label flex-grow-1 mb-0" for="${type}_${newId}">${newName}</label>
-                                <a href="javascript:void(0)" class="text-danger ms-2 delete-master-data-btn" data-id="${newId}" data-type="${type}"><i class="fa fa-trash"></i></a>
+                        <div class="${colClass} mb-2">
+                            <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded border">
+                                <div class="form-check checkbox-primary mb-0 d-flex align-items-center">
+                                    <input class="form-check-input" type="checkbox" name="${checkboxName}" value="${newName}" id="${type}_${newId}" checked>
+                                    <label class="form-check-label ms-2 mb-0" for="${type}_${newId}">${newName}</label>
+                                </div>
+                                <a href="javascript:void(0)" class="text-danger delete-master-data-btn" data-id="${newId}" data-type="${type}"><i class="fa fa-trash"></i></a>
                             </div>
                         </div>
                     `;

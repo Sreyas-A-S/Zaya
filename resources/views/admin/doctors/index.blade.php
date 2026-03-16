@@ -1134,8 +1134,18 @@
             iti = window.intlTelInput(phoneInput, {
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
                 separateDialCode: true,
+                formatOnDisplay: false,
                 initialCountry: "in",
                 preferredCountries: ["in", "ae", "us", "gb"]
+            });
+
+            // Add digit-only and leading zero removal enforcement
+            phoneInput.addEventListener('input', function() {
+                let val = this.value.replace(/\D/g, '');
+                if (val.startsWith('0')) {
+                    val = val.substring(1);
+                }
+                this.value = val.slice(0, 15);
             });
         }
 
@@ -1600,6 +1610,11 @@
             $('[name="dob"]').val(profile.dob ? profile.dob.substring(0, 10) : '');
             if (profile.phone && iti) {
                 iti.setNumber(profile.phone);
+                // After setNumber, manually clean leading zero if it appears in input
+                let currentVal = phoneInput.value.replace(/\D/g, '');
+                if (currentVal.startsWith('0')) {
+                    phoneInput.value = currentVal.substring(1);
+                }
             } else if (iti) {
                 iti.setNumber('');
             }
