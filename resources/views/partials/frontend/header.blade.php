@@ -76,51 +76,75 @@
 
         <!-- Right Actions (Desktop) -->
         <div class="flex items-center gap-6 xl:gap-8 justify-end flex-1">
+            @guest
             <a id="nav-login" href="{{ route('zaya-login') }}"
                 class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors" data-i18n="Login">{{ __('Login') }}</a>
+            @endguest
 
             <a id="nav-find-practitioner" href="{{ route('find-practitioner') }}"
                 class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap" data-i18n="Find Practitioner">{{ __('Find Practitioner') }}</a>
 
             <!-- Language Toggle -->
             @if(isset($available_languages) && $available_languages->count() >= 2)
-                @php
-                    $lang1 = $available_languages->first();
-                    $lang2 = $available_languages->skip(1)->first();
-                    $currentLocale = App::getLocale();
-                @endphp
-                <button type="button"
-                    class="relative flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
-                    onclick="toggleLanguage('{{ $currentLocale == $lang1->code ? $lang2->code : $lang1->code }}')">
-                    <!-- Sliding Pill -->
-                    <div id="lang-toggle-pill"
-                        class="absolute top-1 bottom-1 left-1 w-9 bg-primary rounded-full shadow-sm transition-transform duration-300 ease-in-out {{ $currentLocale == $lang2->code ? 'translate-x-full' : 'translate-x-0' }}">
-                    </div>
+            @php
+            $lang1 = $available_languages->first();
+            $lang2 = $available_languages->skip(1)->first();
+            $currentLocale = App::getLocale();
+            @endphp
+            <button type="button"
+                class="relative flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
+                onclick="toggleLanguage('{{ $currentLocale == $lang1->code ? $lang2->code : $lang1->code }}')">
+                <!-- Sliding Pill -->
+                <div id="lang-toggle-pill"
+                    class="absolute top-1 bottom-1 left-1 w-9 bg-primary rounded-full shadow-sm transition-transform duration-300 ease-in-out {{ $currentLocale == $lang2->code ? 'translate-x-full' : 'translate-x-0' }}">
+                </div>
 
-                    <span id="lang-text-{{ $lang1->code }}"
-                        class="relative z-10 w-9 text-center {{ $currentLocale == $lang1->code ? 'text-white' : 'text-gray-500' }} text-sm font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang1->code, 0, 2)) }}</span>
-                    <span id="lang-text-{{ $lang2->code }}"
-                        class="relative z-10 w-9 text-center {{ $currentLocale == $lang2->code ? 'text-white' : 'text-gray-500' }} text-sm font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang2->code, 0, 2)) }}</span>
-                </button>
+                <span id="lang-text-{{ $lang1->code }}"
+                    class="relative z-10 w-9 text-center {{ $currentLocale == $lang1->code ? 'text-white' : 'text-gray-500' }} text-sm font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang1->code, 0, 2)) }}</span>
+                <span id="lang-text-{{ $lang2->code }}"
+                    class="relative z-10 w-9 text-center {{ $currentLocale == $lang2->code ? 'text-white' : 'text-gray-500' }} text-sm font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang2->code, 0, 2)) }}</span>
+            </button>
             @endif
 
-            <!-- User Profile -->
-            <a href="#" class="relative shrink-0 ml-1 hidden">
-                @php
-                    // NOTE FOR BACKEND: Replace these variables with actual auth/user logic
-                    $mockHasProfilePicture = true; // Toggle to false to see the placeholder design
-                    $mockProfilePictureUrl = 'https://i.pravatar.cc/150?img=48'; // Example profile image
-                @endphp
+            <!-- User Profile (Desktop) -->
+            @auth
+            <div class="relative group ml-1 hidden lg:inline-block">
+                <button class="relative shrink-0 focus:outline-none py-4">
+                    @php
+                    $user = Auth::user();
+                    $hasProfilePicture = !empty($user->profile_picture);
+                    $profilePictureUrl = $hasProfilePicture ? asset('storage/' . $user->profile_picture) : null;
+                    @endphp
 
-                <div
-                    class="w-11 h-11 md:w-12 md:h-12 rounded-full border-2 border-gray-200 overflow-hidden flex items-center justify-center bg-secondary/10 transition-transform duration-300 hover:scale-105 hover:border-gray-300">
-                    @if($mockHasProfilePicture)
-                        <img src="{{ $mockProfilePictureUrl }}" alt="User Profile" class="w-full h-full object-cover">
-                    @else
+                    <div
+                        class="w-11 h-11 md:w-12 md:h-12 rounded-full border-2 border-gray-200 overflow-hidden flex items-center justify-center bg-secondary/10 transition-all duration-300 group-hover:border-primary">
+                        @if($hasProfilePicture)
+                        <img src="{{ $profilePictureUrl }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
+                        @else
                         <i class="ri-user-3-line text-xl text-secondary"></i>
-                    @endif
+                        @endif
+                    </div>
+                </button>
+
+                <!-- Profile Dropdown -->
+                <div class="absolute top-full right-0 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden z-[60]">
+                    <div class="py-2">
+                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
+                            <i class="ri-dashboard-line text-lg"></i> {{ __('Dashboard') }}
+                        </a>
+                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
+                            <i class="ri-user-settings-line text-lg"></i> {{ __('My Profile') }}
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}" id="logout-form-desktop" class="hidden">
+                            @csrf
+                        </form>
+                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form-desktop').submit();" class="flex items-center gap-3 px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                            <i class="ri-logout-box-r-line text-lg"></i> {{ __('Logout') }}
+                        </a>
+                    </div>
                 </div>
-            </a>
+            </div>
+            @endauth
         </div>
     </div>
 
@@ -168,7 +192,13 @@
 
         <a href="{{ route('contact-us') }}"
             class="text-lg font-medium text-secondary border-b border-gray-50 pb-2" data-i18n="Contact Us">{{ __('Contact Us') }}</a>
+        @auth
+        <a href="{{ route('dashboard') }}" class="text-lg font-medium text-secondary pb-2 flex items-center gap-3">
+            <i class="ri-user-3-line"></i> {{ __('Profile') }}
+        </a>
+        @else
         <a href="{{ route('zaya-login') }}" class="text-lg font-medium text-secondary pb-2" data-i18n="Login">{{ __('Login') }}</a>
+        @endauth
 
         <div class="pt-2">
             <a href="{{ route('find-practitioner') }}"
@@ -179,94 +209,94 @@
     <script>
         function toggleLanguage(targetLocale) {
             fetch(`{{ url('/lang') }}/${targetLocale}`, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                    "Accept": "application/json"
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status) {
-                    // 1. Update dynamic settings in the DOM
-                    Object.keys(data.data).forEach(key => {
-                        const element = document.getElementById(key);
-                        if (element) {
-                            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                                element.placeholder = data.data[key];
-                            } else if (element.tagName === 'A' || element.tagName === 'BUTTON' || element.tagName === 'SPAN' || element.tagName === 'H1' || element.tagName === 'H2' || element.tagName === 'H3' || element.tagName === 'P') {
-                                // For elements with children (like icons), we only want to update the text part
-                                // This is a bit tricky, but innerHTML is okay if settings don't have HTML usually.
-                                // If they do have HTML (like blog_subtitle), innerHTML is required.
-                                element.innerHTML = data.data[key];
-                            } else {
-                                element.innerHTML = data.data[key];
-                            }
-                        }
-                    });
-
-                    // 2. Update static translations (data-i18n)
-                    if (data.translations) {
-                        document.querySelectorAll('[data-i18n]').forEach(el => {
-                            const key = el.getAttribute('data-i18n');
-                            const translation = data.translations[key];
-                            if (translation) {
-                                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                                    el.placeholder = translation;
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Accept": "application/json"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        // 1. Update dynamic settings in the DOM
+                        Object.keys(data.data).forEach(key => {
+                            const element = document.getElementById(key);
+                            if (element) {
+                                if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                                    element.placeholder = data.data[key];
+                                } else if (element.tagName === 'A' || element.tagName === 'BUTTON' || element.tagName === 'SPAN' || element.tagName === 'H1' || element.tagName === 'H2' || element.tagName === 'H3' || element.tagName === 'P') {
+                                    // For elements with children (like icons), we only want to update the text part
+                                    // This is a bit tricky, but innerHTML is okay if settings don't have HTML usually.
+                                    // If they do have HTML (like blog_subtitle), innerHTML is required.
+                                    element.innerHTML = data.data[key];
                                 } else {
-                                    // Preserve icons if they are children
-                                    const icon = el.querySelector('i');
-                                    if (icon) {
-                                        el.innerHTML = translation + ' ' + icon.outerHTML;
-                                    } else {
-                                        el.textContent = translation;
-                                    }
+                                    element.innerHTML = data.data[key];
                                 }
                             }
                         });
-                    }
 
-                    // 3. Update toggle UI
-                    const pill = document.getElementById('lang-toggle-pill');
-                    const langTexts = document.querySelectorAll('[id^="lang-text-"]');
-                    
-                    @if(isset($available_languages) && $available_languages->count() >= 2)
-                    if (pill) {
-                        if (targetLocale === '{{ $lang2->code }}') {
-                            pill.classList.remove('translate-x-0');
-                            pill.classList.add('translate-x-full');
-                        } else {
-                            pill.classList.remove('translate-x-full');
-                            pill.classList.add('translate-x-0');
+                        // 2. Update static translations (data-i18n)
+                        if (data.translations) {
+                            document.querySelectorAll('[data-i18n]').forEach(el => {
+                                const key = el.getAttribute('data-i18n');
+                                const translation = data.translations[key];
+                                if (translation) {
+                                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                                        el.placeholder = translation;
+                                    } else {
+                                        // Preserve icons if they are children
+                                        const icon = el.querySelector('i');
+                                        if (icon) {
+                                            el.innerHTML = translation + ' ' + icon.outerHTML;
+                                        } else {
+                                            el.textContent = translation;
+                                        }
+                                    }
+                                }
+                            });
                         }
-                    }
 
-                    langTexts.forEach(txt => {
-                        if (txt.id === `lang-text-${targetLocale}`) {
-                            txt.classList.remove('text-gray-500');
-                            txt.classList.add('text-white');
-                        } else {
-                            txt.classList.remove('text-white');
-                            txt.classList.add('text-gray-500');
+                        // 3. Update toggle UI
+                        const pill = document.getElementById('lang-toggle-pill');
+                        const langTexts = document.querySelectorAll('[id^="lang-text-"]');
+
+                        @if(isset($available_languages) && $available_languages->count() >= 2)
+                        if (pill) {
+                            if (targetLocale === '{{ $lang2->code }}') {
+                                pill.classList.remove('translate-x-0');
+                                pill.classList.add('translate-x-full');
+                            } else {
+                                pill.classList.remove('translate-x-full');
+                                pill.classList.add('translate-x-0');
+                            }
                         }
-                    });
 
-                    // 4. Update onclick for next toggle
-                    const toggleBtn = pill ? pill.parentElement : null;
-                    if (toggleBtn) {
-                        const nextLocale = targetLocale === '{{ $lang1->code }}' ? '{{ $lang2->code }}' : '{{ $lang1->code }}';
-                        toggleBtn.setAttribute('onclick', `toggleLanguage('${nextLocale}')`);
+                        langTexts.forEach(txt => {
+                            if (txt.id === `lang-text-${targetLocale}`) {
+                                txt.classList.remove('text-gray-500');
+                                txt.classList.add('text-white');
+                            } else {
+                                txt.classList.remove('text-white');
+                                txt.classList.add('text-gray-500');
+                            }
+                        });
+
+                        // 4. Update onclick for next toggle
+                        const toggleBtn = pill ? pill.parentElement : null;
+                        if (toggleBtn) {
+                            const nextLocale = targetLocale === '{{ $lang1->code }}' ? '{{ $lang2->code }}' : '{{ $lang1->code }}';
+                            toggleBtn.setAttribute('onclick', `toggleLanguage('${nextLocale}')`);
+                        }
+                        @endif
+
+                        console.log("Language changed dynamically to:", targetLocale);
                     }
-                    @endif
-
-                    console.log("Language changed dynamically to:", targetLocale);
-                }
-            })
-            .catch(error => {
-                console.error('Error switching language:', error);
-                // Fallback to reload if AJAX fails
-                window.location.href = `{{ url('/lang') }}/${targetLocale}`;
-            });
+                })
+                .catch(error => {
+                    console.error('Error switching language:', error);
+                    // Fallback to reload if AJAX fails
+                    window.location.href = `{{ url('/lang') }}/${targetLocale}`;
+                });
         }
     </script>
 </header>

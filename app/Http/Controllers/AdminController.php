@@ -103,8 +103,8 @@ class AdminController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'first_name' => 'required|string|min:2|max:50|regex:/^[a-zA-Z\s\-]+$/',
-            'last_name' => 'required|string|min:2|max:50|regex:/^[a-zA-Z\s\-]+$/',
+            'first_name' => 'required|string|min:1|max:50|regex:/^[a-zA-Z\s\-]+$/',
+            'last_name' => 'required|string|min:1|max:50|regex:/^[a-zA-Z\s\-]+$/',
             'email' => 'required|email:rfc,dns|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|min:7|max:20',
             'national_id' => 'nullable|exists:countries,id',
