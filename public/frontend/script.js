@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = newsletterInput.value;
 
             if (!email) {
-                alert('Please enter an email address.');
+                showZayaToast('Please enter an email address.');
                 return;
             }
 
@@ -301,14 +301,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 const data = await response.json();
-                alert(data.message);
+                showZayaToast(data.message);
 
                 if (response.ok && data.success !== false) {
                     newsletterInput.value = '';
                 }
             } catch (error) {
                 console.error('Newsletter error:', error);
-                alert('Something went wrong. Please try again.');
+                showZayaToast('Something went wrong. Please try again.');
             } finally {
                 newsletterBtn.disabled = false;
                 newsletterBtn.innerHTML = originalIcon;
@@ -328,7 +328,7 @@ function shareService() {
     } else {
         // Fallback: Copy to clipboard
         navigator.clipboard.writeText(window.location.href).then(() => {
-            alert('Link copied to clipboard!');
+            showZayaToast('Link copied to clipboard!');
         });
     }
 }
