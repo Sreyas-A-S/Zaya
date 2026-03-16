@@ -73,6 +73,7 @@
     </div>
 
     @include('partials.frontend.toast')
+    @include('partials.frontend.success-popup')
     @include('partials.frontend.header')
 
     @yield('content')
