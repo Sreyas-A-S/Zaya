@@ -1,6 +1,50 @@
 @extends('layouts.app')
 
 @section('content')
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+<style>
+    .iti {
+        width: 100%;
+    }
+
+    .iti__country-list {
+        z-index: 100003;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
+        margin-top: 5px;
+        padding: 8px 0;
+        background: #fff;
+    }
+
+    .iti__country {
+        padding: 8px 15px;
+    }
+
+    .iti__country:hover {
+        background-color: #f7f7f7;
+    }
+
+    .iti__flag-box {
+        margin-right: 10px;
+    }
+
+    #phone {
+        padding-left: 95px !important;
+    }
+
+    .iti--separate-dial-code .iti__selected-flag {
+        background-color: transparent !important;
+        border-radius: 30px 0 0 30px !important;
+    }
+
+    .iti--separate-dial-code .iti__selected-dial-code {
+        color: #4A5568;
+        font-weight: 500;
+    }
+</style>
+@endpush
 
 <!-- Hero Banner Section -->
 <section class="pt-[144px] md:pt-[150px] pb-4 md:pb-12 px-4 md:px-6 bg-white">
@@ -101,7 +145,7 @@
                 </label>
                 <input type="text" id="first_name" name="first_name" placeholder="{{ __('Your First Name') }}"
                     class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
-                    required>
+                    maxlength="50" required>
             </div>
 
             <!-- Last Name -->
@@ -111,7 +155,7 @@
                 </label>
                 <input type="text" id="last_name" name="last_name" placeholder="{{ __('Your Last Name') }}"
                     class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
-                    required>
+                    maxlength="50" required>
             </div>
 
             <!-- Email -->
@@ -121,7 +165,7 @@
                 </label>
                 <input type="email" id="email" name="email" placeholder="{{ __('Your Email') }}"
                     class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
-                    required>
+                    maxlength="255" required>
             </div>
 
             <!-- Phone No -->
@@ -131,7 +175,7 @@
                 </label>
                 <input type="tel" id="phone" name="phone" placeholder="{{ __('Your Phone No.') }}"
                     class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
-                    required>
+                    maxlength="20" required>
             </div>
 
             <!-- I am a -->
@@ -159,7 +203,7 @@
                 </label>
                 <textarea id="message" name="message" rows="6" placeholder="{{ __('Your Message') }}"
                     class="w-full border border-[#C5C5C5] rounded-4xl px-6 py-4 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base resize-none"
-                    required></textarea>
+                    maxlength="2000" required></textarea>
             </div>
 
             <!-- Consent Checkbox -->
@@ -421,274 +465,179 @@
     </div>
 </section>
 
-<!-- FAQ Toggle Script -->
-<script>
-    // GDPR Consent logic
-    const consentCheckbox = document.getElementById('consent');
-    const submitBtn = document.getElementById('contact-btn-submit');
-
-    if (consentCheckbox && submitBtn) {
-        consentCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('bg-[#E6E6E6]', 'text-[#888888]', 'cursor-not-allowed', 'opacity-60');
-                submitBtn.classList.add('bg-primary', 'text-white', 'hover:bg-opacity-90', 'cursor-pointer');
-            } else {
-                submitBtn.disabled = true;
-                submitBtn.classList.add('bg-[#E6E6E6]', 'text-[#888888]', 'cursor-not-allowed', 'opacity-60');
-                submitBtn.classList.remove('bg-primary', 'text-white', 'hover:bg-opacity-90', 'cursor-pointer');
-            }
-        });
-    }
-
-    document.getElementById('contact-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const form = this;
-        const submitBtn = form.querySelector('button[type=\"submit\"]');
-        const originalBtnText = submitBtn.innerText;
-
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Sending...';
-
-        try {
-            const formData = new FormData(form);
-            const response = await fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            });
-
-            const data = await response.json();
-
-            if (window.hidePreloader) window.hidePreloader();
-
-            if (response.ok) {
-                if (window.showSuccessPopup) {
-                    window.showSuccessPopup();
-                } else if (window.showZayaToast) {
-                    window.showZayaToast(data.success, 'Success');
-                } else {
-                    alert(data.success);
-                }
-                form.reset();
-                // Reset button state
-                if (consentCheckbox) {
-                    consentCheckbox.checked = false;
-                    submitBtn.disabled = true;
-                    submitBtn.classList.add('bg-[#E6E6E6]', 'text-[#888888]', 'cursor-not-allowed', 'opacity-60');
-                    submitBtn.classList.remove('bg-primary', 'text-white', 'hover:bg-opacity-90', 'cursor-pointer');
-                }
-            } else {
-                const errorMsg = data.message || 'Something went wrong. Please try again.';
-                if (window.showZayaToast) {
-                    window.showZayaToast(errorMsg, 'Error');
-                } else {
-                    alert(errorMsg);
-                }
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            if (window.showZayaToast) {
-                window.showZayaToast('An error occurred. Please try again.', 'Error');
-            } else {
-                alert('An error occurred. Please try again.');
-            }
-        } finally {
-            submitBtn.innerText = originalBtnText;
-            if (consentCheckbox && consentCheckbox.checked) {
-                submitBtn.disabled = false;
-            }
-        }
-    });
-
-    function toggleFaq(button) {
-        const faqItem = button.closest('.faq-item');
-        const content = faqItem.querySelector('.faq-content');
-        const icon = button.querySelector('.faq-icon');
-
-        // Check if this FAQ is currently open
-        const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
-
-        // Close all FAQs first
-        document.querySelectorAll('.faq-item').forEach(item => {
-            const c = item.querySelector('.faq-content');
-            const i = item.querySelector('.faq-icon');
-            c.style.maxHeight = '0px';
-            i.classList.remove('rotate-45');
-            item.classList.remove('border-primary/30', 'bg-surface/30');
-            item.classList.add('border-gray-200');
-        });
-
-        // If it was closed, open it
-        if (!isOpen) {
-            content.style.maxHeight = content.scrollHeight + 'px';
-            icon.classList.add('rotate-45');
-            faqItem.classList.add('border-primary/30', 'bg-surface/30');
-            faqItem.classList.remove('border-gray-200');
-        }
-    }
-</script>
+@endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
-    <script>
-        (function() {
-            // Expose for inline onclick handlers in the FAQ items.
-            window.toggleFaq = function(button) {
-                const faqItem = button.closest('.faq-item');
-                const content = faqItem.querySelector('.faq-content');
-                const icon = button.querySelector('.faq-icon');
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
+<script>
+    (function() {
+        // Expose for FAQ toggle
+        window.toggleFaq = function(button) {
+            const faqItem = button.closest('.faq-item');
+            const content = faqItem.querySelector('.faq-content');
+            const icon = button.querySelector('.faq-icon');
+            const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
 
-                // Check if this FAQ is currently open
-                const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+            document.querySelectorAll('.faq-item').forEach(item => {
+                const c = item.querySelector('.faq-content');
+                const i = item.querySelector('.faq-icon');
+                if (c) c.style.maxHeight = '0px';
+                if (i) i.classList.remove('rotate-45');
+                item.classList.remove('border-primary/30', 'bg-surface/30');
+                item.classList.add('border-gray-200');
+            });
 
-                // Close all FAQs first
-                document.querySelectorAll('.faq-item').forEach(item => {
-                    const c = item.querySelector('.faq-content');
-                    const i = item.querySelector('.faq-icon');
-                    c.style.maxHeight = '0px';
-                    i.classList.remove('rotate-45');
-                    item.classList.remove('border-primary/30', 'bg-surface/30');
-                    item.classList.add('border-gray-200');
+            if (!isOpen) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.classList.add('rotate-45');
+                faqItem.classList.add('border-primary/30', 'bg-surface/30');
+                faqItem.classList.remove('border-gray-200');
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize intl-tel-input
+            const phoneInput = document.querySelector('#phone');
+            if (phoneInput && window.intlTelInput) {
+                window.contactIti = window.intlTelInput(phoneInput, {
+                    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                    separateDialCode: true,
+                    formatOnDisplay: false,
+                    initialCountry: "in",
+                    preferredCountries: ["in", "ae", "us", "gb"]
                 });
 
-                // If it was closed, open it
-                if (!isOpen) {
-                    content.style.maxHeight = content.scrollHeight + 'px';
-                    icon.classList.add('rotate-45');
-                    faqItem.classList.add('border-primary/30', 'bg-surface/30');
-                    faqItem.classList.remove('border-gray-200');
+                phoneInput.addEventListener('input', function() {
+                    let val = this.value.replace(/\D/g, '');
+                    if (val.startsWith('0')) val = val.substring(1);
+                    this.value = val.slice(0, 15);
+                });
+            }
+
+            const form = document.getElementById('contact-form');
+            if (!form) return;
+
+            const consent = document.getElementById('consent');
+            const submitBtn = document.getElementById('contact-btn-submit');
+
+            const setSubmitState = () => {
+                const enabled = !!(consent && consent.checked);
+                if (!submitBtn) return;
+                submitBtn.disabled = !enabled;
+                if (enabled) {
+                    submitBtn.classList.remove('bg-[#E6E6E6]', 'text-[#888888]', 'cursor-not-allowed', 'opacity-60');
+                    submitBtn.classList.add('bg-primary', 'text-white', 'hover:bg-opacity-90', 'cursor-pointer', 'is-enabled');
+                } else {
+                    submitBtn.classList.add('bg-[#E6E6E6]', 'text-[#888888]', 'cursor-not-allowed', 'opacity-60');
+                    submitBtn.classList.remove('bg-primary', 'text-white', 'hover:bg-opacity-90', 'cursor-pointer', 'is-enabled');
                 }
             };
 
-            document.addEventListener('DOMContentLoaded', function() {
-                // Initialize intl-tel-input (match Doctors behavior)
-                const phoneInput = document.querySelector('#phone');
-                if (phoneInput && window.intlTelInput) {
-                    window.contactIti = window.intlTelInput(phoneInput, {
-                        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
-                        separateDialCode: true,
-                        formatOnDisplay: false,
-                        initialCountry: "in",
-                        preferredCountries: ["in", "ae", "us", "gb"]
-                    });
+            if (consent) consent.addEventListener('change', setSubmitState);
+            setSubmitState();
 
-                    phoneInput.addEventListener('input', function() {
-                        let val = this.value.replace(/\\D/g, '');
-                        if (val.startsWith('0')) val = val.substring(1);
-                        this.value = val.slice(0, 15);
-                    });
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // Clear previous errors
+                document.querySelectorAll('.error-text').forEach(el => el.remove());
+                document.querySelectorAll('input, textarea').forEach(el => el.classList.remove('border-red-500'));
+
+                // Frontend Phone Validation
+                if (window.contactIti && phoneInput) {
+                    if (!window.contactIti.isValidNumber()) {
+                        const errorMsg = document.createElement('p');
+                        errorMsg.className = 'error-text text-red-500 text-xs mt-1 px-4';
+                        errorMsg.innerText = 'Please enter a valid phone number.';
+                        let container = phoneInput.closest('div');
+                        if (container.classList.contains('iti')) {
+                            container = container.parentElement;
+                        }
+                        container.appendChild(errorMsg);
+                        phoneInput.classList.add('border-red-500');
+                        return;
+                    }
+                    phoneInput.value = window.contactIti.getNumber();
                 }
 
-                const form = document.getElementById('contact-form');
-                if (!form) return;
+                const originalBtnText = submitBtn.innerText;
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Sending...';
 
-                // Consent gates submit. Also prevents "sticky hover" looking enabled forever on touch.
-                const consent = document.getElementById('consent');
-                const submitBtn = document.getElementById('contact-btn-submit');
-                const setSubmitState = () => {
-                    const enabled = !!(consent && consent.checked);
-                    if (!submitBtn) return;
-                    submitBtn.disabled = !enabled;
-                    submitBtn.classList.toggle('is-enabled', enabled);
-                    submitBtn.classList.toggle('bg-primary', enabled);
-                    submitBtn.classList.toggle('text-white', enabled);
-                    submitBtn.classList.toggle('cursor-pointer', enabled);
-                    submitBtn.classList.toggle('bg-[#E6E6E6]', !enabled);
-                    submitBtn.classList.toggle('text-[#888888]', !enabled);
-                    submitBtn.classList.toggle('cursor-not-allowed', !enabled);
-                };
-
-                if (consent) consent.addEventListener('change', setSubmitState);
-                setSubmitState();
-
-                const resetContactPage = () => {
-                    form.reset();
-
-                    // Reset intl-tel-input UI and the underlying input.
-                    if (window.contactIti && phoneInput) {
-                        try {
-                            window.contactIti.setNumber('');
-                        } catch (e) {
-                            // ignore
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
                         }
-                        phoneInput.value = '';
-                    }
-
-                    // Close all FAQs (if any are open)
-                    document.querySelectorAll('.faq-item').forEach(item => {
-                        const c = item.querySelector('.faq-content');
-                        const i = item.querySelector('.faq-icon');
-                        if (c) c.style.maxHeight = '0px';
-                        if (i) i.classList.remove('rotate-45');
-                        item.classList.remove('border-primary/30', 'bg-surface/30');
-                        item.classList.add('border-gray-200');
                     });
 
-                    setSubmitState();
+                    const data = await response.json();
+                    if (window.hidePreloader) window.hidePreloader();
 
-                    if (submitBtn) submitBtn.blur();
-                };
-
-                form.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    const submitBtn = document.getElementById('contact-btn-submit');
-                    const originalBtnText = submitBtn ? submitBtn.innerText : '';
-
-                    if (submitBtn) {
-                        submitBtn.disabled = true;
-                        submitBtn.innerText = 'Sending...';
-                    }
-
-                    try {
-                        // Ensure we submit a consistent phone format when intl-tel-input is enabled.
-                        if (window.contactIti && phoneInput) {
-                            phoneInput.value = window.contactIti.getNumber() || phoneInput.value;
+                    if (response.ok) {
+                        // Priority 1: Success Popup
+                        if (window.showSuccessPopup) {
+                            window.showSuccessPopup();
                         }
-
-                        const formData = new FormData(form);
-                        const response = await fetch(form.action, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json'
-                            }
-                        });
-
-                        const data = await response.json();
-
-                        if (response.ok) {
-                            if (window.showToast) window.showToast(data.success, 'success');
-                            else alert(data.success);
-                            resetContactPage();
-
-                            // Some mobile browsers keep stale focus/hover/intl-tel-input state.
-                            // A soft reload guarantees the page returns to the initial state.
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, window.showToast ? 900 : 0);
+                        // Priority 2: Standard Toast
+                        else if (window.showZayaToast) {
+                            window.showZayaToast(data.success, 'Success');
+                        } else if (window.showToast) {
+                            window.showToast(data.success, 'success');
                         } else {
-                            const errorMsg = data.message || 'Something went wrong. Please try again.';
-                            if (window.showToast) window.showToast(errorMsg, 'error');
-                            else alert(errorMsg);
+                            alert(data.success);
                         }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                    } finally {
-                        if (submitBtn) {
-                            submitBtn.disabled = false;
-                            submitBtn.innerText = originalBtnText;
-                            submitBtn.blur(); // helps avoid sticky focus/hover styles on mobile
-                        }
+
+                        form.reset();
+                        if (window.contactIti && phoneInput) window.contactIti.setNumber('');
+                        if (consent) consent.checked = false;
                         setSubmitState();
+                    } else if (response.status === 422) {
+                        // Validation errors
+                        if (data.errors) {
+                            Object.keys(data.errors).forEach(key => {
+                                const input = document.getElementsByName(key)[0] || document.getElementById(key);
+                                if (input) {
+                                    input.classList.add('border-red-500');
+                                    const err = document.createElement('p');
+                                    err.className = 'error-text text-red-500 text-xs mt-1 px-4';
+                                    err.innerText = data.errors[key][0];
+
+                                    // For phone input, we need to go past the 'iti' wrapper
+                                    let container = input.closest('div');
+                                    if (input.id === 'phone' && container.classList.contains('iti')) {
+                                        container = container.parentElement;
+                                    }
+                                    container.appendChild(err);
+                                }
+                            });
+                        }
+                        const firstError = document.querySelector('.error-text');
+                        if (firstError) firstError.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    } else {
+                        const errorMsg = data.message || 'Something went wrong. Please try again.';
+                        if (window.showZayaToast) window.showZayaToast(errorMsg, 'Error');
+                        else if (window.showToast) window.showToast(errorMsg, 'error');
+                        else alert(errorMsg);
                     }
-                });
+                } catch (error) {
+                    console.error('Error:', error);
+                    const msg = 'An error occurred. Please try again.';
+                    if (window.showZayaToast) window.showZayaToast(msg, 'Error');
+                    else alert(msg);
+                } finally {
+                    submitBtn.innerText = originalBtnText;
+                    setSubmitState();
+                }
             });
-        })();
-    </script>
+        });
+    })();
+</script>
 @endpush

@@ -88,14 +88,6 @@
                                 </div>
                             </div>
                         @endif
-
-                        <div class="d-flex align-center justify-content-between mt-auto">
-                            <span>
-                                <svg class="stroke-icon" style="width:16px; height:16px;">
-                                    <use href="{{ asset('admiro/assets/svg/icon-sprite.svg#watch') }}"></use>
-                                </svg> {{ date('h:i A') }}
-                            </span>
-                        </div>
                     </div>
                 </div>
             </div>

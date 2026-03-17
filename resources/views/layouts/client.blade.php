@@ -103,13 +103,13 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-y-4 justify-center lg:justify-start text-center lg:text-left items-center gap-8">
-                    <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) : 'https://i.pravatar.cc/150?img=32' }}" alt="Profile"
+                    <img src="{{ property_exists($user, 'profile_pic') && $user->profile_pic ? ($user->profile_pic[0] == 'h' ? $user->profile_pic : asset('storage/' . $user->profile_pic)) : 'https://i.pravatar.cc/150?img=32' }}" alt="Profile"
                         class="w-25 lg:w-20 h-25 lg:h-20 rounded-full object-cover p-1 bg-white">
                     <div>
                         <h1 class="text-3xl lg:text-4xl font-bold font-sans! text-secondary mb-2">{{ $user->name }}</h1>
                         <div class="flex flex-wrap gap-y-1 items-center text-gray-500 text-sm space-x-4">
-                            <span class="flex items-center"><i class="ri-map-pin-line mr-1"></i> {{ $user->city ?? 'Location not set' }}</span>
-                            <span class="flex items-center"><i class="ri-mail-line mr-1"></i> Client ID: Z-{{ 10000 + $user->id }}</span>
+                            <span class="flex items-center"><i class="ri-map-pin-line mr-1"></i> {{ $user->patient->city_state ?? ($user->city ?? 'Location not set') }}</span>
+                            <span class="flex items-center"><i class="ri-mail-line mr-1"></i> Client ID: {{ $user->patient->client_id ?? 'Z-' . (10000 + $user->id) }}</span>
                         </div>
                     </div>
                 </div>

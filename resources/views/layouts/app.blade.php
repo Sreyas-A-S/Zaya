@@ -142,13 +142,7 @@
                 }
             });
 
-            // 4. Instant show on Form Submit
-            document.addEventListener('submit', function(e) {
-                const form = e.target;
-                if (!form.target || form.target === '_self') {
-                    window.showPreloader();
-                }
-            });
+
         });
     </script>
 

@@ -30,15 +30,15 @@
             <div class="grid grid-cols-2 gap-y-6 gap-x-4 mb-6">
                 <div>
                     <p class="text-base text-gray-400 mb-1">Age</p>
-                    <p class="text-base font-normal text-gray-800">28 Years</p>
+                    <p class="text-base font-normal text-gray-800">{{ $user->patient->age ?? 'Not set' }} {{ isset($user->patient->age) ? 'Years' : '' }}</p>
                 </div>
                 <div>
                     <p class="text-base text-gray-400 mb-1">Gender</p>
-                    <p class="text-base font-normal text-gray-800">Female</p>
+                    <p class="text-base font-normal text-gray-800">{{ ucfirst($user->patient->gender ?? ($user->gender ?? 'Not set')) }}</p>
                 </div>
                 <div class="col-span-2">
                     <p class="text-base text-gray-400 mb-1">DOB</p>
-                    <p class="text-base font-normal text-gray-800">May 01, 1998</p>
+                    <p class="text-base font-normal text-gray-800">{{ $user->patient->dob ? $user->patient->dob->format('M d, Y') : 'Not set' }}</p>
                 </div>
             </div>
 
@@ -51,11 +51,11 @@
                 </div>
                 <div>
                     <p class="text-base text-gray-400 mb-1">Phone</p>
-                    <p class="text-base font-normal text-gray-800">{{ $user->phone ?? '+44 7700 800077' }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ $user->patient->phone ?? ($user->phone ?? 'Not set') }}</p>
                 </div>
                 <div>
                     <p class="text-base text-gray-400 mb-1">Address</p>
-                    <p class="text-base font-normal text-gray-800 leading-snug">{{ $user->city ?? 'London' }}, UK.</p>
+                    <p class="text-base font-normal text-gray-800 leading-snug">{{ $user->patient->address ?? ($user->patient->city_state ?? ($user->city ?? 'Not set')) }}</p>
                 </div>
             </div>
         </div>
@@ -64,33 +64,18 @@
         <div id="section-transactions" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
             <h2 class="text-xl font-sans! font-medium text-secondary mb-6">Transaction Vault</h2>
             <div class="space-y-5">
-                <!-- Invoice 1 -->
+                @forelse($invoices as $invoice)
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-sm font-normal text-gray-800 mb-0.5">Invoice #88751</p>
-                        <p class="text-xs text-gray-400">Dec 7, 2025</p>
+                        <p class="text-sm font-normal text-gray-800 mb-0.5">Invoice #{{ $invoice->id + 10000 }}</p>
+                        <p class="text-xs text-gray-400">{{ $invoice->created_at->format('M d, Y') }}</p>
                     </div>
-                    <span
-                        class="px-3 py-1 bg-[#EEF2EF] text-[#2B4C3B] text-sm font-normal rounded-full">Open</span>
+                    <a href="{{ $invoice->razorpay_payment_url }}" target="_blank"
+                        class="px-3 py-1 bg-[#EEF2EF] text-[#2B4C3B] text-sm font-normal rounded-full">Open</a>
                 </div>
-                <!-- Invoice 2 -->
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-sm font-normal text-gray-800 mb-0.5">Invoice #13742</p>
-                        <p class="text-xs text-gray-400">Nov 28, 2025</p>
-                    </div>
-                    <span
-                        class="px-3 py-1 bg-[#EEF2EF] text-[#2B4C3B] text-sm font-normal rounded-full">Open</span>
-                </div>
-                <!-- Invoice 3 -->
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-sm font-normal text-gray-800 mb-0.5">Invoice #70159</p>
-                        <p class="text-xs text-gray-400">Feb 17, 2025</p>
-                    </div>
-                    <span
-                        class="px-3 py-1 bg-[#EEF2EF] text-[#2B4C3B] text-sm font-normal rounded-full">Open</span>
-                </div>
+                @empty
+                <p class="text-center text-gray-500 text-xs py-4">No recent invoices.</p>
+                @endforelse
             </div>
             <div class="mt-6 text-center">
                 <a href="#" class="text-xs text-gray-400 hover:text-gray-800 font-normal tracking-wide">See
@@ -115,37 +100,54 @@
 
             <!-- Upcoming Sessions -->
             <div id="content-upcoming" class="space-y-6">
-                <!-- Session 1 -->
+                @forelse($upcomingBookings as $booking)
                 <div class="flex gap-2 justify-between items-center">
                     <div>
                         <div class="flex flex-wrap items-center space-x-2 mb-1">
-                            <p class="text-base font-normal text-gray-800">Life Coach</p>
+                            @php
+                            $sNames = [];
+                            foreach($booking->service_ids ?? [] as $sid) {
+                            if(isset($allServices[$sid])) $sNames[] = $allServices[$sid]->title;
+                            }
+                            @endphp
+                            <p class="text-base font-normal text-gray-800">{{ implode(', ', $sNames) }}</p>
                             <span class="text-gray-800 text-base">•</span>
-                            <p class="text-xs text-gray-600 font-normal">(Session with Dr. Evelyn Reed)</p>
+                            <p class="text-xs text-gray-600 font-normal">(Session with {{ $booking->practitioner->user->name }})</p>
                         </div>
-                        <p class="text-xs text-gray-400">Mar 07, 2026 - 11:30 AM</p>
+                        <p class="text-xs text-gray-400">{{ $booking->booking_date->format('M d, Y') }} - {{ $booking->booking_time }}</p>
                     </div>
-                    <button
-                        class="px-5 py-2 bg-[#D1EBE1] text-[#2B4C3B] hover:bg-[#bce0d2] rounded-full text-xs font-normal transition-colors">Reschedule</button>
+                    {{-- <button
+                        class="px-5 py-2 bg-[#D1EBE1] text-[#2B4C3B] hover:bg-[#bce0d2] rounded-full text-xs font-normal transition-colors">Reschedule</button> --}}
+                    <span class="px-3 py-1 bg-[#EEF2EF] text-[#2FA749] text-xs font-normal rounded-full capitalize">{{ $booking->status }}</span>
                 </div>
-                <!-- Session 2 -->
-                <div class="flex gap-2 justify-between items-center">
-                    <div>
-                        <div class="flex flex-wrap items-center space-x-2 mb-1">
-                            <p class="text-base font-normal text-gray-800">Naturopathy</p>
-                            <span class="text-gray-800 text-base">•</span>
-                            <p class="text-xs text-gray-600 font-normal">(Session with Dr. Nahala Nazim)</p>
-                        </div>
-                        <p class="text-xs text-gray-400">Mar 28, 2026 - 5:30 PM</p>
-                    </div>
-                    <button
-                        class="px-5 py-2 bg-[#D1EBE1] text-[#2B4C3B] hover:bg-[#bce0d2] rounded-full text-xs font-normal transition-colors">Reschedule</button>
-                </div>
+                @empty
+                <p class="text-center text-gray-500 text-sm py-6">No upcoming sessions.</p>
+                @endforelse
             </div>
 
             <!-- Completed Sessions -->
             <div id="content-completed" class="space-y-6 hidden">
+                @forelse($completedBookings as $booking)
+                <div class="flex gap-2 justify-between items-center">
+                    <div>
+                        <div class="flex flex-wrap items-center space-x-2 mb-1">
+                            @php
+                            $sNames = [];
+                            foreach($booking->service_ids ?? [] as $sid) {
+                            if(isset($allServices[$sid])) $sNames[] = $allServices[$sid]->title;
+                            }
+                            @endphp
+                            <p class="text-base font-normal text-gray-800">{{ implode(', ', $sNames) }}</p>
+                            <span class="text-gray-800 text-base">•</span>
+                            <p class="text-xs text-gray-600 font-normal">(Session with {{ $booking->practitioner->user->name }})</p>
+                        </div>
+                        <p class="text-xs text-gray-400">{{ $booking->booking_date->format('M d, Y') }} - {{ $booking->booking_time }}</p>
+                    </div>
+                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-normal rounded-full capitalize">Completed</span>
+                </div>
+                @empty
                 <p class="text-center text-gray-500 text-sm py-10">No completed sessions recently.</p>
+                @endforelse
             </div>
             <a href="{{ route('bookings.index') }}" class="block text-center text-sm font-medium text-secondary hover:underline pt-4">View All Bookings</a>
         </div>
@@ -214,37 +216,43 @@
 <div id="section-reviews" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12 mb-5 md:mb-8">
     <h2 class="text-xl font-medium font-sans! text-secondary mb-6">Your Reviews</h2>
     <div class="space-y-6">
-        <!-- Review 1 -->
+        @forelse($reviews as $review)
         <div class="border-b border-[#DDDDDD] pb-6">
             <div class="flex items-center space-x-3 mb-3">
-                <h3 class="font-sans! text-base font-medium text-gray-800">Art Therapy</h3>
-                <span class="text-xs md:text-sm text-gray-400">Just now</span>
-                <div class="flex items-center gap-3 ml-auto shrink-0">
+                <h3 class="font-sans! text-base font-medium text-gray-800">{{ $review->practitioner->user->name }}</h3>
+                <span class="text-xs md:text-sm text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
+                {{-- <div class="flex items-center gap-3 ml-auto shrink-0">
                     <button
                         class="md:w-10 md:h-10 w-8 h-8 md:text-lg text-sm rounded-full flex items-center justify-center text-[#2B4C3B] hover:bg-gray-50 transition-colors cursor-pointer"><i
                             class="ri-pencil-line"></i></button>
                     <button
                         class="md:w-10 md:h-10 w-8 h-8 md:text-lg text-sm rounded-full flex items-center justify-center bg-red-50 text-red-400 hover:bg-red-100 transition-colors cursor-pointer"><i
                             class="ri-delete-bin-line"></i></button>
-                </div>
+                </div> --}}
             </div>
             <div class="flex flex-wrap gap-2 justify-between items-start">
                 <div>
-                    <p class="text-sm text-gray-600 mb-2.5 leading-relaxed">Comment: "Dr. Bennett was
-                        incredibly attentive and provided excellent care."</p>
+                    <p class="text-sm text-gray-600 mb-2.5 leading-relaxed">Comment: "{{ $review->review }}"</p>
                     <div class="flex items-center">
                         <span class="text-sm text-gray-500 mr-3">Rating:</span>
                         <div class="flex text-[#FFD166] space-x-0.5">
-                            <i class="ri-star-fill text-sm"></i>
-                            <i class="ri-star-fill text-sm"></i>
-                            <i class="ri-star-fill text-sm"></i>
-                            <i class="ri-star-fill text-sm"></i>
-                            <i class="ri-star-half-fill text-sm"></i>
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <=floor($review->rating))
+                                <i class="ri-star-fill text-sm"></i>
+                                @elseif($i - 0.5 <= $review->rating)
+                                    <i class="ri-star-half-fill text-sm"></i>
+                                    @else
+                                    <i class="ri-star-line text-sm text-gray-300"></i>
+                                    @endif
+                                    @endfor
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        @empty
+        <p class="text-center text-gray-500 text-sm py-6">You haven't written any reviews yet.</p>
+        @endforelse
     </div>
 </div>
 
@@ -301,13 +309,13 @@
             const btn = document.getElementById('m-tab-' + tab);
             if (btn) {
                 if (tab === 'dashboard') {
-                     btn.className = (tab === selectedTab)
-                        ? "leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1"
-                        : "leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors";
+                    btn.className = (tab === selectedTab) ?
+                        "leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1" :
+                        "leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors";
                 } else {
-                    btn.className = (tab === selectedTab)
-                        ? "leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1"
-                        : "leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors";
+                    btn.className = (tab === selectedTab) ?
+                        "leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1" :
+                        "leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors";
                 }
             }
         });
@@ -343,7 +351,7 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         if (typeof Swiper !== 'undefined') {
             new Swiper('.document-swiper', {
                 slidesPerView: 'auto',
