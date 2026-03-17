@@ -139,43 +139,68 @@
             @csrf
 
             <!-- First Name -->
-            <div>
-                <label id="contact-label-first-name" for="first_name" class="block text-base text-secondary font-normal mb-2">
-                    {{ __('First Name') }} <span class="text-red-500">*</span>
-                </label>
-                <input type="text" id="first_name" name="first_name" placeholder="{{ __('Your First Name') }}"
-                    class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
-                    maxlength="50" required>
-            </div>
+           <div>
+    <label class="block text-base text-secondary font-normal mb-2">
+        First Name <span class="text-red-500">*</span>
+    </label>
+
+    <input type="text"
+        id="first_name"
+        name="first_name"
+        placeholder="Your First Name" 
+        class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none"
+        maxlength="50" 
+        pattern="/^[A-Z][a-zA-Z]*$/"
+        title="First letter must be capital and only letters allowed">
+
+    <span id="first_name_error" class="text-red-500 text-sm mt-1 hidden"></span>
+</div>
 
             <!-- Last Name -->
-            <div>
-                <label id="contact-label-last-name" for="last_name" class="block text-base text-secondary font-normal mb-2">
-                    {{ __('Last Name') }} <span class="text-red-500">*</span>
-                </label>
-                <input type="text" id="last_name" name="last_name" placeholder="{{ __('Your Last Name') }}"
-                    class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
-                    maxlength="50" required>
-            </div>
+          <div>
+    <label class="block text-base text-secondary font-normal mb-2">
+        Last Name <span class="text-red-500">*</span>
+    </label>
 
+    <input type="text"
+        id="last_name"
+        name="last_name"
+        placeholder="Your Last Name"
+        class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none"
+        maxlength="50">
+
+    <!-- Error message -->
+    <span id="last_name_error" class="text-red-500 text-sm mt-1 hidden"></span>
+</div>
             <!-- Email -->
             <div>
-                <label id="contact-label-email" for="email" class="block text-base text-secondary font-normal mb-2">
-                    {{ __('Email') }} <span class="text-red-500">*</span>
+                <label class="block text-base text-secondary font-normal mb-2">
+                    Email <span class="text-red-500">*</span>
                 </label>
-                <input type="email" id="email" name="email" placeholder="{{ __('Your Email') }}"
-                    class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
-                    maxlength="255" required>
+
+                <input type="text"
+                    id="email"
+                    name="email"
+                    placeholder="Your Email"
+                    class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none">
+
+                <span id="email_error" class="text-red-500 text-sm mt-1 hidden"></span>
             </div>
 
             <!-- Phone No -->
             <div>
-                <label id="contact-label-phone" for="phone" class="block text-base text-secondary font-normal mb-2">
-                    {{ __('Phone No') }} <span class="text-red-500">*</span>
+                <label class="block text-base text-secondary font-normal mb-2">
+                    Phone No <span class="text-red-500">*</span>
                 </label>
-                <input type="tel" id="phone" name="phone" placeholder="{{ __('Your Phone No.') }}"
-                    class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base"
-                    maxlength="20" required>
+
+                <input type="text"
+                    id="phone"
+                    name="phone"
+                    placeholder="Your Phone No"
+                    class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none"
+                    maxlength="10">
+
+                <span id="phone_error" class="text-red-500 text-sm mt-1 hidden"></span>
             </div>
 
             <!-- I am a -->
@@ -197,15 +222,19 @@
             </div>
 
             <!-- Message -->
-            <div>
-                <label id="contact-label-message" for="message" class="block text-base text-secondary font-normal mb-2">
-                    {{ __('Message') }} <span class="text-red-500">*</span>
-                </label>
-                <textarea id="message" name="message" rows="6" placeholder="{{ __('Your Message') }}"
-                    class="w-full border border-[#C5C5C5] rounded-4xl px-6 py-4 text-secondary placeholder-[#A3A3A3] focus:border-primary focus:outline-none transition-colors text-base resize-none"
-                    maxlength="2000" required></textarea>
-            </div>
+           <div>
+            <label class="block text-base text-secondary font-normal mb-2">
+                Message <span class="text-red-500">*</span>
+            </label>
 
+            <textarea
+                id="message"
+                name="message"
+                placeholder="Your Message"
+                class="w-full border border-[#C5C5C5] rounded-2xl px-6 py-3 text-secondary focus:border-primary focus:outline-none"></textarea>
+
+            <span id="message_error" class="text-red-500 text-sm mt-1 hidden"></span>
+        </div>
             <!-- Consent Checkbox -->
             <div class="flex items-start gap-3 mt-2">
                 <input type="checkbox" id="consent" name="consent"
@@ -639,5 +668,51 @@
             });
         });
     })();
+
+
+// First Name
+document.getElementById('first_name').addEventListener('blur', function () {
+    validateField(
+        'first_name',
+        'first_name_error',
+         '/^[A-Z][a-zA-Z]*$/',
+        'First name is required',
+        'First letter must be capital and only letters allowed'
+    );
+});
+
+// Email
+document.getElementById('email').addEventListener('blur', function () {
+    validateField(
+        'email',
+        'email_error',
+        '/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
+        'Email is required',
+        'Enter a valid email address'
+    );
+});
+
+// Phone
+document.getElementById('phone').addEventListener('blur', function () {
+    validateField(
+        'phone',
+        'phone_error',
+        '/^[0-14]{15}$/',
+        'Phone number is required',
+        'Phone number must be 15 digits'
+    );
+});
+
+// Message
+document.getElementById('message').addEventListener('blur', function () {
+    validateField(
+        'message',
+        'message_error',
+        null,
+        'Message is required',
+        ''
+    );
+});
+    
 </script>
 @endpush

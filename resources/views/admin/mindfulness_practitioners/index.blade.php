@@ -578,26 +578,65 @@
                                             <div id="languages_capabilities_container"></div>
                                         </div>
 
-                                        <hr>
+                                        <div class="col-12">
+                                            <hr>
+                                        </div>
 
-                                        <h6 class="text-primary">Identity & Payment</h6>
+                                        <div class="col-12">
+                                            <h6 class="text-primary">Identity & Payment</h6>
+                                        </div>
 
-                                        <input type="text" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Government ID Type</label>
+                                            <input class="form-control" type="text" name="gov_id_type" maxlength="255" placeholder="Aadhar, Passport, etc.">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Upload Government ID</label>
+                                            <input class="form-control" type="file" name="gov_id_upload" accept=".pdf,.jpg,.jpeg,.png">
+                                            <div id="current-gov_id_upload" class="mt-1 d-none small"></div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">PAN Number</label>
+                                            <input class="form-control" type="text" name="pan_number" maxlength="20" placeholder="ABCDE1234F"
+                                                oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Bank Holder Name</label>
+                                            <input class="form-control" type="text" name="bank_holder_name" maxlength="255" placeholder="Account holder name">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Bank Name</label>
+                                            <input class="form-control" type="text" name="bank_name" maxlength="255" placeholder="Bank name">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Account Number</label>
+                                            <input class="form-control" type="text" name="account_number" maxlength="255" placeholder="Account number">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">IFSC Code</label>
+                                            <input class="form-control" type="text" name="ifsc_code" maxlength="20" placeholder="ABCD0123456"
+                                                oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">UPI ID</label>
+                                            <input class="form-control" type="text" name="upi_id" placeholder="username@bank" maxlength="100"
+                                                pattern="^[a-zA-Z0-9.\\-_]{2,}@[a-zA-Z]{2,}$" title="Enter valid UPI ID">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Upload Cancelled Cheque</label>
+                                            <input class="form-control" type="file" name="cancelled_cheque" accept=".pdf,.jpg,.jpeg,.png">
+                                            <div id="current-cancelled_cheque" class="mt-1 d-none small"></div>
+                                        </div>
+
                                     </div>
-
-                                    <!-- UPI -->
-                                    <div class="col-md-6">
-                                        <label class="form-label">UPI ID</label>
-
-                                        <input class="form-control"
-                                            type="text"
-                                            name="upi_id"
-                                            placeholder="username@bank"
-                                            maxlength="100"
-                                            pattern="^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$"
-                                            title="Enter valid UPI ID">
-                                    </div>
-
                                 </div>
                         </div>
 
@@ -1324,7 +1363,27 @@
                     $(`input[name="consultation_modes[]"][value="${v}"]`).prop('checked', true);
                 });
             }
+            $('input[name="gov_id_type"]').val(p.gov_id_type || '');
+            $('input[name="pan_number"]').val(p.pan_number || '');
+            $('input[name="bank_holder_name"]').val(p.bank_holder_name || '');
+            $('input[name="bank_name"]').val(p.bank_name || '');
+            $('input[name="account_number"]').val(p.account_number || '');
+            $('input[name="ifsc_code"]').val(p.ifsc_code || '');
             $('input[name="upi_id"]').val(p.upi_id || '');
+
+            if (p.gov_id_upload_path) {
+                $('#current-gov_id_upload').removeClass('d-none').html(`<a href="/storage/${p.gov_id_upload_path}" target="_blank" class="text-primary">View Current</a>`);
+                $('input[name="gov_id_upload"]').prop('required', false);
+            } else {
+                $('#current-gov_id_upload').addClass('d-none').empty();
+            }
+
+            if (p.cancelled_cheque_path) {
+                $('#current-cancelled_cheque').removeClass('d-none').html(`<a href="/storage/${p.cancelled_cheque_path}" target="_blank" class="text-primary">View Current</a>`);
+                $('input[name="cancelled_cheque"]').prop('required', false);
+            } else {
+                $('#current-cancelled_cheque').addClass('d-none').empty();
+            }
 
             // Step 6: Profile
             $('textarea[name="short_bio"]').val(p.short_bio || '');
@@ -1954,6 +2013,10 @@
 
         // Clear dynamic containers
         $('#languages_capabilities_container').empty();
+        $('#current-certificates').addClass('d-none').empty();
+        $('#current-profile_photo').addClass('d-none').empty();
+        $('#current-gov_id_upload').addClass('d-none').empty();
+        $('#current-cancelled_cheque').addClass('d-none').empty();
 
         // Reset image preview
         $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");

@@ -158,21 +158,17 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
                                 <!-- First Name -->
                                 <div class="col-md-4">
-                                    <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                    <input class="form-control validate-char-limit" type="text" name="first_name" required maxlength="50" data-max="50"
-                                        pattern="^[A-Z][a-zA-Z\s]{1,49}$" title="First letter must be capital (Example: John)"
-                                        oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)">
-                                    <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
-                                </div>
-
-                                <!-- Last Name -->
-                                <div class="col-md-4">
-                                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                    <input class="form-control validate-char-limit" type="text" name="last_name" required maxlength="50" data-max="50"
-                                        pattern="^[A-Z][a-zA-Z\s]{1,49}$" title="First letter must be capital (Example: Smith)"
-                                        oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)">
-                                    <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
-                                </div>
+                                            <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="first_name" required maxlength="50" data-max="50" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed (No numbers, No Special Characters)" placeholder="First Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            <input class="form-control validate-char-limit validate-format" type="text" name="last_name" required maxlength="50" data-max="50" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed (No numbers, No Special Characters)" placeholder="Last Name">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                                        </div>
 
                                 <!-- Email -->
                                 <div class="col-md-4">

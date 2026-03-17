@@ -471,9 +471,9 @@
                                         @foreach($docs as $name => $label)
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold">{{ $label }} <span class="text-danger">*</span></label>
-                                            <input type="file" class="form-control form-control-sm" name="{{ $name }}"
+                                            <input type="file"  class="form-control form-control-sm" name="{{ $name }}"
                                                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                required>
+                                                 multiple required>
                                             <div id="current-{{ $name }}" class="mt-1 d-none small"></div>
                                         </div>
                                         @endforeach
@@ -1427,7 +1427,23 @@
             const docsList = ['doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 'doc_contract', 'doc_id_proof'];
             docsList.forEach(inputName => {
                 if (p[inputName]) {
-                    $(`#current-${inputName}`).removeClass('d-none').html(`<a href="${storageBase}${p[inputName]}" target="_blank" class="text-primary">View Current</a>`);
+                    if (inputName === 'doc_certificates') {
+                        let certs = p[inputName];
+                        if (typeof certs === 'string') {
+                            try {
+                                certs = JSON.parse(certs);
+                            } catch (e) {
+                                certs = [certs];
+                            }
+                        }
+                        if (!Array.isArray(certs)) certs = [certs];
+                        const links = certs.map((path, idx) =>
+                            `<a href="${storageBase}${path}" target="_blank" class="badge bg-light-primary text-primary border border-primary text-decoration-none me-2 mb-2">Certificate ${idx + 1}</a>`
+                        ).join('');
+                        $(`#current-${inputName}`).removeClass('d-none').html(links);
+                    } else {
+                        $(`#current-${inputName}`).removeClass('d-none').html(`<a href="${storageBase}${p[inputName]}" target="_blank" class="text-primary">View Current</a>`);
+                    }
                     $(`input[name="${inputName}"]`).prop('required', false);
                 } else {
                     $(`input[name="${inputName}"]`).prop('required', true);
@@ -1598,7 +1614,7 @@
                 }
 
                 if (!list.length) return '<span class="text-muted">None</span>';
-                return list.map(i => `<span class="badge bg-light text-dark border me-1 mb-1">${i}</span>`).join('');
+                return list.map(i => `<span class="badge bg-light text-dark border me-1 mb-1" style="white-space: normal; text-align: center; line-height: 1.2; word-break: break-word; overflow-wrap: anywhere; max-width: 100%;">${i}</span>`).join('');
             };
 
             let qualsHtml = (p.qualifications || []).map(q => `
@@ -1642,9 +1658,9 @@
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="p-practice" role="tabpanel">
-                                <h6>Consultations</h6><div>${badges(p.consultations)}</div>
-                                <h6 class="mt-3">Body Therapies</h6><div>${badges(p.body_therapies)}</div>
-                                <h6 class="mt-3">Other Modalities</h6><div>${badges(p.other_modalities)}</div>
+                                <h6>Consultations</h6><div class="d-flex flex-wrap gap-2">${badges(p.consultations)}</div>
+                                <h6 class="mt-3">Body Therapies</h6><div class="d-flex flex-wrap gap-2">${badges(p.body_therapies)}</div>
+                                <h6 class="mt-3">Other Modalities</h6><div class="d-flex flex-wrap gap-2">${badges(p.other_modalities)}</div>
                             </div>
                             <div class="tab-pane fade" id="p-qual" role="tabpanel">
                                 <div class="row">${qualsHtml || 'No qualifications listed.'}</div>
