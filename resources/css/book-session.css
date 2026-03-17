@@ -190,6 +190,12 @@ h6 {
     font-weight: 600;
 }
 
+.cal-cell.cal-date.cal-disabled {
+    color: #D0D0D0;
+    cursor: default;
+    pointer-events: none;
+}
+
 /* ===== Time Picker Dropdown ===== */
 .time-picker-dropdown {
     position: absolute;

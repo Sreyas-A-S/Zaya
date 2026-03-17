@@ -675,7 +675,8 @@
             btn.innerHTML = '<i class="ri-loader-4-line animate-spin text-xl"></i> Processing...';
             btn.disabled = true;
 
-            const practitionerId = document.getElementById('selected-practitioner-id')?.value || '{{ $activePractitioner->id ?? '' }}';
+            const practitionerId = document.getElementById('selected-practitioner-id')?.value || '{{ $activePractitioner->id ?? '
+            ' }}';
             const selectedServices = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
             const serviceIds = selectedServices.map(cb => cb.closest('.service-tag-label').dataset.serviceId);
 
@@ -717,7 +718,8 @@
             let paymentWindow = window.open('about:blank', '_blank');
 
             try {
-                const response = await fetch('{{ route('bookings.store') }}', {
+                const response = await fetch('{{ route('
+                    bookings.store ') }}', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -1381,9 +1383,20 @@
                 html += '<div class="cal-cell cal-empty"></div>';
             }
             // Day cells
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                html += `<div class="cal-cell cal-date" data-date="${dateStr}" onclick="selectDate(this, '${dateStr}')">${d}</div>`;
+                const cellDate = new Date(year, month, d);
+                cellDate.setHours(0, 0, 0, 0);
+                const isPast = cellDate < today;
+
+                if (isPast) {
+                    html += `<div class="cal-cell cal-date cal-disabled">${d}</div>`;
+                } else {
+                    html += `<div class="cal-cell cal-date" data-date="${dateStr}" onclick="selectDate(this, '${dateStr}')">${d}</div>`;
+                }
             }
             html += '</div>';
 
@@ -1453,6 +1466,17 @@
             '4.00 PM', '5.00 PM', '6.00 PM'
         ];
 
+        function parseTimeToMinutes(timeStr) {
+            const [time, modifier] = timeStr.split(' ');
+            let [hours, minutes] = time.split('.').map(Number);
+            if (hours === 12) {
+                hours = modifier === 'AM' ? 0 : 12;
+            } else if (modifier === 'PM') {
+                hours += 12;
+            }
+            return hours * 60 + (minutes || 0);
+        }
+
         function toggleTimePicker(trigger) {
             const container = trigger.closest('.relative');
             const dropdown = container.querySelector('.time-picker-dropdown');
@@ -1469,6 +1493,7 @@
             if (dropdown.classList.contains('hidden')) {
                 // Determine Date Label
                 let dateLabel = "Today";
+                let isToday = true;
                 const dayContainer = container.previousElementSibling;
                 if (dayContainer) {
                     const dayInput = dayContainer.querySelector('.day-value');
@@ -1477,6 +1502,12 @@
                         const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
                         const mon = SHORT_MONTH_NAMES[d.getMonth()];
                         dateLabel = `${mon} ${d.getDate()}, ${d.getFullYear()}`;
+
+                        const dStart = new Date(d);
+                        dStart.setHours(0, 0, 0, 0);
+                        const todayStart = new Date();
+                        todayStart.setHours(0, 0, 0, 0);
+                        isToday = dStart.getTime() === todayStart.getTime();
                     }
                 }
 
@@ -1484,7 +1515,7 @@
                 const timeInput = container.querySelector('.time-value');
                 const selectedTime = timeInput.value;
 
-                renderTimePicker(content, dateLabel, selectedTime);
+                renderTimePicker(content, dateLabel, selectedTime, isToday);
                 dropdown.classList.remove('hidden');
                 smartPosition(trigger, dropdown);
             } else {
@@ -1493,7 +1524,7 @@
             }
         }
 
-        function renderTimePicker(wrapper, dateStr, selectedTime) {
+        function renderTimePicker(wrapper, dateStr, selectedTime, isToday) {
             let html = `
                 <div class="time-picker-header">
                     <div class="time-picker-title">Available Slots on ${dateStr}</div>
@@ -1501,9 +1532,19 @@
                 <div class="time-slots-grid">
             `;
 
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
             AVAILABLE_SLOTS.forEach(slot => {
-                const isSel = (slot === selectedTime) ? 'selected' : '';
-                html += `<div class="time-slot ${isSel}" onclick="selectTimeSlot(this)">${slot}</div>`;
+                const slotMinutes = parseTimeToMinutes(slot);
+                const isPast = isToday && (slotMinutes < currentMinutes);
+
+                if (isPast) {
+                    html += `<div class="time-slot disabled" style="opacity: 0.3; cursor: not-allowed; pointer-events: none;">${slot}</div>`;
+                } else {
+                    const isSel = (slot === selectedTime) ? 'selected' : '';
+                    html += `<div class="time-slot ${isSel}" onclick="selectTimeSlot(this)">${slot}</div>`;
+                }
             });
 
             html += `
