@@ -1186,7 +1186,7 @@
         $('#saveBtn').text('Create Content Manager');
         $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
         $('.password-field').show();
-        $('#password-input, #password-confirm-input').attr('required', 'required').attr('minlength', '8').attr('pattern', '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d)\\\\S{6,}$');
+        $('#password-input, #password-confirm-input').attr('required', 'required').attr('minlength', '8').attr('pattern', '(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}');
         $('#contentManagerModal').modal('show');
     }
 </script>
