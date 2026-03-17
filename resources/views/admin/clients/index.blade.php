@@ -230,8 +230,8 @@
                         <div class="col-md-4">
                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control validate-char-limit" name="last_name" required 
-                                maxlength="50" data-max="50" pattern="^[A-Z][a-zA-Z\s]{1,49}$" 
-                                title="First letter must be capital (Example: Smith)"
+                                maxlength="50" data-max="50" pattern="^[A-Z][a-zA-Z\s]{0,49}$" 
+                                title="First letter must be capital (Example: S)"
                                 oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)"
                                 placeholder="Enter last name">
                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>

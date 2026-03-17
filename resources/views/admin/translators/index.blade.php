@@ -570,9 +570,8 @@
                 <p id="status-confirmation-msg">Select the new status for this translator:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input-translator" class="form-select">
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-translator-id">

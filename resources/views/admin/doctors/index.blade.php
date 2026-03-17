@@ -27,6 +27,9 @@
     #custom-filters-container {
         margin-bottom: 0 !important;
     }
+    .iti__country-list {
+        z-index: 999999 !important; 
+    }
 </style>
 <div class="container-fluid">
     <div class="page-title">
@@ -1099,6 +1102,7 @@
     let toastInstance;
     let languageChoices;
     let iti;
+    let phoneInput;
 
     $(document).on('input', '.validate-char-limit', function() {
         const el = $(this);
@@ -1129,7 +1133,7 @@
 
     $(document).ready(function() {
         // Initialize intl-tel-input
-        const phoneInput = document.querySelector("#mobile_number");
+        phoneInput = document.querySelector("#mobile_number");
         if (phoneInput) {
             iti = window.intlTelInput(phoneInput, {
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
@@ -1608,7 +1612,7 @@
             $('[name="last_name"]').val(lastName || '');
             $('[name="gender"]').val(profile.gender);
             $('[name="dob"]').val(profile.dob ? profile.dob.substring(0, 10) : '');
-            if (profile.phone && iti) {
+            if (profile.phone && iti && phoneInput) {
                 iti.setNumber(profile.phone);
                 // After setNumber, manually clean leading zero if it appears in input
                 let currentVal = phoneInput.value.replace(/\D/g, '');

@@ -3,6 +3,7 @@
 @push('css')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 @endpush
 
 @section('title', 'Yoga Therapists')
@@ -128,6 +129,7 @@
                                 @csrf
                                 <input type="hidden" name="_method" id="form-method" value="POST">
                                 <input type="hidden" name="therapist_id" id="therapist_id">
+                                <input type="hidden" name="cropped_image" id="croppedImage">
 
                                 <!-- Step 1: Personal Details -->
                               <div class="step-content" id="step-1">
@@ -612,9 +614,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 <p id="status-confirmation-text">Select the new status for this practitioner:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input" class="form-select">
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-therapist-id">
@@ -667,17 +668,43 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
         </div>
     </div>
 
+    <!-- Cropper Modal -->
+    <div class="modal fade" id="cropperModal" tabindex="-1" role="dialog" aria-labelledby="cropperModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cropperModalLabel">Crop Profile Photo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="cropperImage" src="" alt="Image to crop" style="max-width: 100%;">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="cropSave">Crop & Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     @endsection
 
-    @section('scripts')
+@section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script>
         const storageBase = "{{ asset('storage') }}/";
         let table;
         let therapistIti;
         let currentStep = 1;
         const totalSteps = 6;
+        let cropper;
+        const cropperImage = document.getElementById('cropperImage');
+        let cropperDidApply = false;
+        let cropperPrevBg = null;
+        let cropperPrevCropped = null;
 
         function openCreateModal() {
             $('#therapist-form')[0].reset();
@@ -687,7 +714,10 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             $('.password-field').show();
             $('input[name="password"]').attr('required', 'required');
             $('input[name="password_confirmation"]').attr('required', 'required');
+            $('input[name="profile_photo"]').prop('required', true);
             $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+            $('#croppedImage').val('');
+            $('#imageUpload').val('');
 
             if (window.languageChoices) {
                 window.languageChoices.removeActiveItems();
@@ -697,6 +727,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 therapistIti.setNumber('');
             }
 
+            currentStep = 1;
+            updateStepper();
             $('#therapist-form-modal').modal('show');
         }
 
@@ -1011,8 +1043,12 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 updateStepper();
             });
 
-            // Image Preview
-            // Image Preview
+            // Image Cropper
+            $("#imageUpload").on('click', function() {
+                // Allow selecting the same file again
+                this.value = '';
+            });
+
             $("#imageUpload").change(function() {
                 if (this.files && this.files[0]) {
                     if (this.files[0].size > 2 * 1024 * 1024) { // 2MB
@@ -1021,15 +1057,70 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         } else {
                             alert('Profile photo size must be less than 2MB');
                         }
-                        $(this).val(''); // Clear input
+                        $(this).val('');
                         return;
                     }
 
                     var reader = new FileReader();
                     reader.onload = function(e) {
-                        $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
-                    }
+                        if (cropper) {
+                            cropper.destroy();
+                            cropper = null;
+                        }
+                        cropperDidApply = false;
+                        cropperPrevBg = $('#imagePreview').css('background-image');
+                        cropperPrevCropped = $('#croppedImage').val() || '';
+                        $('#croppedImage').val('');
+                        cropperImage.src = e.target.result;
+                        const modalEl = document.getElementById('cropperModal');
+                        if (modalEl && modalEl.parentElement !== document.body) {
+                            document.body.appendChild(modalEl);
+                        }
+                        if (modalEl) {
+                            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                        }
+                    };
                     reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            $('#cropperModal').on('shown.bs.modal', function() {
+                cropper = new Cropper(cropperImage, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    guides: true,
+                    center: true,
+                    highlight: false,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleDragModeOnDblclick: false,
+                });
+            }).on('hidden.bs.modal', function() {
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
+                if (!cropperDidApply) {
+                    if (cropperPrevBg) {
+                        $('#imagePreview').css('background-image', cropperPrevBg);
+                    }
+                    $('#croppedImage').val(cropperPrevCropped || '');
+                }
+            });
+
+            $('#cropSave').click(function() {
+                if (!cropper) return;
+                let canvas = cropper.getCroppedCanvas({
+                    width: 400,
+                    height: 400,
+                });
+                let base64data = canvas.toDataURL();
+                $('#imagePreview').css('background-image', 'url(' + base64data + ')');
+                $('#croppedImage').val(base64data);
+                cropperDidApply = true;
+                const modalEl = document.getElementById('cropperModal');
+                if (modalEl) {
+                    bootstrap.Modal.getOrCreateInstance(modalEl).hide();
                 }
             });
 
@@ -1224,6 +1315,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 $('input[name="password"]').removeAttr('required');
                 $('input[name="password_confirmation"]').removeAttr('required');
                 $('[id^="current-"]').addClass('d-none').html(''); // Clear all current file previews
+                $('#croppedImage').val('');
+                $('#imageUpload').val('');
 
                 $.get("{{ url('admin/yoga-therapists') }}/" + id + "/edit", function(response) {
                     let u = response.user;
@@ -1248,16 +1341,20 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
                     $('select[name="gender"]').val(t.gender);
                     $('input[name="dob"]').val(t.dob ? t.dob.substring(0, 10) : '');
-                    $('input[name="address_line_1"]').val(t.address_line_1);
-                    $('input[name="address_line_2"]').val(t.address_line_2);
-                    $('input[name="city"]').val(t.city);
-                    $('input[name="state"]').val(t.state);
-                    $('input[name="zip_code"]').val(t.zip_code);
+                    const addrLine1 = t.address_line_1 || t.address || '';
+                    $('input[name="address_line_1"]').val(addrLine1);
+                    $('input[name="address_line_2"]').val(t.address_line_2 || '');
+                    $('input[name="city"]').val(t.city || '');
+                    $('input[name="state"]').val(t.state || '');
+                    $('input[name="zip_code"]').val(t.zip_code || '');
                     $('select[name="country"]').val(t.country || 'India');
 
                     if (t.profile_photo_path) {
                         $('#imagePreview').css('background-image', 'url(' + storageBase + t.profile_photo_path + ')');
                         $('#current-profile_photo').removeClass('d-none').html(`<a href="${storageBase}${t.profile_photo_path}" target="_blank" class="text-primary">View Current Photo</a>`);
+                        $('input[name="profile_photo"]').prop('required', false);
+                    } else {
+                        $('input[name="profile_photo"]').prop('required', true);
                     }
 
                     $('select[name="yoga_therapist_type"]').val(t.yoga_therapist_type);
@@ -1296,23 +1393,36 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
                     // Handle Languages Spoken (Choices.js)
                     $('#languages_capabilities_container').empty();
-                    if (t.languages_spoken) {
-                        const langs = Array.isArray(t.languages_spoken) ? t.languages_spoken : [];
+                    let languagesData = t.languages_spoken || [];
+                    if (typeof languagesData === 'string') {
+                        try {
+                            languagesData = JSON.parse(languagesData);
+                        } catch (e) {
+                            languagesData = languagesData.split(',').map(v => v.trim()).filter(Boolean);
+                        }
+                    }
 
-                        if (langs.length > 0 && typeof langs[0] === 'string') {
-                            window.languageChoices.setChoiceByValue(langs);
-                            langs.forEach(lang => addLanguageCapabilityRow(lang, lang));
+                    if (window.languageChoices) {
+                        window.languageChoices.removeActiveItems();
+                    }
+
+                    if (languagesData && Object.keys(languagesData).length) {
+                        if (Array.isArray(languagesData) && (languagesData.length === 0 || typeof languagesData[0] === 'string')) {
+                            if (window.languageChoices) {
+                                window.languageChoices.setChoiceByValue(languagesData);
+                            }
+                            languagesData.forEach(lang => addLanguageCapabilityRow(lang, lang));
                         } else {
                             const langValues = [];
-                            $.each(t.languages_spoken, function(key, caps) {
-                                const langName = caps.language || key;
+                            $.each(languagesData, function(key, caps) {
+                                const langName = (caps && caps.language) ? caps.language : key;
                                 langValues.push(langName);
-                                addLanguageCapabilityRow(langName, langName, caps);
+                                addLanguageCapabilityRow(langName, langName, caps || {});
                             });
-                            window.languageChoices.setChoiceByValue(langValues);
+                            if (window.languageChoices) {
+                                window.languageChoices.setChoiceByValue(langValues);
+                            }
                         }
-                    } else {
-                        window.languageChoices.removeActiveItems();
                     }
 
                     if (t.areas_of_expertise) {
@@ -1351,6 +1461,10 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     } else {
                         $('input[name="cancelled_cheque"]').prop('required', true);
                     }
+
+                    currentStep = 1;
+                    updateStepper();
+                    $('#therapist-form-modal').modal('show');
                 });
             });
 
@@ -1400,6 +1514,48 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
                     const defaultProfile = "{{ asset('admiro/assets/images/user/user.png') }}";
 
+                    const renderLanguages = (langs) => {
+                        if (!langs) return '<span class="text-muted">None</span>';
+                        let data = langs;
+                        if (typeof data === 'string') {
+                            try {
+                                data = JSON.parse(data);
+                            } catch (e) {
+                                data = data.split(',').map(v => v.trim()).filter(Boolean);
+                            }
+                        }
+                        if (Array.isArray(data)) {
+                            if (data.length === 0) return '<span class="text-muted">None</span>';
+                            if (typeof data[0] === 'object') {
+                                return data.map(item => {
+                                    const name = item.language || item.name || item.label;
+                                    if (!name) return '';
+                                    const caps = [];
+                                    if (item.read) caps.push('Read');
+                                    if (item.write) caps.push('Write');
+                                    if (item.speak) caps.push('Speak');
+                                    const capsStr = caps.length ? ` (${caps.join(', ')})` : '';
+                                    return `<span class="badge bg-light text-dark border">${name}${capsStr}</span>`;
+                                }).join('');
+                            }
+                            return data.map(l => `<span class="badge bg-light text-dark border">${l}</span>`).join('');
+                        }
+                        if (typeof data === 'object') {
+                            let html = '';
+                            $.each(data, function(key, caps) {
+                                const name = (caps && caps.language) ? caps.language : key;
+                                const capList = [];
+                                if (caps && caps.read) capList.push('Read');
+                                if (caps && caps.write) capList.push('Write');
+                                if (caps && caps.speak) capList.push('Speak');
+                                const capsStr = capList.length ? ` (${capList.join(', ')})` : '';
+                                html += `<span class="badge bg-light text-dark border">${name}${capsStr}</span>`;
+                            });
+                            return html || '<span class="text-muted">None</span>';
+                        }
+                        return `<span class="badge bg-light text-dark border">${String(data)}</span>`;
+                    };
+
                     let html = `
                     <div class="row g-4">
                         <div class="col-md-3 text-center border-end pe-3">
@@ -1407,8 +1563,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 <img src="${t.profile_photo_path ? '/storage/' + t.profile_photo_path : defaultProfile}" 
                                      class="rounded-circle shadow-sm img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
                                 <div class="mt-2">
-                                    <span class="badge rounded-pill ${t.status === 'active' ? 'bg-success' : 'bg-warning'} border border-white">
-                                        ${(t.status || 'N/A').toUpperCase()}
+                                    <span class="badge rounded-pill ${String(t.status || '').toLowerCase() === 'active' ? 'bg-success' : 'bg-danger'} border border-white">
+                                        ${String(t.status || 'inactive').toUpperCase() === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'}
                                     </span>
                                 </div>
                             </div>
@@ -1439,7 +1595,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                         </div>
                                         <div class="col-12">
                                             <p class="text-muted small mb-1">Address</p>
-                                            <p class="fw-medium">${[t.address_line_1, t.address_line_2, t.city, t.state, t.zip_code, t.country].filter(Boolean).join(', ') || 'N/A'}</p>
+                                            <p class="fw-medium">${[t.address_line_1 || t.address, t.address_line_2, t.city, t.state, t.zip_code, t.country].filter(Boolean).join(', ') || 'N/A'}</p>
                                         </div>
                                          <div class="col-12">
                                             <p class="text-muted small mb-1">Short Bio</p>
@@ -1503,7 +1659,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                     </div>
                                     <p class="text-muted small mb-1">Languages</p>
                                     <div class="d-flex flex-wrap gap-2">
-                                         ${t.languages_spoken ? t.languages_spoken.join(', ') : 'None'}
+                                         ${renderLanguages(t.languages_spoken)}
                                     </div>
                                 </div>
                                 <!-- Qualifications -->

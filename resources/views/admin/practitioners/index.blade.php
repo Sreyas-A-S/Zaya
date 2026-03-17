@@ -576,9 +576,8 @@
                 <p id="status-confirmation-text">Select the new status for this practitioner:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input" class="form-select">
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-practitioner-id">
@@ -1294,6 +1293,7 @@
         }
         $('#practitioner_id').val('');
         $('#form-method').val('POST');
+        $('#submit-btn').prop('disabled', false).html('<i class="fa-solid fa-check-circle me-2"></i> Complete Registration');
 
         // Reset Choices.js
         if (languageChoices) {
@@ -1337,6 +1337,7 @@
             $('#practitioner_id').val(u.id);
             $('#form-method').val('PUT');
             $('#form-modal-title').text('Edit Practitioner');
+            $('#submit-btn').prop('disabled', false).html('Submit');
 
             // Reset UI states
             $('[id^="current-"]').addClass('d-none').html('');
@@ -1547,7 +1548,8 @@
                 showToast(response.success);
             },
             error: function(xhr) {
-                btn.prop('disabled', false).html('<i class="fa-solid fa-check-circle me-2"></i> Save Practitioner');
+                const isEdit = !!$('#practitioner_id').val();
+                btn.prop('disabled', false).html(isEdit ? 'Submit' : '<i class="fa-solid fa-check-circle me-2"></i> Complete Registration');
                 if (xhr.status === 422) {
                     let errors = xhr.responseJSON.errors;
                     let errorMessages = [];
@@ -1568,17 +1570,35 @@
             const u = data.user;
             const p = data.practitioner || {};
             const badges = (arr) => {
-                if (!arr) return '';
+                if (!arr) return '<span class="text-muted">None</span>';
                 let data = arr;
-                if (typeof arr === 'string') {
+                if (typeof data === 'string') {
                     try {
-                        data = JSON.parse(arr);
+                        data = JSON.parse(data);
                     } catch (e) {
-                        data = [arr];
+                        data = [data];
                     }
                 }
-                if (!Array.isArray(data)) data = [data];
-                return data.map(i => `<span class="badge bg-light text-dark border me-1 mb-1">${i}</span>`).join('');
+
+                let list = [];
+                if (Array.isArray(data)) {
+                    if (data.length > 0 && typeof data[0] === 'object') {
+                        list = data.map(item => item.language || item.name || item.label).filter(Boolean);
+                    } else {
+                        list = data;
+                    }
+                } else if (typeof data === 'object') {
+                    list = Object.keys(data).map((key) => {
+                        const value = data[key];
+                        if (value && typeof value === 'object' && value.language) return value.language;
+                        return key;
+                    }).filter(Boolean);
+                } else {
+                    list = [String(data)];
+                }
+
+                if (!list.length) return '<span class="text-muted">None</span>';
+                return list.map(i => `<span class="badge bg-light text-dark border me-1 mb-1">${i}</span>`).join('');
             };
 
             let qualsHtml = (p.qualifications || []).map(q => `
@@ -1594,7 +1614,7 @@
                         <div class="text-center mb-3">
                             <img src="${p.profile_photo_path ? storageBase + p.profile_photo_path : '/admiro/assets/images/user/user.png'}" class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;">
                             <h5>${u.name}</h5>
-                            <span class="badge bg-success">${p.status.toUpperCase()}</span>
+                            <span class="badge ${String(p.status || '').toLowerCase() === 'active' ? 'bg-success' : 'bg-danger'}">${String(p.status || 'inactive').toUpperCase() === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'}</span>
                         </div>
                         <div class="small">
                             <p class="mb-1"><strong>Email:</strong> ${u.email}</p>

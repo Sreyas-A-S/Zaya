@@ -166,7 +166,7 @@
                                         <div class="col-md-4">
                                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
                                             <input class="form-control validate-char-limit" type="text" name="last_name" required maxlength="50" data-max="50"
-                                                pattern="^[A-Za-z\s]{2,50}$" title="Only letters allowed (2-50 characters)">
+                                                pattern="^[A-Za-z\s]{1,50}$" title="Only letters allowed (1-50 characters)">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                         </div>
 
@@ -441,6 +441,7 @@
                                         <div class="col-md-12">
                                             <label class="form-label">Upload Certificates <span class="text-danger">*</span> <small class="text-muted fs-9">Ctrl + click to select multiple</small><span class="small text-muted">(Format: PDF/JPG/PNG, Max 2MB each)</span></label>
                                             <input class="form-control" type="file" name="certificates[]" multiple accept=".pdf,.jpg,.jpeg,.png" required>
+                                            <div id="current-certificates" class="mt-2 d-none"></div>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Additional Certifications (Optional)</label>
@@ -732,9 +733,8 @@
                 <p id="status-confirmation-msg">Select the new status for this practitioner:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input-practitioner" class="form-select">
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-practitioner-id">
@@ -780,6 +780,7 @@
     let currentStep = 1;
     const totalSteps = 6;
     let iti;
+    let phoneInput;
     let cropper;
     const cropperImage = document.getElementById('cropperImage');
 
@@ -795,7 +796,7 @@
     });
 
     $(document).ready(function() {
-        const phoneInput = document.querySelector("#phone");
+        phoneInput = document.querySelector("#phone");
         if (phoneInput) {
             iti = window.intlTelInput(phoneInput, {
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
@@ -1081,18 +1082,26 @@
     let deleteMasterBtnRef = null;
 
     // Handle Delete Master Data
-    $(document).on('click', '.delete-master-data-btn', function() {
+    $(document).off('click', '.delete-master-data-btn').on('click', '.delete-master-data-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         deleteMasterBtnRef = $(this);
         let id = $(this).data('id');
         let type = $(this).data('type');
 
         $('#delete-master-id').val(id);
         $('#delete-master-type').val(type);
-        $('#master-data-delete-modal').modal('show');
+        const modalEl = document.getElementById('master-data-delete-modal');
+        if (modalEl && modalEl.parentElement !== document.body) {
+            document.body.appendChild(modalEl);
+        }
+        if (modalEl) {
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        }
     });
 
     // Confirm Master Data Delete
-    $('#confirm-master-delete-btn').click(function() {
+    $(document).off('click', '#confirm-master-delete-btn').on('click', '#confirm-master-delete-btn', function() {
         let btn = $(this);
         let id = $('#delete-master-id').val();
         let type = $('#delete-master-type').val();
@@ -1107,11 +1116,19 @@
             },
             success: function(response) {
                 if (response.success) {
-                    $('#master-data-delete-modal').modal('hide');
+                    const modalEl = document.getElementById('master-data-delete-modal');
+                    if (modalEl) {
+                        bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+                    }
                     if (deleteMasterBtnRef) {
-                        deleteMasterBtnRef.closest('[class^="col-"]').fadeOut(300, function() {
-                            $(this).remove();
-                        });
+                        const wrapper = deleteMasterBtnRef.closest('.col-12');
+                        const fallback = deleteMasterBtnRef.closest('[class^="col-"]');
+                        const target = wrapper.length ? wrapper : fallback;
+                        if (target.length) {
+                            target.fadeOut(300, function() {
+                                $(this).remove();
+                            });
+                        }
                     }
                     if (typeof showToast === 'function') showToast('Item deleted successfully');
                 } else {
@@ -1119,7 +1136,11 @@
                 }
             },
             error: function(xhr) {
-                alert('Error: ' + (xhr.responseJSON?.error || 'Could not delete item'));
+                if (typeof showToast === 'function') {
+                    showToast(xhr.responseJSON?.error || 'Could not delete item', 'error');
+                } else {
+                    alert('Error: ' + (xhr.responseJSON?.error || 'Could not delete item'));
+                }
             },
             complete: function() {
                 btn.prop('disabled', false).html('Delete Now');
@@ -1231,7 +1252,7 @@
             $('input[name="first_name"]').val(p.first_name || u.first_name || '');
             $('input[name="last_name"]').val(p.last_name || u.last_name || '');
             $('input[name="email"]').val(u.email);
-            if (iti) {
+            if (iti && phoneInput) {
                 let phone = p.phone || '';
                 iti.setNumber(phone);
                 // After setNumber, manually clean leading zero if it appears in input
@@ -1272,6 +1293,18 @@
             $('input[name="highest_education"]').val(p.highest_education || '');
             $('textarea[name="mindfulness_training_details"]').val(p.mindfulness_training_details || '');
             $('textarea[name="additional_certifications"]').val(p.additional_certifications || '');
+            if (p.certificates_path && p.certificates_path.length > 0) {
+                $('input[name="certificates[]"]').prop('required', false);
+                const certLinks = p.certificates_path.map((path, idx) =>
+                    `<a href="/storage/${path}" target="_blank" class="badge bg-light-primary text-primary border border-primary text-decoration-none me-2 mb-2">
+                        <i class="fa fa-certificate me-1"></i> Certificate ${idx + 1}
+                    </a>`
+                ).join('');
+                $('#current-certificates').removeClass('d-none').html(certLinks);
+            } else {
+                $('input[name="certificates[]"]').prop('required', true);
+                $('#current-certificates').addClass('d-none').empty();
+            }
 
             // Step 4: Expertise
             if (p.services_offered) {
@@ -1388,8 +1421,8 @@
                                 <img src="${p.profile_photo_path ? '/storage/' + p.profile_photo_path : defaultProfile}" 
                                      class="rounded-circle shadow-sm img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
                                 <div class="mt-2">
-                                    <span class="badge rounded-pill ${p.status === 'active' ? 'bg-success' : 'bg-warning'} border border-white">
-                                        ${(p.status || 'N/A').toUpperCase()}
+                                    <span class="badge rounded-pill ${String(p.status || '').toLowerCase() === 'active' ? 'bg-success' : 'bg-danger'} border border-white">
+                                        ${String(p.status || 'inactive').toUpperCase() === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'}
                                     </span>
                                 </div>
                             </div>
@@ -1802,12 +1835,20 @@
                 message: 'Passwords do not match'
             },
             {
-                selector: 'input[name="first_name"], input[name="last_name"]',
+                selector: 'input[name="first_name"]',
                 check: (el) => {
                     if (!el.val()) return true;
                     return /^[a-zA-Z\s]{2,50}$/.test(el.val());
                 },
                 message: 'Only letters allowed (2-50 characters)'
+            },
+            {
+                selector: 'input[name="last_name"]',
+                check: (el) => {
+                    if (!el.val()) return true;
+                    return /^[a-zA-Z\s]{1,50}$/.test(el.val());
+                },
+                message: 'Only letters allowed (1-50 characters)'
             },
             {
                 selector: 'input[name="phone"]',

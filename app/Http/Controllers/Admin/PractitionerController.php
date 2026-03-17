@@ -98,17 +98,12 @@ class PractitionerController extends Controller
                 ->orderColumn('nationality', 'practitioners.nationality $1')
                 ->orderColumn('status', 'practitioners.status $1')
                 ->editColumn('status', function ($row) {
-                    $badgeClass = 'bg-danger'; // For rejected or inactive
-                    if (in_array($row->status, ['active', 'approved'])) {
-                        $badgeClass = 'bg-success';
-                    } elseif ($row->status == 'pending') {
-                        $badgeClass = 'bg-warning';
-                    }
-
-                    $statusText = ucfirst($row->status ?? 'inactive');
+                    $normalizedStatus = ($row->status === 'active') ? 'active' : 'inactive';
+                    $badgeClass = $normalizedStatus === 'active' ? 'bg-success' : 'bg-danger';
+                    $statusText = ucfirst($normalizedStatus);
 
                     if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
-                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $row->status . '" style="cursor: pointer;">' . $statusText . '</span>';
+                        return '<span class="badge ' . $badgeClass . ' cursor-pointer toggle-status" data-id="' . $row->id . '" data-status="' . $normalizedStatus . '" style="cursor: pointer;">' . $statusText . '</span>';
                     }
 
                     return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
@@ -401,9 +396,20 @@ class PractitionerController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        $status = strtolower((string) $request->status);
+        if ($status === 'approved') {
+            $status = 'active';
+        } elseif (in_array($status, ['pending', 'rejected', ''])) {
+            $status = 'inactive';
+        }
+
+        if (!in_array($status, ['active', 'inactive'])) {
+            return response()->json(['error' => 'Invalid status.'], 422);
+        }
+
         $practitioner = Practitioner::where('user_id', $id)->firstOrFail();
         $practitioner->update([
-            'status' => $request->status
+            'status' => $status
         ]);
 
         return response()->json(['success' => 'Status updated successfully!']);
