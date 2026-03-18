@@ -80,7 +80,7 @@
                                 </div>
                                 <p class="text-lg font-medium text-secondary mb-1">No bookings found</p>
                                 <p class="text-sm text-gray-400 mb-6">You haven't booked any sessions yet.</p>
-                                <a href="{{ route('book-session') }}" class="bg-secondary text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-primary transition-colors">Book Your First Session</a>
+                                <a href="{{ route('find-practitioner') }}" class="bg-secondary text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-primary transition-colors">Book Your First Session</a>
                             </div>
                         </td>
                     </tr>

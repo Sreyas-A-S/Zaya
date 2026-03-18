@@ -95,4 +95,76 @@ class ProfileController extends Controller
 
         return view('transactions', compact('user', 'invoices'));
     }
+
+    public function conferences()
+    {
+        $user = Auth::user();
+        $conferences = \App\Models\Booking::with(['practitioner.user'])
+            ->where('user_id', $user->id)
+            ->where('mode', 'online')
+            ->latest()
+            ->paginate(15);
+
+        return view('conference-history', compact('user', 'conferences'));
+    }
+
+    public function showRecording($id)
+    {
+        $user = Auth::user();
+        $booking = \App\Models\Booking::with(['practitioner.user'])
+            ->where('user_id', $user->id)
+            ->where('id', $id)
+            ->whereNotNull('recording_url')
+            ->firstOrFail();
+
+        return view('recordings.show', compact('user', 'booking'));
+    }
+
+    public function joinSession($channel)
+    {
+        $user = Auth::user();
+        $appId = config('services.agora.app_id');
+        
+        return view('conference.session', compact('user', 'channel', 'appId'));
+    }
+
+    public function generateToken(Request $request)
+    {
+        $appId = config('services.agora.app_id');
+        $appCertificate = config('services.agora.app_certificate');
+        $channelName = $request->channel;
+        $uid = $request->uid ?? 0;
+        
+        \Log::info("Agora Token Request:", [
+            'channel' => $channelName,
+            'uid' => $uid,
+            'has_app_id' => !empty($appId),
+            'has_cert' => !empty($appCertificate)
+        ]);
+
+        if (!$appId || !$appCertificate) {
+            return response()->json(['token' => null, 'error' => 'Agora credentials missing']);
+        }
+
+        $role = \App\Services\Agora\RtcTokenBuilder::ROLE_PUBLISHER;
+        $expireTimeInSeconds = 3600;
+        $currentTimestamp = now()->getTimestamp();
+        $privilegeExpiredTs = $currentTimestamp + $expireTimeInSeconds;
+
+        $token = \App\Services\Agora\RtcTokenBuilder::buildTokenWithUid(
+            $appId, 
+            $appCertificate, 
+            $channelName, 
+            $uid, 
+            $role, 
+            $privilegeExpiredTs
+        );
+
+        \Log::info("Generated Token: " . substr($token, 0, 10) . "...");
+
+        return response()->json([
+            'token' => $token, 
+            'expire' => $privilegeExpiredTs
+        ]);
+    }
 }

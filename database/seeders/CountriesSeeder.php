@@ -17,7 +17,14 @@ class CountriesSeeder extends Seeder
         $countries = config('countries');
 
         if (empty($countries)) {
-            dd('Countries config is empty');
+            $this->command->error('Countries config is empty. Please check config/countries.php');
+            return;
+        }
+
+        // Check if data already exists to avoid duplicates in production
+        if (DB::table('countries')->count() > 0) {
+            $this->command->info('Countries table already has data. Skipping.');
+            return;
         }
 
         $insertData = [];

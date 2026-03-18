@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showZayaToast(data.message, 'success');
                     newsletterInput.value = '';
                 } else {
-                    showZayaToast(data.message || 'Something went wrong.', 'error');
+                    showZayaToast(data.message || 'Subscription failed', 'error');
                 }
             } catch (error) {
                 console.error('Newsletter error:', error);

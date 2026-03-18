@@ -2,95 +2,80 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
+use App\Models\Translator;
+use App\Models\TranslatorService;
+use App\Models\TranslatorSpecialization;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class TranslatorSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $faker = \Faker\Factory::create('en_IN');
+        $nationalities = ['India', 'USA', 'UK', 'Germany', 'France', 'UAE', 'Canada', 'Australia', 'Japan', 'Singapore'];
+        $cities = ['Mumbai', 'New York', 'London', 'Berlin', 'Paris', 'Dubai', 'Toronto', 'Sydney', 'Tokyo', 'Singapore'];
+        $languages = ['Hindi', 'English', 'English', 'German', 'French', 'Arabic', 'English', 'English', 'Japanese', 'Mandarin'];
 
-        $services = [
-            "Document Translation",
-            "Website / App Localization",
-            "Live Interpretation (Voice / Video)",
-            "Subtitles / Captions",
-            "Transcription + Translation",
-            "Proofreading / Editing",
-            "Voice-over Script Translation",
-            "Other"
-        ];
+        $services = TranslatorService::pluck('name')->toArray() ?: ['Translation', 'Interpretation', 'Localization'];
+        $specializations = TranslatorSpecialization::pluck('name')->toArray() ?: ['Medical', 'Legal', 'Technical'];
 
-        foreach ($services as $service) {
-            \App\Models\TranslatorService::firstOrCreate(['name' => $service], ['status' => 1]);
-        }
+        for ($i = 1; $i <= 30; $i++) {
+            $index = ($i - 1) % 10;
+            $country = $nationalities[$index];
+            $city = $cities[$index];
+            $lang = $languages[$index];
 
-        $specializations = [
-            "Medical",
-            "Legal",
-            "Technical",
-            "Financial",
-            "Literary",
-            "Marketing",
-            "Scientific",
-            "General"
-        ];
+            $firstName = "Translator";
+            $lastName = "Expert" . $i;
+            $fullName = $firstName . " " . $lastName;
 
-        foreach ($specializations as $spec) {
-            \App\Models\TranslatorSpecialization::firstOrCreate(['name' => $spec], ['status' => 1]);
-        }
+            $user = User::updateOrCreate(
+                ['email' => "translator{$i}@zaya.com"],
+                [
+                    'name' => $fullName,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'password' => Hash::make('password'),
+                    'role' => 'translator',
+                    'gender' => ($i % 2 == 0) ? 'Female' : 'Male',
+                    'phone' => '+447890' . str_pad($i, 6, '0', STR_PAD_LEFT),
+                    'status' => 'active',
+                ]
+            );
 
-        $languages = ["English", "Hindi", "Malayalam", "Tamil", "French", "German", "Spanish"];
-
-        // Seed 5 Translators
-        for ($i = 0; $i < 5; $i++) {
-            $firstName = $faker->firstName;
-            $lastName = $faker->lastName;
-            $email = $faker->unique()->safeEmail;
-
-            $user = \App\Models\User::create([
-                'name' => "$firstName $lastName",
-                'email' => $email,
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
-                'role' => 'translator',
-            ]);
-
-            \App\Models\Translator::create([
-                'user_id' => $user->id,
-                'status' => $faker->randomElement(['active', 'pending']),
-                'full_name' => "$firstName $lastName",
-                'gender' => $faker->randomElement(['male', 'female']),
-                'dob' => $faker->date(),
-                'phone' => $faker->mobileNumber,
-                'address_line_1' => $faker->streetAddress,
-                'address_line_2' => $faker->streetName,
-                'city' => $faker->city,
-                'state' => $faker->state,
-                'zip_code' => $faker->postcode,
-                'country' => 'India',
-                'native_language' => $faker->randomElement($languages),
-                'source_languages' => $faker->randomElements($languages, 2),
-                'target_languages' => $faker->randomElements($languages, 2),
-                'additional_languages' => $faker->randomElements($languages, 1),
-                'translator_type' => $faker->randomElement(['Freelance', 'Agency']),
-                'years_of_experience' => $faker->numberBetween(1, 20),
-                'fields_of_specialization' => $faker->randomElements($specializations, 2),
-                'previous_clients_projects' => $faker->sentence,
-                'portfolio_link' => $faker->url,
-                'highest_education' => 'Bachelor of Arts in Linguistics',
-                'certification_details' => 'Certified Translator',
-                'services_offered' => $faker->randomElements($services, 3),
-                'gov_id_type' => 'Aadhaar',
-                'pan_number' => strtoupper($faker->bothify('?????####?')),
-                'bank_holder_name' => "$firstName $lastName",
-                'bank_name' => 'SBI',
-                'account_number' => $faker->bankAccountNumber,
-                'ifsc_code' => 'SBIN0001234',
-            ]);
+            Translator::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'status' => 'active',
+                    'full_name' => $fullName,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'gender' => $user->gender,
+                    'dob' => '1990-03-' . str_pad(($i % 28) + 1, 2, '0', STR_PAD_LEFT),
+                    'phone' => $user->phone,
+                    'native_language' => $lang,
+                    'source_languages' => [$lang, 'English'],
+                    'target_languages' => ['English', $lang],
+                    'translator_type' => 'Freelance',
+                    'years_of_experience' => ($i % 12) + 2,
+                    'fields_of_specialization' => array_slice($specializations, 0, 2),
+                    'highest_education' => 'Bachelor in Linguistics',
+                    'certification_details' => 'Certified Professional Translator',
+                    'services_offered' => array_slice($services, 0, 2),
+                    'gov_id_type' => 'National ID',
+                    'pan_number' => 'KLMNO' . (9012 + $i) . 'P',
+                    'bank_holder_name' => $fullName,
+                    'bank_name' => 'Central Bank of ' . $country,
+                    'account_number' => '5566778899' . str_pad($i, 2, '0', STR_PAD_LEFT),
+                    'ifsc_code' => 'CNBK000' . str_pad($i, 4, '0', STR_PAD_LEFT),
+                    'address_line_1' => ($i * 15) . ' Language Street',
+                    'city' => $city,
+                    'state' => $city . ' Region',
+                    'zip_code' => '300' . str_pad($i, 2, '0', STR_PAD_LEFT),
+                    'country' => $country,
+                ]
+            );
         }
     }
 }

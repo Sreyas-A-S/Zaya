@@ -61,7 +61,7 @@
     <div id="toast-container"></div>
 
     <!-- Main Content -->
-    <div class="container-fluid mx-auto">
+    <div class="w-full">
 
         @php
         $isLoggedIn = auth()->check();
