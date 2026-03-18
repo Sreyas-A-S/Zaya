@@ -53,4 +53,9 @@ return [
         'verify_ssl' => env('RAZORPAY_VERIFY_SSL', env('APP_ENV') === 'local' ? false : true),
     ],
 
+    'agora' => [
+        'app_id' => env('AGORA_APP_ID'),
+        'app_certificate' => env('AGORA_APP_CERTIFICATE'),
+    ],
+
 ];

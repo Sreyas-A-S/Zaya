@@ -10,4 +10,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transactions', [ProfileController::class, 'transactions'])->name('transactions.index');
     Route::get('/conference-history', [ProfileController::class, 'conferences'])->name('conferences.index');
     Route::get('/recordings/{id}', [ProfileController::class, 'showRecording'])->name('recordings.show');
+    Route::get('/conference/session/{channel}', [ProfileController::class, 'joinSession'])->name('conference.join');
+    Route::get('/agora/token', [ProfileController::class, 'generateToken'])->name('agora.token');
 });

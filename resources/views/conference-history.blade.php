@@ -16,8 +16,14 @@
 <!-- Conference History Content -->
 <div id="conferences-container">
     <div class="bg-white rounded-2xl border border-[#2E4B3D]/12 overflow-hidden mb-8">
-        <div class="p-6 border-b border-[#2E4B3D]/12">
+        <div class="p-6 border-b border-[#2E4B3D]/12 flex flex-col sm:flex-row justify-between items-center gap-4">
             <h2 class="text-xl font-medium text-secondary">Conference History</h2>
+            <a href="{{ route('conference.join', ['channel' => 'zaya-' . strtolower(Str::random(10))]) }}" 
+               target="_blank" 
+               class="px-6 py-3 bg-secondary text-white rounded-full font-medium flex items-center gap-2 hover:bg-opacity-90 shadow-lg shadow-secondary/10 transition-all">
+                <i class="ri-vidicon-fill text-lg"></i>
+                Start Instant Meeting
+            </a>
         </div>
 
         <div class="overflow-x-auto">
