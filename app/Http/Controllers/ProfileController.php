@@ -56,6 +56,20 @@ class ProfileController extends Controller
         return view('dashboard', compact('user', 'upcomingBookings', 'completedBookings', 'reviews', 'invoices', 'allServices'));
     }
 
+    public function updateConsent(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->patient) {
+            return response()->json(['message' => 'Profile not found'], 404);
+        }
+
+        $user->patient->update([
+            'data_sharing_consent' => $request->consent ? 1 : 0
+        ]);
+
+        return response()->json(['message' => 'Consent updated successfully', 'consent' => $user->patient->data_sharing_consent]);
+    }
+
     public function bookings(Request $request)
     {
         $user = Auth::user();
@@ -69,5 +83,16 @@ class ProfileController extends Controller
         }
 
         return view('bookings', compact('user', 'bookings'));
+    }
+
+    public function transactions()
+    {
+        $user = Auth::user();
+        $invoices = \App\Models\Booking::where('user_id', $user->id)
+            ->whereNotNull('razorpay_payment_id')
+            ->latest()
+            ->paginate(15);
+
+        return view('transactions', compact('user', 'invoices'));
     }
 }

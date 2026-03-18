@@ -55,7 +55,7 @@
                 </div>
                 <div>
                     <p class="text-base text-gray-400 mb-1">Address</p>
-                    <p class="text-base font-normal text-gray-800 leading-snug">{{ $user->patient->address ?? ($user->patient->city_state ?? ($user->city ?? 'Not set')) }}</p>
+                    <p class="text-base font-normal text-gray-800 leading-snug">{{ $user->patient->address ?? ($user->patient->city_state ?? 'Location not set') }}</p>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
                 @endforelse
             </div>
             <div class="mt-6 text-center">
-                <a href="#" class="text-xs text-gray-400 hover:text-gray-800 font-normal tracking-wide">See
+                <a href="{{ route('transactions.index') }}" class="text-xs text-gray-400 hover:text-gray-800 font-normal tracking-wide">See
                     all</a>
             </div>
         </div>
@@ -269,12 +269,46 @@
         <span class="text-base md:text-lg text-gray-600">Data sharing with Practitioners</span>
         <!-- Toggle Switch -->
         <button
-            onclick="this.classList.toggle('bg-secondary'); this.classList.toggle('bg-gray-300'); this.children[0].classList.toggle('translate-x-5')"
-            class="w-10 h-5 bg-gray-300 rounded-full relative flex items-center transition-colors cursor-pointer">
+            id="gdpr-toggle"
+            onclick="toggleConsent(this)"
+            class="w-10 h-5 {{ $user->patient->data_sharing_consent ? 'bg-secondary' : 'bg-gray-300' }} rounded-full relative flex items-center transition-colors cursor-pointer">
             <div
-                class="w-4 h-4 bg-white rounded-full absolute left-0.5 shadow-sm transition-transform duration-300">
+                class="w-4 h-4 bg-white rounded-full absolute left-0.5 shadow-sm transition-transform duration-300 {{ $user->patient->data_sharing_consent ? 'translate-x-5' : '' }}">
             </div>
         </button>
+    </div>
+</div>
+
+<!-- GDPR Confirmation Modal -->
+<div id="gdpr-modal" class="fixed inset-0 z-[100002] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeGdprModal()"></div>
+
+    <!-- Modal Content -->
+    <div class="relative bg-white rounded-[32px] p-8 md:p-10 max-w-[450px] w-[90%] text-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] transform transition-all duration-300 scale-90">
+        <!-- Close Button -->
+        <button onclick="closeGdprModal()" class="absolute top-6 right-8 text-gray-300 hover:text-gray-500 transition-colors">
+            <i class="ri-close-line text-2xl"></i>
+        </button>
+
+        <div class="mb-6">
+            <div class="w-16 h-16 bg-[#EEF2EF] rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ri-shield-user-line text-secondary text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold font-sans! text-secondary mb-2">Update Data Sharing?</h3>
+            <p id="gdpr-modal-text" class="text-gray-500 text-sm leading-relaxed">
+                Are you sure you want to change your data sharing preferences?
+            </p>
+        </div>
+
+        <div class="flex gap-4">
+            <button onclick="closeGdprModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-full font-medium hover:bg-gray-50 transition-colors">
+                Cancel
+            </button>
+            <button id="confirm-gdpr-btn" class="flex-1 px-6 py-3 bg-secondary text-white rounded-full font-medium hover:bg-opacity-90 transition-all">
+                Confirm
+            </button>
+        </div>
     </div>
 </div>
 @endsection
@@ -361,5 +395,90 @@
             });
         }
     });
+
+    function openGdprModal(callback) {
+        const modal = document.getElementById('gdpr-modal');
+        const content = modal.querySelector('.relative.bg-white');
+        const confirmBtn = document.getElementById('confirm-gdpr-btn');
+
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100');
+
+        setTimeout(() => {
+            content.classList.remove('scale-90');
+            content.classList.add('scale-100');
+        }, 10);
+
+        confirmBtn.onclick = () => {
+            callback();
+            closeGdprModal();
+        };
+    }
+
+    function closeGdprModal() {
+        const modal = document.getElementById('gdpr-modal');
+        const content = modal.querySelector('.relative.bg-white');
+
+        content.classList.remove('scale-100');
+        content.classList.add('scale-90');
+
+        setTimeout(() => {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.classList.remove('opacity-100');
+        }, 300);
+    }
+
+    function toggleConsent(btn) {
+        const dot = btn.querySelector('div');
+        const isCurrentlyActive = btn.classList.contains('bg-secondary');
+        const newState = !isCurrentlyActive;
+
+        const actionText = newState ?
+            "By enabling this, your health records and clinical documents will be accessible to practitioners during consultations." :
+            "By disabling this, practitioners will no longer have access to your health records and clinical documents.";
+
+        document.getElementById('gdpr-modal-text').innerText = actionText;
+
+        openGdprModal(() => {
+            // Optimistic UI update
+            if (newState) {
+                btn.classList.remove('bg-gray-300');
+                btn.classList.add('bg-secondary');
+                dot.classList.add('translate-x-5');
+            } else {
+                btn.classList.remove('bg-secondary');
+                btn.classList.add('bg-gray-300');
+                dot.classList.remove('translate-x-5');
+            }
+
+            fetch("{{ route('profile.updateConsent') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        consent: newState
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    // Revert UI on error
+                    if (isCurrentlyActive) {
+                        btn.classList.remove('bg-gray-300');
+                        btn.classList.add('bg-secondary');
+                        dot.classList.add('translate-x-5');
+                    } else {
+                        btn.classList.remove('bg-secondary');
+                        btn.classList.add('bg-gray-300');
+                        dot.classList.remove('translate-x-5');
+                    }
+                });
+        });
+    }
 </script>
 @endsection

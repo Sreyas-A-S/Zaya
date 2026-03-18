@@ -8,6 +8,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-[#F9F9F9]">
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">ID</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Practitioner</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Mode</th>
@@ -19,6 +20,9 @@
                 <tbody class="divide-y divide-[#2E4B3D]/12">
                     @forelse($bookings as $booking)
                     <tr class="hover:bg-[#FDFDFD] transition-colors">
+                        <td class="px-6 py-4 text-sm font-medium text-secondary">
+                            #{{ $booking->id + 10000 }}
+                        </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center">
                                 <img class="h-10 w-10 rounded-full object-cover border border-[#2E4B3D]/12" 

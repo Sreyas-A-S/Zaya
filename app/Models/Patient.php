@@ -22,4 +22,18 @@ class Patient extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getCityStateAttribute()
+    {
+        if ($this->city && $this->state) {
+            return $this->city . ', ' . $this->state;
+        }
+        return $this->city ?: ($this->state ?: 'Location not set');
+    }
+
+    public function getAddressAttribute()
+    {
+        $parts = array_filter([$this->address_line_1, $this->address_line_2]);
+        return count($parts) > 0 ? implode(', ', $parts) : null;
+    }
 }

@@ -28,11 +28,54 @@
                 display: none !important;
             }
         }
+
+        /* Preloader Styles */
+        #global-preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .preloader-logo {
+            width: 100px;
+            height: 100px;
+            animation: pulse-smooth 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-smooth {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
     </style>
     @yield('styles')
 </head>
 
 <body class="flex h-screen overflow-hidden text-gray-800 bg-white">
+
+    <!-- Global Preloader -->
+    <div id="global-preloader">
+        <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="preloader-logo">
+    </div>
 
     <!-- Sidebar -->
     <aside class="w-[288px] bg-[#FFFFFF] border-r border-[#2E4B3D]/12 hidden lg:flex lg:flex-col h-full shrink-0">
@@ -54,8 +97,8 @@
                     class="flex items-center px-8 py-3 {{ request()->routeIs('bookings.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-calendar-event-line mr-3 text-lg"></i> Bookings
                 </a>
-                <a href="#"
-                    class="flex items-center px-8 py-3 text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary  font-normal transition-colors">
+                <a href="{{ route('transactions.index') }}"
+                    class="flex items-center px-8 py-3 {{ request()->routeIs('transactions.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-wallet-3-line mr-3 text-lg"></i> Transaction Vault
                 </a>
                 <a href="{{ route('logout') }}"
@@ -103,12 +146,12 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-y-4 justify-center lg:justify-start text-center lg:text-left items-center gap-8">
-                    <img src="{{ property_exists($user, 'profile_pic') && $user->profile_pic ? ($user->profile_pic[0] == 'h' ? $user->profile_pic : asset('storage/' . $user->profile_pic)) : 'https://i.pravatar.cc/150?img=32' }}" alt="Profile"
+                    <img src="{{ $user->profile_pic ? (str_starts_with($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" alt="Profile"
                         class="w-25 lg:w-20 h-25 lg:h-20 rounded-full object-cover p-1 bg-white">
                     <div>
                         <h1 class="text-3xl lg:text-4xl font-bold font-sans! text-secondary mb-2">{{ $user->name }}</h1>
                         <div class="flex flex-wrap gap-y-1 items-center text-gray-500 text-sm space-x-4">
-                            <span class="flex items-center"><i class="ri-map-pin-line mr-1"></i> {{ $user->patient->city_state ?? ($user->city ?? 'Location not set') }}</span>
+                            <span class="flex items-center"><i class="ri-map-pin-line mr-1"></i> {{ $user->patient->city_state ?? 'Location not set' }}</span>
                             <span class="flex items-center"><i class="ri-mail-line mr-1"></i> Client ID: {{ $user->patient->client_id ?? 'Z-' . (10000 + $user->id) }}</span>
                         </div>
                     </div>
@@ -144,6 +187,33 @@
     </main>
 
     @yield('scripts')
+    <script>
+        (function() {
+            const preloader = document.getElementById('global-preloader');
+            if (!preloader) return;
+
+            window.hidePreloader = () => {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+            };
+
+            window.showPreloader = () => {
+                preloader.style.opacity = '1';
+                preloader.style.visibility = 'visible';
+            };
+
+            // Hide on initial load
+            window.addEventListener('load', window.hidePreloader);
+
+            // Safety timeout - hide after 8s no matter what
+            setTimeout(window.hidePreloader, 8000);
+
+            // Handle Back/Forward Cache
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) window.hidePreloader();
+            });
+        })();
+    </script>
 </body>
 
 </html>

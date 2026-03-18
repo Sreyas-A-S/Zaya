@@ -247,6 +247,11 @@ Route::get('/migrate', function () {
     return '<pre>' . Artisan::output() . '</pre>';
 });
 
+Route::get('/migrate-fresh', function () {
+    Artisan::call('migrate:fresh', ['--force' => true]);
+    return '<pre>' . Artisan::output() . '</pre>';
+});
+
 Route::get('/migrate-fresh-seed', function () {
     Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
     return '<pre>' . Artisan::output() . '</pre>';
