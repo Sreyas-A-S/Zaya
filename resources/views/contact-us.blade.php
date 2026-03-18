@@ -31,7 +31,7 @@
     }
 
     #phone {
-        padding-left: 95px !important;
+        /* Let intl-tel-input handle padding naturally */
     }
 
     .iti--separate-dial-code .iti__selected-flag {
@@ -541,13 +541,14 @@ if (phoneInput && window.intlTelInput) {
     window.contactIti = window.intlTelInput(phoneInput, {
         utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
         separateDialCode: true,
-        formatOnDisplay: false,
+        autoPlaceholder: "polite",
         initialCountry: "in",
         preferredCountries: ["in", "ae", "us", "gb"]
     });
 
     phoneInput.addEventListener('input', function () {
-        this.value = this.value.replace(/[^\d\s\-\+\(\)]/g, '').slice(0, 20);
+        // Strip non-digits since dial code is separate
+        this.value = this.value.replace(/\D/g, '').slice(0, 15);
     });
 }
             const form = document.getElementById('contact-form');
@@ -566,15 +567,15 @@ if (phoneInput && window.intlTelInput) {
             const rules = {
                 first_name: {
                     required: true,
-                    pattern: /^[A-Za-z][A-Za-z\s'-]{0,49}$/,
+                    pattern: /^[A-Z][A-Za-z]{0,49}$/,
                     requiredMessage: 'First name is required',
-                    patternMessage: 'Only letters, spaces, apostrophes, and hyphens (1–50 characters).'
+                    patternMessage: 'First letter must be uppercase and only letters (1–50 characters).'
                 },
                 last_name: {
                     required: true,
-                    pattern: /^[A-Za-z][A-Za-z\s'-]{0,49}$/,
+                    pattern: /^[A-Z][A-Za-z]{0,49}$/,
                     requiredMessage: 'Last name is required',
-                    patternMessage: 'Only letters, spaces, apostrophes, and hyphens (1–50 characters).'
+                    patternMessage: 'First letter must be uppercase and only letters (1–50 characters).'
                 },
                 email: {
                     required: true,
@@ -650,7 +651,8 @@ if (phoneInput && window.intlTelInput) {
                     return false;
                 }
                 if (window.contactIti) {
-                    if (!window.contactIti.isValidNumber()) {
+                    // Use isPossibleNumber for more leniency as isValidNumber can be too strict for some prefixes
+                    if (!window.contactIti.isPossibleNumber()) {
                         const errorCode = window.contactIti.getValidationError();
                         const message = phoneErrorMap[errorCode] || rules.phone.patternMessage;
                         showError(input, message);
@@ -658,7 +660,7 @@ if (phoneInput && window.intlTelInput) {
                     }
                 } else {
                     const digits = value.replace(/\D/g, '');
-                    if (digits.length < 7 || digits.length > 20) {
+                    if (digits.length < 7 || digits.length > 15) {
                         showError(input, rules.phone.patternMessage);
                         return false;
                     }
@@ -713,10 +715,12 @@ if (phoneInput && window.intlTelInput) {
 
                 // Frontend Phone Validation
                 if (window.contactIti && phoneInput) {
-                    if (!window.contactIti.isValidNumber()) {
+                    if (!window.contactIti.isPossibleNumber()) {
+                        const errorCode = window.contactIti.getValidationError();
+                        const message = phoneErrorMap[errorCode] || 'Please enter a valid phone number.';
                         const errorMsg = document.createElement('p');
                         errorMsg.className = 'error-text text-red-500 text-xs mt-1 px-4';
-                        errorMsg.innerText = 'Please enter a valid phone number.';
+                        errorMsg.innerText = message;
                         let container = phoneInput.closest('div');
                         if (container.classList.contains('iti')) {
                             container = container.parentElement;
@@ -725,7 +729,6 @@ if (phoneInput && window.intlTelInput) {
                         phoneInput.classList.add('border-red-500');
                         return;
                     }
-                    phoneInput.value = window.contactIti.getNumber();
                 }
 
                 const originalBtnText = submitBtn.innerText;
@@ -734,6 +737,9 @@ if (phoneInput && window.intlTelInput) {
 
                 try {
                     const formData = new FormData(form);
+                    if (window.contactIti) {
+                        formData.set('phone', window.contactIti.getNumber());
+                    }
                     const response = await fetch(form.action, {
                         method: 'POST',
                         body: formData,
