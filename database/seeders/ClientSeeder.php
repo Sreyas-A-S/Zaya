@@ -2,12 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Patient;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class ClientSeeder extends Seeder
@@ -17,120 +15,66 @@ class ClientSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = \Faker\Factory::create();
+        $nationalities = [
+            ['country' => 'India', 'code' => '+91', 'lang' => ['Hindi', 'English']],
+            ['country' => 'United Kingdom', 'code' => '+44', 'lang' => ['English']],
+            ['country' => 'United States', 'code' => '+1', 'lang' => ['English', 'Spanish']],
+            ['country' => 'France', 'code' => '+33', 'lang' => ['French', 'English']],
+            ['country' => 'Germany', 'code' => '+49', 'lang' => ['German', 'English']],
+            ['country' => 'United Arab Emirates', 'code' => '+971', 'lang' => ['Arabic', 'English']],
+            ['country' => 'Australia', 'code' => '+61', 'lang' => ['English']],
+            ['country' => 'Canada', 'code' => '+1', 'lang' => ['English', 'French']],
+            ['country' => 'Singapore', 'code' => '+65', 'lang' => ['English', 'Mandarin']],
+            ['country' => 'Netherlands', 'code' => '+31', 'lang' => ['Dutch', 'English']],
+        ];
 
-        // Sample Client 1
-        $user1 = User::updateOrCreate(
-            ['email' => 'client@zaya.com'],
-            [
-                'first_name' => 'John',
-                'last_name' => 'Client',
-                'name' => 'John Client',
-                'password' => Hash::make('password'),
-                'role' => 'client',
-            ]
-        );
+        $occupations = ['Software Engineer', 'Teacher', 'Architect', 'Doctor', 'Entrepreneur', 'Designer', 'Student', 'Artist', 'Lawyer', 'Manager'];
+        $genders = ['male', 'female'];
+        $referralTypes = ['Social Media', 'Friend/Family', 'Google Search', 'Advertisement', 'Healthcare Professional'];
 
-        Patient::updateOrCreate(
-            ['user_id' => $user1->id],
-            [
-                'client_id' => 'CL-' . strtoupper(Str::random(6)),
-                'phone' => '9876543210',
-                'mobile_country_code' => '+91',
-                'dob' => '1990-01-01',
-                'age' => 34,
-                'gender' => 'Male',
-                'occupation' => 'Software Engineer',
-                'address_line_1' => '123 Main St',
-                'address_line_2' => 'Tech City',
-                'city' => 'Bangalore',
-                'state' => 'Karnataka',
-                'zip_code' => '560001',
-                'country' => 'India',
-                'consultation_preferences' => ['General Consultation', 'Diet & Nutrition'],
-                'languages_spoken' => ['English', 'Hindi'],
-                'referral_type' => 'Social Media',
-                'referrer_name' => 'Instagram',
-                'profile_photo_path' => null,
-                'status' => 'active',
-            ]
-        );
-
-        // Sample Client 2
-        $user2 = User::updateOrCreate(
-            ['email' => 'jane@zaya.com'],
-            [
-                'first_name' => 'Jane',
-                'last_name' => 'Smith',
-                'name' => 'Jane Smith',
-                'password' => Hash::make('password'),
-                'role' => 'client',
-            ]
-        );
-
-        Patient::updateOrCreate(
-            ['user_id' => $user2->id],
-            [
-                'client_id' => 'CL-' . strtoupper(Str::random(6)),
-                'phone' => '8765432109',
-                'mobile_country_code' => '+1',
-                'dob' => '1985-05-15',
-                'age' => 39,
-                'gender' => 'Female',
-                'occupation' => 'Teacher',
-                'address_line_1' => '456 Oak Avenue',
-                'address_line_2' => 'Education Town',
-                'city' => 'Pune',
-                'state' => 'Maharashtra',
-                'zip_code' => '411001',
-                'country' => 'India',
-                'consultation_preferences' => ['Stress Management', 'Women\'s Health'],
-                'languages_spoken' => ['English', 'Spanish'],
-                'referral_type' => 'Friend or Family',
-                'referrer_name' => 'Sarah Connor',
-                'profile_photo_path' => null,
-                'status' => 'active',
-            ]
-        );
-
-        // Loop for more random clients
-        for ($i = 0; $i < 5; $i++) {
-            $firstName = $faker->firstName;
-            $lastName = $faker->lastName;
-            $email = $faker->unique()->safeEmail;
+        for ($i = 1; $i <= 30; $i++) {
+            $index = ($i - 1) % count($nationalities);
+            $nat = $nationalities[$index];
+            $gender = $genders[($i - 1) % 2];
+            $firstName = $gender === 'male' ? 'John' . $i : 'Jane' . $i;
+            $lastName = 'Doe' . $i;
+            $email = 'client' . $i . '@zaya.com';
+            $clientId = 'CL-' . str_pad($i, 5, '0', STR_PAD_LEFT);
+            $dob = Carbon::create(1980 + ($i % 25), ($i % 12) + 1, ($i % 28) + 1);
+            $age = $dob->age;
 
             $user = User::create([
+                'name' => $firstName . ' ' . $lastName,
                 'first_name' => $firstName,
                 'last_name' => $lastName,
-                'name' => $firstName . ' ' . $lastName,
                 'email' => $email,
                 'password' => Hash::make('password'),
-                'role' => 'client',
+                'role' => 'patient',
+                'gender' => $gender,
+                'phone' => $nat['code'] . '9876543' . str_pad($i, 3, '0', STR_PAD_LEFT),
+                'status' => 'active',
+                'email_verified_at' => now(),
             ]);
-
-            $dob = $faker->date('Y-m-d', '2000-01-01');
-            $age = Carbon::parse($dob)->age;
 
             Patient::create([
                 'user_id' => $user->id,
-                'client_id' => 'CL-' . strtoupper(Str::random(6)),
-                'phone' => $faker->numerify('##########'),
-                'mobile_country_code' => '+91',
-                'dob' => $dob,
+                'client_id' => $clientId,
+                'dob' => $dob->toDateString(),
                 'age' => $age,
-                'gender' => $faker->randomElement(['Male', 'Female', 'Other']),
-                'occupation' => $faker->jobTitle,
-                'address_line_1' => $faker->streetAddress,
-                'address_line_2' => $faker->streetName,
-                'city' => $faker->city,
-                'state' => $faker->state,
-                'zip_code' => $faker->postcode,
-                'country' => 'India',
-                'consultation_preferences' => $faker->randomElements(['General Consultation', 'Diet & Nutrition', 'Stress Management', 'Mental Health'], 2),
-                'languages_spoken' => $faker->randomElements(['English', 'Hindi', 'Marathi'], 2),
-                'referral_type' => $faker->randomElement(['Social Media', 'Website', 'Friend or Family']),
-                'referrer_name' => $faker->name,
-                'profile_photo_path' => null,
+                'gender' => $gender,
+                'occupation' => $occupations[($i - 1) % count($occupations)],
+                'phone' => $user->phone,
+                'mobile_country_code' => $nat['code'],
+                'address_line_1' => $i . ' Main Street',
+                'address_line_2' => 'Apartment ' . $i,
+                'city' => 'City' . $i,
+                'state' => 'State' . $i,
+                'zip_code' => '100' . str_pad($i, 2, '0', STR_PAD_LEFT),
+                'country' => $nat['country'],
+                'consultation_preferences' => ['Video', 'Audio'],
+                'languages_spoken' => $nat['lang'],
+                'referral_type' => $referralTypes[($i - 1) % count($referralTypes)],
+                'referrer_name' => 'Referrer ' . $i,
                 'status' => 'active',
             ]);
         }
