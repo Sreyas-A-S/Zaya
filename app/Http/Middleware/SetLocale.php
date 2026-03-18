@@ -18,12 +18,14 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next)
     {
+        \Illuminate\Support\Facades\Log::info('SetLocale middleware running. Session locale: ' . Session::get('locale', 'NOT_SET'));
         if (Session::has('locale')) {
             App::setLocale(Session::get('locale'));
         } else {
             // Default to app config locale if not set in session
             App::setLocale(config('app.locale', 'en'));
         }
+        \Illuminate\Support\Facades\Log::info('App locale set to: ' . App::getLocale());
 
         return $next($request);
     }

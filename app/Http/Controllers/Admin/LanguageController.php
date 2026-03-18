@@ -145,6 +145,10 @@ class LanguageController extends Controller
         Session::put('locale', $laravelLocale);
         session(['locale' => $laravelLocale]);
 
+        \Illuminate\Support\Facades\Log::info('Language changed to: ' . $laravelLocale);
+        \Illuminate\Support\Facades\Log::info('Session locale is now: ' . Session::get('locale'));
+
+
         $settings = HomepageSetting::where('language', $laravelLocale)
             ->pluck('value', 'key');
 

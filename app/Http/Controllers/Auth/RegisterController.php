@@ -209,8 +209,8 @@ class RegisterController extends Controller
             'nationality' => ['nullable', 'string', 'max:255'],
             'zip_code' => ['nullable', 'string', 'max:20'],
             'website_url' => ['nullable', 'url', 'max:255'],
-            'address_line_1' => ['nullable', 'string', 'max:255'],
-            'city' => ['nullable', 'string', 'max:255'],
+            'address_line_1' => ['nullable', 'string', 'max:500'],
+            'address_line_2' => ['nullable', 'string', 'max:500'],
             'state' => ['nullable', 'string', 'max:255'],
             'country' => ['nullable', 'string', 'max:255'],
         ]);

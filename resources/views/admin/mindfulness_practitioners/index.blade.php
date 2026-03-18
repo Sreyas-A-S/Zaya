@@ -237,11 +237,11 @@
                                                 class="form-control validate-char-limit"
                                                 name="address_line_1"
                                                 required
-                                                maxlength="255"
-                                                data-max="255"
-                                                pattern="^[A-Za-z0-9\s,./-]{5,255}$"
+                                                maxlength="500"
+                                                data-max="500"
+                                                pattern="^[A-Za-z0-9\s,./-]{5,500}$"
                                                 title="Enter a valid address">
-                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 500 characters allowed.</div>
                                         </div>
 
                                         <!-- Address Line 2 -->
@@ -250,10 +250,10 @@
                                             <input type="text"
                                                 class="form-control validate-char-limit"
                                                 name="address_line_2"
-                                                maxlength="255"
-                                                data-max="255"
-                                                pattern="^[A-Za-z0-9\s,./-]{0,255}$">
-                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
+                                                maxlength="500"
+                                                data-max="500"
+                                                pattern="^[A-Za-z0-9\s,./-]{0,500}$">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 500 characters allowed.</div>
                                         </div>
 
                                         <!-- City -->

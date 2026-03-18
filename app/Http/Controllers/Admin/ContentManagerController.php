@@ -28,7 +28,7 @@ class ContentManagerController extends Controller
 
         if ($request->ajax()) {
 
-            $data = User::where('role', 'content_manager')
+            $data = User::where('role', 'content-manager')
                         ->select('users.*');
 
             // Apply Admin Filters (Country & Language)
@@ -186,7 +186,7 @@ class ContentManagerController extends Controller
             'password'   => Hash::make($request->password),
             'national_id'=> $request->country,
             'languages'  => $request->language, 
-            'role'       => 'content_manager',
+            'role'       => 'content-manager',
             'status'     => $request->status ?? 'pending',
             'profile_pic'=> $profilePic,
             'phone'      => $request->phone,
@@ -200,7 +200,7 @@ class ContentManagerController extends Controller
      */
     public function edit($id)
     {
-        $user = User::where('role', 'content_manager')->findOrFail($id);
+        $user = User::where('role', 'content-manager')->findOrFail($id);
         return response()->json($user);
     }
 
@@ -209,7 +209,7 @@ class ContentManagerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::where('role', 'content_manager')->findOrFail($id);
+        $user = User::where('role', 'content-manager')->findOrFail($id);
 
         $request->validate([
             'firstname' => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s\-]+$/u'],
@@ -258,7 +258,7 @@ class ContentManagerController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::where('role', 'content_manager')->findOrFail($id);
+        $user = User::where('role', 'content-manager')->findOrFail($id);
         $user->delete();
 
         return response()->json(['success' => true, 'message' => 'Content Manager Deleted Successfully']);
@@ -286,7 +286,7 @@ class ContentManagerController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $user = User::where('role', 'content_manager')->findOrFail($id);
+        $user = User::where('role', 'content-manager')->findOrFail($id);
         $user->status = $request->status;
         $user->save();
 

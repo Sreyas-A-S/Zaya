@@ -29,7 +29,7 @@ class UserManagerSeeder extends Seeder
                     'last_name' => $lastName,
                     'phone' => $faker->unique()->numerify('##########'),
                     'password' => Hash::make('password123'),
-                    'role' => 'user_manager',
+                    'role' => 'user-manager',
                 ]
             );
         }
