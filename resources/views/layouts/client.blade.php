@@ -172,7 +172,7 @@
                         <div class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></div>
                     </div>
 
-                    <a href="{{ route('book-session') }}"
+                    <a href="{{ route('find-practitioner') }}"
                         class="bg-[#2B4C3B] hover:bg-[#1f372a] text-white px-5 py-2.5 rounded-full font-normal text-base transition-colors shadow-sm cursor-pointer">
                         Book a New Consultation
                     </a>
