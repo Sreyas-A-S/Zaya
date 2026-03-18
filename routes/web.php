@@ -60,6 +60,7 @@ Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
 Route::get('/gallery', [WebController::class, 'gallery'])->name('gallery');
 Route::get('/find-practitioner', [WebController::class, 'findPractitioner'])->name('find-practitioner');
+Route::post('/find-practitioner', [WebController::class, 'findPractitionerPost'])->name('find-practitioner.post');
 Route::get('/search', [WebController::class, 'search'])->name('search');
 Route::get('/filter-practitioners', [WebController::class, 'filterPractitioners'])->name('filter-practitioners');
 Route::get('/search-locations', [WebController::class, 'searchLocations'])->name('search-locations');

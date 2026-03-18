@@ -90,10 +90,16 @@ class WebController extends Controller
 
         $query = Service::where('status', true);
 
-        if ($request->filled('category')) {
-            $categoryName = $request->category;
-            $query->whereHas('categories', function ($q) use ($categoryName) {
-                $q->where('name', $categoryName);
+        $categoryName = $request->query('category') ?? $request->query('servicescategory');
+
+        if ($categoryName) {
+            $query->where(function ($q) use ($categoryName) {
+                // Check in categories
+                $q->whereHas('categories', function ($sq) use ($categoryName) {
+                    $sq->where('name', 'like', "%$categoryName%");
+                })
+                // OR check in service title (fallback)
+                ->orWhere('title', 'like', "%$categoryName%");
             });
         }
 
@@ -169,6 +175,16 @@ class WebController extends Controller
         }
 
         return view('find-practitioner', compact('settings', 'practitioners', 'pincode'));
+    }
+
+    public function findPractitionerPost(Request $request)
+    {
+        $pincode = trim((string) $request->input('pincode', ''));
+        if ($pincode !== '') {
+            session(['global_pincode' => $pincode]);
+        }
+
+        return redirect()->route('find-practitioner');
     }
 
     public function search(Request $request)
