@@ -85,7 +85,7 @@ class ProfileController extends Controller
         return view('bookings', compact('user', 'bookings'));
     }
 
-    public function transactions()
+    public function transactions(Request $request)
     {
         $user = Auth::user();
         $invoices = \App\Models\Booking::where('user_id', $user->id)
@@ -93,10 +93,14 @@ class ProfileController extends Controller
             ->latest()
             ->paginate(15);
 
+        if ($request->ajax()) {
+            return view('partials.transactions-table', compact('user', 'invoices'))->render();
+        }
+
         return view('transactions', compact('user', 'invoices'));
     }
 
-    public function conferences()
+    public function conferences(Request $request)
     {
         $user = Auth::user();
         $conferences = \App\Models\Booking::with(['practitioner.user'])
@@ -104,6 +108,10 @@ class ProfileController extends Controller
             ->where('mode', 'online')
             ->latest()
             ->paginate(15);
+
+        if ($request->ajax()) {
+            return view('partials.conferences-table', compact('user', 'conferences'))->render();
+        }
 
         return view('conference-history', compact('user', 'conferences'));
     }
