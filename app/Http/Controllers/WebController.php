@@ -417,10 +417,10 @@ class WebController extends Controller
     public function storeContact(Request $request)
     {
         $validatedData = $request->validate([
-            'first_name' => 'required|string|min:2|max:50',
-            'last_name' => 'required|string|min:2|max:50',
+            'first_name' => 'required|string|min:1|max:50',
+            'last_name' => 'required|string|min:1|max:50',
             'email' => 'required|email:rfc,dns|max:255',
-            'phone' => 'required|string|min:7|max:20',
+            'phone' => 'required|string|min:7|max:20|regex:/^\+?[0-9\s\-\+\(\)]+$/',
             'user_type' => 'nullable|array',
             'message' => 'required|string|min:10|max:2000',
         ]);

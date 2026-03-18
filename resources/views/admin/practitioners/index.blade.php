@@ -1617,6 +1617,32 @@
                 return list.map(i => `<span class="badge bg-light text-dark border me-1 mb-1" style="white-space: normal; text-align: center; line-height: 1.2; word-break: break-word; overflow-wrap: anywhere; max-width: 100%;">${i}</span>`).join('');
             };
 
+            const renderDocLinks = (value, label, opts = {}) => {
+                const multiple = !!opts.multiple;
+                if (!value) return `<div class="col-12"><span class="text-muted">${label}: N/A</span></div>`;
+
+                let paths = value;
+                if (multiple) {
+                    if (typeof paths === 'string') {
+                        try {
+                            paths = JSON.parse(paths);
+                        } catch (e) {
+                            paths = [paths];
+                        }
+                    }
+                    if (!Array.isArray(paths)) paths = [paths];
+                } else {
+                    paths = [value];
+                }
+
+                const links = paths
+                    .filter(Boolean)
+                    .map((p, idx) => `<a href="${storageBase}${p}" target="_blank" class="badge bg-light-primary text-primary border border-primary text-decoration-none me-2 mb-2">${label}${multiple ? ` ${idx + 1}` : ''}</a>`)
+                    .join('');
+
+                return `<div class="col-12"><div class="d-flex flex-wrap gap-2">${links || `<span class="text-muted">${label}: N/A</span>`}</div></div>`;
+            };
+
             let qualsHtml = (p.qualifications || []).map(q => `
                 <div class="col-12 mb-2 p-2 border rounded bg-light small">
                     <strong>${q.training_diploma_title || 'Training'}</strong> at ${q.institute_name || 'N/A'}<br>
@@ -1664,6 +1690,17 @@
                             </div>
                             <div class="tab-pane fade" id="p-qual" role="tabpanel">
                                 <div class="row">${qualsHtml || 'No qualifications listed.'}</div>
+                                <hr class="my-3">
+                                <h6>Documents</h6>
+                                <div class="row g-2">
+                                    ${renderDocLinks(p.doc_cover_letter, 'Cover Letter')}
+                                    ${renderDocLinks(p.doc_certificates, 'Educational Certificate', { multiple: true })}
+                                    ${renderDocLinks(p.doc_experience, 'Experience Certificate')}
+                                    ${renderDocLinks(p.doc_registration, 'Signed Registration Form')}
+                                    ${renderDocLinks(p.doc_ethics, 'Signed Code of Ethics')}
+                                    ${renderDocLinks(p.doc_contract, 'Signed ZAYA Contract')}
+                                    ${renderDocLinks(p.doc_id_proof, 'Valid ID / Passport')}
+                                </div>
                             </div>
                             <div class="tab-pane fade" id="p-bio" role="tabpanel">
                                 <p class="small text-muted">${p.profile_bio || 'No bio provided.'}</p>

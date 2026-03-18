@@ -43,6 +43,7 @@ class Practitioner extends Model
         'dob',
         'nationality',
         'profile_photo_path',
+        'residential_address',
         'zip_code',
         'phone',
         'website_url',
@@ -59,6 +60,13 @@ class Practitioner extends Model
         'city',
         'state',
         'country',
+        'doc_cover_letter',
+        'doc_certificates',
+        'doc_experience',
+        'doc_registration',
+        'doc_ethics',
+        'doc_contract',
+        'doc_id_proof',
     ];
 
     protected $casts = [
