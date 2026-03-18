@@ -147,11 +147,12 @@
     <input type="text"
         id="first_name"
         name="first_name"
-        placeholder="Your First Name" 
+        placeholder="Your First Name"
         class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none"
-        maxlength="50" 
-        pattern="/^[A-Z][a-zA-Z]*$/"
-        title="First letter must be capital and only letters allowed">
+        maxlength="50"
+        required
+        pattern="^[A-Za-z][A-Za-z\s'-]{0,49}$"
+        title="Only letters, spaces, apostrophes, and hyphens (1–50 characters)">
 
     <span id="first_name_error" class="text-red-500 text-sm mt-1 hidden"></span>
 </div>
@@ -167,7 +168,10 @@
         name="last_name"
         placeholder="Your Last Name"
         class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none"
-        maxlength="50">
+        maxlength="50"
+        required
+        pattern="^[A-Za-z][A-Za-z\s'-]{0,49}$"
+        title="Only letters, spaces, apostrophes, and hyphens (1–50 characters)">
 
     <!-- Error message -->
     <span id="last_name_error" class="text-red-500 text-sm mt-1 hidden"></span>
@@ -178,11 +182,13 @@
                     Email <span class="text-red-500">*</span>
                 </label>
 
-                <input type="text"
+                <input type="email"
                     id="email"
                     name="email"
                     placeholder="Your Email"
-                    class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none">
+                    class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none"
+                    maxlength="255"
+                    required>
 
                 <span id="email_error" class="text-red-500 text-sm mt-1 hidden"></span>
             </div>
@@ -193,12 +199,15 @@
                     Phone No <span class="text-red-500">*</span>
                 </label>
 
-                <input type="text"
+                <input type="tel"
                     id="phone"
                     name="phone"
                     placeholder="Your Phone No"
                     class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none"
-                    maxlength="10">
+                    maxlength="15"
+                    inputmode="numeric"
+                    autocomplete="tel"
+                    required>
 
                 <span id="phone_error" class="text-red-500 text-sm mt-1 hidden"></span>
             </div>
@@ -526,28 +535,137 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize intl-tel-input
-            const phoneInput = document.querySelector('#phone');
-            if (phoneInput && window.intlTelInput) {
-                window.contactIti = window.intlTelInput(phoneInput, {
-                    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
-                    separateDialCode: true,
-                    formatOnDisplay: false,
-                    initialCountry: "in",
-                    preferredCountries: ["in", "ae", "us", "gb"]
-                });
+          const phoneInput = document.querySelector('#phone');
 
-                phoneInput.addEventListener('input', function() {
-                    let val = this.value.replace(/\D/g, '');
-                    if (val.startsWith('0')) val = val.substring(1);
-                    this.value = val.slice(0, 15);
-                });
-            }
+if (phoneInput && window.intlTelInput) {
+    window.contactIti = window.intlTelInput(phoneInput, {
+        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+        separateDialCode: true,
+        formatOnDisplay: false,
+        initialCountry: "in",
+        preferredCountries: ["in", "ae", "us", "gb"]
+    });
 
+    phoneInput.addEventListener('input', function () {
+        this.value = this.value.replace(/[^\d\s\-\+\(\)]/g, '').slice(0, 20);
+    });
+}
             const form = document.getElementById('contact-form');
             if (!form) return;
 
             const consent = document.getElementById('consent');
             const submitBtn = document.getElementById('contact-btn-submit');
+            const fields = {
+                first_name: document.getElementById('first_name'),
+                last_name: document.getElementById('last_name'),
+                email: document.getElementById('email'),
+                phone: document.getElementById('phone'),
+                message: document.getElementById('message')
+            };
+
+            const rules = {
+                first_name: {
+                    required: true,
+                    pattern: /^[A-Za-z][A-Za-z\s'-]{0,49}$/,
+                    requiredMessage: 'First name is required',
+                    patternMessage: 'Only letters, spaces, apostrophes, and hyphens (1–50 characters).'
+                },
+                last_name: {
+                    required: true,
+                    pattern: /^[A-Za-z][A-Za-z\s'-]{0,49}$/,
+                    requiredMessage: 'Last name is required',
+                    patternMessage: 'Only letters, spaces, apostrophes, and hyphens (1–50 characters).'
+                },
+                email: {
+                    required: true,
+                    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    requiredMessage: 'Email is required',
+                    patternMessage: 'Enter a valid email address'
+                },
+                phone: {
+                    required: true,
+                    requiredMessage: 'Phone number is required',
+                    patternMessage: 'Enter a valid phone number'
+                },
+                message: {
+                    required: true,
+                    requiredMessage: 'Message is required'
+                }
+            };
+
+            const getErrorEl = (fieldId) => document.getElementById(`${fieldId}_error`);
+
+            const showError = (input, message) => {
+                if (!input) return;
+                const errorEl = getErrorEl(input.id);
+                if (errorEl) {
+                    errorEl.textContent = message;
+                    errorEl.classList.remove('hidden');
+                }
+                input.classList.add('border-red-500');
+            };
+
+            const clearError = (input) => {
+                if (!input) return;
+                const errorEl = getErrorEl(input.id);
+                if (errorEl) {
+                    errorEl.textContent = '';
+                    errorEl.classList.add('hidden');
+                }
+                input.classList.remove('border-red-500');
+            };
+
+            const validateTextField = (fieldId) => {
+                const input = fields[fieldId];
+                const rule = rules[fieldId];
+                if (!input || !rule) return true;
+
+                const value = (input.value || '').trim();
+                if (rule.required && !value) {
+                    showError(input, rule.requiredMessage);
+                    return false;
+                }
+                if (rule.pattern && value && !rule.pattern.test(value)) {
+                    showError(input, rule.patternMessage);
+                    return false;
+                }
+                clearError(input);
+                return true;
+            };
+
+            const phoneErrorMap = [
+                "Invalid number",
+                "Invalid country code",
+                "Too short",
+                "Too long",
+                "Invalid number"
+            ];
+
+            const validatePhoneField = () => {
+                const input = fields.phone;
+                if (!input) return true;
+                const value = (input.value || '').trim();
+                if (!value) {
+                    showError(input, rules.phone.requiredMessage);
+                    return false;
+                }
+                if (window.contactIti) {
+                    if (!window.contactIti.isValidNumber()) {
+                        const errorCode = window.contactIti.getValidationError();
+                        const message = phoneErrorMap[errorCode] || rules.phone.patternMessage;
+                        showError(input, message);
+                        return false;
+                    }
+                } else {
+                    const digits = value.replace(/\D/g, '');
+                    if (digits.length < 7 || digits.length > 20) {
+                        showError(input, rules.phone.patternMessage);
+                        return false;
+                    }
+                }
+                clearError(input);
+                return true;
+            };
 
             const setSubmitState = () => {
                 const enabled = !!(consent && consent.checked);
@@ -565,12 +683,33 @@
             if (consent) consent.addEventListener('change', setSubmitState);
             setSubmitState();
 
+            Object.keys(fields).forEach((key) => {
+                const input = fields[key];
+                if (!input) return;
+                const handler = () => {
+                    if (key === 'phone') return validatePhoneField();
+                    return validateTextField(key);
+                };
+                input.addEventListener('blur', handler);
+                input.addEventListener('input', () => clearError(input));
+            });
+
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
                 // Clear previous errors
                 document.querySelectorAll('.error-text').forEach(el => el.remove());
                 document.querySelectorAll('input, textarea').forEach(el => el.classList.remove('border-red-500'));
+
+                const isFirstNameValid = validateTextField('first_name');
+                const isLastNameValid = validateTextField('last_name');
+                const isEmailValid = validateTextField('email');
+                const isMessageValid = validateTextField('message');
+                const isPhoneValid = validatePhoneField();
+
+                if (!isFirstNameValid || !isLastNameValid || !isEmailValid || !isPhoneValid || !isMessageValid) {
+                    return;
+                }
 
                 // Frontend Phone Validation
                 if (window.contactIti && phoneInput) {
@@ -670,49 +809,5 @@
     })();
 
 
-// First Name
-document.getElementById('first_name').addEventListener('blur', function () {
-    validateField(
-        'first_name',
-        'first_name_error',
-         '/^[A-Z][a-zA-Z]*$/',
-        'First name is required',
-        'First letter must be capital and only letters allowed'
-    );
-});
-
-// Email
-document.getElementById('email').addEventListener('blur', function () {
-    validateField(
-        'email',
-        'email_error',
-        '/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
-        'Email is required',
-        'Enter a valid email address'
-    );
-});
-
-// Phone
-document.getElementById('phone').addEventListener('blur', function () {
-    validateField(
-        'phone',
-        'phone_error',
-        '/^[0-14]{15}$/',
-        'Phone number is required',
-        'Phone number must be 15 digits'
-    );
-});
-
-// Message
-document.getElementById('message').addEventListener('blur', function () {
-    validateField(
-        'message',
-        'message_error',
-        null,
-        'Message is required',
-        ''
-    );
-});
-    
 </script>
 @endpush

@@ -286,8 +286,15 @@ class ContentManagerController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        $status = strtolower((string) $request->status);
+        if ($status === 'approved' || $status === '1' || $status === 'active') {
+            $status = 'active';
+        } else {
+            $status = 'inactive';
+        }
+
         $user = User::where('role', 'content_manager')->findOrFail($id);
-        $user->status = $request->status;
+        $user->status = $status;
         $user->save();
 
         return response()->json(['success' => true, 'message' => 'Status updated successfully']);
