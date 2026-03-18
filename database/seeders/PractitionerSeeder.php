@@ -66,6 +66,7 @@ class PractitionerSeeder extends Seeder
                     'status' => 'active',
                     'first_name' => $practitioner['first_name'],
                     'last_name' => $practitioner['last_name'],
+                    'slug' => \Illuminate\Support\Str::slug($practitioner['first_name'] . ' ' . $practitioner['last_name'] . '-' . $user->id),
                     'gender' => $practitioner['gender'],
                     'dob' => $practitioner['dob'],
                     'nationality' => $practitioner['nationality'],

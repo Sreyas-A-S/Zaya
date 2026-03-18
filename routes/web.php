@@ -243,16 +243,19 @@ Route::get('/optimize', function () {
 });
 
 Route::get('/migrate', function () {
+    set_time_limit(300);
     Artisan::call('migrate', ['--force' => true]);
     return '<pre>' . Artisan::output() . '</pre>';
 });
 
 Route::get('/migrate-fresh', function () {
+    set_time_limit(300);
     Artisan::call('migrate:fresh', ['--force' => true]);
     return '<pre>' . Artisan::output() . '</pre>';
 });
 
 Route::get('/migrate-fresh-seed', function () {
+    set_time_limit(600);
     Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
     return '<pre>' . Artisan::output() . '</pre>';
 });
@@ -263,6 +266,7 @@ Route::get('/storage-link', function () {
 });
 
 Route::get('/seed', function () {
+    set_time_limit(600);
     Artisan::call('db:seed', ['--force' => true]);
     return '<pre>' . Artisan::output() . '</pre>';
 });

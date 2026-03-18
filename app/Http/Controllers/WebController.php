@@ -162,7 +162,7 @@ class WebController extends Controller
             }
         }
 
-        $practitioners = $query->paginate(4)->withQueryString();
+        $practitioners = $query->paginate(12)->onEachSide(1)->withQueryString();
 
         if ($request->ajax()) {
             return view('partials.frontend.practitioner-grid', compact('practitioners', 'pincode'))->render();
