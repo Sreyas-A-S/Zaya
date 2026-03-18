@@ -28,7 +28,7 @@ class FinanceManagerController extends Controller
 
         if ($request->ajax()) {
 
-            $data = User::where('role', 'finance_manager')
+            $data = User::where('role', 'financial-manager')
                 ->select('users.*');
 
             // Apply Admin Filters (Country & Language)
@@ -189,7 +189,7 @@ class FinanceManagerController extends Controller
             'password'   => Hash::make($request->password),
             'national_id' => $request->country,
             'languages'  => $request->language,
-            'role'       => 'finance_manager',
+            'role'       => 'financial-manager',
             'status'     => $request->status ?? 'pending',
             'profile_pic' => $profilePic,
             'phone'      => $request->phone,
@@ -203,7 +203,7 @@ class FinanceManagerController extends Controller
      */
     public function edit($id)
     {
-        $user = User::where('role', 'finance_manager')->findOrFail($id);
+        $user = User::where('role', 'financial-manager')->findOrFail($id);
         return response()->json($user);
     }
 
@@ -212,7 +212,7 @@ class FinanceManagerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::where('role', 'finance_manager')->findOrFail($id);
+        $user = User::where('role', 'financial-manager')->findOrFail($id);
 
         $request->validate([
             'firstname' => ['required', 'string', 'max:255', 'regex:/^[A-Z][a-zA-Z]*$/'],
@@ -262,7 +262,7 @@ class FinanceManagerController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::where('role', 'finance_manager')->findOrFail($id);
+        $user = User::where('role', 'financial-manager')->findOrFail($id);
         $user->delete();
 
         return response()->json(['success' => true, 'message' => 'Finance Manager Deleted Successfully']);
@@ -290,7 +290,7 @@ class FinanceManagerController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $user = User::where('role', 'finance_manager')->findOrFail($id);
+        $user = User::where('role', 'financial-manager')->findOrFail($id);
         $user->status = $request->status;
         $user->save();
 

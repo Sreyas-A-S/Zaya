@@ -39,8 +39,8 @@ trait AdminFilterTrait
                                   ->orWhere('national_id', $id);
                             }
                         });
-                    } elseif ($effectiveTable === 'finance_managers') {
-                        $q->whereIn('finance_managers.country_id', $assignedCountryIds);
+                    } elseif ($effectiveTable === 'financial-managers') {
+                        $q->whereIn('financial-managers.country_id', $assignedCountryIds);
                     } else {
                         // For specialized tables like doctors, practitioners, etc.
                         $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
@@ -87,8 +87,8 @@ trait AdminFilterTrait
                     } else {
                         $query->where($effectiveTable . '.country', $country->name);
                     }
-                } elseif ($type === 'finance_manager') {
-                    $query->where('finance_managers.country_id', $country->id);
+                } elseif ($type === 'financial-manager') {
+                    $query->where('financial-managers.country_id', $country->id);
                 }
             }
         }
@@ -107,8 +107,8 @@ trait AdminFilterTrait
                     }
                 } elseif ($type === 'homepage_setting') {
                     $query->where('homepage_settings.language', $adminLocale);
-                } elseif ($type === 'finance_manager') {
-                    $query->where('finance_managers.language_id', $language->id);
+                } elseif ($type === 'financial-manager') {
+                    $query->where('financial-managers.language_id', $language->id);
                 }
             }
         }

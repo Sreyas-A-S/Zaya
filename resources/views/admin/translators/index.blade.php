@@ -227,13 +227,13 @@
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control validate-char-limit" name="address_line_1" required placeholder="House No, Building, Street" maxlength="255" data-max="255">
-                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
+                                            <input type="text" class="form-control validate-char-limit" name="address_line_1" required placeholder="House No, Building, Street" maxlength="500" data-max="500">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 500 characters allowed.</div>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Address Line 2</label>
-                                            <input type="text" class="form-control validate-char-limit" name="address_line_2" placeholder="Locality, Landmark" maxlength="255" data-max="255">
-                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
+                                            <input type="text" class="form-control validate-char-limit" name="address_line_2" placeholder="Locality, Landmark" maxlength="500" data-max="500">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 500 characters allowed.</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">City <span class="text-danger">*</span></label>

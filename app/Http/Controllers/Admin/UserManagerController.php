@@ -24,7 +24,7 @@ class UserManagerController extends Controller
     {
         if ($request->ajax()) {
 
-            $data = User::where('role', 'user_manager')
+            $data = User::where('role', 'user-manager')
                         ->select('users.*');
 
             // Apply Admin Filters (Country & Language)
@@ -157,7 +157,7 @@ class UserManagerController extends Controller
             'password'   => Hash::make($request->password),
             'national_id'=> $request->country,
             'languages'  => $request->language, 
-            'role'       => 'user_manager',
+            'role'       => 'user-manager',
             'status'     => $request->status ?? 'pending',
             'profile_pic'=> $profilePic,
             'phone'      => $request->phone,
@@ -171,7 +171,7 @@ class UserManagerController extends Controller
      */
     public function edit($id)
     {
-        $user = User::where('role', 'user_manager')->findOrFail($id);
+        $user = User::where('role', 'user-manager')->findOrFail($id);
         return response()->json($user);
     }
 
@@ -180,7 +180,7 @@ class UserManagerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::where('role', 'user_manager')->findOrFail($id);
+        $user = User::where('role', 'user-manager')->findOrFail($id);
 
         $request->validate([
            'firstname' => ['required', 'string', 'max:40', 'regex:/^[A-Za-z]+$/'],
@@ -230,7 +230,7 @@ class UserManagerController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::where('role', 'user_manager')->findOrFail($id);
+        $user = User::where('role', 'user-manager')->findOrFail($id);
         $user->delete();
 
         return response()->json(['success' => true, 'message' => 'User Manager Deleted Successfully']);
@@ -258,7 +258,7 @@ class UserManagerController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $user = User::where('role', 'user_manager')->findOrFail($id);
+        $user = User::where('role', 'user-manager')->findOrFail($id);
         $user->status = $request->status;
         $user->save();
 

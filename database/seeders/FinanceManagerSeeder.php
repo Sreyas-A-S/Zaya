@@ -32,7 +32,7 @@ class FinanceManagerSeeder extends Seeder
                 'password' => Hash::make('password123'),
                 'national_id' => !empty($countryIds) ? [$faker->randomElement($countryIds)] : [],
                 'languages' => !empty($languageIds) ? [$faker->randomElement($languageIds)] : [],
-                'role' => 'finance_manager',
+                'role' => 'financial-manager',
                 'phone' => $faker->numerify('##########'),
             ]);
         }

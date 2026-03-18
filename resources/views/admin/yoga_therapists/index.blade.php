@@ -235,8 +235,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 class="form-control"
                                 name="address_line_1"
                                 required
-                                maxlength="255"
-                                pattern="^[A-Za-z0-9\s,./-]{5,255}$"
+                                maxlength="500"
+                                pattern="^[A-Za-z0-9\s,./-]{5,500}$"
                                 title="Enter a valid address">
                                 </div>
 
@@ -246,8 +246,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 <input type="text"
                                 class="form-control"
                                 name="address_line_2"
-                                maxlength="255"
-                                pattern="^[A-Za-z0-9\s,./-]{0,255}$">
+                                maxlength="500"
+                                pattern="^[A-Za-z0-9\s,./-]{0,500}$">
                                 </div>
 
                                 <!-- City -->
