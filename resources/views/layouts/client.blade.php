@@ -97,6 +97,10 @@
                     class="flex items-center px-8 py-3 {{ request()->routeIs('bookings.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-calendar-event-line mr-3 text-lg"></i> Bookings
                 </a>
+                <a href="{{ route('conferences.index') }}"
+                    class="flex items-center px-8 py-3 {{ request()->routeIs('conferences.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
+                    <i class="ri-vidicon-line mr-3 text-lg"></i> Conference History
+                </a>
                 <a href="{{ route('transactions.index') }}"
                     class="flex items-center px-8 py-3 {{ request()->routeIs('transactions.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-wallet-3-line mr-3 text-lg"></i> Transaction Vault
@@ -185,6 +189,8 @@
             <div class="h-10"></div>
         </div>
     </main>
+
+    @include('partials.frontend.toast')
 
     @yield('scripts')
     <script>

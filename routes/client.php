@@ -8,4 +8,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/update-consent', [ProfileController::class, 'updateConsent'])->name('profile.updateConsent');
     Route::get('/bookings', [ProfileController::class, 'bookings'])->name('bookings.index');
     Route::get('/transactions', [ProfileController::class, 'transactions'])->name('transactions.index');
+    Route::get('/conference-history', [ProfileController::class, 'conferences'])->name('conferences.index');
+    Route::get('/recordings/{id}', [ProfileController::class, 'showRecording'])->name('recordings.show');
 });

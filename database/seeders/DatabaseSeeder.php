@@ -49,6 +49,7 @@ class DatabaseSeeder extends Seeder
             UserManagerSeeder::class,
             FooterSettingSeeder::class,
             FooterSettingFrenchSeeder::class,
+            BookingSeeder::class,
         ]);
 
         User::updateOrCreate(
