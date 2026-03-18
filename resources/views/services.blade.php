@@ -2,9 +2,11 @@
 
 @section('content')
 
-    @if(request()->filled('category'))
+    @php
+        $category = request('category') ?? request('servicescategory');
+    @endphp
+    @if($category)
         @php
-            $category = request('category');
             $descMap = [
                 'Ayurveda' => 'Restore your natural state of health through personalized Ayurvedic routines. Find the wellness path that completely aligns with your physical health.',
                 'Yoga' => 'Realign your body and energetic pathways with our expert yoga guidance and therapeutic healing sessions.',
@@ -21,7 +23,7 @@
                     <h1 class="text-4xl md:text-7xl font-serif text-primary font-medium tracking-tight">
                         {{ $category }}
                     </h1>
-                    <p class="text-gray-600 text-[15px] md:text-base leading-relaxed max-w-xl md:mt-4 md:text-right">
+                    <p class="text-gray-500 text-[15px] md:text-base leading-relaxed max-w-xl md:mt-4 md:text-right">
                         {{ $categoryDescription }}
                     </p>
                 </div>
@@ -41,7 +43,11 @@
 
                     <!-- Search Box -->
                     <form action="{{ route('services') }}" method="GET" class="w-full lg:w-auto flex items-center gap-2">
-                        <input type="hidden" name="category" value="{{ $category }}">
+                        @if(request()->has('servicescategory'))
+                            <input type="hidden" name="servicescategory" value="{{ request('servicescategory') }}">
+                        @else
+                            <input type="hidden" name="category" value="{{ request('category', $category) }}">
+                        @endif
                         <input type="text" name="search" value="{{ request('search') }}"
                             placeholder="Search services or conditions..."
                             class="text-sm outline-none lg:text-base italic bg-transparent text-gray-700 placeholder-gray-400 w-full md:w-56">
@@ -69,110 +75,40 @@
                 @endif
 
                 <!-- Rendered Category Services Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
-                    <!-- Card 1 -->
-                    <a href="{{ route('service-detail', 'wellness-based-ayurveda-consultation') }}"
-                        class="block group cursor-pointer">
-                        <div class="w-full aspect-video overflow-hidden mb-5 bg-gray-100">
-                            <img src="{{ asset('frontend/assets/wellness-based-ayurveda-consultation.png') }}"
-                                alt="Wellness based Ayurveda consultation"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12" id="services-grid">
+                    @forelse($services as $service)
+                        <a href="{{ $service->slug ? route('service-detail', $service->slug) : '#' }}" class="block group cursor-pointer">
+                            <div class="w-full aspect-video overflow-hidden mb-5 bg-gray-100">
+                                @php
+                                    $imageUrl = asset('frontend/assets/wellness-based-ayurveda-consultation.png'); // fallback
+                                    if ($service->image) {
+                                        if (str_starts_with($service->image, 'http')) {
+                                            $imageUrl = $service->image;
+                                        } elseif (file_exists(public_path('storage/' . $service->image))) {
+                                            $imageUrl = asset('storage/' . $service->image);
+                                        } elseif (file_exists(public_path($service->image))) {
+                                            $imageUrl = asset($service->image);
+                                        }
+                                    }
+                                @endphp
+                                <img src="{{ $imageUrl }}"
+                                    alt="{{ $service->title }}"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                            </div>
+                            <div>
+                                <h3 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                                    {{ $service->title }}
+                                </h3>
+                                <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
+                                    {{ $service->description }}
+                                </p>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="col-span-full py-20 text-center">
+                            <p class="text-gray-500 text-lg italic">No services found in this category.</p>
                         </div>
-                        <div>
-                            <h3
-                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
-                                Wellness based Ayurveda consultation</h3>
-                            <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
-                                A custom plan for your diet, lifestyle and herbs based on your unique body type and needs.
-                            </p>
-                        </div>
-                    </a>
-
-                    <!-- Card 2 -->
-                    <a href="{{ route('service-detail', 'ayurvedic-diet-nutrition-guidance') }}"
-                        class="block group cursor-pointer">
-                        <div class="w-full aspect-video overflow-hidden mb-5 bg-gray-100">
-                            <img src="{{ asset('frontend/assets/ayurvedic-diet-nutrition-guidance.png') }}"
-                                alt="Ayurvedic diet & nutrition guidance"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                        </div>
-                        <div>
-                            <h3
-                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
-                                Ayurvedic diet & nutrition guidance</h3>
-                            <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
-                                Customized eating plans based on your body type to improve digestion and energy.
-                            </p>
-                        </div>
-                    </a>
-
-                    <!-- Card 3 -->
-                    <a href="{{ route('service-detail', 'herbal-wellness-support') }}" class="block group cursor-pointer">
-                        <div class="w-full aspect-video overflow-hidden mb-5 bg-gray-100">
-                            <img src="{{ asset('frontend/assets/herbal-wellness-support.png') }}" alt="Herbal wellness support"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                        </div>
-                        <div>
-                            <h3
-                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
-                                Herbal wellness support</h3>
-                            <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
-                                Natural herbal remedies tailored to your unique needs to restore balance and vitality.
-                            </p>
-                        </div>
-                    </a>
-
-                    <!-- Card 4 -->
-                    <a href="{{ route('service-detail', 'abhyanga-ayurvedic-oil-massage') }}"
-                        class="block group cursor-pointer">
-                        <div class="w-full aspect-video overflow-hidden mb-5 bg-gray-100">
-                            <img src="{{ asset('frontend/assets/abhyanga-ayurvedic-oil-massage.png') }}"
-                                alt="Abhyanga (Ayurvedic Oil Massage)"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                        </div>
-                        <div>
-                            <h3
-                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
-                                Abhyanga (Ayurvedic Oil Massage)</h3>
-                            <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
-                                A soothing full-body oil massage to release toxins, reduce stress and nourish your skin.
-                            </p>
-                        </div>
-                    </a>
-
-                    <!-- Card 5 -->
-                    <a href="{{ route('service-detail', 'shirodhara') }}" class="block group cursor-pointer">
-                        <div class="w-full aspect-video overflow-hidden mb-5 bg-gray-100">
-                            <img src="{{ asset('frontend/assets/shirodhara.png') }}" alt="Shirodhara"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                        </div>
-                        <div>
-                            <h3
-                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
-                                Shirodhara</h3>
-                            <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
-                                A calming therapy of warm oil poured on the forehead to quiet the mind and improve sleep.
-                            </p>
-                        </div>
-                    </a>
-
-                    <!-- Card 6 -->
-                    <a href="{{ route('service-detail', 'panchakarma-inspired-detox-programs-light-versions') }}"
-                        class="block group cursor-pointer">
-                        <div class="w-full aspect-video overflow-hidden mb-5 bg-gray-100">
-                            <img src="{{ asset('frontend/assets/panchakarma-inspired-detox-programs-light-versions.png') }}"
-                                alt="Panchakarma-inspired detox programs (light versions)"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                        </div>
-                        <div>
-                            <h3
-                                class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2 group-hover:text-primary transition-colors">
-                                Panchakarma-inspired detox programs (light versions)</h3>
-                            <p class="text-gray-500 text-base leading-relaxed font-light line-clamp-2">
-                                Gentle detox plans to cleanse your system, boost immunity, and refresh your mind.
-                            </p>
-                        </div>
-                    </a>
+                    @endforelse
                 </div>
             </div>
         </section>

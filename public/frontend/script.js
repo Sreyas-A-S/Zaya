@@ -301,14 +301,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 const data = await response.json();
-                showZayaToast(data.message);
-
+                
                 if (response.ok && data.success !== false) {
+                    showZayaToast(data.message, 'success');
                     newsletterInput.value = '';
+                } else {
+                    showZayaToast(data.message || 'Something went wrong.', 'error');
                 }
             } catch (error) {
                 console.error('Newsletter error:', error);
-                showZayaToast('Something went wrong. Please try again.');
+                showZayaToast('Something went wrong. Please try again.', 'error');
             } finally {
                 newsletterBtn.disabled = false;
                 newsletterBtn.innerHTML = originalIcon;

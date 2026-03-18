@@ -32,13 +32,15 @@
             <div class="relative z-20 text-center px-4 sm:px-16 py-4 max-w-3xl mx-auto animate-on-scroll">
 
                 <!-- Search Bar -->
-                <div
+                <form action="{{ route('find-practitioner.post') }}" method="POST"
                     class="bg-white/20 backdrop-blur-md rounded-3xl md:rounded-full px-4 md:ps-6 md:pe-2 py-4 md:py-2 mb-6 lg:mb-14 flex flex-col md:flex-row items-center max-w-5xl mx-auto border border-[#FDE2D8] gap-4 md:gap-0 relative search-container">
+                    @csrf
                     <!-- Section 1 -->
                     <div
                         class="w-full md:flex-1 flex items-center border-b md:border-b-0 md:border-r border-white/30 pb-3 md:pb-0 md:pr-2">
                         <i class="ri-search-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg search-icon"></i>
                         <input id="hero_search_input" type="text"
+                            name="query"
                             placeholder="{{ $settings['hero_search_placeholder_1'] ?? 'Practitioners, Treatments...' }}"
                             autocomplete="off"
                             class="bg-transparent border-none outline-none text-[#FDE2D8] placeholder-[#FDE2D8]/80 w-full text-base font-normal">
@@ -47,12 +49,13 @@
                     <div class="w-full md:flex-1 flex items-center md:pl-3 pb-2 md:pb-0 md:pr-2">
                         <i class="ri-map-pin-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg"></i>
                         <input id="hero_search_placeholder_2" type="text"
+                            name="pincode"
                             value="{{ session('global_pincode') }}"
                             placeholder="{{ $settings['hero_search_placeholder_2'] ?? 'City, Postal code...' }}"
                             class="bg-transparent border-none outline-none text-[#FDE2D8] placeholder-[#FDE2D8]/80 w-full text-base font-normal">
                     </div>
 
-                    <button
+                    <button type="submit"
                         class="bg-white text-secondary w-full md:w-[62px] h-12 md:h-[62px] rounded-full flex items-center justify-center hover:bg-opacity-90 transition-all gap-2">
                         <span class="md:hidden font-medium text-[#CD8162]">Search</span>
                         <i class="ri-search-line text-lg md:text-[26px] text-[#CD8162]"></i>
@@ -64,7 +67,7 @@
                             <!-- Results will be injected here -->
                         </div>
                     </div>
-                </div>
+                </form>
 
 
 
