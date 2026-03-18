@@ -718,8 +718,7 @@
             let paymentWindow = window.open('about:blank', '_blank');
 
             try {
-                const response = await fetch('{{ route('
-                    bookings.store ') }}', {
+                const response = await fetch('{{ route('bookings.store') }}', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
