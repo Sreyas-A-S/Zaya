@@ -16,7 +16,10 @@
     <link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.1/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+    <style>
+        .iti { width: 100% !important; display: block !important; }
+    </style>
 </head>
 
 <body class="bg-white min-h-screen flex flex-col">
@@ -70,7 +73,7 @@
             <form action="{{ route('register') }}" method="POST" enctype="multipart/form-data" class="max-w-5xl mx-auto"
                 id="practitioner-form">
                 @csrf
-                <input type="hidden" name="type" value="practitioner">
+                <input type="hidden" name="role" value="practitioner">
                 <input type="hidden" name="cropped_image" id="croppedImage">
 
                 <!-- Tab 1: Basic Details -->
@@ -79,16 +82,29 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <!-- Fullname & Photo Row -->
-                        <div class="order-last md:order-first">
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">Fullname</label>
-                          <input type="text" 
-                                    name="fullname" 
-                                    value="{{ old('fullname') }}"
-                                    pattern="^[A-Z][a-zA-Z\s]*$"
-                                    title="Fullname must start with a capital letter and contain only alphabets"
-                                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="Enter Fullname" 
-                                    required>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">First Name</label>
+                                <input type="text" 
+                                        name="first_name" 
+                                        value="{{ old('first_name') }}"
+                                        pattern="^[A-Z][a-zA-Z\s]*$"
+                                        title="First name must start with a capital letter and contain only alphabets"
+                                        class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                        placeholder="Enter First Name" 
+                                        required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">Last Name</label>
+                                <input type="text" 
+                                        name="last_name" 
+                                        value="{{ old('last_name') }}"
+                                        pattern="^[A-Z][a-zA-Z\s]*$"
+                                        title="Last name must start with a capital letter and contain only alphabets"
+                                        class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                        placeholder="Enter Last Name" 
+                                        required>
+                            </div>
                         </div>
                         <div class="flex flex-col items-center order-first md:order-last">
                             <label
@@ -114,40 +130,70 @@
                                 <span class="text-gray-700">Female</span>
                             </label>
                             <label class="gender-radio flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="gender" value="others">
-                                <span class="text-gray-700">Others</span>
+                                <input type="radio" name="gender" value="other">
+                                <span class="text-gray-700">Other</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Email & Mobile -->
+                    <!-- Email -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div>
+                        <div class="md:col-span-1">
                             <label class="block text-gray-700 font-normal mb-4 text-lg">Email</label>
                             <input type="email" name="email" value="{{ old('email') }}"
+                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                title="Please enter a valid email address"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                 placeholder="Enter Email" required>
                         </div>
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">Mobile No.</label>
-                            <input type="tel" name="mobile" value="{{ old('mobile') }}"
+                    </div>
+                    <!-- Phone -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">Phone No.</label>
+                            <input type="tel" name="phone" id="phone" value="{{ old('phone') }}"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter Mobile No." required>
+                                placeholder="Enter Phone No." required>
                         </div>
                     </div>
 
-                    <!-- DOB & Nationality -->
+                    <!-- Password & Confirm Password -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div>
+                                                        <label class="block text-gray-700 font-normal mb-4 text-lg">Password</label>
+                                                        <div class="relative">
+                                                            <input type="password" name="password" 
+                                                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}"
+                                                                title="Must contain at least 8 characters, including NUMBER, UPPERCASE, LOWERCASE and SYMBOL"
+                                                                class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                                                placeholder="Enter Password" 
+                                                                required>
+                                                            <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
+                                                        </div>
+                                                    </div>
+                        <div>
+                                                        <label class="block text-gray-700 font-normal mb-4 text-lg">Confirm Password</label>
+                                                        <div class="relative">
+                                                            <input type="password" name="password_confirmation"
+                                                                class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                                                placeholder="Confirm Password" required>
+                                                            <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
+                                                        </div>
+                                                    </div>                    </div>
+
+                    <!-- DOB & Country -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">DOB</label>
                             <input type="date" name="dob" value="{{ old('dob') }}"
+                                max="{{ now()->subYears(18)->format('Y-m-d') }}"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                 placeholder="DD/MM/YYYY" required>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">Nationality</label>
-                            <select id="nationality-select" name="nationality"
-                                data-default="{{ old('nationality', 'IN') }}" required>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">Country</label>
+                            <select id="country-select" name="country"
+                                data-default="{{ old('country', 'IN') }}" required>
                                 <option value="">Select Country</option>
                             </select>
                         </div>
@@ -156,17 +202,43 @@
                     <!-- Address & Website -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">Residential Address</label>
-                            <input type="text" name="address" value="{{ old('address') }}"
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">Address Line 1</label>
+                            <input type="text" name="address_line_1" value="{{ old('address_line_1') }}"
+                                maxlength="500"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Address with Zipcode" required>
+                                placeholder="Enter Address Line 1" required>
                         </div>
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">Website <span
                                     class="text-gray-400 italic">(if any)</span></label>
-                            <input type="url" name="website" value="{{ old('website') }}"
+                            <input type="url" name="website_url" value="{{ old('website_url') }}"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                 placeholder="Enter URL">
+                        </div>
+                    </div>
+
+                    <!-- City, State, Zipcode -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">City</label>
+                            <input type="text" name="city" value="{{ old('city') }}"
+                                pattern="^[A-Za-z\s]+$" title="Only alphabets and spaces are allowed"
+                                class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                placeholder="Enter City" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">State</label>
+                            <input type="text" name="state" value="{{ old('state') }}"
+                                pattern="^[A-Za-z\s]+$" title="Only alphabets and spaces are allowed"
+                                class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                placeholder="Enter State" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">Zip Code</label>
+                            <input type="text" name="zip_code" value="{{ old('zip_code') }}"
+                                pattern="^[A-Za-z0-9\s\-]{4,10}$" title="Enter a valid zip code (4-10 characters)"
+                                class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                placeholder="Enter Zip Code" required>
                         </div>
                     </div>
                 </div>
@@ -209,14 +281,14 @@
                                     Name</label>
                                 <input type="text" name="education[0][institution]"
                                     class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="Enter Institution Name">
+                                    placeholder="Enter Institution Name" required>
                             </div>
                             <div>
                                 <label class="block text-[#525252] text-lg font-normal mb-3">Duration <span
                                         class="italic text-[#737373] text-[1rem] font-normal">(Hours/Years)</span></label>
                                 <input type="text" name="education[0][duration]"
                                     class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="Enter Duration">
+                                    placeholder="Enter Duration" required>
                             </div>
                         </div>
 
@@ -255,7 +327,7 @@
                             <div class="education-country-wrapper">
                                 <label class="block text-[#525252] text-lg font-normal mb-3">Country</label>
                                 <select id="education-country-select-0" name="education[0][country]"
-                                    class="education-country-select tom-select-white" data-default="" required>
+                                    class="education-country-select" data-default="" required>
                                     <option value="">Select Country</option>
                                 </select>
                             </div>
@@ -417,50 +489,41 @@
                     <div class="bg-[#F5F5F5] rounded-xl mb-6" id="certification-section">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-10">
                             <div>
-                                <label class="block text-gray-600 text-lg mb-4">Institution / School</label>
-                                <div
-                                    class="rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-                                    <div
-                                        class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                <label class="block text-gray-600 text-lg mb-4">ID Proof</label>
+                                <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                    <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
                                         <p class="text-gray-500 text-sm leading-none">Upload</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm">(Max 2MB)</p>
-                                    <input type="file" name="cert_institution" class="hidden"
-                                        accept=".pdf,.jpg,.jpeg,.png">
+                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <input type="file" name="doc_id_proof" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-gray-600 text-lg mb-4">Training / Diploma</label>
-                                <div
-                                    class="rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-                                    <div
-                                        class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                    <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
                                         <p class="text-gray-500 text-sm leading-none">Upload</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm">(Max 2MB)</p>
-                                    <input type="file" name="cert_training" class="hidden"
-                                        accept=".pdf,.jpg,.jpeg,.png">
+                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <input type="file" name="doc_certificates" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-gray-600 text-lg mb-4">Experience <span
-                                        class="text-gray-400">(if any)</span></label>
-                                <div
-                                    class="rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-                                    <div
-                                        class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                <label class="block text-gray-600 text-lg mb-4">Experience <span class="text-gray-400">(if any)</span></label>
+                                <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                    <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
                                         <p class="text-gray-500 text-sm leading-none">Upload</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm">(Max 2MB)</p>
-                                    <input type="file" name="cert_experience" class="hidden"
-                                        accept=".pdf,.jpg,.jpeg,.png">
+                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <input type="file" name="doc_experience" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                                 </div>
                             </div>
                         </div>
                         <div class="bg-[#FFECC8] rounded-lg py-6 px-10 flex justify-between items-center mb-4">
+...
                             <div>
                                 <span class="italic text-[#423131] text-sm">*Incomplete applications will not be
                                     reviewed. Please ensure all documents are legible.</span>
@@ -479,59 +542,48 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 px-10 pt-10">
                             <div>
                                 <label class="block text-gray-600 mb-4 text-lg">Registration Form</label>
-                                <div
-                                    class="rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-                                    <div
-                                        class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                    <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
                                         <p class="text-gray-500 text-sm leading-none">Upload</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm">(Max 2MB)</p>
-                                    <input type="file" name="registration_form" class="hidden"
-                                        accept=".pdf,.jpg,.jpeg,.png">
+                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <input type="file" name="doc_registration" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-gray-700  mb-4 text-lg">Code of Ethics</label>
-                                <div
-                                    class="rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-                                    <div
-                                        class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                    <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
                                         <p class="text-gray-500 text-sm leading-none">Upload</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm">(Max 2MB)</p>
-                                    <input type="file" name="code_of_ethics" class="hidden"
-                                        accept=".pdf,.jpg,.jpeg,.png">
+                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <input type="file" name="doc_ethics" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-gray-700  mb-4 text-lg">Wellness Contract</label>
-                                <div
-                                    class="rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-                                    <div
-                                        class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                    <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
                                         <p class="text-gray-500 text-sm leading-none">Upload</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm">(Max 2MB)</p>
-                                    <input type="file" name="wellness_contract" class="hidden"
-                                        accept=".pdf,.jpg,.jpeg,.png">
+                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <input type="file" name="doc_contract" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                                 </div>
                             </div>
                         </div>
                         <!-- Upload Cover Letter -->
                         <div class="p-10">
                             <label class="block text-gray-700  mb-4 text-lg">Upload Cover Letter</label>
-                            <div
-                                class="rounded-xl py-8 px-4 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                            <div class="upload-box rounded-xl py-8 px-4 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
                                 <div class="inline-block border border-[#BEBEBE] rounded-[16px] px-4 py-2 mb-3">
                                     <i class="ri-upload-cloud-2-line text-[#FABD4D] text-3xl"></i>
                                 </div>
                                 <p class="text-gray-500 text-sm">Choose Images or documents</p>
-                                <p class="text-gray-400 text-xs">JPG, JPEG, PNG, WEBP, DOC & PDF (Max.20MB)</p>
-                                <input type="file" name="cover_letter" class="hidden"
-                                    accept=".pdf,.jpg,.jpeg,.png,.ai,.svg,.xls,.xlsx">
+                                <p class="text-gray-400 text-xs file-name-display">JPG, JPEG, PNG, WEBP, DOC & PDF (Max.20MB)</p>
+                                <input type="file" name="doc_registration" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png,.ai,.svg,.xls,.xlsx" required>
                             </div>
                         </div>
                         <div class="bg-[#FFECC8] rounded-lg py-6 px-10 flex justify-end items-center mb-4">
@@ -745,7 +797,28 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const phoneInput = document.querySelector("#phone");
+            if (phoneInput) {
+                const iti = window.intlTelInput(phoneInput, {
+                    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                    separateDialCode: true,
+                    initialCountry: "in",
+                    preferredCountries: ["in", "ae", "us", "gb"]
+                });
+
+                const form = document.querySelector("#practitioner-form");
+                form.addEventListener('submit', function() {
+                    const fullNumber = iti.getNumber();
+                    if (fullNumber) {
+                        phoneInput.value = fullNumber;
+                    }
+                });
+            }
+        });
+
         let currentTab = 1;
         const totalTabs = 3;
         let cropper;
@@ -818,15 +891,135 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function nextTab() {
+        function validateStep() {
+            const currentTabEl = document.getElementById(`tab-${currentTab}`);
+            const inputs = currentTabEl.querySelectorAll('input, select, textarea');
+            let isValid = true;
+
+            // Clear previous errors
+            currentTabEl.querySelectorAll('.error-message').forEach(el => el.remove());
+            currentTabEl.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500', 'focus:border-red-500'));
+
+            inputs.forEach(input => {
+                let errorMsg = null;
+                
+                if (input.hasAttribute('required') && !input.value.trim() && input.type !== 'radio' && input.type !== 'checkbox' && input.type !== 'file') {
+                    errorMsg = 'This field is required';
+                } else if (input.type === 'radio' && input.hasAttribute('required')) {
+                    const group = currentTabEl.querySelectorAll(`input[name="${input.name}"]`);
+                    const checked = Array.from(group).some(r => r.checked);
+                    if (!checked) errorMsg = 'Please select an option';
+                } else if (!input.checkValidity()) {
+                    errorMsg = input.title || input.validationMessage;
+                }
+
+                if (errorMsg) {
+                    input.classList.add('border-red-500', 'focus:border-red-500');
+                    const err = document.createElement('p');
+                    err.className = 'error-message text-red-500 text-sm mt-1 absolute';
+                    err.textContent = errorMsg;
+                    
+                    // Add position relative to parent to stick the error to the bottom appropriately
+                    const parent = input.parentElement;
+                    if(parent) {
+                        parent.style.position = 'relative';
+                        parent.appendChild(err);
+                    }
+                    isValid = false;
+                }
+
+                // Add real-time clearance
+                input.addEventListener('input', function() {
+                    this.classList.remove('border-red-500', 'focus:border-red-500');
+                    const err = this.parentElement ? this.parentElement.querySelector('.error-message') : null;
+                    if (err) err.remove();
+                }, { once: true });
+            });
+
+            if (currentTab === 1) {
+                const pwd = document.querySelector('input[name="password"]');
+                const conf = document.querySelector('input[name="password_confirmation"]');
+                if (pwd && conf && pwd.value !== conf.value) {
+                    conf.classList.add('border-red-500', 'focus:border-red-500');
+                    const err = document.createElement('p');
+                    err.className = 'error-message text-red-500 text-sm mt-1 absolute';
+                    err.textContent = 'Passwords do not match';
+                    conf.parentElement.style.position = 'relative';
+                    conf.parentElement.appendChild(err);
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        async function nextTab() {
+            if (!validateStep()) {
+                // Focus the first invalid element
+                const firstInvalid = document.querySelector('.border-red-500');
+                if (firstInvalid) firstInvalid.focus();
+                return;
+            }
+
             if (currentTab < totalTabs) {
                 showTab(currentTab + 1);
             } else {
-                // Show Thank You Popup instead of actual submit
-                const popup = document.getElementById('thank-you-popup');
-                if (popup) {
-                    popup.classList.remove('hidden');
-                    popup.classList.add('flex');
+                const form = document.getElementById('practitioner-form');
+                const nextBtn = document.getElementById('next-btn');
+                const btnText = document.getElementById('next-btn-text');
+                
+                const originalText = btnText.textContent;
+                btnText.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Submitting...';
+                nextBtn.disabled = true;
+
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const popup = document.getElementById('thank-you-popup');
+                        if (popup) {
+                            popup.classList.remove('hidden');
+                            popup.classList.add('flex');
+                        }
+                        // Redirect after 3 seconds
+                        setTimeout(() => {
+                            closeThankYouPopup();
+                        }, 3000);
+                    } else {
+                        const data = await response.json();
+                        let errorMessage = 'Validation failed. Please check your inputs.';
+                        if (data.errors && Object.keys(data.errors).length > 0) {
+                            errorMessage = data.errors[Object.keys(data.errors)[0]][0];
+                        } else if (data.message) {
+                            errorMessage = data.message;
+                        }
+                        
+                        if (typeof showZayaToast === 'function') {
+                            showZayaToast(errorMessage, 'error');
+                        } else {
+                            alert(errorMessage);
+                        }
+                        
+                        nextBtn.disabled = false;
+                        btnText.textContent = originalText;
+                    }
+                } catch (error) {
+                    console.error("Submission Error:", error);
+                    if (typeof showZayaToast === 'function') {
+                        showZayaToast('An error occurred during submission. Please try again.', 'error');
+                    } else {
+                        alert('An error occurred. Please try again.');
+                    }
+                    nextBtn.disabled = false;
+                    btnText.textContent = originalText;
                 }
             }
         }
@@ -836,8 +1029,8 @@
             if (popup) {
                 popup.classList.remove('flex');
                 popup.classList.add('hidden');
-                // Optional: redirect to home after closing
-                window.location.href = "{{ route('index') }}";
+                // Redirect to login after closing
+                window.location.href = "{{ route('zaya-login') }}";
             }
         }
 
@@ -889,11 +1082,24 @@
         });
 
         // Upload box click handlers
-        document.querySelectorAll('.border-dashed').forEach(box => {
-            box.addEventListener('click', function () {
+        document.querySelectorAll('.upload-box').forEach(box => {
+            box.addEventListener('click', function (e) {
                 const input = this.querySelector('input[type="file"]');
-                if (input) input.click();
+                if (input && e.target !== input) input.click();
             });
+            const fileInput = box.querySelector('input[type="file"]');
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    if (this.files && this.files[0]) {
+                        const nameDisplay = box.querySelector('.file-name-display');
+                        if (nameDisplay) {
+                            nameDisplay.textContent = this.files[0].name;
+                            nameDisplay.classList.add('text-[#F5A623]');
+                            nameDisplay.classList.remove('text-gray-400');
+                        }
+                    }
+                });
+            }
         });
 
         // Photo upload preview with cropping
@@ -993,7 +1199,18 @@
 
         if (langInput) {
             langInput.addEventListener('input', checkLangFormState);
-            langCheckboxes.forEach(cb => cb.addEventListener('change', checkLangFormState));
+            langCheckboxes.forEach(cb => cb.addEventListener('change', function() {
+                checkLangFormState();
+                const circle = this.nextElementSibling;
+                const dot = circle.querySelector('.inner-dot');
+                if(this.checked) {
+                    circle.style.borderColor = '#FABC41';
+                    dot.style.backgroundColor = '#FABC41';
+                } else {
+                    circle.style.borderColor = '#E5E5E5';
+                    dot.style.backgroundColor = 'transparent';
+                }
+            }));
 
             langAddBtn.addEventListener('click', function () {
                 const langName = langInput.value.trim();
@@ -1009,9 +1226,9 @@
                     <div class="bg-[#FABC41] text-[#423131] px-5 py-2.5 rounded-[99px] flex items-center gap-3 shadow-none transition-all duration-300" 
                          style="animation: popIn 0.3s forwards;" 
                          id="${tagId}">
-                        <span class="font-normal text-[1rem]">${langName}</span>
+                        <span class="font-normal text-[1rem]">${langName} (${selectedSkills.join(', ')})</span>
                         <i class="ri-close-line cursor-pointer text-xl font-normal opacity-70 hover:opacity-100 transition-opacity" onclick="removeLang('${tagId}')"></i>
-                        <input type="hidden" name="languages_known[${langName}]" value="${selectedSkills.join(', ')}">
+                        <input type="hidden" name="languages[]" value="${langName}">
                     </div>
                 `;
 
@@ -1020,7 +1237,13 @@
 
                 // Reset Form Layer
                 langInput.value = '';
-                langCheckboxes.forEach(cb => cb.checked = false);
+                langCheckboxes.forEach(cb => {
+                    cb.checked = false;
+                    const circle = cb.nextElementSibling;
+                    const dot = circle.querySelector('.inner-dot');
+                    circle.style.borderColor = '#E5E5E5';
+                    dot.style.backgroundColor = 'transparent';
+                });
                 checkLangFormState();
             });
 

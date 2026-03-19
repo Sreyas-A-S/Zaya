@@ -95,12 +95,15 @@ class RegisterController extends Controller
                 return $response;
             }
 
-            return $request->wantsJson()
-                ? new \Illuminate\Http\JsonResponse([], 201)
-                : redirect($this->redirectPath());
+            if ($request->wantsJson()) {
+                return response()->json(['success' => 'Registration successful! Your application is under review.'], 201);
+            }
+            return redirect($this->redirectPath());
         } catch (\Exception $e) {
             DB::rollBack();
-            // Log error if needed
+            if ($request->wantsJson()) {
+                return response()->json(['errors' => ['error' => [$e->getMessage()]]], 422);
+            }
             return back()->withInput()->withErrors(['error' => 'Registration failed: ' . $e->getMessage()]);
         }
     }
@@ -157,18 +160,24 @@ class RegisterController extends Controller
             'dob',
             'nationality',
             'residential_address',
+            'address_line_1',
+            'address_line_2',
+            'city',
+            'state',
+            'country',
             'zip_code',
             'phone',
             'website_url',
-            'consultations',
-            'body_therapies',
-            'other_modalities',
             'can_translate_english',
-            'profile_bio',
             'cover_letter_text'
         ]), $filePaths);
 
-        $profileData['first_name'] = $request->name;
+        $profileData['consultations'] = $request->ayurvedic_practices;
+        $profileData['body_therapies'] = $request->massage_practices;
+        $profileData['other_modalities'] = $request->other_modalities;
+        $profileData['profile_bio'] = $request->professional_bio;
+
+        $profileData['first_name'] = $request->first_name;
         $profileData['last_name'] = $request->last_name;
         $profileData['additional_courses'] = $request->has('additional_courses') ? implode(', ', array_filter($request->additional_courses)) : null;
         $profileData['languages_spoken'] = $request->has('languages') ? array_values(array_filter($request->languages)) : null;
@@ -193,7 +202,7 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
+        $rules = [
             'name' => ['nullable', 'string', 'max:255'],
             'first_name' => ['nullable', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
@@ -203,17 +212,25 @@ class RegisterController extends Controller
             'role' => ['required', 'string', 'in:practitioner,patient,client'],
             'profile_photo' => ['nullable', 'image', 'max:2048'],
             'gender' => ['nullable', 'string', 'in:male,female,transgender,other'],
-            'dob' => ['nullable', 'date'],
+            'dob' => ['required', 'date', 'before:today'],
             'phone' => ['nullable', 'string', 'max:20'],
             'mobile' => ['nullable', 'string', 'max:20'],
             'nationality' => ['nullable', 'string', 'max:255'],
+            'residential_address' => ['nullable', 'string', 'max:500'],
+            'city' => ['nullable', 'string', 'max:255'],
             'zip_code' => ['nullable', 'string', 'max:20'],
             'website_url' => ['nullable', 'url', 'max:255'],
             'address_line_1' => ['nullable', 'string', 'max:500'],
             'address_line_2' => ['nullable', 'string', 'max:500'],
             'state' => ['nullable', 'string', 'max:255'],
             'country' => ['nullable', 'string', 'max:255'],
-        ]);
+        ];
+
+        if (isset($data['role']) && $data['role'] === 'practitioner') {
+            $rules['dob'][] = 'before:' . now()->subYears(18)->format('Y-m-d');
+        }
+
+        return Validator::make($data, $rules);
     }
 
     /**
@@ -253,6 +270,11 @@ class RegisterController extends Controller
      */
     protected function registered(Request $request, $user)
     {
+        if ($request->role === 'practitioner') {
+            $this->guard()->logout();
+            return null;
+        }
+
         if ($request->has('redirect')) {
             return redirect($request->redirect);
         }

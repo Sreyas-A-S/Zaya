@@ -48,9 +48,15 @@ document.addEventListener('DOMContentLoaded', function () {
     // Check if nationality select exists on the page
     const nationalitySelect = document.querySelector('#nationality-select');
     if (nationalitySelect) {
-        // Get default value from data attribute or use India
         const defaultValue = nationalitySelect.dataset.default || 'IN';
         initCountrySelector('#nationality-select', defaultValue);
+    }
+
+    // Check if country-select exists on the page (practitioner register form)
+    const countrySelect = document.querySelector('#country-select');
+    if (countrySelect) {
+        const defaultValue = countrySelect.dataset.default || 'IN';
+        initCountrySelector('#country-select', defaultValue);
     }
 
     // Auto-initialize Education Country Selectors

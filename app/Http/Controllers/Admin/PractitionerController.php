@@ -108,13 +108,19 @@ class PractitionerController extends Controller
 
                     return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
                 })
-                ->editColumn('profile_photo', function ($row) {
+                ->addColumn('profile_photo', function ($row) {
                     $url = $row->profile_photo_path ? asset('storage/' . $row->profile_photo_path) : asset('admiro/assets/images/user/user.png');
                     return '<img src="' . $url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
                 })
                 ->editColumn('phone', function ($row) {
                     if (!$row->phone) return 'N/A';
                     return '<a href="javascript:void(0);" class="text-primary fw-bold call-phone" data-phone="' . $row->phone . '" data-name="' . $row->name . '"><i class="iconly-Call icli me-1"></i>' . $row->phone . '</a>';
+                })
+                ->editColumn('nationality', function ($row) {
+                    $code = $row->nationality ?: ($row->country ?: null);
+                    if (!$code) return 'N/A';
+                    $countries = config('countries', []);
+                    return $countries[strtoupper($code)] ?? $code;
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-3">';
@@ -124,7 +130,7 @@ class PractitionerController extends Controller
                     $btn .= '</div>';
                     return $btn;
                 })
-                ->rawColumns(['status', 'phone', 'profile_photo', 'action'])
+                ->rawColumns(['status', 'phone', 'profile_photo', 'action', 'nationality'])
                 ->make(true);
         }
 
@@ -141,7 +147,9 @@ class PractitionerController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
-        return view('admin.practitioners.index', compact('wellnessConsultations', 'bodyTherapies', 'practitionerModalities', 'languages', 'countries'));
+        $countryMap = $allCountries->pluck('name', 'code')->toArray();
+
+        return view('admin.practitioners.index', compact('wellnessConsultations', 'bodyTherapies', 'practitionerModalities', 'languages', 'countries', 'countryMap'));
     }
 
     public function store(Request $request)
@@ -164,8 +172,8 @@ class PractitionerController extends Controller
             'phone' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'website_url' => 'nullable|url|max:255',
             'social_links' => 'nullable|array',
-            'consultations' => 'nullable|array',
-            'body_therapies' => 'nullable|array',
+            'ayurvedic_practices' => 'nullable|array',
+            'massage_practices' => 'nullable|array',
             'other_modalities' => 'nullable|array',
             'additional_courses' => 'nullable|string|max:1000',
             'languages_spoken' => 'nullable|array',
@@ -202,7 +210,7 @@ class PractitionerController extends Controller
                 'last_name' => $validatedData['last_name'],
                 'gender' => $validatedData['gender'] ?? null,
                 'dob' => $validatedData['dob'] ?? null,
-                'nationality' => $validatedData['nationality'] ?? null,
+                'nationality' => $request->country ?? $validatedData['nationality'] ?? null,
                 'address_line_1' => $validatedData['address_line_1'],
                 'address_line_2' => $validatedData['address_line_2'] ?? null,
                 'city' => $validatedData['city'],
@@ -212,23 +220,45 @@ class PractitionerController extends Controller
                 'phone' => $validatedData['phone'] ?? null,
                 'website_url' => $validatedData['website_url'] ?? null,
                 'social_links' => $validatedData['social_links'] ?? null,
-                'consultations' => $validatedData['consultations'] ?? null,
-                'body_therapies' => $validatedData['body_therapies'] ?? null,
-                'other_modalities' => $validatedData['other_modalities'] ?? null,
+                'consultations' => $request->ayurvedic_practices ?? $validatedData['consultations'] ?? null,
+                'body_therapies' => $request->massage_practices ?? $validatedData['body_therapies'] ?? null,
+                'other_modalities' => $request->other_modalities ?? $validatedData['other_modalities'] ?? null,
                 'additional_courses' => $validatedData['additional_courses'] ?? null,
                 'languages_spoken' => $validatedData['languages_spoken'] ?? null,
                 'can_translate_english' => $validatedData['can_translate_english'] ?? false,
-                'profile_bio' => $validatedData['profile_bio'] ?? null,
+                'profile_bio' => $request->professional_bio ?? $request->summary ?? $validatedData['profile_bio'] ?? null,
             ];
 
             if ($request->hasFile('profile_photo')) {
                 $practitionerData['profile_photo_path'] = $request->file('profile_photo')->store('practitioner_photos', 'public');
             }
 
-            $docFields = ['doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 'doc_contract', 'doc_id_proof'];
-            foreach ($docFields as $field) {
-                if ($request->hasFile($field)) {
-                    $practitionerData[$field] = $request->file($field)->store('practitioner_docs', 'public');
+            $docFields = [
+                'doc_cover_letter' => 'doc_cover_letter',
+                'doc_certificates' => 'doc_certificates',
+                'doc_experience' => 'doc_experience',
+                'doc_registration' => 'doc_registration',
+                'doc_ethics' => 'doc_ethics',
+                'doc_contract' => 'doc_contract',
+                'doc_id_proof' => 'doc_id_proof'
+            ];
+            
+            // Map alternative names from registration form
+            $formDocMappings = [
+                'doc_cover_letter' => 'registration_form',
+                'doc_certificates' => 'doc_certificates',
+                'doc_experience' => 'experience_certificate',
+                'doc_registration' => 'registration_form', // fallback
+                'doc_ethics' => 'code_of_ethics',
+                'doc_contract' => 'zaya_contract',
+                'doc_id_proof' => 'doc_id_proof'
+            ];
+
+            foreach ($docFields as $dbField => $requestField) {
+                if ($request->hasFile($requestField)) {
+                    $practitionerData[$dbField] = $request->file($requestField)->store('practitioner_docs', 'public');
+                } elseif (isset($formDocMappings[$dbField]) && $request->hasFile($formDocMappings[$dbField])) {
+                    $practitionerData[$dbField] = $request->file($formDocMappings[$dbField])->store('practitioner_docs', 'public');
                 }
             }
 
@@ -292,8 +322,8 @@ class PractitionerController extends Controller
             'phone' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'website_url' => 'nullable|url|max:255',
             'social_links' => 'nullable|array',
-            'consultations' => 'nullable|array',
-            'body_therapies' => 'nullable|array',
+            'ayurvedic_practices' => 'nullable|array',
+            'massage_practices' => 'nullable|array',
             'other_modalities' => 'nullable|array',
             'additional_courses' => 'nullable|string|max:1000',
             'languages_spoken' => 'nullable|array',
@@ -339,9 +369,9 @@ class PractitionerController extends Controller
                 'phone' => $validatedData['phone'] ?? null,
                 'website_url' => $validatedData['website_url'] ?? null,
                 'social_links' => $validatedData['social_links'] ?? null,
-                'consultations' => $validatedData['consultations'] ?? null,
-                'body_therapies' => $validatedData['body_therapies'] ?? null,
-                'other_modalities' => $validatedData['other_modalities'] ?? null,
+                'consultations' => $request->ayurvedic_practices ?? null,
+                'body_therapies' => $request->massage_practices ?? null,
+                'other_modalities' => $request->other_modalities ?? null,
                 'additional_courses' => $validatedData['additional_courses'] ?? null,
                 'languages_spoken' => $validatedData['languages_spoken'] ?? null,
                 'can_translate_english' => $request->has('can_translate_english'),
