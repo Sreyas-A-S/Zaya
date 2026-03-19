@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             YogaTherapistSeeder::class,
             TestimonialSeeder::class,
             ServiceSeeder::class,
+            ServiceSeederFrench::class,
             PractitionerReviewSeeder::class,
             CountriesSeeder::class,
             GeneralSettingSeeder::class,
