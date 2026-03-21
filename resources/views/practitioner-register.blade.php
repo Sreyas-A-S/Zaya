@@ -138,7 +138,7 @@
 
                     <!-- Email -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="md:col-span-1">
+                        <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">Email</label>
                             <input type="email" name="email" value="{{ old('email') }}"
                                 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
@@ -146,10 +146,7 @@
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                 placeholder="Enter Email" required>
                         </div>
-                    </div>
-                    <!-- Phone -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="md:col-span-2">
+                        <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">Phone No.</label>
                             <input type="tel" name="phone" id="phone" value="{{ old('phone') }}"
                                 maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
@@ -329,18 +326,15 @@
                             <div class="education-country-wrapper">
                                 <label class="block text-[#525252] text-lg font-normal mb-3">Country</label>
                                 <select id="education-country-select-0" name="education[0][country]"
-                                    class="education-country-select" data-default="" required>
+                                    class="education-country-select w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]" data-default="" required>
                                     <option value="">Select Country</option>
                                 </select>
                             </div>
                         </div>
-
-                        </div>
                     </div>
-                    </div>
+                </div>
 
-                    <!-- Professional Bio -->
-                    <div class="mb-8">
+                <div class="mb-8">
                         <h3 class="text-2xl font-medium text-gray-900 mb-4">Professional Bio</h3>
                         <textarea name="professional_bio"
                             class="w-full py-4 px-5 bg-[#F5F5F5] rounded-2xl outline-none text-[0.95rem] text-gray-700 transition-all duration-300 min-h-[200px] resize-y placeholder:text-gray-400 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
@@ -1181,6 +1175,75 @@
             }
         });
 
+        const countriesData = [
+            { code: "AF", name: "Afghanistan", flag: "🇦🇫" }, { code: "AL", name: "Albania", flag: "🇦🇱" }, { code: "DZ", name: "Algeria", flag: "🇩🇿" },
+            { code: "AD", name: "Andorra", flag: "🇦🇩" }, { code: "AO", name: "Angola", flag: "🇦🇴" }, { code: "AG", name: "Antigua and Barbuda", flag: "🇦🇬" },
+            { code: "AR", name: "Argentina", flag: "🇦🇷" }, { code: "AM", name: "Armenia", flag: "🇦🇲" }, { code: "AU", name: "Australia", flag: "🇦🇺" },
+            { code: "AT", name: "Austria", flag: "🇦🇹" }, { code: "AZ", name: "Azerbaijan", flag: "🇦🇿" }, { code: "BS", name: "Bahamas", flag: "🇧🇸" },
+            { code: "BH", name: "Bahrain", flag: "🇧🇭" }, { code: "BD", name: "Bangladesh", flag: "🇧🇩" }, { code: "BB", name: "Barbados", flag: "🇧🇧" },
+            { code: "BY", name: "Belarus", flag: "🇧🇾" }, { code: "BE", name: "Belgium", flag: "🇧🇪" }, { code: "BZ", name: "Belize", flag: "🇧🇿" },
+            { code: "BJ", name: "Benin", flag: "🇧🇯" }, { code: "BT", name: "Bhutan", flag: "🇧🇹" }, { code: "BO", name: "Bolivia", flag: "🇧🇴" },
+            { code: "BA", name: "Bosnia and Herzegovina", flag: "🇧🇦" }, { code: "BW", name: "Botswana", flag: "🇧🇼" }, { code: "BR", name: "Brazil", flag: "🇧🇷" },
+            { code: "BN", name: "Brunei", flag: "🇧🇳" }, { code: "BG", name: "Bulgaria", flag: "🇧🇬" }, { code: "BF", name: "Burkina Faso", flag: "🇧🇫" },
+            { code: "BI", name: "Burundi", flag: "🇧🇮" }, { code: "CV", name: "Cabo Verde", flag: "🇨🇻" }, { code: "KH", name: "Cambodia", flag: "🇰🇭" },
+            { code: "CM", name: "Cameroon", flag: "🇨🇲" }, { code: "CA", name: "Canada", flag: "🇨🇦" }, { code: "CF", name: "Central African Republic", flag: "🇨🇫" },
+            { code: "TD", name: "Chad", flag: "🇹🇩" }, { code: "CL", name: "Chile", flag: "🇨🇱" }, { code: "CN", name: "China", flag: "🇨🇳" },
+            { code: "CO", name: "Colombia", flag: "🇨🇴" }, { code: "KM", name: "Comoros", flag: "🇰🇲" }, { code: "CG", name: "Congo", flag: "🇨🇬" },
+            { code: "CD", name: "Congo (DRC)", flag: "🇨🇩" }, { code: "CR", name: "Costa Rica", flag: "🇨🇷" }, { code: "CI", name: "Côte d'Ivoire", flag: "🇨🇮" },
+            { code: "HR", name: "Croatia", flag: "🇭🇷" }, { code: "CU", name: "Cuba", flag: "🇨🇺" }, { code: "CY", name: "Cyprus", flag: "🇨🇾" },
+            { code: "CZ", name: "Czechia", flag: "🇨🇿" }, { code: "DK", name: "Denmark", flag: "🇩🇰" }, { code: "DJ", name: "Djibouti" },
+            { code: "DM", name: "Dominica", flag: "🇩🇲" }, { code: "DO", name: "Dominican Republic", flag: "🇩🇴" }, { code: "EC", name: "Ecuador", flag: "🇪🇨" },
+            { code: "EG", name: "Egypt", flag: "🇪🇬" }, { code: "SV", name: "El Salvador", flag: "🇸🇻" }, { code: "GQ", name: "Equatorial Guinea", flag: "🇬🇶" },
+            { code: "ER", name: "Eritrea", flag: "🇪🇷" }, { code: "EE", name: "Estonia", flag: "🇪🇪" }, { code: "SZ", name: "Eswatini", flag: "🇸🇿" },
+            { code: "ET", name: "Ethiopia", flag: "🇪🇹" }, { code: "FJ", name: "Fiji", flag: "🇫🇯" }, { code: "FI", name: "Finland", flag: "🇫🇮" },
+            { code: "FR", name: "France", flag: "🇫🇷" }, { code: "GA", name: "Gabon", flag: "🇬🇦" }, { code: "GM", name: "Gambia", flag: "🇬🇲" },
+            { code: "GE", name: "Georgia", flag: "🇬🇪" }, { code: "DE", name: "Germany", flag: "🇩🇪" }, { code: "GH", name: "Ghana", flag: "🇬🇭" },
+            { code: "GR", name: "Greece", flag: "🇬🇷" }, { code: "GD", name: "Grenada", flag: "🇬🇩" }, { code: "GT", name: "Guatemala", flag: "🇬🇹" },
+            { code: "GN", name: "Guinea", flag: "🇬🇳" }, { code: "GW", name: "Guinea-Bissau", flag: "🇬🇼" }, { code: "GY", name: "Guyana", flag: "🇬🇾" },
+            { code: "HT", name: "Haiti", flag: "🇭🇹" }, { code: "HN", name: "Honduras", flag: "🇭🇳" }, { code: "HU", name: "Hungary", flag: "🇭🇺" },
+            { code: "IS", name: "Iceland", flag: "🇮🇸" }, { code: "IN", name: "India", flag: "🇮🇳" }, { code: "ID", name: "Indonesia", flag: "🇮🇩" },
+            { code: "IR", name: "Iran", flag: "🇮🇷" }, { code: "IQ", name: "Iraq", flag: "🇮🇶" }, { code: "IE", name: "Ireland", flag: "🇮🇪" },
+            { code: "IL", name: "Israel", flag: "🇮🇱" }, { code: "IT", name: "Italy", flag: "🇮🇹" }, { code: "JM", name: "Jamaica", flag: "🇯🇲" },
+            { code: "JP", name: "Japan", flag: "🇯🇵" }, { code: "JO", name: "Jordan", flag: "🇯🇴" }, { code: "KZ", name: "Kazakhstan", flag: "🇰🇿" },
+            { code: "KE", name: "Kenya", flag: "🇰🇪" }, { code: "KI", name: "Kiribati" }, { code: "KP", name: "North Korea", flag: "🇰🇵" },
+            { code: "KR", name: "South Korea", flag: "🇰🇷" }, { code: "KW", name: "Kuwait", flag: "🇰🇼" }, { code: "KG", name: "Kyrgyzstan", flag: "🇰🇬" },
+            { code: "LA", name: "Laos", flag: "🇱🇦" }, { code: "LV", name: "Latvia", flag: "🇱🇻" }, { code: "LB", name: "Lebanon", flag: "🇱🇧" },
+            { code: "LS", name: "Lesotho", flag: "🇱🇸" }, { code: "LR", name: "Liberia", flag: "🇱🇷" }, { code: "LY", name: "Libya", flag: "🇱🇾" },
+            { code: "LI", name: "Liechtenstein", flag: "🇱🇮" }, { code: "LT", name: "Lithuania", flag: "🇱🇹" }, { code: "LU", name: "Luxembourg", flag: "🇱🇺" },
+            { code: "MG", name: "Madagascar", flag: "🇲🇬" }, { code: "MW", name: "Malawi", flag: "🇲🇼" }, { code: "MY", name: "Malaysia", flag: "🇲🇾" },
+            { code: "MV", name: "Maldives", flag: "🇲🇻" }, { code: "ML", name: "Mali", flag: "🇲🇱" }, { code: "MT", name: "Malta", flag: "🇲🇹" },
+            { code: "MH", name: "Marshall Islands", flag: "🇲🇭" }, { code: "MR", name: "Mauritania", flag: "🇲🇷" }, { code: "MU", name: "Mauritius", flag: "🇲🇺" },
+            { code: "MX", name: "Mexico", flag: "🇲🇽" }, { code: "FM", name: "Micronesia", flag: "🇫🇲" }, { code: "MD", name: "Moldova", flag: "🇲🇩" },
+            { code: "MC", name: "Monaco", flag: "🇲🇨" }, { code: "MN", name: "Mongolia", flag: "🇲🇳" }, { code: "ME", name: "Montenegro", flag: "🇲🇪" },
+            { code: "MA", name: "Morocco", flag: "🇲🇦" }, { code: "MZ", name: "Mozambique" }, { code: "MM", name: "Myanmar", flag: "🇲🇲" },
+            { code: "NA", name: "Namibia", flag: "🇳🇦" }, { code: "NR", name: "Nauru", flag: "🇳🇷" }, { code: "NP", name: "Nepal", flag: "🇳🇵" },
+            { code: "NL", name: "Netherlands", flag: "🇳🇱" }, { code: "NZ", name: "New Zealand", flag: "🇳🇿" }, { code: "NI", name: "Nicaragua", flag: "🇳🇮" },
+            { code: "NE", name: "Niger", flag: "🇳🇪" }, { code: "NG", name: "Nigeria", flag: "🇳🇬" }, { code: "MK", name: "North Macedonia", flag: "🇲🇰" },
+            { code: "NO", name: "Norway", flag: "🇳🇴" }, { code: "OM", name: "Oman", flag: "🇴🇲" }, { code: "PK", name: "Pakistan", flag: "🇵🇰" },
+            { code: "PW", name: "Palau", flag: "🇵🇼" }, { code: "PS", name: "Palestine", flag: "🇵🇸" }, { code: "PA", name: "Panama", flag: "🇵🇦" },
+            { code: "PG", name: "Papua New Guinea", flag: "🇵🇬" }, { code: "PY", name: "Paraguay" }, { code: "PE", name: "Peru", flag: "🇵🇪" },
+            { code: "PH", name: "Philippines", flag: "🇵🇭" }, { code: "PL", name: "Poland", flag: "🇵🇱" }, { code: "PT", name: "Portugal", flag: "🇵🇹" },
+            { code: "QA", name: "Qatar", flag: "🇶🇦" }, { code: "RO", name: "Romania", flag: "🇷🇴" }, { code: "RU", name: "Russia", flag: "🇷🇺" },
+            { code: "RW", name: "Rwanda", flag: "🇷🇼" }, { code: "KN", name: "Saint Kitts and Nevis" }, { code: "LC", name: "Saint Lucia", flag: "🇱🇨" },
+            { code: "VC", name: "Saint Vincent and the Grenadines", flag: "🇻🇨" }, { code: "WS", name: "Samoa", flag: "🇼🇸" }, { code: "SM", name: "San Marino", flag: "🇸🇲" },
+            { code: "ST", name: "São Tomé and Príncipe", flag: "🇸🇹" }, { code: "SA", name: "Saudi Arabia", flag: "🇸🇦" }, { code: "SN", name: "Senegal", flag: "🇸🇳" },
+            { code: "RS", name: "Serbia", flag: "🇷🇸" }, { code: "SC", name: "Seychelles", flag: "🇸🇨" }, { code: "SL", name: "Sierra Leone", flag: "🇸🇱" },
+            { code: "SG", name: "Singapore", flag: "🇸🇬" }, { code: "SK", name: "Slovakia", flag: "🇸🇰" }, { code: "SI", name: "Slovenia", flag: "🇸🇮" },
+            { code: "SB", name: "Solomon Islands", flag: "🇸🇧" }, { code: "SO", name: "Somalia", flag: "🇸🇴" }, { code: "ZA", name: "South Africa" },
+            { code: "SS", name: "South Sudan", flag: "🇸🇸" }, { code: "ES", name: "Spain", flag: "🇪🇸" }, { code: "LK", name: "Sri Lanka", flag: "🇱🇰" },
+            { code: "SD", name: "Sudan", flag: "🇸🇩" }, { code: "SR", name: "Suriname", flag: "🇸🇷" }, { code: "SE", name: "Sweden", flag: "🇸🇪" },
+            { code: "CH", name: "Switzerland", flag: "🇨🇭" }, { code: "SY", name: "Syria", flag: "🇸🇾" }, { code: "TW", name: "Taiwan", flag: "🇹🇼" },
+            { code: "TJ", name: "Tajikistan", flag: "🇹🇯" }, { code: "TZ", name: "Tanzania", flag: "🇹🇿" }, { code: "TH", name: "Thailand", flag: "🇹🇭" },
+            { code: "TL", name: "Timor-Leste", flag: "🇹🇱" }, { code: "TG", name: "Togo", flag: "🇹🇬" }, { code: "TO", name: "Tonga", flag: "🇹🇴" },
+            { code: "TT", name: "Trinidad and Tobago", flag: "🇹🇹" }, { code: "TN", name: "Tunisia", flag: "🇹🇳" }, { code: "TR", name: "Turkey", flag: "🇹🇷" },
+            { code: "TM", name: "Turkmenistan", flag: "🇹🇲" }, { code: "TV", name: "Tuvalu", flag: "🇹🇻" }, { code: "UG", name: "Uganda", flag: "🇺🇬" },
+            { code: "UA", name: "Ukraine", flag: "🇺🇦" }, { code: "AE", name: "United Arab Emirates", flag: "🇦🇪" }, { code: "GB", name: "United Kingdom", flag: "🇬🇧" },
+            { code: "US", name: "United States", flag: "🇺🇸" }, { code: "UY", name: "Uruguay", flag: "🇺🇾" }, { code: "UZ", name: "Uzbekistan", flag: "🇺🇿" },
+            { code: "VU", name: "Vanuatu", flag: "🇻🇺" }, { code: "VA", name: "Vatican City", flag: "🇻🇦" }, { code: "VE", name: "Venezuela", flag: "🇻🇪" },
+            { code: "VN", name: "Vietnam", flag: "🇻🇳" }, { code: "YE", name: "Yemen", flag: "🇾🇪" }, { code: "ZM", name: "Zambia", flag: "🇿🇲" },
+            { code: "ZW", name: "Zimbabwe", flag: "🇿🇼" }
+        ];
+
         let educationCount = 1;
 
         function addEducation() {
@@ -1261,8 +1324,9 @@
                         <div class="education-country-wrapper">
                             <label class="block text-[#525252] text-lg font-normal mb-3">Country</label>
                             <select id="education-country-select-${index}" name="education[${index}][country]"
-                                class="education-country-select" data-default="" required>
+                                class="education-country-select w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]" data-default="" required>
                                 <option value="">Select Country</option>
+                                ${countriesData.map(c => `<option value="${c.code}">${c.flag} ${c.name}</option>`).join('')}
                             </select>
                         </div>
                     </div>
@@ -1273,9 +1337,13 @@
             
             // Initialize dynamic elements
             setupCustomSelect(`education-type-select-${index}`, `education-type-input-${index}`, `education-type-selected-${index}`);
-            if (window.initCountrySelector) {
-                window.initCountrySelector(`#education-country-select-${index}`, '');
-            }
+            
+            // Use a 100ms timeout to ensure DOM is fully ready for TomSelect
+            setTimeout(() => {
+                if (window.initCountrySelector) {
+                    window.initCountrySelector(`#education-country-select-${index}`, '');
+                }
+            }, 100);
         }
 
         window.removeEducation = function(index) {
@@ -1512,6 +1580,11 @@
 
         // Initialize Education Type format Custom Select
         setupCustomSelect('education-type-select-0', 'education-type-input-0', 'education-type-selected-0');
+
+        // Ensure first Country Selector is initialized if not automatically caught
+        if (window.initCountrySelector) {
+            window.initCountrySelector('#education-country-select-0', '');
+        }
 
         // Initialize TomSelect for lang-input
         new TomSelect("#lang-input", {

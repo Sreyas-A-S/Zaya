@@ -421,7 +421,7 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Middle Name</label>
                         <input type="text" name="middle_name" value="{{ old('middle_name') }}" class="reg-input"
-                            placeholder="Enter Middle Name">
+                            placeholder="Enter Middle Name" pattern="^[a-zA-Z][a-zA-Z\s]*$" title="Middle name can start with a small or capital letter and must contain only alphabets">
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Last Name</label>
@@ -596,7 +596,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Languages Spoken</label>
-                        <select id="languages-select" name="languages[]" multiple placeholder="Select Languages" class="reg-input">
+                        <select id="languages-select" name="languages[]" multiple placeholder="Select Languages">
                             @foreach($languages as $lang)
                                 <option value="{{ $lang->code }}">{{ $lang->name }}</option>
                             @endforeach
@@ -797,13 +797,32 @@
                     plugins: ['remove_button'],
                     maxItems: 10,
                     placeholder: 'Select Languages',
-                    controlClass: 'ts-control reg-input',
+                    controlClass: 'ts-control',
                     render: {
                         option: function(data, escape) {
-                            return '<div>' + escape(data.text) + '</div>';
+                            // Map language codes to country flags where common
+                            const langToCountry = {
+                                'en': 'gb', 'fr': 'fr', 'es': 'es', 'de': 'de', 'zh': 'cn', 
+                                'hi': 'in', 'ja': 'jp', 'ru': 'ru', 'ar': 'sa', 'pt': 'pt',
+                                'it': 'it', 'ko': 'kr'
+                            };
+                            const flagCode = langToCountry[data.value.toLowerCase()] || data.value.toLowerCase();
+                            return `<div class="country-option">
+                                <span class="fi fi-${flagCode} country-option-flag"></span>
+                                <span class="country-option-name">${escape(data.text)}</span>
+                            </div>`;
                         },
                         item: function(data, escape) {
-                            return '<div>' + escape(data.text) + '</div>';
+                            const langToCountry = {
+                                'en': 'gb', 'fr': 'fr', 'es': 'es', 'de': 'de', 'zh': 'cn', 
+                                'hi': 'in', 'ja': 'jp', 'ru': 'ru', 'ar': 'sa', 'pt': 'pt',
+                                'it': 'it', 'ko': 'kr'
+                            };
+                            const flagCode = langToCountry[data.value.toLowerCase()] || data.value.toLowerCase();
+                            return `<div class="country-item">
+                                <span class="fi fi-${flagCode} country-item-flag"></span>
+                                <span class="country-item-name">${escape(data.text)}</span>
+                            </div>`;
                         }
                     }
                 });
@@ -829,8 +848,7 @@
             const dobInput = document.getElementById('dob-input');
             if (dobInput) {
                 const today = new Date();
-                const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-                const maxDate = eighteenYearsAgo.toISOString().split('T')[0];
+                const maxDate = today.toISOString().split('T')[0];
                 dobInput.max = maxDate;
             }
 

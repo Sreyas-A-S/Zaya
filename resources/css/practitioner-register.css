@@ -65,20 +65,20 @@ h6 {
     font-size: 0.95rem;
     color: #374151;
     transition: all 0.3s ease;
-    height: 54px;
+    height: 51px;
     display: flex;
     align-items: center;
 }
 
 .education-country-select+.ts-wrapper .ts-control {
-    padding: 12px 24px;
+    padding: 14px 24px;
     background: white;
     border-radius: 9999px;
     border: 1px solid transparent;
     font-size: 0.95rem;
     color: #374151;
     transition: all 0.3s ease;
-    height: 48px;
+    height: 51px;
     display: flex;
     align-items: center;
 }
@@ -258,7 +258,7 @@ h6 {
     transition: all 0.3s ease;
     color: #A3A3A3;
     font-size: 0.95rem;
-    min-height: 48px;
+    min-height: 51px;
 }
 
 .custom-select-trigger.has-value {
