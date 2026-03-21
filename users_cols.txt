@@ -1,0 +1,21 @@
+Array
+(
+    [0] => id
+    [1] => name
+    [2] => first_name
+    [3] => middle_name
+    [4] => last_name
+    [5] => gender
+    [6] => email
+    [7] => national_id
+    [8] => languages
+    [9] => email_verified_at
+    [10] => password
+    [11] => status
+    [12] => remember_token
+    [13] => created_at
+    [14] => updated_at
+    [15] => role
+    [16] => profile_pic
+    [17] => phone
+)

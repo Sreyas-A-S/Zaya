@@ -13,9 +13,13 @@
     <title>Client Registration - Zaya Wellness</title>
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/country-selector.js'])
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.1/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <style>
+        .iti { width: 100% !important; display: block !important; }
         /* Custom Gender Select Dropdown Styles */
         .custom-select-wrapper {
             position: relative;
@@ -162,6 +166,15 @@
             font-size: 0.95rem;
             color: #374151;
             transition: all 0.3s ease;
+            appearance: none;
+        }
+
+        select.reg-input {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23374151'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 24px center;
+            background-size: 1.2rem;
+            padding-right: 50px;
         }
 
         .reg-input::placeholder {
@@ -198,40 +211,34 @@
             opacity: 1;
         }
 
-        /* Tom Select Overrides */
-        #nationality-select+.ts-wrapper {
-            width: 100%;
+        /* Tom Select Premium Alignment */
+        .ts-wrapper {
+            width: 100% !important;
         }
 
-        #nationality-select+.ts-wrapper .ts-control {
-            padding: 14px 24px;
-            background: #F5F5F5;
-            border-radius: 9999px;
-            border: 1px solid transparent;
-            font-size: 0.95rem;
-            color: #374151;
-            transition: all 0.3s ease;
-            min-height: 48px;
-            display: flex;
-            align-items: center;
+        .ts-control {
+            padding: 10px 24px !important;
+            background: #F5F5F5 !important;
+            border-radius: 9999px !important;
+            border: 1px solid transparent !important;
+            min-height: 52px !important;
+            display: flex !important;
+            align-items: center !important;
+            width: 100% !important;
+            transition: all 0.3s ease !important;
         }
 
-        #nationality-select+.ts-wrapper .ts-control:hover {
-            background: #EFEFEF;
+        .ts-wrapper.focus .ts-control {
+            border-color: #97563D !important;
+            background: white !important;
+            box-shadow: 0 0 0 3px rgba(151, 86, 61, 0.1) !important;
         }
 
-        #nationality-select+.ts-wrapper.focus .ts-control {
-            border-color: #97563D;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(151, 86, 61, 0.1);
-        }
-
-        #nationality-select+.ts-wrapper .ts-control input {
-            color: #374151;
-        }
-
-        #nationality-select+.ts-wrapper .ts-control input::placeholder {
-            color: #9CA3AF;
+        .ts-dropdown {
+            border-radius: 12px !important;
+            border: 1px solid #E5E7EB !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1) !important;
+            overflow: hidden !important;
         }
 
         #nationality-select+.ts-wrapper .ts-dropdown {
@@ -406,7 +413,7 @@
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">First Name</label>
                         <input type="text" name="first_name" value="{{ old('first_name') }}"
                             class="reg-input @error('first_name') border-red-500! @enderror"
-                            placeholder="Enter First Name" required>
+                            placeholder="Enter First Name" required pattern="^[A-Z][a-zA-Z\s]*$" title="First name must start with a capital letter and contain only alphabets">
                         @error('first_name')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
@@ -420,7 +427,7 @@
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Last Name</label>
                         <input type="text" name="last_name" value="{{ old('last_name') }}"
                             class="reg-input @error('last_name') border-red-500! @enderror"
-                            placeholder="Enter Last Name" required>
+                            placeholder="Enter Last Name" required pattern="^[A-Z][a-zA-Z\s]*$" title="Last name must start with a capital letter and contain only alphabets">
                         @error('last_name')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
@@ -552,43 +559,109 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Captcha
-                            Verification</label>
-                        <div class="flex items-center gap-3 md:gap-4 lg:gap-6">
-                            <!-- Captcha Mockup -->
-                            <div
-                                class="bg-[#F5F5F5] rounded-full flex items-center justify-center py-2 h-[52px] min-w-[130px] md:min-w-[150px] overflow-hidden relative shrink-0">
-                                <div class="absolute inset-0 p-2 w-full h-full pointer-events-none opacity-60">
-                                    <!-- SVG lines to accurately mimic captcha distortion -->
-                                    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"
-                                        preserveAspectRatio="none">
-                                        <path d="M0,15 Q30,30 50,15 T150,15" stroke="black" stroke-width="1.5"
-                                            fill="none" />
-                                        <path d="M0,35 Q40,20 70,35 T150,20" stroke="black" stroke-width="1"
-                                            fill="none" />
-                                        <path d="M0,45 Q50,55 80,10 T150,45" stroke="black" stroke-width="2"
-                                            fill="none" />
-                                        <circle cx="10%" cy="30%" r="1" fill="black" />
-                                        <circle cx="30%" cy="70%" r="1.5" fill="black" />
-                                        <circle cx="80%" cy="20%" r="2" fill="black" />
-                                        <circle cx="60%" cy="80%" r="1" fill="black" />
-                                    </svg>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Zip Code</label>
+                        <input type="text" name="zip_code" value="{{ old('zip_code') }}" class="reg-input" 
+                                placeholder="Pincode" required maxlength="8" pattern="\d*" title="Maximum 8 numerical values allowed"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
+                    </div>
+                </div>
+
+                <!-- Consultation Preferences -->
+                <div class="mb-10">
+                    <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Preferred Speciality of Consultation</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8 bg-gray-50/50 p-6 md:p-8 rounded-3xl">
+                        @foreach($consultationPreferences as $pref)
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <div class="relative w-6 h-6 flex-shrink-0">
+                                    <input type="checkbox" name="consultation_preferences[]" value="{{ $pref->name }}" class="peer absolute inset-0 opacity-0 z-10 cursor-pointer">
+                                    <div class="w-full h-full border-2 border-gray-300 rounded-full peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center peer-checked:[&>i]:opacity-100">
+                                        <i class="ri-check-line text-white text-sm opacity-0 transition-opacity font-bold"></i>
+                                    </div>
                                 </div>
-                                <span
-                                    class="relative z-10 text-[28px] md:text-[32px] font-black text-gray-900 tracking-[2px] md:tracking-[4px]"
-                                    style="font-family: 'Courier New', Courier, monospace; transform: scaleY(1.3) skewX(-12deg); text-shadow: 1px 1px 0px rgba(245,245,245,0.8), -1px -1px 0px rgba(245,245,245,0.8);">98RW6</span>
+                                <span class="text-gray-700 group-hover:text-primary transition-colors">{{ $pref->name }}</span>
+                            </label>
+                        @endforeach
+                        <div class="col-span-1 sm:col-span-2 lg:col-span-3 mt-4 pt-4 border-t border-gray-200">
+                            <div class="flex items-center gap-3">
+                                <input type="text" id="new-preference" placeholder="Add New Preference" class="reg-input flex-1 max-w-xs">
+                                <button type="button" onclick="addNewPreference()" class="bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-90 transition-all">
+                                    <i class="ri-add-line text-xl"></i>
+                                </button>
                             </div>
-
-                            <!-- Refresh Arrow -->
-                            <button type="button"
-                                class="text-[#1052CE] hover:text-blue-800 transition-colors focus:outline-none cursor-pointer shrink-0">
-                                <i class="ri-restart-line text-[22px] md:text-[26px] font-medium"
-                                    style="display: inline-block;"></i>
-                            </button>
-
-                            <!-- Captcha Input -->
-                            <input type="text" name="captcha" placeholder="Enter Code" class="reg-input w-full">
                         </div>
+                    </div>
+                </div>
+
+                <!-- Row: Languages & Referral -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Languages Spoken</label>
+                        <select id="languages-select" name="languages[]" multiple placeholder="Select Languages" class="reg-input">
+                            @foreach($languages as $lang)
+                                <option value="{{ $lang->code }}">{{ $lang->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">How did you hear about us?</label>
+                        <select name="referral_type" class="reg-input w-full">
+                            <option value="">Select Option</option>
+                            <option value="Direct Search">Direct Search</option>
+                            <option value="Social Media">Social Media</option>
+                            <option value="Friends & Family">Friends & Family</option>
+                            <option value="Healthcare Practitioner">Referral by Healthcare Practitioner</option>
+                            <option value="Other">Other Sources</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
+                        <div class="relative">
+                            <input type="password" name="password" id="password"
+                                class="reg-input @error('password') border-red-500! @enderror"
+                                placeholder="Enter Password" required>
+                            <button type="button" onclick="togglePassword('password')"
+                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="ri-eye-line text-lg" id="password-icon"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-primary mt-2 pl-4">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</p>
+                        @error('password')
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Confirm Password</label>
+                        <div class="relative">
+                            <input type="password" name="password_confirmation" id="password_confirmation"
+                                class="reg-input"
+                                placeholder="Confirm Password" required>
+                            <button type="button" onclick="togglePassword('password_confirmation')"
+                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="ri-eye-line text-lg" id="password_confirmation-icon"></i>
+                            </button>
+                        </div>
+                        <span id="password-match-error" class="text-red-500 text-xs mt-1 pl-4 block h-4"></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
+                    <div class="md:col-span-1">
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Captcha Verification</label>
+                        <div class="flex items-center gap-4">
+                            <div class="bg-white rounded-full flex items-center justify-center h-[52px] w-[150px] overflow-hidden relative shrink-0 border border-gray-200">
+                                <img src="{{ route('captcha') }}" id="captcha-img" alt="captcha" class="w-full h-full object-cover">
+                            </div>
+                            <button type="button" onclick="refreshCaptcha()" class="text-[#1052CE] hover:text-blue-800 transition-colors cursor-pointer shrink-0">
+                                <i class="ri-restart-line text-[28px]"></i>
+                            </button>
+                            <input type="text" name="captcha" placeholder="Enter Code" class="reg-input flex-1 @error('captcha') border-red-500! @enderror">
+                        </div>
+                        @error('captcha')
+                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
 
@@ -709,10 +782,98 @@
                 }
             }
 
+            // Refresh Captcha
+            window.refreshCaptcha = function() {
+                const img = document.getElementById('captcha-img');
+                if (img) img.src = "{{ route('captcha') }}?" + new Date().getTime();
+            }
+
             // Initialize Gender Select (Still uses generic Logic)
             setupCustomSelect('gender-select', 'gender-input', 'gender-selected');
 
+            // Initialize Tom Select for Languages
+            if (document.getElementById('languages-select')) {
+                new TomSelect('#languages-select', {
+                    plugins: ['remove_button'],
+                    maxItems: 10,
+                    placeholder: 'Select Languages',
+                    controlClass: 'ts-control reg-input',
+                    render: {
+                        option: function(data, escape) {
+                            return '<div>' + escape(data.text) + '</div>';
+                        },
+                        item: function(data, escape) {
+                            return '<div>' + escape(data.text) + '</div>';
+                        }
+                    }
+                });
+            }
+
+            // Mobile Phone Flag Initialization
+            const phoneInputField = document.querySelector("input[name='mobile']");
+            if (phoneInputField) {
+                window.intlTelInput(phoneInputField, {
+                    initialCountry: "auto",
+                    geoIpLookup: function(callback) {
+                        fetch("https://ipapi.co/json")
+                            .then(res => res.json())
+                            .then(data => callback(data.country_code))
+                            .catch(() => callback("in"));
+                    },
+                    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                    separateDialCode: true,
+                });
+            }
+
+            // Set Max Date for DOB (18+ years requirement)
+            const dobInput = document.getElementById('dob-input');
+            if (dobInput) {
+                const today = new Date();
+                const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+                const maxDate = eighteenYearsAgo.toISOString().split('T')[0];
+                dobInput.max = maxDate;
+            }
+
+            // Name Capitalization Helpers
+            const nameFields = ['first_name', 'last_name'];
+            nameFields.forEach(name => {
+                const field = document.querySelector(`input[name='${name}']`);
+                if (field) {
+                    field.addEventListener('input', function() {
+                        if (this.value.length > 0) {
+                            this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+                        }
+                    });
+                }
+            });
         });
+
+        // Add New Preference Logic
+        function addNewPreference() {
+            const input = document.getElementById('new-preference');
+            const value = input.value.trim();
+            if (value === '') return;
+
+            // Create new checkbox element
+            const grid = input.closest('.grid');
+            const label = document.createElement('label');
+            label.className = 'flex items-center gap-3 cursor-pointer group animate-fade-in';
+            label.innerHTML = `
+                <div class="relative flex items-center">
+                    <input type="checkbox" name="consultation_preferences[]" value="${value}" class="peer hidden" checked>
+                    <div class="w-5 h-5 border-2 border-primary rounded-md bg-primary transition-all flex items-center justify-center">
+                        <i class="ri-check-line text-white text-xs opacity-100"></i>
+                    </div>
+                    <span class="text-gray-700 group-hover:text-primary transition-colors ml-1">${value}</span>
+                </div>
+            `;
+
+            // Insert before the "Add New" section
+            const addSection = input.closest('.col-span-1');
+            grid.insertBefore(label, addSection);
+            
+            input.value = '';
+        }
 
         // Calculate Age from DOB
         document.getElementById('dob-input').addEventListener('change', function () {

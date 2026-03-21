@@ -306,201 +306,32 @@
 <!-- FAQ Section -->
 <section id="faqs" class="py-12 md:py-20 px-4 md:px-6 bg-white scroll-mt-20">
     <div class="container mx-auto max-w-5xl">
-        <!-- Section Heading -->
         <div class="text-center mb-10 md:mb-14">
             <h2 id="contact_faq_title" class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary mb-3">{!! $settings['contact_faq_title'] ?? 'Frequently Asked Questions' !!}</h2>
         </div>
 
         <!-- FAQ Grid -->
         <div class="columns-1 md:columns-2 gap-4 [&>div]:break-inside-avoid [&>div]:mb-4">
-            <!-- FAQ Item 1 -->
-            <div
-                class="faq-item border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md">
-                <button
-                    class="faq-toggle w-full flex items-center justify-between px-6 py-5 text-left cursor-pointer group"
-                    onclick="toggleFaq(this)">
-                    <span
-                        class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
-                        What is Ayurveda and how can it help me?
-                    </span>
-                    <div
-                        class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
-                        <i class="ri-add-line text-white text-lg"></i>
+            @forelse($faqs as $faq)
+                <div class="faq-item border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md">
+                    <button class="faq-toggle w-full flex items-center justify-between px-6 py-5 text-left cursor-pointer group" onclick="toggleFaq(this)">
+                        <span class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
+                            {{ $faq->question }}
+                        </span>
+                        <div class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
+                            <i class="ri-add-line text-white text-lg"></i>
+                        </div>
+                    </button>
+                    <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
+                        <p class="px-6 pb-5 text-sm text-gray-500 leading-relaxed">
+                            {!! nl2br(e($faq->answer)) !!}
+                        </p>
                     </div>
-                </button>
-                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-5 text-sm text-gray-500 leading-relaxed">
-                        Ayurveda is an ancient Indian system of medicine that emphasizes balancing mind, body, and
-                        spirit
-                        for optimal health. Our practitioners can create personalized wellness plans tailored to your
-                        unique constitution.
-                    </p>
                 </div>
-            </div>
-
-            <!-- FAQ Item 2 -->
-            <div
-                class="faq-item border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md">
-                <button
-                    class="faq-toggle w-full flex items-center justify-between px-6 py-5 text-left cursor-pointer group"
-                    onclick="toggleFaq(this)">
-                    <span
-                        class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
-                        How do I book a consultation online?
-                    </span>
-                    <div
-                        class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
-                        <i class="ri-add-line text-white text-lg"></i>
-                    </div>
-                </button>
-                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-5 text-sm text-gray-500 leading-relaxed">
-                        You can book a consultation by browsing our practitioner directory, selecting a practitioner
-                        that
-                        matches your needs, and scheduling a session through their profile page.
-                    </p>
-                </div>
-            </div>
-
-            <!-- FAQ Item 3 -->
-            <div
-                class="faq-item border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md">
-                <button
-                    class="faq-toggle w-full flex items-center justify-between px-6 py-5 text-left cursor-pointer group"
-                    onclick="toggleFaq(this)">
-                    <span
-                        class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
-                        What types of practitioners are available?
-                    </span>
-                    <div
-                        class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
-                        <i class="ri-add-line text-white text-lg"></i>
-                    </div>
-                </button>
-                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-5 text-sm text-gray-500 leading-relaxed">
-                        We have a diverse range of practitioners including Ayurvedic doctors, Yoga therapists,
-                        Mindfulness counselors, and Spiritual guides — all verified and experienced.
-                    </p>
-                </div>
-            </div>
-
-            <!-- FAQ Item 4 -->
-            <div
-                class="faq-item border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md">
-                <button
-                    class="faq-toggle w-full flex items-center justify-between px-6 py-5 text-left cursor-pointer group"
-                    onclick="toggleFaq(this)">
-                    <span
-                        class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
-                        Can I get a consultation from abroad?
-                    </span>
-                    <div
-                        class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
-                        <i class="ri-add-line text-white text-lg"></i>
-                    </div>
-                </button>
-                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-5 text-sm text-gray-500 leading-relaxed">
-                        Yes! Zaya offers both in-person and online consultations, making it easy for clients from
-                        anywhere in the world to access our practitioner network.
-                    </p>
-                </div>
-            </div>
-
-            <!-- FAQ Item 5 -->
-            <div
-                class="faq-item border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md">
-                <button
-                    class="faq-toggle w-full flex items-center justify-between px-6 py-5 text-left cursor-pointer group"
-                    onclick="toggleFaq(this)">
-                    <span
-                        class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
-                        How do I join as a practitioner on Zaya?
-                    </span>
-                    <div
-                        class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
-                        <i class="ri-add-line text-white text-lg"></i>
-                    </div>
-                </button>
-                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-5 text-sm text-gray-500 leading-relaxed">
-                        Register through our practitioner registration page, submit your qualifications and
-                        certifications, and our team will verify your profile before listing you on the platform.
-                    </p>
-                </div>
-            </div>
-
-            <!-- FAQ Item 6 -->
-            <div
-                class="faq-item border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md">
-                <button
-                    class="faq-toggle w-full flex items-center justify-between px-6 py-5 text-left cursor-pointer group"
-                    onclick="toggleFaq(this)">
-                    <span
-                        class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
-                        What conditions do your practitioners treat?
-                    </span>
-                    <div
-                        class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
-                        <i class="ri-add-line text-white text-lg"></i>
-                    </div>
-                </button>
-                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-5 text-sm text-gray-500 leading-relaxed">
-                        Our practitioners address a wide range of conditions including stress, digestive disorders, skin
-                        issues, chronic pain, mental health challenges, and overall wellness optimization.
-                    </p>
-                </div>
-            </div>
-
-            <!-- FAQ Item 7 -->
-            <div
-                class="faq-item border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md">
-                <button
-                    class="faq-toggle w-full flex items-center justify-between px-6 py-5 text-left cursor-pointer group"
-                    onclick="toggleFaq(this)">
-                    <span
-                        class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
-                        Are your practitioners certified and verified?
-                    </span>
-                    <div
-                        class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
-                        <i class="ri-add-line text-white text-lg"></i>
-                    </div>
-                </button>
-                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-5 text-sm text-gray-500 leading-relaxed">
-                        Absolutely. Every practitioner on Zaya goes through a thorough verification process to ensure
-                        they meet our quality standards and hold valid certifications.
-                    </p>
-                </div>
-            </div>
-
-            <!-- FAQ Item 8 -->
-            <div
-                class="faq-item border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md">
-                <button
-                    class="faq-toggle w-full flex items-center justify-between px-6 py-5 text-left cursor-pointer group"
-                    onclick="toggleFaq(this)">
-                    <span
-                        class="text-sm md:text-base font-medium text-gray-700 pr-4 group-hover:text-primary transition-colors">
-                        How can I cancel or reschedule a session?
-                    </span>
-                    <div
-                        class="w-8 h-8 rounded-full bg-[#1A1A1A] flex items-center justify-center shrink-0 transition-transform duration-300 faq-icon group-hover:bg-primary">
-                        <i class="ri-add-line text-white text-lg"></i>
-                    </div>
-                </button>
-                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300">
-                    <p class="px-6 pb-5 text-sm text-gray-500 leading-relaxed">
-                        You can manage your bookings through your account dashboard. Cancellations and rescheduling are
-                        available up to 24 hours before the scheduled session.
-                    </p>
-                </div>
-            </div>
+            @empty
+                <!-- Fallback to some defaults if empty (Optional, but good for first time) -->
+            @endforelse
         </div>
-    </div>
 </section>
 
 @endsection

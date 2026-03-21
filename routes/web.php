@@ -170,12 +170,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // Find Practitioner Settings
     Route::get('find-practitioner-settings', [\App\Http\Controllers\Admin\FindPractitionerSettingController::class, 'index'])->name('find-practitioner-settings.index');
     Route::post('find-practitioner-settings', [\App\Http\Controllers\Admin\FindPractitionerSettingController::class, 'update'])->name('find-practitioner-settings.update');
-    
+
     // Footer Page Settings
     Route::get('footer-settings', [\App\Http\Controllers\Admin\FooterPageController::class, 'index'])->name('footer-settings.index');
     Route::post('footer-settings', [\App\Http\Controllers\Admin\FooterPageController::class, 'update'])->name('footer-settings.update');
+
+    // Contact Settings & FAQs
     Route::get('/contact-settings', [\App\Http\Controllers\Admin\ContactusController::class, 'index'])->name('contact-us.index');
     Route::post('/contact-settings/update', [\App\Http\Controllers\Admin\ContactusController::class, 'update'])->name('contact-settings.update');
+    Route::post('/contact-settings/faqs', [\App\Http\Controllers\Admin\ContactusController::class, 'faqStore'])->name('contact-settings.faq-store');
+    Route::post('/contact-settings/faqs/{id}', [\App\Http\Controllers\Admin\ContactusController::class, 'faqUpdate'])->name('contact-settings.faq-update');
+    Route::delete('/contact-settings/faqs/{id}', [\App\Http\Controllers\Admin\ContactusController::class, 'faqDestroy'])->name('contact-settings.faq-destroy');
+    Route::post('/contact-settings/faqs/{id}/status', [\App\Http\Controllers\Admin\ContactusController::class, 'faqStatus'])->name('contact-settings.faq-status');
     // Contact Messages
     Route::get('/contact-messages', [\App\Http\Controllers\Admin\ContactusController::class, 'messages'])->name('contact-us.messages');
     Route::delete('/contact-messages/{id}', [\App\Http\Controllers\Admin\ContactusController::class, 'destroyMessage'])->name('contact-us.destroy-message');

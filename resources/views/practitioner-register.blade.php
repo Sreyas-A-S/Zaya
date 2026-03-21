@@ -152,6 +152,7 @@
                         <div class="md:col-span-2">
                             <label class="block text-gray-700 font-normal mb-4 text-lg">Phone No.</label>
                             <input type="tel" name="phone" id="phone" value="{{ old('phone') }}"
+                                maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                 placeholder="Enter Phone No." required>
                         </div>
@@ -186,7 +187,7 @@
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">DOB</label>
                             <input type="date" name="dob" value="{{ old('dob') }}"
-                                max="{{ now()->subYears(18)->format('Y-m-d') }}"
+                                max="{{ now()->format('Y-m-d') }}"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                 placeholder="DD/MM/YYYY" required>
                         </div>
@@ -255,8 +256,9 @@
                         </button>
                     </div>
 
-                    <div class="bg-[#F6F6F6] rounded-[24px] py-10 px-6 md:px-12 mb-8" id="education-section">
-                        <!-- Row 1: Education Type, Institution Name, Duration -->
+                    <div id="education-container">
+                        <div class="bg-[#F6F6F6] rounded-[24px] py-10 px-6 md:px-12 mb-8 education-block" id="education-block-0">
+                            <!-- Row 1: Education Type, Institution Name, Duration -->
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                             <div>
                                 <label class="block text-[#525252] text-lg font-normal mb-3">Education
@@ -333,13 +335,8 @@
                             </div>
                         </div>
 
-                        <!-- Buttons -->
-                        <div class="flex justify-end items-center gap-6 mt-4">
-                            <button type="button"
-                                class="text-[#525252] text-[1rem] font-normal cursor-pointer bg-transparent border-none py-2 px-2 hover:text-black transition-colors">Cancel</button>
-                            <button type="button"
-                                class="bg-[#FABC41] text-[#423131] py-3.5 px-10 rounded-full text-[1rem] font-medium transition-all duration-300 cursor-pointer border-none hover:bg-[#E8AA32] hover:shadow-md tracking-wide">Save</button>
                         </div>
+                    </div>
                     </div>
 
                     <!-- Professional Bio -->
@@ -363,22 +360,23 @@
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
                                 placeholder="Choose your practice areas">
                             <div class="flex flex-wrap gap-4">
+                                @foreach($wellnessConsultations as $consultation)
+                                    @if(strtolower($consultation->name) !== 'other')
+                                        <label
+                                            class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
+                                            <input type="checkbox" name="ayurvedic_practices[]" value="{{ $consultation->name }}" class="sr-only">
+                                            {{ $consultation->name }}
+                                        </label>
+                                    @endif
+                                @endforeach
                                 <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="ayurvedic_practices[]" value="nutrition_advice"
-                                        class="sr-only"> Ayurvedic Nutrition Advice</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="ayurvedic_practices[]" value="educator" class="sr-only">
-                                    Ayurvedic Educator</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="ayurvedic_practices[]" value="constitution_advice"
-                                        class="sr-only"> Ayurvedic Constitution Advice</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="ayurvedic_practices[]" value="lifestyle_advice"
-                                        class="sr-only"> Lifestyle Advice</label>
+                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
+                                    <input type="checkbox" name="ayurvedic_practices[]" value="other" class="sr-only other-checkbox" onchange="toggleOtherInput(this, 'ayurvedic-other-text')">
+                                    Other
+                                </label>
+                            </div>
+                            <div id="ayurvedic-other-text" class="hidden mt-4">
+                                <input type="text" name="ayurvedic_practices_other" class="w-full py-3.5 px-6 bg-white rounded-full border border-gray-200 outline-none focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] text-[0.95rem]" placeholder="Please specify other practice area">
                             </div>
                         </div>
 
@@ -391,47 +389,23 @@
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
                                 placeholder="Choose your practice areas">
                             <div class="flex flex-wrap gap-4">
+                                @foreach($bodyTherapies as $bodyTherapy)
+                                    @if(strtolower($bodyTherapy->name) !== 'other')
+                                        <label
+                                            class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
+                                            <input type="checkbox" name="massage_practices[]" value="{{ $bodyTherapy->name }}" class="sr-only">
+                                            {{ $bodyTherapy->name }}
+                                        </label>
+                                    @endif
+                                @endforeach
                                 <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="massage_practices[]" value="abhyanga" class="sr-only">
-                                    Abhyanga</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="massage_practices[]" value="panchakarma" class="sr-only">
-                                    Panchakarma</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="massage_practices[]" value="shirodhara" class="sr-only">
-                                    Shirodhara</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="massage_practices[]" value="swedana" class="sr-only">
-                                    Swedana</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="massage_practices[]" value="udvarthana" class="sr-only">
-                                    Udvarthana</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="massage_practices[]" value="agnikarma" class="sr-only">
-                                    Agnikarma</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="massage_practices[]" value="pain_management"
-                                        class="sr-only"> Pain Management</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="massage_practices[]" value="face_scalp_care"
-                                        class="sr-only"> Face & Scalp Care</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="massage_practices[]" value="marma_therapy"
-                                        class="sr-only">
-                                    Marma Therapy</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="massage_practices[]" value="shikhara" class="sr-only">
-                                    Shikhara</label>
+                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
+                                    <input type="checkbox" name="massage_practices[]" value="other" class="sr-only other-checkbox" onchange="toggleOtherInput(this, 'massage-other-text')">
+                                    Other
+                                </label>
+                            </div>
+                            <div id="massage-other-text" class="hidden mt-4">
+                                <input type="text" name="massage_practices_other" class="w-full py-3.5 px-6 bg-white rounded-full border border-gray-200 outline-none focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] text-[0.95rem]" placeholder="Please specify other therapy">
                             </div>
                         </div>
 
@@ -442,18 +416,23 @@
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
                                 placeholder="Choose your practice areas">
                             <div class="flex flex-wrap gap-4">
+                                @foreach($otherModalities as $modality)
+                                    @if(strtolower($modality->name) !== 'other')
+                                        <label
+                                            class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:border-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
+                                            <input type="checkbox" name="other_modalities[]" value="{{ $modality->name }}" class="sr-only">
+                                            {{ $modality->name }}
+                                        </label>
+                                    @endif
+                                @endforeach
                                 <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="other_modalities[]" value="yoga_sessions" class="sr-only">
-                                    Yoga Sessions</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="other_modalities[]" value="yoga_therapy" class="sr-only">
-                                    Yoga Therapy</label>
-                                <label
-                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1"><input
-                                        type="checkbox" name="other_modalities[]" value="ayurvedic_cooking"
-                                        class="sr-only"> Ayurvedic Cooking</label>
+                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
+                                    <input type="checkbox" name="other_modalities[]" value="other" class="sr-only other-checkbox" onchange="toggleOtherInput(this, 'modalities-other-text')">
+                                    Other
+                                </label>
+                            </div>
+                            <div id="modalities-other-text" class="hidden mt-4">
+                                <input type="text" name="other_modalities_other" class="w-full py-3.5 px-6 bg-white rounded-full border border-gray-200 outline-none focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] text-[0.95rem]" placeholder="Please specify other modality">
                             </div>
                         </div>
                     </div>
@@ -486,7 +465,8 @@
                         </button>
                     </div>
 
-                    <div class="bg-[#F5F5F5] rounded-xl mb-6" id="certification-section">
+                    <div id="certification-container">
+                        <div class="bg-[#F5F5F5] rounded-xl mb-6 certification-block" id="certification-block-0">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-10">
                             <div>
                                 <label class="block text-gray-600 text-lg mb-4">ID Proof</label>
@@ -522,18 +502,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-[#FFECC8] rounded-lg py-6 px-10 flex justify-between items-center mb-4">
-...
-                            <div>
-                                <span class="italic text-[#423131] text-sm">*Incomplete applications will not be
-                                    reviewed. Please ensure all documents are legible.</span>
-                            </div>
-                            <div class="flex justify-end gap-3">
-                                <button type="button"
-                                    class="text-gray-500 text-base cursor-pointer bg-transparent border-none py-2 px-4 hover:text-gray-700">Cancel</button>
-                                <button type="button"
-                                    class="bg-[#FABD4D] text-[#423131] py-2 px-5 rounded-full text-base transition-all duration-300 cursor-pointer border-none hover:bg-[#d3992d]">Save</button>
-                            </div>
                         </div>
                     </div>
 
@@ -603,11 +571,25 @@
                             <!-- Left Side: Add Language -->
                             <div class="w-full lg:w-[45%]">
                                 <div class="relative mb-6">
-                                    <input type="text" id="lang-input"
-                                        class="w-full py-3.5 pl-6 pr-14 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                        placeholder="Enter Language">
+                                    <select id="lang-input"
+                                        class="w-full py-3.5 pl-6 pr-14 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
+                                        <option value="">Select Language</option>
+                                        <option value="English">English</option>
+                                        <option value="Arabic">Arabic</option>
+                                        <option value="French">French</option>
+                                        <option value="Spanish">Spanish</option>
+                                        <option value="German">German</option>
+                                        <option value="Hindi">Hindi</option>
+                                        <option value="Malayalam">Malayalam</option>
+                                        <option value="Tamil">Tamil</option>
+                                        <option value="Chinese">Chinese</option>
+                                        <option value="Japanese">Japanese</option>
+                                        <option value="Italian">Italian</option>
+                                        <option value="Russian">Russian</option>
+                                        <option value="Portuguese">Portuguese</option>
+                                    </select>
                                     <button type="button" id="lang-add-btn"
-                                        class="absolute right-2 top-1/2 -translate-y-1/2 w-[34px] h-[34px] rounded-full flex justify-center items-center transition-all duration-300 bg-[#E5E5E5] text-white cursor-not-allowed pointer-events-none">
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 w-[34px] h-[34px] rounded-full flex justify-center items-center transition-all duration-300 bg-[#E5E5E5] text-white cursor-not-allowed pointer-events-none z-10">
                                         <i class="ri-check-line text-xl font-bold"></i>
                                     </button>
                                 </div>
@@ -699,13 +681,13 @@
                             <div class="flex items-center justify-center gap-3">
                                 <div
                                     class="bg-white border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1">
-                                    <!-- Replace with dynamic captcha image -->
-                                    <img src="{{ asset('frontend/assets/captcha-placeholder.png') }}"
-                                        onerror="this.src='https://dummyimage.com/130x48/f3f4f6/000.png&text=98RW6'"
+                                    <img src="{{ route('captcha') }}"
+                                        id="captcha-img"
                                         alt="Captcha"
                                         class="w-full h-full object-contain filter contrast-125 mix-blend-multiply">
                                 </div>
                                 <button type="button"
+                                    onclick="refreshCaptcha()"
                                     class="w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white transition-all hover:bg-[#154a96] border-none cursor-pointer shadow-sm">
                                     <i class="ri-refresh-line text-2xl"></i>
                                 </button>
@@ -817,6 +799,22 @@
                     }
                 });
             }
+
+            // Toggle password visibility
+            document.querySelectorAll('.ri-eye-line').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const input = this.parentElement.querySelector('input');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.classList.remove('ri-eye-line');
+                        this.classList.add('ri-eye-off-line');
+                    } else {
+                        input.type = 'password';
+                        this.classList.remove('ri-eye-off-line');
+                        this.classList.add('ri-eye-line');
+                    }
+                });
+            });
         });
 
         let currentTab = 1;
@@ -911,6 +909,17 @@
                     if (!checked) errorMsg = 'Please select an option';
                 } else if (!input.checkValidity()) {
                     errorMsg = input.title || input.validationMessage;
+                } else if (input.name === 'dob' && input.value) {
+                    const dob = new Date(input.value);
+                    const today = new Date();
+                    let age = today.getFullYear() - dob.getFullYear();
+                    const m = today.getMonth() - dob.getMonth();
+                    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                        age--;
+                    }
+                    if (age < 18) {
+                        errorMsg = 'You must be at least 18 years old';
+                    }
                 }
 
                 if (errorMsg) {
@@ -939,14 +948,21 @@
             if (currentTab === 1) {
                 const pwd = document.querySelector('input[name="password"]');
                 const conf = document.querySelector('input[name="password_confirmation"]');
-                if (pwd && conf && pwd.value !== conf.value) {
+                if (pwd && conf && conf.value !== pwd.value) {
                     conf.classList.add('border-red-500', 'focus:border-red-500');
                     const err = document.createElement('p');
-                    err.className = 'error-message text-red-500 text-sm mt-1 absolute';
-                    err.textContent = 'Passwords do not match';
+                    err.className = 'error-message text-red-500 text-sm mt-1 absolute left-6';
+                    err.textContent = 'The password confirmation does not match';
                     conf.parentElement.style.position = 'relative';
                     conf.parentElement.appendChild(err);
                     isValid = false;
+                    
+                    // Add real-time clearance for confirmation
+                    conf.addEventListener('input', function() {
+                        this.classList.remove('border-red-500', 'focus:border-red-500');
+                        const errEl = this.parentElement ? this.parentElement.querySelector('.error-message') : null;
+                        if (errEl) errEl.remove();
+                    }, { once: true });
                 }
             }
 
@@ -1165,14 +1181,207 @@
             }
         });
 
+        let educationCount = 1;
+
         function addEducation() {
-            // Add education form logic here
-            alert('Add another education form');
+            const container = document.getElementById('education-container');
+            const index = educationCount++;
+            
+            const educationHTML = `
+                <div class="bg-[#F6F6F6] rounded-[24px] py-10 px-6 md:px-12 mb-8 education-block" id="education-block-${index}">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-xl font-medium text-gray-800">Education #${index + 1}</h4>
+                        <button type="button" class="text-red-500 hover:text-red-700 font-medium flex items-center gap-1 bg-transparent border-none cursor-pointer" onclick="removeEducation(${index})">
+                            <i class="ri-delete-bin-line"></i> Remove
+                        </button>
+                    </div>
+                    <!-- Row 1: Education Type, Institution Name, Duration -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <div>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">Education Type</label>
+                            <div class="custom-select-wrapper w-full">
+                                <div class="custom-select" id="education-type-select-${index}">
+                                    <div class="custom-select-trigger cursor-pointer">
+                                        <span id="education-type-selected-${index}">Select</span>
+                                        <i class="ri-arrow-down-s-line arrow text-gray-400"></i>
+                                    </div>
+                                    <div class="custom-options">
+                                        <div class="custom-option" data-value="degree">Degree</div>
+                                        <div class="custom-option" data-value="diploma">Diploma</div>
+                                        <div class="custom-option" data-value="certification">Certification</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="education[${index}][type]" id="education-type-input-${index}" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">Institution Name</label>
+                            <input type="text" name="education[${index}][institution]"
+                                class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                placeholder="Enter Institution Name" required>
+                        </div>
+                        <div>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">Duration <span class="italic text-[#737373] text-[1rem] font-normal">(Hours/Years)</span></label>
+                            <input type="text" name="education[${index}][duration]"
+                                class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                placeholder="Enter Duration" required>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Address Line 1, Address Line 2 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">Address Line 1</label>
+                            <input type="text" name="education[${index}][address_line_1]"
+                                class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                placeholder="Address Line 1">
+                        </div>
+                        <div>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">Address Line 2</label>
+                            <input type="text" name="education[${index}][address_line_2]"
+                                class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                placeholder="Address Line 2">
+                        </div>
+                    </div>
+
+                    <!-- Row 3: City, State, Country -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                        <div>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">City</label>
+                            <input type="text" name="education[${index}][city]"
+                                class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                placeholder="Enter City">
+                        </div>
+                        <div>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">State</label>
+                            <input type="text" name="education[${index}][state]"
+                                class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                placeholder="Enter State">
+                        </div>
+                        <div class="education-country-wrapper">
+                            <label class="block text-[#525252] text-lg font-normal mb-3">Country</label>
+                            <select id="education-country-select-${index}" name="education[${index}][country]"
+                                class="education-country-select" data-default="" required>
+                                <option value="">Select Country</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', educationHTML);
+            
+            // Initialize dynamic elements
+            setupCustomSelect(`education-type-select-${index}`, `education-type-input-${index}`, `education-type-selected-${index}`);
+            if (window.initCountrySelector) {
+                window.initCountrySelector(`#education-country-select-${index}`, '');
+            }
+        }
+
+        window.removeEducation = function(index) {
+            const block = document.getElementById(`education-block-${index}`);
+            if (block) {
+                block.remove();
+            }
         }
 
         function addCertification() {
-            // Add certification form logic here
-            alert('Add more certificates');
+            const container = document.getElementById('certification-container');
+            const index = certificationCount++;
+            
+            const certHTML = `
+                <div class="bg-[#F5F5F5] rounded-xl mb-6 certification-block" id="certification-block-${index}">
+                    <div class="flex justify-between items-center px-10 pt-6">
+                        <h4 class="text-xl font-medium text-gray-800">Certification #${index + 1}</h4>
+                        <button type="button" class="text-red-500 hover:text-red-700 font-medium flex items-center gap-1 bg-transparent border-none cursor-pointer" onclick="removeCertification(${index})">
+                            <i class="ri-delete-bin-line"></i> Remove
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-10">
+                        <div>
+                            <label class="block text-gray-600 text-lg mb-4">ID Proof</label>
+                            <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                    <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
+                                    <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                </div>
+                                <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                <input type="file" name="certifications[${index}][id_proof]" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-lg mb-4">Training / Diploma</label>
+                            <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                    <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
+                                    <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                </div>
+                                <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                <input type="file" name="certifications[${index}][certificate]" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-lg mb-4">Experience <span class="text-gray-400">(if any)</span></label>
+                            <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                    <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
+                                    <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                </div>
+                                <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                <input type="file" name="certifications[${index}][experience]" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', certHTML);
+            
+            // Re-initialize upload box listeners for new blocks
+            initializeUploadBoxes();
+        }
+
+        function refreshCaptcha() {
+            const img = document.getElementById('captcha-img');
+            if (img) {
+                img.src = "{{ route('captcha') }}?" + Date.now();
+            }
+        }
+
+        window.removeCertification = function(index) {
+            const block = document.getElementById(`certification-block-${index}`);
+            if (block) {
+                block.remove();
+            }
+        }
+
+        let certificationCount = 1;
+
+        function initializeUploadBoxes() {
+            document.querySelectorAll('.upload-box').forEach(box => {
+                // Remove old listener to avoid duplicates if any
+                const newBox = box.cloneNode(true);
+                box.parentNode.replaceChild(newBox, box);
+                
+                newBox.addEventListener('click', function (e) {
+                    const input = this.querySelector('input[type="file"]');
+                    if (input && e.target !== input) input.click();
+                });
+                
+                const fileInput = newBox.querySelector('input[type="file"]');
+                if (fileInput) {
+                    fileInput.addEventListener('change', function(e) {
+                        if (this.files && this.files[0]) {
+                            const nameDisplay = newBox.querySelector('.file-name-display');
+                            if (nameDisplay) {
+                                nameDisplay.textContent = this.files[0].name;
+                                nameDisplay.classList.add('text-[#F5A623]');
+                                nameDisplay.classList.remove('text-gray-400');
+                            }
+                        }
+                    });
+                }
+            });
         }
 
         // Language Section Interactive Logic
@@ -1304,6 +1513,23 @@
         // Initialize Education Type format Custom Select
         setupCustomSelect('education-type-select-0', 'education-type-input-0', 'education-type-selected-0');
 
+        // Initialize TomSelect for lang-input
+        new TomSelect("#lang-input", {
+            create: true,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
+        function toggleOtherInput(checkbox, targetId) {
+            const target = document.getElementById(targetId);
+            if (checkbox.checked) {
+                target.classList.remove('hidden');
+            } else {
+                target.classList.add('hidden');
+                target.querySelector('input').value = '';
+            }
+        }
     </script>
 </body>
 

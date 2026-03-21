@@ -18,7 +18,8 @@ use App\Models\BodyTherapy;
 use App\Models\PractitionerModality;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Redirect;
 use App\Traits\ImageUploadTrait;
 
 class RegisterController extends Controller
@@ -123,8 +124,13 @@ class RegisterController extends Controller
             'city' => $request->city,
             'state' => $request->state,
             'country' => $request->country,
+            'zip_code' => $request->zip_code,
             'phone' => $request->mobile,
-            // 'occupation' => $request->occupation, // Form doesn't have occupation
+            'consultation_preferences' => $request->consultation_preferences,
+            'languages_spoken' => $request->languages,
+            'referral_type' => $request->referral_type,
+            'nationality' => $request->nationality,
+            'status' => 'active',
         ]);
     }
 
@@ -230,6 +236,16 @@ class RegisterController extends Controller
             $rules['dob'][] = 'before:' . now()->subYears(18)->format('Y-m-d');
         }
 
+        if (isset($data['role']) && ($data['role'] === 'patient' || $data['role'] === 'client')) {
+            $rules['captcha'] = ['required', 'string', function ($attribute, $value, $fail) {
+                if (strtoupper($value) !== Session::get('captcha_code')) {
+                    $fail('The captcha code is incorrect.');
+                }
+            }];
+            $rules['consultation_preferences'] = ['nullable', 'array'];
+            $rules['languages'] = ['nullable', 'array'];
+        }
+
         return Validator::make($data, $rules);
     }
 
@@ -280,7 +296,7 @@ class RegisterController extends Controller
         }
 
         if ($request->role === 'client' || $request->role === 'patient') {
-            return redirect($this->redirectPath())->with('success', 'Registration successful! Welcome to Zaya Wellness.');
+            return redirect('/zaya-login')->with('success', 'Registration successful! Please login to your account.');
         }
     }
 }

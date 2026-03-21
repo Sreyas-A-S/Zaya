@@ -14,8 +14,9 @@ export function initCountrySelector(selector = '#nationality-select', defaultVal
         })),
         valueField: 'value',
         labelField: 'text',
-        searchField: ['text'],
+        searchField: ['text', 'value'],
         maxItems: 1,
+        maxOptions: 300,
         create: false,
         placeholder: 'Select Country',
         render: {
@@ -42,6 +43,8 @@ export function initCountrySelector(selector = '#nationality-select', defaultVal
 
     return tomSelect;
 }
+
+window.initCountrySelector = initCountrySelector;
 
 // Auto-initialize on DOM ready
 document.addEventListener('DOMContentLoaded', function () {

@@ -282,6 +282,7 @@
                         });
 
                         // 4. Update onclick for next toggle
+                        // 4. Update onclick for next toggle
                         const toggleBtn = pill ? pill.parentElement : null;
                         if (toggleBtn) {
                             const nextLocale = targetLocale === '{{ $lang1->code }}' ? '{{ $lang2->code }}' : '{{ $lang1->code }}';
@@ -290,6 +291,8 @@
                         @endif
 
                         console.log("Language changed dynamically to:", targetLocale);
+                        // Reload for pages with dynamic content from other tables like FAQs
+                        location.reload();
                     }
                 })
                 .catch(error => {

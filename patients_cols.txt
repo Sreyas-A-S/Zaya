@@ -1,0 +1,29 @@
+Array
+(
+    [0] => id
+    [1] => user_id
+    [2] => status
+    [3] => data_sharing_consent
+    [4] => first_name
+    [5] => last_name
+    [6] => client_id
+    [7] => dob
+    [8] => age
+    [9] => phone
+    [10] => created_at
+    [11] => updated_at
+    [12] => gender
+    [13] => occupation
+    [14] => mobile_country_code
+    [15] => consultation_preferences
+    [16] => languages_spoken
+    [17] => referral_type
+    [18] => referrer_name
+    [19] => profile_photo_path
+    [20] => address_line_1
+    [21] => address_line_2
+    [22] => city
+    [23] => state
+    [24] => zip_code
+    [25] => country
+)

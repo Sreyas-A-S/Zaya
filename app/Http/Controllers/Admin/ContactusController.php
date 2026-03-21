@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\HomepageSetting;
 use App\Models\ContactUs;
 use App\Models\EmailLog;
+use App\Models\Faq;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
@@ -46,8 +47,14 @@ class ContactusController extends Controller
             'support_section' => $settings->filter(fn($s) => Str::contains($s->key, 'support')),
             'faqs' => $settings->filter(fn($s) => Str::contains($s->key, 'faq')),
         ];
-        // 3. Return the grouped settings!
-        return view('admin.contact-us.index', ['settings' => $groupedSettings]);
+        // 3. Fetch FAQs for current language
+        $faqs = Faq::where('language', $language)->orderBy('created_at', 'desc')->get();
+
+        // 4. Return the grouped settings and FAQs!
+        return view('admin.contact-us.index', [
+            'settings' => $groupedSettings,
+            'faqs' => $faqs
+        ]);
     }
 
     public function update(Request $request)
@@ -101,6 +108,56 @@ class ContactusController extends Controller
             'success' => true,
             'message' => 'Contact settings updated successfully.'
         ]);
+    }
+
+    public function faqStore(Request $request)
+    {
+        $language = $this->getCurrentLocale();
+        $request->validate([
+            'question' => 'required|string',
+            'answer' => 'required|string',
+        ]);
+
+        $faq = Faq::create([
+            'language' => $language,
+            'question' => $request->question,
+            'answer' => $request->answer,
+            'status' => true,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'FAQ added successfully.', 'faq' => $faq]);
+    }
+
+    public function faqUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'question' => 'required|string',
+            'answer' => 'required|string',
+        ]);
+
+        $faq = Faq::findOrFail($id);
+        $faq->update([
+            'question' => $request->question,
+            'answer' => $request->answer,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'FAQ updated successfully.']);
+    }
+
+    public function faqDestroy($id)
+    {
+        $faq = Faq::findOrFail($id);
+        $faq->delete();
+
+        return response()->json(['success' => true, 'message' => 'FAQ deleted successfully.']);
+    }
+
+    public function faqStatus(Request $request, $id)
+    {
+        $faq = Faq::findOrFail($id);
+        $faq->update(['status' => $request->status]);
+
+        return response()->json(['success' => true, 'message' => 'FAQ status updated successfully.']);
     }
 
     private function ensureContactDefaults(): void
