@@ -28,18 +28,14 @@
         <div class="container mx-auto px-4 py-8 md:py-12 lg:py-16">
             <!-- Header -->
             <div class="text-center mb-8 md:mb-12">
-                <h1 class="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-primary mb-6">Elevate Your
-                    Practice. Join the ZAYA Collective</h1>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-primary mb-6">{{ __('Elevate Your Practice. Join the ZAYA Collective') }}</h1>
                 <p class="text-gray-500 text-sm md:text-base max-w-2xl mx-auto">
-                    Become a part of a specialized ecosystem where tradition meets technology.
-                    Complete your registration to showcase your expertise, manage your global
-                    clientele and help us redefine holistic wellness.
+                    {{ __('Become a part of a specialized ecosystem where tradition meets technology. Complete your registration to showcase your expertise, manage your global clientele and help us redefine holistic wellness.') }}
                 </p>
             </div>
 
             <!-- Form Title -->
-            <h2 class="text-xl md:text-2xl font-sans! font-medium text-center text-gray-900 mb-8">Practitioner
-                Registration Form</h2>
+            <h2 class="text-xl md:text-2xl font-sans! font-medium text-center text-gray-900 mb-8">{{ __('Practitioner Registration Form') }}</h2>
 
             <!-- Step Indicator -->
             <div class="sticky top-0 z-50 bg-white flex justify-center pb-6 pt-8 mb-20 border-b border-[#D0D0D0]">
@@ -48,7 +44,7 @@
                         <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#60E48C] text-white"
                             id="step-circle-1">1</div>
                         <span class="text-sm lg:text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap"
-                            id="step-label-1">Basic Details</span>
+                            id="step-label-1">{{ __('Basic Details') }}</span>
                     </div>
                     <div class="w-[60px] md:w-[100px] xl:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative"
                         id="step-line-1"></div>
@@ -56,7 +52,7 @@
                         <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]"
                             id="step-circle-2">2</div>
                         <span class="text-sm lg:text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap"
-                            id="step-label-2">Qualifications</span>
+                            id="step-label-2">{{ __('Qualifications') }}</span>
                     </div>
                     <div class="w-[60px] md:w-[100px] xl:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative"
                         id="step-line-2"></div>
@@ -64,7 +60,7 @@
                         <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]"
                             id="step-circle-3">3</div>
                         <span class="text-sm lg:text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap"
-                            id="step-label-3">Verification</span>
+                            id="step-label-3">{{ __('Verification') }}</span>
                     </div>
                 </div>
             </div>
@@ -78,31 +74,31 @@
 
                 <!-- Tab 1: Basic Details -->
                 <div class="block" id="tab-1">
-                    <h3 class="text-2xl font-sans! font-normal text-gray-900 mb-10">Basic Details</h3>
+                    <h3 class="text-2xl font-sans! font-normal text-gray-900 mb-10">{{ __('Basic Details') }}</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <!-- Fullname & Photo Row -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <div>
-                                <label class="block text-gray-700 font-normal mb-4 text-lg">First Name</label>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('First Name') }}</label>
                                 <input type="text" 
                                         name="first_name" 
                                         value="{{ old('first_name') }}"
                                         pattern="^[A-Z][a-zA-Z\s]*$"
                                         title="First name must start with a capital letter and contain only alphabets"
                                         class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                        placeholder="Enter First Name" 
+                                        placeholder="{{ __('Enter First Name') }}" 
                                         required>
                             </div>
                             <div>
-                                <label class="block text-gray-700 font-normal mb-4 text-lg">Last Name</label>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Last Name') }}</label>
                                 <input type="text" 
                                         name="last_name" 
                                         value="{{ old('last_name') }}"
                                         pattern="^[A-Z][a-zA-Z\s]*$"
                                         title="Last name must start with a capital letter and contain only alphabets"
                                         class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                        placeholder="Enter Last Name" 
+                                        placeholder="{{ __('Enter Last Name') }}" 
                                         required>
                             </div>
                         </div>
@@ -113,25 +109,25 @@
                                 <i class="ri-camera-4-fill text-white text-2xl"></i>
                             </label>
                             <input type="file" id="profile-photo" name="profile_photo" accept="image/*" class="hidden">
-                            <span class="text-gray-500 text-sm mt-2">Add Photo</span>
+                            <span class="text-gray-500 text-sm mt-2">{{ __('Add Photo') }}</span>
                         </div>
                     </div>
 
                     <!-- Gender -->
                     <div class="mb-8">
-                        <label class="block text-gray-700 font-normal mb-4 text-lg">Gender</label>
+                        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Gender') }}</label>
                         <div class="flex flex-wrap gap-6">
                             <label class="gender-radio flex items-center gap-2 cursor-pointer">
                                 <input type="radio" name="gender" value="male">
-                                <span class="text-gray-700">Male</span>
+                                <span class="text-gray-700">{{ __('Male') }}</span>
                             </label>
                             <label class="gender-radio flex items-center gap-2 cursor-pointer">
                                 <input type="radio" name="gender" value="female" checked>
-                                <span class="text-gray-700">Female</span>
+                                <span class="text-gray-700">{{ __('Female') }}</span>
                             </label>
                             <label class="gender-radio flex items-center gap-2 cursor-pointer">
                                 <input type="radio" name="gender" value="other">
-                                <span class="text-gray-700">Other</span>
+                                <span class="text-gray-700">{{ __('Other') }}</span>
                             </label>
                         </div>
                     </div>
@@ -139,42 +135,42 @@
                     <!-- Email -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">Email</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Email') }}</label>
                             <input type="email" name="email" value="{{ old('email') }}"
                                 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                                 title="Please enter a valid email address"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter Email" required>
+                                placeholder="{{ __('Enter Email') }}" required>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">Phone No.</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Phone No.') }}</label>
                             <input type="tel" name="phone" id="phone" value="{{ old('phone') }}"
                                 maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter Phone No." required>
+                                placeholder="{{ __('Enter Phone No.') }}" required>
                         </div>
                     </div>
 
                     <!-- Password & Confirm Password -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                                                        <label class="block text-gray-700 font-normal mb-4 text-lg">Password</label>
+                                                        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Password') }}</label>
                                                         <div class="relative">
                                                             <input type="password" name="password" 
                                                                 pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}"
                                                                 title="Must contain at least 8 characters, including NUMBER, UPPERCASE, LOWERCASE and SYMBOL"
                                                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                                                placeholder="Enter Password" 
+                                                                placeholder="{{ __('Enter Password') }}" 
                                                                 required>
                                                             <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
                                                         </div>
                                                     </div>
                         <div>
-                                                        <label class="block text-gray-700 font-normal mb-4 text-lg">Confirm Password</label>
+                                                        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Confirm Password') }}</label>
                                                         <div class="relative">
                                                             <input type="password" name="password_confirmation"
                                                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                                                placeholder="Confirm Password" required>
+                                                                placeholder="{{ __('Confirm Password') }}" required>
                                                             <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
                                                         </div>
                                                     </div>                    </div>
@@ -182,17 +178,17 @@
                     <!-- DOB & Country -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">DOB</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('DOB') }}</label>
                             <input type="date" name="dob" value="{{ old('dob') }}"
                                 max="{{ now()->format('Y-m-d') }}"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="DD/MM/YYYY" required>
+                                placeholder="{{ __('DD/MM/YYYY') }}" required>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">Country</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Country') }}</label>
                             <select id="country-select" name="country"
                                 data-default="{{ old('country', 'IN') }}" required>
-                                <option value="">Select Country</option>
+                                <option value="">{{ __('Select Country') }}</option>
                             </select>
                         </div>
                     </div>
@@ -200,43 +196,42 @@
                     <!-- Address & Website -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">Address Line 1</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Address Line 1') }}</label>
                             <input type="text" name="address_line_1" value="{{ old('address_line_1') }}"
                                 maxlength="500"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter Address Line 1" required>
+                                placeholder="{{ __('Enter Address Line 1') }}" required>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">Website <span
-                                    class="text-gray-400 italic">(if any)</span></label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Website') }} <span class="text-gray-400 italic">{{ __('(if any)') }}</span></label>
                             <input type="url" name="website_url" value="{{ old('website_url') }}"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter URL">
+                                placeholder="{{ __('Enter URL') }}">
                         </div>
                     </div>
 
                     <!-- City, State, Zipcode -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">City</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('City') }}</label>
                             <input type="text" name="city" value="{{ old('city') }}"
                                 pattern="^[A-Za-z\s]+$" title="Only alphabets and spaces are allowed"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter City" required>
+                                placeholder="{{ __('Enter City') }}" required>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">State</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State') }}</label>
                             <input type="text" name="state" value="{{ old('state') }}"
                                 pattern="^[A-Za-z\s]+$" title="Only alphabets and spaces are allowed"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter State" required>
+                                placeholder="{{ __('Enter State') }}" required>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">Zip Code</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Zip Code') }}</label>
                             <input type="text" name="zip_code" value="{{ old('zip_code') }}"
                                 pattern="^[A-Za-z0-9\s\-]{4,10}$" title="Enter a valid zip code (4-10 characters)"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter Zip Code" required>
+                                placeholder="{{ __('Enter Zip Code') }}" required>
                         </div>
                     </div>
                 </div>
@@ -245,12 +240,11 @@
                 <div class="hidden" id="tab-2">
                     <!-- Education Section -->
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-2xl font-sans! font-medium text-gray-900">Education</h3>
+                        <h3 class="text-2xl font-sans! font-medium text-gray-900">{{ __('Education') }}</h3>
                         <button type="button"
                             class="text-secondary text-lg font-medium hover:text-primary flex items-center gap-1 cursor-pointer bg-transparent border-none"
                             onclick="addEducation()">
-                            <i class="ri-add-line text-lg"></i> Add Another Education
-                        </button>
+                            <i class="ri-add-line text-lg"></i>{{ __('Add Another Education') }}</button>
                     </div>
 
                     <div id="education-container">
@@ -258,76 +252,72 @@
                             <!-- Row 1: Education Type, Institution Name, Duration -->
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                             <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">Education
-                                    Type</label>
+                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Education Type') }}</label>
                                 <div class="custom-select-wrapper w-full">
                                     <div class="custom-select" id="education-type-select-0">
                                         <div class="custom-select-trigger cursor-pointer">
-                                            <span id="education-type-selected-0">Select</span>
+                                            <span id="education-type-selected-0">{{ __('Select') }}</span>
                                             <i class="ri-arrow-down-s-line arrow text-gray-400"></i>
                                         </div>
                                         <div class="custom-options">
-                                            <div class="custom-option" data-value="degree">Degree</div>
-                                            <div class="custom-option" data-value="diploma">Diploma</div>
-                                            <div class="custom-option" data-value="certification">Certification</div>
+                                            <div class="custom-option" data-value="degree">{{ __('Degree') }}</div>
+                                            <div class="custom-option" data-value="diploma">{{ __('Diploma') }}</div>
+                                            <div class="custom-option" data-value="certification">{{ __('Certification') }}</div>
                                         </div>
                                     </div>
                                     <input type="hidden" name="education[0][type]" id="education-type-input-0" required>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">Institution
-                                    Name</label>
+                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Institution Name') }}</label>
                                 <input type="text" name="education[0][institution]"
                                     class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="Enter Institution Name" required>
+                                    placeholder="{{ __('Enter Institution Name') }}" required>
                             </div>
                             <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">Duration <span
-                                        class="italic text-[#737373] text-[1rem] font-normal">(Hours/Years)</span></label>
+                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Duration') }}<span
+                                        class="italic text-[#737373] text-[1rem] font-normal">{{ __('(Hours/Years)') }}</span></label>
                                 <input type="text" name="education[0][duration]"
                                     class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="Enter Duration" required>
+                                    placeholder="{{ __('Enter Duration') }}" required>
                             </div>
                         </div>
 
                         <!-- Row 2: Address Line 1, Address Line 2 -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                             <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">Address Line
-                                    1</label>
+                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Address Line 1') }}</label>
                                 <input type="text" name="education[0][address_line_1]"
                                     class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="Address Line 1">
+                                    placeholder="{{ __('Address Line 1') }}">
                             </div>
                             <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">Address Line
-                                    2</label>
+                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Address Line 2') }}</label>
                                 <input type="text" name="education[0][address_line_2]"
                                     class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="Address Line 2">
+                                    placeholder="{{ __('Address Line 2') }}">
                             </div>
                         </div>
 
                         <!-- Row 3: City, State, Country -->
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
                             <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">City</label>
+                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('City') }}</label>
                                 <input type="text" name="education[0][city]"
                                     class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="Enter City">
+                                    placeholder="{{ __('Enter City') }}">
                             </div>
                             <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">State</label>
+                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('State') }}</label>
                                 <input type="text" name="education[0][state]"
                                     class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="Enter State">
+                                    placeholder="{{ __('Enter State') }}">
                             </div>
                             <div class="education-country-wrapper">
-                                <label class="block text-[#525252] text-lg font-normal mb-3">Country</label>
+                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Country') }}</label>
                                 <select id="education-country-select-0" name="education[0][country]"
                                     class="education-country-select w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]" data-default="" required>
-                                    <option value="">Select Country</option>
+                                    <option value="">{{ __('Select Country') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -335,24 +325,23 @@
                 </div>
 
                 <div class="mb-8">
-                        <h3 class="text-2xl font-medium text-gray-900 mb-4">Professional Bio</h3>
+                        <h3 class="text-2xl font-medium text-gray-900 mb-4">{{ __('Professional Bio') }}</h3>
                         <textarea name="professional_bio"
                             class="w-full py-4 px-5 bg-[#F5F5F5] rounded-2xl outline-none text-[0.95rem] text-gray-700 transition-all duration-300 min-h-[200px] resize-y placeholder:text-gray-400 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                            placeholder="Write your Professional Bio..."></textarea>
+                            placeholder="{{ __('Write your Professional Bio...') }}"></textarea>
                     </div>
 
                     <!-- Professional Practice Details -->
                     <div class="mb-8">
-                        <h3 class="text-2xl font-medium text-gray-900 mb-6">Professional Practice Details</h3>
+                        <h3 class="text-2xl font-medium text-gray-900 mb-6">{{ __('Professional Practice Details') }}</h3>
 
                         <!-- Ayurvedic Wellness Consultation -->
                         <div class="mb-8 practice-group" data-input="ayurvedic-input">
-                            <h4 class="font-medium text-gray-900 mb-4 text-xl">Ayurvedic Wellness Consultation:</h4>
-                            <p class="text-gray-700 text-lg mb-4">Focuses on nutritional and lifestyle guidance rooted
-                                in Ayurvedic principles:</p>
+                            <h4 class="font-medium text-gray-900 mb-4 text-xl">{{ __('Ayurvedic Wellness Consultation:') }}</h4>
+                            <p class="text-gray-700 text-lg mb-4">{{ __('Focuses on nutritional and lifestyle guidance rooted in Ayurvedic principles:') }}</p>
                             <input type="text" name="ayurvedic_practices_custom" id="ayurvedic-input" readonly
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
-                                placeholder="Choose your practice areas">
+                                placeholder="{{ __('Choose your practice areas') }}">
                             <div class="flex flex-wrap gap-4">
                                 @foreach($wellnessConsultations as $consultation)
                                     @if(strtolower($consultation->name) !== 'other')
@@ -365,23 +354,20 @@
                                 @endforeach
                                 <label
                                     class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
-                                    <input type="checkbox" name="ayurvedic_practices[]" value="other" class="sr-only other-checkbox" onchange="toggleOtherInput(this, 'ayurvedic-other-text')">
-                                    Other
-                                </label>
+                                    <input type="checkbox" name="ayurvedic_practices[]" value="other" class="sr-only other-checkbox" onchange="toggleOtherInput(this, 'ayurvedic-other-text')">{{ __('Other') }}</label>
                             </div>
                             <div id="ayurvedic-other-text" class="hidden mt-4">
-                                <input type="text" name="ayurvedic_practices_other" class="w-full py-3.5 px-6 bg-white rounded-full border border-gray-200 outline-none focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] text-[0.95rem]" placeholder="Please specify other practice area">
+                                <input type="text" name="ayurvedic_practices_other" class="w-full py-3.5 px-6 bg-white rounded-full border border-gray-200 outline-none focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] text-[0.95rem]" placeholder="{{ __('Please specify other practice area') }}">
                             </div>
                         </div>
 
                         <!-- Massage & Body Therapists -->
                         <div class="mb-8 practice-group" data-input="massage-input">
-                            <h4 class="text-xl font-medium text-gray-900 mb-4">Massage & Body Therapists:</h4>
-                            <p class="text-gray-700 text-lg mb-4">Includes specific traditional physical treatments and
-                                specialized care:</p>
+                            <h4 class="text-xl font-medium text-gray-900 mb-4">{{ __('Massage & Body Therapists:') }}</h4>
+                            <p class="text-gray-700 text-lg mb-4">{{ __('Includes specific traditional physical treatments and specialized care:') }}</p>
                             <input type="text" name="massage_practices_custom" id="massage-input" readonly
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
-                                placeholder="Choose your practice areas">
+                                placeholder="{{ __('Choose your practice areas') }}">
                             <div class="flex flex-wrap gap-4">
                                 @foreach($bodyTherapies as $bodyTherapy)
                                     @if(strtolower($bodyTherapy->name) !== 'other')
@@ -394,21 +380,19 @@
                                 @endforeach
                                 <label
                                     class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
-                                    <input type="checkbox" name="massage_practices[]" value="other" class="sr-only other-checkbox" onchange="toggleOtherInput(this, 'massage-other-text')">
-                                    Other
-                                </label>
+                                    <input type="checkbox" name="massage_practices[]" value="other" class="sr-only other-checkbox" onchange="toggleOtherInput(this, 'massage-other-text')">{{ __('Other') }}</label>
                             </div>
                             <div id="massage-other-text" class="hidden mt-4">
-                                <input type="text" name="massage_practices_other" class="w-full py-3.5 px-6 bg-white rounded-full border border-gray-200 outline-none focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] text-[0.95rem]" placeholder="Please specify other therapy">
+                                <input type="text" name="massage_practices_other" class="w-full py-3.5 px-6 bg-white rounded-full border border-gray-200 outline-none focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] text-[0.95rem]" placeholder="{{ __('Please specify other therapy') }}">
                             </div>
                         </div>
 
                         <!-- Other Modalities -->
                         <div class="mb-8 practice-group" data-input="modalities-input">
-                            <h4 class="text-xl font-medium text-gray-900 mb-4">Other Modalities:</h4>
+                            <h4 class="text-xl font-medium text-gray-900 mb-4">{{ __('Other Modalities:') }}</h4>
                             <input type="text" name="other_modalities_custom" id="modalities-input" readonly
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
-                                placeholder="Choose your practice areas">
+                                placeholder="{{ __('Choose your practice areas') }}">
                             <div class="flex flex-wrap gap-4">
                                 @foreach($otherModalities as $modality)
                                     @if(strtolower($modality->name) !== 'other')
@@ -421,12 +405,10 @@
                                 @endforeach
                                 <label
                                     class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
-                                    <input type="checkbox" name="other_modalities[]" value="other" class="sr-only other-checkbox" onchange="toggleOtherInput(this, 'modalities-other-text')">
-                                    Other
-                                </label>
+                                    <input type="checkbox" name="other_modalities[]" value="other" class="sr-only other-checkbox" onchange="toggleOtherInput(this, 'modalities-other-text')">{{ __('Other') }}</label>
                             </div>
                             <div id="modalities-other-text" class="hidden mt-4">
-                                <input type="text" name="other_modalities_other" class="w-full py-3.5 px-6 bg-white rounded-full border border-gray-200 outline-none focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] text-[0.95rem]" placeholder="Please specify other modality">
+                                <input type="text" name="other_modalities_other" class="w-full py-3.5 px-6 bg-white rounded-full border border-gray-200 outline-none focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] text-[0.95rem]" placeholder="{{ __('Please specify other modality') }}">
                             </div>
                         </div>
                     </div>
@@ -436,62 +418,56 @@
                 <div class="hidden" id="tab-3">
                     <!-- Add Summary -->
                     <div class="mb-8">
-                        <h3 class="text-2xl font-medium text-gray-900 mb-4">Add Summary</h3>
+                        <h3 class="text-2xl font-medium text-gray-900 mb-4">{{ __('Add Summary') }}</h3>
                         <textarea name="summary"
                             class="w-full py-4 px-5 bg-[#F5F5F5] rounded-2xl outline-none text-[0.95rem] text-gray-700 transition-all duration-300 min-h-[200px] resize-y placeholder:text-gray-400 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                            placeholder="E.g Outline your background in Ayurveda, yoga, sports or holistic wellness"></textarea>
+                            placeholder="{{ __('E.g Outline your background in Ayurveda, yoga, sports or holistic wellness') }}"></textarea>
                     </div>
 
                     <!-- Certifications -->
                     <div class="flex justify-between items-center mb-4">
                         <div>
-                            <h3 class="text-2xl font-medium text-gray-900">Certifications
-
-                                <span class="text-gray-500 text-lg font-normal italic">(Kindly include hours and dates.
-                                    It
-                                    should be self-attested)</span>
+                            <h3 class="text-2xl font-medium text-gray-900">{{ __('Certifications') }}<span class="text-gray-500 text-lg font-normal italic">{{ __('(Kindly include hours and dates. It should be self-attested)') }}</span>
                             </h3>
                         </div>
                         <button type="button"
                             class="text-secondary text-lg font-medium hover:text-primary cursor-pointer"
-                            onclick="addCertification()">
-                            + Add More Certificates
-                        </button>
+                            onclick="addCertification()">{{ __('+ Add More Certificates') }}</button>
                     </div>
 
                     <div id="certification-container">
                         <div class="bg-[#F5F5F5] rounded-xl mb-6 certification-block" id="certification-block-0">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-10">
                             <div>
-                                <label class="block text-gray-600 text-lg mb-4">ID Proof</label>
+                                <label class="block text-gray-600 text-lg mb-4">{{ __('ID Proof') }}</label>
                                 <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
                                     <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                        <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                        <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
                                     <input type="file" name="doc_id_proof" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-gray-600 text-lg mb-4">Training / Diploma</label>
+                                <label class="block text-gray-600 text-lg mb-4">{{ __('Training / Diploma') }}</label>
                                 <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
                                     <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                        <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                        <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
                                     <input type="file" name="doc_certificates" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-gray-600 text-lg mb-4">Experience <span class="text-gray-400">(if any)</span></label>
+                                <label class="block text-gray-600 text-lg mb-4">{{ __('Experience') }}<span class="text-gray-400">{{ __('(if any)') }}</span></label>
                                 <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
                                     <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                        <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                        <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
                                     <input type="file" name="doc_experience" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                                 </div>
                             </div>
@@ -503,71 +479,71 @@
                     <div class="bg-[#F5F5F5] rounded-xl mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 px-10 pt-10">
                             <div>
-                                <label class="block text-gray-600 mb-4 text-lg">Registration Form</label>
+                                <label class="block text-gray-600 mb-4 text-lg">{{ __('Registration Form') }}</label>
                                 <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
                                     <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                        <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                        <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
                                     <input type="file" name="doc_registration" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-gray-700  mb-4 text-lg">Code of Ethics</label>
+                                <label class="block text-gray-700  mb-4 text-lg">{{ __('Code of Ethics') }}</label>
                                 <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
                                     <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                        <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                        <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
                                     <input type="file" name="doc_ethics" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-gray-700  mb-4 text-lg">Wellness Contract</label>
+                                <label class="block text-gray-700  mb-4 text-lg">{{ __('Wellness Contract') }}</label>
                                 <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
                                     <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                         <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                        <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                        <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
                                     </div>
-                                    <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                    <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
                                     <input type="file" name="doc_contract" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                                 </div>
                             </div>
                         </div>
                         <!-- Upload Cover Letter -->
                         <div class="p-10">
-                            <label class="block text-gray-700  mb-4 text-lg">Upload Cover Letter</label>
+                            <label class="block text-gray-700  mb-4 text-lg">{{ __('Upload Cover Letter') }}</label>
                             <div class="upload-box rounded-xl py-8 px-4 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
                                 <div class="inline-block border border-[#BEBEBE] rounded-[16px] px-4 py-2 mb-3">
                                     <i class="ri-upload-cloud-2-line text-[#FABD4D] text-3xl"></i>
                                 </div>
-                                <p class="text-gray-500 text-sm">Choose Images or documents</p>
-                                <p class="text-gray-400 text-xs file-name-display">JPG, JPEG, PNG, WEBP, DOC & PDF (Max.20MB)</p>
+                                <p class="text-gray-500 text-sm">{{ __('Choose Images or documents') }}</p>
+                                <p class="text-gray-400 text-xs file-name-display">{{ __('JPG, JPEG, PNG, WEBP, DOC & PDF (Max.20MB)') }}</p>
                                 <input type="file" name="doc_registration" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png,.ai,.svg,.xls,.xlsx" required>
                             </div>
                         </div>
                         <div class="bg-[#FFECC8] rounded-lg py-6 px-10 flex justify-end items-center mb-4">
                             <div class="flex justify-end gap-3">
                                 <button type="button"
-                                    class="text-gray-500 text-base cursor-pointer bg-transparent border-none py-2 px-4 hover:text-gray-700">Cancel</button>
+                                    class="text-gray-500 text-base cursor-pointer bg-transparent border-none py-2 px-4 hover:text-gray-700">{{ __('Cancel') }}</button>
                                 <button type="button"
-                                    class="bg-[#FABD4D] text-[#423131] py-2 px-5 rounded-full text-base transition-all duration-300 cursor-pointer border-none hover:bg-[#d3992d]">Save</button>
+                                    class="bg-[#FABD4D] text-[#423131] py-2 px-5 rounded-full text-base transition-all duration-300 cursor-pointer border-none hover:bg-[#d3992d]">{{ __('Save') }}</button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Languages Known -->
                     <div class="mb-12">
-                        <h3 class="text-2xl font-medium text-gray-900 mb-8">Languages Known</h3>
+                        <h3 class="text-2xl font-medium text-gray-900 mb-8">{{ __('Languages Known') }}</h3>
                         <div class="flex flex-col lg:flex-row gap-8 lg:gap-10">
                             <!-- Left Side: Add Language -->
                             <div class="w-full lg:w-[45%]">
                                 <div class="relative mb-6">
                                     <select id="lang-input"
                                         class="w-full py-3.5 pl-6 pr-14 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
-                                        <option value="">Select Language</option>
+                                        <option value="">{{ __('Select Language') }}</option>
                                         <option value="English">English</option>
                                         <option value="Arabic">Arabic</option>
                                         <option value="French">French</option>
@@ -597,7 +573,7 @@
                                             </div>
                                         </div>
                                         <span
-                                            class="text-[#A3A3A3] text-base transition-colors duration-200 label-text font-normal">Read</span>
+                                            class="text-[#A3A3A3] text-base transition-colors duration-200 label-text font-normal">{{ __('Read') }}</span>
                                     </label>
                                     <label class="custom-radio-checkbox flex items-center gap-2 cursor-pointer group">
                                         <input type="checkbox" value="Write" class="sr-only lang-skill-checkbox">
@@ -608,7 +584,7 @@
                                             </div>
                                         </div>
                                         <span
-                                            class="text-[#A3A3A3] text-base transition-colors duration-200 label-text font-normal">Write</span>
+                                            class="text-[#A3A3A3] text-base transition-colors duration-200 label-text font-normal">{{ __('Write') }}</span>
                                     </label>
                                     <label class="custom-radio-checkbox flex items-center gap-2 cursor-pointer group">
                                         <input type="checkbox" value="Speak" class="sr-only lang-skill-checkbox">
@@ -619,7 +595,7 @@
                                             </div>
                                         </div>
                                         <span
-                                            class="text-[#A3A3A3] text-base transition-colors duration-200 label-text font-normal">Speak</span>
+                                            class="text-[#A3A3A3] text-base transition-colors duration-200 label-text font-normal">{{ __('Speak') }}</span>
                                     </label>
                                 </div>
                             </div>
@@ -640,30 +616,25 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12">
                             <!-- Registration Fee Amount -->
                             <div>
-                                <label class="block text-gray-800 text-lg font-medium mb-4">Registration Fee
-                                    Amount</label>
+                                <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Registration Fee Amount') }}</label>
                                 <div class="relative w-full">
                                     <div class="w-full h-[58px] bg-[#F5F5F5] rounded-full flex items-center pl-8 pr-2">
                                         <span class="text-gray-900 text-[1.05rem] font-medium">€ 10.00</span>
                                         <input type="hidden" name="registration_fee" value="10.00">
                                         <button type="button"
-                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer">
-                                            Pay
-                                        </button>
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer">{{ __('Pay') }}</button>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Promocode -->
                             <div>
-                                <label class="block text-gray-800 text-lg font-medium mb-4">Promocode</label>
+                                <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Promocode') }}</label>
                                 <div class="relative w-full">
                                     <input type="text" name="promocode" placeholder="CODE1234"
                                         class="w-full h-[58px] pl-6 pr-28 bg-white rounded-full border border-dashed border-[#CFCFCF] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#FABC41] focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)]">
                                     <button type="button"
-                                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-7 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer">
-                                        Apply
-                                    </button>
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-7 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer">{{ __('Apply') }}</button>
                                 </div>
                             </div>
                         </div>
@@ -671,7 +642,7 @@
                         <!-- Captcha Verification -->
                         <div
                             class="bg-gradient-to-r from-[#FFFFFF] via-[#F0F0F0] to-[#FFFFFF] p-12 flex flex-col items-center justify-center">
-                            <h3 class="text-xl font-medium text-gray-800 mb-6">Captcha Verification</h3>
+                            <h3 class="text-xl font-medium text-gray-800 mb-6">{{ __('Captcha Verification') }}</h3>
                             <div class="flex items-center justify-center gap-3">
                                 <div
                                     class="bg-white border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1">
@@ -685,7 +656,7 @@
                                     class="w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white transition-all hover:bg-[#154a96] border-none cursor-pointer shadow-sm">
                                     <i class="ri-refresh-line text-2xl"></i>
                                 </button>
-                                <input type="text" name="captcha" placeholder="Enter Code"
+                                <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}"
                                     class="h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#1B5CB8] focus:shadow-[0_0_0_3px_rgba(27,92,184,0.1)]">
                             </div>
                         </div>
@@ -702,12 +673,12 @@
                 <button type="button"
                     class="text-[#594B4B] font-normal text-base transition-all duration-200 cursor-pointer bg-transparent border-none py-3.5 px-6 hover:text-gray-700"
                     id="back-btn" onclick="previousTab()">
-                    <span id="back-btn-text">← Back to Website</span>
+                    <span id="back-btn-text">{{ __('← Back to Website') }}</span>
                 </button>
                 <button type="button"
                     class="bg-[#F5A623] text-[#423131] py-3.5 px-8 rounded-full font-normal text-base transition-all duration-300 cursor-pointer border-none hover:bg-[#A87139] hover:text-white hover:-translate-y-0.5"
                     id="next-btn" onclick="nextTab()">
-                    <span id="next-btn-text">Save & Continue</span>
+                    <span id="next-btn-text">{{ __('Save & Continue') }}</span>
                 </button>
             </div>
         </div>
@@ -734,12 +705,9 @@
             </div>
 
             <!-- Text Content -->
-            <h3 class="text-[#209F59] text-[28px] font-medium mb-4">Thank you!</h3>
-            <h4 class="text-[#333333] text-[20px] font-semibold mb-3">Your Application Submitted!</h4>
-            <p class="text-[#737373] text-[15px] leading-relaxed mb-6 font-normal">
-                Your application will be reviewed within 20 days.<br>
-                Stay connect with us!
-            </p>
+            <h3 class="text-[#209F59] text-[28px] font-medium mb-4">{{ __('Thank you!') }}</h3>
+            <h4 class="text-[#333333] text-[20px] font-semibold mb-3">{{ __('Your Application Submitted!') }}</h4>
+            <p class="text-[#737373] text-[15px] leading-relaxed mb-6 font-normal">{{ __('Your application will be reviewed within 20 days.') }}<br>{{ __('Stay connect with us!') }}</p>
             
             <button onclick="closeThankYouPopup()" class="hidden"></button>
         </div>
@@ -749,7 +717,7 @@
     <div id="cropper-modal" class="fixed inset-0 bg-black/60 z-[110] hidden items-center justify-center backdrop-blur-md px-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-[popIn_0.3s_ease-out_forwards]">
             <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="text-xl font-medium text-gray-900 font-sans!">Crop Profile Photo</h3>
+                <h3 class="text-xl font-medium text-gray-900 font-sans!">{{ __('Crop Profile Photo') }}</h3>
                 <button type="button" onclick="closeCropperModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
                     <i class="ri-close-line text-2xl"></i>
                 </button>
@@ -761,13 +729,9 @@
             </div>
             <div class="p-6 border-t border-gray-100 flex justify-end gap-3">
                 <button type="button" onclick="closeCropperModal()" 
-                    class="px-6 py-2.5 rounded-full border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-all duration-200">
-                    Cancel
-                </button>
+                    class="px-6 py-2.5 rounded-full border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-all duration-200">{{ __('Cancel') }}</button>
                 <button type="button" id="cropSave" 
-                    class="px-8 py-2.5 rounded-full bg-[#F5A623] text-[#423131] font-medium hover:bg-[#E09518] transition-all duration-200 shadow-sm shadow-[#F5A623]/20">
-                    Crop & Save
-                </button>
+                    class="px-8 py-2.5 rounded-full bg-[#F5A623] text-[#423131] font-medium hover:bg-[#E09518] transition-all duration-200 shadow-sm shadow-[#F5A623]/20">{{ __('Crop & Save') }}</button>
             </div>
         </div>
     </div>
@@ -855,15 +819,15 @@
             const nextBtnText = document.getElementById('next-btn-text');
 
             if (currentTab === 1) {
-                backBtnText.textContent = '← Back to Website';
+                backBtnText.textContent = '{{ __('← Back to Website') }}';
             } else {
-                backBtnText.textContent = 'Back';
+                backBtnText.textContent = '{{ __('Back') }}';
             }
 
             if (currentTab === totalTabs) {
-                nextBtnText.textContent = 'Submit';
+                nextBtnText.textContent = '{{ __('Submit') }}';
             } else {
-                nextBtnText.textContent = 'Save & Continue';
+                nextBtnText.textContent = '{{ __('Save & Continue') }}';
             }
         }
 
@@ -896,11 +860,11 @@
                 let errorMsg = null;
                 
                 if (input.hasAttribute('required') && !input.value.trim() && input.type !== 'radio' && input.type !== 'checkbox' && input.type !== 'file') {
-                    errorMsg = 'This field is required';
+                    errorMsg = '{{ __('This field is required') }}';
                 } else if (input.type === 'radio' && input.hasAttribute('required')) {
                     const group = currentTabEl.querySelectorAll(`input[name="${input.name}"]`);
                     const checked = Array.from(group).some(r => r.checked);
-                    if (!checked) errorMsg = 'Please select an option';
+                    if (!checked) errorMsg = '{{ __('Please select an option') }}';
                 } else if (!input.checkValidity()) {
                     errorMsg = input.title || input.validationMessage;
                 } else if (input.name === 'dob' && input.value) {
@@ -912,7 +876,7 @@
                         age--;
                     }
                     if (age < 18) {
-                        errorMsg = 'You must be at least 18 years old';
+                        errorMsg = '{{ __('You must be at least 18 years old') }}';
                     }
                 }
 
@@ -946,7 +910,7 @@
                     conf.classList.add('border-red-500', 'focus:border-red-500');
                     const err = document.createElement('p');
                     err.className = 'error-message text-red-500 text-sm mt-1 absolute left-6';
-                    err.textContent = 'The password confirmation does not match';
+                    err.textContent = '{{ __('The password confirmation does not match') }}';
                     conf.parentElement.style.position = 'relative';
                     conf.parentElement.appendChild(err);
                     isValid = false;
@@ -1255,77 +1219,77 @@
                     <div class="flex justify-between items-center mb-6">
                         <h4 class="text-xl font-medium text-gray-800">Education #${index + 1}</h4>
                         <button type="button" class="text-red-500 hover:text-red-700 font-medium flex items-center gap-1 bg-transparent border-none cursor-pointer" onclick="removeEducation(${index})">
-                            <i class="ri-delete-bin-line"></i> Remove
+                            <i class="ri-delete-bin-line"></i> {{ __('Remove') }}
                         </button>
                     </div>
                     <!-- Row 1: Education Type, Institution Name, Duration -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                         <div>
-                            <label class="block text-[#525252] text-lg font-normal mb-3">Education Type</label>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Education Type') }}</label>
                             <div class="custom-select-wrapper w-full">
                                 <div class="custom-select" id="education-type-select-${index}">
                                     <div class="custom-select-trigger cursor-pointer">
-                                        <span id="education-type-selected-${index}">Select</span>
+                                        <span id="education-type-selected-${index}">{{ __('Select') }}</span>
                                         <i class="ri-arrow-down-s-line arrow text-gray-400"></i>
                                     </div>
                                     <div class="custom-options">
-                                        <div class="custom-option" data-value="degree">Degree</div>
-                                        <div class="custom-option" data-value="diploma">Diploma</div>
-                                        <div class="custom-option" data-value="certification">Certification</div>
+                                        <div class="custom-option" data-value="degree">{{ __('Degree') }}</div>
+                                        <div class="custom-option" data-value="diploma">{{ __('Diploma') }}</div>
+                                        <div class="custom-option" data-value="certification">{{ __('Certification') }}</div>
                                     </div>
                                 </div>
                                 <input type="hidden" name="education[${index}][type]" id="education-type-input-${index}" required>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[#525252] text-lg font-normal mb-3">Institution Name</label>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Institution Name') }}</label>
                             <input type="text" name="education[${index}][institution]"
                                 class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter Institution Name" required>
+                                placeholder="{{ __('Enter Institution Name') }}" required>
                         </div>
                         <div>
-                            <label class="block text-[#525252] text-lg font-normal mb-3">Duration <span class="italic text-[#737373] text-[1rem] font-normal">(Hours/Years)</span></label>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Duration') }}<span class="italic text-[#737373] text-[1rem] font-normal">{{ __('(Hours/Years)') }}</span></label>
                             <input type="text" name="education[${index}][duration]"
                                 class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter Duration" required>
+                                placeholder="{{ __('Enter Duration') }}" required>
                         </div>
                     </div>
 
                     <!-- Row 2: Address Line 1, Address Line 2 -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-[#525252] text-lg font-normal mb-3">Address Line 1</label>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Address Line 1') }}</label>
                             <input type="text" name="education[${index}][address_line_1]"
                                 class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Address Line 1">
+                                placeholder="{{ __('Address Line 1') }}">
                         </div>
                         <div>
-                            <label class="block text-[#525252] text-lg font-normal mb-3">Address Line 2</label>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Address Line 2') }}</label>
                             <input type="text" name="education[${index}][address_line_2]"
                                 class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Address Line 2">
+                                placeholder="{{ __('Address Line 2') }}">
                         </div>
                     </div>
 
                     <!-- Row 3: City, State, Country -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
                         <div>
-                            <label class="block text-[#525252] text-lg font-normal mb-3">City</label>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('City') }}</label>
                             <input type="text" name="education[${index}][city]"
                                 class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter City">
+                                placeholder="{{ __('Enter City') }}">
                         </div>
                         <div>
-                            <label class="block text-[#525252] text-lg font-normal mb-3">State</label>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('State') }}</label>
                             <input type="text" name="education[${index}][state]"
                                 class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="Enter State">
+                                placeholder="{{ __('Enter State') }}">
                         </div>
                         <div class="education-country-wrapper">
-                            <label class="block text-[#525252] text-lg font-normal mb-3">Country</label>
+                            <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Country') }}</label>
                             <select id="education-country-select-${index}" name="education[${index}][country]"
                                 class="education-country-select w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]" data-default="" required>
-                                <option value="">Select Country</option>
+                                <option value="">{{ __('Select Country') }}</option>
                                 ${countriesData.map(c => `<option value="${c.code}">${c.flag} ${c.name}</option>`).join('')}
                             </select>
                         </div>
@@ -1362,40 +1326,40 @@
                     <div class="flex justify-between items-center px-10 pt-6">
                         <h4 class="text-xl font-medium text-gray-800">Certification #${index + 1}</h4>
                         <button type="button" class="text-red-500 hover:text-red-700 font-medium flex items-center gap-1 bg-transparent border-none cursor-pointer" onclick="removeCertification(${index})">
-                            <i class="ri-delete-bin-line"></i> Remove
+                            <i class="ri-delete-bin-line"></i> {{ __('Remove') }}
                         </button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-10">
                         <div>
-                            <label class="block text-gray-600 text-lg mb-4">ID Proof</label>
+                            <label class="block text-gray-600 text-lg mb-4">{{ __('ID Proof') }}</label>
                             <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
                                 <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                     <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                    <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                    <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
                                 </div>
-                                <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
                                 <input type="file" name="certifications[${index}][id_proof]" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-gray-600 text-lg mb-4">Training / Diploma</label>
+                            <label class="block text-gray-600 text-lg mb-4">{{ __('Training / Diploma') }}</label>
                             <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
                                 <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                     <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                    <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                    <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
                                 </div>
-                                <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
                                 <input type="file" name="certifications[${index}][certificate]" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-gray-600 text-lg mb-4">Experience <span class="text-gray-400">(if any)</span></label>
+                            <label class="block text-gray-600 text-lg mb-4">{{ __('Experience') }}<span class="text-gray-400">{{ __('(if any)') }}</span></label>
                             <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
                                 <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                                     <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                    <p class="text-gray-500 text-sm leading-none">Upload</p>
+                                    <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
                                 </div>
-                                <p class="text-gray-400 text-sm file-name-display">(Max 2MB)</p>
+                                <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
                                 <input type="file" name="certifications[${index}][experience]" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
                             </div>
                         </div>

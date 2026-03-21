@@ -8,7 +8,7 @@ export function initCountrySelector(selector = '#nationality-select', defaultVal
 
     const tomSelect = new TomSelect(element, {
         options: countries.map(country => ({
-            value: country.code,
+            value: country.name, // Use name instead of code to match admin system
             text: country.name,
             code: country.code.toLowerCase() // For flag-icons CSS class
         })),
@@ -38,7 +38,13 @@ export function initCountrySelector(selector = '#nationality-select', defaultVal
 
     // Set default value
     if (defaultValue) {
-        tomSelect.setValue(defaultValue);
+        // Try to match value (name) or the legacy code
+        let targetValue = defaultValue;
+        const matchingCountry = countries.find(c => c.code === defaultValue || c.name === defaultValue);
+        if (matchingCountry) {
+            targetValue = matchingCountry.name;
+        }
+        tomSelect.setValue(targetValue);
     }
 
     return tomSelect;

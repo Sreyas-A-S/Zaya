@@ -43,6 +43,8 @@ class DatabaseSeeder extends Seeder
             HomepageSettingFrenchSeeder::class,
             ContactSettingSeeder::class,
             ContactSettingFrenchSeeder::class,
+            GallerySeeder::class,
+            GalleryFrenchSeeder::class,
             AdminPanelSettingSeeder::class,
             AdminPanelSettingFrenchSeeder::class,
             FinanceManagerSeeder::class,

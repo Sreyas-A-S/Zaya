@@ -154,7 +154,18 @@ class RegisterController extends Controller
         ];
 
         foreach ($docFields as $field) {
-            if ($request->hasFile($field)) {
+            if ($field === 'doc_certificates' && $request->hasFile($field)) {
+                $files = $request->file($field);
+                $paths = [];
+                if (is_array($files)) {
+                    foreach ($files as $file) {
+                        $paths[] = $file->store('practitioner_docs', 'public');
+                    }
+                } else {
+                    $paths[] = $files->store('practitioner_docs', 'public');
+                }
+                $filePaths[$field] = json_encode($paths);
+            } elseif ($request->hasFile($field)) {
                 $filePaths[$field] = $request->file($field)->store('practitioner_docs', 'public');
             }
         }
@@ -178,10 +189,10 @@ class RegisterController extends Controller
             'cover_letter_text'
         ]), $filePaths);
 
-        $profileData['consultations'] = $request->ayurvedic_practices;
-        $profileData['body_therapies'] = $request->massage_practices;
+        $profileData['consultations'] = $request->ayurvedic_practices ?? $request->consultations;
+        $profileData['body_therapies'] = $request->massage_practices ?? $request->body_therapies;
         $profileData['other_modalities'] = $request->other_modalities;
-        $profileData['profile_bio'] = $request->professional_bio;
+        $profileData['profile_bio'] = $request->professional_bio ?? $request->profile_bio;
 
         $profileData['first_name'] = $request->first_name;
         $profileData['last_name'] = $request->last_name;

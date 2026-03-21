@@ -18,7 +18,7 @@
     ]
   },
   "resources/css/practitioner-register.css": {
-    "file": "assets/practitioner-register-DJpvDs9P.css",
+    "file": "assets/practitioner-register-B0kcQJB0.css",
     "src": "resources/css/practitioner-register.css",
     "isEntry": true,
     "name": "practitioner-register",
@@ -36,7 +36,7 @@
     ]
   },
   "resources/js/country-selector.js": {
-    "file": "assets/country-selector-DKDN0IxO.js",
+    "file": "assets/country-selector-ANxcA9Cf.js",
     "name": "country-selector",
     "src": "resources/js/country-selector.js",
     "isEntry": true

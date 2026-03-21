@@ -129,7 +129,28 @@ class ClientController extends Controller
                     $btn .= '</div>';
                     return $btn;
                 })
-                ->rawColumns(['profile_photo', 'action', 'phone', 'status'])
+                ->editColumn('country', function ($row) {
+                    if (!$row->country) return 'N/A';
+                    
+                    // Try to find country by code first (for old data) then by name
+                    $country = null;
+                    if (strlen($row->country) === 2) {
+                        $country = \App\Models\Country::where('code', strtoupper($row->country))->first();
+                    }
+                    
+                    if (!$country) {
+                        $country = \App\Models\Country::where('name', $row->country)->first();
+                    }
+
+                    $name = $country ? $country->name : $row->country;
+                    $code = $country ? strtolower($country->code) : null;
+                    
+                    if ($code) {
+                        return '<i class="flag-icon flag-icon-' . $code . ' me-2"></i> ' . $name;
+                    }
+                    return $name;
+                })
+                ->rawColumns(['profile_photo', 'action', 'phone', 'status', 'country'])
                 ->make(true);
         }
 

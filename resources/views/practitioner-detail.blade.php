@@ -27,7 +27,7 @@
                     <div class="flex flex-col items-start gap-10">
                         <a href="{{ route('book-session', ['practitioner' => $practitioner->slug]) }}"
                             class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg">
-                            {{ $settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
+                            {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
                         </a>
 
                         <!-- Rating Block -->
@@ -45,7 +45,7 @@
                                                 @endif
                                             @endfor
                                         </div>
-                                        <span class="text-xs text-[#404040] opacity-80">{{ $settings['practitioner_based_on'] ?? 'Based on' }} {{ $practitioner->reviews->count() }} {{ $settings['practitioner_reviewers'] ?? 'Reviewers' }}</span>
+                                        <span class="text-xs text-[#404040] opacity-80">{{ $site_settings['practitioner_based_on'] ?? 'Based on' }} {{ $practitioner->reviews->count() }} {{ $site_settings['practitioner_reviewers'] ?? 'Reviewers' }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -63,7 +63,7 @@
                                         class="w-10 h-10 rounded-full border-1 border-black bg-[#4DD385] text-black text-[10px] flex items-center justify-center font-bold z-10">
                                         +{{ $practitioner->reviews->count() }}</div>
                                 </div>
-                                <span class="text-sm font-medium text-gray-600 block leading-tight">{{ $settings['practitioner_reviews_label'] ?? "Client's Reviews" }}</span>
+                                <span class="text-sm font-medium text-gray-600 block leading-tight">{{ $site_settings['practitioner_reviews_label'] ?? "Client's Reviews" }}</span>
                             </div>
                         </div>
                     </div>
@@ -80,14 +80,14 @@
                 <div
                     class="bg-white rounded-2xl shadow-[0_0px_72px_rgba(186,186,186,0.45)] border border-gray-100 px-16 py-10 text-center w-full xl:w-auto xl:min-w-[500px]">
                     <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">100+</h3>
-                    <p class="text-gray-500 text-xl">{{ $settings['practitioner_total_sessions'] ?? 'Total No.of Sessions' }}</p>
+                    <p class="text-gray-500 text-xl">{{ $site_settings['practitioner_total_sessions'] ?? 'Total No.of Sessions' }}</p>
                 </div>
 
                 <!-- Clients Card -->
                 <div
                     class="bg-white rounded-2xl shadow-[0_0px_72px_rgba(186,186,186,0.45)] border border-gray-100 px-16 py-10 text-center w-full xl:w-auto xl:min-w-[500px]">
                     <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">80+</h3>
-                    <p class="text-gray-500 text-xl">{{ $settings['practitioner_total_clients'] ?? 'Total No.of Clients' }}</p>
+                    <p class="text-gray-500 text-xl">{{ $site_settings['practitioner_total_clients'] ?? 'Total No.of Clients' }}</p>
                 </div>
             </div>
         </div>
@@ -98,8 +98,8 @@
         <div class="container mx-auto px-6">
             <!-- Header -->
             <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-serif font-bold text-[#A66E58] mb-4">{{ $settings['practitioner_legacy_title'] ?? 'A Legacy of Expertise' }}</h2>
-                <h3 class="text-2xl md:text-3xl font-serif text-[#4A7060]">{{ $settings['practitioner_legacy_subtitle'] ?? 'Precision and Passion Across Every Field' }}</h3>
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-[#A66E58] mb-4">{{ $site_settings['practitioner_legacy_title'] ?? 'A Legacy of Expertise' }}</h2>
+                <h3 class="text-2xl md:text-3xl font-serif text-[#4A7060]">{{ $site_settings['practitioner_legacy_subtitle'] ?? 'Precision and Passion Across Every Field' }}</h3>
             </div>
 
             <!-- Grid -->
@@ -111,7 +111,7 @@
                             class="w-16 h-16 rounded-full bg-[#56B280] flex items-center justify-center text-white text-3xl shadow-md">
                             <i class="ri-briefcase-4-line"></i>
                         </div>
-                        <h4 class="text-xl font-sans! font-bold text-black">{{ $settings['practitioner_consultations_title'] ?? 'Consultations' }}</h4>
+                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_consultations_title'] ?? 'Consultations' }}</h4>
                     </div>
 
                     <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
@@ -128,7 +128,7 @@
                             class="w-16 h-16 rounded-full bg-[#56B280] flex items-center justify-center text-white text-3xl shadow-md">
                             <i class="ri-shield-check-line"></i>
                         </div>
-                        <h4 class="text-xl font-sans! font-bold text-black">{{ $settings['practitioner_therapies_title'] ?? 'Therapies' }}</h4>
+                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_therapies_title'] ?? 'Therapies' }}</h4>
                     </div>
                     <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
                         @foreach($practitioner->body_therapies ?? [] as $item)
@@ -144,7 +144,7 @@
                             class="w-16 h-16 rounded-full bg-[#56B280] flex items-center justify-center text-white text-3xl shadow-md">
                             <i class="ri-user-heart-line"></i>
                         </div>
-                        <h4 class="text-xl font-sans! font-bold text-black">{{ $settings['practitioner_modalities_title'] ?? 'Other Modalities' }}</h4>
+                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_modalities_title'] ?? 'Other Modalities' }}</h4>
                     </div>
                     <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
                         @foreach($practitioner->other_modalities ?? [] as $item)
@@ -163,14 +163,14 @@
                 <!-- Left: Heading -->
                 <div class="md:w-1/3 flex justify-center md:justify-start">
                     <h2 class="text-3xl md:text-[38px] font-serif font-bold text-secondary leading-tight">
-                        {!! str_replace("\n", '<br />', $settings['practitioner_glimpse_title'] ?? "A Glimpse Into\nMy Practice") !!}
+                        {!! str_replace("\n", '<br />', $site_settings['practitioner_glimpse_title'] ?? "A Glimpse Into\nMy Practice") !!}
                     </h2>
                 </div>
 
                 <!-- Center: Description -->
                 <div class="md:w-1/3 flex justify-center md:text-center">
                     <p class="text-gray-800 text-base mb-0 max-w-90">
-                        {{ $settings['practitioner_glimpse_description'] ?? 'Explore the spaces, rituals, and healing moments that define my approach to Ayurvedic wellness and patient care.' }}
+                        {{ $site_settings['practitioner_glimpse_description'] ?? 'Explore the spaces, rituals, and healing moments that define my approach to Ayurvedic wellness and patient care.' }}
                     </p>
                 </div>
 
@@ -178,7 +178,7 @@
                 <div class="md:w-1/3 flex justify-center md:justify-end">
                     <button type="button" id="btn-open-gallery"
                         class="inline-flex items-center justify-center bg-secondary hover:bg-primary text-white px-8 py-3.5 rounded-full text-sm font-normal transition-all font-sans! cursor-pointer">
-                        {{ $settings['practitioner_explore_gallery_btn'] ?? 'Explore Our Gallery' }}
+                        {{ $site_settings['practitioner_explore_gallery_btn'] ?? 'Explore Our Gallery' }}
                     </button>
                 </div>
             </div>
@@ -189,9 +189,9 @@
     <section class="py-20 bg-white">
         <div class="container mx-auto px-6 relative">
             <div class="text-center mb-16 max-w-4xl mx-auto">
-                <h2 class="text-4xl md:text-5xl font-serif font-bold text-[#A66E58] mb-6">{{ $settings['practitioner_stories_title'] ?? 'Stories of Transformation' }}</h2>
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-[#A66E58] mb-6">{{ $site_settings['practitioner_stories_title'] ?? 'Stories of Transformation' }}</h2>
                 <p class="text-gray-500 leading-relaxed text-lg">
-                    {{ $settings['practitioner_stories_description'] ?? 'The true measure of ZAYA Wellness lies in the journeys of our members. These stories reflect our commitment to authenticity and excellence.' }}
+                    {{ $site_settings['practitioner_stories_description'] ?? 'The true measure of ZAYA Wellness lies in the journeys of our members. These stories reflect our commitment to authenticity and excellence.' }}
                 </p>
             </div>
 
@@ -221,14 +221,14 @@
                 </div>
                 @empty
                 <div class="col-span-full text-center py-10">
-                    <p class="text-gray-500 italic">{{ $settings['practitioner_no_reviews'] ?? 'No reviews yet for this practitioner.' }}</p>
+                    <p class="text-gray-500 italic">{{ $site_settings['practitioner_no_reviews'] ?? 'No reviews yet for this practitioner.' }}</p>
                 </div>
                 @endforelse
             </div>
             
             <div class="text-center mt-12">
                 <button
-                    class="border cursor-pointer border-secondary text-secondary px-10 py-3 rounded-full hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 font-medium bg-white shadow-sm pointer-events-auto relative z-20">{{ $settings['practitioner_load_more_reviews'] ?? 'Load More' }}</button>
+                    class="border cursor-pointer border-secondary text-secondary px-10 py-3 rounded-full hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 font-medium bg-white shadow-sm pointer-events-auto relative z-20">{{ $site_settings['practitioner_load_more_reviews'] ?? 'Load More' }}</button>
             </div>
         </div>
     </section>
@@ -239,11 +239,11 @@
             <div
                 class="bg-[#F9EBD6] px-8 md:px-12 py-5 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
                 <p class="text-gray-700 text-base md:text-lg text-center md:text-left">
-                    {{ $settings['practitioner_cta_text'] ?? 'Ready to start your wellness journey with' }} {{ $practitioner->first_name }} {{ $practitioner->last_name }}?
+                    {{ $site_settings['practitioner_cta_text'] ?? 'Ready to start your wellness journey with' }} {{ $practitioner->first_name }} {{ $practitioner->last_name }}?
                 </p>
                 <a href="{{ route('book-session', ['practitioner' => $practitioner->slug]) }}"
                     class="bg-secondary text-white px-8 py-3 rounded-full font-normal hover:bg-primary transition-colors text-sm md:text-base whitespace-nowrap">
-                    {{ $settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
+                    {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
                 </a>
             </div>
         </div>
@@ -299,16 +299,16 @@
                 <div class="flex overflow-x-auto no-scrollbar gap-8 md:gap-12 border-b border-gray-200" role="tablist">
                     <button data-tab="sanctuary"
                         class="gallery-tab gallery-tab-btn relative pb-4 text-base md:text-lg font-normal transition-colors text-secondary whitespace-nowrap bg-transparent cursor-pointer"
-                        role="tab" aria-selected="true">{{ $settings['practitioner_gallery_sanctuary'] ?? 'Our Sanctuary' }}</button>
+                        role="tab" aria-selected="true">{{ $site_settings['practitioner_gallery_sanctuary'] ?? 'Our Sanctuary' }}</button>
                     <button data-tab="rituals"
                         class="gallery-tab gallery-tab-btn relative pb-4 text-base md:text-lg font-normal transition-colors border-b-[3px] border-transparent text-[#8D8D8D] hover:text-secondary whitespace-nowrap bg-transparent cursor-pointer"
-                        role="tab" aria-selected="false">{{ $settings['practitioner_gallery_rituals'] ?? 'Expressive Rituals' }}</button>
+                        role="tab" aria-selected="false">{{ $site_settings['practitioner_gallery_rituals'] ?? 'Expressive Rituals' }}</button>
                     <button data-tab="medium"
                         class="gallery-tab gallery-tab-btn relative pb-4 text-base md:text-lg font-normal transition-colors border-b-[3px] border-transparent text-[#8D8D8D] hover:text-secondary whitespace-nowrap bg-transparent cursor-pointer"
-                        role="tab" aria-selected="false">{{ $settings['practitioner_gallery_medium'] ?? 'Medium of the Soul' }}</button>
+                        role="tab" aria-selected="false">{{ $site_settings['practitioner_gallery_medium'] ?? 'Medium of the Soul' }}</button>
                     <button data-tab="moments"
                         class="gallery-tab gallery-tab-btn relative pb-4 text-base md:text-lg font-normal transition-colors border-b-[3px] border-transparent text-[#8D8D8D] hover:text-secondary whitespace-nowrap bg-transparent cursor-pointer"
-                        role="tab" aria-selected="false">{{ $settings['practitioner_gallery_moments'] ?? 'Moments of Clarity' }}</button>
+                        role="tab" aria-selected="false">{{ $site_settings['practitioner_gallery_moments'] ?? 'Moments of Clarity' }}</button>
                 </div>
             </div>
 

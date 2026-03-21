@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('frontend/assets/apple-touch-icon.png') }}" />
     <meta name="apple-mobile-web-app-title" content="Zaya Wellness" />
     <link rel="manifest" href="{{ asset('frontend/assets/site.webmanifest') }}">
-    <title>Client Registration - Zaya Wellness</title>
+    <title>{{ __('Client Registration') }} - Zaya Wellness</title>
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/country-selector.js'])
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
@@ -392,9 +392,8 @@
         <div class="container mx-auto px-4 py-8 md:py-12 lg:py-16">
             <!-- Header -->
             <div class="text-center mb-8 md:mb-16">
-                <p class="text-[#424F93] font-regular text-base md:text-lg mb-2">Create Account</p>
-                <h1 class="text-2xl md:text-3xl lg:text-4xl font-sans! font-medium text-gray-900">Client Registration
-                    Form</h1>
+                <p class="text-[#424F93] font-regular text-base md:text-lg mb-2">{{ __('Create Account') }}</p>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-sans! font-medium text-gray-900">{{ __('Client Registration Form') }}</h1>
             </div>
 
             <!-- Toast Container -->
@@ -410,24 +409,24 @@
                 <!-- Row 1: Name Fields -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">First Name</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('First Name') }}</label>
                         <input type="text" name="first_name" value="{{ old('first_name') }}"
                             class="reg-input @error('first_name') border-red-500! @enderror"
-                            placeholder="Enter First Name" required pattern="^[A-Z][a-zA-Z\s]*$" title="First name must start with a capital letter and contain only alphabets">
+                            placeholder="{{ __('Enter First Name') }}" required pattern="^[A-Z][a-zA-Z\s]*$" title="{{ __('First name must start with a capital letter and contain only alphabets') }}">
                         @error('first_name')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Middle Name</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Middle Name') }}</label>
                         <input type="text" name="middle_name" value="{{ old('middle_name') }}" class="reg-input"
-                            placeholder="Enter Middle Name" pattern="^[a-zA-Z][a-zA-Z\s]*$" title="Middle name can start with a small or capital letter and must contain only alphabets">
+                            placeholder="{{ __('Enter Middle Name') }}" pattern="^[a-zA-Z][a-zA-Z\s]*$" title="{{ __('Middle name can start with a small or capital letter and must contain only alphabets') }}">
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Last Name</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Last Name') }}</label>
                         <input type="text" name="last_name" value="{{ old('last_name') }}"
                             class="reg-input @error('last_name') border-red-500! @enderror"
-                            placeholder="Enter Last Name" required pattern="^[A-Z][a-zA-Z\s]*$" title="Last name must start with a capital letter and contain only alphabets">
+                            placeholder="{{ __('Enter Last Name') }}" required pattern="^[A-Z][a-zA-Z\s]*$" title="{{ __('Last name must start with a capital letter and contain only alphabets') }}">
                         @error('last_name')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
@@ -437,32 +436,32 @@
                 <!-- Row 2: DOB, Age, Gender -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Date of Birth</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Date of Birth') }}</label>
                         <div class="date-input-wrapper">
                             <input type="date" name="dob" value="{{ old('dob') }}" id="dob-input"
-                                class="reg-input @error('dob') border-red-500! @enderror" placeholder="DOB" required>
+                                class="reg-input @error('dob') border-red-500! @enderror" placeholder="{{ __('dd-mm-yyyy') }}" required>
                         </div>
                         @error('dob')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Age</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Age') }}</label>
                         <input type="number" name="age" id="age-input" value="{{ old('age') }}"
-                            class="reg-input bg-gray-100 cursor-not-allowed" placeholder="Age" readonly>
+                            class="reg-input bg-gray-100 cursor-not-allowed" placeholder="{{ __('Age') }}" readonly>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Gender</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Gender') }}</label>
                         <div class="custom-select-wrapper">
                             <div class="custom-select" id="gender-select">
                                 <div class="custom-select-trigger">
-                                    <span id="gender-selected">Select Gender</span>
+                                    <span id="gender-selected">{{ __('Select Gender') }}</span>
                                     <i class="ri-arrow-down-s-line arrow text-gray-400"></i>
                                 </div>
                                 <div class="custom-options">
-                                    <div class="custom-option" data-value="male">Male</div>
-                                    <div class="custom-option" data-value="female">Female</div>
-                                    <div class="custom-option" data-value="transgender">Transgender</div>
+                                    <div class="custom-option" data-value="male">{{ __('Male') }}</div>
+                                    <div class="custom-option" data-value="female">{{ __('Female') }}</div>
+                                    <div class="custom-option" data-value="transgender">{{ __('Transgender') }}</div>
                                 </div>
                             </div>
                             <input type="hidden" name="gender" id="gender-input" value="{{ old('gender') }}" required>
@@ -476,18 +475,18 @@
                 <!-- Row 3: Email, Mobile -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Email</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Email') }}</label>
                         <input type="email" name="email" value="{{ old('email') }}"
-                            class="reg-input @error('email') border-red-500! @enderror" placeholder="Enter Email"
+                            class="reg-input @error('email') border-red-500! @enderror" placeholder="{{ __('Enter Email') }}"
                             required>
                         @error('email')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Mobile No.</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Mobile No.') }}</label>
                         <input type="tel" name="mobile" value="{{ old('mobile') }}"
-                            class="reg-input @error('mobile') border-red-500! @enderror" placeholder="Enter Mobile No."
+                            class="reg-input @error('mobile') border-red-500! @enderror" placeholder="{{ __('Enter Mobile No.') }}"
                             required>
                         @error('mobile')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
@@ -498,46 +497,46 @@
                 <!-- Row 4: Address Lines -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Address line 1</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Address Line 1') }}</label>
                         <input type="text" name="address_line_1" value="{{ old('address_line_1') }}"
                             class="reg-input @error('address_line_1') border-red-500! @enderror"
-                            placeholder="Enter Address line 1" required>
+                            placeholder="{{ __('Enter Address Line 1') }}" required>
                         @error('address_line_1')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Address line 2</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Address Line 2') }}</label>
                         <input type="text" name="address_line_2" value="{{ old('address_line_2') }}" class="reg-input"
-                            placeholder="Enter Address line 2">
+                            placeholder="{{ __('Enter Address Line 2') }}">
                     </div>
                 </div>
 
                 <!-- Row 5: City, State, Country -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">City</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('City') }}</label>
                         <input type="text" name="city" value="{{ old('city') }}"
-                            class="reg-input @error('city') border-red-500! @enderror" placeholder="Enter City"
+                            class="reg-input @error('city') border-red-500! @enderror" placeholder="{{ __('Enter City') }}"
                             required>
                         @error('city')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">State</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('State') }}</label>
                         <input type="text" name="state" value="{{ old('state') }}"
-                            class="reg-input @error('state') border-red-500! @enderror" placeholder="Enter State"
+                            class="reg-input @error('state') border-red-500! @enderror" placeholder="{{ __('Enter State') }}"
                             required>
                         @error('state')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Country</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Country') }}</label>
                         <select id="nationality-select" name="country" data-default="{{ old('country', 'IN') }}"
                             required>
-                            <option value="">Select Country</option>
+                            <option value="">{{ __('Select Country') }}</option>
                         </select>
                         @error('country')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
@@ -559,16 +558,16 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Zip Code</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Zip Code') }}</label>
                         <input type="text" name="zip_code" value="{{ old('zip_code') }}" class="reg-input" 
-                                placeholder="Pincode" required maxlength="8" pattern="\d*" title="Maximum 8 numerical values allowed"
+                                placeholder="{{ __('Enter Zip Code') }}" required maxlength="8" pattern="\d*" title="{{ __('Maximum 8 numerical values allowed') }}"
                                 oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
                     </div>
                 </div>
 
                 <!-- Consultation Preferences -->
                 <div class="mb-10">
-                    <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Preferred Speciality of Consultation</label>
+                    <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Preferred Speciality of Consultation') }}</label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8 bg-gray-50/50 p-6 md:p-8 rounded-3xl">
                         @foreach($consultationPreferences as $pref)
                             <label class="flex items-center gap-3 cursor-pointer group">
@@ -583,7 +582,7 @@
                         @endforeach
                         <div class="col-span-1 sm:col-span-2 lg:col-span-3 mt-4 pt-4 border-t border-gray-200">
                             <div class="flex items-center gap-3">
-                                <input type="text" id="new-preference" placeholder="Add New Preference" class="reg-input flex-1 max-w-xs">
+                                <input type="text" id="new-preference" placeholder="{{ __('Add New Preference') }}" class="reg-input flex-1 max-w-xs">
                                 <button type="button" onclick="addNewPreference()" class="bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-90 transition-all">
                                     <i class="ri-add-line text-xl"></i>
                                 </button>
@@ -595,22 +594,22 @@
                 <!-- Row: Languages & Referral -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Languages Spoken</label>
-                        <select id="languages-select" name="languages[]" multiple placeholder="Select Languages">
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Languages Spoken') }}</label>
+                        <select id="languages-select" name="languages[]" multiple placeholder="{{ __('Select Languages') }}">
                             @foreach($languages as $lang)
                                 <option value="{{ $lang->code }}">{{ $lang->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">How did you hear about us?</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('How did you hear about us?') }}</label>
                         <select name="referral_type" class="reg-input w-full">
-                            <option value="">Select Option</option>
-                            <option value="Direct Search">Direct Search</option>
-                            <option value="Social Media">Social Media</option>
-                            <option value="Friends & Family">Friends & Family</option>
-                            <option value="Healthcare Practitioner">Referral by Healthcare Practitioner</option>
-                            <option value="Other">Other Sources</option>
+                            <option value="">{{ __('Select Option') }}</option>
+                            <option value="Direct Search">{{ __('Direct Search') }}</option>
+                            <option value="Social Media">{{ __('Social Media') }}</option>
+                            <option value="Friends & Family">{{ __('Friends & Family') }}</option>
+                            <option value="Healthcare Practitioner">{{ __('Referral by Healthcare Practitioner') }}</option>
+                            <option value="Other">{{ __('Other Sources') }}</option>
                         </select>
                     </div>
                 </div>
@@ -627,17 +626,17 @@
                                 <i class="ri-eye-line text-lg" id="password-icon"></i>
                             </button>
                         </div>
-                        <p class="text-xs text-primary mt-2 pl-4">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</p>
+                        <p class="text-xs text-primary mt-2 pl-4">{{ __('Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.') }}</p>
                         @error('password')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Confirm Password</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Confirm Password') }}</label>
                         <div class="relative">
                             <input type="password" name="password_confirmation" id="password_confirmation"
                                 class="reg-input"
-                                placeholder="Confirm Password" required>
+                                placeholder="{{ __('Confirm Password') }}" required>
                             <button type="button" onclick="togglePassword('password_confirmation')"
                                 class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                 <i class="ri-eye-line text-lg" id="password_confirmation-icon"></i>
@@ -649,7 +648,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div class="md:col-span-1">
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Captcha Verification</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }}</label>
                         <div class="flex items-center gap-4">
                             <div class="bg-white rounded-full flex items-center justify-center h-[52px] w-[150px] overflow-hidden relative shrink-0 border border-gray-200">
                                 <img src="{{ route('captcha') }}" id="captcha-img" alt="captcha" class="w-full h-full object-cover">
@@ -657,7 +656,7 @@
                             <button type="button" onclick="refreshCaptcha()" class="text-[#1052CE] hover:text-blue-800 transition-colors cursor-pointer shrink-0">
                                 <i class="ri-restart-line text-[28px]"></i>
                             </button>
-                            <input type="text" name="captcha" placeholder="Enter Code" class="reg-input flex-1 @error('captcha') border-red-500! @enderror">
+                            <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}" class="reg-input flex-1 @error('captcha') border-red-500! @enderror">
                         </div>
                         @error('captcha')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
@@ -704,8 +703,8 @@
     <footer class="bg-[#FFF3D4] py-6 mt-auto">
         <div class="container mx-auto px-4">
             <div class="max-w-5xl mx-auto flex items-center justify-end gap-4 md:gap-8">
-                <a href="{{ route('zaya-login') }}" class="btn-cancel">Cancel</a>
-                <button type="submit" form="registration-form" class="btn-create">Create Account</button>
+                <a href="{{ route('zaya-login') }}" class="btn-cancel">{{ __('Cancel') }}</a>
+                <button type="submit" form="registration-form" class="btn-create">{{ __('Create Account') }}</button>
             </div>
         </div>
     </footer>

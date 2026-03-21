@@ -444,6 +444,13 @@ class AdminPanelSettingSeeder extends Seeder
                 'max_length' => 60,
             ],
             [
+                'key' => 'admin_panel_sidebar_gallery_settings',
+                'value' => 'Gallery Page Settings',
+                'type' => 'text',
+                'section' => 'admin_panel',
+                'max_length' => 70,
+            ],
+            [
                 'key' => 'admin_panel_sidebar_about_settings',
                 'value' => 'About Us Settings',
                 'type' => 'text',
