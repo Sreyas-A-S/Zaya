@@ -276,35 +276,55 @@
             });
 
             try {
+                console.log("Checking App ID validity...");
+                if (options.appId.length < 10) {
+                    throw new Error("Invalid App ID format. Check your .env file.");
+                }
+
                 // REQUEST PERMISSIONS FIRST
                 console.log("Requesting microphone track...");
-                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-                console.log("Microphone track created.");
+                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack().catch(err => {
+                    console.error("Mic Access Denied:", err);
+                    throw new Error("Microphone access was denied or no device found.");
+                });
 
                 console.log("Requesting camera track...");
-                localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
-                console.log("Camera track created.");
+                localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack().catch(err => {
+                    console.error("Camera Access Denied:", err);
+                    throw new Error("Camera access was denied or no device found.");
+                });
 
                 options.token = await fetchToken();
-                console.log("Token fetched, joining channel:", options.channel);
-
+                if (!options.token) {
+                    throw new Error("Failed to generate secure access token.");
+                }
+                
+                console.log("Joining channel:", options.channel);
                 await client.join(options.appId, options.channel, options.token, options.uid);
-                console.log("Joined channel successfully.");
+                console.log("Joined successfully.");
 
                 localTracks.videoTrack.play("local-player");
                 await client.publish(Object.values(localTracks));
-                console.log("Tracks published.");
 
                 const devices = await AgoraRTC.getDevices();
                 const camSelect = document.getElementById('camera-select');
                 const micSelect = document.getElementById('mic-select');
                 if (camSelect && micSelect) {
-                    devices.filter(d => d.kind === 'videoinput').forEach(c => camSelect.innerHTML += `<option value="${c.deviceId}">${c.label}</option>`);
-                    devices.filter(d => d.kind === 'audioinput').forEach(m => micSelect.innerHTML += `<option value="${m.deviceId}">${m.label}</option>`);
+                    camSelect.innerHTML = ''; micSelect.innerHTML = '';
+                    devices.filter(d => d.kind === 'videoinput').forEach(c => camSelect.innerHTML += `<option value="${c.deviceId}">${c.label || 'Camera ' + (camSelect.length+1)}</option>`);
+                    devices.filter(d => d.kind === 'audioinput').forEach(m => micSelect.innerHTML += `<option value="${m.deviceId}">${m.label || 'Mic ' + (micSelect.length+1)}</option>`);
                 }
             } catch (e) {
-                console.error("Agora Error:", e);
-                alert("Could not access camera/mic or join the session. Error: " + e.message);
+                console.error("Agora Critical Error:", e);
+                let msg = e.message;
+                if (e.message.includes("invalid vendor key")) {
+                    msg = "Agora App ID is invalid. Please verify the ID in your Agora Console and .env file.";
+                }
+                alert("Connection Failed: " + msg);
+                // Don't remove overlay so user can try again after fixing
+                const btn = document.getElementById('start-btn');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ri-door-open-fill"></i> Retry Joining';
             }        }
 
         async function handleUserPublished(user, mediaType) {

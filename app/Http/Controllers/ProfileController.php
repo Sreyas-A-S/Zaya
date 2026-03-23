@@ -158,13 +158,18 @@ class ProfileController extends Controller
     public function joinSession($channel)
     {
         $user = Auth::user();
-        $appId = trim(config('services.agora.app_id') ?? '');
+        $appId = config('services.agora.app_id');
         
         \Log::info("User joining session:", [
             'user' => $user->id,
             'channel' => $channel,
-            'app_id_prefix' => substr($appId, 0, 5) . '...'
+            'has_app_id' => !empty($appId),
+            'app_id_preview' => $appId ? substr($appId, 0, 5) . '...' : 'NONE'
         ]);
+
+        if (!$appId) {
+            return back()->with('error', 'Video consultation is not configured (Missing App ID).');
+        }
 
         return view('conference.session', compact('user', 'channel', 'appId'));
     }
