@@ -5,7 +5,7 @@
         <div class="bg-[#79584B] px-6 py-8 md:px-12 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
             <h3 id="footer-newsletter-title"
                 class="text-white text-sm sm:text-base md:text-xl font-normal text-center md:text-left font-sans!" data-i18n="{{ $site_settings['newsletter_title'] ?? 'Join our newsletter for weekly wellness tips.' }}">
-                {{ $site_settings['newsletter_title'] ?? __('Join our newsletter for weekly wellness tips.') }}
+                {{ __($site_settings['newsletter_title'] ?? 'Join our newsletter for weekly wellness tips.') }}
             </h3>
             <div class="flex w-full md:w-auto gap-2">
                 <input id="footer-newsletter-input" type="email" placeholder="{{ __('Your email...') }}" data-i18n="Your email..."
@@ -31,7 +31,7 @@
                             class="h-16 md:h-24 w-auto object-contain">
                     </a>
                     <p id="footer-tagline" class="text-[#2E2E2E] text-center xl:text-start opacity-80 text-xs md:text-base leading-relaxed max-w-xs" data-i18n="{{ $site_settings['footer_description'] ?? 'Empowering your wellness journey through ancient wisdom and modern science.' }}">
-                        {{ $site_settings['footer_description'] ?? __('Empowering your wellness journey through ancient wisdom and modern science.') }}
+                        {{ __($site_settings['footer_description'] ?? 'Empowering your wellness journey through ancient wisdom and modern science.') }}
                     </p>
                 </div>
 
@@ -39,7 +39,7 @@
                 <div class="order-first border-b border-[#DABEA2] md:border-none pb-4 md:pb-0">
                     <div class="flex justify-between items-center cursor-pointer md:cursor-auto" onclick="toggleFooterMenu('quick-links')">
                         <h4 id="footer-quick-links-title" class="font-medium font-sans! mb-0 md:mb-6 text-xl text-[#2E2E2E]" data-i18n="{{ $site_settings['quick_links_heading'] ?? 'Quick Links' }}">
-                            {{ $site_settings['quick_links_heading'] ?? __('Quick Links') }}</h4>
+                            {{ __($site_settings['quick_links_heading'] ?? 'Quick Links') }}</h4>
                         <i class="ri-add-line text-2xl md:hidden text-[#2E2E2E]" id="quick-links-icon"></i>
                     </div>
                     <ul id="quick-links-menu" class="hidden md:block! space-y-4 text-base font-regular text-[#2E2E2E]/80 pt-6 md:pt-0">
@@ -64,7 +64,7 @@
                 <div class="order-2 z-1 pb-4 md:pb-0">
                     <div class="flex justify-between items-center cursor-pointer md:cursor-auto" onclick="toggleFooterMenu('conditions')">
                         <h4 id="footer-conditions-title" class="font-medium font-sans! mb-0 md:mb-6 text-xl text-[#2E2E2E]" data-i18n="{{ $site_settings['conditions_heading'] ?? 'Conditions We Support' }}">
-                            {{ $site_settings['conditions_heading'] ?? __('Conditions We Support') }}</h4>
+                            {{ __($site_settings['conditions_heading'] ?? 'Conditions We Support') }}</h4>
                         <i class="ri-add-line text-2xl md:hidden text-[#2E2E2E]" id="conditions-icon"></i>
                     </div>
                     <ul id="conditions-menu" class="hidden md:block! space-y-4 text-base font-regular text-[#2E2E2E]/80 pt-6 md:pt-0">
@@ -86,7 +86,7 @@
                 <!-- Column 4: Pincode & Socials -->
                 <div class="order-3 z-1 md:col-span-2 lg:col-span-1">
                     <h4 id="footer-pincode-title" class="font-sans! text-base font-medium text-[#252525] mb-4 text-center lg:text-start" data-i18n="{{ $site_settings['pincode_heading'] ?? 'Save your pincode & find nearby care.' }}">
-                        {{ $site_settings['pincode_heading'] ?? __('Save your pincode & find nearby care.') }}</h4>                  
+                        {{ __($site_settings['pincode_heading'] ?? 'Save your pincode & find nearby care.') }}</h4>                  
                     
                     <form class="flex gap-2 mb-2 items-center">
                         <div class="relative flex-1">
@@ -145,7 +145,7 @@
 
             <div class="text-center text-[10px] md:text-sm text-[#252525] cursor-default lg:border-t border-[#252525]/80 py-4"> 
                 <p id="footer-all-rights" data-i18n="{{ $site_settings['copyright_text'] ?? 'All rights reserved.' }}">
-                    {{ $site_settings['copyright_text'] ?? __('All rights reserved.') }} &copy; {{ date('Y') }} Zaya Wellness
+                    {{ __($site_settings['copyright_text'] ?? 'All rights reserved.') }} &copy; {{ date('Y') }} Zaya Wellness
                 </p>
             </div>
         </div>

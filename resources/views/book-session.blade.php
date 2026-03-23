@@ -91,7 +91,7 @@
                         id="step-circle-1">1</div>
                     <span
                         class="text-xs md:text-base {{ $isClient ? 'text-gray-400' : 'text-gray-700' }} mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
-                        id="step-label-1">Login</span>
+                        id="step-label-1" data-i18n="Login">{{ __('Login') }}</span>
                 </div>
                 <div class="w-10 sm:w-16 md:w-[100px] lg:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]"
                     id="step-line-1"></div>
@@ -100,7 +100,7 @@
                         id="step-circle-2">2</div>
                     <span
                         class="text-xs md:text-base {{ $isClient ? 'text-gray-700' : 'text-gray-400' }} mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
-                        id="step-label-2">Schedule booking</span>
+                        id="step-label-2" data-i18n="Schedule booking">{{ __('Schedule booking') }}</span>
                 </div>
                 <div class="w-10 sm:w-16 md:w-[100px] lg:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center shrink-0 relative top-[-15px] sm:top-[-10px] md:top-[-14px]"
                     id="step-line-2"></div>
@@ -109,9 +109,25 @@
                         id="step-circle-3">3</div>
                     <span
                         class="text-xs md:text-base text-gray-400 mt-2.5 font-normal whitespace-normal md:whitespace-nowrap text-center max-w-[70px] sm:max-w-none leading-tight"
-                        id="step-label-3">Booking confirmation</span>
+                        id="step-label-3" data-i18n="Booking confirmation">{{ __('Booking confirmation') }}</span>
                 </div>
             </div>
+
+            <!-- Language Toggle Desktop -->
+            <div class="hidden lg:flex absolute right-10 top-1/2 -translate-y-1/2">
+                @php
+                $available_languages = $languages->where('status', 'active');
+                $lang1 = $available_languages->first();
+                $lang2 = $available_languages->skip(1)->first();
+                $currentLocale = App::getLocale();
+                @endphp
+                @if($available_languages->count() >= 2)
+               
+                @endif
+            </div>
+
+            <!-- Mobile Language Toggle -->
+            
         </div>
 
         <!-- Welcome Section - Step 1 -->
@@ -131,21 +147,20 @@
                 <!-- Content -->
                 <div
                     class="relative z-10 flex flex-col items-center justify-center text-center px-6 py-20 md:py-32">
-                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-sans! font-medium text-gray-900 mb-6">Welcome
-                        to ZAYA</h1>
-                    <p class="text-gray-600 text-lg md:text-xl mb-12 max-w-lg">
-                        Please identify yourself to continue with your booking.
+                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-sans! font-medium text-gray-900 mb-6" data-i18n="Welcome to ZAYA">{{ __('Welcome to ZAYA') }}</h1>
+                    <p class="text-gray-600 text-lg md:text-xl mb-12 max-w-lg" data-i18n="Please identify yourself to continue with your booking.">
+                        {{ __('Please identify yourself to continue with your booking.') }}
                     </p>
-
+ 
                     <!-- Action Buttons -->
                     <div class="flex flex-col sm:flex-row items-center gap-4">
                         <a href="{{ route('client-register', ['redirect' => request()->fullUrl()]) }}"
-                            class="bg-[#F5A623] text-[#423131] px-10 py-3.5 rounded-full font-medium text-base transition-all duration-300 hover:bg-[#E09518] hover:-translate-y-0.5 shadow-md">
-                            Register Now
+                            class="bg-[#F5A623] text-[#423131] px-10 py-3.5 rounded-full font-medium text-base transition-all duration-300 hover:bg-[#E09518] hover:-translate-y-0.5 shadow-md" data-i18n="Register Now">
+                            {{ __('Register Now') }}
                         </a>
                         <a href="{{ route('login', ['redirect' => request()->fullUrl()]) }}"
-                            class="text-gray-700 px-10 py-3.5 rounded-full font-medium text-base border border-[#423131] transition-all duration-300 hover:bg-[#423131] hover:text-white cursor-pointer">
-                            Login
+                            class="text-gray-700 px-10 py-3.5 rounded-full font-medium text-base border border-[#423131] transition-all duration-300 hover:bg-[#423131] hover:text-white cursor-pointer" data-i18n="Login">
+                            {{ __('Login') }}
                         </a>
                     </div>
                 </div>
@@ -158,15 +173,15 @@
 
                 <!-- Select Session Mode -->
                 <div class="text-center mb-8">
-                    <h2 class="text-xl md:text-xl font-sans! font-normal text-[#404040] mb-6">Select Session Mode
+                    <h2 class="text-xl md:text-xl font-sans! font-normal text-[#404040] mb-6" data-i18n="Select Session Mode">{{ __('Select Session Mode') }}
                     </h2>
                     <div class="inline-flex gap-4">
                         <button type="button"
                             class="session-mode-btn px-6 py-2 rounded-full text-base font-base transition-all duration-200 bg-[#EAEAEA] text-[#747474] cursor-pointer"
-                            data-mode="online">Online</button>
+                            data-mode="online" data-i18n="Online">{{ __('Online') }}</button>
                         <button type="button"
                             class="session-mode-btn px-6 py-2 rounded-full text-base font-base transition-all duration-200 bg-[#EAEAEA] text-[#747474] cursor-pointer"
-                            data-mode="in-person">In Person</button>
+                            data-mode="in-person" data-i18n="In Person">{{ __('In Person') }}</button>
                     </div>
                 </div>
 
@@ -195,41 +210,41 @@
                         </div>
                     </div>
                     <button type="button" onclick="openPractitionerModal()"
-                        class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors">
-                        Change Practitioner
+                        class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors" data-i18n="Change Practitioner">
+                        {{ __('Change Practitioner') }}
                     </button>
                 </div>
 
                 <!-- Why do you want to meet this practitioner -->
                 <div class="mb-10">
-                    <h3 class="text-gray-700 font-normal mb-4 text-lg">Why do you want to meet this practitioner?
+                    <h3 class="text-gray-700 font-normal mb-4 text-lg" data-i18n="Why do you want to meet this practitioner?">{{ __('Why do you want to meet this practitioner?') }}
                     </h3>
-                    <input type="text" id="conditions-input" placeholder="Add conditions..." readonly
-                        class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400 mb-4 cursor-default">
+                    <input type="text" id="conditions-input" placeholder="{{ __('Add conditions...') }}" readonly
+                        class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400 mb-4 cursor-default" data-i18n-placeholder="Add conditions...">
 
                     <!-- Condition Tags -->
                     <div class="flex flex-wrap gap-2" id="condition-tags-wrapper">
                         <label
                             class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
                                 type="checkbox" name="conditions[]" value="identifying_imbalances" class="sr-only">
-                            Identifying Imbalances</label>
+                            <span data-i18n="Identifying Imbalances">{{ __('Identifying Imbalances') }}</span></label>
                         <label
                             class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
                                 type="checkbox" name="conditions[]" value="preventative_lifestyle_guidance"
                                 class="sr-only">
-                            Preventative Lifestyle Guidance</label>
+                            <span data-i18n="Preventative Lifestyle Guidance">{{ __('Preventative Lifestyle Guidance') }}</span></label>
                         <label
                             class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
                                 type="checkbox" name="conditions[]" value="holistic_restoration" class="sr-only">
-                            Holistic Restoration</label>
+                            <span data-i18n="Holistic Restoration">{{ __('Holistic Restoration') }}</span></label>
                         <label
                             class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
                                 type="checkbox" name="conditions[]" value="natural_healing" class="sr-only">
-                            Natural Healing</label>
+                            <span data-i18n="Natural Healing">{{ __('Natural Healing') }}</span></label>
                         <label
                             class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
                                 type="checkbox" name="conditions[]" value="prakriti" class="sr-only">
-                            Prakriti</label>
+                            <span data-i18n="Prakriti">{{ __('Prakriti') }}</span></label>
                         <label
                             class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
                                 type="checkbox" name="conditions[]" value="identifying_imbalances_2"
@@ -253,12 +268,13 @@
 
                 <!-- Explain your situation -->
                 <div class="mb-10">
-                    <h3 class="text-gray-700 font-normal mb-4 text-lg">Do you want to explain your situation?
-                        <span class="italic">(Optional)</span>
+                    <h3 class="text-gray-700 font-normal mb-4 text-lg" data-i18n="Do you want to explain your situation?">
+                        {{ __('Do you want to explain your situation?') }}
+                        <span class="italic" data-i18n="(Optional)">({{ __('Optional') }})</span>
                     </h3>
-                    <textarea placeholder="Write here..."
-                        class="w-full py-4 px-5 bg-[#F5F5F5] rounded-2xl outline-none text-sm text-gray-700 min-h-[120px] resize-y placeholder:text-gray-400 focus:border-primary focus:bg-white border border-transparent"></textarea>
-                    <p class="text-right text-sm text-gray-400 mt-2 italic">(Paragraph should contain 100 words
+                    <textarea placeholder="{{ __('Write here...') }}"
+                        class="w-full py-4 px-5 bg-[#F5F5F5] rounded-2xl outline-none text-sm text-gray-700 min-h-[120px] resize-y placeholder:text-gray-400 focus:border-primary focus:bg-white border border-transparent" data-i18n-placeholder="Write here..."></textarea>
+                    <p class="text-right text-sm text-gray-400 mt-2 italic" data-i18n="(Paragraph should contain 100 words only)">(Paragraph should contain 100 words
                         only)</p>
                 </div>
 
@@ -465,13 +481,13 @@
                     <div class="max-w-4xl mx-auto flex items-center justify-end gap-4 md:gap-8">
                         <button type="button"
                             class="text-[#594B4B] font-normal text-base transition-all duration-200 cursor-pointer bg-transparent border-none py-3.5 px-6 hover:text-gray-700"
-                            onclick="previousStep()">
-                            Back
+                            onclick="previousStep()" data-i18n="Back">
+                            {{ __('Back') }}
                         </button>
                         <button type="button"
                             class="bg-[#F5A623] text-[#423131] py-3.5 px-8 rounded-full font-normal text-base transition-all duration-300 cursor-pointer border-none hover:bg-[#A87139] hover:text-white hover:-translate-y-0.5"
-                            onclick="nextStep()">
-                            Save & Continue
+                            onclick="nextStep()" data-i18n="Save & Continue">
+                            {{ __('Save & Continue') }}
                         </button>
                     </div>
                 </div>
@@ -625,10 +641,10 @@
             <div class="flex justify-center items-center gap-6 mb-12">
                 <button type="button"
                     class="text-gray-500 hover:text-gray-800 transition-colors cursor-pointer text-base"
-                    onclick="previousStep()">Back</button>
+                    onclick="previousStep()" data-i18n="Back">{{ __('Back') }}</button>
                 <button type="button" onclick="submitBooking(this)"
-                    class="bg-secondary text-white px-10 py-3.5 rounded-full font-normal hover:bg-primary transition-colors cursor-pointer text-base transform duration-200">
-                    Confirm Booking
+                    class="bg-secondary text-white px-10 py-3.5 rounded-full font-normal hover:bg-primary transition-colors cursor-pointer text-base transform duration-200" data-i18n="Confirm Booking">
+                    {{ __('Confirm Booking') }}
                 </button>
             </div>
 
@@ -1701,14 +1717,62 @@
 
                 <div class="border-t border-[#EAEAEA] px-8 py-6 flex justify-end gap-3 mt-4">
                     <button type="button" onclick="closePractitionerModal()"
-                        class="px-7 py-2.5 rounded-full border border-transparent bg-white text-gray-700 text-base font-normal hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+                        class="px-7 py-2.5 rounded-full border border-transparent bg-white text-gray-700 text-base font-normal hover:bg-gray-50 transition-colors cursor-pointer" data-i18n="Cancel">{{ __('Cancel') }}</button>
                     <button type="button" onclick="closePractitionerModal()"
-                        class="px-10 py-2.5 rounded-full bg-[#FABD4D] text-[#423131] text-base font-normal hover:bg-[#F5A623] transition-colors border border-transparent cursor-pointer">Save</button>
+                        class="px-10 py-2.5 rounded-full bg-[#FABD4D] text-[#423131] text-base font-normal hover:bg-[#F5A623] transition-colors border border-transparent cursor-pointer" data-i18n="Save">{{ __('Save') }}</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <script>
+        function togglePageLanguage(targetLocale) {
+            fetch(`{{ url('/lang') }}/${targetLocale}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status && data.translations) {
+                    // Update all text content
+                    document.querySelectorAll('[data-i18n]').forEach(el => {
+                        const key = el.getAttribute('data-i18n');
+                        el.textContent = data.translations[key] || key;
+                    });
+                    // Update placeholders
+                    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                        const key = el.getAttribute('data-i18n-placeholder');
+                        el.setAttribute('placeholder', data.translations[key] || key);
+                    });
+
+                    // Update toggle UI
+                    const pills = [document.getElementById('lang-toggle-pill'), document.getElementById('lang-toggle-pill-mobile')];
+                    pills.forEach(pill => {
+                        if (pill) {
+                            if (targetLocale === 'fr') {
+                                pill.classList.remove('translate-x-0');
+                                pill.classList.add('translate-x-[36px]');
+                            } else {
+                                pill.classList.remove('translate-x-[36px]');
+                                pill.classList.add('translate-x-0');
+                            }
+                        }
+                    });
+
+                    // Update next toggle link logic
+                    const nextLocale = targetLocale === 'en' ? 'fr' : 'en';
+                    document.querySelectorAll('[onclick^="togglePageLanguage"]').forEach(btn => {
+                        btn.setAttribute('onclick', `togglePageLanguage('${nextLocale}')`);
+                    });
+
+                    console.log('Language switched to:', targetLocale);
+                }
+            });
+        }
+    </script>
     <script src="{{ asset('frontend/script.js') }}"></script>
 </body>
 

@@ -306,7 +306,8 @@ class WebController extends Controller
 
     public function zayaLogin()
     {
-        return view('zaya-login');
+        $available_languages = \App\Models\Language::where('status', 'active')->get();
+        return view('zaya-login', compact('available_languages'));
     }
 
     public function clientRegister(Request $request)
@@ -761,11 +762,11 @@ class WebController extends Controller
                     'excerpt' => strip_tags(html_entity_decode($post->excerpt->rendered)),
                     'content' => $post->content->rendered,
                     'slug' => $post->slug,
-                    'date' => \Carbon\Carbon::parse($post->date)->format('M d, Y'),
+                    'date' => \Carbon\Carbon::parse($post->date)->translatedFormat('M d, Y'),
                     'featured_image' => $featuredImage,
                     'featured_image_srcset' => $featuredImageSrcset,
                     'featured_image_sizes' => $featuredImageSizes,
-                    'category' => $categoryName,
+                    'category' => __($categoryName),
                     'link' => $post->link,
                 ];
             }

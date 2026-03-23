@@ -5,16 +5,14 @@
 @section('content')
 <!-- Mobile Tab Navigation -->
 <div class="lg:hidden flex space-x-6 overflow-x-auto scrollbar-hide mb-5">
-    <button onclick="switchMobileTab('dashboard')" id="m-tab-dashboard"
-        class="leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1">Dashboard</button>
-    <button onclick="switchMobileTab('health')" id="m-tab-health"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Health
-        Journey</button>
-    <a href="{{ route('bookings.index') }}" id="m-tab-bookings"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Bookings</a>
-    <button onclick="switchMobileTab('transactions')" id="m-tab-transactions"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Transaction
-        Vault</button>
+    <button onclick="switchMobileTab('dashboard')" id="client_panel_sidebar_dashboard_mobile"
+        class="leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1" data-i18n="Dashboard">{{ __($site_settings['client_panel_sidebar_dashboard'] ?? 'Dashboard') }}</button>
+    <button onclick="switchMobileTab('health')" id="client_panel_sidebar_health_journey_mobile"
+        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors" data-i18n="Health Journey">{{ __($site_settings['client_panel_sidebar_health_journey'] ?? 'Health Journey') }}</button>
+    <a href="{{ route('bookings.index') }}" id="client_panel_sidebar_bookings_mobile"
+        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors" data-i18n="Bookings">{{ __($site_settings['client_panel_sidebar_bookings'] ?? 'Bookings') }}</a>
+    <button onclick="switchMobileTab('transactions')" id="client_panel_sidebar_transaction_vault_mobile"
+        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors" data-i18n="Transaction Vault">{{ __($site_settings['client_panel_sidebar_transaction_vault'] ?? 'Transaction Vault') }}</button>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 md:gap-8 md:mb-8 mb-5">
@@ -23,7 +21,7 @@
         <!-- Identity Hub -->
         <div id="section-identity" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-medium font-sans! text-secondary">Identity Hub</h2>
+                <h2 id="client_panel_identity_hub_title" class="text-xl font-medium font-sans! text-secondary" data-i18n="{{ $site_settings['client_panel_identity_hub_title'] ?? 'Identity Hub' }}">{{ __($site_settings['client_panel_identity_hub_title'] ?? 'Identity Hub') }}</h2>
                 <button class="text-gray-400 hover:text-gray-600"><i class="ri-pencil-line"></i></button>
             </div>
 
@@ -32,16 +30,16 @@
             @endphp
             <div class="grid grid-cols-2 gap-y-6 gap-x-4 mb-6">
                 <div>
-                    <p class="text-base text-gray-400 mb-1">Age</p>
-                    <p class="text-base font-normal text-gray-800">{{ $profile->age ?? 'Not set' }} {{ isset($profile->age) ? 'Years' : '' }}</p>
+                    <p id="client_panel_age_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_age_label'] ?? 'Age' }}">{{ __($site_settings['client_panel_age_label'] ?? 'Age') }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ $profile->age ?? __($site_settings['client_panel_not_set'] ?? 'Not set') }} {{ isset($profile->age) ? __($site_settings['client_panel_years'] ?? 'Years') : '' }}</p>
                 </div>
                 <div>
-                    <p class="text-base text-gray-400 mb-1">Gender</p>
-                    <p class="text-base font-normal text-gray-800">{{ ucfirst($profile->gender ?? ($user->gender ?? 'Not set')) }}</p>
+                    <p id="client_panel_gender_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_gender_label'] ?? 'Gender' }}">{{ __($site_settings['client_panel_gender_label'] ?? 'Gender') }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ ucfirst(__($profile->gender ?? ($user->gender ?? ($site_settings['client_panel_not_set'] ?? 'Not set')))) }}</p>
                 </div>
                 <div class="col-span-2">
-                    <p class="text-base text-gray-400 mb-1">DOB</p>
-                    <p class="text-base font-normal text-gray-800">{{ (isset($profile->dob) && $profile->dob) ? (\Carbon\Carbon::parse($profile->dob)->format('M d, Y')) : 'Not set' }}</p>
+                    <p id="client_panel_dob_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_dob_label'] ?? 'DOB' }}">{{ __($site_settings['client_panel_dob_label'] ?? 'DOB') }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ (isset($profile->dob) && $profile->dob) ? (\Carbon\Carbon::parse($profile->dob)->translatedFormat('M d, Y')) : __($site_settings['client_panel_not_set'] ?? 'Not set') }}</p>
                 </div>
             </div>
 
@@ -49,40 +47,39 @@
 
             <div class="space-y-6">
                 <div>
-                    <p class="text-base text-gray-400 mb-1">Email</p>
+                    <p id="client_panel_email_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_email_label'] ?? 'Email' }}">{{ __($site_settings['client_panel_email_label'] ?? 'Email') }}</p>
                     <p class="text-base font-normal text-gray-800">{{ $user->email }}</p>
                 </div>
                 <div>
-                    <p class="text-base text-gray-400 mb-1">Phone</p>
-                    <p class="text-base font-normal text-gray-800">{{ $profile->phone ?? ($user->phone ?? 'Not set') }}</p>
+                    <p id="client_panel_phone_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_phone_label'] ?? 'Phone' }}">{{ __($site_settings['client_panel_phone_label'] ?? 'Phone') }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ $profile->phone ?? ($user->phone ?? __($site_settings['client_panel_not_set'] ?? 'Not set')) }}</p>
                 </div>
                 <div>
-                    <p class="text-base text-gray-400 mb-1">Address</p>
-                    <p class="text-base font-normal text-gray-800 leading-snug">{{ $profile->address ?? ($profile->city_state ?? 'Location not set') }}</p>
+                    <p id="client_panel_address_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_address_label'] ?? 'Address' }}">{{ __($site_settings['client_panel_address_label'] ?? 'Address') }}</p>
+                    <p class="text-base font-normal text-gray-800 leading-snug">{{ $profile->address ?? ($profile->city_state ?? __($site_settings['client_panel_location_not_set'] ?? 'Location not set')) }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Transaction Vault Snippet -->
         <div id="section-transactions" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
-            <h2 class="text-xl font-sans! font-medium text-secondary mb-6">Transaction Vault</h2>
+            <h2 id="client_panel_transaction_vault_title" class="text-xl font-sans! font-medium text-secondary mb-6" data-i18n="{{ $site_settings['client_panel_transaction_vault_title'] ?? 'Transaction Vault' }}">{{ __($site_settings['client_panel_transaction_vault_title'] ?? 'Transaction Vault') }}</h2>
             <div class="space-y-5">
                 @forelse($invoices as $invoice)
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-sm font-normal text-gray-800 mb-0.5">Invoice #{{ $invoice->id + 10000 }}</p>
+                        <p class="text-sm font-normal text-gray-800 mb-0.5">{{ __($site_settings['client_panel_invoice_hash'] ?? 'Invoice #') }}{{ $invoice->id + 10000 }}</p>
                         <p class="text-xs text-gray-400">{{ $invoice->created_at->format('M d, Y') }}</p>
                     </div>
                     <a href="{{ $invoice->razorpay_payment_url }}" target="_blank"
-                        class="px-3 py-1 bg-[#EEF2EF] text-[#2B4C3B] text-sm font-normal rounded-full">Open</a>
+                        class="px-3 py-1 bg-[#EEF2EF] text-[#2B4C3B] text-sm font-normal rounded-full" data-i18n="{{ $site_settings['client_panel_open_invoice'] ?? 'Open' }}">{{ __($site_settings['client_panel_open_invoice'] ?? 'Open') }}</a>
                 </div>
                 @empty
-                <p class="text-center text-gray-500 text-xs py-4">No recent invoices.</p>
+                <p id="client_panel_no_recent_invoices" class="text-center text-gray-500 text-xs py-4" data-i18n="{{ $site_settings['client_panel_no_recent_invoices'] ?? 'No recent invoices.' }}">{{ __($site_settings['client_panel_no_recent_invoices'] ?? 'No recent invoices.') }}</p>
                 @endforelse
             </div>
             <div class="mt-6 text-center">
-                <a href="{{ route('transactions.index') }}" class="text-xs text-gray-400 hover:text-gray-800 font-normal tracking-wide">See
-                    all</a>
+                <a id="client_panel_see_all" href="{{ route('transactions.index') }}" class="text-xs text-gray-400 hover:text-gray-800 font-normal tracking-wide" data-i18n="{{ $site_settings['client_panel_see_all'] ?? 'See all' }}">{{ __($site_settings['client_panel_see_all'] ?? 'See all') }}</a>
             </div>
         </div>
     </div>
@@ -91,14 +88,14 @@
     <div id="col-right" class="lg:col-span-7 xl:col-span-8 space-y-5 md:space-y-8">
         <!-- Consultations -->
         <div id="section-consultations" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
-            <h2 class="text-xl  font-sans! font-medium text-secondary mb-5">Consultations</h2>
+            <h2 id="client_panel_consultations_title" class="text-xl  font-sans! font-medium text-secondary mb-5" data-i18n="{{ $site_settings['client_panel_consultations_title'] ?? 'Consultations' }}">{{ __($site_settings['client_panel_consultations_title'] ?? 'Consultations') }}</h2>
 
             <!-- Tabs -->
             <div class="flex space-x-2 mb-4">
                 <button id="tab-upcoming" onclick="switchConsultationTab('upcoming')"
-                    class="px-4 py-1.5 w-1/2 text-center bg-[#CFFAD8] text-[#2FA749] text-sm font-normal rounded-lg transition-all cursor-pointer">Upcoming</button>
+                    class="px-4 py-1.5 w-1/2 text-center bg-[#CFFAD8] text-[#2FA749] text-sm font-normal rounded-lg transition-all cursor-pointer" data-i18n="Upcoming">Upcoming</button>
                 <button id="tab-completed" onclick="switchConsultationTab('completed')"
-                    class="px-4 py-1.5 w-1/2 text-center bg-[#F9F9F9] text-[#8C8C8C] text-sm font-normal rounded-lg transition-all cursor-pointer">Completed</button>
+                    class="px-4 py-1.5 w-1/2 text-center bg-[#F9F9F9] text-[#8C8C8C] text-sm font-normal rounded-lg transition-all cursor-pointer" data-i18n="Completed">Completed</button>
             </div>
 
             <!-- Upcoming Sessions -->
@@ -117,20 +114,18 @@
                             <span class="text-gray-800 text-base">•</span>
                             <p class="text-xs text-gray-600 font-normal">
                                 @if($user->role === 'client' || $user->role === 'patient')
-                                    (Session with {{ $booking->practitioner->user->name ?? 'Practitioner' }})
+                                    ({{ __($site_settings['client_panel_session_with'] ?? 'Session with') }} {{ $booking->practitioner->user->name ?? 'Practitioner' }})
                                 @else
-                                    (Client: {{ $booking->user->name ?? 'Patient' }})
+                                    ({{ __($site_settings['client_panel_client_label'] ?? 'Client') }}: {{ $booking->user->name ?? 'Patient' }})
                                 @endif
                             </p>
                         </div>
-                        <p class="text-xs text-gray-400">{{ $booking->booking_date->format('M d, Y') }} - {{ $booking->booking_time }}</p>
+                        <p class="text-xs text-gray-400">{{ $booking->booking_date->translatedFormat('M d, Y') }} - {{ $booking->booking_time }}</p>
                     </div>
-                    {{-- <button
-                        class="px-5 py-2 bg-[#D1EBE1] text-[#2B4C3B] hover:bg-[#bce0d2] rounded-full text-xs font-normal transition-colors">Reschedule</button> --}}
-                    <span class="px-3 py-1 bg-[#EEF2EF] text-[#2FA749] text-xs font-normal rounded-full capitalize">{{ $booking->status }}</span>
+                    <span class="px-3 py-1 bg-[#EEF2EF] text-[#2FA749] text-xs font-normal rounded-full capitalize">{{ __($booking->status) }}</span>
                 </div>
                 @empty
-                <p class="text-center text-gray-500 text-sm py-6">No upcoming sessions.</p>
+                <p id="client_panel_no_upcoming_msg" class="text-center text-gray-500 text-sm py-6" data-i18n="{{ $site_settings['client_panel_no_upcoming_msg'] ?? 'No upcoming sessions.' }}">{{ __($site_settings['client_panel_no_upcoming_msg'] ?? 'No upcoming sessions.') }}</p>
                 @endforelse
             </div>
 
@@ -150,47 +145,44 @@
                             <span class="text-gray-800 text-base">•</span>
                             <p class="text-xs text-gray-600 font-normal">
                                 @if($user->role === 'client' || $user->role === 'patient')
-                                    (Session with {{ $booking->practitioner->user->name ?? 'Practitioner' }})
+                                    ({{ __($site_settings['client_panel_session_with'] ?? 'Session with') }} {{ $booking->practitioner->user->name ?? 'Practitioner' }})
                                 @else
-                                    (Client: {{ $booking->user->name ?? 'Patient' }})
+                                    ({{ __($site_settings['client_panel_client_label'] ?? 'Client') }}: {{ $booking->user->name ?? 'Patient' }})
                                 @endif
                             </p>
                         </div>
-                        <p class="text-xs text-gray-400">{{ $booking->booking_date->format('M d, Y') }} - {{ $booking->booking_time }}</p>
+                        <p class="text-xs text-gray-400">{{ $booking->booking_date->translatedFormat('M d, Y') }} - {{ $booking->booking_time }}</p>
                     </div>
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-normal rounded-full capitalize">Completed</span>
+                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-normal rounded-full capitalize">{{ __('Completed') }}</span>
                 </div>
                 @empty
-                <p class="text-center text-gray-500 text-sm py-10">No completed sessions recently.</p>
+                <p id="client_panel_no_completed_msg" class="text-center text-gray-500 text-sm py-10" data-i18n="{{ $site_settings['client_panel_no_completed_msg'] ?? 'No completed sessions recently.' }}">{{ __($site_settings['client_panel_no_completed_msg'] ?? 'No completed sessions recently.') }}</p>
                 @endforelse
             </div>
-            <a href="{{ route('bookings.index') }}" class="block text-center text-sm font-medium text-secondary hover:underline pt-4">View All Bookings</a>
+            <a id="client_panel_view_all_bookings" href="{{ route('bookings.index') }}" class="block text-center text-sm font-medium text-secondary hover:underline pt-4" data-i18n="{{ $site_settings['client_panel_view_all_bookings'] ?? 'View All Bookings' }}">{{ __($site_settings['client_panel_view_all_bookings'] ?? 'View All Bookings') }}</a>
         </div>
 
         <!-- Clinical Document Portal -->
         <div id="section-clinical" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
-            <h2 class="text-xl font-sans! font-medium text-secondary mb-6">Clinical Document Portal</h2>
+            <h2 id="client_panel_clinical_portal_title" class="text-xl font-sans! font-medium text-secondary mb-6" data-i18n="{{ $site_settings['client_panel_clinical_portal_title'] ?? 'Clinical Document Portal' }}">{{ __($site_settings['client_panel_clinical_portal_title'] ?? 'Clinical Document Portal') }}</h2>
 
             <!-- Upload Area -->
             <div
                 class="border-2 border-dashed border-[#8FC0A8] rounded-xl p-6 md:p-8 text-center bg-white mb-8">
-                <p class="text-lg font-medium text-secondary mb-1.5">Drag and Drop files here</p>
-                <p class="text-xs text-gray-500 mb-1 leading-relaxed">Upload X-Rays, MRIs, Blood tests
-                    and other clinical documents</p>
-                <p class="text-xs text-gray-400 mb-6 leading-relaxed">JPG, JPEG, PNG, WPS, DOC & PDF (Max
-                    20MB)</p>
-                <button
-                    class="inline-flex items-center justify-center px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors">
-                    <i class="ri-upload-2-line mr-2"></i> Upload
+                <p id="client_panel_drag_drop_heading" class="text-lg font-medium text-secondary mb-1.5" data-i18n="{{ $site_settings['client_panel_drag_drop_heading'] ?? 'Drag and Drop files here' }}">{{ __($site_settings['client_panel_drag_drop_heading'] ?? 'Drag and Drop files here') }}</p>
+                <p id="client_panel_upload_description" class="text-xs text-gray-500 mb-1 leading-relaxed" data-i18n="{{ $site_settings['client_panel_upload_description'] ?? 'Upload X-Rays, MRIs, Blood tests and other clinical documents' }}">{{ __($site_settings['client_panel_upload_description'] ?? 'Upload X-Rays, MRIs, Blood tests and other clinical documents') }}</p>
+                <p id="client_panel_file_types_info" class="text-xs text-gray-400 mb-6 leading-relaxed" data-i18n="{{ $site_settings['client_panel_file_types_info'] ?? 'JPG, JPEG, PNG, WPS, DOC & PDF (Max 20MB)' }}">{{ __($site_settings['client_panel_file_types_info'] ?? 'JPG, JPEG, PNG, WPS, DOC & PDF (Max 20MB)') }}</p>
+                <button id="client_panel_upload_btn"
+                    class="inline-flex items-center justify-center px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors" data-i18n="{{ $site_settings['client_panel_upload_btn'] ?? 'Upload' }}">
+                    <i class="ri-upload-2-line mr-2"></i> {{ __($site_settings['client_panel_upload_btn'] ?? 'Upload') }}
                 </button>
             </div>
 
             <!-- Uploaded Documents -->
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-medium font-sans! text-secondary">Uploaded Documents</h3>
-                <a href="#"
-                    class="text-[11px] text-gray-400 hover:text-gray-700 font-medium tracking-wide">See
-                    all</a>
+                <h3 id="client_panel_uploaded_documents_title" class="text-xl font-medium font-sans! text-secondary" data-i18n="{{ $site_settings['client_panel_uploaded_documents_title'] ?? 'Uploaded Documents' }}">{{ __($site_settings['client_panel_uploaded_documents_title'] ?? 'Uploaded Documents') }}</h3>
+                <a id="client_panel_see_all_docs" href="#"
+                    class="text-[11px] text-gray-400 hover:text-gray-700 font-medium tracking-wide" data-i18n="{{ $site_settings['client_panel_see_all'] ?? 'See all' }}">{{ __($site_settings['client_panel_see_all'] ?? 'See all') }}</a>
             </div>
 
             <div class="swiper document-swiper pb-4 w-full">
@@ -229,7 +221,7 @@
 
 <!-- Reviews -->
 <div id="section-reviews" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12 mb-5 md:mb-8">
-    <h2 class="text-xl font-medium font-sans! text-secondary mb-6">Your Reviews</h2>
+    <h2 id="client_panel_your_reviews_title" class="text-xl font-medium font-sans! text-secondary mb-6" data-i18n="{{ $site_settings['client_panel_your_reviews_title'] ?? 'Your Reviews' }}">{{ __($site_settings['client_panel_your_reviews_title'] ?? 'Your Reviews') }}</h2>
     <div class="space-y-6">
         @forelse($reviews as $review)
         <div class="border-b border-[#DDDDDD] pb-6">
@@ -247,9 +239,9 @@
             </div>
             <div class="flex flex-wrap gap-2 justify-between items-start">
                 <div>
-                    <p class="text-sm text-gray-600 mb-2.5 leading-relaxed">Comment: "{{ $review->review }}"</p>
+                    <p class="text-sm text-gray-600 mb-2.5 leading-relaxed">{{ __($site_settings['client_panel_comment_label'] ?? 'Comment') }}: "{{ $review->review }}"</p>
                     <div class="flex items-center">
-                        <span class="text-sm text-gray-500 mr-3">Rating:</span>
+                        <span id="client_panel_rating_label" class="text-sm text-gray-500 mr-3" data-i18n="{{ $site_settings['client_panel_rating_label'] ?? 'Rating' }}">{{ __($site_settings['client_panel_rating_label'] ?? 'Rating') }}:</span>
                         <div class="flex text-[#FFD166] space-x-0.5">
                             @for($i = 1; $i <= 5; $i++)
                                 @if($i <=floor($review->rating))
@@ -265,9 +257,9 @@
                 </div>
             </div>
         </div>
-        @empty
-        <p class="text-center text-gray-500 text-sm py-6">You haven't written any reviews yet.</p>
-        @endforelse
+                @empty
+                <p id="client_panel_no_reviews_msg" class="text-center text-gray-500 text-sm py-6" data-i18n="{{ $site_settings['client_panel_no_reviews_msg'] ?? 'You haven\'t written any reviews yet.' }}">{{ __($site_settings['client_panel_no_reviews_msg'] ?? 'You haven\'t written any reviews yet.') }}</p>
+                @endforelse
     </div>
 </div>
 
@@ -276,12 +268,10 @@
     class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12 flex flex-col md:flex-row flex-wrap gap-4 items-center justify-between">
     <div class="flex flex-1 items-center space-x-3">
         <i class="ri-shield-check-fill text-secondary text-xl"></i>
-        <h2 class="text-sm md:text-lg font-sans! font-medium text-secondary leading-snug">General Data
-            Protection Regulation Control
-            Center</h2>
+        <h2 id="client_panel_gdpr_title" class="text-sm md:text-lg font-sans! font-medium text-secondary leading-snug" data-i18n="{{ $site_settings['client_panel_gdpr_title'] ?? 'General Data Protection Regulation Control Center' }}">{{ __($site_settings['client_panel_gdpr_title'] ?? 'General Data Protection Regulation Control Center') }}</h2>
     </div>
     <div class="flex flex-1 items-center justify-end space-x-4 lg:border-l lg:border-gray-100 lg:h-8">
-        <span class="text-base md:text-lg text-gray-600">Data sharing with Practitioners</span>
+        <span id="client_panel_data_sharing_label" class="text-base md:text-lg text-gray-600" data-i18n="{{ $site_settings['client_panel_data_sharing_label'] ?? 'Data sharing with Practitioners' }}">{{ __($site_settings['client_panel_data_sharing_label'] ?? 'Data sharing with Practitioners') }}</span>
         <!-- Toggle Switch -->
         <button
             id="gdpr-toggle"
@@ -310,18 +300,18 @@
             <div class="w-16 h-16 bg-[#EEF2EF] rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="ri-shield-user-line text-secondary text-3xl"></i>
             </div>
-            <h3 class="text-xl font-bold font-sans! text-secondary mb-2">Update Data Sharing?</h3>
+            <h3 id="client_panel_gdpr_modal_title" class="text-xl font-bold font-sans! text-secondary mb-2" data-i18n="{{ $site_settings['client_panel_gdpr_modal_title'] ?? 'Update Data Sharing?' }}">{{ __($site_settings['client_panel_gdpr_modal_title'] ?? 'Update Data Sharing?') }}</h3>
             <p id="gdpr-modal-text" class="text-gray-500 text-sm leading-relaxed">
                 Are you sure you want to change your data sharing preferences?
             </p>
         </div>
 
         <div class="flex gap-4">
-            <button onclick="closeGdprModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-full font-medium hover:bg-gray-50 transition-colors">
-                Cancel
+            <button onclick="closeGdprModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-full font-medium hover:bg-gray-50 transition-colors" data-i18n="{{ $site_settings['client_panel_gdpr_cancel_btn'] ?? 'Cancel' }}">
+                {{ __($site_settings['client_panel_gdpr_cancel_btn'] ?? 'Cancel') }}
             </button>
-            <button id="confirm-gdpr-btn" class="flex-1 px-6 py-3 bg-secondary text-white rounded-full font-medium hover:bg-opacity-90 transition-all">
-                Confirm
+            <button id="confirm-gdpr-btn" class="flex-1 px-6 py-3 bg-secondary text-white rounded-full font-medium hover:bg-opacity-90 transition-all" data-i18n="{{ $site_settings['client_panel_gdpr_confirm_btn'] ?? 'Confirm' }}">
+                {{ __($site_settings['client_panel_gdpr_confirm_btn'] ?? 'Confirm') }}
             </button>
         </div>
     </div>
@@ -353,19 +343,20 @@
     }
 
     function switchMobileTab(selectedTab) {
-        const tabs = ['dashboard', 'health', 'bookings', 'transactions'];
-        tabs.forEach(tab => {
-            const btn = document.getElementById('m-tab-' + tab);
+        const tabMapping = {
+            'dashboard': 'client_panel_sidebar_dashboard_mobile',
+            'health': 'client_panel_sidebar_health_journey_mobile',
+            'bookings': 'client_panel_sidebar_bookings_mobile',
+            'transactions': 'client_panel_sidebar_transaction_vault_mobile'
+        };
+
+        Object.keys(tabMapping).forEach(tabKey => {
+            const btnId = tabMapping[tabKey];
+            const btn = document.getElementById(btnId);
             if (btn) {
-                if (tab === 'dashboard') {
-                    btn.className = (tab === selectedTab) ?
-                        "leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1" :
-                        "leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors";
-                } else {
-                    btn.className = (tab === selectedTab) ?
-                        "leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1" :
-                        "leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors";
-                }
+                btn.className = (tabKey === selectedTab) ?
+                    "leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1" :
+                    "leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors";
             }
         });
 

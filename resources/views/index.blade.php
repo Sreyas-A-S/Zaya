@@ -52,6 +52,10 @@
                             name="pincode"
                             value="{{ session('global_pincode') }}"
                             placeholder="{{ $settings['hero_search_placeholder_2'] ?? 'City, Postal code...' }}"
+                            maxlength="6"
+                            pattern="[0-9]{6}"
+                            inputmode="numeric"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,6);"
                             class="bg-transparent border-none outline-none text-[#FDE2D8] placeholder-[#FDE2D8]/80 w-full text-base font-normal">
                     </div>
 

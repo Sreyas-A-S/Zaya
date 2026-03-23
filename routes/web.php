@@ -197,11 +197,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::delete('/newsletters/{id}', [\App\Http\Controllers\Admin\NewsletterController::class, 'destroy'])->name('newsletters.destroy');
     Route::get('/newsletters/export', [\App\Http\Controllers\Admin\NewsletterController::class, 'export'])->name('newsletters.export');
 
-    // Notifications
-    Route::get('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/mark-as-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
-    Route::post('/notifications/mark-all-as-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
-    Route::delete('/notifications/{id}', [\App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('notifications.destroy');
+    // Notifications moved to routes/client.php
 
     // General Settings
     Route::get('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'index'])->name('general-settings.index');
@@ -242,6 +238,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('/admin-panel-settings/edit', [\App\Http\Controllers\Admin\AdminPanelSettingController::class, 'edit'])->name('admin.admin-panel-settings.edit');
     Route::post('/admin-panel-settings/update', [\App\Http\Controllers\Admin\AdminPanelSettingController::class, 'update'])->name('admin.admin-panel-settings.update');
     Route::post('/admin-panel-settings/change-password', [\App\Http\Controllers\Admin\AdminPanelSettingController::class, 'changePassword'])->name('admin.admin-panel-settings.change-password');
+
+    // client pannel settings
+    Route::get('/client-pannel-settings', [\App\Http\Controllers\Admin\ClientPannelSettingController::class, 'index'])->name('admin.client-pannel-settings.index');
+    Route::post('/client-pannel-settings/update', [\App\Http\Controllers\Admin\ClientPannelSettingController::class, 'update'])->name('admin.client-pannel-settings.update');
+
 
 // Route to run artisan optimize
 Route::get('/optimize', function () {

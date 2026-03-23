@@ -10,39 +10,39 @@
         <!-- Left Nav (Desktop) -->
         <nav
             class="hidden lg:flex items-center gap-6 xl:gap-8 text-base lg:text-lg font-medium flex-1 justify-start text-gray-700">
-            <a id="nav-home" href="{{ route('index') }}" class="hover:text-primary transition-colors" data-i18n="Home">{{ $site_settings['footer_link_home'] ?? __('Home') }}</a>
+            <a id="nav-home" href="{{ route('index') }}" class="hover:text-primary transition-colors" data-i18n="Home">{{ __($site_settings['footer_link_home'] ?? 'Home') }}</a>
 
             <!-- About Us Dropdown -->
             <div class="relative group">
                 <button id="nav-about-us" class="flex items-center gap-1 hover:text-primary transition-colors focus:outline-none py-4" data-i18n="About Us">
-                    {{ $site_settings['about_us_nav_title'] ?? __('About Us') }} <i
+                    {{ __($site_settings['about_us_nav_title'] ?? 'About Us') }} <i
                         class="ri-arrow-down-s-line transition-transform duration-300 group-hover:-rotate-180"></i>
                 </button>
                 <div
                     class="absolute top-full left-0 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden">
                     <a id="nav-who-we-are" href="{{ route('about-us') }}#who-we-are"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50" data-i18n="Who we are?">{{ $site_settings['footer_link_who_we_are'] ?? __('Who we are?') }}</a>
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50" data-i18n="Who we are?">{{ __($site_settings['footer_link_who_we_are'] ?? 'Who we are?') }}</a>
                     <a id="nav-what-we-do" href="{{ route('about-us') }}#what-we-do"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50" data-i18n="What we do?">{{ $site_settings['footer_link_what_we_do'] ?? __('What we do?') }}</a>
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50" data-i18n="What we do?">{{ __($site_settings['footer_link_what_we_do'] ?? 'What we do?') }}</a>
                     <a id="nav-our-team" href="{{ route('about-us') }}#our-team"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors" data-i18n="Our Team">{{ $site_settings['footer_link_our_team'] ?? __('Our Team') }}</a>
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors" data-i18n="Our Team">{{ __($site_settings['footer_link_our_team'] ?? 'Our Team') }}</a>
                     <a id="nav-gallery" href="{{ route('gallery') }}"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors" data-i18n="Gallery">{{ $site_settings['footer_link_gallery'] ?? __('Gallery') }}</a>
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors" data-i18n="Gallery">{{ __($site_settings['footer_link_gallery'] ?? 'Gallery') }}</a>
                     <a id="nav-blog" href="{{ route('blogs') }}"
-                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors" data-i18n="Blog">{{ $site_settings['footer_link_blog'] ?? __('Blog') }}</a>
+                        class="block px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors" data-i18n="Blog">{{ __($site_settings['footer_link_blog'] ?? 'Blog') }}</a>
                 </div>
             </div>
 
             <!-- Services Dropdown (Desktop)-->
             <div class="relative group">
                 <button id="nav-services" class="flex items-center gap-1 hover:text-primary transition-colors focus:outline-none py-4" data-i18n="Services">
-                    {{ $site_settings['services_page_badge'] ?? __('Services') }} <i
+                    {{ __($site_settings['services_page_badge'] ?? 'Services') }} <i
                         class="ri-arrow-down-s-line transition-transform duration-300 group-hover:-rotate-180"></i>
                 </button>
                 <div
                     class="absolute top-full -left-8 w-[240px] bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden py-5">
                     <a id="nav-our-specialities" href="{{ route('services') }}"
-                        class="block px-6 pb-4 text-[16px] leading-none font-medium text-gray-800 hover:text-primary transition-colors" data-i18n="Our Specialities">{{ $site_settings['services_title'] ?? __('Our Specialities') }}</a>
+                        class="block px-6 pb-4 text-[16px] leading-none font-medium text-gray-800 hover:text-primary transition-colors" data-i18n="Our Specialities">{{ __($site_settings['services_title'] ?? 'Our Specialities') }}</a>
                     <div class="flex flex-col gap-1 pl-3">
                         <a id="nav-ayurveda" href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
                             class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors" data-i18n="Ayurveda">
@@ -64,7 +64,7 @@
                 </div>
             </div>
 
-            <a id="nav-contact-us" href="{{ route('contact-us') }}" class="hover:text-primary transition-colors" data-i18n="Contact Us">{{ $site_settings['footer_link_contact_us'] ?? __('Contact Us') }}</a>
+            <a id="nav-contact-us" href="{{ route('contact-us') }}" class="hover:text-primary transition-colors" data-i18n="Contact Us">{{ __($site_settings['footer_link_contact_us'] ?? 'Contact Us') }}</a>
         </nav>
 
         <!-- Logo (Centered) -->
@@ -78,11 +78,11 @@
         <div class="flex items-center gap-6 xl:gap-8 justify-end flex-1">
             @guest
             <a id="nav-login" href="{{ route('zaya-login') }}"
-                class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors" data-i18n="Login">{{ $site_settings['nav_login'] ?? __('Login') }}</a>
+                class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors" data-i18n="Login">{{ __($site_settings['nav_login'] ?? 'Login') }}</a>
             @endguest
 
             <a id="nav-find-practitioner" href="{{ route('find-practitioner') }}"
-                class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap" data-i18n="Find Practitioner">{{ $site_settings['nav_find_practitioner'] ?? __('Find Practitioner') }}</a>
+                class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap" data-i18n="Find Practitioner">{{ __($site_settings['nav_find_practitioner'] ?? 'Find Practitioner') }}</a>
 
             <!-- Language Toggle -->
             @if(isset($available_languages) && $available_languages->count() >= 2)
@@ -151,24 +151,24 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu"
         class="absolute top-full left-0 w-full bg-white shadow-xl border-t border-gray-100 flex flex-col p-6 gap-4 lg:hidden max-h-0 opacity-0 invisible transform -translate-y-4 transition-all duration-300 ease-in-out overflow-hidden">
-        <a id="nav-home-mobile" href="{{ route('index') }}" class="text-lg font-medium text-secondary border-b border-gray-50 pb-2" data-i18n="Home">{{ $site_settings['footer_link_home'] ?? __('Home') }}</a>
+        <a id="nav-home-mobile" href="{{ route('index') }}" class="text-lg font-medium text-secondary border-b border-gray-50 pb-2" data-i18n="Home">{{ __($site_settings['footer_link_home'] ?? 'Home') }}</a>
 
         <div class="flex flex-col gap-2">
-            <span class="text-lg font-medium text-secondary" data-i18n="About Us">{{ $site_settings['about_us_nav_title'] ?? __('About Us') }}</span>
+            <span class="text-lg font-medium text-secondary" data-i18n="About Us">{{ __($site_settings['about_us_nav_title'] ?? 'About Us') }}</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
-                <a id="nav-who-we-are-mobile" href="{{ route('about-us') }}#who-we-are" class="text-gray-600 text-base" data-i18n="Who we are?">{{ $site_settings['footer_link_who_we_are'] ?? __('Who we are?') }}</a>
-                <a id="nav-what-we-do-mobile" href="{{ route('about-us') }}#what-we-do" class="text-gray-600 text-base" data-i18n="What we do?">{{ $site_settings['footer_link_what_we_do'] ?? __('What we do?') }}</a>
-                <a id="nav-our-team-mobile" href="{{ route('about-us') }}#our-team" class="text-gray-600 text-base" data-i18n="Our Team">{{ $site_settings['footer_link_our_team'] ?? __('Our Team') }}</a>
-                <a id="nav-gallery-mobile" href="{{ route('gallery') }}" class="text-gray-600 text-base" data-i18n="Gallery">{{ $site_settings['footer_link_gallery'] ?? __('Gallery') }}</a>
-                <a id="nav-blog-mobile" href="{{ route('blogs') }}" class="text-gray-600 text-base" data-i18n="Blog">{{ $site_settings['footer_link_blog'] ?? __('Blog') }}</a>
+                <a id="nav-who-we-are-mobile" href="{{ route('about-us') }}#who-we-are" class="text-gray-600 text-base" data-i18n="Who we are?">{{ __($site_settings['footer_link_who_we_are'] ?? 'Who we are?') }}</a>
+                <a id="nav-what-we-do-mobile" href="{{ route('about-us') }}#what-we-do" class="text-gray-600 text-base" data-i18n="What we do?">{{ __($site_settings['footer_link_what_we_do'] ?? 'What we do?') }}</a>
+                <a id="nav-our-team-mobile" href="{{ route('about-us') }}#our-team" class="text-gray-600 text-base" data-i18n="Our Team">{{ __($site_settings['footer_link_our_team'] ?? 'Our Team') }}</a>
+                <a id="nav-gallery-mobile" href="{{ route('gallery') }}" class="text-gray-600 text-base" data-i18n="Gallery">{{ __($site_settings['footer_link_gallery'] ?? 'Gallery') }}</a>
+                <a id="nav-blog-mobile" href="{{ route('blogs') }}" class="text-gray-600 text-base" data-i18n="Blog">{{ __($site_settings['footer_link_blog'] ?? 'Blog') }}</a>
             </div>
         </div>
 
         <div class="flex flex-col gap-2">
-            <span class="text-lg font-medium text-secondary" data-i18n="Services">{{ $site_settings['services_page_badge'] ?? __('Services') }}</span>
+            <span class="text-lg font-medium text-secondary" data-i18n="Services">{{ __($site_settings['services_page_badge'] ?? 'Services') }}</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
                 <a id="nav-our-specialities-mobile" href="{{ route('services') }}"
-                    class="text-base font-medium text-gray-800 hover:text-primary transition-colors inline-block mt-1" data-i18n="Our Specialities">{{ $site_settings['services_title'] ?? __('Our Specialities') }}</a>
+                    class="text-base font-medium text-gray-800 hover:text-primary transition-colors inline-block mt-1" data-i18n="Our Specialities">{{ __($site_settings['services_title'] ?? 'Our Specialities') }}</a>
                 <div class="flex flex-col gap-2">
                     <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
                         class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors" data-i18n="Ayurveda">
@@ -191,18 +191,18 @@
         </div>
 
         <a id="nav-contact-us-mobile" href="{{ route('contact-us') }}"
-            class="text-lg font-medium text-secondary border-b border-gray-50 pb-2" data-i18n="Contact Us">{{ $site_settings['footer_link_contact_us'] ?? __('Contact Us') }}</a>
+            class="text-lg font-medium text-secondary border-b border-gray-50 pb-2" data-i18n="Contact Us">{{ __($site_settings['footer_link_contact_us'] ?? 'Contact Us') }}</a>
         @auth
         <a id="nav-dashboard-mobile" href="{{ route('dashboard') }}" class="text-lg font-medium text-secondary pb-2 flex items-center gap-3">
             <i class="ri-user-3-line"></i> {{ __('Profile') }}
         </a>
         @else
-        <a id="nav-login-mobile" href="{{ route('zaya-login') }}" class="text-lg font-medium text-secondary pb-2" data-i18n="Login">{{ $site_settings['nav_login'] ?? __('Login') }}</a>
+        <a id="nav-login-mobile" href="{{ route('zaya-login') }}" class="text-lg font-medium text-secondary pb-2" data-i18n="Login">{{ __($site_settings['nav_login'] ?? 'Login') }}</a>
         @endauth
 
         <div class="pt-2">
             <a id="nav-find-practitioner-mobile" href="{{ route('find-practitioner') }}"
-                class="block w-full bg-secondary text-white px-6 py-3 rounded-full text-center hover:bg-opacity-90" data-i18n="Find Practitioner">{{ $site_settings['nav_find_practitioner'] ?? __('Find Practitioner') }}</a>
+                class="block w-full bg-secondary text-white px-6 py-3 rounded-full text-center hover:bg-opacity-90" data-i18n="Find Practitioner">{{ __($site_settings['nav_find_practitioner'] ?? 'Find Practitioner') }}</a>
         </div>
     </div>
 
