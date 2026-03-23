@@ -284,11 +284,15 @@
                     <li> <a href="{{ route('admin.admin-panel-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_admin_panel_settings'] ?? 'Admin Panel Settings' }}</a></li>
                     
                     <li> <a href="{{ route('admin.footer-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_footer_settings'] ?? 'Footer Page Settings' }}</a></li>
+                    
+                    <li> <a href="{{ route('admin.client-pannel-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_client_pannel_settings'] ?? 'Client Pannel Settings' }}</a></li>
+
                 </ul>
+
+               
             </li>
             @endif
-            
-
+           
             @if(auth()->user()->hasPermission('contact-messages-view'))
             <li class="sidebar-list">
                 <a class="sidebar-link" href="{{ route('admin.contact-us.messages') }}">
@@ -307,6 +311,7 @@
                 </a>
             </li>
             @endif
+            
         </ul>
     </div>
     <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
