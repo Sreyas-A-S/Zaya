@@ -25,6 +25,11 @@ use App\Http\Controllers\CaptchaController;
 use Illuminate\Support\Facades\Artisan;
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+
+// Social Authentication Routes
+Route::get('auth/{provider}', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirectToProvider'])->name('social.login');
+Route::get('auth/{provider}/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'handleProviderCallback'])->name('social.callback');
+
 Route::get('admin/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
 Route::post('admin/login', [LoginController::class, 'adminLogin'])->name('admin.login.submit');
 

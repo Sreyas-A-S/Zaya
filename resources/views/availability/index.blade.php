@@ -31,6 +31,13 @@
     .slot-available { background-color: var(--cal-available); color: var(--cal-secondary); }
     .slot-off { background-color: var(--cal-off); color: #EF4444; border: 1px solid #FEE2E2; }
 
+    .slot-is-off {
+        background-color: #FEF2F2 !important;
+        color: #EF4444 !important;
+        border-color: #FEE2E2 !important;
+        box-shadow: inset 0 0 0 1px #FEE2E2 !important;
+    }
+
     select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important; background-position: right 1rem center !important; background-repeat: no-repeat !important; background-size: 1rem !important; padding-right: 2.5rem !important; appearance: none !important; cursor: pointer; }
 </style>
 @endsection
@@ -201,7 +208,7 @@
             </div>
         </div>
         <div class="p-8 max-h-[80vh] overflow-y-auto">
-            <form id="daily-settings-form" onsubmit="saveDailySettings(event)" class="space-y-6">
+            <form id="daily-settings-form" class="space-y-6">
                 <input type="hidden" id="modal-date-input">
                 <input type="hidden" id="modal-off-slots-input" value="">
                 
@@ -271,14 +278,15 @@
     // Weekly Settings Logic
     function resetOffSlots() { document.getElementById('weekly-off-slots-input').value = ''; }
     function toggleSlot(slotTime, element) {
+        console.log('Toggling weekly slot:', slotTime);
         const input = document.getElementById('weekly-off-slots-input');
-        let offSlots = input.value ? input.value.split(',') : [];
+        let offSlots = input.value && input.value.trim() !== "" ? input.value.split(',') : [];
         if (offSlots.includes(slotTime)) {
             offSlots = offSlots.filter(s => s !== slotTime);
-            element.classList.remove('!bg-red-50', '!text-red-500', '!border-red-200');
+            element.classList.remove('slot-is-off');
         } else {
             offSlots.push(slotTime);
-            element.classList.add('!bg-red-50', '!text-red-500', '!border-red-200');
+            element.classList.add('slot-is-off');
         }
         input.value = offSlots.join(',');
     }
@@ -288,20 +296,31 @@
         const duration = parseInt(document.getElementById('weekly-slot-duration').value);
         const container = document.getElementById('weekly-slots-preview');
         const error = document.getElementById('preview-error');
-        const offSlots = document.getElementById('weekly-off-slots-input').value.split(',');
+        const offInput = document.getElementById('weekly-off-slots-input').value;
+        const offSlots = offInput && offInput.trim() !== "" ? offInput.split(',') : [];
+
         container.innerHTML = ''; error.classList.add('hidden');
         if (!startTime || !endTime || !duration) return;
         const start = new Date(`2000-01-01T${startTime}`); const end = new Date(`2000-01-01T${endTime}`);
         if (end <= start) { error.innerText = 'End time must be after start time'; error.classList.remove('hidden'); return; }
         let current = new Date(start); let count = 0;
         while (new Date(current.getTime() + duration * 60000) <= end) {
-            const time24 = current.toTimeString().substring(0, 5);
+            const h = current.getHours().toString().padStart(2, '0');
+            const m = current.getMinutes().toString().padStart(2, '0');
+            const time24 = `${h}:${m}`;
             const label = current.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-            const el = document.createElement('div');
-            el.className = 'bg-white border border-secondary/20 text-secondary text-[11px] font-bold px-3 py-2 rounded-xl shadow-sm cursor-pointer hover:scale-105 transition-all';
-            if (offSlots.includes(time24)) el.classList.add('!bg-red-50', '!text-red-500', '!border-red-200');
-            el.innerText = label; el.onclick = () => toggleSlot(time24, el);
-            container.appendChild(el);
+            
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'bg-white border border-secondary/20 text-secondary text-[11px] font-bold px-3 py-2 rounded-xl shadow-sm cursor-pointer hover:scale-105 transition-all';
+            if (offSlots.includes(time24)) btn.classList.add('slot-is-off');
+            btn.innerText = label;
+            btn.onclick = (e) => {
+                e.preventDefault();
+                toggleSlot(time24, btn);
+            };
+            
+            container.appendChild(btn);
             current.setMinutes(current.getMinutes() + duration); count++;
         }
         if (count === 0) { error.innerText = 'No slots generated'; error.classList.remove('hidden'); }
@@ -310,14 +329,15 @@
     // Modal Settings Logic
     function resetModalOffSlots() { document.getElementById('modal-off-slots-input').value = ''; }
     function toggleModalSlot(time, element) {
+        console.log('Toggling modal slot:', time);
         const input = document.getElementById('modal-off-slots-input');
-        let off = input.value ? input.value.split(',') : [];
+        let off = input.value && input.value.trim() !== "" ? input.value.split(',') : [];
         if (off.includes(time)) {
             off = off.filter(s => s !== time);
-            element.classList.remove('!bg-red-50', '!text-red-500', '!border-red-200');
+            element.classList.remove('slot-is-off');
         } else {
             off.push(time);
-            element.classList.add('!bg-red-50', '!text-red-500', '!border-red-200');
+            element.classList.add('slot-is-off');
         }
         input.value = off.join(',');
     }
@@ -327,20 +347,31 @@
         const dur = parseInt(document.getElementById('modal-slot-duration').value);
         const container = document.getElementById('modal-slots-preview');
         const error = document.getElementById('modal-preview-error');
-        const off = document.getElementById('modal-off-slots-input').value.split(',');
+        const offInput = document.getElementById('modal-off-slots-input').value;
+        const off = offInput && offInput.trim() !== "" ? offInput.split(',') : [];
+        
         container.innerHTML = ''; error.classList.add('hidden');
         if (!startT || !endT || !dur) return;
         const s = new Date(`2000-01-01T${startT}`); const e = new Date(`2000-01-01T${endT}`);
         if (e <= s) { error.innerText = 'End after start'; error.classList.remove('hidden'); return; }
         let curr = new Date(s); let cnt = 0;
         while (new Date(curr.getTime() + dur * 60000) <= e) {
-            const t24 = curr.toTimeString().substring(0, 5);
+            const h = curr.getHours().toString().padStart(2, '0');
+            const m = curr.getMinutes().toString().padStart(2, '0');
+            const t24 = `${h}:${m}`;
             const lbl = curr.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-            const el = document.createElement('div');
-            el.className = 'bg-white border border-secondary/20 text-secondary text-[11px] font-bold px-3 py-2 rounded-xl shadow-sm cursor-pointer hover:scale-105 transition-all';
-            if (off.includes(t24)) el.classList.add('!bg-red-50', '!text-red-500', '!border-red-200');
-            el.innerText = lbl; el.onclick = () => toggleModalSlot(t24, el);
-            container.appendChild(el);
+            
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'bg-white border border-secondary/20 text-secondary text-[11px] font-bold px-3 py-2 rounded-xl shadow-sm cursor-pointer hover:scale-105 transition-all';
+            if (off.includes(t24)) btn.classList.add('slot-is-off');
+            btn.innerText = lbl;
+            btn.onclick = (e) => {
+                e.preventDefault();
+                toggleModalSlot(t24, btn);
+            };
+            
+            container.appendChild(btn);
             curr.setMinutes(curr.getMinutes() + dur); cnt++;
         }
     }
@@ -357,16 +388,20 @@
             const badge = document.getElementById('schedule-type-badge');
             badge.innerHTML = data.is_custom ? '<span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold">CUSTOM OVERRIDE</span>' : '<span class="text-[10px] bg-secondary/10 text-secondary px-2 py-0.5 rounded-full font-bold">WEEKLY SCHEDULE</span>';
 
-            // Pre-fill fields from first slot or defaults
-            if (data.slots && data.slots.length > 0 && data.slots[0].start) {
-                // Find original range if possible (last slot end - first slot start)
-                document.getElementById('modal-start-time').value = data.slots[0].start_24 || '09:00';
-                document.getElementById('modal-end-time').value = data.slots[data.slots.length-1].end_24 || '17:00';
-                document.getElementById('modal-slot-duration').value = data.slots[0].duration || 60;
-                
-                // Set blocked slots if any
-                const blocked = data.slots.filter(s => !s.is_available).map(s => s.start_24);
-                document.getElementById('modal-off-slots-input').value = blocked.join(',');
+            if (data.slots && data.slots.length > 0) {
+                const validSlots = data.slots.filter(s => s.start_24);
+                if (validSlots.length > 0) {
+                    document.getElementById('modal-start-time').value = validSlots[0].start_24;
+                    document.getElementById('modal-end-time').value = validSlots[validSlots.length-1].end_24;
+                    document.getElementById('modal-slot-duration').value = validSlots[0].duration || 60;
+                    const blocked = data.slots.filter(s => !s.is_available && s.start_24).map(s => s.start_24);
+                    document.getElementById('modal-off-slots-input').value = blocked.join(',');
+                } else {
+                    document.getElementById('modal-start-time').value = '09:00';
+                    document.getElementById('modal-end-time').value = '17:00';
+                    document.getElementById('modal-slot-duration').value = 60;
+                    document.getElementById('modal-off-slots-input').value = '';
+                }
             } else {
                 document.getElementById('modal-start-time').value = '09:00';
                 document.getElementById('modal-end-time').value = '17:00';
@@ -386,8 +421,8 @@
         document.getElementById('manage-modal-content').classList.replace('scale-100', 'scale-95');
     }
 
-    async function saveDailySettings(e) {
-        e.preventDefault();
+    async function saveDailySettings() {
+        console.log('SAVING INITIATED');
         const body = {
             specific_date: document.getElementById('modal-date-input').value,
             start_time: document.getElementById('modal-start-time').value,
@@ -402,8 +437,10 @@
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify(body)
             });
-            window.location.reload();
-        } catch (e) { console.error(e); }
+            const data = await res.json();
+            if (res.ok) { alert('Saved successfully!'); window.location.reload(); }
+            else { alert('Save failed: ' + (data.message || 'Error')); }
+        } catch (e) { console.error(e); alert('Network error'); }
     }
 
     async function markDayOff() {
@@ -482,6 +519,14 @@
     function changeMonth(delta) { currentDate.setMonth(currentDate.getMonth() + delta); renderCalendar(); }
 
     document.addEventListener('DOMContentLoaded', () => {
+        const dailyForm = document.getElementById('daily-settings-form');
+        if (dailyForm) {
+            dailyForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveDailySettings();
+            });
+        }
+
         const winIn = document.getElementById('window-value-input');
         if (winIn) {
             winIn.addEventListener('input', updateWindowValue);
