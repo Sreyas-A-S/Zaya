@@ -253,7 +253,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('/invoice-settings/update', [\App\Http\Controllers\Admin\InvoiceSettingController::class, 'update'])->name('admin.invoice-settings.update');
 
     // Invoice Management
-    Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('admin.invoices.index');
+    Route::get('/invoices', [\App\Http\Controllers\InvoiceController::class, 'index'])->name('admin.invoices.index');
     
 
 

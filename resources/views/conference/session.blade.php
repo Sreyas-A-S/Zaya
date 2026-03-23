@@ -219,11 +219,13 @@
             uid: 0 
         };
         
-        console.log("Agora Initialization with App ID Length:", options.appId.length);
+        console.log("DEBUG: Agora Config Status:");
+        console.log("- App ID Length:", options.appId.length);
+        console.log("- App ID Preview:", options.appId.substring(0,5) + "..." + options.appId.substring(options.appId.length-5));
         
-        if (!options.appId) {
-            console.error("CRITICAL: Agora App ID is empty. Check your .env and config/services.php");
-            alert("Configuration Error: Agora App ID is missing. Please contact support.");
+        if (!options.appId || options.appId.length < 10) {
+            console.error("CRITICAL: Agora App ID is invalid or empty.");
+            alert("Configuration Error: Agora App ID is invalid. Please check your .env file.");
             return;
         }
 
@@ -238,6 +240,9 @@
             try {
                 const response = await fetch(`{{ route('agora.token') }}?channel=${options.channel}&uid=${options.uid}`);
                 const data = await response.json();
+                if (data.token) {
+                    console.log("- Token Received (Preview):", data.token.substring(0,10) + "...");
+                }
                 return data.token;
             } catch (e) {
                 console.error("Token fetch failed:", e);
