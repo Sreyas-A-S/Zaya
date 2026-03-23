@@ -209,15 +209,23 @@
         };
 
         // --- AGORA LOGIC ---
+        const rawAppId = "{{ $appId }}";
+        const trimmedAppId = rawAppId.trim();
+        
         let options = { 
-            appId: "{{ trim($appId) }}", 
+            appId: trimmedAppId, 
             channel: "{{ trim($channel) }}", 
             token: null, 
             uid: 0 
         };
         
-        console.log("Agora Initialization with App ID:", options.appId);
-        console.log("Channel:", options.channel);
+        console.log("Agora Initialization with App ID Length:", options.appId.length);
+        
+        if (!options.appId) {
+            console.error("CRITICAL: Agora App ID is empty. Check your .env and config/services.php");
+            alert("Configuration Error: Agora App ID is missing. Please contact support.");
+            return;
+        }
 
         let client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
         let localTracks = { videoTrack: null, audioTrack: null };
