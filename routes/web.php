@@ -77,6 +77,7 @@ Route::get('/book-session/{practitioner?}', [WebController::class, 'bookSession'
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
 Route::get('/bookings/payment/callback', [BookingController::class, 'paymentCallback'])->name('bookings.payment.callback');
 Route::get('/fetch-translators', [BookingController::class, 'fetchTranslators'])->name('fetch-translators');
+Route::get('/api/available-slots/{practitioner}/{date}', [\App\Http\Controllers\AvailabilityController::class, 'getGeneratedSlots'])->name('api.available-slots');
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
 Route::post('/contact-us', [WebController::class, 'storeContact'])->name('contact-us.store');
 Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');

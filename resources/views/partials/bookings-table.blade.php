@@ -9,7 +9,7 @@
                 <thead>
                     <tr class="bg-[#F9F9F9]">
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Practitioner</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{{ ($user->role === 'client' || $user->role === 'patient') ? 'Practitioner' : 'Client' }}</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Mode</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Amount</th>
@@ -25,17 +25,31 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center">
-                                <img class="h-10 w-10 rounded-full object-cover border border-[#2E4B3D]/12" 
-                                     src="{{ $booking->practitioner->profile_photo_path ? asset('storage/' . $booking->practitioner->profile_photo_path) : 'https://i.pravatar.cc/150?img=32' }}" 
-                                     alt="">
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-secondary">
-                                        {{ $booking->practitioner->user->name ?? 'Practitioner' }}
+                                @if($user->role === 'client' || $user->role === 'patient')
+                                    <img class="h-10 w-10 rounded-full object-cover border border-[#2E4B3D]/12" 
+                                         src="{{ $booking->practitioner->profile_photo_path ? asset('storage/' . $booking->practitioner->profile_photo_path) : asset('frontend/assets/profile-dummy-img.png') }}" 
+                                         alt="">
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-secondary">
+                                            {{ $booking->practitioner->user->name ?? 'Practitioner' }}
+                                        </div>
+                                        <div class="text-xs text-gray-400">
+                                            {{ $booking->practitioner->specialization ?? 'Specialist' }}
+                                        </div>
                                     </div>
-                                    <div class="text-xs text-gray-400">
-                                        {{ $booking->practitioner->specialization ?? 'Specialist' }}
+                                @else
+                                    <img class="h-10 w-10 rounded-full object-cover border border-[#2E4B3D]/12" 
+                                         src="{{ $booking->user->profile_pic ? (str_starts_with($booking->user->profile_pic, 'http') ? $booking->user->profile_pic : asset('storage/' . $booking->user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" 
+                                         alt="">
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-secondary">
+                                            {{ $booking->user->name ?? 'Patient' }}
+                                        </div>
+                                        <div class="text-xs text-gray-400">
+                                            ID: {{ $booking->user->patient->client_id ?? 'N/A' }}
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
                             </div>
                         </td>
                         <td class="px-6 py-4">

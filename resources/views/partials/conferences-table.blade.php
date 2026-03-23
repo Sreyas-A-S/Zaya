@@ -15,7 +15,7 @@
                 <thead>
                     <tr class="bg-[#F9F9F9]">
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Practitioner</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{{ ($user->role === 'client' || $user->role === 'patient') ? 'Practitioner' : 'Client' }}</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Mode</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
@@ -30,9 +30,15 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center">
                                 <div class="w-8 h-8 rounded-full bg-gray-100 mr-3 flex items-center justify-center overflow-hidden">
-                                    <i class="ri-user-line text-gray-400"></i>
+                                    @if($user->role === 'client' || $user->role === 'patient')
+                                        <i class="ri-user-star-line text-secondary"></i>
+                                    @else
+                                        <i class="ri-user-line text-gray-400"></i>
+                                    @endif
                                 </div>
-                                <span class="text-sm font-medium text-gray-900">{{ $conference->practitioner->user->name }}</span>
+                                <span class="text-sm font-medium text-gray-900">
+                                    {{ ($user->role === 'client' || $user->role === 'patient') ? ($conference->practitioner->user->name ?? 'Practitioner') : ($conference->user->name ?? 'Client') }}
+                                </span>
                             </div>
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500">

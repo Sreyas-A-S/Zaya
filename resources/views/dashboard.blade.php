@@ -27,18 +27,21 @@
                 <button class="text-gray-400 hover:text-gray-600"><i class="ri-pencil-line"></i></button>
             </div>
 
+            @php
+                $profile = $user->patient ?? $user->practitioner ?? $user->doctor ?? $user->mindfulnessPractitioner ?? $user->yogaTherapist ?? $user->translator ?? null;
+            @endphp
             <div class="grid grid-cols-2 gap-y-6 gap-x-4 mb-6">
                 <div>
                     <p class="text-base text-gray-400 mb-1">Age</p>
-                    <p class="text-base font-normal text-gray-800">{{ $user->patient->age ?? 'Not set' }} {{ isset($user->patient->age) ? 'Years' : '' }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ $profile->age ?? 'Not set' }} {{ isset($profile->age) ? 'Years' : '' }}</p>
                 </div>
                 <div>
                     <p class="text-base text-gray-400 mb-1">Gender</p>
-                    <p class="text-base font-normal text-gray-800">{{ ucfirst($user->patient->gender ?? ($user->gender ?? 'Not set')) }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ ucfirst($profile->gender ?? ($user->gender ?? 'Not set')) }}</p>
                 </div>
                 <div class="col-span-2">
                     <p class="text-base text-gray-400 mb-1">DOB</p>
-                    <p class="text-base font-normal text-gray-800">{{ $user->patient->dob ? $user->patient->dob->format('M d, Y') : 'Not set' }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ (isset($profile->dob) && $profile->dob) ? (\Carbon\Carbon::parse($profile->dob)->format('M d, Y')) : 'Not set' }}</p>
                 </div>
             </div>
 
@@ -51,11 +54,11 @@
                 </div>
                 <div>
                     <p class="text-base text-gray-400 mb-1">Phone</p>
-                    <p class="text-base font-normal text-gray-800">{{ $user->patient->phone ?? ($user->phone ?? 'Not set') }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ $profile->phone ?? ($user->phone ?? 'Not set') }}</p>
                 </div>
                 <div>
                     <p class="text-base text-gray-400 mb-1">Address</p>
-                    <p class="text-base font-normal text-gray-800 leading-snug">{{ $user->patient->address ?? ($user->patient->city_state ?? 'Location not set') }}</p>
+                    <p class="text-base font-normal text-gray-800 leading-snug">{{ $profile->address ?? ($profile->city_state ?? 'Location not set') }}</p>
                 </div>
             </div>
         </div>
@@ -112,7 +115,13 @@
                             @endphp
                             <p class="text-base font-normal text-gray-800">{{ implode(', ', $sNames) }}</p>
                             <span class="text-gray-800 text-base">•</span>
-                            <p class="text-xs text-gray-600 font-normal">(Session with {{ $booking->practitioner->user->name }})</p>
+                            <p class="text-xs text-gray-600 font-normal">
+                                @if($user->role === 'client' || $user->role === 'patient')
+                                    (Session with {{ $booking->practitioner->user->name ?? 'Practitioner' }})
+                                @else
+                                    (Client: {{ $booking->user->name ?? 'Patient' }})
+                                @endif
+                            </p>
                         </div>
                         <p class="text-xs text-gray-400">{{ $booking->booking_date->format('M d, Y') }} - {{ $booking->booking_time }}</p>
                     </div>
@@ -139,7 +148,13 @@
                             @endphp
                             <p class="text-base font-normal text-gray-800">{{ implode(', ', $sNames) }}</p>
                             <span class="text-gray-800 text-base">•</span>
-                            <p class="text-xs text-gray-600 font-normal">(Session with {{ $booking->practitioner->user->name }})</p>
+                            <p class="text-xs text-gray-600 font-normal">
+                                @if($user->role === 'client' || $user->role === 'patient')
+                                    (Session with {{ $booking->practitioner->user->name ?? 'Practitioner' }})
+                                @else
+                                    (Client: {{ $booking->user->name ?? 'Patient' }})
+                                @endif
+                            </p>
                         </div>
                         <p class="text-xs text-gray-400">{{ $booking->booking_date->format('M d, Y') }} - {{ $booking->booking_time }}</p>
                     </div>
@@ -271,9 +286,9 @@
         <button
             id="gdpr-toggle"
             onclick="toggleConsent(this)"
-            class="w-10 h-5 {{ $user->patient->data_sharing_consent ? 'bg-secondary' : 'bg-gray-300' }} rounded-full relative flex items-center transition-colors cursor-pointer">
+            class="w-10 h-5 {{ ($user->patient->data_sharing_consent ?? false) ? 'bg-secondary' : 'bg-gray-300' }} rounded-full relative flex items-center transition-colors cursor-pointer">
             <div
-                class="w-4 h-4 bg-white rounded-full absolute left-0.5 shadow-sm transition-transform duration-300 {{ $user->patient->data_sharing_consent ? 'translate-x-5' : '' }}">
+                class="w-4 h-4 bg-white rounded-full absolute left-0.5 shadow-sm transition-transform duration-300 {{ ($user->patient->data_sharing_consent ?? false) ? 'translate-x-5' : '' }}">
             </div>
         </button>
     </div>

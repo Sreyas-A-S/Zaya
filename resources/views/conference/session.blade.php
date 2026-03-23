@@ -45,6 +45,24 @@
 
         <!-- Video Area -->
         <div class="relative aspect-video bg-[#0A1209] group" id="meeting-stage">
+            
+            <!-- Pre-Join Screen (User Gesture Trigger) -->
+            <div id="join-overlay" class="absolute inset-0 z-[100] bg-secondary flex flex-col items-center justify-center text-center p-6 transition-all duration-500">
+                <div class="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mb-8">
+                    <i class="ri-vidicon-fill text-white text-5xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-white mb-4">Ready to Join?</h2>
+                <p class="text-white/60 mb-10 max-w-md text-lg">Ensure your camera and microphone are connected before entering the session.</p>
+                <button id="start-btn" onclick="startSession()" class="px-12 py-4 bg-white text-secondary rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl flex items-center gap-3 cursor-pointer">
+                    <i class="ri-door-open-fill"></i>
+                    Join Meeting Now
+                </button>
+                <p id="browser-warning" class="mt-8 text-yellow-300 text-sm hidden">
+                    <i class="ri-error-warning-line"></i> 
+                    Warning: Browser requires HTTPS for camera access.
+                </p>
+            </div>
+
             <!-- Main Remote Video -->
             <div id="remote-player" class="w-full h-full"></div>
 
@@ -140,6 +158,12 @@
 <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        
+        // --- SECURE ORIGIN CHECK ---
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            document.getElementById('browser-warning').classList.remove('hidden');
+        }
+
         // --- GLOBAL FUNCTIONS (WINDOW SCOPE) ---
         window.copyMeetingLink = () => {
             const url = window.location.href;
@@ -186,12 +210,15 @@
 
         // --- AGORA LOGIC ---
         let options = { 
-            appId: "{{ $appId }}", 
-            channel: "{{ $channel }}", 
+            appId: "{{ trim($appId) }}", 
+            channel: "{{ trim($channel) }}", 
             token: null, 
-            uid: 0 // Using 0 lets Agora assign a random UID
+            uid: 0 
         };
         
+        console.log("Agora Initialization with App ID:", options.appId);
+        console.log("Channel:", options.channel);
+
         let client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
         let localTracks = { videoTrack: null, audioTrack: null };
         let screenTrack = null;
@@ -210,29 +237,28 @@
             }
         }
 
-        // Timer
-        let startTime = Date.now();
-        setInterval(() => {
-            let delta = Date.now() - startTime;
-            let h = Math.floor(delta / 3600000).toString().padStart(2, '0');
-            let m = Math.floor((delta % 3600000) / 60000).toString().padStart(2, '0');
-            let s = Math.floor((delta % 60000) / 1000).toString().padStart(2, '0');
-            const timerEl = document.getElementById('timer');
-            if (timerEl) timerEl.innerText = `${h}:${m}:${s}`;
-        }, 1000);
+        // Start Session (User Gesture Required)
+        window.startSession = async () => {
+            const btn = document.getElementById('start-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Initializing...';
+
+            await join();
+            
+            // Hide Overlay
+            const overlay = document.getElementById('join-overlay');
+            overlay.style.opacity = '0';
+            overlay.style.pointerEvents = 'none';
+            setTimeout(() => overlay.remove(), 500);
+        };
 
         async function join() {
             client.on("user-published", handleUserPublished);
             client.on("user-unpublished", handleUserUnpublished);
             
-            // Auto-Renew Token Event
             client.on("token-privilege-will-expire", async function() {
-                console.log("Token expiring, renewing...");
                 let newToken = await fetchToken();
-                if (newToken) {
-                    await client.renewToken(newToken);
-                    console.log("Token renewed successfully");
-                }
+                if (newToken) await client.renewToken(newToken);
             });
 
             client.on("network-quality", q => {
@@ -242,16 +268,14 @@
             });
 
             try {
-                // Get token before joining
                 options.token = await fetchToken();
-                
-                // Join the channel
                 await client.join(options.appId, options.channel, options.token, options.uid);
                 
+                // REQUEST PERMISSIONS
                 localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
                 localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
-                localTracks.videoTrack.play("local-player");
                 
+                localTracks.videoTrack.play("local-player");
                 await client.publish(Object.values(localTracks));
                 
                 const devices = await AgoraRTC.getDevices();
@@ -263,6 +287,7 @@
                 }
             } catch (e) { 
                 console.error("Join Room Error:", e);
+                alert("Could not access camera/mic. Please check your browser permissions.");
             }
         }
 
@@ -313,8 +338,6 @@
                 document.getElementById('screen-icon').className = 'ri-screen-share-line';
             }
         };
-
-        if (options.appId) join();
     });
 </script>
 @endsection

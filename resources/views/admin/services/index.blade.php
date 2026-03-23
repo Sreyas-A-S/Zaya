@@ -274,6 +274,27 @@
     </div>
 </div>
 
+<!-- Cropper Modal -->
+<div class="modal fade" id="cropper-modal" tabindex="-1" role="dialog" aria-labelledby="cropperModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel">Crop Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="img-container">
+                    <img id="cropper-image" src="" style="max-width: 100%;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="crop-save-btn">Save Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- View Modal -->
 <div class="modal fade" id="service-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -321,6 +342,11 @@
 <!-- Summernote -->
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+
+<!-- Cropper.js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 <style>
     .avatar-upload {
         position: relative;
@@ -385,6 +411,40 @@
         color: #333 !important;
         background-color: #fff !important;
     }
+
+    /* Media grid styling update */
+    .media-item {
+        transition: all 0.2s;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .media-item.border-primary {
+        border-color: #2E4B3D !important;
+        box-shadow: 0 0 0 2px rgba(46, 75, 61, 0.2);
+    }
+    .media-action-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+        gap: 5px;
+    }
+    .media-item:hover .media-action-overlay {
+        opacity: 1;
+    }
+    .media-action-overlay .btn-sm {
+        padding: 4px 8px;
+        font-size: 10px;
+        border-radius: 4px;
+    }
 </style>
 
 
@@ -393,14 +453,14 @@
     var baseUrl = "{{ asset('') }}";
     var storageUrl = "{{ asset('storage') }}";
 
-    var servicesTable;
-    var baseUrl = "{{ asset('') }}";
-    var storageUrl = "{{ asset('storage') }}";
-
     // Media Manager State
     let newFiles = []; // Array of File objects
     let existingImages = []; // Array of objects {id, path, type='gallery'/'main'}
     let mainSelection = null; // { type: 'new'|'existing', id: id|index }
+
+    // Cropper State
+    let cropper = null;
+    let currentCroppingIndex = null;
 
     function openCreateModal() {
         $('#form-modal-title').text('Add Service');
@@ -425,15 +485,17 @@
         // Render Existing Images
         existingImages.forEach(function(img) {
             let isMain = (mainSelection && mainSelection.type === 'existing' && mainSelection.id == img.id);
-            let badge = isMain ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1">Main Cover</span>' : '';
+            let badge = isMain ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1" style="z-index: 2;">Main</span>' : '';
             let borderClass = isMain ? 'border-primary border-3' : 'border-light';
 
             html += `
-                <div class="position-relative media-item" style="width: 100px; height: 100px; cursor: pointer;" onclick="setMain('existing', ${img.id})">
-                    <img src="${img.path}" class="w-100 h-100 object-fit-cover rounded border ${borderClass}">
+                <div class="position-relative media-item" style="width: 100px; height: 100px; cursor: pointer;">
+                    <img src="${img.path}" class="w-100 h-100 object-fit-cover rounded ${borderClass}">
                     ${badge}
-                    ${!isMain ? `<button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 d-flex justify-content-center align-items-center" 
-                        onclick="deleteExistingImage(event, ${img.id})" style="width: 20px; height: 20px; border-radius: 50%;">&times;</button>` : ''}
+                    <div class="media-action-overlay rounded">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="setMain('existing', ${img.id})">Set Main</button>
+                        ${!isMain ? `<button type="button" class="btn btn-danger btn-sm" onclick="deleteExistingImage(event, ${img.id})"><i class="fa fa-trash"></i></button>` : ''}
+                    </div>
                 </div>
             `;
         });
@@ -441,16 +503,19 @@
         // Render New Files
         newFiles.forEach(function(file, index) {
             let isMain = (mainSelection && mainSelection.type === 'new' && mainSelection.id === index);
-            let badge = isMain ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1">Main Cover</span>' : '';
+            let badge = isMain ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1" style="z-index: 2;">Main</span>' : '';
             let borderClass = isMain ? 'border-primary border-3' : 'border-light';
             let objectUrl = URL.createObjectURL(file);
 
             html += `
-                <div class="position-relative media-item" style="width: 100px; height: 100px; cursor: pointer;" onclick="setMain('new', ${index})">
-                    <img src="${objectUrl}" class="w-100 h-100 object-fit-cover rounded border ${borderClass}">
+                <div class="position-relative media-item" style="width: 100px; height: 100px; cursor: pointer;">
+                    <img src="${objectUrl}" class="w-100 h-100 object-fit-cover rounded ${borderClass}">
                     ${badge}
-                    ${!isMain ? `<button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 d-flex justify-content-center align-items-center" 
-                        onclick="removeNewFile(event, ${index})" style="width: 20px; height: 20px; border-radius: 50%;">&times;</button>` : ''}
+                    <div class="media-action-overlay rounded">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="setMain('new', ${index})">Set Main</button>
+                        <button type="button" class="btn btn-warning btn-sm" onclick="openCropper(${index})"><i class="fa fa-crop"></i></button>
+                        ${!isMain ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeNewFile(event, ${index})"><i class="fa fa-trash"></i></button>` : ''}
+                    </div>
                 </div>
             `;
         });
@@ -469,6 +534,58 @@
         };
         renderMediaGrid();
     }
+
+    // --- Cropper Functions ---
+    window.openCropper = function(index) {
+        currentCroppingIndex = index;
+        const file = newFiles[index];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            $('#cropper-image').attr('src', e.target.result);
+            $('#cropper-modal').modal('show');
+        };
+        reader.readAsDataURL(file);
+    };
+
+    $('#cropper-modal').on('shown.bs.modal', function() {
+        cropper = new Cropper(document.getElementById('cropper-image'), {
+            aspectRatio: 16 / 9,
+            viewMode: 2,
+        });
+    }).on('hidden.bs.modal', function() {
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+    });
+
+    $('#crop-save-btn').on('click', function() {
+        if (!cropper) return;
+
+        const canvas = cropper.getCroppedCanvas({
+            width: 1280,
+            height: 720,
+        });
+
+        canvas.toBlob(function(blob) {
+            // Create a new File object from the blob
+            const originalFile = newFiles[currentCroppingIndex];
+            const croppedFile = new File([blob], originalFile.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+            });
+
+            // Replace in newFiles array
+            newFiles[currentCroppingIndex] = croppedFile;
+
+            // Re-render
+            renderMediaGrid();
+            $('#cropper-modal').modal('hide');
+
+            if (typeof showToast === 'function') showToast('Image cropped successfully');
+        }, 'image/jpeg');
+    });
 
     function removeNewFile(e, index) {
         e.stopPropagation();

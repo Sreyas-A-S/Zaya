@@ -7,14 +7,44 @@ use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
+    private function getBookingQuery($user)
+    {
+        $role = $user->role;
+        $profileId = $user->profile_id;
+        $query = \App\Models\Booking::with(['practitioner.user', 'user']);
+
+        if ($role === 'client' || $role === 'patient') {
+            $query->where('user_id', $user->id);
+        } elseif ($role === 'translator') {
+            $query->where('translator_id', $profileId);
+        } else {
+            // Practitioners, Doctors, Mindfulness, Yoga
+            $query->where('practitioner_id', $profileId);
+        }
+
+        return $query;
+    }
+
     public function index()
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $user->load('patient');
+        
+        // Dynamic loading based on role
+        $relation = match ($user->role) {
+            'client', 'patient' => 'patient',
+            'practitioner' => 'practitioner',
+            'doctor' => 'doctor',
+            'mindfulness_practitioner' => 'mindfulnessPractitioner',
+            'yoga_therapist' => 'yogaTherapist',
+            'translator' => 'translator',
+            default => null,
+        };
+        if ($relation) $user->load($relation);
 
-        $upcomingBookings = \App\Models\Booking::with(['practitioner.user'])
-            ->where('user_id', $user->id)
+        $bookingQuery = $this->getBookingQuery($user);
+
+        $upcomingBookings = (clone $bookingQuery)
             ->where(function ($query) {
                 $query->where('booking_date', '>', now()->toDateString())
                     ->orWhere(function ($q) {
@@ -28,8 +58,7 @@ class ProfileController extends Controller
             ->take(5)
             ->get();
 
-        $completedBookings = \App\Models\Booking::with(['practitioner.user'])
-            ->where('user_id', $user->id)
+        $completedBookings = (clone $bookingQuery)
             ->where(function ($query) {
                 $query->where('status', 'completed')
                     ->orWhere('booking_date', '<', now()->toDateString());
@@ -43,7 +72,7 @@ class ProfileController extends Controller
             ->latest()
             ->get();
 
-        // Invoices can be derived from paid bookings for now
+        // Invoices are usually client-centric (payments they made)
         $invoices = \App\Models\Booking::where('user_id', $user->id)
             ->whereNotNull('razorpay_payment_id')
             ->latest()
@@ -59,22 +88,22 @@ class ProfileController extends Controller
     public function updateConsent(Request $request)
     {
         $user = Auth::user();
-        if (!$user->patient) {
-            return response()->json(['message' => 'Profile not found'], 404);
+        $profile = $user->profile;
+        if (!$profile || !method_exists($profile, 'update')) {
+            return response()->json(['message' => 'Profile not supported'], 404);
         }
 
-        $user->patient->update([
+        $profile->update([
             'data_sharing_consent' => $request->consent ? 1 : 0
         ]);
 
-        return response()->json(['message' => 'Consent updated successfully', 'consent' => $user->patient->data_sharing_consent]);
+        return response()->json(['message' => 'Consent updated successfully', 'consent' => $profile->data_sharing_consent]);
     }
 
     public function bookings(Request $request)
     {
         $user = Auth::user();
-        $bookings = \App\Models\Booking::with(['practitioner.user'])
-            ->where('user_id', $user->id)
+        $bookings = $this->getBookingQuery($user)
             ->latest()
             ->paginate(10);
 
@@ -103,8 +132,7 @@ class ProfileController extends Controller
     public function conferences(Request $request)
     {
         $user = Auth::user();
-        $conferences = \App\Models\Booking::with(['practitioner.user'])
-            ->where('user_id', $user->id)
+        $conferences = $this->getBookingQuery($user)
             ->where('mode', 'online')
             ->latest()
             ->paginate(15);
@@ -119,8 +147,7 @@ class ProfileController extends Controller
     public function showRecording($id)
     {
         $user = Auth::user();
-        $booking = \App\Models\Booking::with(['practitioner.user'])
-            ->where('user_id', $user->id)
+        $booking = $this->getBookingQuery($user)
             ->where('id', $id)
             ->whereNotNull('recording_url')
             ->firstOrFail();
@@ -131,8 +158,14 @@ class ProfileController extends Controller
     public function joinSession($channel)
     {
         $user = Auth::user();
-        $appId = config('services.agora.app_id');
+        $appId = trim(config('services.agora.app_id') ?? '');
         
+        \Log::info("User joining session:", [
+            'user' => $user->id,
+            'channel' => $channel,
+            'app_id_prefix' => substr($appId, 0, 5) . '...'
+        ]);
+
         return view('conference.session', compact('user', 'channel', 'appId'));
     }
 

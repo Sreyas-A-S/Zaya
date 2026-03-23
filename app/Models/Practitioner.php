@@ -36,6 +36,7 @@ class Practitioner extends Model
     protected $fillable = [
         'user_id',
         'status',
+        'booking_window_days',
         'first_name',
         'last_name',
         'slug',
@@ -77,6 +78,7 @@ class Practitioner extends Model
         'dob' => 'date',
         'can_translate_english' => 'boolean',
         'social_links' => 'array',
+        'booking_window_days' => 'integer',
     ];
 
     public function user()

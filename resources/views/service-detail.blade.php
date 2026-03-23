@@ -1,13 +1,17 @@
 @extends('layouts.app')
 
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+@endpush
+
 @section('content')
 
 <section class="pt-[144px] md:pt-[150px] pb-8 lg:pb-20 px-4 md:px-6 bg-white">
-    <div class="container mx-auto max-w-6xl"> 
-        <div class="w-full h-[200px] sm:h-[300px] md:h-[480px] rounded-[20px] overflow-hidden mb-8 relative">
-            <div class="swiper serviceImageSwiper h-full">
+    <div class="container mx-auto max-w-6xl">
+        <!-- Main Area Carousel -->
+        <div class="w-full h-[300px] md:h-[520px] rounded-[32px] overflow-hidden mb-10 relative group/main shadow-2xl shadow-secondary/5 bg-[#D4E6B5]/10">
+            <div class="swiper mainImageSwiper h-full">
                 <div class="swiper-wrapper">
-                    <!-- Main Image -->
                     @if($service->image)
                     <div class="swiper-slide">
                         <img src="{{ Str::startsWith($service->image, 'frontend/') ? asset($service->image) : asset('storage/' . $service->image) }}"
@@ -15,15 +19,13 @@
                     </div>
                     @endif
 
-                    <!-- Gallery Images -->
                     @foreach($service->images as $img)
                     <div class="swiper-slide">
                         <img src="{{ asset('storage/' . $img->image_path) }}"
-                            alt="{{ $service->title }}" class="w-full h-full object-cover">
+                            alt="Service gallery image" class="w-full h-full object-cover">
                     </div>
                     @endforeach
 
-                    <!-- Fallback if no images found at all -->
                     @if(!$service->image && $service->images->isEmpty())
                     <div class="swiper-slide">
                         <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma-01.jpg') }}"
@@ -31,135 +33,86 @@
                     </div>
                     @endif
                 </div>
-                <!-- Pagination Dots -->
-                <div class="swiper-pagination bottom-4!"></div>
             </div>
+
+            <!-- Floating Dynamic Pagination Pill -->
+            @php
+                $totalImages = ($service->image ? 1 : 0) + $service->images->count();
+            @endphp
+            
+            @if($totalImages > 1)
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full flex items-center justify-center z-50 shadow-xl shadow-black/5 border border-white/20 transition-all duration-300">
+                <div class="main-pagination flex items-center gap-2"></div>
+            </div>
+            @endif
+            
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-60 pointer-events-none"></div>
         </div>
 
         <!-- Title & Actions Bar -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-gray-200">
-            <h1 class="text-xl md:text-3xl font-sans! font-medium text-gray-900">{{ $service->title }}</h1>
-            <div class="flex -flex-wrap items-center gap-3">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10 pb-8 border-b border-gray-100">
+            <div>
+                <h1 class="text-2xl md:text-4xl font-sans! font-bold text-secondary mb-2 tracking-tight">{{ $service->title }}</h1>
+                <div class="flex items-center gap-2 text-gray-400 text-sm">
+                    <i class="ri-shield-check-line text-primary"></i>
+                    <span>Authentic Zaya Wellness Service</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 w-full sm:w-auto">
                 <a href="{{ route('book-session') }}"
-                    class="bg-secondary text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-primary transition-all shadow-md flex items-center gap-2">
+                    class="flex-1 sm:flex-none bg-secondary text-white px-8 py-4 rounded-full font-bold hover:bg-primary transition-all shadow-xl shadow-secondary/10 flex items-center justify-center gap-2 group">
                     <span class="text-nowrap">Book a Session</span>
+                    <i class="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
                 </a>
                 <button onclick="shareService()"
-                    class="rounded-full px-6 py-3 text-[#1D77AE] bg-[#1D77AE]/17 hover:bg-[#1D77AE] hover:text-white transition-all flex items-center justify-center cursor-pointer gap-2">
-                    <i class="ri-share-line text-sm"></i>
-                    <span class="text-sm">Share</span>
+                    class="p-4 rounded-full text-secondary bg-secondary/5 hover:bg-secondary hover:text-white transition-all flex items-center justify-center cursor-pointer group shadow-sm">
+                    <i class="ri-share-forward-line text-xl group-hover:scale-110 transition-transform"></i>
                 </button>
             </div>
         </div>
 
         <!-- Content Section -->
-        <!-- Content Section -->
         <style>
-            /* Scoped styles for dynamic content */
             .service-description-content {
                 font-family: 'Roboto', sans-serif;
                 color: #4b5563;
-                /* text-gray-600 */
                 line-height: 1.8;
                 font-size: 1.05rem;
             }
-
-            .service-description-content h1,
-            .service-description-content h2,
-            .service-description-content h3,
-            .service-description-content h4,
-            .service-description-content h5,
-            .service-description-content h6 {
+            .service-description-content h2 {
                 font-family: 'Playfair Display', serif !important;
                 color: #2E4B3C !important;
-                /* secondary */
                 margin-top: 2.5rem;
                 margin-bottom: 1.25rem;
                 font-weight: 600;
-                line-height: 1.3;
-            }
-
-            .service-description-content h1 {
-                font-size: 2.5rem;
-            }
-
-            .service-description-content h2 {
                 font-size: 1.8rem;
                 border-bottom: 1px solid #e5e7eb;
                 padding-bottom: 0.5rem;
             }
-
-            .service-description-content h3 {
-                font-size: 1.5rem;
-            }
-
-            .service-description-content h4 {
-                font-size: 1.25rem;
-            }
-
-            .service-description-content p {
-                margin-bottom: 1.5rem;
-            }
-
+            .service-description-content p { margin-bottom: 1.5rem; }
             .service-description-content ul {
                 list-style-type: disc !important;
                 padding-left: 1.5rem !important;
                 margin-bottom: 1.5rem;
             }
+            .service-description-content li { margin-bottom: 0.5rem; }
 
-            .service-description-content ol {
-                list-style-type: decimal !important;
-                padding-left: 1.5rem !important;
-                margin-bottom: 1.5rem;
+            /* Modern Pagination Styling - Dots */
+            .main-pagination .swiper-pagination-bullet {
+                width: 8px;
+                height: 8px;
+                background: #2E4B3C !important;
+                border-radius: 50% !important;
+                opacity: 0.2;
+                transition: all 0.3s ease;
+                margin: 0 !important;
+                cursor: pointer;
+                display: block;
             }
-
-            .service-description-content li {
-                margin-bottom: 0.5rem;
-                padding-left: 0.5rem;
-            }
-
-            .service-description-content strong,
-            .service-description-content b {
-                font-weight: 600 !important;
-                /* Matches loaded Roboto SemiBold */
-                color: #000000 !important;
-            }
-
-            /* Catch-all for spans that might have inline bold style */
-            .service-description-content span[style*="font-weight: bold"],
-            .service-description-content span[style*="font-weight: 700"] {
-                font-weight: 600 !important;
-                color: #000000 !important;
-            }
-
-            .service-description-content img {
-                max-width: 100%;
-                height: auto;
-                border-radius: 12px;
-                margin: 2rem 0;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            }
-
-            .service-description-content blockquote {
-                border-left: 4px solid #C5896B;
-                /* primary/accent */
-                padding-left: 1rem;
-                font-style: italic;
-                color: #555;
-                margin: 2rem 0;
-                background: #f9fafb;
-                padding: 1.5rem;
-                border-radius: 0 8px 8px 0;
-            }
-
-            .service-description-content a {
-                color: #C5896B;
-                text-decoration: underline;
-                transition: color 0.2s;
-            }
-
-            .service-description-content a:hover {
-                color: #97563D;
+            .main-pagination .swiper-pagination-bullet-active {
+                opacity: 1 !important;
+                transform: scale(1.2);
+                background: #2E4B3C !important;
             }
         </style>
         <div class="service-description-content max-w-none">
@@ -169,20 +122,43 @@
 </section>
 
 <!-- CTA Section -->
-<section class="pt-0 pb-16 bg-white">
-    <div class="container mx-auto px-4 md:px-6">
-        <div class="text-center md:max-w-2xl mx-auto">
-            <h2 class="text-xl md:text-4xl font-sans! font-medium text-primary mb-4">Ready to restore your natural
-                rhythm?</h2>
-            <p class="text-gray-500 mb-8 text-sm md:text-base lg:text-xl md:w-3/4 mx-auto">
-                Join a global community committed to authentic, expert-led wellness.
-            </p>
-            <a href="{{ route('book-session') }}"
-                class="inline-block bg-secondary text-white px-10 py-4 rounded-full font-normal hover:bg-primary transition-all shadow-lg">
-                Book a Session
-            </a>
-        </div>
+<section class="pt-0 pb-16 bg-white text-center">
+    <div class="container mx-auto px-4 md:px-6 max-w-2xl">
+        <h2 class="text-xl md:text-4xl font-sans! font-medium text-primary mb-4">Ready to restore your natural rhythm?</h2>
+        <p class="text-gray-500 mb-8 text-sm md:text-base lg:text-xl">Join a global community committed to authentic, expert-led wellness.</p>
+        <a href="{{ route('book-session') }}" class="inline-block bg-secondary text-white px-10 py-4 rounded-full font-normal hover:bg-primary transition-all shadow-lg">Book a Session</a>
     </div>
 </section>
 
+@endsection
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainSwiper = new Swiper('.mainImageSwiper', {
+            loop: true,
+            grabCursor: true,
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.main-pagination',
+                clickable: true,
+            },
+        });
+    });
+
+    function shareService() {
+        if (navigator.share) {
+            navigator.share({ title: '{{ $service->title }} | Zaya Wellness', url: window.location.href }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                if (window.showZayaToast) showZayaToast('Link copied to clipboard!', 'Service Shared');
+                else alert('Link copied to clipboard!');
+            });
+        }
+    }
+</script>
 @endsection

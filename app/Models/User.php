@@ -59,6 +59,31 @@ class User extends Authenticatable implements JWTSubject
             'languages' => 'array',
         ];
     }
+    /**
+     * Get the specific profile model based on the user's role.
+     */
+    public function getProfileAttribute()
+    {
+        return match ($this->role) {
+            'client', 'patient' => $this->patient,
+            'practitioner' => $this->practitioner,
+            'doctor' => $this->doctor,
+            'mindfulness_practitioner' => $this->mindfulnessPractitioner,
+            'yoga_therapist' => $this->yogaTherapist,
+            'translator' => $this->translator,
+            default => null,
+        };
+    }
+
+    /**
+     * Get the ID of the related profile.
+     */
+    public function getProfileIdAttribute()
+    {
+        $profile = $this->profile;
+        return $profile ? $profile->id : null;
+    }
+
     public function doctor()
     {
         return $this->hasOne(Doctor::class);

@@ -1,4 +1,4 @@
-<div id="zaya-toast" class="fixed top-28 right-8 z-[100001] opacity-0 pointer-events-none transition-all duration-300 translate-y-[-20px]">
+<div id="zaya-toast" class="fixed top-28 right-8 z-[100001] opacity-0 pointer-events-none transition-all duration-500 transform translate-x-[100px]">
     <div id="toast-container" class="bg-[#A8D7C2]/95 backdrop-blur-sm border border-[#95C3AE] rounded-[15px] px-6 py-3 flex items-center gap-4 shadow-[0_12px_40px_rgba(0,0,0,0.12)] min-w-[450px] max-w-[95vw]">
         <!-- Icon Wrapper -->
         <div id="toast-icon-bg" class="shrink-0 w-10 h-10 rounded-full border-[3px] border-white bg-[#4ADE80]/80 flex items-center justify-center">
@@ -39,7 +39,6 @@
         if (validTypes.includes(typeOrTitle)) {
             type = typeOrTitle;
         } else if (typeOrTitle !== 'success') {
-            // If it's not a standard type and not default 'success', treat it as a title
             title = typeOrTitle;
         }
 
@@ -61,9 +60,9 @@
             icon.className = 'ri-check-line text-white text-xl font-bold';
         }
 
-        // Show toast
-        toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-[-20px]');
-        toast.classList.add('opacity-100', 'translate-y-0');
+        // Show toast with slide-left animation
+        toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-x-[100px]');
+        toast.classList.add('opacity-100', 'translate-x-0');
 
         // Auto hide after 5 seconds
         if (window.zayaToastTimeout) clearTimeout(window.zayaToastTimeout);
@@ -74,7 +73,8 @@
         const toast = document.getElementById('zaya-toast');
         if (!toast) return;
 
-        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-[-20px]');
-        toast.classList.remove('opacity-100', 'translate-y-0');
+        // Hide with slide-right animation
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-x-[100px]');
+        toast.classList.remove('opacity-100', 'translate-x-0');
     }
 </script>
