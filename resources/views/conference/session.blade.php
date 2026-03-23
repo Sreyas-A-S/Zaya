@@ -268,16 +268,25 @@
             });
 
             try {
-                options.token = await fetchToken();
-                await client.join(options.appId, options.channel, options.token, options.uid);
-                
-                // REQUEST PERMISSIONS
+                // REQUEST PERMISSIONS FIRST
+                console.log("Requesting microphone track...");
                 localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                console.log("Microphone track created.");
+
+                console.log("Requesting camera track...");
                 localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
-                
+                console.log("Camera track created.");
+
+                options.token = await fetchToken();
+                console.log("Token fetched, joining channel:", options.channel);
+
+                await client.join(options.appId, options.channel, options.token, options.uid);
+                console.log("Joined channel successfully.");
+
                 localTracks.videoTrack.play("local-player");
                 await client.publish(Object.values(localTracks));
-                
+                console.log("Tracks published.");
+
                 const devices = await AgoraRTC.getDevices();
                 const camSelect = document.getElementById('camera-select');
                 const micSelect = document.getElementById('mic-select');
@@ -285,11 +294,10 @@
                     devices.filter(d => d.kind === 'videoinput').forEach(c => camSelect.innerHTML += `<option value="${c.deviceId}">${c.label}</option>`);
                     devices.filter(d => d.kind === 'audioinput').forEach(m => micSelect.innerHTML += `<option value="${m.deviceId}">${m.label}</option>`);
                 }
-            } catch (e) { 
-                console.error("Join Room Error:", e);
-                alert("Could not access camera/mic. Please check your browser permissions.");
-            }
-        }
+            } catch (e) {
+                console.error("Agora Error:", e);
+                alert("Could not access camera/mic or join the session. Error: " + e.message);
+            }        }
 
         async function handleUserPublished(user, mediaType) {
             await client.subscribe(user, mediaType);

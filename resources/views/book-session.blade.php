@@ -368,7 +368,7 @@
                                                 </div>
                                                 <span class="text-[15px] text-[#404040]">45 Mins</span>
                                             </div>
-                                            <span class="text-[15px] font-medium text-[#29724C]">??? 50</span>
+                                            <span class="text-[15px] font-medium text-[#29724C]">€ 50</span>
                                         </label>
 
                                         <!-- Option 2 -->
@@ -385,7 +385,7 @@
                                                 </div>
                                                 <span class="text-[15px] text-[#404040]">1 Hour</span>
                                             </div>
-                                            <span class="text-[15px] font-medium text-[#29724C]">??? 100</span>
+                                            <span class="text-[15px] font-medium text-[#29724C]">€ 100</span>
                                         </label>
 
                                         <!-- Option 3 -->
@@ -402,7 +402,7 @@
                                                 </div>
                                                 <span class="text-[15px] text-[#404040]">2 Hours</span>
                                             </div>
-                                            <span class="text-[15px] font-medium text-[#29724C]">??? 150</span>
+                                            <span class="text-[15px] font-medium text-[#29724C]">€ 150</span>
                                         </label>
                                     </div>
 
@@ -973,13 +973,6 @@
 
             function updateTotalPrice(total) {
                 const priceContainer = document.querySelector('.text-4xl.font-medium.text-gray-900');
-                if (priceContainer) {
-                    priceContainer.innerHTML = `€ ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ EUR</span>`;
-                }
-            }
-
-            function updateTotalPrice(total) {
-                const priceContainer = document.querySelector('.text-4xl.font-medium.text-gray-900');
                 lastComputedTotal = total;
                 const testToggle = document.getElementById('test-payment-toggle');
                 const showTest = testToggle && testToggle.checked;
@@ -987,7 +980,7 @@
                     if (showTest) {
                         priceContainer.innerHTML = `INR 1.00 <span class="text-xl text-gray-400 font-normal">/ TEST</span>`;
                     } else {
-                        priceContainer.innerHTML = `â‚¬ ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ EUR</span>`;
+                        priceContainer.innerHTML = `€ ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ EUR</span>`;
                     }
                 }
             }
