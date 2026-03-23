@@ -286,6 +286,8 @@
                     <li> <a href="{{ route('admin.footer-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_footer_settings'] ?? 'Footer Page Settings' }}</a></li>
                     
                     <li> <a href="{{ route('admin.client-pannel-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_client_pannel_settings'] ?? 'Client Pannel Settings' }}</a></li>
+                    
+                    <li> <a href="{{ route('admin.invoice-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_invoice_settings'] ?? 'Invoice Settings' }}</a></li>
 
                 </ul>
 

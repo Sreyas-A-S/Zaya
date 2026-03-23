@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'isClient'])->group(function () {
@@ -12,6 +13,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/recordings/{id}', [ProfileController::class, 'showRecording'])->name('recordings.show');
     Route::get('/conference/session/{channel}', [ProfileController::class, 'joinSession'])->name('conference.join');
     Route::get('/agora/token', [ProfileController::class, 'generateToken'])->name('agora.token');
+    Route::get('/invoice/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
 
     // Availability / Time Slots
     Route::get('/time-slots', [\App\Http\Controllers\AvailabilityController::class, 'index'])->name('time-slots.index');

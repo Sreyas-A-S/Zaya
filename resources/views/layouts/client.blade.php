@@ -270,7 +270,7 @@
                         const langTexts = document.querySelectorAll('[id^="lang-text-"]');
 
                         if (pill) {
-                            if (targetLocale === '{{ $lang2->code }}') {
+                            if (targetLocale === '{{ $lang2->code ?? 'fr' }}') {
                                 pill.classList.remove('translate-x-0');
                                 pill.classList.add('translate-x-full');
                             } else {
@@ -292,7 +292,7 @@
                         // 3. Update onclick for next toggle
                         const toggleBtn = pill ? pill.parentElement : null;
                         if (toggleBtn) {
-                            const nextLocale = targetLocale === '{{ $lang1->code }}' ? '{{ $lang2->code }}' : '{{ $lang1->code }}';
+                            const nextLocale = targetLocale === '{{ $lang1->code ?? 'en' }}' ? '{{ $lang2->code ?? 'fr' }}' : '{{ $lang1->code ?? 'en' }}';
                             toggleBtn.setAttribute('onclick', `toggleLanguage('${nextLocale}')`);
                         }
                         

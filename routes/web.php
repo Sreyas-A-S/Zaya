@@ -243,6 +243,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('/client-pannel-settings', [\App\Http\Controllers\Admin\ClientPannelSettingController::class, 'index'])->name('admin.client-pannel-settings.index');
     Route::post('/client-pannel-settings/update', [\App\Http\Controllers\Admin\ClientPannelSettingController::class, 'update'])->name('admin.client-pannel-settings.update');
 
+    // Invoice settings
+    Route::get('/invoice-settings', [\App\Http\Controllers\Admin\InvoiceSettingController::class, 'index'])->name('admin.invoice-settings.index');
+    Route::post('/invoice-settings/update', [\App\Http\Controllers\Admin\InvoiceSettingController::class, 'update'])->name('admin.invoice-settings.update');
+
+    // Invoice Management
+    Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('admin.invoices.index');
+    
+
 
 // Route to run artisan optimize
 Route::get('/optimize', function () {
