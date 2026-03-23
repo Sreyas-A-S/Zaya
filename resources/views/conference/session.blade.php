@@ -299,20 +299,8 @@
                     throw new Error("Failed to generate secure access token.");
                 }
                 
-                console.log("Attempting Secure Join (with token)...");
-                try {
-                    await client.join(options.appId, options.channel, options.token, options.uid);
-                } catch (joinError) {
-                    if (joinError.message.includes("invalid vendor key") || joinError.code === "CAN_NOT_GET_GATEWAY_SERVER") {
-                        console.warn("Secure join failed. Attempting Diagnostic Join (no token)...");
-                        // Fallback: Try joining without token (only works if project is in Testing Mode)
-                        await client.join(options.appId, options.channel, null, options.uid);
-                        console.log("Diagnostic Join Successful (Project is likely in 'Testing Mode')");
-                    } else {
-                        throw joinError;
-                    }
-                }
-                
+                console.log("Attempting Secure Join...");
+                await client.join(options.appId, options.channel, options.token, options.uid);
                 console.log("Joined successfully.");
 
                 localTracks.videoTrack.play("local-player");
@@ -329,9 +317,13 @@
             } catch (e) {
                 console.error("Agora Critical Error:", e);
                 let msg = e.message;
-                if (e.message.includes("invalid vendor key")) {
-                    msg = "Agora App ID is invalid. Please verify the ID in your Agora Console and .env file. Ensure your project is not in 'Testing Mode' if using tokens.";
+                
+                if (e.message.includes("dynamic use static key")) {
+                    msg = "Security Mismatch: Your Agora project is in 'Testing Mode' but we are sending a secure token. \n\nFIX: Go to Agora Console and ENABLE 'App Certificate' for this project.";
+                } else if (e.message.includes("invalid vendor key")) {
+                    msg = "Invalid App ID: The ID in your .env does not match any project in your Agora Console.";
                 }
+                
                 alert("Connection Failed: " + msg);
                 const btn = document.getElementById('start-btn');
                 btn.disabled = false;
