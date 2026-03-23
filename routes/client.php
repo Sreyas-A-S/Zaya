@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/dashboard', [ProfileController::class, 'index'])->name('dashboard');
     Route::post('/update-consent', [ProfileController::class, 'updateConsent'])->name('profile.updateConsent');
     Route::get('/bookings', [ProfileController::class, 'bookings'])->name('bookings.index');
@@ -20,6 +20,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/time-slots/reset', [\App\Http\Controllers\AvailabilityController::class, 'resetToWeekly'])->name('time-slots.reset-to-weekly');
     Route::post('/time-slots/settings', [\App\Http\Controllers\AvailabilityController::class, 'updateBookingSettings'])->name('time-slots.update-settings');
     Route::post('/time-slots/weekly-off', [\App\Http\Controllers\AvailabilityController::class, 'updateWeeklyOffDays'])->name('time-slots.update-weekly-off');
+    Route::post('/time-slots/weekly-slots', [\App\Http\Controllers\AvailabilityController::class, 'updateWeeklySlots'])->name('time-slots.update-weekly-slots');
     Route::post('/time-slots/toggle-off', [\App\Http\Controllers\AvailabilityController::class, 'toggleOffDay'])->name('time-slots.toggle-off');
     Route::post('/time-slots/toggle-off-time', [\App\Http\Controllers\AvailabilityController::class, 'toggleOffTime'])->name('time-slots.toggle-off-time');
     Route::delete('/time-slots/{id}', [\App\Http\Controllers\AvailabilityController::class, 'destroy'])->name('time-slots.destroy');

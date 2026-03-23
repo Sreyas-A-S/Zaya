@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class IsClient
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
+        
+        if (auth()->check() && in_array(auth()->user()->role, $adminRoles)) {
+            // Administrative users are redirected to the admin dashboard
+            return redirect()->route('admin.dashboard')->with('warning', 'Admins cannot access the client panel.');
+        }
+
+        return $next($request);
+    }
+}
