@@ -43,7 +43,7 @@
 <div class="px-2">
     <div class="tab-nav-wrapper">
         <button onclick="switchTab('calendar-tab')" id="tab-calendar-btn" class="tab-btn active">Availability Calendar</button>
-        <button onclick="switchTab('settings-tab')" id="tab-settings-btn" class="tab-btn">Booking Rules</button>
+        <button onclick="switchTab('settings-tab')" id="tab-settings-btn" class="tab-btn">Slots Settings</button>
     </div>
 </div>
 
@@ -81,6 +81,52 @@
     <!-- Tab 2: Settings -->
     <div id="settings-tab" class="tab-content hidden space-y-8">
         @if(isset($profile))
+        <!-- Global Weekly Slots -->
+        <div class="w-full bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-sm">
+            <div class="p-8 border-b border-gray-50">
+                <h2 class="text-2xl font-bold text-secondary font-sans!">Set Weekly Slots</h2>
+                <p class="text-sm text-gray-500 mt-2">Quickly set your working hours for all active days. Days marked as "Off" will be skipped.</p>
+            </div>
+            <div class="p-8">
+                <form action="{{ route('time-slots.update-weekly-slots') }}" method="POST" class="space-y-6">
+                    @csrf
+                    <input type="hidden" name="off_slots" id="weekly-off-slots-input" value="">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-3">Start Time</label>
+                            <input type="time" name="start_time" id="weekly-start-time" value="09:00" required onchange="resetOffSlots(); updateWeeklySlotsPreview();" class="w-full border border-gray-100 bg-gray-50 rounded-2xl px-5 py-4 text-base outline-none focus:border-secondary transition-all">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-3">End Time</label>
+                            <input type="time" name="end_time" id="weekly-end-time" value="17:00" required onchange="resetOffSlots(); updateWeeklySlotsPreview();" class="w-full border border-gray-100 bg-gray-50 rounded-2xl px-5 py-4 text-base outline-none focus:border-secondary transition-all">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-3">Slot Duration</label>
+                            <select name="slot_duration" id="weekly-slot-duration" onchange="resetOffSlots(); updateWeeklySlotsPreview();" class="w-full border border-gray-100 bg-gray-50 rounded-2xl px-5 py-4 text-base outline-none focus:border-secondary transition-all">
+                                @foreach([15, 30, 45, 60, 90, 120] as $min)
+                                    <option value="{{ $min }}" {{ $min == 60 ? 'selected' : '' }}>{{ $min }} mins</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Slot Preview -->
+                    <div id="weekly-slots-preview-container" class="bg-[#F6F7F7] rounded-2xl p-6 border border-dashed border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block">Patient View Preview</label>
+                            <span class="text-[10px] text-gray-400 font-medium">Click slots to toggle (Red = Off)</span>
+                        </div>
+                        <div id="weekly-slots-preview" class="flex flex-wrap gap-2">
+                            <!-- Preview slots will be injected here -->
+                        </div>
+                        <p id="preview-error" class="text-xs text-red-400 mt-2 hidden"></p>
+                    </div>
+
+                    <button type="submit" class="px-10 py-4 bg-secondary text-white rounded-2xl font-bold hover:opacity-90 shadow-lg shadow-secondary/10 transition-all">Apply to All Working Days</button>
+                </form>
+            </div>
+        </div>
+
         <!-- Weekly Off Days -->
         <div class="w-full bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-sm">
             <div class="p-8 border-b border-gray-50">
@@ -145,30 +191,56 @@
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeManageDayModal()"></div>
     <div class="relative bg-white rounded-[32px] w-full max-w-2xl shadow-2xl scale-95 transition-transform overflow-hidden" id="manage-modal-content">
         <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-            <div><h3 id="modal-date-display" class="text-2xl font-bold text-secondary font-sans!">Date</h3><div id="schedule-type-badge" class="mt-1"></div></div>
-            <button onclick="closeManageDayModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-all"><i class="ri-close-line text-2xl text-gray-400"></i></button>
-        </div>
-        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 max-h-[70vh] overflow-y-auto">
             <div>
-                <div class="flex justify-between items-center mb-4"><h4 class="text-sm font-bold text-secondary uppercase tracking-widest">Active Criteria</h4><button id="reset-button" onclick="resetDayToWeekly()" class="text-[10px] font-bold text-red-500 uppercase hover:underline hidden">Reset to Weekly</button></div>
-                <div id="modal-slots-list" class="space-y-3"></div>
+                <h3 id="modal-date-display" class="text-2xl font-bold text-secondary font-sans!">Date</h3>
+                <div id="schedule-type-badge" class="mt-1"></div>
             </div>
-            <div class="border-l border-gray-100 md:pl-8">
-                <h4 class="text-sm font-bold text-secondary uppercase tracking-widest mb-4">Add Custom Slot</h4>
-                <form id="custom-slot-form" onsubmit="saveCustomSlot(event)" class="space-y-4">
-                    <input type="hidden" id="custom-slot-date">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-2">Start</label><input type="time" id="custom-start" required class="w-full border border-gray-100 bg-gray-50 rounded-xl px-4 py-3 text-sm outline-none focus:border-secondary transition-all"></div>
-                        <div><label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-2">End</label><input type="time" id="custom-end" required class="w-full border border-gray-100 bg-gray-50 rounded-xl px-4 py-3 text-sm outline-none focus:border-secondary transition-all"></div>
+            <div class="flex items-center gap-3">
+                <button id="modal-reset-btn" onclick="resetDayToWeekly()" class="text-[10px] font-bold text-red-500 uppercase hover:underline hidden">Reset to Weekly</button>
+                <button onclick="closeManageDayModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-all"><i class="ri-close-line text-2xl text-gray-400"></i></button>
+            </div>
+        </div>
+        <div class="p-8 max-h-[80vh] overflow-y-auto">
+            <form id="daily-settings-form" onsubmit="saveDailySettings(event)" class="space-y-6">
+                <input type="hidden" id="modal-date-input">
+                <input type="hidden" id="modal-off-slots-input" value="">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-2">Start Time</label>
+                        <input type="time" id="modal-start-time" required onchange="resetModalOffSlots(); updateModalSlotsPreview();" class="w-full border border-gray-100 bg-gray-50 rounded-xl px-4 py-3 text-sm outline-none focus:border-secondary transition-all">
                     </div>
-                    <div><label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-2">Duration</label>
-                        <select id="custom-duration" class="w-full border border-gray-100 bg-gray-50 rounded-xl px-4 py-3 text-sm outline-none focus:border-secondary transition-all">
-                            @foreach([15, 30, 45, 60, 90, 120] as $min)<option value="{{ $min }}" {{ $min == 60 ? 'selected' : '' }}>{{ $min }}m sessions</option>@endforeach
-                        </select></div>
-                    <button type="submit" class="w-full py-4 bg-secondary text-white rounded-xl font-bold hover:opacity-90 transition-all shadow-lg shadow-secondary/10">Add Override</button>
-                    <button type="button" onclick="markDayOff()" class="w-full py-3 border border-red-100 text-red-500 rounded-xl text-sm font-bold hover:bg-red-50 transition-all">Mark Day OFF</button>
-                </form>
-            </div>
+                    <div>
+                        <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-2">End Time</label>
+                        <input type="time" id="modal-end-time" required onchange="resetModalOffSlots(); updateModalSlotsPreview();" class="w-full border border-gray-100 bg-gray-50 rounded-xl px-4 py-3 text-sm outline-none focus:border-secondary transition-all">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-2">Duration</label>
+                        <select id="modal-slot-duration" onchange="resetModalOffSlots(); updateModalSlotsPreview();" class="w-full border border-gray-100 bg-gray-50 rounded-xl px-4 py-3 text-sm outline-none focus:border-secondary transition-all">
+                            @foreach([15, 30, 45, 60, 90, 120] as $min)
+                                <option value="{{ $min }}">{{ $min }} mins</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Modal Slot Preview -->
+                <div id="modal-slots-preview-container" class="bg-[#F6F7F7] rounded-2xl p-6 border border-dashed border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block">Daily Slots Preview</label>
+                        <span class="text-[10px] text-gray-400 font-medium">Click to block (Red = Off)</span>
+                    </div>
+                    <div id="modal-slots-preview" class="flex flex-wrap gap-2">
+                        <!-- Preview slots injected here -->
+                    </div>
+                    <p id="modal-preview-error" class="text-xs text-red-400 mt-2 hidden"></p>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="flex-1 py-4 bg-secondary text-white rounded-xl font-bold hover:opacity-90 transition-all shadow-lg shadow-secondary/10">Save for this Date</button>
+                    <button type="button" onclick="markDayOff()" class="px-6 py-4 border border-red-100 text-red-500 rounded-xl font-bold hover:bg-red-50 transition-all">Mark Day OFF</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -176,6 +248,10 @@
 
 @section('scripts')
 <script>
+    let currentDate = new Date();
+    const availabilities = @json($availabilities);
+    const bookingWindowDays = {{ $profile->booking_window_days ?? 14 }};
+
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -192,21 +268,169 @@
         if (typeof renderCalendar === 'function') renderCalendar();
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const input = document.getElementById('window-value-input');
-        if (input) {
-            input.addEventListener('input', updateWindowValue);
-            const currentDays = {{ $profile->booking_window_days ?? 14 }};
-            if (currentDays % 30 === 0) { document.getElementById('window-value-input').value = currentDays / 30; document.getElementById('window-unit-select').value = 'months'; }
-            else if (currentDays % 7 === 0) { document.getElementById('window-value-input').value = currentDays / 7; document.getElementById('window-unit-select').value = 'weeks'; }
+    // Weekly Settings Logic
+    function resetOffSlots() { document.getElementById('weekly-off-slots-input').value = ''; }
+    function toggleSlot(slotTime, element) {
+        const input = document.getElementById('weekly-off-slots-input');
+        let offSlots = input.value ? input.value.split(',') : [];
+        if (offSlots.includes(slotTime)) {
+            offSlots = offSlots.filter(s => s !== slotTime);
+            element.classList.remove('!bg-red-50', '!text-red-500', '!border-red-200');
+        } else {
+            offSlots.push(slotTime);
+            element.classList.add('!bg-red-50', '!text-red-500', '!border-red-200');
         }
-        renderCalendar();
-    });
+        input.value = offSlots.join(',');
+    }
+    function updateWeeklySlotsPreview() {
+        const startTime = document.getElementById('weekly-start-time').value;
+        const endTime = document.getElementById('weekly-end-time').value;
+        const duration = parseInt(document.getElementById('weekly-slot-duration').value);
+        const container = document.getElementById('weekly-slots-preview');
+        const error = document.getElementById('preview-error');
+        const offSlots = document.getElementById('weekly-off-slots-input').value.split(',');
+        container.innerHTML = ''; error.classList.add('hidden');
+        if (!startTime || !endTime || !duration) return;
+        const start = new Date(`2000-01-01T${startTime}`); const end = new Date(`2000-01-01T${endTime}`);
+        if (end <= start) { error.innerText = 'End time must be after start time'; error.classList.remove('hidden'); return; }
+        let current = new Date(start); let count = 0;
+        while (new Date(current.getTime() + duration * 60000) <= end) {
+            const time24 = current.toTimeString().substring(0, 5);
+            const label = current.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+            const el = document.createElement('div');
+            el.className = 'bg-white border border-secondary/20 text-secondary text-[11px] font-bold px-3 py-2 rounded-xl shadow-sm cursor-pointer hover:scale-105 transition-all';
+            if (offSlots.includes(time24)) el.classList.add('!bg-red-50', '!text-red-500', '!border-red-200');
+            el.innerText = label; el.onclick = () => toggleSlot(time24, el);
+            container.appendChild(el);
+            current.setMinutes(current.getMinutes() + duration); count++;
+        }
+        if (count === 0) { error.innerText = 'No slots generated'; error.classList.remove('hidden'); }
+    }
 
-    let currentDate = new Date();
-    const availabilities = @json($availabilities);
-    const bookingWindowDays = {{ $profile->booking_window_days ?? 14 }};
-    
+    // Modal Settings Logic
+    function resetModalOffSlots() { document.getElementById('modal-off-slots-input').value = ''; }
+    function toggleModalSlot(time, element) {
+        const input = document.getElementById('modal-off-slots-input');
+        let off = input.value ? input.value.split(',') : [];
+        if (off.includes(time)) {
+            off = off.filter(s => s !== time);
+            element.classList.remove('!bg-red-50', '!text-red-500', '!border-red-200');
+        } else {
+            off.push(time);
+            element.classList.add('!bg-red-50', '!text-red-500', '!border-red-200');
+        }
+        input.value = off.join(',');
+    }
+    function updateModalSlotsPreview() {
+        const startT = document.getElementById('modal-start-time').value;
+        const endT = document.getElementById('modal-end-time').value;
+        const dur = parseInt(document.getElementById('modal-slot-duration').value);
+        const container = document.getElementById('modal-slots-preview');
+        const error = document.getElementById('modal-preview-error');
+        const off = document.getElementById('modal-off-slots-input').value.split(',');
+        container.innerHTML = ''; error.classList.add('hidden');
+        if (!startT || !endT || !dur) return;
+        const s = new Date(`2000-01-01T${startT}`); const e = new Date(`2000-01-01T${endT}`);
+        if (e <= s) { error.innerText = 'End after start'; error.classList.remove('hidden'); return; }
+        let curr = new Date(s); let cnt = 0;
+        while (new Date(curr.getTime() + dur * 60000) <= e) {
+            const t24 = curr.toTimeString().substring(0, 5);
+            const lbl = curr.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+            const el = document.createElement('div');
+            el.className = 'bg-white border border-secondary/20 text-secondary text-[11px] font-bold px-3 py-2 rounded-xl shadow-sm cursor-pointer hover:scale-105 transition-all';
+            if (off.includes(t24)) el.classList.add('!bg-red-50', '!text-red-500', '!border-red-200');
+            el.innerText = lbl; el.onclick = () => toggleModalSlot(t24, el);
+            container.appendChild(el);
+            curr.setMinutes(curr.getMinutes() + dur); cnt++;
+        }
+    }
+
+    async function openManageDayModal(date) {
+        document.getElementById('modal-date-input').value = date;
+        const modal = document.getElementById('manage-day-modal');
+        try {
+            const res = await fetch(`{{ url('/time-slots/date') }}/${date}`);
+            const data = await res.json();
+            document.getElementById('modal-date-display').innerText = data.formatted_date;
+            document.getElementById('modal-reset-btn').classList.toggle('hidden', !data.is_custom);
+            
+            const badge = document.getElementById('schedule-type-badge');
+            badge.innerHTML = data.is_custom ? '<span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold">CUSTOM OVERRIDE</span>' : '<span class="text-[10px] bg-secondary/10 text-secondary px-2 py-0.5 rounded-full font-bold">WEEKLY SCHEDULE</span>';
+
+            // Pre-fill fields from first slot or defaults
+            if (data.slots && data.slots.length > 0 && data.slots[0].start) {
+                // Find original range if possible (last slot end - first slot start)
+                document.getElementById('modal-start-time').value = data.slots[0].start_24 || '09:00';
+                document.getElementById('modal-end-time').value = data.slots[data.slots.length-1].end_24 || '17:00';
+                document.getElementById('modal-slot-duration').value = data.slots[0].duration || 60;
+                
+                // Set blocked slots if any
+                const blocked = data.slots.filter(s => !s.is_available).map(s => s.start_24);
+                document.getElementById('modal-off-slots-input').value = blocked.join(',');
+            } else {
+                document.getElementById('modal-start-time').value = '09:00';
+                document.getElementById('modal-end-time').value = '17:00';
+                document.getElementById('modal-slot-duration').value = 60;
+                document.getElementById('modal-off-slots-input').value = '';
+            }
+
+            updateModalSlotsPreview();
+            modal.classList.replace('opacity-0', 'opacity-100'); modal.classList.remove('pointer-events-none');
+            document.getElementById('manage-modal-content').classList.replace('scale-95', 'scale-100');
+        } catch (e) { console.error(e); }
+    }
+
+    function closeManageDayModal() {
+        const modal = document.getElementById('manage-day-modal');
+        modal.classList.replace('opacity-100', 'opacity-0'); modal.classList.add('pointer-events-none');
+        document.getElementById('manage-modal-content').classList.replace('scale-100', 'scale-95');
+    }
+
+    async function saveDailySettings(e) {
+        e.preventDefault();
+        const body = {
+            specific_date: document.getElementById('modal-date-input').value,
+            start_time: document.getElementById('modal-start-time').value,
+            end_time: document.getElementById('modal-end-time').value,
+            slot_duration: document.getElementById('modal-slot-duration').value,
+            off_slots: document.getElementById('modal-off-slots-input').value,
+            _token: '{{ csrf_token() }}'
+        };
+        try {
+            const res = await fetch("{{ route('time-slots.store') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            window.location.reload();
+        } catch (e) { console.error(e); }
+    }
+
+    async function markDayOff() {
+        const date = document.getElementById('modal-date-input').value;
+        try {
+            await fetch("{{ route('time-slots.toggle-off') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify({ date })
+            });
+            window.location.reload();
+        } catch (e) { console.error(e); }
+    }
+
+    async function resetDayToWeekly() {
+        if (!confirm('Reset to weekly?')) return;
+        const date = document.getElementById('modal-date-input').value;
+        try {
+            await fetch("{{ route('time-slots.reset-to-weekly') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify({ date })
+            });
+            window.location.reload();
+        } catch (e) { console.error(e); }
+    }
+
     function renderCalendar() {
         const grid = document.getElementById('calendar-grid');
         const monthDisplay = document.getElementById('current-month-display');
@@ -217,100 +441,56 @@
         let firstDay = new Date(year, month, 1).getDay();
         let startIndex = (firstDay === 0) ? 6 : firstDay - 1; 
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const currentWindow = parseInt(document.getElementById('final-window-days')?.value) || bookingWindowDays;
+        const currentWin = parseInt(document.getElementById('final-window-days')?.value) || bookingWindowDays;
         const today = new Date(); today.setHours(0,0,0,0);
-        const maxDate = new Date(today); maxDate.setDate(today.getDate() + currentWindow);
+        const maxDate = new Date(today); maxDate.setDate(today.getDate() + currentWin);
+        
         for (let i = 0; i < startIndex; i++) {
-            const emptyCell = document.createElement('div');
-            emptyCell.className = 'bg-[#F9FAFB] aspect-square'; grid.appendChild(emptyCell);
+            const el = document.createElement('div'); el.className = 'bg-[#F9FAFB] aspect-square'; grid.appendChild(el);
         }
         for (let day = 1; day <= daysInMonth; day++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const dateObj = new Date(year, month, day); const dayOfWeek = dateObj.getDay();
-            const isPast = dateObj < today; const isOutsideWindow = dateObj > maxDate;
+            const isPast = dateObj < today; const isOut = dateObj > maxDate;
             const cell = document.createElement('div'); cell.className = 'calendar-day-cell';
-            if (isPast) cell.classList.add('is-past'); else if (isOutsideWindow) cell.classList.add('is-outside');
-            const customSlots = availabilities.filter(a => {
+            if (isPast) cell.classList.add('is-past'); else if (isOut) cell.classList.add('is-outside');
+            
+            const custom = availabilities.filter(a => {
                 if (!a.specific_date) return false;
-                const exDate = new Date(a.specific_date);
-                return exDate.getFullYear() === year && exDate.getMonth() === month && exDate.getDate() === day;
+                const d = new Date(a.specific_date);
+                return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
             });
-            const hasCustom = customSlots.length > 0;
-            const hasWeekly = !hasCustom && availabilities.some(a => a.day_of_week === dayOfWeek && !a.specific_date);
-            const isFullDayOff = (hasCustom && customSlots.some(e => !e.start_time && !e.is_available)) || 
-                                (!hasCustom && availabilities.some(a => a.day_of_week === dayOfWeek && !a.specific_date && !a.is_available && !a.start_time));
-            const isWeeklyOff = !hasCustom && availabilities.some(a => a.day_of_week === dayOfWeek && !a.specific_date && !a.is_available && !a.start_time);
+            const hasC = custom.length > 0;
+            const hasW = !hasC && availabilities.some(a => a.day_of_week === dayOfWeek && !a.specific_date);
+            const isOff = (hasC && custom.some(e => !e.start_time && !e.is_available)) || 
+                        (!hasC && availabilities.some(a => a.day_of_week === dayOfWeek && !a.specific_date && !a.is_available && !a.start_time));
 
             if (today.toDateString() === dateObj.toDateString()) cell.classList.add('is-today');
-            let indicatorsHtml = '';
-            if (!isPast && !isOutsideWindow) {
-                if (isFullDayOff) {
-                    if (isWeeklyOff) indicatorsHtml += '<div class="slot-indicator slot-off">WEEKLY OFF</div>';
-                    else indicatorsHtml += '<div class="slot-indicator slot-off">DATE OFF</div>';
-                }
-                else if (hasCustom) indicatorsHtml += '<div class="slot-indicator bg-orange-100 text-orange-600 border border-orange-200">CUSTOM SET</div>';
-                else if (hasWeekly) indicatorsHtml += '<div class="slot-indicator slot-available">WEEKLY</div>';
-            } else if (isOutsideWindow) { indicatorsHtml += '<div class="text-[9px] text-gray-300 mt-2 flex items-center justify-center"><i class="ri-lock-line"></i></div>'; }
-            cell.innerHTML = `<span class="calendar-day-number">${day}</span><div class="flex-1 flex flex-col justify-center items-center">${indicatorsHtml}</div>`;
-            if (!isPast && !isOutsideWindow) cell.onclick = () => openManageDayModal(dateStr);
+            let html = '';
+            if (!isPast && !isOut) {
+                if (isOff) html += '<div class="slot-indicator slot-off">OFF</div>';
+                else if (hasC) html += '<div class="slot-indicator bg-orange-100 text-orange-600 border border-orange-200">CUSTOM</div>';
+                else if (hasW) html += '<div class="slot-indicator slot-available">WEEKLY</div>';
+            } else if (isOut) html += '<div class="text-[9px] text-gray-300 mt-2"><i class="ri-lock-line"></i></div>';
+            
+            cell.innerHTML = `<span class="calendar-day-number">${day}</span><div class="flex-1 flex flex-col justify-center items-center">${html}</div>`;
+            if (!isPast && !isOut) cell.onclick = () => openManageDayModal(dateStr);
             grid.appendChild(cell);
         }
     }
-    
+
     function changeMonth(delta) { currentDate.setMonth(currentDate.getMonth() + delta); renderCalendar(); }
-    
-    async function openManageDayModal(date) {
-        document.getElementById('custom-slot-date').value = date;
-        const modal = document.getElementById('manage-day-modal');
-        try {
-            const response = await fetch(`{{ url('/time-slots/date') }}/${date}`);
-            const data = await response.json();
-            document.getElementById('modal-date-display').innerText = data.formatted_date;
-            const badge = document.getElementById('schedule-type-badge');
-            badge.innerHTML = data.is_custom ? '<span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold">CUSTOM OVERRIDE</span>' : '<span class="text-[10px] bg-secondary/10 text-secondary px-2 py-0.5 rounded-full font-bold">WEEKLY SCHEDULE</span>';
-            document.getElementById('reset-button').classList.toggle('hidden', !data.is_custom);
-            const list = document.getElementById('modal-slots-list'); list.innerHTML = '';
-            if (data.slots.length === 0) list.innerHTML = '<p class="text-xs text-gray-400 italic py-4">No working hours defined.</p>';
-            else if (data.slots.some(s => !s.is_available && !s.start)) { list.innerHTML = '<div class="p-4 bg-red-50 text-red-600 rounded-2xl font-bold text-center border border-red-100 tracking-widest text-xs uppercase">Day is OFF</div>'; }
-            else {
-                data.slots.forEach(slot => {
-                    const div = document.createElement('div'); div.className = `flex items-center justify-between p-4 ${data.is_custom ? 'bg-orange-50/30' : 'bg-secondary/5'} rounded-2xl border border-gray-100`;
-                    div.innerHTML = `<div><div class="text-sm font-bold text-secondary">${slot.start} - ${slot.end}</div><div class="text-[10px] text-gray-400">${slot.duration}m slots</div></div>
-                        ${data.is_custom ? `<button onclick="deleteSlot(${slot.id})" class="text-red-400 hover:text-red-600"><i class="ri-delete-bin-line"></i></button>` : '<i class="ri-lock-line text-gray-300"></i>'}`;
-                    list.appendChild(div);
-                });
-            }
-            modal.classList.replace('opacity-0', 'opacity-100'); modal.classList.remove('pointer-events-none');
-            document.getElementById('manage-modal-content').classList.replace('scale-95', 'scale-100');
-        } catch (e) { console.error(e); }
-    }
 
-    function closeManageDayModal() {
-        const modal = document.getElementById('manage-day-modal'); modal.classList.replace('opacity-100', 'opacity-0'); modal.classList.add('pointer-events-none');
-        document.getElementById('manage-modal-content').classList.replace('scale-100', 'scale-95');
-    }
-
-    async function saveCustomSlot(e) {
-        e.preventDefault();
-        const date = document.getElementById('custom-slot-date').value;
-        const body = { specific_date: date, start_time: document.getElementById('custom-start').value, end_time: document.getElementById('custom-end').value, slot_duration: document.getElementById('custom-duration').value, _token: '{{ csrf_token() }}' };
-        try { await fetch("{{ route('time-slots.store') }}", { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) }); window.location.reload(); } catch (e) { console.error(e); }
-    }
-
-    async function markDayOff() {
-        const date = document.getElementById('custom-slot-date').value;
-        try { await fetch("{{ route('time-slots.toggle-off') }}", { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }, body: JSON.stringify({ date }) }); window.location.reload(); } catch (e) { console.error(e); }
-    }
-
-    async function resetDayToWeekly() {
-        if (!confirm('Reset to weekly pattern?')) return;
-        const date = document.getElementById('custom-slot-date').value;
-        try { await fetch("{{ route('time-slots.reset-to-weekly') }}", { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }, body: JSON.stringify({ date }) }); window.location.reload(); } catch (e) { console.error(e); }
-    }
-
-    async function deleteSlot(id) {
-        if (!confirm('Remove slot?')) return;
-        try { await fetch(`{{ url('/time-slots') }}/${id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } }); window.location.reload(); } catch (e) { console.error(e); }
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const winIn = document.getElementById('window-value-input');
+        if (winIn) {
+            winIn.addEventListener('input', updateWindowValue);
+            const cur = {{ $profile->booking_window_days ?? 14 }};
+            if (cur % 30 === 0) { winIn.value = cur/30; document.getElementById('window-unit-select').value = 'months'; }
+            else if (cur % 7 === 0) { winIn.value = cur/7; document.getElementById('window-unit-select').value = 'weeks'; }
+        }
+        if (document.getElementById('weekly-start-time')) updateWeeklySlotsPreview();
+        renderCalendar();
+    });
 </script>
 @endsection

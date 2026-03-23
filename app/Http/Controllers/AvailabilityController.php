@@ -53,13 +53,13 @@ class AvailabilityController extends Controller
             'start_time' => 'required',
             'end_time' => 'required|after:start_time',
             'slot_duration' => 'required|integer|min:1|max:480',
+            'off_slots' => 'nullable|string',
         ]);
 
-        // Clear any "Full Day Off" record for this specific day/weekly pattern first
-        $query = PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('is_available', false)
-            ->whereNull('start_time');
-        
+        $offSlots = $request->off_slots ? explode(',', $request->off_slots) : [];
+
+        // 1. Clear existing slots for this pattern/date
+        $query = PractitionerAvailability::where('practitioner_id', $profile->id);
         if ($request->specific_date) {
             $query->where('specific_date', $request->specific_date);
         } else {
@@ -67,15 +67,38 @@ class AvailabilityController extends Controller
         }
         $query->delete();
 
-        PractitionerAvailability::create([
-            'practitioner_id' => $profile->id,
-            'day_of_week' => $request->day_of_week,
-            'specific_date' => $request->specific_date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'slot_duration' => $request->slot_duration,
-            'is_available' => true
-        ]);
+        // 2. Generate and create slots
+        $start = \Carbon\Carbon::parse($request->start_time);
+        $end = \Carbon\Carbon::parse($request->end_time);
+        $duration = $request->slot_duration;
+
+        $current = $start->copy();
+        while ($current->copy()->addMinutes($duration)->lte($end)) {
+            $currentTimeStr = $current->format('H:i:s');
+            
+            // Check if this slot start time is in our "off" list
+            $isOff = false;
+            foreach($offSlots as $os) {
+                if (\Carbon\Carbon::parse($os)->format('H:i:s') === $currentTimeStr) {
+                    $isOff = true;
+                    break;
+                }
+            }
+
+            if (!$isOff) {
+                PractitionerAvailability::create([
+                    'practitioner_id' => $profile->id,
+                    'day_of_week' => $request->day_of_week,
+                    'specific_date' => $request->specific_date,
+                    'start_time' => $current->format('H:i:s'),
+                    'end_time' => $current->copy()->addMinutes($duration)->format('H:i:s'),
+                    'slot_duration' => $duration,
+                    'is_available' => true
+                ]);
+            }
+            
+            $current->addMinutes($duration);
+        }
 
         if ($request->ajax()) {
             return response()->json(['status' => 'success', 'message' => 'Availability updated.']);
@@ -95,12 +118,14 @@ class AvailabilityController extends Controller
 
         $customSlots = PractitionerAvailability::where('practitioner_id', $profile->id)
             ->where('specific_date', $date)
+            ->orderBy('start_time')
             ->get();
 
         $isCustom = $customSlots->isNotEmpty();
         $slots = $isCustom ? $customSlots : PractitionerAvailability::where('practitioner_id', $profile->id)
             ->where('day_of_week', $dayOfWeek)
             ->whereNull('specific_date')
+            ->orderBy('start_time')
             ->get();
 
         return response()->json([
@@ -111,7 +136,9 @@ class AvailabilityController extends Controller
                 return [
                     'id' => $s->id,
                     'start' => $s->start_time ? \Carbon\Carbon::parse($s->start_time)->format('h:i A') : null,
+                    'start_24' => $s->start_time ? \Carbon\Carbon::parse($s->start_time)->format('H:i') : null,
                     'end' => $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('h:i A') : null,
+                    'end_24' => $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('H:i') : null,
                     'duration' => $s->slot_duration,
                     'is_available' => $s->is_available
                 ];
@@ -188,8 +215,6 @@ class AvailabilityController extends Controller
         // 2. Add new weekly off records
         foreach ($offDays as $day) {
             // Delete any existing active weekly slots for this day if we're making it an off day
-            // Optional: User might want to keep slots but just hide them. 
-            // Better to delete them to avoid confusion if we're marking the day as "Usually Off"
             PractitionerAvailability::where('practitioner_id', $profile->id)
                 ->whereNull('specific_date')
                 ->where('day_of_week', $day)
@@ -203,6 +228,77 @@ class AvailabilityController extends Controller
         }
 
         return back()->with('success', 'Weekly off days updated.');
+    }
+
+    public function updateWeeklySlots(Request $request)
+    {
+        $user = Auth::user();
+        $profile = $this->getTestPractitioner($user);
+        if (!$profile) return back()->with('error', 'No profile linked.');
+
+        $request->validate([
+            'start_time' => 'required',
+            'end_time' => 'required|after:start_time',
+            'slot_duration' => 'required|integer|min:1|max:480',
+            'off_slots' => 'nullable|string', // Comma separated start times like "09:00,10:00"
+        ]);
+
+        $offSlots = $request->off_slots ? explode(',', $request->off_slots) : [];
+
+        // Get days that are NOT off days
+        $offDayIndexes = PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->whereNull('specific_date')
+            ->whereNull('start_time')
+            ->where('is_available', false)
+            ->pluck('day_of_week')
+            ->toArray();
+
+        $allDayIndexes = [0, 1, 2, 3, 4, 5, 6];
+        $workingDayIndexes = array_diff($allDayIndexes, $offDayIndexes);
+
+        foreach ($workingDayIndexes as $dayIndex) {
+            // Remove existing weekly active slots for this day
+            PractitionerAvailability::where('practitioner_id', $profile->id)
+                ->whereNull('specific_date')
+                ->where('day_of_week', $dayIndex)
+                ->where('is_available', true)
+                ->delete();
+
+            // Generate and create slots, skipping the "off" ones
+            $start = \Carbon\Carbon::parse($request->start_time);
+            $end = \Carbon\Carbon::parse($request->end_time);
+            $duration = $request->slot_duration;
+
+            $current = $start->copy();
+            while ($current->copy()->addMinutes($duration)->lte($end)) {
+                $currentTimeStr = $current->format('H:i:s');
+                
+                // Check if this slot start time is in our "off" list
+                // We compare against H:i because the request time might be H:i
+                $isOff = false;
+                foreach($offSlots as $os) {
+                    if (\Carbon\Carbon::parse($os)->format('H:i:s') === $currentTimeStr) {
+                        $isOff = true;
+                        break;
+                    }
+                }
+
+                if (!$isOff) {
+                    PractitionerAvailability::create([
+                        'practitioner_id' => $profile->id,
+                        'day_of_week' => $dayIndex,
+                        'start_time' => $current->format('H:i:s'),
+                        'end_time' => $current->copy()->addMinutes($duration)->format('H:i:s'),
+                        'slot_duration' => $duration,
+                        'is_available' => true
+                    ]);
+                }
+                
+                $current->addMinutes($duration);
+            }
+        }
+
+        return back()->with('success', 'Weekly working hours updated for all active days.');
     }
 
     public function toggleOffDay(Request $request)
