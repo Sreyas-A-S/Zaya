@@ -505,6 +505,14 @@ class AdminPanelSettingFrenchSeeder extends Seeder
                 'language' => 'fr',
             ],
             [
+                'key' => 'admin_panel_sidebar_gallery_settings',
+                'value' => 'Paramètres de la page galerie',
+                'type' => 'text',
+                'section' => 'admin_panel',
+                'max_length' => 70,
+                'language' => 'fr',
+            ],
+            [
                 'key' => 'admin_panel_sidebar_about_settings',
                 'value' => 'Paramètres À propos de nous',
                 'type' => 'text',

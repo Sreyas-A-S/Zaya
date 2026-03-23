@@ -52,7 +52,7 @@
                         <li><a id="footer-our-team" href="{{ route('about-us') }}#our-team"
                                 class="hover:text-[#79584B] transition-colors" data-i18n="Our Team">{{ __('Our Team') }}</a></li>
                         <li><a id="footer-gallery" href="{{ route('gallery') }}"
-                                class="hover:text-[#79584B] transition-colors" data-i18n="Gallery">{{ __('Gallery') }}</a></li>
+                                class="hover:text-[#79584B] transition-colors" data-i18n="Gallery">{{ $site_settings['footer_link_gallery'] ?? __('Gallery') }}</a></li>
                         <li><a id="footer-blog" href="{{ route('blogs') }}"
                                 class="hover:text-[#79584B] transition-colors" data-i18n="Blog">{{ __('Blog') }}</a></li>
                         <li><a id="footer-contact-us" href="{{ route('contact-us') }}"

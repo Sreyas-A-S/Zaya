@@ -18,7 +18,8 @@ use App\Models\BodyTherapy;
 use App\Models\PractitionerModality;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Redirect;
 use App\Traits\ImageUploadTrait;
 
 class RegisterController extends Controller
@@ -95,12 +96,15 @@ class RegisterController extends Controller
                 return $response;
             }
 
-            return $request->wantsJson()
-                ? new \Illuminate\Http\JsonResponse([], 201)
-                : redirect($this->redirectPath());
+            if ($request->wantsJson()) {
+                return response()->json(['success' => 'Registration successful! Your application is under review.'], 201);
+            }
+            return redirect($this->redirectPath());
         } catch (\Exception $e) {
             DB::rollBack();
-            // Log error if needed
+            if ($request->wantsJson()) {
+                return response()->json(['errors' => ['error' => [$e->getMessage()]]], 422);
+            }
             return back()->withInput()->withErrors(['error' => 'Registration failed: ' . $e->getMessage()]);
         }
     }
@@ -120,8 +124,13 @@ class RegisterController extends Controller
             'city' => $request->city,
             'state' => $request->state,
             'country' => $request->country,
+            'zip_code' => $request->zip_code,
             'phone' => $request->mobile,
-            // 'occupation' => $request->occupation, // Form doesn't have occupation
+            'consultation_preferences' => $request->consultation_preferences,
+            'languages_spoken' => $request->languages,
+            'referral_type' => $request->referral_type,
+            'nationality' => $request->nationality,
+            'status' => 'active',
         ]);
     }
 
@@ -145,7 +154,18 @@ class RegisterController extends Controller
         ];
 
         foreach ($docFields as $field) {
-            if ($request->hasFile($field)) {
+            if ($field === 'doc_certificates' && $request->hasFile($field)) {
+                $files = $request->file($field);
+                $paths = [];
+                if (is_array($files)) {
+                    foreach ($files as $file) {
+                        $paths[] = $file->store('practitioner_docs', 'public');
+                    }
+                } else {
+                    $paths[] = $files->store('practitioner_docs', 'public');
+                }
+                $filePaths[$field] = json_encode($paths);
+            } elseif ($request->hasFile($field)) {
                 $filePaths[$field] = $request->file($field)->store('practitioner_docs', 'public');
             }
         }
@@ -157,18 +177,24 @@ class RegisterController extends Controller
             'dob',
             'nationality',
             'residential_address',
+            'address_line_1',
+            'address_line_2',
+            'city',
+            'state',
+            'country',
             'zip_code',
             'phone',
             'website_url',
-            'consultations',
-            'body_therapies',
-            'other_modalities',
             'can_translate_english',
-            'profile_bio',
             'cover_letter_text'
         ]), $filePaths);
 
-        $profileData['first_name'] = $request->name;
+        $profileData['consultations'] = $request->ayurvedic_practices ?? $request->consultations;
+        $profileData['body_therapies'] = $request->massage_practices ?? $request->body_therapies;
+        $profileData['other_modalities'] = $request->other_modalities;
+        $profileData['profile_bio'] = $request->professional_bio ?? $request->profile_bio;
+
+        $profileData['first_name'] = $request->first_name;
         $profileData['last_name'] = $request->last_name;
         $profileData['additional_courses'] = $request->has('additional_courses') ? implode(', ', array_filter($request->additional_courses)) : null;
         $profileData['languages_spoken'] = $request->has('languages') ? array_values(array_filter($request->languages)) : null;
@@ -193,7 +219,7 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
+        $rules = [
             'name' => ['nullable', 'string', 'max:255'],
             'first_name' => ['nullable', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
@@ -203,17 +229,35 @@ class RegisterController extends Controller
             'role' => ['required', 'string', 'in:practitioner,patient,client'],
             'profile_photo' => ['nullable', 'image', 'max:2048'],
             'gender' => ['nullable', 'string', 'in:male,female,transgender,other'],
-            'dob' => ['nullable', 'date'],
+            'dob' => ['required', 'date', 'before:today'],
             'phone' => ['nullable', 'string', 'max:20'],
             'mobile' => ['nullable', 'string', 'max:20'],
             'nationality' => ['nullable', 'string', 'max:255'],
+            'residential_address' => ['nullable', 'string', 'max:500'],
+            'city' => ['nullable', 'string', 'max:255'],
             'zip_code' => ['nullable', 'string', 'max:20'],
             'website_url' => ['nullable', 'url', 'max:255'],
             'address_line_1' => ['nullable', 'string', 'max:500'],
             'address_line_2' => ['nullable', 'string', 'max:500'],
             'state' => ['nullable', 'string', 'max:255'],
             'country' => ['nullable', 'string', 'max:255'],
-        ]);
+        ];
+
+        if (isset($data['role']) && $data['role'] === 'practitioner') {
+            $rules['dob'][] = 'before:' . now()->subYears(18)->format('Y-m-d');
+        }
+
+        if (isset($data['role']) && ($data['role'] === 'patient' || $data['role'] === 'client')) {
+            $rules['captcha'] = ['required', 'string', function ($attribute, $value, $fail) {
+                if (strtoupper($value) !== Session::get('captcha_code')) {
+                    $fail('The captcha code is incorrect.');
+                }
+            }];
+            $rules['consultation_preferences'] = ['nullable', 'array'];
+            $rules['languages'] = ['nullable', 'array'];
+        }
+
+        return Validator::make($data, $rules);
     }
 
     /**
@@ -253,12 +297,17 @@ class RegisterController extends Controller
      */
     protected function registered(Request $request, $user)
     {
+        if ($request->role === 'practitioner') {
+            $this->guard()->logout();
+            return null;
+        }
+
         if ($request->has('redirect')) {
             return redirect($request->redirect);
         }
 
         if ($request->role === 'client' || $request->role === 'patient') {
-            return redirect($this->redirectPath())->with('success', 'Registration successful! Welcome to Zaya Wellness.');
+            return redirect('/zaya-login')->with('success', 'Registration successful! Please login to your account.');
         }
     }
 }

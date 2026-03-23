@@ -312,12 +312,19 @@ class WebController extends Controller
     public function clientRegister(Request $request)
     {
         $redirect = $request->query('redirect');
-        return view('client-register', compact('redirect'));
+        $consultationPreferences = \App\Models\ClientConsultationPreference::all();
+        $languages = \App\Models\Language::where('status', 'active')->get();
+
+        return view('client-register', compact('redirect', 'consultationPreferences', 'languages'));
     }
 
     public function practitionerRegister()
     {
-        return view('practitioner-register');
+        $wellnessConsultations = \App\Models\WellnessConsultation::where('status', true)->get();
+        $bodyTherapies = \App\Models\BodyTherapy::where('status', true)->get();
+        $otherModalities = \App\Models\PractitionerModality::where('status', true)->get();
+
+        return view('practitioner-register', compact('wellnessConsultations', 'bodyTherapies', 'otherModalities'));
     }
 
     public function serviceDetail($slug)
@@ -407,7 +414,7 @@ class WebController extends Controller
             $services = Service::where('status', true)->get();
         }
 
-        $languages = Language::all();
+        $languages = \App\Models\Language::all();
         $consultationPreferences = \App\Models\ClientConsultationPreference::all();
 
         return view('book-session', compact('practitioners', 'selectedPractitioner', 'services', 'languages', 'consultationPreferences'));
@@ -415,19 +422,21 @@ class WebController extends Controller
 
     public function contactUs()
     {
-        $language = App::getLocale();
-        $settings = HomepageSetting::where('key', 'like', 'contact_%')
+        $language = \Illuminate\Support\Facades\App::getLocale();
+        $settings = \App\Models\HomepageSetting::where('key', 'like', 'contact_%')
             ->where('language', $language)
             ->pluck('value', 'key');
 
         // Fallback to English if no settings found for current language
         if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('key', 'like', 'contact_%')
+            $settings = \App\Models\HomepageSetting::where('key', 'like', 'contact_%')
                 ->where('language', 'en')
                 ->pluck('value', 'key');
         }
 
-        return view('contact-us', compact('settings'));
+        $faqs = \App\Models\Faq::where('language', $language)->where('status', true)->get();
+
+        return view('contact-us', compact('settings', 'faqs'));
     }
 
     public function storeContact(Request $request)

@@ -823,6 +823,7 @@
 
 <script>
     const storageBase = "{{ asset('storage') }}/";
+    const countryMap = @json($countryMap);
     let table;
     let toastInstance;
     let languageChoices;
@@ -1585,36 +1586,45 @@
         $.get("{{ url('admin/practitioners') }}/" + id, function(data) {
             const u = data.user;
             const p = data.practitioner || {};
+            const getCountryName = (code) => {
+                if (!code) return null;
+                return countryMap[code.toUpperCase()] || code;
+            };
+
             const badges = (arr) => {
                 if (!arr) return '<span class="text-muted">None</span>';
                 let data = arr;
-                if (typeof data === 'string') {
+                
+                // If it's a string that looks like an array, try to parse it
+                if (typeof data === 'string' && (data.startsWith('[') || data.startsWith('{'))) {
                     try {
                         data = JSON.parse(data);
                     } catch (e) {
-                        data = [data];
+                        // If parsing fails, use it as is
                     }
                 }
 
                 let list = [];
                 if (Array.isArray(data)) {
                     if (data.length > 0 && typeof data[0] === 'object') {
-                        list = data.map(item => item.language || item.name || item.label).filter(Boolean);
+                        list = data.map(item => item.language || item.name || item.label || item.value).filter(Boolean);
                     } else {
                         list = data;
                     }
-                } else if (typeof data === 'object') {
+                } else if (typeof data === 'object' && data !== null) {
                     list = Object.keys(data).map((key) => {
                         const value = data[key];
                         if (value && typeof value === 'object' && value.language) return value.language;
+                        if (typeof value === 'boolean' && value === true) return key;
                         return key;
                     }).filter(Boolean);
-                } else {
-                    list = [String(data)];
+                } else if (typeof data === 'string') {
+                    // Split comma separated strings if any
+                    list = data.split(',').map(s => s.trim()).filter(Boolean);
                 }
 
                 if (!list.length) return '<span class="text-muted">None</span>';
-                return list.map(i => `<span class="badge bg-light text-dark border me-1 mb-1" style="white-space: normal; text-align: center; line-height: 1.2; word-break: break-word; overflow-wrap: anywhere; max-width: 100%;">${i}</span>`).join('');
+                return list.map(i => `<span class="badge bg-light text-dark border me-1 mb-1" style="white-space: normal; text-align: center; line-height: 1.2; word-break: break-word; overflow-wrap: anywhere; max-width: 100%;">${i.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>`).join('');
             };
 
             const renderDocLinks = (value, label, opts = {}) => {
@@ -1661,8 +1671,9 @@
                         <div class="small">
                             <p class="mb-1"><strong>Email:</strong> ${u.email}</p>
                             <p class="mb-1"><strong>Phone:</strong> ${p.phone || 'N/A'}</p>
-                            <p class="mb-1"><strong>Nationality:</strong> ${p.nationality || 'N/A'}</p>
-                            <p class="mb-1"><strong>Gender:</strong> ${p.gender || 'N/A'}</p>
+                            <p class="mb-1"><strong>Nationality:</strong> ${getCountryName(p.nationality) || getCountryName(p.country) || 'N/A'}</p>
+                            <p class="mb-1"><strong>Location:</strong> ${[p.city, p.state, getCountryName(p.country)].filter(Boolean).join(', ') || 'N/A'}</p>
+                            <p class="mb-1"><strong>Gender:</strong> ${p.gender ? p.gender.charAt(0).toUpperCase() + p.gender.slice(1) : 'N/A'}</p>
                             <p class="mb-1"><strong>DOB:</strong> ${p.dob ? new Date(p.dob).toLocaleDateString() : 'N/A'}</p>
                             <div class="d-flex justify-content-center gap-2 mt-3">
                                 ${p.social_links && p.social_links.website ? `<a href="${p.social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs" title="Website"><i class="fa-solid fa-globe"></i></a>` : ''}

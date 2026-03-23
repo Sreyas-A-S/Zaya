@@ -176,7 +176,7 @@
 
                         <div class="custom-menu overflow-hidden">
                             <div class="dropdown-header py-2 px-3 border-bottom bg-light">
-                                <span class="f-w-700 text-dark small">SELECT LANGUAGE</span>
+                                <span class="f-w-700 text-dark small">{{ __('SELECT LANGUAGE') }}</span>
                             </div>
                             <ul class="profile-body language-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
                                 @if(in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
@@ -188,7 +188,7 @@
                                         onclick="changeLanguage(this)"
                                         style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
                                         <i class="fa fa-globe ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
-                                        <span class="f-w-600 small">ALL LANGUAGES</span>
+                                        <span class="f-w-600 small">{{ __('ALL LANGUAGES') }}</span>
                                         @if($currentLocale == 'all')
                                         <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
                                         @endif
@@ -196,7 +196,7 @@
                                 </li>
                                 @endif
                                 @if($languages->isEmpty() && !in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
-                                <li class="p-3 text-center text-muted small">No assigned languages</li>
+                                <li class="p-3 text-center text-muted small">{{ __('No assigned languages') }}</li>
                                 @endif
                                 @foreach($languages as $lang)
                                 <li class="d-flex align-items-center last-0" style="cursor: pointer;">
@@ -229,7 +229,7 @@
 
                     <div class="custom-menu overflow-hidden">
                         <div class="dropdown-header py-2 px-3 border-bottom bg-light">
-                            <span class="f-w-700 text-dark small">SELECT REGION</span>
+                            <span class="f-w-700 text-dark small">{{ __('SELECT REGION') }}</span>
                         </div>
                         <ul class="profile-body country-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
                             @if(in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
@@ -241,7 +241,7 @@
                                     onclick="changeCountry(this)"
                                     style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
                                     <i class="fa fa-earth-americas ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
-                                    <span class="f-w-600 small">ALL REGIONS</span>
+                                    <span class="f-w-600 small">{{ __('ALL REGIONS') }}</span>
                                     @if($currentCountryCode == 'all')
                                     <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
                                     @endif
@@ -249,7 +249,7 @@
                             </li>
                             @endif
                             @if($userCountries->isEmpty() && !in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
-                            <li class="p-3 text-center text-muted small">No assigned regions</li>
+                            <li class="p-3 text-center text-muted small">{{ __('No assigned regions') }}</li>
                             @endif
                             @foreach($userCountries as $country)
                             <li class="d-flex align-items-center last-0" style="cursor: pointer;">
@@ -283,13 +283,13 @@
                             <li class="d-flex">
                                 <svg class="svg-color">
                                     <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Profile') }}"></use>
-                                </svg><a class="ms-2" href="{{ route('admin.profile') }}">My Profile</a>
+                                </svg><a class="ms-2" href="{{ route('admin.profile') }}">{{ __('My Profile') }}</a>
                             </li>
                             <li class="d-flex">
                                 <svg class="svg-color">
                                     <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Login') }}"></use>
                                 </svg>
-                                <a class="ms-2" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Log Out</a>
+                                <a class="ms-2" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Log Out') }}</a>
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                     @csrf
                                 </form>

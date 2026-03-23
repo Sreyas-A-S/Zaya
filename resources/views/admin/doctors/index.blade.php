@@ -153,7 +153,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <label class="form-label mt-2">Profile Photo <span class="text-danger">*</span> <span class="small text-muted">(Max 2MB)</span></label>
+                                            <label class="form-label mt-2">Profile Photo <span class="text-danger">*</span> <span class="small text-muted" required>(Max 2MB)</span></label>
                                             <div id="current-profile-photo" class="d-none"></div>
                                         </div>
                                         <div class="col-md-4">
@@ -180,8 +180,11 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                                            <input type="date" class="form-control" name="dob" max="{{ date('Y-m-d', strtotime('-1 day')) }}" required>
-                                        </div>
+<input type="date" 
+    class="form-control" 
+    name="dob" 
+    max="{{ date('Y-m-d', strtotime('-1 day')) }}" 
+    required>                                       </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
                                             <input type="tel" class="form-control phone-input validate-char-limit" name="mobile_number" id="mobile_number" data-max="20" maxlength="20" placeholder="Enter mobile number" required>

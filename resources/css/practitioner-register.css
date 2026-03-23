@@ -51,50 +51,55 @@ h6 {
    TOM SELECT - Third-party library overrides
    ======================================== */
 #nationality-select+.ts-wrapper,
+#country-select+.ts-wrapper,
 .education-country-select+.ts-wrapper {
     width: 100%;
 }
 
-#nationality-select+.ts-wrapper .ts-control {
-    padding: 12px 24px;
+#nationality-select+.ts-wrapper .ts-control,
+#country-select+.ts-wrapper .ts-control {
+    padding: 14px 24px;
     background: #F5F5F5;
     border-radius: 9999px;
     border: 1px solid transparent;
     font-size: 0.95rem;
     color: #374151;
     transition: all 0.3s ease;
-    min-height: 48px;
+    height: 51px;
     display: flex;
     align-items: center;
 }
 
 .education-country-select+.ts-wrapper .ts-control {
-    padding: 12px 24px;
+    padding: 14px 24px;
     background: white;
     border-radius: 9999px;
     border: 1px solid transparent;
     font-size: 0.95rem;
     color: #374151;
     transition: all 0.3s ease;
-    min-height: 48px;
+    height: 51px;
     display: flex;
     align-items: center;
 }
 
 #nationality-select+.ts-wrapper .ts-control>*,
+#country-select+.ts-wrapper .ts-control>*,
 .education-country-select+.ts-wrapper .ts-control>* {
     vertical-align: top;
 }
 
 #nationality-select+.ts-wrapper .ts-control>.item,
+#country-select+.ts-wrapper .ts-control>.item,
 .education-country-select+.ts-wrapper .ts-control>.item {
     margin: 0;
     padding: 0;
-    line-height: inherit;
+    line-height: 1.5;
     height: auto;
 }
 
-#nationality-select+.ts-wrapper .ts-control:hover {
+#nationality-select+.ts-wrapper .ts-control:hover,
+#country-select+.ts-wrapper .ts-control:hover {
     background: #EFEFEF;
 }
 
@@ -103,6 +108,7 @@ h6 {
 }
 
 #nationality-select+.ts-wrapper.focus .ts-control,
+#country-select+.ts-wrapper.focus .ts-control,
 .education-country-select+.ts-wrapper.focus .ts-control {
     border-color: #97563D;
     background: white;
@@ -110,25 +116,30 @@ h6 {
 }
 
 #nationality-select+.ts-wrapper .ts-control input,
+#country-select+.ts-wrapper .ts-control input,
 .education-country-select+.ts-wrapper .ts-control input {
     color: #374151;
 }
 
 #nationality-select+.ts-wrapper .ts-control input::placeholder,
+#country-select+.ts-wrapper .ts-control input::placeholder,
 .education-country-select+.ts-wrapper .ts-control input::placeholder {
     color: #9CA3AF;
 }
 
 #nationality-select+.ts-wrapper .ts-dropdown,
+#country-select+.ts-wrapper .ts-dropdown,
 .education-country-select+.ts-wrapper .ts-dropdown {
     border: 1px solid #E5E7EB;
     border-radius: 16px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
     margin-top: 8px;
     overflow: hidden;
+    z-index: 1000;
 }
 
 #nationality-select+.ts-wrapper .ts-dropdown .ts-dropdown-content,
+#country-select+.ts-wrapper .ts-dropdown .ts-dropdown-content,
 .education-country-select+.ts-wrapper .ts-dropdown .ts-dropdown-content {
     max-height: 200px;
     padding: 8px 0;
@@ -145,6 +156,7 @@ h6 {
 
 .country-option:hover,
 #nationality-select+.ts-wrapper .ts-dropdown .option.active,
+#country-select+.ts-wrapper .ts-dropdown .option.active,
 .education-country-select+.ts-wrapper .ts-dropdown .option.active {
     background: #FFF7EF;
 }
@@ -186,6 +198,44 @@ h6 {
     margin-left: 8px;
 }
 
+/* ========================================
+   INTL-TEL-INPUT - Custom styling
+   ======================================== */
+.iti {
+    width: 100%;
+}
+
+.iti__country-list {
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+    border: 1px solid #E5E7EB;
+    margin-top: 8px;
+    z-index: 1000;
+}
+
+.iti--separate-dial-code .iti__selected-dial-code {
+    color: #374151;
+    font-size: 0.95rem;
+    margin-left: 8px;
+}
+
+.iti__flag-container {
+    padding: 2px;
+}
+
+.iti__selected-flag {
+    background-color: transparent !important;
+    border-radius: 9999px 0 0 9999px;
+    padding-left: 20px !important;
+}
+
+/* Fix rounded corners for phone input with intl-tel-input */
+#phone {
+    height: 54px !important;
+    padding-left: 95px !important; /* Adjust based on dial code width */
+    border-radius: 9999px !important;
+}
+
 /* Custom Select Dropdown Styles */
 .custom-select-wrapper {
     position: relative;
@@ -208,7 +258,7 @@ h6 {
     transition: all 0.3s ease;
     color: #A3A3A3;
     font-size: 0.95rem;
-    min-height: 48px;
+    min-height: 51px;
 }
 
 .custom-select-trigger.has-value {
