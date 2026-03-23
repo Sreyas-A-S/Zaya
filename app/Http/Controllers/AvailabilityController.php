@@ -181,10 +181,12 @@ class AvailabilityController extends Controller
 
         $request->validate([
             'booking_window_days' => 'required|integer|min:1|max:365',
+            'reminder_lead_time' => 'required|integer|min:5|max:1440',
         ]);
 
         $profile->update([
             'booking_window_days' => $request->booking_window_days,
+            'reminder_lead_time' => $request->reminder_lead_time,
         ]);
 
         return back()->with('success', 'Booking settings updated successfully.');

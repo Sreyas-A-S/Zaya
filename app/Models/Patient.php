@@ -14,7 +14,7 @@ class Patient extends Model
 
     protected $casts = [
         'dob' => 'date',
-        'consultation_preferences' => 'array',
+        'consultation_preferences' => 'encrypted:json',
         'languages_spoken' => 'array',
     ];
 

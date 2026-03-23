@@ -254,6 +254,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
 
     // Invoice Management
     Route::get('/invoices', [\App\Http\Controllers\InvoiceController::class, 'index'])->name('admin.invoices.index');
+    Route::get('/invoice/preview', [\App\Http\Controllers\InvoiceController::class, 'preview'])->name('admin.invoice.preview');
     
 
 

@@ -135,7 +135,29 @@
                     <a href="{{ route('home') }}" class="text-gray-500 hover:text-gray-800 text-sm font-medium">
                         <i class="ri-arrow-left-line mr-2"></i> <span id="client_panel_back_btn_mobile" data-i18n="{{ $site_settings['client_panel_back_btn'] ?? 'Back' }}">{{ __($site_settings['client_panel_back_btn'] ?? 'Back') }}</span>
                     </a>
-                    <div class="flex gap-5">
+                    <div class="flex gap-3 items-center">
+                        <!-- Language Toggle -->
+                        @if(isset($available_languages) && $available_languages->count() >= 2)
+                        @php
+                        $lang1 = $available_languages->first();
+                        $lang2 = $available_languages->skip(1)->first();
+                        $currentLocale = App::getLocale();
+                        @endphp
+                        <button type="button"
+                            class="relative flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
+                            onclick="toggleLanguage('{{ $currentLocale == $lang1->code ? $lang2->code : $lang1->code }}')">
+                            <!-- Sliding Pill -->
+                            <div id="lang-toggle-pill-mobile"
+                                class="absolute top-1 bottom-1 left-1 w-9 bg-primary rounded-full shadow-sm transition-transform duration-300 ease-in-out {{ $currentLocale == $lang2->code ? 'translate-x-full' : 'translate-x-0' }}">
+                            </div>
+
+                            <span id="lang-text-{{ $lang1->code }}-mobile"
+                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang1->code ? 'text-white' : 'text-gray-500' }} text-[10px] font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang1->code, 0, 2)) }}</span>
+                            <span id="lang-text-{{ $lang2->code }}-mobile"
+                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang2->code ? 'text-white' : 'text-gray-500' }} text-[10px] font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang2->code, 0, 2)) }}</span>
+                        </button>
+                        @endif
+
                         <!-- Coin -->
                         <div
                             class="w-10 h-10 rounded-full bg-[#FFD166] flex items-center justify-center text-white relative shadow-sm cursor-pointer hover:bg-yellow-400 transition-colors ">
@@ -193,26 +215,28 @@
                         </div>
                     </div>
 
-                    <!-- Language Toggle -->
+                    <!-- Language Toggle (Desktop Only) -->
                     @if(isset($available_languages) && $available_languages->count() >= 2)
                     @php
                     $lang1 = $available_languages->first();
                     $lang2 = $available_languages->skip(1)->first();
                     $currentLocale = App::getLocale();
                     @endphp
-                    <button type="button"
-                        class="relative flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
-                        onclick="toggleLanguage('{{ $currentLocale == $lang1->code ? $lang2->code : $lang1->code }}')">
-                        <!-- Sliding Pill -->
-                        <div id="lang-toggle-pill"
-                            class="absolute top-1 bottom-1 left-1 w-9 bg-primary rounded-full shadow-sm transition-transform duration-300 ease-in-out {{ $currentLocale == $lang2->code ? 'translate-x-full' : 'translate-x-0' }}">
-                        </div>
+                    <div class="hidden lg:block">
+                        <button type="button"
+                            class="relative flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
+                            onclick="toggleLanguage('{{ $currentLocale == $lang1->code ? $lang2->code : $lang1->code }}')">
+                            <!-- Sliding Pill -->
+                            <div id="lang-toggle-pill"
+                                class="absolute top-1 bottom-1 left-1 w-9 bg-primary rounded-full shadow-sm transition-transform duration-300 ease-in-out {{ $currentLocale == $lang2->code ? 'translate-x-full' : 'translate-x-0' }}">
+                            </div>
 
-                        <span id="lang-text-{{ $lang1->code }}"
-                            class="relative z-10 w-9 text-center {{ $currentLocale == $lang1->code ? 'text-white' : 'text-gray-500' }} text-[10px] font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang1->code, 0, 2)) }}</span>
-                        <span id="lang-text-{{ $lang2->code }}"
-                            class="relative z-10 w-9 text-center {{ $currentLocale == $lang2->code ? 'text-white' : 'text-gray-500' }} text-[10px] font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang2->code, 0, 2)) }}</span>
-                    </button>
+                            <span id="lang-text-{{ $lang1->code }}"
+                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang1->code ? 'text-white' : 'text-gray-500' }} text-[10px] font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang1->code, 0, 2)) }}</span>
+                            <span id="lang-text-{{ $lang2->code }}"
+                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang2->code ? 'text-white' : 'text-gray-500' }} text-[10px] font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang2->code, 0, 2)) }}</span>
+                        </button>
+                    </div>
                     @endif
 
                     <a href="{{ route('find-practitioner') }}"
@@ -265,11 +289,11 @@
                              }
                         }
 
-                        // 2. Update toggle UI
-                        const pill = document.getElementById('lang-toggle-pill');
+                        // 2. Update toggle UI (Sync all toggles)
+                        const pills = document.querySelectorAll('[id^="lang-toggle-pill"]');
                         const langTexts = document.querySelectorAll('[id^="lang-text-"]');
 
-                        if (pill) {
+                        pills.forEach(pill => {
                             @if(isset($available_languages) && $available_languages->count() >= 2)
                             @php
                                 $l1 = $available_languages->first();
@@ -283,10 +307,10 @@
                                 pill.classList.add('translate-x-0');
                             }
                             @endif
-                        }
+                        });
 
                         langTexts.forEach(txt => {
-                            if (txt.id === `lang-text-${targetLocale}`) {
+                            if (txt.id === `lang-text-${targetLocale}` || txt.id === `lang-text-${targetLocale}-mobile`) {
                                 txt.classList.remove('text-gray-500');
                                 txt.classList.add('text-white');
                             } else {
@@ -295,18 +319,17 @@
                             }
                         });
 
-                        // 3. Update onclick for next toggle
-                        const toggleBtn = pill ? pill.parentElement : null;
-                        if (toggleBtn) {
-                            @if(isset($available_languages) && $available_languages->count() >= 2)
-                            @php
-                                $l1 = $available_languages->first();
-                                $l2 = $available_languages->skip(1)->first();
-                            @endphp
-                            const nextLocale = targetLocale === '{{ $l1->code }}' ? '{{ $l2->code }}' : '{{ $l1->code }}';
-                            toggleBtn.setAttribute('onclick', `toggleLanguage('${nextLocale}')`);
-                            @endif
-                        }
+                        // 3. Update onclick for all toggle buttons
+                        @if(isset($available_languages) && $available_languages->count() >= 2)
+                        @php
+                            $l1 = $available_languages->first();
+                            $l2 = $available_languages->skip(1)->first();
+                        @endphp
+                        const nextLocale = targetLocale === '{{ $l1->code }}' ? '{{ $l2->code }}' : '{{ $l1->code }}';
+                        document.querySelectorAll('button[onclick^="toggleLanguage"]').forEach(btn => {
+                            btn.setAttribute('onclick', `toggleLanguage('${nextLocale}')`);
+                        });
+                        @endif
                         
                         console.log("Language switched dynamically to:", targetLocale);
                     }

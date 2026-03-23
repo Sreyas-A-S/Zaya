@@ -12,6 +12,7 @@ class Booking extends Model
     protected $fillable = [
         'user_id',
         'practitioner_id',
+        'invoice_no',
         'service_ids',
         'mode',
         'conditions',
@@ -25,9 +26,11 @@ class Booking extends Model
         'booking_time',
         'total_price',
         'status',
+        'reminder_sent',
         'razorpay_order_id',
         'razorpay_payment_id',
-        'razorpay_payment_url'
+        'razorpay_payment_url',
+        'payment_details'
     ];
 
     protected $casts = [
@@ -35,6 +38,10 @@ class Booking extends Model
         'need_translator' => 'boolean',
         'booking_date' => 'date',
         'total_price' => 'decimal:2',
+        'reminder_sent' => 'boolean',
+        'payment_details' => 'array',
+        'conditions' => 'encrypted',
+        'situation' => 'encrypted',
     ];
 
     public function user()

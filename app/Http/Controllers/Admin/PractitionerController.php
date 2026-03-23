@@ -179,6 +179,7 @@ class PractitionerController extends Controller
             'languages_spoken' => 'nullable|array',
             'can_translate_english' => 'boolean',
             'profile_bio' => 'nullable|string|max:1000',
+            'reminder_lead_time' => 'nullable|integer|min:5|max:1440',
             // Documents
             'doc_cover_letter' => 'required|file|mimes:pdf,doc,docx,jpeg,png,jpg|max:2048',
             'doc_certificates' => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
@@ -227,6 +228,7 @@ class PractitionerController extends Controller
                 'languages_spoken' => $validatedData['languages_spoken'] ?? null,
                 'can_translate_english' => $validatedData['can_translate_english'] ?? false,
                 'profile_bio' => $request->professional_bio ?? $request->summary ?? $validatedData['profile_bio'] ?? null,
+                'reminder_lead_time' => $validatedData['reminder_lead_time'] ?? 60,
             ];
 
             if ($request->hasFile('profile_photo')) {
@@ -329,6 +331,7 @@ class PractitionerController extends Controller
             'languages_spoken' => 'nullable|array',
             'can_translate_english' => 'boolean',
             'profile_bio' => 'nullable|string|max:1000',
+            'reminder_lead_time' => 'nullable|integer|min:5|max:1440',
 
             // Documents
             'doc_cover_letter' => 'nullable|file|mimes:pdf,doc,docx,jpeg,png,jpg|max:2048',
@@ -376,6 +379,7 @@ class PractitionerController extends Controller
                 'languages_spoken' => $validatedData['languages_spoken'] ?? null,
                 'can_translate_english' => $request->has('can_translate_english'),
                 'profile_bio' => $validatedData['profile_bio'] ?? null,
+                'reminder_lead_time' => $validatedData['reminder_lead_time'] ?? 60,
             ];
 
             if ($request->hasFile('profile_photo')) {

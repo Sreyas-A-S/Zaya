@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $title ?? 'Session Reminder' }}</title>
+    <style>
+        body { font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #f7f9fa; margin: 0; padding: 0; color: #333; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .accent-bar { height: 6px; background: linear-gradient(90deg, #97563D, #F8E0BB, #2E4B3C); }
+        .header { padding: 40px 20px; text-align: center; }
+        .logo { height: 60px; }
+        .content { padding: 0 40px 40px; text-align: center; }
+        h1 { color: #2E4B3C; font-size: 24px; margin-bottom: 16px; font-weight: 700; }
+        p { font-size: 16px; line-height: 1.6; margin-bottom: 24px; color: #4B5563; }
+        .session-info { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-bottom: 32px; text-align: left; }
+        .info-row { margin-bottom: 8px; font-size: 14px; }
+        .label { font-weight: 600; color: #64748b; }
+        .value { color: #1e293b; font-weight: 700; }
+        .join-button { display: inline-block; padding: 16px 40px; background-color: #2FA749; color: #ffffff !important; border-radius: 99px; text-decoration: none; font-weight: 700; font-size: 18px; box-shadow: 0 4px 6px -1px rgba(47, 167, 73, 0.2); transition: all 0.3s ease; }
+        .footer { background-color: #2E4B3C; color: #ffffff; padding: 30px 20px; text-align: center; font-size: 14px; }
+        .footer a { color: #F8E0BB; text-decoration: none; }
+        .notice { font-size: 12px; color: #94a3b8; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="accent-bar"></div>
+        <div class="header">
+            <img src="{{ url('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="logo">
+        </div>
+
+        <div class="content">
+            <h1>{{ $title }}</h1>
+            <p>{{ $intro }}</p>
+
+            <div class="session-info">
+                <div class="info-row">
+                    <span class="label">Session ID:</span>
+                    <span class="value">{{ $booking->invoice_no }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Time:</span>
+                    <span class="value">{{ $booking->booking_time }} (Today)</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Participants:</span>
+                    <span class="value">{{ $booking->user->name }} & {{ $booking->practitioner->user->name }}</span>
+                </div>
+                @if($booking->need_translator)
+                <div class="info-row">
+                    <span class="label">Translator:</span>
+                    <span class="value">{{ $booking->translator->user->name ?? 'Assigned' }}</span>
+                </div>
+                @endif
+            </div>
+
+            <a href="{{ $agoraLink }}" class="join-button">Join Video Session</a>
+            
+            <p class="notice">
+                If the button above doesn't work, copy and paste this link into your browser:<br>
+                <span style="word-break: break-all; color: #2E4B3C; font-weight: 500;">{{ $agoraLink }}</span>
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
+            <p>Where Indian Wisdom Meets Modern Wellness</p>
+            <p><a href="{{ config('app.url') }}">Visit our Website</a></p>
+        </div>
+    </div>
+</body>
+</html>

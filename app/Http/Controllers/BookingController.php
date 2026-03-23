@@ -7,9 +7,11 @@ use App\Models\Practitioner;
 use App\Models\Service;
 use App\Models\Translator;
 use App\Models\Language;
+use App\Mail\BookingMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 class BookingController extends Controller
 {
@@ -58,6 +60,16 @@ class BookingController extends Controller
         $booking->booking_time = $request->booking_time;
         $booking->total_price = $request->total_price;
         $booking->status = 'pending';
+        
+        // Generate unique invoice number: ZAYA-YYYYMMDD-XXXXX
+        $today = date('Ymd');
+        $lastBooking = Booking::where('invoice_no', 'like', "ZAYA-$today-%")->orderBy('id', 'desc')->first();
+        $sequence = 1;
+        if ($lastBooking && preg_match('/-(\d+)$/', $lastBooking->invoice_no, $matches)) {
+            $sequence = intval($matches[1]) + 1;
+        }
+        $booking->invoice_no = "ZAYA-$today-" . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+
         $booking->save(); // Save first to get the ID
         
         // --- Razorpay Payment Link Creation ---
@@ -134,10 +146,32 @@ class BookingController extends Controller
         if ($status === 'paid') {
             $booking->status = 'confirmed';
             $booking->razorpay_payment_id = $paymentId;
+            $booking->payment_details = $request->all();
             $booking->save();
 
-            return redirect()->route('home')->with('success', 'Payment successful! Your booking is confirmed.');
+            // Send Emails
+            try {
+                // To Client
+                Mail::to($booking->user->email)->send(new BookingMail($booking, 'client'));
+                
+                // To Practitioner
+                if ($booking->practitioner && $booking->practitioner->user) {
+                    Mail::to($booking->practitioner->user->email)->send(new BookingMail($booking, 'practitioner'));
+                }
+                
+                // To Translator
+                if ($booking->need_translator && $booking->translator && $booking->translator->user) {
+                    Mail::to($booking->translator->user->email)->send(new BookingMail($booking, 'translator'));
+                }
+            } catch (\Exception $e) {
+                \Log::error('Booking Email Error: ' . $e->getMessage());
+            }
+
+            return redirect()->route('invoice.show', $booking->invoice_no)->with('success', 'Payment successful! Your booking is confirmed.');
         }
+
+        $booking->payment_details = $request->all();
+        $booking->save();
 
         return redirect()->route('home')->with('error', 'Payment was not completed. Please try again or contact support.');
     }
@@ -169,5 +203,14 @@ class BookingController extends Controller
             })->get();
         
         return response()->json($translators);
+    }
+
+    public function fetchReferrablePractitioners()
+    {
+        $users = User::whereIn('role', ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'])
+            ->where('status', 'active')
+            ->get(['id', 'name', 'role']);
+            
+        return response()->json($users);
     }
 }

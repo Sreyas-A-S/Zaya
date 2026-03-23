@@ -173,7 +173,7 @@
             <div class="p-8 max-w-2xl">
                 <form action="{{ route('time-slots.update-settings') }}" method="POST" class="space-y-6">
                     @csrf
-                    <div>
+                    <div class="mb-6">
                         <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-3">Advance Booking Limit</label>
                         <div class="flex gap-3">
                             <input type="text" id="window-value-input" name="booking_window_days" value="{{ $profile->booking_window_days ?? 14 }}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="flex-1 border border-gray-100 bg-gray-50 rounded-2xl px-5 py-4 text-base outline-none focus:border-secondary transition-all">
@@ -184,6 +184,17 @@
                             </select>
                         </div>
                         <input type="hidden" id="final-window-days" name="booking_window_days" value="{{ $profile->booking_window_days ?? 14 }}">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-3">Session Reminder Lead Time (Minutes)</label>
+                        <div class="flex gap-3">
+                            <input type="number" name="reminder_lead_time" value="{{ $profile->reminder_lead_time ?? 60 }}" min="5" max="1440" class="flex-1 border border-gray-100 bg-gray-50 rounded-2xl px-5 py-4 text-base outline-none focus:border-secondary transition-all">
+                            <div class="flex items-center text-xs text-gray-400 px-4">
+                                <i class="ri-information-line mr-1"></i>
+                                When to send the video link email before session.
+                            </div>
+                        </div>
                     </div>
                     <button type="submit" class="px-10 py-4 bg-secondary text-white rounded-2xl font-bold hover:opacity-90 shadow-lg shadow-secondary/10 transition-all">Save Rules</button>
                 </form>

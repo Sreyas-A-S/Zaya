@@ -61,10 +61,15 @@
             <div class="card">
                 <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
                     <h3>Manage Invoice Content</h3>
-                    <div class="current-lang-badge">
-                        <span class="badge badge-light-primary text-uppercase" style="font-size: 14px; padding: 8px 15px; border-radius: 5px; border: 1px solid var(--theme-default);">
-                            <i class="fa-solid fa-language me-2"></i> Editing: <strong id="current-editing-lang">{{ session('locale', env('APP_LOCALE', 'en')) }}</strong>
-                        </span>
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="{{ route('admin.invoice.preview') }}" target="_blank" class="btn btn-secondary">
+                            <i class="fa-solid fa-eye me-2"></i>Preview Invoice
+                        </a>
+                        <div class="current-lang-badge">
+                            <span class="badge badge-light-primary text-uppercase" style="font-size: 14px; padding: 8px 15px; border-radius: 5px; border: 1px solid var(--theme-default);">
+                                <i class="fa-solid fa-language me-2"></i> Editing: <strong id="current-editing-lang">{{ session('locale', env('APP_LOCALE', 'en')) }}</strong>
+                            </span>
+                        </div>
                     </div>
                 </div>
 

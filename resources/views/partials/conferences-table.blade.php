@@ -14,7 +14,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-[#F9F9F9]">
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">SL No.</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{{ ($user->role === 'client' || $user->role === 'patient') ? 'Practitioner' : 'Client' }}</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Mode</th>

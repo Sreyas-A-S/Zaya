@@ -8,7 +8,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-[#F9F9F9]">
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">SL No.</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Invoice ID</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Description</th>
@@ -24,7 +24,7 @@
                             {{ $loop->iteration + ($invoices->currentPage() - 1) * $invoices->perPage() }}
                         </td>
                         <td class="px-6 py-4 text-sm font-medium text-secondary">
-                            #{{ $invoice->id + 10000 }}
+                            {{ $invoice->invoice_no }}
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500">
                             {{ $invoice->created_at->format('M d, Y') }}

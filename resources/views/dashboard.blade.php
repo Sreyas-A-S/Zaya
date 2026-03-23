@@ -61,14 +61,15 @@
             </div>
         </div>
 
-        <!-- Transaction Vault Snippet -->
+        <!-- Transaction Vault Snippet (Only for Clients) -->
+        @if($user->role === 'client' || $user->role === 'patient')
         <div id="section-transactions" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
             <h2 id="client_panel_transaction_vault_title" class="text-xl font-sans! font-medium text-secondary mb-6" data-i18n="{{ $site_settings['client_panel_transaction_vault_title'] ?? 'Transaction Vault' }}">{{ __($site_settings['client_panel_transaction_vault_title'] ?? 'Transaction Vault') }}</h2>
             <div class="space-y-5">
                 @forelse($invoices as $invoice)
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-sm font-normal text-gray-800 mb-0.5">{{ __($site_settings['client_panel_invoice_hash'] ?? 'Invoice #') }}{{ $invoice->id + 10000 }}</p>
+                        <p class="text-sm font-normal text-gray-800 mb-0.5">{{ __($site_settings['client_panel_invoice_hash'] ?? 'Invoice #') }}{{ $invoice->invoice_no }}</p>
                         <p class="text-xs text-gray-400">{{ $invoice->created_at->format('M d, Y') }}</p>
                     </div>
                     <a href="{{ $invoice->razorpay_payment_url }}" target="_blank"
@@ -82,6 +83,56 @@
                 <a id="client_panel_see_all" href="{{ route('transactions.index') }}" class="text-xs text-gray-400 hover:text-gray-800 font-normal tracking-wide" data-i18n="{{ $site_settings['client_panel_see_all'] ?? 'See all' }}">{{ __($site_settings['client_panel_see_all'] ?? 'See all') }}</a>
             </div>
         </div>
+        @endif
+
+        @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']))
+        <!-- Practitioner Referrals -->
+        <div id="section-referrals" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
+            <h2 class="text-xl font-sans! font-medium text-secondary mb-6 flex items-center gap-2">
+                <i class="ri-user-shared-line"></i> My Referrals
+            </h2>
+            <div class="space-y-5">
+                @forelse($referrals as $ref)
+                <div class="flex justify-between items-center pb-4 border-b border-gray-50 last:border-0 last:pb-0">
+                    <div>
+                        <p class="text-sm font-bold text-gray-800 mb-0.5">{{ $ref->user->name }}</p>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold">To: {{ $ref->referredTo->name }}</p>
+                    </div>
+                    <span class="px-3 py-1 text-[10px] font-bold rounded-full uppercase {{ $ref->status === 'paid' ? 'bg-green-50 text-green-600' : 'bg-yellow-50 text-yellow-600' }}">
+                        {{ $ref->status }}
+                    </span>
+                </div>
+                @empty
+                <p class="text-center text-gray-500 text-xs py-4">No recent referrals.</p>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Client Data Access -->
+        <div id="section-client-access" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
+            <h2 class="text-xl font-sans! font-medium text-secondary mb-6 flex items-center gap-2">
+                <i class="ri-shield-user-line"></i> Client Access
+            </h2>
+            <div class="space-y-5">
+                @forelse($dataAccessRequests as $dar)
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+                            <i class="ri-user-line text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-800">{{ $dar->client->name }}</p>
+                            <p class="text-[10px] text-gray-400 uppercase font-bold">Since: {{ $dar->approved_at->format('M d') }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('client.profile.view', $dar->client_id) }}" class="px-3 py-1 bg-secondary text-white text-xs font-bold rounded-full">View</a>
+                </div>
+                @empty
+                <p class="text-center text-gray-500 text-xs py-4">No active client data permissions.</p>
+                @endforelse
+            </div>
+        </div>
+        @endif
     </div>
 
     <!-- Right Column -->
@@ -162,21 +213,26 @@
             <a id="client_panel_view_all_bookings" href="{{ route('bookings.index') }}" class="block text-center text-sm font-medium text-secondary hover:underline pt-4" data-i18n="{{ $site_settings['client_panel_view_all_bookings'] ?? 'View All Bookings' }}">{{ __($site_settings['client_panel_view_all_bookings'] ?? 'View All Bookings') }}</a>
         </div>
 
+        @if($user->role === 'client' || $user->role === 'patient')
         <!-- Clinical Document Portal -->
         <div id="section-clinical" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
             <h2 id="client_panel_clinical_portal_title" class="text-xl font-sans! font-medium text-secondary mb-6" data-i18n="{{ $site_settings['client_panel_clinical_portal_title'] ?? 'Clinical Document Portal' }}">{{ __($site_settings['client_panel_clinical_portal_title'] ?? 'Clinical Document Portal') }}</h2>
 
             <!-- Upload Area -->
-            <div
-                class="border-2 border-dashed border-[#8FC0A8] rounded-xl p-6 md:p-8 text-center bg-white mb-8">
-                <p id="client_panel_drag_drop_heading" class="text-lg font-medium text-secondary mb-1.5" data-i18n="{{ $site_settings['client_panel_drag_drop_heading'] ?? 'Drag and Drop files here' }}">{{ __($site_settings['client_panel_drag_drop_heading'] ?? 'Drag and Drop files here') }}</p>
-                <p id="client_panel_upload_description" class="text-xs text-gray-500 mb-1 leading-relaxed" data-i18n="{{ $site_settings['client_panel_upload_description'] ?? 'Upload X-Rays, MRIs, Blood tests and other clinical documents' }}">{{ __($site_settings['client_panel_upload_description'] ?? 'Upload X-Rays, MRIs, Blood tests and other clinical documents') }}</p>
-                <p id="client_panel_file_types_info" class="text-xs text-gray-400 mb-6 leading-relaxed" data-i18n="{{ $site_settings['client_panel_file_types_info'] ?? 'JPG, JPEG, PNG, WPS, DOC & PDF (Max 20MB)' }}">{{ __($site_settings['client_panel_file_types_info'] ?? 'JPG, JPEG, PNG, WPS, DOC & PDF (Max 20MB)') }}</p>
-                <button id="client_panel_upload_btn"
-                    class="inline-flex items-center justify-center px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors" data-i18n="{{ $site_settings['client_panel_upload_btn'] ?? 'Upload' }}">
-                    <i class="ri-upload-2-line mr-2"></i> {{ __($site_settings['client_panel_upload_btn'] ?? 'Upload') }}
-                </button>
-            </div>
+            <form id="upload-form" enctype="multipart/form-data">
+                @csrf
+                <input type="file" id="document-input" name="document" class="hidden" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
+                <div id="drop-zone"
+                    class="border-2 border-dashed border-[#8FC0A8] rounded-xl p-6 md:p-8 text-center bg-white mb-8 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <p id="client_panel_drag_drop_heading" class="text-lg font-medium text-secondary mb-1.5" data-i18n="{{ $site_settings['client_panel_drag_drop_heading'] ?? 'Drag and Drop files here' }}">{{ __($site_settings['client_panel_drag_drop_heading'] ?? 'Drag and Drop files here') }}</p>
+                    <p id="client_panel_upload_description" class="text-xs text-gray-500 mb-1 leading-relaxed" data-i18n="{{ $site_settings['client_panel_upload_description'] ?? 'Upload X-Rays, MRIs, Blood tests and other clinical documents' }}">{{ __($site_settings['client_panel_upload_description'] ?? 'Upload X-Rays, MRIs, Blood tests and other clinical documents') }}</p>
+                    <p id="client_panel_file_types_info" class="text-xs text-gray-400 mb-6 leading-relaxed" data-i18n="{{ $site_settings['client_panel_file_types_info'] ?? 'JPG, JPEG, PNG, DOC, DOCX & PDF (Max 20MB)' }}">{{ __($site_settings['client_panel_file_types_info'] ?? 'JPG, JPEG, PNG, DOC, DOCX & PDF (Max 20MB)') }}</p>
+                    <button type="button" id="client_panel_upload_btn"
+                        class="inline-flex items-center justify-center px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors" data-i18n="{{ $site_settings['client_panel_upload_btn'] ?? 'Upload' }}">
+                        <i class="ri-upload-2-line mr-2"></i> {{ __($site_settings['client_panel_upload_btn'] ?? 'Upload') }}
+                    </button>
+                </div>
+            </form>
 
             <!-- Uploaded Documents -->
             <div class="flex justify-between items-center mb-4">
@@ -186,36 +242,42 @@
             </div>
 
             <div class="swiper document-swiper pb-4 w-full">
-                <div class="swiper-wrapper">
-                    <!-- Doc Card 1 -->
-                    <div
-                        class="swiper-slide w-[133px]! bg-white px-3 md:px-5 pt-6 md:pt-16 pb-3 md:pb-5 rounded-xl relative flex flex-col items-center justify-center border border-gray-200">
-                        <button
+                <div class="swiper-wrapper" id="documents-wrapper">
+                    @forelse($clinicalDocuments as $doc)
+                    <div class="swiper-slide w-[133px]! bg-white px-3 md:px-5 pt-6 md:pt-16 pb-3 md:pb-5 rounded-xl relative flex flex-col items-center justify-center border border-gray-200" id="doc-{{ $doc->id }}">
+                        <button onclick="deleteDocument({{ $doc->id }})"
                             class="absolute top-1 md:top-2.5 right-1 md:right-2.5 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors"><i
                                 class="ri-delete-bin-line text-sm"></i></button>
-                        <div
-                            class="w-10 h-10 justify-self-center bg-[#E1EAF2] text-[#3E7CB1] flex items-center justify-center rounded-lg mb-3">
-                            <i class="ri-file-text-fill text-lg"></i>
-                        </div>
-                        <p class="text-xs font-semibold text-gray-800 truncate w-full text-center select-none">
-                            X-RayJan.DOC</p>
+                        <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="flex flex-col items-center justify-center w-full">
+                            @php
+                                $bgColor = 'bg-[#E1EAF2]';
+                                $textColor = 'text-[#3E7CB1]';
+                                $icon = 'ri-file-text-fill';
+                                
+                                if (in_array(strtolower($doc->file_type), ['pdf'])) {
+                                    $bgColor = 'bg-[#FEE2E2]';
+                                    $textColor = 'text-[#EF4444]';
+                                    $icon = 'ri-file-pdf-fill';
+                                } elseif (in_array(strtolower($doc->file_type), ['jpg', 'jpeg', 'png'])) {
+                                    $bgColor = 'bg-[#DCFCE7]';
+                                    $textColor = 'text-[#22C55E]';
+                                    $icon = 'ri-image-fill';
+                                }
+                            @endphp
+                            <div class="w-10 h-10 justify-self-center {{ $bgColor }} {{ $textColor }} flex items-center justify-center rounded-lg mb-3">
+                                <i class="{{ $icon }} text-lg"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-gray-800 truncate w-full text-center select-none" title="{{ $doc->file_name }}">
+                                {{ $doc->file_name }}</p>
+                        </a>
                     </div>
-                    <!-- Doc Card 2 -->
-                    <div
-                        class="swiper-slide w-[133px]! bg-white px-3 md:px-5 pt-6 md:pt-16 pb-3 md:pb-5 rounded-xl relative flex flex-col items-center justify-center border border-gray-200">
-                        <button
-                            class="absolute top-1 md:top-2.5 right-1 md:right-2.5 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors"><i
-                                class="ri-delete-bin-line text-sm"></i></button>
-                        <div
-                            class="w-10 h-10 justify-self-center bg-[#FEE2E2] text-[#EF4444] flex items-center justify-center rounded-lg mb-3">
-                            <i class="ri-file-pdf-fill text-lg"></i>
-                        </div>
-                        <p class="text-xs font-semibold text-gray-800 truncate w-full text-center select-none">
-                            Bloodtst.PDF</p>
-                    </div>
+                    @empty
+                    <p id="no-docs-msg" class="text-center text-gray-500 text-sm py-4 w-full">{{ __('No documents uploaded yet.') }}</p>
+                    @endforelse
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </div>
 
@@ -263,6 +325,7 @@
     </div>
 </div>
 
+@if($user->role === 'client' || $user->role === 'patient')
 <!-- GDPR Center -->
 <div id="section-gdpr"
     class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12 flex flex-col md:flex-row flex-wrap gap-4 items-center justify-between">
@@ -316,6 +379,78 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" class="fixed inset-0 z-[100002] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeDeleteModal()"></div>
+
+    <!-- Modal Content -->
+    <div class="relative bg-white rounded-[32px] p-8 md:p-10 max-w-[450px] w-[90%] text-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] transform transition-all duration-300 scale-90">
+        <!-- Close Button -->
+        <button onclick="closeDeleteModal()" class="absolute top-6 right-8 text-gray-300 hover:text-gray-500 transition-colors">
+            <i class="ri-close-line text-2xl"></i>
+        </button>
+
+        <div class="mb-6">
+            <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ri-delete-bin-line text-red-500 text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold font-sans! text-secondary mb-2">{{ __('Delete Document?') }}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed">
+                {{ __('Are you sure you want to delete this document? This action cannot be undone.') }}
+            </p>
+        </div>
+
+        <div class="flex gap-4">
+            <button onclick="closeDeleteModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-full font-medium hover:bg-gray-50 transition-colors">
+                {{ __('Cancel') }}
+            </button>
+            <button id="confirm-delete-btn" class="flex-1 px-6 py-3 bg-red-500 text-white rounded-full font-medium hover:bg-opacity-90 transition-all">
+                {{ __('Delete') }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Preview Modal -->
+<div id="upload-preview-modal" class="fixed inset-0 z-[100002] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeUploadPreviewModal()"></div>
+
+    <!-- Modal Content -->
+    <div class="relative bg-white rounded-[32px] p-8 md:p-10 max-w-[450px] w-[90%] text-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] transform transition-all duration-300 scale-90">
+        <!-- Close Button -->
+        <button onclick="closeUploadPreviewModal()" class="absolute top-6 right-8 text-gray-300 hover:text-gray-500 transition-colors">
+            <i class="ri-close-line text-2xl"></i>
+        </button>
+
+        <div class="mb-6">
+            <div id="preview-icon-bg" class="w-16 h-16 bg-[#EEF2EF] rounded-full flex items-center justify-center mx-auto mb-4">
+                <i id="preview-icon" class="ri-file-upload-line text-secondary text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold font-sans! text-secondary mb-2">{{ __('Confirm Upload') }}</h3>
+            <p id="preview-filename" class="text-gray-800 font-semibold text-sm mb-1 truncate px-4"></p>
+            <p id="preview-filesize" class="text-gray-400 text-xs mb-4"></p>
+            
+            <!-- Progress Bar (Initially Hidden) -->
+            <div id="upload-progress-container" class="hidden w-full bg-gray-100 rounded-full h-2 mb-4 overflow-hidden">
+                <div id="upload-progress-bar" class="bg-secondary h-full w-0 transition-all duration-300"></div>
+            </div>
+            <p id="upload-percentage" class="hidden text-secondary text-xs font-bold mb-4">0%</p>
+        </div>
+
+        <div id="preview-actions" class="flex gap-4">
+            <button onclick="closeUploadPreviewModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-full font-medium hover:bg-gray-50 transition-colors">
+                {{ __('Cancel') }}
+            </button>
+            <button id="confirm-upload-btn" class="flex-1 px-6 py-3 bg-secondary text-white rounded-full font-medium hover:bg-opacity-90 transition-all">
+                {{ __('Upload Now') }}
+            </button>
+        </div>
+    </div>
+</div>
+@endif
 @endsection
 
 @section('scripts')
@@ -392,15 +527,276 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        const docInput = document.getElementById('document-input');
+        const uploadBtn = document.getElementById('client_panel_upload_btn');
+        const dropZone = document.getElementById('drop-zone');
+        let documentSwiper;
+
         if (typeof Swiper !== 'undefined') {
-            new Swiper('.document-swiper', {
+            documentSwiper = new Swiper('.document-swiper', {
                 slidesPerView: 'auto',
                 spaceBetween: 16,
                 grabCursor: true,
                 freeMode: true,
             });
         }
+
+        if (uploadBtn && docInput) {
+            uploadBtn.addEventListener('click', () => docInput.click());
+        }
+
+        if (dropZone && docInput) {
+            dropZone.addEventListener('click', (e) => {
+                if (e.target !== uploadBtn && !uploadBtn.contains(e.target)) {
+                    docInput.click();
+                }
+            });
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('bg-gray-100');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('bg-gray-100');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('bg-gray-100');
+                if (e.dataTransfer.files.length) {
+                    const file = e.dataTransfer.files[0];
+                    openUploadPreviewModal(file);
+                }
+            });
+        }
+
+        if (docInput) {
+            docInput.addEventListener('change', () => {
+                if (docInput.files.length) {
+                    openUploadPreviewModal(docInput.files[0]);
+                }
+            });
+        }
+
+        function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('document', file);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            const progressContainer = document.getElementById('upload-progress-container');
+            const progressBar = document.getElementById('upload-progress-bar');
+            const percentageText = document.getElementById('upload-percentage');
+            const actions = document.getElementById('preview-actions');
+            const closeBtn = document.querySelector('#upload-preview-modal button[onclick="closeUploadPreviewModal()"]');
+
+            // Show progress bar, hide actions
+            progressContainer.classList.remove('hidden');
+            percentageText.classList.remove('hidden');
+            actions.classList.add('hidden');
+            if (closeBtn) closeBtn.classList.add('hidden');
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', "{{ route('clinical-documents.upload') }}", true);
+
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = Math.round((e.loaded / e.total) * 100);
+                    progressBar.style.width = percentComplete + '%';
+                    percentageText.textContent = percentComplete + '%';
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+                    if (data.document) {
+                        addDocumentToUI(data.document, data.url);
+                        if (window.showZayaToast) showZayaToast('Document uploaded successfully.', 'Clinical Portal');
+                        if (document.getElementById('no-docs-msg')) {
+                            document.getElementById('no-docs-msg').remove();
+                        }
+                    }
+                    closeUploadPreviewModal();
+                } else {
+                    const data = JSON.parse(xhr.responseText);
+                    if (window.showZayaToast) showZayaToast(data.message || 'Upload failed', 'Error', 'error');
+                    closeUploadPreviewModal();
+                }
+            };
+
+            xhr.onerror = function() {
+                if (window.showZayaToast) showZayaToast('An error occurred during upload.', 'Error', 'error');
+                closeUploadPreviewModal();
+            };
+
+            xhr.send(formData);
+        }
+
+        function openUploadPreviewModal(file) {
+            const modal = document.getElementById('upload-preview-modal');
+            const content = modal.querySelector('.relative.bg-white');
+            const filenameEl = document.getElementById('preview-filename');
+            const filesizeEl = document.getElementById('preview-filesize');
+            const iconBg = document.getElementById('preview-icon-bg');
+            const icon = document.getElementById('preview-icon');
+            const confirmBtn = document.getElementById('confirm-upload-btn');
+            
+            // Reset Progress UI
+            document.getElementById('upload-progress-container').classList.add('hidden');
+            document.getElementById('upload-percentage').classList.add('hidden');
+            document.getElementById('upload-progress-bar').style.width = '0%';
+            document.getElementById('preview-actions').classList.remove('hidden');
+            const closeBtn = document.querySelector('#upload-preview-modal button[onclick="closeUploadPreviewModal()"]');
+            if (closeBtn) closeBtn.classList.remove('hidden');
+
+            filenameEl.textContent = file.name;
+            filesizeEl.textContent = formatFileSize(file.size);
+
+            // Set icon based on file type
+            const ext = file.name.split('.').pop().toLowerCase();
+            iconBg.className = "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-[#EEF2EF]";
+            icon.className = "ri-file-text-line text-secondary text-3xl";
+
+            if (ext === 'pdf') {
+                iconBg.classList.add('bg-red-50');
+                icon.className = "ri-file-pdf-line text-red-500 text-3xl";
+            } else if (['jpg', 'jpeg', 'png'].includes(ext)) {
+                iconBg.classList.add('bg-green-50');
+                icon.className = "ri-image-line text-green-500 text-3xl";
+            }
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+
+            setTimeout(() => {
+                content.classList.remove('scale-90');
+                content.classList.add('scale-100');
+            }, 10);
+
+            confirmBtn.onclick = () => {
+                uploadFile(file);
+            };
+        }
+
+        window.closeUploadPreviewModal = function() {
+            const modal = document.getElementById('upload-preview-modal');
+            const content = modal.querySelector('.relative.bg-white');
+
+            content.classList.remove('scale-100');
+            content.classList.add('scale-90');
+
+            setTimeout(() => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modal.classList.remove('opacity-100');
+                if (docInput) docInput.value = ''; // Reset input
+            }, 300);
+        };
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function addDocumentToUI(doc, url) {
+            const wrapper = document.getElementById('documents-wrapper');
+            const slide = document.createElement('div');
+            slide.className = 'swiper-slide w-[133px]! bg-white px-3 md:px-5 pt-6 md:pt-16 pb-3 md:pb-5 rounded-xl relative flex flex-col items-center justify-center border border-gray-200';
+            slide.id = `doc-${doc.id}`;
+
+            let bgColor = 'bg-[#E1EAF2]';
+            let textColor = 'text-[#3E7CB1]';
+            let icon = 'ri-file-text-fill';
+            const ext = doc.file_type.toLowerCase();
+
+            if (ext === 'pdf') {
+                bgColor = 'bg-[#FEE2E2]';
+                textColor = 'text-[#EF4444]';
+                icon = 'ri-file-pdf-fill';
+            } else if (['jpg', 'jpeg', 'png'].includes(ext)) {
+                bgColor = 'bg-[#DCFCE7]';
+                textColor = 'text-[#22C55E]';
+                icon = 'ri-image-fill';
+            }
+
+            slide.innerHTML = `
+                <button onclick="deleteDocument(${doc.id})"
+                    class="absolute top-1 md:top-2.5 right-1 md:right-2.5 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors"><i
+                        class="ri-delete-bin-line text-sm"></i></button>
+                <a href="${url}" target="_blank" class="flex flex-col items-center justify-center w-full">
+                    <div class="w-10 h-10 justify-self-center ${bgColor} ${textColor} flex items-center justify-center rounded-lg mb-3">
+                        <i class="${icon} text-lg"></i>
+                    </div>
+                    <p class="text-xs font-semibold text-gray-800 truncate w-full text-center select-none" title="${doc.file_name}">
+                        ${doc.file_name}</p>
+                </a>
+            `;
+            wrapper.prepend(slide);
+            if (documentSwiper) {
+                documentSwiper.update();
+            }
+        }
     });
+
+    function deleteDocument(id) {
+        openDeleteModal(() => {
+            fetch(`{{ url('/clinical-documents') }}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById(`doc-${id}`).remove();
+                if (window.showZayaToast) showZayaToast('Document deleted successfully.', 'Clinical Portal');
+                
+                const wrapper = document.getElementById('documents-wrapper');
+                if (wrapper.children.length === 0) {
+                    wrapper.innerHTML = '<p id="no-docs-msg" class="text-center text-gray-500 text-sm py-4 w-full">{{ __("No documents uploaded yet.") }}</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (window.showZayaToast) showZayaToast('An error occurred while deleting.', 'Error', 'error');
+            });
+        });
+    }
+
+    function openDeleteModal(callback) {
+        const modal = document.getElementById('delete-modal');
+        const content = modal.querySelector('.relative.bg-white');
+        const confirmBtn = document.getElementById('confirm-delete-btn');
+
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100');
+
+        setTimeout(() => {
+            content.classList.remove('scale-90');
+            content.classList.add('scale-100');
+        }, 10);
+
+        confirmBtn.onclick = () => {
+            callback();
+            closeDeleteModal();
+        };
+    }
+
+    function closeDeleteModal() {
+        const modal = document.getElementById('delete-modal');
+        const content = modal.querySelector('.relative.bg-white');
+
+        content.classList.remove('scale-100');
+        content.classList.add('scale-90');
+
+        setTimeout(() => {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.classList.remove('opacity-100');
+        }, 300);
+    }
 
     function openGdprModal(callback) {
         const modal = document.getElementById('gdpr-modal');

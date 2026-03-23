@@ -13,7 +13,23 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/recordings/{id}', [ProfileController::class, 'showRecording'])->name('recordings.show');
     Route::get('/conference/session/{channel}', [ProfileController::class, 'joinSession'])->name('conference.join');
     Route::get('/agora/token', [ProfileController::class, 'generateToken'])->name('agora.token');
-    Route::get('/invoice/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
+    Route::get('/invoice/{invoice_no}', [InvoiceController::class, 'show'])->name('invoice.show');
+    Route::get('/bookings/{id}/details', [ProfileController::class, 'showDetails'])->name('bookings.details');
+
+    // Clinical Document Routes
+    Route::post('/clinical-documents', [ProfileController::class, 'uploadDocument'])->name('clinical-documents.upload');
+    Route::delete('/clinical-documents/{id}', [ProfileController::class, 'deleteDocument'])->name('clinical-documents.delete');
+
+    // Referral Routes
+    Route::post('/bookings/{id}/refer', [\App\Http\Controllers\ReferralController::class, 'store'])->name('bookings.refer');
+    Route::get('/referrals/{referral_no}/pay', [\App\Http\Controllers\ReferralController::class, 'pay'])->name('referrals.pay');
+    Route::get('/referrals/payment/callback', [\App\Http\Controllers\ReferralController::class, 'paymentCallback'])->name('referrals.payment.callback');
+
+    // Data Access Routes (OTP)
+    Route::post('/data-access/request', [\App\Http\Controllers\DataAccessController::class, 'requestAccess'])->name('data-access.request');
+    Route::post('/data-access/verify', [\App\Http\Controllers\DataAccessController::class, 'verifyOTP'])->name('data-access.verify');
+    Route::get('/client-profile/{id}', [ProfileController::class, 'viewClientProfile'])->name('client.profile.view');
+    Route::get('/api/referrable-practitioners', [\App\Http\Controllers\BookingController::class, 'fetchReferrablePractitioners'])->name('api.referrable-practitioners');
 
     // Availability / Time Slots
     Route::get('/time-slots', [\App\Http\Controllers\AvailabilityController::class, 'index'])->name('time-slots.index');

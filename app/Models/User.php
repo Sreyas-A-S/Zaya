@@ -109,6 +109,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(YogaTherapist::class);
     }
 
+    public function clinicalDocuments()
+    {
+        return $this->hasMany(ClinicalDocument::class);
+    }
+
     public function country()
     {
         return $this->belongsTo(Country::class, 'national_id');

@@ -122,7 +122,7 @@
                         </div>
                         <div>
                             <p class="text-[10px] md:text-sm text-gray-400 font-medium uppercase tracking-widest mb-0.5">Session ID</p>
-                            <p class="text-sm md:text-lg font-bold text-secondary">#{{ $booking->id + 10000 }}</p>
+                            <p class="text-sm md:text-lg font-bold text-secondary">{{ $booking->invoice_no }}</p>
                         </div>
                     </div>
                     

@@ -8,6 +8,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-[#F9F9F9]">
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">SL No.</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">ID</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{{ ($user->role === 'client' || $user->role === 'patient') ? 'Practitioner' : 'Client' }}</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
@@ -21,7 +22,10 @@
                     @forelse($bookings as $booking)
                     <tr class="hover:bg-[#FDFDFD] transition-colors">
                         <td class="px-6 py-4 text-sm font-medium text-secondary">
-                            #{{ $booking->id + 10000 }}
+                            {{ $loop->iteration + ($bookings->currentPage() - 1) * $bookings->perPage() }}
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium text-secondary">
+                            {{ $booking->invoice_no }}
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center">
@@ -79,15 +83,21 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
-                            @if($booking->razorpay_payment_url && $booking->status === 'pending')
-                                <a href="{{ $booking->razorpay_payment_url }}" target="_blank" class="text-secondary hover:underline mr-4">Pay Now</a>
-                            @endif
-                            <button class="text-gray-400 hover:text-secondary"><i class="ri-more-2-fill text-lg"></i></button>
+                            <div class="flex items-center justify-end gap-3">
+                                <button onclick="viewBookingDetails({{ $booking->id }})" class="text-secondary hover:text-primary transition-colors flex items-center gap-1">
+                                    <i class="ri-eye-line text-lg"></i>
+                                    <span>View</span>
+                                </button>
+                                @if($booking->razorpay_payment_url && $booking->status === 'pending')
+                                    <a href="{{ $booking->razorpay_payment_url }}" target="_blank" class="text-secondary hover:underline">Pay Now</a>
+                                @endif
+                                <button class="text-gray-400 hover:text-secondary"><i class="ri-more-2-fill text-lg"></i></button>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-20 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-20 text-center text-gray-500">
                             <div class="flex flex-col items-center">
                                 <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                                     <i class="ri-calendar-line text-3xl text-gray-300"></i>

@@ -37,6 +37,7 @@ class Practitioner extends Model
         'user_id',
         'status',
         'booking_window_days',
+        'reminder_lead_time',
         'first_name',
         'last_name',
         'slug',

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,7 +13,7 @@ class ProfileController extends Controller
     {
         $role = $user->role;
         $profileId = $user->profile_id;
-        $query = \App\Models\Booking::with(['practitioner.user', 'user']);
+        $query = Booking::with(['practitioner.user', 'user']);
 
         if ($role === 'client' || $role === 'patient') {
             $query->where('user_id', $user->id);
@@ -82,7 +84,68 @@ class ProfileController extends Controller
         $allServices = \App\Models\Service::whereIn('id', collect($upcomingBookings->pluck('service_ids'))->collapse()->unique())->get()->keyBy('id');
         $allServices = $allServices->merge(\App\Models\Service::whereIn('id', collect($completedBookings->pluck('service_ids'))->collapse()->unique())->get()->keyBy('id'));
 
-        return view('dashboard', compact('user', 'upcomingBookings', 'completedBookings', 'reviews', 'invoices', 'allServices'));
+        $clinicalDocuments = $user->clinicalDocuments()->latest()->get();
+
+        $referrals = [];
+        $dataAccessRequests = [];
+        if (in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'])) {
+            $referrals = \App\Models\Referral::with(['user', 'referredTo'])
+                ->where('referred_by_id', $user->id)
+                ->latest()
+                ->take(5)
+                ->get();
+            
+            $dataAccessRequests = \App\Models\DataAccessRequest::with(['client'])
+                ->where('requester_id', $user->id)
+                ->where('status', 'approved')
+                ->latest()
+                ->take(5)
+                ->get();
+        }
+
+        return view('dashboard', compact('user', 'upcomingBookings', 'completedBookings', 'reviews', 'invoices', 'allServices', 'clinicalDocuments', 'referrals', 'dataAccessRequests'));
+    }
+
+    public function uploadDocument(Request $request)
+    {
+        $request->validate([
+            'document' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:20480',
+        ]);
+
+        $user = Auth::user();
+        $file = $request->file('document');
+        $originalName = $file->getClientOriginalName();
+        $extension = $file->getClientOriginalExtension();
+        $size = $file->getSize();
+
+        $path = $file->store('clinical_documents/' . $user->id, 'public');
+
+        $document = $user->clinicalDocuments()->create([
+            'file_name' => $originalName,
+            'file_path' => $path,
+            'file_type' => $extension,
+            'file_size' => $size,
+        ]);
+
+        return response()->json([
+            'message' => 'Document uploaded successfully',
+            'document' => $document,
+            'url' => asset('storage/' . $path)
+        ]);
+    }
+
+    public function deleteDocument($id)
+    {
+        $user = Auth::user();
+        $document = $user->clinicalDocuments()->findOrFail($id);
+
+        if (\Storage::disk('public')->exists($document->file_path)) {
+            \Storage::disk('public')->delete($document->file_path);
+        }
+
+        $document->delete();
+
+        return response()->json(['message' => 'Document deleted successfully']);
     }
 
     public function updateConsent(Request $request)
@@ -147,12 +210,74 @@ class ProfileController extends Controller
     public function showRecording($id)
     {
         $user = Auth::user();
-        $booking = $this->getBookingQuery($user)
-            ->where('id', $id)
-            ->whereNotNull('recording_url')
-            ->firstOrFail();
+        
+        // Find the booking
+        $booking = Booking::with(['practitioner.user', 'user'])->findOrFail($id);
+
+        // Check if user is the client or the original practitioner
+        $isParticipant = ($booking->user_id === $user->id) || 
+                         ($booking->practitioner && $booking->practitioner->user_id === $user->id) ||
+                         ($booking->translator && $booking->translator->user_id === $user->id);
+
+        if (!$isParticipant) {
+            // Check if this is a practitioner with OTP-verified access to this client
+            $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
+            if (!$hasAccess) {
+                abort(403);
+            }
+        }
+
+        if (!$booking->recording_url) {
+            return back()->with('error', 'No recording available for this session.');
+        }
 
         return view('recordings.show', compact('user', 'booking'));
+    }
+
+    public function showDetails($id)
+    {
+        $user = Auth::user();
+        $booking = $this->getBookingQuery($user)
+            ->with(['language', 'translator.user'])
+            ->findOrFail($id);
+
+        $serviceIds = is_array($booking->service_ids) ? $booking->service_ids : [];
+        $services = Service::whereIn('id', $serviceIds)->get();
+
+        return view('partials.booking-details-modal-content', compact('user', 'booking', 'services'))->render();
+    }
+
+    public function viewClientProfile($id)
+    {
+        $practitioner = Auth::user();
+        
+        // Ensure only practitioners/doctors can access this
+        if (in_array($practitioner->role, ['client', 'patient'])) {
+            abort(403);
+        }
+
+        // Check for OTP-verified access
+        $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($practitioner->id, $id);
+        
+        if (!$hasAccess) {
+            return redirect()->route('bookings.index')->with('error', 'You do not have permission to view this client\'s profile. Please verify via OTP first.');
+        }
+
+        $client = \App\Models\User::with(['patient'])->findOrFail($id);
+        
+        // Get all recordings for this client
+        $recordings = Booking::where('user_id', $client->id)
+            ->whereNotNull('recording_url')
+            ->latest()
+            ->get();
+
+        // Get booking history
+        $bookings = Booking::with(['practitioner.user'])
+            ->where('user_id', $client->id)
+            ->latest()
+            ->get();
+
+        return view('practitioner.client-profile', compact('client', 'recordings', 'bookings'));
     }
 
     public function joinSession($channel)
