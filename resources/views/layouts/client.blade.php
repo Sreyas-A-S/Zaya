@@ -270,13 +270,19 @@
                         const langTexts = document.querySelectorAll('[id^="lang-text-"]');
 
                         if (pill) {
-                            if (targetLocale === '{{ $lang2->code ?? 'fr' }}') {
+                            @if(isset($available_languages) && $available_languages->count() >= 2)
+                            @php
+                                $l1 = $available_languages->first();
+                                $l2 = $available_languages->skip(1)->first();
+                            @endphp
+                            if (targetLocale === '{{ $l2->code }}') {
                                 pill.classList.remove('translate-x-0');
                                 pill.classList.add('translate-x-full');
                             } else {
                                 pill.classList.remove('translate-x-full');
                                 pill.classList.add('translate-x-0');
                             }
+                            @endif
                         }
 
                         langTexts.forEach(txt => {
@@ -292,8 +298,14 @@
                         // 3. Update onclick for next toggle
                         const toggleBtn = pill ? pill.parentElement : null;
                         if (toggleBtn) {
-                            const nextLocale = targetLocale === '{{ $lang1->code ?? 'en' }}' ? '{{ $lang2->code ?? 'fr' }}' : '{{ $lang1->code ?? 'en' }}';
+                            @if(isset($available_languages) && $available_languages->count() >= 2)
+                            @php
+                                $l1 = $available_languages->first();
+                                $l2 = $available_languages->skip(1)->first();
+                            @endphp
+                            const nextLocale = targetLocale === '{{ $l1->code }}' ? '{{ $l2->code }}' : '{{ $l1->code }}';
                             toggleBtn.setAttribute('onclick', `toggleLanguage('${nextLocale}')`);
+                            @endif
                         }
                         
                         console.log("Language switched dynamically to:", targetLocale);

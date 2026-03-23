@@ -85,17 +85,15 @@ class AvailabilityController extends Controller
                 }
             }
 
-            if (!$isOff) {
-                PractitionerAvailability::create([
-                    'practitioner_id' => $profile->id,
-                    'day_of_week' => $request->day_of_week,
-                    'specific_date' => $request->specific_date,
-                    'start_time' => $current->format('H:i:s'),
-                    'end_time' => $current->copy()->addMinutes($duration)->format('H:i:s'),
-                    'slot_duration' => $duration,
-                    'is_available' => true
-                ]);
-            }
+            PractitionerAvailability::create([
+                'practitioner_id' => $profile->id,
+                'day_of_week' => $request->day_of_week,
+                'specific_date' => $request->specific_date,
+                'start_time' => $current->format('H:i:s'),
+                'end_time' => $current->copy()->addMinutes($duration)->format('H:i:s'),
+                'slot_duration' => $duration,
+                'is_available' => !$isOff
+            ]);
             
             $current->addMinutes($duration);
         }
@@ -264,7 +262,7 @@ class AvailabilityController extends Controller
                 ->where('is_available', true)
                 ->delete();
 
-            // Generate and create slots, skipping the "off" ones
+            // Generate and create slots, marking the "off" ones
             $start = \Carbon\Carbon::parse($request->start_time);
             $end = \Carbon\Carbon::parse($request->end_time);
             $duration = $request->slot_duration;
@@ -274,7 +272,6 @@ class AvailabilityController extends Controller
                 $currentTimeStr = $current->format('H:i:s');
                 
                 // Check if this slot start time is in our "off" list
-                // We compare against H:i because the request time might be H:i
                 $isOff = false;
                 foreach($offSlots as $os) {
                     if (\Carbon\Carbon::parse($os)->format('H:i:s') === $currentTimeStr) {
@@ -283,16 +280,14 @@ class AvailabilityController extends Controller
                     }
                 }
 
-                if (!$isOff) {
-                    PractitionerAvailability::create([
-                        'practitioner_id' => $profile->id,
-                        'day_of_week' => $dayIndex,
-                        'start_time' => $current->format('H:i:s'),
-                        'end_time' => $current->copy()->addMinutes($duration)->format('H:i:s'),
-                        'slot_duration' => $duration,
-                        'is_available' => true
-                    ]);
-                }
+                PractitionerAvailability::create([
+                    'practitioner_id' => $profile->id,
+                    'day_of_week' => $dayIndex,
+                    'start_time' => $current->format('H:i:s'),
+                    'end_time' => $current->copy()->addMinutes($duration)->format('H:i:s'),
+                    'slot_duration' => $duration,
+                    'is_available' => !$isOff
+                ]);
                 
                 $current->addMinutes($duration);
             }
