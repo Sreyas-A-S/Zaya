@@ -247,12 +247,13 @@ class RegisterController extends Controller
             $rules['dob'][] = 'before:' . now()->subYears(18)->format('Y-m-d');
         }
 
+        $rules['captcha'] = ['required', 'string', function ($attribute, $value, $fail) {
+            if (strtoupper($value) !== Session::get('captcha_code')) {
+                $fail('The captcha code is incorrect.');
+            }
+        }];
+
         if (isset($data['role']) && ($data['role'] === 'patient' || $data['role'] === 'client')) {
-            $rules['captcha'] = ['required', 'string', function ($attribute, $value, $fail) {
-                if (strtoupper($value) !== Session::get('captcha_code')) {
-                    $fail('The captcha code is incorrect.');
-                }
-            }];
             $rules['consultation_preferences'] = ['nullable', 'array'];
             $rules['languages'] = ['nullable', 'array'];
         }
@@ -299,7 +300,7 @@ class RegisterController extends Controller
     {
         if ($request->role === 'practitioner') {
             $this->guard()->logout();
-            return null;
+            return redirect()->back()->with('success', 'Thank you! Your application has been submitted and is under review.');
         }
 
         if ($request->has('redirect')) {
@@ -307,7 +308,7 @@ class RegisterController extends Controller
         }
 
         if ($request->role === 'client' || $request->role === 'patient') {
-            return redirect('/zaya-login')->with('success', 'Registration successful! Please login to your account.');
+            return redirect()->back()->with('success', 'Registration successful! Please login to your account.');
         }
     }
 }

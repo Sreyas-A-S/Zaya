@@ -110,6 +110,21 @@ class LoginController extends Controller
             return redirect()->route('admin.login')->with('error', 'Admins must login via the Admin Portal.');
         }
 
+        $checkStatusRoles = ['practitioner', 'doctor', 'mindfulness-practitioner', 'yoga-therapist', 'mindfulness_practitioner', 'yoga_therapist', 'client', 'patient'];
+        if (in_array($user->role, $checkStatusRoles)) {
+            $profile = $user->profile; // Fetch the correct profile model dynamically
+            
+            // Allow login only if User status is 'active' AND (if profile exists) profile status is 'active'
+            $userStatus = strtolower(trim($user->status ?? 'active'));
+            // Profile status is sometimes null/empty for new clients, default to active if missing from profile but checked on user
+            $profileStatus = ($profile && isset($profile->status)) ? strtolower(trim($profile->status)) : 'active';
+
+            if ($userStatus !== 'active' || $profileStatus !== 'active') {
+                auth()->logout();
+                return redirect()->route('login')->with('error', 'Your account is currently inactive. Please wait for approval or contact support.');
+            }
+        }
+
         if ($request->has('redirect')) {
             return redirect($request->redirect);
         }

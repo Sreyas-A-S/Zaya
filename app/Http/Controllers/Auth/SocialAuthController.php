@@ -29,8 +29,15 @@ class SocialAuthController extends Controller
             $socialUser = Socialite::driver($provider)->user();
             
             $existingUser = User::where($provider . '_id', $socialUser->id)->first();
+            $practitionerRoles = ['practitioner', 'doctor', 'mindfulness-practitioner', 'yoga-therapist', 'mindfulness_practitioner', 'yoga_therapist'];
 
             if ($existingUser) {
+                if (in_array($existingUser->role, $practitionerRoles)) {
+                    $profile = $existingUser->profile;
+                    if (!$profile || strtolower(trim($profile->status)) !== 'active') {
+                        return redirect()->route('login')->with('error', 'Your account is currently inactive. Please wait for approval or contact support.');
+                    }
+                }
                 Auth::login($existingUser);
                 return redirect()->route('dashboard');
             } else {
@@ -38,6 +45,12 @@ class SocialAuthController extends Controller
                 $userByEmail = User::where('email', $socialUser->email)->first();
 
                 if ($userByEmail) {
+                    if (in_array($userByEmail->role, $practitionerRoles)) {
+                        $profile = $userByEmail->profile;
+                        if (!$profile || strtolower(trim($profile->status)) !== 'active') {
+                            return redirect()->route('login')->with('error', 'Your account is currently inactive. Please wait for approval or contact support.');
+                        }
+                    }
                     $userByEmail->update([
                         $provider . '_id' => $socialUser->id,
                     ]);

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('frontend/assets/favicon-96x96.png') }}" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="{{ asset('frontend/assets/favicon.svg') }}" />
     <link rel="shortcut icon" href="{{ asset('frontend/assets/favicon.ico') }}" />
@@ -373,6 +374,20 @@
         .toast.error {
             background-color: #F56565;
         }
+
+        /* Thank You Popup Styles */
+        #thank-you-popup {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .animate-pop-in {
+            animation: popIn 0.3s ease-out forwards;
+        }
     </style>
 </head>
 
@@ -381,13 +396,13 @@
     <div class="flex-1 relative overflow-x-hidden">
         <!-- Floating Leaves -->
         <img src="{{ asset('frontend/assets/reg-floating-img-01.png') }}" alt="Decorative Leaf"
-            class="floating-leaf floating-leaf-2 w-14 md:w-16 lg:w-20 right-4 md:right-12 lg:right-20 top-16 md:top-20">
+            class="floating-leaf w-14 md:w-16 lg:w-20 right-4 md:right-12 lg:right-20 top-16 md:top-20">
 
         <img src="{{ asset('frontend/assets/reg-floating-img-02.png') }}" alt="Decorative Leaf"
-            class="floating-leaf floating-leaf-1 w-16 md:w-20 lg:w-24 -left-2 md:left-0 top-40 md:top-52">
+            class="floating-leaf w-16 md:w-20 lg:w-24 -left-2 md:left-0 top-40 md:top-52">
 
         <img src="{{ asset('frontend/assets/reg-floating-img-03.png') }}" alt="Decorative Leaf"
-            class="floating-leaf floating-leaf-3 w-20 md:w-28 lg:w-36 right-0 bottom-32 md:bottom-40">
+            class="floating-leaf w-20 md:w-28 lg:w-36 right-0 bottom-32 md:bottom-40">
 
         <div class="container mx-auto px-4 py-8 md:py-12 lg:py-16">
             <!-- Header -->
@@ -699,6 +714,33 @@
         </div>
     </div>
 
+    <!-- Client Thank You Popup Modal -->
+    <div id="thank-you-popup" class="fixed inset-0 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
+        <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-[450px] p-10 text-center relative animate-pop-in">
+            <!-- Success Icon -->
+            <div class="w-24 h-24 bg-[#60E48C] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#60E48C]/30">
+                <i class="ri-check-line text-white text-5xl"></i>
+            </div>
+
+            <!-- Text Content -->
+            <h3 class="text-[#209F59] text-3xl font-medium mb-4">{{ __('Thank you!') }}</h3>
+            <h4 class="text-gray-800 text-xl font-semibold mb-3">{{ __('Registration Successful!') }}</h4>
+            <p class="text-gray-500 text-base leading-relaxed mb-8">
+                {{ __('Your account has been created successfully.') }}<br>
+                {{ __('Please login to access your portal.') }}
+            </p>
+            
+            <div class="flex flex-col gap-3">
+                <a href="{{ route('zaya-login') }}" class="bg-[#FABC41] text-[#423131] py-3.5 px-8 rounded-full font-medium transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5">
+                    {{ __('Login Now') }}
+                </a>
+                <button onclick="closeThankYouPopup()" class="text-gray-400 hover:text-gray-600 text-sm py-2">
+                    {{ __('Close') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer with Buttons -->
     <footer class="bg-[#FFF3D4] py-6 mt-auto">
         <div class="container mx-auto px-4">
@@ -792,6 +834,39 @@
 
             // Initialize Tom Select for Languages
             if (document.getElementById('languages-select')) {
+                // Comprehensive ISO 639-1 language code → ISO 3166-1 country flag mapping
+                const langToCountry = {
+                    'af': 'za', 'ak': 'gh', 'sq': 'al', 'am': 'et', 'ar': 'sa', 'hy': 'am', 'as': 'in', 'ay': 'bo', 'az': 'az',
+                    'bm': 'ml', 'eu': 'es', 'be': 'by', 'bn': 'bd', 'bho': 'in', 'bs': 'ba', 'bg': 'bg', 'ca': 'es', 'ceb': 'ph',
+                    'zh': 'cn', 'zh-hk': 'hk', 'zh-tw': 'tw', 'co': 'fr', 'hr': 'hr', 'cs': 'cz', 'da': 'dk', 'dv': 'mv',
+                    'doi': 'in', 'nl': 'nl', 'en': 'gb', 'en-au': 'au', 'en-ca': 'ca', 'en-gb': 'gb', 'en-us': 'us',
+                    'eo': 'eu', 'et': 'ee', 'ee': 'gh', 'fil': 'ph', 'fi': 'fi', 'fr': 'fr', 'fr-fr': 'fr', 'fr-ca': 'ca',
+                    'fy': 'nl', 'gl': 'es', 'ka': 'ge', 'de': 'de', 'el': 'gr', 'gn': 'py', 'gu': 'in', 'ht': 'ht',
+                    'ha': 'ng', 'haw': 'us', 'he': 'il', 'hi': 'in', 'hmn': 'cn', 'hu': 'hu', 'is': 'is', 'ig': 'ng',
+                    'ilo': 'ph', 'id': 'id', 'ga': 'ie', 'it': 'it', 'ja': 'jp', 'jv': 'id', 'kn': 'in', 'kk': 'kz',
+                    'km': 'kh', 'rw': 'rw', 'gom': 'in', 'ko': 'kr', 'kri': 'sl', 'ku': 'iq', 'ckb': 'iq', 'ky': 'kg',
+                    'lo': 'la', 'la': 'va', 'lv': 'lv', 'ln': 'cd', 'lt': 'lt', 'lg': 'ug', 'lb': 'lu', 'mk': 'mk',
+                    'mai': 'in', 'mg': 'mg', 'ms': 'my', 'ms-my': 'my', 'ml': 'in', 'mt': 'mt', 'mi': 'nz', 'mr': 'in',
+                    'mni': 'in', 'lus': 'in', 'mn': 'mn', 'my': 'mm', 'ne': 'np', 'no': 'no', 'ny': 'mw', 'or': 'in',
+                    'om': 'et', 'ps': 'af', 'fa': 'ir', 'pl': 'pl', 'pt': 'pt', 'pt-br': 'br', 'pt-pt': 'pt', 'pa': 'in',
+                    'qu': 'pe', 'ro': 'ro', 'ru': 'ru', 'sm': 'ws', 'sa': 'in', 'gd': 'gb', 'nso': 'za', 'sr': 'rs',
+                    'st': 'ls', 'sn': 'zw', 'sd': 'pk', 'si': 'lk', 'sk': 'sk', 'sl': 'si', 'so': 'so', 'es': 'es',
+                    'es-419': 'mx', 'es-us': 'us', 'su': 'id', 'sw': 'ke', 'sv': 'se', 'tl': 'ph', 'tg': 'tj', 'ta': 'in',
+                    'tt': 'ru', 'te': 'in', 'th': 'th', 'ti': 'et', 'ts': 'za', 'tr': 'tr', 'tk': 'tm', 'uk': 'ua',
+                    'ur': 'pk', 'ug': 'cn', 'uz': 'uz', 'vi': 'vn', 'cy': 'gb', 'xh': 'za', 'yi': 'il', 'yo': 'ng', 'zu': 'za'
+                };
+
+                const getFlagCode = (code) => {
+                    const lc = (code || '').toLowerCase();
+                    if (langToCountry[lc]) return langToCountry[lc];
+                    
+                    const baseCode = lc.split('-')[0];
+                    if (langToCountry[baseCode]) return langToCountry[baseCode];
+                    
+                    if (lc.length === 2) return lc; // Fallback to lc if it looks like a 2-char code
+                    return null;
+                };
+
                 new TomSelect('#languages-select', {
                     plugins: ['remove_button'],
                     maxItems: 10,
@@ -799,43 +874,46 @@
                     controlClass: 'ts-control',
                     render: {
                         option: function(data, escape) {
-                            // Map language codes to country flags where common
-                            const langToCountry = {
-                                'en': 'gb', 'fr': 'fr', 'es': 'es', 'de': 'de', 'zh': 'cn', 
-                                'hi': 'in', 'ja': 'jp', 'ru': 'ru', 'ar': 'sa', 'pt': 'pt',
-                                'it': 'it', 'ko': 'kr'
-                            };
-                            const flagCode = langToCountry[data.value.toLowerCase()] || data.value.toLowerCase();
-                            return `<div class="country-option">
-                                <span class="fi fi-${flagCode} country-option-flag"></span>
-                                <span class="country-option-name">${escape(data.text)}</span>
-                            </div>`;
+                            const flag = getFlagCode(data.value);
+                            const flagHtml = flag ? `<span class="fi fi-${flag} country-option-flag mr-2"></span>` : `<span class="country-option-flag-placeholder inline-block w-5 mr-2"></span>`;
+                            return `<div class="country-option flex items-center px-4 py-2 hover:bg-gray-50">${flagHtml}<span class="country-option-name">${escape(data.text)}</span></div>`;
                         },
                         item: function(data, escape) {
-                            const langToCountry = {
-                                'en': 'gb', 'fr': 'fr', 'es': 'es', 'de': 'de', 'zh': 'cn', 
-                                'hi': 'in', 'ja': 'jp', 'ru': 'ru', 'ar': 'sa', 'pt': 'pt',
-                                'it': 'it', 'ko': 'kr'
-                            };
-                            const flagCode = langToCountry[data.value.toLowerCase()] || data.value.toLowerCase();
-                            return `<div class="country-item">
-                                <span class="fi fi-${flagCode} country-item-flag"></span>
-                                <span class="country-item-name">${escape(data.text)}</span>
-                            </div>`;
+                            const flag = getFlagCode(data.value);
+                            const flagHtml = flag ? `<span class="fi fi-${flag} country-item-flag mr-2"></span>` : '';
+                            return `<div class="country-item flex items-center bg-[#E8F5E9] text-primary px-2 py-1 rounded-full text-sm mr-2 mb-1">${flagHtml}<span class="country-item-name">${escape(data.text)}</span></div>`;
                         }
                     }
                 });
             }
 
-            // Mobile Phone Flag Initialization
+            // Geolocation and Mobile Phone Flag Initialization
             const phoneInputField = document.querySelector("input[name='mobile']");
             if (phoneInputField) {
-                window.intlTelInput(phoneInputField, {
+                const iti = window.intlTelInput(phoneInputField, {
                     initialCountry: "auto",
                     geoIpLookup: function(callback) {
                         fetch("https://ipapi.co/json")
                             .then(res => res.json())
-                            .then(data => callback(data.country_code))
+                            .then(data => {
+                                // Auto-fill other location fields if they are empty
+                                const cityInput = document.querySelector("input[name='city']");
+                                if (cityInput && !cityInput.value) cityInput.value = data.city;
+
+                                const stateInput = document.querySelector("input[name='state']");
+                                if (stateInput && !stateInput.value) stateInput.value = data.region;
+
+                                const zipInput = document.querySelector("input[name='zip_code']");
+                                if (zipInput && !zipInput.value) zipInput.value = data.postal;
+
+                                // Update Nationality Select (TomSelect)
+                                const nationalitySelect = document.querySelector('#nationality-select');
+                                if (nationalitySelect && nationalitySelect.tomselect) {
+                                    nationalitySelect.tomselect.setValue(data.country_name);
+                                }
+
+                                callback(data.country_code);
+                            })
                             .catch(() => callback("in"));
                     },
                     utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
@@ -955,7 +1033,53 @@
                 confirmPasswordInput.focus();
             }
         });
+
+        // Show Thank You Popup if success session exists
+        @if(session('success'))
+        document.addEventListener('DOMContentLoaded', function() {
+            const popup = document.getElementById('thank-you-popup');
+            if (popup) {
+                popup.classList.remove('hidden');
+                popup.classList.add('flex');
+            }
+        });
+        @endif
+
+        function closeThankYouPopup() {
+            const popup = document.getElementById('thank-you-popup');
+            if (popup) {
+                popup.classList.add('hidden');
+                popup.classList.remove('flex');
+            }
+        }
+
+        // Close on click outside
+        document.getElementById('thank-you-popup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeThankYouPopup();
+            }
+        });
     </script>
+    <!-- Thank You Popup -->
+    <div id="thank-you-popup" class="fixed inset-0 bg-black/40 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
+        <div class="bg-white rounded-[40px] p-8 md:p-12 max-w-[550px] w-full text-center relative animate-pop-in shadow-2xl">
+            <button onclick="closeThankYouPopup()" class="absolute top-6 right-8 text-gray-300 hover:text-gray-500 transition-colors">
+                <i class="ri-close-line text-2xl"></i>
+            </button>
+            <div class="mb-8 flex justify-center">
+                <div class="w-20 h-20 rounded-full bg-[#E8F5E9] flex items-center justify-center">
+                    <i class="ri-checkbox-circle-fill text-[#4CAF50] text-5xl"></i>
+                </div>
+            </div>
+            <h3 class="text-2xl md:text-3xl font-serif font-bold text-secondary mb-4">{{ __('Thank You!') }}</h3>
+            <p class="text-gray-600 text-base md:text-lg mb-8 leading-relaxed">
+                {{ __('Your registration has been submitted successfully. Our team will review your application and get back to you shortly.') }}
+            </p>
+            <button onclick="closeThankYouPopup()" class="bg-secondary text-white px-8 py-3 rounded-full hover:bg-opacity-90 transition-all font-medium">
+                {{ __('Got it, thanks!') }}
+            </button>
+        </div>
+    </div>
 </body>
 
 </html>

@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <link rel="icon" type="image/png" href="{{ asset('frontend/assets/favicon-96x96.png') }}" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="{{ asset('frontend/assets/favicon.svg') }}" />
     <link rel="shortcut icon" href="{{ asset('frontend/assets/favicon.ico') }}" />
@@ -339,7 +341,7 @@
                         <div class="mb-8 practice-group" data-input="ayurvedic-input">
                             <h4 class="font-medium text-gray-900 mb-4 text-xl">{{ __('Ayurvedic Wellness Consultation:') }}</h4>
                             <p class="text-gray-700 text-lg mb-4">{{ __('Focuses on nutritional and lifestyle guidance rooted in Ayurvedic principles:') }}</p>
-                            <input type="text" name="ayurvedic_practices_custom" id="ayurvedic-input" readonly
+                            <input type="text" name="ayurvedic_practices_custom" id="ayurvedic-input" 
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
                                 placeholder="{{ __('Choose your practice areas') }}">
                             <div class="flex flex-wrap gap-4">
@@ -365,7 +367,7 @@
                         <div class="mb-8 practice-group" data-input="massage-input">
                             <h4 class="text-xl font-medium text-gray-900 mb-4">{{ __('Massage & Body Therapists:') }}</h4>
                             <p class="text-gray-700 text-lg mb-4">{{ __('Includes specific traditional physical treatments and specialized care:') }}</p>
-                            <input type="text" name="massage_practices_custom" id="massage-input" readonly
+                            <input type="text" name="massage_practices_custom" id="massage-input" 
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
                                 placeholder="{{ __('Choose your practice areas') }}">
                             <div class="flex flex-wrap gap-4">
@@ -390,7 +392,7 @@
                         <!-- Other Modalities -->
                         <div class="mb-8 practice-group" data-input="modalities-input">
                             <h4 class="text-xl font-medium text-gray-900 mb-4">{{ __('Other Modalities:') }}</h4>
-                            <input type="text" name="other_modalities_custom" id="modalities-input" readonly
+                            <input type="text" name="other_modalities_custom" id="modalities-input" 
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
                                 placeholder="{{ __('Choose your practice areas') }}">
                             <div class="flex flex-wrap gap-4">
@@ -525,12 +527,7 @@
                             </div>
                         </div>
                         <div class="bg-[#FFECC8] rounded-lg py-6 px-10 flex justify-end items-center mb-4">
-                            <div class="flex justify-end gap-3">
-                                <button type="button"
-                                    class="text-gray-500 text-base cursor-pointer bg-transparent border-none py-2 px-4 hover:text-gray-700">{{ __('Cancel') }}</button>
-                                <button type="button"
-                                    class="bg-[#FABD4D] text-[#423131] py-2 px-5 rounded-full text-base transition-all duration-300 cursor-pointer border-none hover:bg-[#d3992d]">{{ __('Save') }}</button>
-                            </div>
+                            
                         </div>
                     </div>
 
@@ -657,7 +654,7 @@
                                     <i class="ri-refresh-line text-2xl"></i>
                                 </button>
                                 <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}"
-                                    class="h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#1B5CB8] focus:shadow-[0_0_0_3px_rgba(27,92,184,0.1)]">
+                                    class="h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#1B5CB8] focus:shadow-[0_0_0_3px_rgba(27,92,184,0.1)]" required>
                             </div>
                         </div>
                     </div>
@@ -745,7 +742,31 @@
                 const iti = window.intlTelInput(phoneInput, {
                     utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
                     separateDialCode: true,
-                    initialCountry: "in",
+                    initialCountry: "auto",
+                    geoIpLookup: function(callback) {
+                        fetch("https://ipapi.co/json")
+                            .then(res => res.json())
+                            .then(data => {
+                                // Auto-fill location fields if they are empty
+                                const cityInput = document.querySelector("input[name='city']");
+                                if (cityInput && !cityInput.value) cityInput.value = data.city;
+
+                                const stateInput = document.querySelector("input[name='state']");
+                                if (stateInput && !stateInput.value) stateInput.value = data.region;
+
+                                const zipInput = document.querySelector("input[name='zip_code']");
+                                if (zipInput && !zipInput.value) zipInput.value = data.postal;
+
+                                // Update Country Select (TomSelect)
+                                const countrySelect = document.querySelector('#country-select');
+                                if (countrySelect && countrySelect.tomselect) {
+                                    countrySelect.tomselect.setValue(data.country_name);
+                                }
+
+                                callback(data.country_code);
+                            })
+                            .catch(() => callback("in"));
+                    },
                     preferredCountries: ["in", "ae", "us", "gb"]
                 });
 
@@ -1567,6 +1588,38 @@
                 target.querySelector('input').value = '';
             }
         }
+
+        function refreshCaptcha() {
+            const img = document.getElementById('captcha-img');
+            if (img) img.src = "{{ route('captcha') }}?" + new Date().getTime();
+        }
+
+        // Show Thank You Popup if success session exists
+        @if(session('success'))
+        document.addEventListener('DOMContentLoaded', function() {
+            const popup = document.getElementById('thank-you-popup');
+            if (popup) {
+                popup.classList.remove('hidden');
+                popup.classList.add('flex');
+            }
+        });
+        @endif
+
+        function closeThankYouPopup() {
+            const popup = document.getElementById('thank-you-popup');
+            if (popup) {
+                popup.classList.add('hidden');
+                popup.classList.remove('flex');
+                window.location.href = "{{ route('index') }}";
+            }
+        }
+
+        // Click outside popup to close or redirect
+        document.getElementById('thank-you-popup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeThankYouPopup();
+            }
+        });
     </script>
 </body>
 

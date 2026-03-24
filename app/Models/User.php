@@ -68,8 +68,8 @@ class User extends Authenticatable implements JWTSubject
             'client', 'patient' => $this->patient,
             'practitioner' => $this->practitioner,
             'doctor' => $this->doctor,
-            'mindfulness_practitioner' => $this->mindfulnessPractitioner,
-            'yoga_therapist' => $this->yogaTherapist,
+            'mindfulness_practitioner', 'mindfulness-practitioner' => $this->mindfulnessPractitioner,
+            'yoga_therapist', 'yoga-therapist' => $this->yogaTherapist,
             'translator' => $this->translator,
             default => null,
         };
