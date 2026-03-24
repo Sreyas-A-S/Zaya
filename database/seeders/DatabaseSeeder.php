@@ -52,6 +52,8 @@ class DatabaseSeeder extends Seeder
             UserManagerSeeder::class,
             FooterSettingSeeder::class,
             FooterSettingFrenchSeeder::class,
+            FaqSeeder::class,
+            FaqfrenchSeeder::class,
             BookingSeeder::class,
         ]);
 
