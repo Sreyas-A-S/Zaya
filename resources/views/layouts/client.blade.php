@@ -69,6 +69,7 @@
         }
     </style>
     @yield('styles')
+    @stack('styles')
 </head>
 
 <body class="flex h-screen overflow-hidden text-gray-800 bg-white">
@@ -109,6 +110,10 @@
                 <a href="{{ route('time-slots.index') }}"
                     class="flex items-center px-8 py-3 {{ request()->routeIs('time-slots.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-time-line mr-3 text-lg"></i> <span id="client_panel_sidebar_time_slots" data-i18n="Time Slots">{{ __($site_settings['client_panel_sidebar_time_slots'] ?? 'Time Slots') }}</span>
+                </a>
+                <a href="{{ route('practitioner.profile') }}"
+                    class="flex items-center px-8 py-3 {{ request()->routeIs('practitioner.profile') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
+                    <i class="ri-user-settings-line mr-3 text-lg"></i> <span id="client_panel_sidebar_practitioner_profile" data-i18n="Practitioner Profile">{{ __('Practitioner Profile') }}</span>
                 </a>
                 <a href="{{ route('logout') }}"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
@@ -503,6 +508,7 @@
             });
         }
     </script>
+    @stack('scripts')
 </body>
 
 </html>

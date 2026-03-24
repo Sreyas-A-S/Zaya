@@ -295,9 +295,7 @@ Route::get('/seed', function () {
 });
 
 
-Route::get('/practitioner-profile', function () {
-    return view('practitioner-profile');
-})->name('practitioner-profile');
+
 
 Route::get('/preview-otp-mail', function () {
     return new App\Mail\AdminOTPMail('123456');

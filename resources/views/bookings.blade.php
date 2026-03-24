@@ -13,6 +13,8 @@
         class="leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1">Bookings</a>
     <button class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Transaction
         Vault</button>
+    <a href="{{ route('practitioner.profile') }}"
+        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Practitioner Profile</a>
 </div>
 
 <!-- Bookings Content -->

@@ -204,6 +204,13 @@ class HomepageSettingSeeder extends Seeder
                 'max_length' => 15
             ],
             [
+                'key' => 'blog_post_1_link',
+                'value' => '#',
+                'type' => 'text',
+                'section' => 'blog',
+                'max_length' => 255
+            ],
+            [
                 'key' => 'blog_post_2_image',
                 'value' => 'frontend/assets/ayurvedha-medicine.png',
                 'type' => 'image',
@@ -222,6 +229,40 @@ class HomepageSettingSeeder extends Seeder
                 'type' => 'text',
                 'section' => 'blog',
                 'max_length' => 15
+            ],
+            [
+                'key' => 'blog_post_2_link',
+                'value' => '#',
+                'type' => 'text',
+                'section' => 'blog',
+                'max_length' => 255
+            ],
+            [
+                'key' => 'blog_post_3_image',
+                'value' => 'frontend/assets/yoga-dress-girl.png',
+                'type' => 'image',
+                'section' => 'blog'
+            ],
+            [
+                'key' => 'blog_post_3_title',
+                'value' => 'Morning Rituals for Energy',
+                'type' => 'text',
+                'section' => 'blog',
+                'max_length' => 60
+            ],
+            [
+                'key' => 'blog_post_3_read_time',
+                'value' => '15 min Read',
+                'type' => 'text',
+                'section' => 'blog',
+                'max_length' => 15
+            ],
+            [
+                'key' => 'blog_post_3_link',
+                'value' => '#',
+                'type' => 'text',
+                'section' => 'blog',
+                'max_length' => 255
             ],
             [
                 'key' => 'blog_footer_text',

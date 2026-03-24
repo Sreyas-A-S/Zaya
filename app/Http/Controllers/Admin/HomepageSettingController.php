@@ -25,12 +25,28 @@ class HomepageSettingController extends Controller
             ->get()
             ->keyBy('key');
 
-        // Get all setting structure from English (default)
         $defaultSettings = HomepageSetting::whereNotIn('section', ['about_page', 'services_page', 'contact', 'general'])
             ->where('language', 'en')
             ->get();
 
-        $settings = $defaultSettings->map(function($setting) use ($currentSettings, $language) {
+        $globalKeys = ['blog_post_1_link', 'blog_post_2_link', 'blog_post_3_link'];
+
+        $settings = $defaultSettings->map(function($setting) use ($currentSettings, $language, $globalKeys) {
+            $isGlobal = in_array($setting->key, $globalKeys);
+            
+            if ($isGlobal) {
+                // For global settings, always use the 'en' record
+                $globalSetting = $setting->replicate();
+                $globalSetting->is_global = true;
+                // If we are editing 'en', use current values, otherwise use en values
+                if ($language === 'en' && $currentSettings->has($setting->key)) {
+                    $globalSetting->value = $currentSettings->get($setting->key)->value;
+                } else {
+                    $globalSetting->value = $setting->value;
+                }
+                return $globalSetting;
+            }
+
             if ($currentSettings->has($setting->key)) {
                 return $currentSettings->get($setting->key);
             }
@@ -49,10 +65,14 @@ class HomepageSettingController extends Controller
     {
         $language = session('locale', 'en');
         $data = $request->except('_token');
+        $globalKeys = ['blog_post_1_link', 'blog_post_2_link', 'blog_post_3_link'];
 
         foreach ($data as $key => $value) {
+            $isGlobal = in_array($key, $globalKeys);
+            $targetLanguage = $isGlobal ? 'en' : $language;
+
             $setting = HomepageSetting::where('key', $key)
-                ->where('language', $language)
+                ->where('language', $targetLanguage)
                 ->first();
             if ($setting) {
                 // Validate max length if applicable

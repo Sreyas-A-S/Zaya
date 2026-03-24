@@ -29,6 +29,10 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::post('/data-access/request', [\App\Http\Controllers\DataAccessController::class, 'requestAccess'])->name('data-access.request');
     Route::post('/data-access/verify', [\App\Http\Controllers\DataAccessController::class, 'verifyOTP'])->name('data-access.verify');
     Route::get('/client-profile/{id}', [ProfileController::class, 'viewClientProfile'])->name('client.profile.view');
+    Route::get('/practitioner-profile', [ProfileController::class, 'practitionerProfile'])->name('practitioner.profile');
+    Route::post('/practitioner-profile/update-professional', [ProfileController::class, 'updateProfessionalDetails'])->name('practitioner.profile.updateProfessional');
+    Route::post('/practitioner-profile/gallery', [ProfileController::class, 'uploadGalleryImage'])->name('practitioner.profile.gallery.upload');
+    Route::delete('/practitioner-profile/gallery/{id}', [ProfileController::class, 'deleteGalleryImage'])->name('practitioner.profile.gallery.delete');
     Route::get('/api/referrable-practitioners', [\App\Http\Controllers\BookingController::class, 'fetchReferrablePractitioners'])->name('api.referrable-practitioners');
 
     // Availability / Time Slots
