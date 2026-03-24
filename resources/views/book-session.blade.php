@@ -930,6 +930,7 @@
 
         function previousStep() {
             if (isClient && currentStep === 2) {
+                window.location.href = @json(route('login', ['redirect' => request()->fullUrl()]));
                 return;
             }
             if (currentStep > 1) {
