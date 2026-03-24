@@ -27,12 +27,10 @@ class MagicLoginController extends Controller
         }
 
         $user = $magicLink->user;
-        $practitionerRoles = ['practitioner', 'doctor', 'mindfulness-practitioner', 'yoga-therapist', 'mindfulness_practitioner', 'yoga_therapist'];
-
-        if ($user && in_array($user->role, $practitionerRoles)) {
-            $profile = $user->profile;
-            if (!$profile || strtolower(trim($profile->status)) !== 'active') {
-                return redirect()->route('login')->with('error', 'Your account is currently inactive. Please wait for approval or contact support.');
+        if ($user) {
+            $blockReason = $user->getLoginBlockReason();
+            if ($blockReason) {
+                return redirect()->route('login')->with('error', $blockReason);
             }
         }
 

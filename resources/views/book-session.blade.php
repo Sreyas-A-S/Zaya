@@ -14,6 +14,19 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <style>
+        .iti { width: 100% !important; display: block !important; }
+        /* Hide Swiper's default navigation arrows */
+        .practitioner-modal-slider .swiper-button-next,
+        .practitioner-modal-slider .swiper-button-prev {
+            display: none !important;
+        }
+        /* Custom arrow disabled state */
+        .practitioner-modal-prev.swiper-button-disabled,
+        .practitioner-modal-next.swiper-button-disabled {
+            opacity: 0.3;
+            cursor: default;
+            pointer-events: none;
+        }
         /* Toast Styles */
         #toast-container {
             position: fixed;
@@ -116,7 +129,7 @@
             <!-- Language Toggle Desktop -->
             <div class="hidden lg:flex absolute right-10 top-1/2 -translate-y-1/2">
                 @php
-                $available_languages = $languages->where('status', 'active');
+                $available_languages = $languages;
                 $lang1 = $available_languages->first();
                 $lang2 = $available_languages->skip(1)->first();
                 $currentLocale = App::getLocale();
@@ -219,7 +232,7 @@
                 <div class="mb-10">
                     <h3 class="text-gray-700 font-normal mb-4 text-lg" data-i18n="Why do you want to meet this practitioner?">{{ __('Why do you want to meet this practitioner?') }}
                     </h3>
-                    <input type="text" id="conditions-input" placeholder="{{ __('Add conditions...') }}" readonly
+                    <input type="text" id="conditions-input" placeholder="{{ __('Add conditions...') }}" readonly 
                         class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400 mb-4 cursor-default" data-i18n-placeholder="Add conditions...">
 
                     <!-- Condition Tags -->
@@ -589,10 +602,12 @@
                         <div
                             class="dropdown-menu absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 z-50 hidden max-h-[280px] overflow-y-auto">
                             <div class="py-2">
-                                <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="english">English</div>
-                                <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="french">French</div>
-                                <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="german">German</div>
-                                <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="spanish">Spanish</div>
+                                @forelse($languages as $language)
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="{{ $language->name }}">{{ $language->name }}</div>
+                                @empty
+                                    <div class="px-6 py-3 text-sm text-gray-400">No languages available.</div>
+                                @endforelse
                             </div>
                         </div>
                     </div>
@@ -610,10 +625,12 @@
                         <div
                             class="dropdown-menu absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100 z-50 hidden max-h-[280px] overflow-y-auto">
                             <div class="py-2">
-                                <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="english">English</div>
-                                <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="french">French</div>
-                                <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="german">German</div>
-                                <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors" data-value="spanish">Spanish</div>
+                                @forelse($languages as $language)
+                                    <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
+                                        data-value="{{ $language->name }}">{{ $language->name }}</div>
+                                @empty
+                                    <div class="px-6 py-3 text-sm text-gray-400">No languages available.</div>
+                                @endforelse
                             </div>
                         </div>
                     </div>
@@ -657,7 +674,7 @@
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
+            toast.className = `toast ${type}`;
             toast.textContent = message;
 
             container.appendChild(toast);
@@ -691,8 +708,7 @@
             btn.innerHTML = '<i class="ri-loader-4-line animate-spin text-xl"></i> Processing...';
             btn.disabled = true;
 
-            const practitionerId = document.getElementById('selected-practitioner-id')?.value || '{{ $activePractitioner->id ?? '
-            ' }}';
+            const practitionerId = document.getElementById('selected-practitioner-id')?.value || @json($activePractitioner ? $activePractitioner->id : null);
             const selectedServices = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
             const serviceIds = selectedServices.map(cb => cb.closest('.service-tag-label').dataset.serviceId);
 
@@ -731,7 +747,12 @@
                 total_price: totalPrice
             };
 
-            let paymentWindow = window.open('about:blank', '_blank');
+            let paymentWindow = null;
+            try {
+                paymentWindow = window.open('about:blank', '_blank');
+            } catch (_) {
+                paymentWindow = null;
+            }
 
             try {
                 const response = await fetch('{{ route('bookings.store') }}', {
@@ -747,11 +768,19 @@
                 const data = await response.json();
 
                 if (response.ok && data.success && data.redirect_url) {
-                    showToast('Booking created! Opening payment gateway...', 'success');
-                    if (paymentWindow && !paymentWindow.closed) {
-                        paymentWindow.location.href = data.redirect_url;
-                        paymentWindow.focus();
+                    showToast(data.message || 'Booking created!', 'success');
+
+                    if (data.open_in_new_tab) {
+                        if (paymentWindow && !paymentWindow.closed) {
+                            paymentWindow.location.href = data.redirect_url;
+                            paymentWindow.focus();
+                        } else {
+                            window.location.href = data.redirect_url;
+                        }
                     } else {
+                        if (paymentWindow && !paymentWindow.closed) {
+                            paymentWindow.close();
+                        }
                         window.location.href = data.redirect_url;
                     }
                 } else {
@@ -867,8 +896,34 @@
             });
         }
 
+        function validateScheduleStep() {
+            const selectedServices = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
+            if (selectedServices.length === 0) {
+                showToast('Please select at least one service.', 'warning');
+                return false;
+            }
+
+            for (const checkbox of selectedServices) {
+                const label = checkbox.closest('.service-tag-label');
+                const serviceNameLower = (label?.dataset?.serviceName || checkbox.value || '').toLowerCase();
+                const scheduleItem = document.querySelector(`.service-schedule-item[data-service-name="${serviceNameLower}"]`);
+                const bookingDate = scheduleItem?.querySelector('.day-value')?.value;
+                const bookingTime = scheduleItem?.querySelector('.time-value')?.value;
+
+                if (!bookingDate || !bookingTime) {
+                    showToast('Please select Date & Time for all selected services.', 'warning');
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         function nextStep() {
             if (currentStep < totalSteps) {
+                if (currentStep === 2 && !validateScheduleStep()) {
+                    return;
+                }
                 showStep(currentStep + 1);
             }
         }
@@ -1672,40 +1727,49 @@
                 </div>
 
                 <!-- Practitioners Slider -->
-                <div class="swiper practitioner-modal-slider">
-                    <div class="swiper-wrapper">
-                        @foreach($practitioners as $practitioner)
-                        @php
-                        $pName = trim(($practitioner->first_name ?? '') . ' ' . ($practitioner->last_name ?? ''));
-                        if ($pName === '') {
-                        $pName = $practitioner->user->name ?? 'Practitioner';
-                        }
-                        $pImage = $practitioner->profile_photo_path
-                        ? asset('storage/' . $practitioner->profile_photo_path)
-                        : asset('frontend/assets/lilly-profile-pic.png');
-                        $pRole = $practitioner->other_modalities[0] ?? 'Practitioner';
-                        @endphp
-                        <div class="swiper-slide !w-[140px]">
-                            <div class="flex flex-col items-center group cursor-pointer text-center practitioner-select-card"
-                                data-id="{{ $practitioner->id }}"
-                                data-name="{{ $pName }}"
-                                data-image="{{ $pImage }}"
-                                data-role="{{ $pRole }}"
-                                data-rating="{{ number_format($practitioner->average_rating, 1) }}"
-                                data-location="{{ $practitioner->city_state }}">
-                                <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
-                                    <img src="{{ $pImage }}" alt="{{ $pName }}"
-                                        class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
+                <div class="relative overflow-hidden">
+                    <div class="swiper practitioner-modal-slider px-8 lg:px-10">
+                        <div class="swiper-wrapper">
+                            @foreach($practitioners as $practitioner)
+                            @php
+                            $pName = trim(($practitioner->first_name ?? '') . ' ' . ($practitioner->last_name ?? ''));
+                            if ($pName === '') {
+                            $pName = $practitioner->user->name ?? 'Practitioner';
+                            }
+                            $pImage = $practitioner->profile_photo_path
+                            ? asset('storage/' . $practitioner->profile_photo_path)
+                            : asset('frontend/assets/lilly-profile-pic.png');
+                            $pRole = $practitioner->other_modalities[0] ?? 'Practitioner';
+                            @endphp
+                            <div class="swiper-slide !w-[140px]">
+                                <div class="flex flex-col items-center group cursor-pointer text-center practitioner-select-card"
+                                    data-id="{{ $practitioner->id }}"
+                                    data-name="{{ $pName }}"
+                                    data-image="{{ $pImage }}"
+                                    data-role="{{ $pRole }}"
+                                    data-rating="{{ number_format($practitioner->average_rating, 1) }}"
+                                    data-location="{{ $practitioner->city_state }}">
+                                    <div class="w-[124px] h-[124px] rounded-full overflow-hidden mb-4 relative">
+                                        <img src="{{ $pImage }}" alt="{{ $pName }}"
+                                            class="w-full h-full object-cover transition-all duration-300 group-hover:grayscale">
+                                    </div>
+                                    <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">{{ $pName }}</h3>
+                                    <p class="text-sm text-[#8B8B8B] font-normal mb-3">{{ $pRole }}</p>
+                                    <a href="{{ $practitioner->slug ? route('practitioner-detail', $practitioner->slug) : '#' }}"
+                                        class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
+                                        more</a>
                                 </div>
-                                <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">{{ $pName }}</h3>
-                                <p class="text-sm text-[#8B8B8B] font-normal mb-3">{{ $pRole }}</p>
-                                <a href="{{ $practitioner->slug ? route('practitioner-detail', $practitioner->slug) : '#' }}"
-                                    class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
-                                    more</a>
                             </div>
+                            @endforeach
                         </div>
-                        @endforeach
                     </div>
+                    <!-- Navigation Arrows - Inside, overlaid on slider -->
+                    <button type="button" class="practitioner-modal-prev absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow-md flex items-center justify-center text-gray-600 hover:bg-[#FABD4D] hover:text-[#423131] transition-all duration-200 z-20 cursor-pointer border border-gray-200/50">
+                        <i class="ri-arrow-left-s-line text-xl"></i>
+                    </button>
+                    <button type="button" class="practitioner-modal-next absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow-md flex items-center justify-center text-gray-600 hover:bg-[#FABD4D] hover:text-[#423131] transition-all duration-200 z-20 cursor-pointer border border-gray-200/50">
+                        <i class="ri-arrow-right-s-line text-xl"></i>
+                    </button>
                 </div>
 
                 <div class="border-t border-[#EAEAEA] px-8 py-6 flex justify-end gap-3 mt-4">

@@ -454,7 +454,10 @@ function openPractitionerModal() {
             spaceBetween: 28,
             grabCursor: true,
             freeMode: true,
-            slidesOffsetBefore: 40,
+            navigation: {
+                nextEl: '.practitioner-modal-next',
+                prevEl: '.practitioner-modal-prev',
+            },
         });
 
         // Add selection logic once

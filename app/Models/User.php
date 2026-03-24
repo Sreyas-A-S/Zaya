@@ -165,6 +165,28 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Returns a human-friendly reason why this user should be blocked from logging in,
+     * or null if login is allowed.
+     */
+    public function getLoginBlockReason(): ?string
+    {
+        $userStatus = strtolower(trim((string) ($this->status ?? 'active')));
+        if ($userStatus !== 'active') {
+            return 'Your account is currently inactive. Please wait for approval or contact support.';
+        }
+
+        $profile = $this->profile;
+        if ($profile && isset($profile->status)) {
+            $profileStatus = strtolower(trim((string) ($profile->status ?? 'active')));
+            if ($profileStatus !== 'active') {
+                return 'Your account is currently inactive. Please wait for approval or contact support.';
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed

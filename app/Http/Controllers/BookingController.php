@@ -79,7 +79,9 @@ class BookingController extends Controller
         $paymentUrl = null;
         $orderId = 'mock_plink_' . uniqid();
 
-        if ($razorpayKey && $razorpaySecret && !str_contains($razorpayKey, 'dummy')) {
+        $paymentConfigured = $razorpayKey && $razorpaySecret && !str_contains((string) $razorpayKey, 'dummy');
+
+        if ($paymentConfigured) {
             $verifySsl = config('services.razorpay.verify_ssl');
             if ($verifySsl === null) {
                 $verifySsl = !app()->environment('local');
@@ -119,11 +121,24 @@ class BookingController extends Controller
         $booking->save();
 
         if (!$paymentUrl) {
+            // If Razorpay is not configured (common in local/dev), still allow the booking flow
+            // to continue by redirecting the user to their invoice page.
+            if (!$paymentConfigured) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Booking created! Payment gateway is not configured; showing invoice instead.',
+                    'booking' => $booking,
+                    'redirect_url' => route('invoice.show', $booking->invoice_no),
+                    'open_in_new_tab' => false,
+                ]);
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Payment gateway is unavailable. Please try again later.',
                 'booking' => $booking,
-                'redirect_url' => null
+                'redirect_url' => null,
+                'open_in_new_tab' => false,
             ], 503);
         }
 
@@ -131,7 +146,8 @@ class BookingController extends Controller
             'success' => true,
             'message' => 'Booking created! Opening payment gateway...',
             'booking' => $booking,
-            'redirect_url' => $paymentUrl
+            'redirect_url' => $paymentUrl,
+            'open_in_new_tab' => true,
         ]);
     }
 
