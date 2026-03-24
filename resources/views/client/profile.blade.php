@@ -1,6 +1,6 @@
 @extends('layouts.client')
 
-@section('title', 'Practitioner Profile')
+@section('title', 'Profile')
 
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
@@ -94,8 +94,9 @@
         class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Bookings</a>
     <button class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Transaction
         Vault</button>
-    <a href="{{ route('practitioner.profile') }}"
-        class="leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1">Practitioner Profile</a>
+    <a href="{{ route('my-services.index') }}" class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">My Services</a>
+    <a href="{{ route('profile') }}"
+        class="leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1">{{ __('Profile') }}</a>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -106,19 +107,20 @@
         <!-- Profile Card -->
         <div class="bg-white rounded-xl px-5 pt-12 pb-5 flex flex-col items-center border border-[#2E4B3D]/12">
             <div class="relative mb-6">
-                <img src="{{ $user->profile_pic ? (str_starts_with($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}"
+                <img id="user-profile-img" src="{{ $user->profile_pic ? (str_starts_with($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}"
                     alt="{{ $user->name }}" class="w-38 h-38 rounded-full object-cover">
-                <div
+                <label for="profile_pic_input"
                     class="absolute -bottom-1 right-0 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-secondary cursor-pointer hover:bg-gray-200 transition-colors border-2 border-white shadow-sm">
                     <i class="ri-pencil-line text-lg"></i>
-                </div>
+                    <input type="file" id="profile_pic_input" class="hidden" accept="image/*">
+                </label>
             </div>
 
             <h2 class="text-2xl font-bold font-sans! text-secondary mb-1">{{ $user->name }}</h2>
             <p class="text-lg text-gray-400 font-normal mb-10 text-capitalize">{{ str_replace('_', ' ', $user->role) }}</p>
 
             <div class="w-full px-4 space-y-4">
-                <a href="#"
+                <a href="javascript:void(0)" onclick="openPasswordModal()"
                     class="flex items-center text-gray-400 hover:text-gray-700 transition-colors text-lg">
                     <i class="ri-lock-line mr-3 text-lg"></i>
                     <span class="font-normal">Change Password</span>
@@ -141,9 +143,20 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     @forelse($sanctuaryImages->take(3) as $index => $img)
-                        <img src="{{ asset('storage/' . $img->image_path) }}"
-                            alt="Sanctuary {{ $index + 1 }}"
-                            class="{{ $index === 0 ? 'col-span-2 h-[140px]' : 'h-[110px]' }} w-full object-cover rounded-xl shadow-sm">
+                        @if($index === 2 && $sanctuaryImages->count() > 3)
+                            <div class="relative cursor-pointer group" onclick="openGalleryModal()">
+                                <img src="{{ asset('storage/' . $img->image_path) }}"
+                                    alt="Sanctuary {{ $index + 1 }}"
+                                    class="h-[110px] w-full object-cover rounded-xl shadow-sm">
+                                <div class="absolute inset-0 bg-secondary/30 backdrop-blur-[2px] rounded-xl flex items-center justify-center border border-white/20 shadow-inner group-hover:bg-secondary/40 transition-all">
+                                    <span class="text-white text-xl font-bold tracking-wider">+{{ $sanctuaryImages->count() - 2 }}</span>
+                                </div>
+                            </div>
+                        @else
+                            <img src="{{ asset('storage/' . $img->image_path) }}"
+                                alt="Sanctuary {{ $index + 1 }}"
+                                class="{{ $index === 0 ? 'col-span-2 h-[140px]' : 'h-[110px]' }} w-full object-cover rounded-xl shadow-sm">
+                        @endif
                     @empty
                         <div class="col-span-2 py-8 bg-gray-50 rounded-xl border border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400">
                             <i class="ri-image-add-line text-3xl mb-2"></i>
@@ -364,7 +377,7 @@
                 <i class="ri-close-line text-3xl"></i>
             </button>
         </div>
-        <form action="{{ route('practitioner.profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
+        <form action="{{ route('profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
             @csrf
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Specialities (Comma separated)</label>
@@ -386,7 +399,7 @@
 <div id="galleryModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col">
         <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center shrink-0">
-            <h3 class="text-2xl font-bold text-secondary">Manage Practitioner Gallery</h3>
+            <h3 class="text-2xl font-bold text-secondary">Manage Gallery</h3>
             <button onclick="closeGalleryModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
                 <i class="ri-close-line text-3xl"></i>
             </button>
@@ -514,6 +527,58 @@
         <i class="ri-close-line text-4xl"></i>
     </button>
     <img id="full-preview-image" src="" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl">
+</div>
+
+<!-- Profile Picture Cropping Modal -->
+<div id="profilePicModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-[80] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+        <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="text-2xl font-bold text-secondary">Crop Profile Picture</h3>
+            <button onclick="closeProfilePicModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="ri-close-line text-3xl"></i>
+            </button>
+        </div>
+        <div class="p-8">
+            <div class="cropper-container rounded-lg overflow-hidden border border-gray-200 mb-6">
+                <img id="profile-crop-image" src="">
+            </div>
+            <div class="flex gap-4">
+                <button type="button" onclick="closeProfilePicModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="button" onclick="uploadProfilePic()" id="save-profile-pic-btn" class="flex-1 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all shadow-lg">Save & Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div id="passwordModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+        <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="text-2xl font-bold text-secondary">Change Password</h3>
+            <button onclick="closePasswordModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="ri-close-line text-3xl"></i>
+            </button>
+        </div>
+        <form id="changePasswordForm" action="{{ route('profile.updatePassword') }}" method="POST" class="px-8 py-8 space-y-6">
+            @csrf
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Current Password</label>
+                <input type="password" name="current_password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
+                <input type="password" name="new_password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Confirm New Password</label>
+                <input type="password" name="new_password_confirmation" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none">
+            </div>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="closePasswordModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all shadow-lg">Update Password</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 @push('scripts')
@@ -672,7 +737,7 @@
             step2.classList.remove('hidden');
             
             cropper = new Cropper(cropperImage, {
-                aspectRatio: 4 / 3,
+                aspectRatio: NaN,
                 viewMode: 2,
                 guides: true,
                 center: true,
@@ -748,7 +813,7 @@
         formData.append('_token', '{{ csrf_token() }}');
 
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', '{{ route("practitioner.profile.gallery.upload") }}', true);
+        xhr.open('POST', '{{ route("profile.gallery.upload") }}', true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
         xhr.upload.onprogress = function(e) {
@@ -804,7 +869,7 @@
         const id = imageIdToDelete;
         closeDeleteModal();
 
-        fetch(`/practitioner-profile/gallery/${id}`, {
+        fetch(`/profile/gallery/${id}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -856,6 +921,156 @@
         if (event.target == document.getElementById('imagePreviewModal')) {
             closePreviewModal();
         }
+        if (event.target == document.getElementById('profilePicModal')) {
+            closeProfilePicModal();
+        }
+        if (event.target == document.getElementById('passwordModal')) {
+            closePasswordModal();
+        }
+    }
+
+    // Password Change Logic
+    function openPasswordModal() {
+        document.getElementById('passwordModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePasswordModal() {
+        document.getElementById('passwordModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('changePasswordForm').reset();
+    }
+
+    document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerText;
+        
+        submitBtn.innerText = 'Updating...';
+        submitBtn.disabled = true;
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(res => {
+            if (res.success) {
+                showToast(res.message);
+                closePasswordModal();
+            } else {
+                let errorMsg = res.message || 'Update failed';
+                if (res.errors) {
+                    errorMsg = Object.values(res.errors).flat().join('\n');
+                }
+                showToast(errorMsg, 'error');
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            }
+        })
+        .catch(err => {
+            showToast('An error occurred. Please try again.', 'error');
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+
+    // Profile Picture Update Logic
+    let profileCropper = null;
+    const profilePicInput = document.getElementById('profile_pic_input');
+    const profileCropImage = document.getElementById('profile-crop-image');
+
+    profilePicInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                if (profileCropper) profileCropper.destroy();
+                profileCropImage.src = event.target.result;
+                openProfilePicModal();
+                
+                profileCropper = new Cropper(profileCropImage, {
+                    aspectRatio: 1,
+                    viewMode: 2,
+                    guides: true,
+                    center: true,
+                    highlight: false,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleDragModeOnDblclick: false,
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function openProfilePicModal() {
+        document.getElementById('profilePicModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeProfilePicModal() {
+        document.getElementById('profilePicModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        profilePicInput.value = '';
+        if (profileCropper) {
+            profileCropper.destroy();
+            profileCropper = null;
+        }
+    }
+
+    function uploadProfilePic() {
+        if (!profileCropper) return;
+
+        const canvas = profileCropper.getCroppedCanvas({
+            width: 400,
+            height: 400,
+        });
+
+        const base64data = canvas.toDataURL('image/jpeg', 0.9);
+        const saveBtn = document.getElementById('save-profile-pic-btn');
+        const originalText = saveBtn.innerText;
+        
+        saveBtn.innerText = 'Uploading...';
+        saveBtn.disabled = true;
+
+        fetch('{{ route("profile.updatePic") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                cropped_image: base64data
+            })
+        })
+        .then(response => response.json())
+        .then(res => {
+            if (res.success) {
+                showToast(res.message);
+                document.getElementById('user-profile-img').src = res.path;
+                closeProfilePicModal();
+            } else {
+                showToast(res.message || 'Update failed', 'error');
+                saveBtn.innerText = originalText;
+                saveBtn.disabled = false;
+            }
+        })
+        .catch(err => {
+            showToast('Network error occurred.', 'error');
+            saveBtn.innerText = originalText;
+            saveBtn.disabled = false;
+        });
     }
 </script>
 @endpush

@@ -8,16 +8,7 @@
     <div class="absolute top-[-10%] right-[-5%] w-96 h-96 bg-[#EEF2EF] rounded-full blur-3xl opacity-50"></div>
     <div class="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-[#EEF2EF] rounded-full blur-3xl opacity-50"></div>
 
-    <div class="text-center max-w-2xl relative z-10">
-        <!-- Animated Icon/Logo Section -->
-        <div class="mb-12">
-            <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center mx-auto shadow-[0_15px_45px_rgba(46,75,60,0.08)] relative">
-                <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="w-20">
-                <!-- Decorative Ring -->
-                <div class="absolute inset-[-8px] border-2 border-[#EEF2EF] rounded-full animate-[spin_10s_linear_infinite]"></div>
-            </div>
-        </div>
-        
+    <div class="text-center max-w-2xl relative z-10 mt-12">
         <!-- Error Code with soft styling -->
         <div class="mb-6">
             <span class="text-sm font-bold uppercase tracking-[0.3em] text-secondary/40 mb-2 block">Error Code: 404</span>

@@ -13,8 +13,9 @@
         class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors" data-i18n="Bookings">{{ __($site_settings['client_panel_sidebar_bookings'] ?? 'Bookings') }}</a>
     <button onclick="switchMobileTab('transactions')" id="client_panel_sidebar_transaction_vault_mobile"
         class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors" data-i18n="Transaction Vault">{{ __($site_settings['client_panel_sidebar_transaction_vault'] ?? 'Transaction Vault') }}</button>
-    <a href="{{ route('practitioner.profile') }}" id="client_panel_sidebar_practitioner_profile_mobile"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors" data-i18n="Practitioner Profile">{{ __('Practitioner Profile') }}</a>
+    <a href="{{ route('my-services.index') }}" class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">My Services</a>
+    <a href="{{ route('profile') }}" id="client_panel_sidebar_profile_mobile"
+        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors" data-i18n="Profile">{{ __('Profile') }}</a>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 md:gap-8 md:mb-8 mb-5">

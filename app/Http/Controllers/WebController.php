@@ -123,29 +123,33 @@ class WebController extends Controller
 
         if ($request->filled('service')) {
             $service = $request->service;
-            $query->where(function ($q) use ($service) {
-                $q->whereJsonContains('consultations', $service)
-                    ->orWhereJsonContains('body_therapies', $service)
-                    ->orWhereJsonContains('other_modalities', $service);
+            $query->whereHas('userServices', function ($q) use ($service) {
+                if (is_numeric($service)) {
+                    $q->where('service_id', $service);
+                } else {
+                    $q->whereHas('service', function ($sq) use ($service) {
+                        $sq->where('slug', $service)
+                           ->orWhereHas('categories', function ($cq) use ($service) {
+                               $cq->where('slug', $service);
+                           });
+                    });
+                }
             });
         }
 
         if ($request->filled('mode')) {
             $mode = $request->mode;
-            if ($mode === 'online') {
-                // Assuming you have something for this, or just logic
-            } else if ($mode === 'offline') {
-                // ...
-            }
+            // Mode filtering can be added here if practitioners have a mode field
         }
 
         $practitioners = $query->paginate(12)->onEachSide(1)->withQueryString();
+        $services = Service::where('status', 'active')->orderBy('title')->get();
 
         if ($request->ajax()) {
             return view('partials.frontend.practitioner-grid', compact('practitioners', 'pincode'))->render();
         }
 
-        return view('find-practitioner', compact('settings', 'practitioners', 'pincode'));
+        return view('find-practitioner', compact('settings', 'practitioners', 'pincode', 'services'));
     }
 
     public function findPractitionerPost(Request $request)
@@ -167,8 +171,9 @@ class WebController extends Controller
             ->where(function ($q) use ($query) {
                 $q->where('first_name', 'LIKE', "%{$query}%")
                     ->orWhere('last_name', 'LIKE', "%{$query}%")
-                    ->orWhere('consultations', 'LIKE', "%{$query}%")
-                    ->orWhere('other_modalities', 'LIKE', "%{$query}%");
+                    ->orWhereHas('userServices.service', function($sq) use ($query) {
+                        $sq->where('title', 'LIKE', "%{$query}%");
+                    });
             })
             ->limit(4)
             ->get();
@@ -190,11 +195,14 @@ class WebController extends Controller
         ];
 
         foreach ($practitioners as $p) {
-            $specialty = !empty($p->consultations) && is_array($p->consultations) ? $p->consultations[0] : 'Practitioner';
+            $specialty = 'Practitioner';
+            if ($p->user && $p->user->userServices->first()) {
+                $specialty = $p->user->userServices->first()->service->title;
+            }
             $results['practitioners'][] = [
-                'name' => $p->first_name . ' ' . $p->last_name,
+                'name' => ($p->first_name ?? '') . ' ' . ($p->last_name ?? ''),
                 'slug' => $p->slug,
-                'image' => $p->profile_photo_path ? asset('storage/' . $p->profile_photo_path) : asset('frontend/assets/lilly-profile-pic.png'),
+                'image' => $p->user && $p->user->profile_pic ? (str_starts_with($p->user->profile_pic, 'http') ? $p->user->profile_pic : asset('storage/' . $p->user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png'),
                 'subtitle' => $specialty . ($p->city ? ' • ' . $p->city : '')
             ];
         }
@@ -204,7 +212,7 @@ class WebController extends Controller
             $results['treatments'][] = [
                 'name' => $s->title,
                 'slug' => $s->slug,
-                'image' => $s->image ? (str_starts_with($s->image, 'frontend/') ? asset($s->image) : asset('storage/' . $s->image)) : asset('admiro/assets/images/user/user.png'),
+                'image' => $s->image ? (str_starts_with($s->image, 'frontend/') ? asset($s->image) : asset('storage/' . $s->image)) : asset('frontend/assets/service-placeholder.png'),
                 'subtitle' => $category
             ];
         }
@@ -357,25 +365,21 @@ class WebController extends Controller
             $selectedPractitioner = $practitioners->first();
         }
 
-        // Filter services based on selected practitioner
-        $practitionerServices = [];
-        if ($selectedPractitioner) {
-            $practitionerServices = array_merge(
-                $selectedPractitioner->consultations ?? [],
-                $selectedPractitioner->body_therapies ?? [],
-                $selectedPractitioner->other_modalities ?? []
-            );
+        // Filter services based on selected practitioner using the new user_services table
+        if ($selectedPractitioner && $selectedPractitioner->user) {
+            $services = Service::where('status', 'active')
+                ->whereHas('userServices', function($q) use ($selectedPractitioner) {
+                    $q->where('user_id', $selectedPractitioner->user_id);
+                })
+                ->get();
+        } else {
+            $services = Service::where('status', 'active')->get();
         }
 
-        if (!empty($practitionerServices)) {
-            $services = Service::where('status', true)
-                ->whereIn('title', $practitionerServices)
-                ->get();
-
-            // If some modalities don't have a matching Service entry, we might want to create "virtual" services or just skip.
-            // For now, let's also pass the raw list to allow future flexibility.
-        } else {
-            $services = Service::where('status', true)->get();
+        // Handle prefilled service from request
+        $prefilledService = null;
+        if ($request->filled('service_id')) {
+            $prefilledService = Service::find($request->service_id);
         }
 
         $languages = \App\Models\Language::where('status', 'active')
@@ -383,7 +387,7 @@ class WebController extends Controller
             ->get();
         $consultationPreferences = \App\Models\ClientConsultationPreference::all();
 
-        return view('book-session', compact('practitioners', 'selectedPractitioner', 'services', 'languages', 'consultationPreferences'));
+        return view('book-session', compact('practitioners', 'selectedPractitioner', 'services', 'languages', 'consultationPreferences', 'prefilledService'));
     }
 
     public function contactUs()

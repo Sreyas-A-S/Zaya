@@ -111,9 +111,13 @@
                     class="flex items-center px-8 py-3 {{ request()->routeIs('time-slots.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-time-line mr-3 text-lg"></i> <span id="client_panel_sidebar_time_slots" data-i18n="Time Slots">{{ __($site_settings['client_panel_sidebar_time_slots'] ?? 'Time Slots') }}</span>
                 </a>
-                <a href="{{ route('practitioner.profile') }}"
-                    class="flex items-center px-8 py-3 {{ request()->routeIs('practitioner.profile') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
-                    <i class="ri-user-settings-line mr-3 text-lg"></i> <span id="client_panel_sidebar_practitioner_profile" data-i18n="Practitioner Profile">{{ __('Practitioner Profile') }}</span>
+                <a href="{{ route('my-services.index') }}"
+                    class="flex items-center px-8 py-3 {{ request()->routeIs('my-services.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
+                    <i class="ri-shake-hands-line mr-3 text-lg"></i> <span id="client_panel_sidebar_my_services" data-i18n="My Services">{{ __('My Services') }}</span>
+                </a>
+                <a href="{{ route('profile') }}"
+                    class="flex items-center px-8 py-3 {{ request()->routeIs('profile') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
+                    <i class="ri-user-settings-line mr-3 text-lg"></i> <span id="client_panel_sidebar_profile" data-i18n="Profile">{{ __('Profile') }}</span>
                 </a>
                 <a href="{{ route('logout') }}"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
@@ -150,7 +154,7 @@
                         $currentLocale = App::getLocale();
                         @endphp
                         <button type="button"
-                            class="relative flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
+                            class="relative flex items-center bg-gray-100 rounded-full h-[44px] px-1 border border-gray-200 cursor-pointer focus:outline-none"
                             onclick="toggleLanguage('{{ $currentLocale == $lang1->code ? $lang2->code : $lang1->code }}')">
                             <!-- Sliding Pill -->
                             <div id="lang-toggle-pill-mobile"
@@ -158,9 +162,9 @@
                             </div>
 
                             <span id="lang-text-{{ $lang1->code }}-mobile"
-                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang1->code ? 'text-white' : 'text-gray-500' }} text-[10px] font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang1->code, 0, 2)) }}</span>
+                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang1->code ? 'text-white' : 'text-gray-500' }} text-[11px] font-bold transition-colors duration-300">{{ Str::ucfirst(substr($lang1->code, 0, 2)) }}</span>
                             <span id="lang-text-{{ $lang2->code }}-mobile"
-                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang2->code ? 'text-white' : 'text-gray-500' }} text-[10px] font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang2->code, 0, 2)) }}</span>
+                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang2->code ? 'text-white' : 'text-gray-500' }} text-[11px] font-bold transition-colors duration-300">{{ Str::ucfirst(substr($lang2->code, 0, 2)) }}</span>
                         </button>
                         @endif
 
@@ -230,7 +234,7 @@
                     @endphp
                     <div class="hidden lg:block">
                         <button type="button"
-                            class="relative flex items-center bg-gray-100 rounded-full p-1 border border-gray-200 cursor-pointer focus:outline-none"
+                            class="relative flex items-center bg-gray-100 rounded-full h-[44px] px-1 border border-gray-200 cursor-pointer focus:outline-none"
                             onclick="toggleLanguage('{{ $currentLocale == $lang1->code ? $lang2->code : $lang1->code }}')">
                             <!-- Sliding Pill -->
                             <div id="lang-toggle-pill"
@@ -238,9 +242,9 @@
                             </div>
 
                             <span id="lang-text-{{ $lang1->code }}"
-                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang1->code ? 'text-white' : 'text-gray-500' }} text-[10px] font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang1->code, 0, 2)) }}</span>
+                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang1->code ? 'text-white' : 'text-gray-500' }} text-[11px] font-bold transition-colors duration-300">{{ Str::ucfirst(substr($lang1->code, 0, 2)) }}</span>
                             <span id="lang-text-{{ $lang2->code }}"
-                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang2->code ? 'text-white' : 'text-gray-500' }} text-[10px] font-bold py-1.5 transition-colors duration-300">{{ Str::ucfirst(substr($lang2->code, 0, 2)) }}</span>
+                                class="relative z-10 w-9 text-center {{ $currentLocale == $lang2->code ? 'text-white' : 'text-gray-500' }} text-[11px] font-bold transition-colors duration-300">{{ Str::ucfirst(substr($lang2->code, 0, 2)) }}</span>
                         </button>
                     </div>
                     @endif

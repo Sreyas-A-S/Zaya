@@ -29,11 +29,19 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::post('/data-access/request', [\App\Http\Controllers\DataAccessController::class, 'requestAccess'])->name('data-access.request');
     Route::post('/data-access/verify', [\App\Http\Controllers\DataAccessController::class, 'verifyOTP'])->name('data-access.verify');
     Route::get('/client-profile/{id}', [ProfileController::class, 'viewClientProfile'])->name('client.profile.view');
-    Route::get('/practitioner-profile', [ProfileController::class, 'practitionerProfile'])->name('practitioner.profile');
-    Route::post('/practitioner-profile/update-professional', [ProfileController::class, 'updateProfessionalDetails'])->name('practitioner.profile.updateProfessional');
-    Route::post('/practitioner-profile/gallery', [ProfileController::class, 'uploadGalleryImage'])->name('practitioner.profile.gallery.upload');
-    Route::delete('/practitioner-profile/gallery/{id}', [ProfileController::class, 'deleteGalleryImage'])->name('practitioner.profile.gallery.delete');
-    Route::get('/api/referrable-practitioners', [\App\Http\Controllers\BookingController::class, 'fetchReferrablePractitioners'])->name('api.referrable-practitioners');
+    Route::get('/profile', [ProfileController::class, 'profile'])->name('profile');
+    Route::post('/profile/update-pic', [ProfileController::class, 'updateProfilePic'])->name('profile.updatePic');
+    Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+    Route::post('/profile/update-professional', [ProfileController::class, 'updateProfessionalDetails'])->name('profile.updateProfessional');
+    Route::post('/profile/gallery', [ProfileController::class, 'uploadGalleryImage'])->name('profile.gallery.upload');
+    Route::delete('/profile/gallery/{id}', [ProfileController::class, 'deleteGalleryImage'])->name('profile.gallery.delete');
+
+    // My Services Routes
+    Route::get('/my-services', [ProfileController::class, 'myServices'])->name('my-services.index');
+    Route::post('/my-services', [ProfileController::class, 'storeService'])->name('my-services.store');
+    Route::delete('/my-services/{id}', [ProfileController::class, 'deleteService'])->name('my-services.delete');
+
+    Route::get('/api/referrable-practitioners', [BookingController::class, 'fetchReferrablePractitioners'])->name('api.referrable-practitioners');
 
     // Availability / Time Slots
     Route::get('/time-slots', [\App\Http\Controllers\AvailabilityController::class, 'index'])->name('time-slots.index');

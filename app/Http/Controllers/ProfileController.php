@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Service;
+use App\Models\UserService;
 use App\Models\PractitionerGallery;
+use App\Traits\ImageUploadTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
+    use ImageUploadTrait;
+
     private function getBookingQuery($user)
     {
         $role = $user->role;
@@ -281,7 +285,96 @@ class ProfileController extends Controller
         return view('practitioner.client-profile', compact('client', 'recordings', 'bookings'));
     }
 
-    public function practitionerProfile()
+    public function myServices()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        
+        $myServices = UserService::with('service')
+            ->where('user_id', $user->id)
+            ->get();
+            
+        $availableServices = Service::whereNotIn('id', $myServices->pluck('service_id'))
+            ->where('status', 'active')
+            ->get();
+
+        return view('client.my-services', compact('myServices', 'availableServices'));
+    }
+
+    public function storeService(Request $request)
+    {
+        $request->validate([
+            'service_id' => 'required|exists:services,id',
+            'rate' => 'required|numeric|min:0',
+            'duration' => 'required|integer|min:1',
+        ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        UserService::updateOrCreate(
+            ['user_id' => $user->id, 'service_id' => $request->service_id],
+            ['rate' => $request->rate, 'duration' => $request->duration, 'status' => 'active']
+        );
+
+        return back()->with('status', 'Service added successfully!');
+    }
+
+    public function deleteService($id)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        
+        UserService::where('user_id', $user->id)->where('id', $id)->delete();
+
+        return back()->with('status', 'Service removed successfully!');
+    }
+
+    public function updateProfilePic(Request $request)
+    {
+        $request->validate([
+            'cropped_image' => 'required|string',
+        ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Delete old profile pic if exists
+        if ($user->profile_pic && !str_starts_with($user->profile_pic, 'http')) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_pic);
+        }
+
+        $path = $this->uploadBase64($request->cropped_image, 'profiles');
+        $user->profile_pic = $path;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile picture updated successfully!',
+            'path' => asset('storage/' . $path)
+        ]);
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|current_password',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $user->password = \Illuminate\Support\Facades\Hash::make($request->new_password);
+        $user->save();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Password updated successfully!']);
+        }
+
+        return back()->with('status', 'Password updated successfully!');
+    }
+
+    public function profile()
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
@@ -325,7 +418,7 @@ class ProfileController extends Controller
 
         $gallery = PractitionerGallery::where('user_id', $user->id)->get()->groupBy('category');
 
-        return view('client.practitioner-profile', compact(
+        return view('client.profile', compact(
             'user', 
             'profile', 
             'totalSessions', 
@@ -390,22 +483,6 @@ class ProfileController extends Controller
             return response()->json(['status' => 'error', 'message' => 'No images uploaded.'], 400);
         }
         return back()->with('error', 'No images uploaded.');
-    }
-
-    /**
-     * Helper to upload base64 image (copied from AdminController for consistency)
-     */
-    protected function uploadBase64($base64String, $directory = 'uploads')
-    {
-        $image_parts = explode(";base64,", $base64String);
-        $image_type_aux = explode("image/", $image_parts[0]);
-        $image_type = $image_type_aux[1];
-        $image_base64 = base64_decode($image_parts[1]);
-        $fileName = $directory . '/' . uniqid() . '.' . $image_type;
-
-        \Storage::disk('public')->put($fileName, $image_base64);
-
-        return $fileName;
     }
 
     public function deleteGalleryImage($id)

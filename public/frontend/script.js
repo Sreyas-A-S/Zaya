@@ -467,53 +467,20 @@ function openPractitionerModal() {
                 if (e.target.tagName === 'A') return;
 
                 const id = this.dataset.id;
-                const name = this.dataset.name;
-                const image = this.dataset.image;
-                const role = this.dataset.role;
-                const rating = this.dataset.rating;
-                const location = this.dataset.location;
-
-                // Update all practitioner cards on the page (Step 2 and Step 3)
-                document.querySelectorAll('img[alt$="Practitioner"], img[alt$="Profile Pic"]').forEach(img => {
-                    img.src = image;
-                    img.alt = name;
-                });
-
-                document.querySelectorAll('h3.font-medium.font-sans\\!').forEach(h3 => {
-                    if (h3.innerText.trim() !== 'ZAYA' && !h3.closest('.practitioner-select-card')) {
-                        h3.innerHTML = `${name}`;
-                    }
-                });
-
-                document.querySelectorAll('.ri-star-fill + span').forEach(span => {
-                    span.innerText = rating;
-                });
-
-                document.querySelectorAll('.text-\\[\\#252525\\].text-base').forEach(p => {
-                    if (!p.closest('.practitioner-select-card')) {
-                        p.innerText = role;
-                    }
-                });
-
-                document.querySelectorAll('.ri-map-pin-line').forEach(icon => {
-                    const p = icon.parentElement;
-                    if (p) {
-                        p.innerHTML = `<i class="ri-map-pin-line"></i> ${location}`;
-                    }
-                });
-
-                // Update hidden input for form submission
-                let hiddenInput = document.getElementById('selected-practitioner-id');
-                if (!hiddenInput) {
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.id = 'selected-practitioner-id';
-                    hiddenInput.name = 'practitioner_id';
-                    document.body.appendChild(hiddenInput);
+                const slug = this.dataset.slug;
+                
+                // Redirect to the booking page for this practitioner
+                // Preserve service_id if it's in the current URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const serviceId = urlParams.get('service_id');
+                
+                let redirectUrl = `/book-session/${slug}`;
+                if (serviceId) {
+                    redirectUrl += `?service_id=${serviceId}`;
                 }
-                hiddenInput.value = id;
-
-                closePractitionerModal();
+                
+                window.location.href = redirectUrl;
+                return;
             });
         });
     }
