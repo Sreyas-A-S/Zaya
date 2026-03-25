@@ -5,10 +5,53 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 <style>
     .cropper-container { max-height: 400px; width: 100%; }
     #cropper-image { max-width: 100%; display: block; }
     .progress-bar-fill { transition: width 0.3s ease; }
+    /* Tom Select Custom Styling */
+    .ts-control {
+        border-radius: 0.75rem !important;
+        padding: 0.5rem 0.75rem !important;
+        border: 1px solid #e5e7eb !important;
+        background-color: #fff !important;
+        font-size: 1rem !important;
+        line-height: 1.5rem !important;
+        transition: all 0.2s !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+    }
+    .ts-wrapper.focus .ts-control {
+        border-color: #2E4B3D !important;
+        box-shadow: 0 0 0 2px rgba(46, 75, 61, 0.1) !important;
+    }
+    /* Tom Select Pill Styling */
+    .ts-control .item {
+        background: rgba(46, 75, 61, 0.1) !important;
+        color: #2E4B3D !important;
+        border-radius: 9999px !important;
+        padding: 3px 12px !important;
+        border: 1px solid rgba(46, 75, 61, 0.1) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        font-weight: 600 !important;
+        margin: 2px !important;
+        font-size: 0.9rem !important;
+    }
+    .ts-control .item .remove {
+        border-left: none !important;
+        margin-left: 6px !important;
+        padding: 0 4px !important;
+        border-radius: 0 9999px 9999px 0 !important;
+        color: rgba(46, 75, 61, 0.4) !important;
+        font-size: 1.1em !important;
+    }
+    .ts-control .item .remove:hover {
+        background: transparent !important;
+        color: #F3324C !important;
+    }
 </style>
 @endpush
 
@@ -220,7 +263,7 @@
         <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12">
             <!-- Specialities -->
             <div class="relative mb-8">
-                <button onclick="openProfessionalModal()" class="absolute top-0 right-0 text-gray-400 hover:text-secondary transition-colors">
+                <button onclick="openSpecialitiesModal()" class="absolute top-0 right-0 text-gray-400 hover:text-secondary transition-colors">
                     <i class="ri-pencil-line text-2xl"></i>
                 </button>
 
@@ -238,7 +281,7 @@
 
             <!-- Conditions I support -->
             <div class="relative">
-                <button onclick="openProfessionalModal()" class="absolute top-0 right-0 text-gray-400 hover:text-[#2B4C3B] transition-colors">
+                <button onclick="openConditionsModal()" class="absolute top-0 right-0 text-gray-400 hover:text-[#2B4C3B] transition-colors">
                     <i class="ri-pencil-line text-2xl"></i>
                 </button>
 
@@ -368,28 +411,67 @@
 
 </div>
 
-<!-- Edit Professional Details Modal -->
-<div id="professionalModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+<!-- Specialities Modal -->
+<div id="specialitiesModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
         <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
-            <h3 class="text-2xl font-bold text-secondary">Edit Professional Details</h3>
-            <button onclick="closeProfessionalModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <h3 class="text-2xl font-bold text-secondary">Edit Specialities</h3>
+            <button onclick="closeSpecialitiesModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
                 <i class="ri-close-line text-3xl"></i>
             </button>
         </div>
         <form action="{{ route('profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
             @csrf
+            <input type="hidden" name="update_type" value="specialities">
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Specialities (Comma separated)</label>
-                <textarea name="specialities" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none resize-none">{{ implode(', ', $specialities) }}</textarea>
-            </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Conditions I support (Comma separated)</label>
-                <textarea name="conditions" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none resize-none">{{ implode(', ', $conditions) }}</textarea>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Select Specialities</label>
+                <select id="specialities-select" name="specialities[]" multiple placeholder="Select or type specialities...">
+                    @foreach($allSpecialities as $item)
+                        <option value="{{ $item }}" {{ in_array($item, $specialities) ? 'selected' : '' }}>{{ $item }}</option>
+                    @endforeach
+                    @foreach($specialities as $item)
+                        @if(!$allSpecialities->contains($item))
+                            <option value="{{ $item }}" selected>{{ $item }}</option>
+                        @endif
+                    @endforeach
+                </select>
             </div>
             <div class="flex gap-4 pt-4">
-                <button type="button" onclick="closeProfessionalModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
-                <button type="submit" class="flex-1 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all shadow-lg">Save Changes</button>
+                <button type="button" onclick="closeSpecialitiesModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all shadow-lg">Save Specialities</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Conditions Modal -->
+<div id="conditionsModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+        <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="text-2xl font-bold text-secondary">Edit Conditions I Support</h3>
+            <button onclick="closeConditionsModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="ri-close-line text-3xl"></i>
+            </button>
+        </div>
+        <form action="{{ route('profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
+            @csrf
+            <input type="hidden" name="update_type" value="conditions">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Select Conditions</label>
+                <select id="conditions-select" name="conditions[]" multiple placeholder="Select or type conditions...">
+                    @foreach($allConditions as $item)
+                        <option value="{{ $item }}" {{ in_array($item, $conditions) ? 'selected' : '' }}>{{ $item }}</option>
+                    @endforeach
+                    @foreach($conditions as $item)
+                        @if(!$allConditions->contains($item))
+                            <option value="{{ $item }}" selected>{{ $item }}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="closeConditionsModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all shadow-lg">Save Conditions</button>
             </div>
         </form>
     </div>
@@ -584,6 +666,7 @@
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
     let cropper = null;
     let currentViewCategory = 'sanctuary';
@@ -597,13 +680,52 @@
     const progressText = document.getElementById('upload-percentage');
     const categoryNameSpan = document.getElementById('target-category-name');
 
-    function openProfessionalModal() {
-        document.getElementById('professionalModal').classList.remove('hidden');
+    // Multi-Select Instances
+    let specialitiesSelect, conditionsSelect;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Tom Select for Specialities
+        const specEl = document.getElementById('specialities-select');
+        if (specEl) {
+            specialitiesSelect = new TomSelect('#specialities-select', {
+                plugins: ['remove_button'],
+                create: true,
+                persist: false,
+                placeholder: 'Select or type specialities...',
+                maxItems: 15,
+            });
+        }
+
+        // Initialize Tom Select for Conditions
+        const condEl = document.getElementById('conditions-select');
+        if (condEl) {
+            conditionsSelect = new TomSelect('#conditions-select', {
+                plugins: ['remove_button'],
+                create: true,
+                persist: false,
+                placeholder: 'Select or type conditions...',
+                maxItems: 15,
+            });
+        }
+    });
+
+    function openSpecialitiesModal() {
+        document.getElementById('specialitiesModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     }
 
-    function closeProfessionalModal() {
-        document.getElementById('professionalModal').classList.add('hidden');
+    function closeSpecialitiesModal() {
+        document.getElementById('specialitiesModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    function openConditionsModal() {
+        document.getElementById('conditionsModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeConditionsModal() {
+        document.getElementById('conditionsModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
 

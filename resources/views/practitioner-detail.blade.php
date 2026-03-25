@@ -25,10 +25,29 @@
                     </p>
 
                     <div class="flex flex-col items-start gap-10">
-                        <a href="{{ route('book-session', ['practitioner' => $practitioner->slug, 'service_id' => request('service_id')]) }}"
-                            class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg">
-                            {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
-                        </a>
+                        @php
+                            $user = auth()->user();
+                            $isClient = $user && ($user->role === 'client' || $user->role === 'patient');
+                            $bookingUrl = route('book-session', ['practitioner' => $practitioner->slug, 'service_id' => request('service_id')]);
+                        @endphp
+
+                        @if(!$user)
+                            <a href="{{ route('zaya-login', ['redirect' => $bookingUrl]) }}"
+                                class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg">
+                                {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
+                            </a>
+                        @elseif($isClient)
+                            <a href="{{ $bookingUrl }}"
+                                class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg">
+                                {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
+                            </a>
+                        @else
+                            <button type="button" 
+                                onclick="showZayaToast('Booking is only available for client accounts. Please log in with a client account to proceed.', 'error', 'Access Restricted')"
+                                class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg">
+                                {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
+                            </button>
+                        @endif
 
                         <!-- Rating Block -->
                         <div class="flex flex-wrap items-center gap-9 xl:gap-18">

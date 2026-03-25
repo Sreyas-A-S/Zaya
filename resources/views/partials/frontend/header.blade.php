@@ -132,7 +132,7 @@
                         <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
                             <i class="ri-dashboard-line text-lg"></i> {{ __('Dashboard') }}
                         </a>
-                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
+                        <a href="{{ route('profile') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
                             <i class="ri-user-settings-line text-lg"></i> {{ __('My Profile') }}
                         </a>
                         <form method="POST" action="{{ route('logout') }}" id="logout-form-desktop" class="hidden">

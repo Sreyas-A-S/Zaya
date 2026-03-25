@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
+@php
+    $user = $user ?? Auth::user();
+@endphp
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -181,7 +183,7 @@
                             <div onclick="toggleNotifications('mobile')"
                                 class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 relative shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
                                 <i class="ri-notification-3-line text-lg"></i>
-                                <div id="notif-dot-mobile" class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full {{ Auth::user()->unreadNotifications->count() > 0 ? '' : 'hidden' }}">
+                                <div id="notif-dot-mobile" class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full {{ $user->unreadNotifications->count() > 0 ? '' : 'hidden' }}">
                                 </div>
                             </div>
                             <!-- Mobile Dropdown Anchor (teleport destination handled by script) -->
@@ -194,11 +196,11 @@
                     <div>
                         <h1 class="text-3xl lg:text-4xl font-bold font-sans! text-secondary mb-2">{{ $user->name }}</h1>
                         <div class="flex flex-wrap gap-y-1 items-center text-gray-500 text-sm space-x-4">
-                            <span class="flex items-center"><i class="ri-map-pin-line mr-1"></i> <span id="loc-label">{{ $user->profile->city_state ?? ($user->profile->address ?? __($site_settings['client_panel_location_not_set'] ?? 'Location not set')) }}</span></span>
+                            <span class="flex items-center"><i class="ri-map-pin-line mr-1"></i> <span id="loc-label">{{ $user->profile?->city_state ?? ($user->profile?->address ?? __($site_settings['client_panel_location_not_set'] ?? 'Location not set')) }}</span></span>
                             <span class="flex items-center">
                                 <i class="ri-mail-line mr-1"></i> 
                                 <span id="id-label">{{ ($user->role === 'client' || $user->role === 'patient') ? __('Client ID') : __('Professional ID') }}</span>: 
-                                {{ $user->profile->client_id ?? ($user->profile->registration_number ?? 'Z-' . (10000 + $user->id)) }}
+                                {{ $user->profile?->client_id ?? ($user->profile?->registration_number ?? 'Z-' . (10000 + $user->id)) }}
                             </span>
                             <span class="flex items-center text-secondary font-bold uppercase tracking-wider opacity-70">
                                 <i class="ri-user-star-line mr-1"></i>
@@ -221,7 +223,7 @@
                         <div onclick="toggleNotifications('desktop')" id="notif-btn-desktop"
                             class="w-10 h-10 rounded-full bg-white border border-gray-200 hidden lg:flex items-center justify-center text-gray-600 relative shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
                             <i class="ri-notification-3-line text-lg"></i>
-                            <div id="notif-dot-desktop" class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full {{ Auth::user()->unreadNotifications->count() > 0 ? '' : 'hidden' }}"></div>
+                            <div id="notif-dot-desktop" class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full {{ $user->unreadNotifications->count() > 0 ? '' : 'hidden' }}"></div>
                         </div>
                     </div>
 

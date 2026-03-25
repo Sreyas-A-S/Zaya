@@ -21,6 +21,7 @@ class AdminOTPMail extends Mailable
     public function __construct($otp)
     {
         $this->otp = $otp;
+        $this->mailer('info');
     }
 
     /**

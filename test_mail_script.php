@@ -19,7 +19,7 @@ try {
     echo "Username: " . config('mail.mailers.smtp.username') . "\n";
     
     Mail::raw('This is a test email sent from Zaya Wellness local environment.', function ($message) {
-        $message->to('info@logiprompt.com')
+        $message->to(['sreyasas25@gmail.com'])
                 ->subject('Local SMTP Test');
     });
 

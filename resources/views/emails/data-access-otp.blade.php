@@ -24,7 +24,7 @@
     <div class="container">
         <div class="accent-bar"></div>
         <div class="header">
-            <img src="{{ url('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="logo">
+            @include('emails.partials.logo')
         </div>
 
         <div class="content">
