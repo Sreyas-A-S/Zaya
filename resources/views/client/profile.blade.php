@@ -268,11 +268,11 @@
                 </button>
 
                 <h2 class="text-2xl font-medium font-sans! text-secondary mb-8">Specialities</h2>
-                <div class="flex flex-wrap gap-2.5">
+                <div class="flex flex-wrap gap-2.5" id="specialities-display-container">
                     @forelse($specialities as $speciality)
                         <span class="px-6 py-2 bg-[#F6F6F6] text-gray-700 text-lg rounded-full">{{ is_array($speciality) ? implode(', ', $speciality) : $speciality }}</span>
                     @empty
-                        <span class="text-gray-400 text-lg">No specialities listed.</span>
+                        <span class="text-gray-400 text-lg no-items-msg">No specialities listed.</span>
                     @endforelse
                 </div>
             </div>
@@ -286,11 +286,11 @@
                 </button>
 
                 <h2 class="text-2xl font-medium font-sans! text-secondary mb-8">Conditions I support</h2>
-                <div class="flex flex-wrap gap-2.5">
+                <div class="flex flex-wrap gap-2.5" id="conditions-display-container">
                     @forelse($conditions as $condition)
                         <span class="px-6 py-2 bg-[#F6F6F6] text-gray-700 text-lg rounded-full">{{ is_array($condition) ? implode(', ', $condition) : $condition }}</span>
                     @empty
-                        <span class="text-gray-400 text-lg">No conditions listed.</span>
+                        <span class="text-gray-400 text-lg no-items-msg">No conditions listed.</span>
                     @endforelse
                 </div>
             </div>
@@ -420,7 +420,7 @@
                 <i class="ri-close-line text-3xl"></i>
             </button>
         </div>
-        <form action="{{ route('profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
+        <form id="specialitiesForm" action="{{ route('profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
             @csrf
             <input type="hidden" name="update_type" value="specialities">
             <div>
@@ -453,7 +453,7 @@
                 <i class="ri-close-line text-3xl"></i>
             </button>
         </div>
-        <form action="{{ route('profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
+        <form id="conditionsForm" action="{{ route('profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
             @csrf
             <input type="hidden" name="update_type" value="conditions">
             <div>
@@ -728,6 +728,75 @@
         document.getElementById('conditionsModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
+
+    // Dynamic Updates for Specialities and Conditions
+    function handleProfessionalFormSubmit(formId, modalId, displayContainerId) {
+        const form = document.getElementById(formId);
+        if (!form) return;
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
+            
+            submitBtn.innerText = 'Saving...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(res => {
+                if (res.success) {
+                    showToast(res.message);
+                    
+                    // Update the display container
+                    const container = document.getElementById(displayContainerId);
+                    if (container && res.items) {
+                        container.innerHTML = '';
+                        if (res.items.length > 0) {
+                            res.items.forEach(item => {
+                                const span = document.createElement('span');
+                                span.className = 'px-6 py-2 bg-[#F6F6F6] text-gray-700 text-lg rounded-full';
+                                span.innerText = Array.isArray(item) ? item.join(', ') : item;
+                                container.appendChild(span);
+                            });
+                        } else {
+                            const emptySpan = document.createElement('span');
+                            emptySpan.className = 'text-gray-400 text-lg no-items-msg';
+                            emptySpan.innerText = formId === 'specialitiesForm' ? 'No specialities listed.' : 'No conditions listed.';
+                            container.appendChild(emptySpan);
+                        }
+                    }
+                    
+                    if (modalId === 'specialitiesModal') closeSpecialitiesModal();
+                    else closeConditionsModal();
+                } else {
+                    showToast(res.message || 'Update failed', 'error');
+                }
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            })
+            .catch(err => {
+                showToast('An error occurred.', 'error');
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        handleProfessionalFormSubmit('specialitiesForm', 'specialitiesModal', 'specialities-display-container');
+        handleProfessionalFormSubmit('conditionsForm', 'conditionsModal', 'conditions-display-container');
+    });
 
     function openGalleryModal() {
         document.getElementById('galleryModal').classList.remove('hidden');

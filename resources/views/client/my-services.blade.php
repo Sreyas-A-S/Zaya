@@ -162,11 +162,10 @@
 <div id="addServiceModal" class="fixed inset-0 bg-[#1A1A1A]/60 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-[40px] w-full max-w-3xl overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-300" id="addModalContent">
         <div class="px-10 py-8 border-b border-gray-100 flex justify-between items-center bg-[#F8FAF9]">
-            <div>
-                <h3 class="text-2xl font-black text-secondary tracking-tight">Configure Services</h3>
-                <p class="text-gray-500 text-sm font-medium">Add multiple services and pricing tiers</p>
-            </div>
-            <button onclick="closeAddServiceModal()" class="w-12 h-12 bg-white rounded-2xl text-gray-400 hover:text-secondary hover:shadow-md transition-all flex items-center justify-center border border-gray-100">
+        <div>
+        <h3 class="text-2xl font-black text-secondary tracking-tight">Configure Services ({{ $availableServices->count() }} available)</h3>
+        <p class="text-gray-500 text-sm font-medium">Add multiple services and pricing tiers</p>
+        </div>            <button onclick="closeAddServiceModal()" class="w-12 h-12 bg-white rounded-2xl text-gray-400 hover:text-secondary hover:shadow-md transition-all flex items-center justify-center border border-gray-100">
                 <i class="ri-close-line text-3xl"></i>
             </button>
         </div>
@@ -184,10 +183,14 @@
                             </label>
                             <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
                                 <select id="service-select-0" name="services[0][service_id]" required class="service-selector w-full">
-                                    <option value="" disabled selected>Choose a service...</option>
-                                    @foreach($availableServices as $service)
-                                        <option value="{{ $service->id }}">{{ $service->title }}</option>
-                                    @endforeach
+                                    @if($availableServices->isEmpty())
+                                        <option value="" disabled selected>No more services available</option>
+                                    @else
+                                        <option value="" disabled selected>Choose a service...</option>
+                                        @foreach($availableServices as $service)
+                                            <option value="{{ $service->id }}">{{ $service->title }}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
                             </div>
                         </div>
@@ -275,14 +278,19 @@
     let tomSelectInstances = {};
 
     function initTomSelect(elementId) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        
         if (tomSelectInstances[elementId]) {
             tomSelectInstances[elementId].destroy();
         }
-        tomSelectInstances[elementId] = new TomSelect(`#${elementId}`, {
+        
+        tomSelectInstances[elementId] = new TomSelect(el, {
             create: false,
             sortField: { field: "text", direction: "asc" },
             placeholder: 'Choose a service...',
             allowEmptyOption: true,
+            maxOptions: 100,
         });
     }
 
@@ -316,7 +324,7 @@
                         <select id="${id}" name="services[${currentIdx}][service_id]" required class="service-selector w-full">
                             <option value="" disabled selected>Choose a service...</option>
                             @foreach($availableServices as $service)
-                                <option value="{{ $service->id }}">{{ addslashes($service->title) }}</option>
+                                <option value="{{ $service->id }}">{{ $service->title }}</option>
                             @endforeach
                         </select>
                     </div>

@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use App\Traits\ImageUploadTrait;
 
-class ServicesSettingController extends Controller
+class GallerySettingController extends Controller
 {
     use ImageUploadTrait;
 
     public function __construct()
     {
-        $this->middleware('permission:services-page-view')->only(['index']);
-        $this->middleware('permission:services-page-edit')->only(['update']);
+        $this->middleware('permission:gallery-page-view')->only(['index']);
+        $this->middleware('permission:gallery-page-edit')->only(['update']);
     }
 
     public function index()
@@ -24,13 +24,13 @@ class ServicesSettingController extends Controller
         $language = session('locale', 'en');
         
         // Get all settings for current language
-        $currentSettings = HomepageSetting::where('section', 'services_page')
+        $currentSettings = HomepageSetting::where('section', 'gallery_page')
             ->where('language', $language)
             ->get()
             ->keyBy('key');
 
         // Get all setting structure from English (default)
-        $defaultSettings = HomepageSetting::where('section', 'services_page')
+        $defaultSettings = HomepageSetting::where('section', 'gallery_page')
             ->where('language', 'en')
             ->get();
 
@@ -41,19 +41,20 @@ class ServicesSettingController extends Controller
             
             $newSetting = $setting->replicate();
             $newSetting->language = $language;
-            $newSetting->value = ''; 
+            $newSetting->value = ($setting->type === 'image') ? $setting->value : ''; 
             return $newSetting;
         });
 
-        return view('admin.services-settings.index', compact('settings'));
+        return view('admin.gallery-settings.index', compact('settings'));
     }
 
     public function update(Request $request)
-    { 
+    {
         $language = Session::get('locale', 'en');
         $data = $request->except(['_token', 'language']);
 
         foreach ($data as $key => $value) {
+            // Skip cropped data keys as they are handled with their respective original keys
             if (str_ends_with($key, '_cropped')) continue;
 
             $setting = HomepageSetting::where('key', $key)
@@ -71,19 +72,19 @@ class ServicesSettingController extends Controller
                 if ($setting->type === 'image') {
                     $croppedKey = $key . '_cropped';
                     if ($request->filled($croppedKey)) {
-                        if ($setting->value && Storage::disk('public')->exists($setting->value)) {
+                        if ($setting->value && !str_contains($setting->value, 'frontend/assets') && Storage::disk('public')->exists($setting->value)) {
                             Storage::disk('public')->delete($setting->value);
                         }
-                        $path = $this->uploadBase64($request->input($croppedKey), "services/{$language}");
+                        $path = $this->uploadBase64($request->input($croppedKey), "gallery/{$language}");
                         $setting->update(['value' => $path]);
                     } elseif ($request->hasFile($key)) {
-                        if ($setting->value && Storage::disk('public')->exists($setting->value)) {
+                        if ($setting->value && !str_contains($setting->value, 'frontend/assets') && Storage::disk('public')->exists($setting->value)) {
                             Storage::disk('public')->delete($setting->value);
                         }
-                        $path = $request->file($key)->store("services/{$language}", 'public');
+                        $path = $request->file($key)->store("gallery/{$language}", 'public');
                         $setting->update(['value' => $path]);
                     }
-                } else {
+                } else if ($setting->type !== 'image') {
                     $setting->update(['value' => $value]);
                 }
             } else {
@@ -93,9 +94,11 @@ class ServicesSettingController extends Controller
                     if ($originalSetting->type === 'image') {
                         $croppedKey = $key . '_cropped';
                         if ($request->filled($croppedKey)) {
-                            $val = $this->uploadBase64($request->input($croppedKey), "services/{$language}");
+                            $val = $this->uploadBase64($request->input($croppedKey), "gallery/{$language}");
                         } elseif ($request->hasFile($key)) {
-                            $val = $request->file($key)->store("services/{$language}", 'public');
+                            $val = $request->file($key)->store("gallery/{$language}", 'public');
+                        } else {
+                            $val = $originalSetting->value;
                         }
                     }
 
@@ -112,13 +115,9 @@ class ServicesSettingController extends Controller
         }
 
         if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Services page settings updated successfully.',
-                'language' => $language
-            ]);
+            return response()->json(['success' => true, 'message' => 'Gallery page settings updated successfully.']);
         }
 
-        return redirect()->back()->with('success', 'Services page settings updated successfully.');
+        return redirect()->back()->with('success', 'Gallery page settings updated successfully.');
     }
 }

@@ -49,6 +49,7 @@
   <!-- App css -->
   <link rel="stylesheet" href="{{ asset('admiro/assets/css/style.css') }}" />
   <link id="color" rel="stylesheet" href="{{ asset('admiro/assets/css/color-1.css') }}" media="screen" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
   @stack('css')
 </head>
 
@@ -403,8 +404,139 @@
           icon.classList.toggle('fa-eye-slash', isPassword);
         }
       });
+
+      // --- Image Resolution Helper ---
+      function updateResInfo(img, key) {
+        if (img.naturalWidth > 0) {
+          $('.resolution-text-' + key).text(img.naturalWidth + 'x' + img.naturalHeight);
+          $('.resolution-info-' + key).removeClass('d-none');
+        }
+      }
+
+      // Initial check for all preview images
+      $('img[class*="preview-"]').each(function() {
+        const img = this;
+        const keyMatch = img.className.match(/preview-([^\s]+)/);
+        if (keyMatch) {
+          const key = keyMatch[1];
+          if (img.complete) {
+            updateResInfo(img, key);
+          } else {
+            img.onload = () => updateResInfo(img, key);
+          }
+        }
+      });
+
+      // Handle dynamic file inputs
+      let currentCropper = null;
+      let currentKey = null;
+
+      $(document).on('change', '.image-ajax-input', function() {
+        const key = $(this).attr('data-key');
+        const ratio = $(this).attr('data-aspect-ratio');
+        
+        currentKey = key;
+        const currentAspectRatio = (ratio && ratio.trim() !== '') ? parseFloat(ratio) : NaN;
+        
+        // Store on the modal for absolute certainty
+        $('#globalCropperModal').attr('data-current-ratio', currentAspectRatio);
+
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            $('#globalCropperImage').attr('src', e.target.result);
+            const modal = new bootstrap.Modal(document.getElementById('globalCropperModal'));
+            modal.show();
+          }
+          reader.readAsDataURL(file);
+        }
+      });
+
+      $('#globalCropperModal').on('shown.bs.modal', function() {
+        const image = document.getElementById('globalCropperImage');
+        const ratioAttr = $(this).attr('data-current-ratio');
+        const ratio = parseFloat(ratioAttr);
+        const finalRatio = !isNaN(ratio) ? ratio : null;
+
+        console.log('Initializing Cropper with Ratio:', finalRatio);
+
+        if (currentCropper) {
+            currentCropper.destroy();
+        }
+
+        currentCropper = new Cropper(image, {
+          aspectRatio: finalRatio,
+          viewMode: 1, 
+          dragMode: 'move',
+          autoCropArea: 1,
+          responsive: true,
+          restore: false,
+          guides: true,
+          center: true,
+          highlight: false,
+          cropBoxMovable: true,
+          cropBoxResizable: true,
+          toggleDragModeOnDblclick: false,
+          crop(event) {
+            const width = Math.round(event.detail.width);
+            const height = Math.round(event.detail.height);
+            $('#crop-live-res').text(width + ' x ' + height);
+          },
+        });
+      }).on('hidden.bs.modal', function() {
+        if (currentCropper) {
+          currentCropper.destroy();
+          currentCropper = null;
+        }
+      });
+
+      $('#globalCropBtn').on('click', function() {
+        if (!currentCropper) return;
+
+        const canvas = currentCropper.getCroppedCanvas({
+          imageSmoothingEnabled: true,
+          imageSmoothingQuality: 'high',
+        });
+
+        const base64Data = canvas.toDataURL('image/jpeg', 0.9);
+        $('#cropped-' + currentKey).val(base64Data);
+        $('.preview-' + currentKey).attr('src', base64Data).parent().removeClass('d-none');
+        
+        $('.resolution-text-' + currentKey).text(canvas.width + 'x' + canvas.height);
+        $('.resolution-info-' + currentKey).removeClass('d-none');
+
+        bootstrap.Modal.getInstance(document.getElementById('globalCropperModal')).hide();
+      });
     });
   </script>
+  <!-- Global Cropper Modal -->
+  <div class="modal fade" id="globalCropperModal" tabindex="-1" role="dialog" aria-labelledby="globalCropperModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="globalCropperModalLabel">Crop Image</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="img-container mb-3" style="min-height: 400px; background: #f8f9fa;">
+            <img id="globalCropperImage" src="" style="max-width: 100%;">
+          </div>
+          <div class="text-center">
+            <span class="badge badge-primary px-3 py-2" style="font-size: 14px;">
+              Selection: <span id="crop-live-res">0 x 0</span> px
+            </span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" id="globalCropBtn" type="button">Apply Crop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   @yield('scripts')
 </body>
 @stack('scripts')

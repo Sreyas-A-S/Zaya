@@ -587,6 +587,17 @@ class ProfileController extends Controller
         }
 
         $label = $updateType === 'specialities' ? 'Specialities' : 'Conditions';
+        $items = ($updateType === 'specialities') ? ($data['consultations'] ?? $data['specialization'] ?? $data['practitioner_type'] ?? $data['yoga_therapist_type'] ?? $data['fields_of_specialization'] ?? []) : ($data['body_therapies'] ?? $data['health_conditions_treated'] ?? $data['client_concerns'] ?? $data['areas_of_expertise'] ?? $data['services_offered'] ?? []);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "{$label} updated successfully!",
+                'items' => $items,
+                'update_type' => $updateType
+            ]);
+        }
+
         return back()->with('status', "{$label} updated successfully!");
     }
 
