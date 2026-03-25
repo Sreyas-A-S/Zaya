@@ -845,11 +845,8 @@
                 backBtnText.textContent = '{{ __('Back') }}';
             }
 
-            if (currentTab === totalTabs) {
-                nextBtnText.textContent = '{{ __('Submit') }}';
-            } else {
-                nextBtnText.textContent = '{{ __('Save & Continue') }}';
-            }
+            // Keep the CTA consistent across steps
+            nextBtnText.textContent = '{{ __('Save & Continue') }}';
         }
 
         function showTab(tabNumber) {
@@ -1059,6 +1056,9 @@
 
                 const checkbox = this.querySelector('input[type="checkbox"]');
                 checkbox.checked = !checkbox.checked;
+                // We toggle the checkbox manually, so fire a real change event too.
+                // This ensures inline/onchange handlers (like "Other") run and cleanup happens.
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
 
                 if (checkbox.checked) {
                     this.classList.remove('border-gray-200', 'bg-white', 'text-gray-700');
