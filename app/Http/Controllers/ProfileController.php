@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Service;
+use App\Models\UserService;
+use App\Models\PractitionerGallery;
+use App\Traits\ImageUploadTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
+    use ImageUploadTrait;
+
     private function getBookingQuery($user)
     {
         $role = $user->role;
@@ -278,6 +283,261 @@ class ProfileController extends Controller
             ->get();
 
         return view('practitioner.client-profile', compact('client', 'recordings', 'bookings'));
+    }
+
+    public function myServices()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        
+        $myServices = UserService::with('service')
+            ->where('user_id', $user->id)
+            ->get();
+            
+        $availableServices = Service::whereNotIn('id', $myServices->pluck('service_id'))
+            ->where('status', 'active')
+            ->get();
+
+        return view('client.my-services', compact('myServices', 'availableServices'));
+    }
+
+    public function storeService(Request $request)
+    {
+        $request->validate([
+            'service_id' => 'required|exists:services,id',
+            'rate' => 'required|numeric|min:0',
+            'duration' => 'required|integer|min:1',
+        ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        UserService::updateOrCreate(
+            ['user_id' => $user->id, 'service_id' => $request->service_id],
+            ['rate' => $request->rate, 'duration' => $request->duration, 'status' => 'active']
+        );
+
+        return back()->with('status', 'Service added successfully!');
+    }
+
+    public function deleteService($id)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        
+        UserService::where('user_id', $user->id)->where('id', $id)->delete();
+
+        return back()->with('status', 'Service removed successfully!');
+    }
+
+    public function updateProfilePic(Request $request)
+    {
+        $request->validate([
+            'cropped_image' => 'required|string',
+        ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Delete old profile pic if exists
+        if ($user->profile_pic && !str_starts_with($user->profile_pic, 'http')) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_pic);
+        }
+
+        $path = $this->uploadBase64($request->cropped_image, 'profiles');
+        $user->profile_pic = $path;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile picture updated successfully!',
+            'path' => asset('storage/' . $path)
+        ]);
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|current_password',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $user->password = \Illuminate\Support\Facades\Hash::make($request->new_password);
+        $user->save();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Password updated successfully!']);
+        }
+
+        return back()->with('status', 'Password updated successfully!');
+    }
+
+    public function profile()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $relation = match ($user->role) {
+            'client', 'patient' => 'patient',
+            'practitioner' => 'practitioner',
+            'doctor' => 'doctor',
+            'mindfulness_practitioner' => 'mindfulnessPractitioner',
+            'yoga_therapist' => 'yogaTherapist',
+            'translator' => 'translator',
+            default => null,
+        };
+        if ($relation) $user->load([$relation, 'nationality']);
+
+        $profile = $user->profile;
+
+        // Stats
+        $bookingQuery = $this->getBookingQuery($user);
+        $totalSessions = (clone $bookingQuery)->where('status', 'completed')->count();
+        $totalClients = (clone $bookingQuery)->distinct('user_id')->count();
+        $todaySessions = (clone $bookingQuery)->where('booking_date', now()->toDateString())->count();
+        $upcomingSessions = (clone $bookingQuery)->where('booking_date', '>', now()->toDateString())->count();
+
+        // History
+        $servicesHistory = (clone $bookingQuery)
+            ->with('user')
+            ->where('status', 'completed')
+            ->latest('booking_date')
+            ->take(5)
+            ->get();
+        
+        $upcomingServices = (clone $bookingQuery)
+            ->with('user')
+            ->where('booking_date', '>=', now()->toDateString())
+            ->where('status', '!=', 'completed')
+            ->where('status', '!=', 'cancelled')
+            ->orderBy('booking_date', 'asc')
+            ->orderBy('booking_time', 'asc')
+            ->take(5)
+            ->get();
+
+        $gallery = PractitionerGallery::where('user_id', $user->id)->get()->groupBy('category');
+
+        return view('client.profile', compact(
+            'user', 
+            'profile', 
+            'totalSessions', 
+            'totalClients', 
+            'todaySessions', 
+            'upcomingSessions', 
+            'servicesHistory', 
+            'upcomingServices',
+            'gallery'
+        ));
+    }
+
+    public function uploadGalleryImage(Request $request)
+    {
+        $request->validate([
+            'image.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'cropped_image' => 'nullable|string', // single base64
+            'cropped_images.*' => 'string', // array of base64
+            'category' => 'nullable|string|in:sanctuary,rituals,soul,moments'
+        ]);
+
+        $user = Auth::user();
+        $paths = [];
+        $category = $request->category ?? 'sanctuary';
+
+        // Handle single cropped image
+        if ($request->filled('cropped_image')) {
+            $paths[] = $this->uploadBase64($request->cropped_image, 'practitioner_galleries/' . $user->id);
+        }
+        
+        // Handle multiple cropped images
+        if ($request->has('cropped_images')) {
+            foreach ($request->cropped_images as $base64) {
+                $paths[] = $this->uploadBase64($base64, 'practitioner_galleries/' . $user->id);
+            }
+        }
+
+        // Handle raw image uploads (single or multiple)
+        if ($request->hasFile('image')) {
+            $files = is_array($request->file('image')) ? $request->file('image') : [$request->file('image')];
+            foreach ($files as $file) {
+                $paths[] = $file->store('practitioner_galleries/' . $user->id, 'public');
+            }
+        }
+
+        if (!empty($paths)) {
+            foreach ($paths as $path) {
+                PractitionerGallery::create([
+                    'user_id' => $user->id,
+                    'image_path' => $path,
+                    'category' => $category
+                ]);
+            }
+
+            if ($request->ajax()) {
+                return response()->json(['status' => 'success', 'message' => count($paths) . ' image(s) added to gallery!']);
+            }
+            return back()->with('status', count($paths) . ' image(s) added to gallery!');
+        }
+
+        if ($request->ajax()) {
+            return response()->json(['status' => 'error', 'message' => 'No images uploaded.'], 400);
+        }
+        return back()->with('error', 'No images uploaded.');
+    }
+
+    public function deleteGalleryImage($id)
+    {
+        $user = Auth::user();
+        $image = PractitionerGallery::where('user_id', $user->id)->findOrFail($id);
+
+        if (\Storage::disk('public')->exists($image->image_path)) {
+            \Storage::disk('public')->delete($image->image_path);
+        }
+
+        $image->delete();
+
+        return back()->with('status', 'Image removed from gallery.');
+    }
+
+    public function updateProfessionalDetails(Request $request)
+    {
+        $user = Auth::user();
+        $profile = $user->profile;
+        if (!$profile) return back()->with('error', 'Profile not found.');
+
+        // Simple comma-separated to array conversion
+        $specialities = array_filter(array_map('trim', explode(',', $request->specialities)));
+        $conditions = array_filter(array_map('trim', explode(',', $request->conditions)));
+
+        $data = [];
+        switch ($user->role) {
+            case 'practitioner':
+                $data['consultations'] = $specialities;
+                $data['body_therapies'] = $conditions;
+                break;
+            case 'doctor':
+                $data['specialization'] = $specialities;
+                $data['health_conditions_treated'] = $conditions;
+                break;
+            case 'mindfulness_practitioner':
+                $data['practitioner_type'] = $specialities;
+                $data['client_concerns'] = $conditions;
+                break;
+            case 'yoga_therapist':
+                $data['yoga_therapist_type'] = $specialities;
+                $data['areas_of_expertise'] = $conditions;
+                break;
+            case 'translator':
+                $data['fields_of_specialization'] = $specialities;
+                $data['services_offered'] = $conditions;
+                break;
+        }
+
+        if (!empty($data)) {
+            $profile->update($data);
+        }
+
+        return back()->with('status', 'Professional details updated successfully!');
     }
 
     public function joinSession($channel)

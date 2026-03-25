@@ -316,7 +316,8 @@
                     <div class="flex flex-wrap gap-3" id="available-services-container">
                         @forelse($services as $service)
                         <label class="service-tag-label inline-block cursor-pointer select-none" data-service-name="{{ strtolower($service->title) }}" data-service-id="{{ $service->id }}">
-                            <input type="checkbox" class="peer hidden" value="{{ $service->title }}" {{ $loop->first ? 'checked' : '' }}>
+                            <input type="checkbox" class="peer hidden" value="{{ $service->title }}" 
+                                {{ (isset($prefilledService) && $prefilledService->id == $service->id) || (!isset($prefilledService) && $loop->first) ? 'checked' : '' }}>
                             <div
                                 class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
                                 {{ $service->title }}
@@ -358,11 +359,13 @@
                                                     icon.className='ri-arrow-up-s-line text-gray-700 text-lg'; 
                                                     if(typeof smartPosition !== 'undefined') { smartPosition(this, dd); } 
                                                 }">
-                                    <span class="text-sm text-[#252525] font-medium duration-label">{{ $loop->first ? '1 Hour' : 'Duration' }}</span>
+                                    <span class="text-sm text-[#252525] font-medium duration-label">
+                                       {{ ((isset($prefilledService) && $prefilledService->id == $service->id) || (!isset($prefilledService) && $loop->first)) ? '1 Hour' : 'Duration' }}
+                                    </span>
                                     <i class="ri-arrow-down-s-line text-gray-700 text-lg"></i>
-                                </div>
-                                <input type="hidden" name="services[{{ $service->id }}][duration]" class="duration-value" value="{{ $loop->first ? '1 Hour' : '' }}">
-
+                                    </div>
+                                    <input type="hidden" name="services[{{ $service->id }}][duration]" class="duration-value" 
+                                    value="{{ ((isset($prefilledService) && $prefilledService->id == $service->id) || (!isset($prefilledService) && $loop->first)) ? '1 Hour' : '' }}">
                                 <!-- Dropdown Menu -->
                                 <div
                                     class="duration-dropdown hidden absolute left-0 w-72 bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 z-50">
@@ -1745,6 +1748,7 @@
                             <div class="swiper-slide !w-[140px]">
                                 <div class="flex flex-col items-center group cursor-pointer text-center practitioner-select-card"
                                     data-id="{{ $practitioner->id }}"
+                                    data-slug="{{ $practitioner->slug }}"
                                     data-name="{{ $pName }}"
                                     data-image="{{ $pImage }}"
                                     data-role="{{ $pRole }}"

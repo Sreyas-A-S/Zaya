@@ -141,6 +141,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::resource('packages', \App\Http\Controllers\Admin\PackageController::class);
     Route::post('packages/{id}/status', [\App\Http\Controllers\Admin\PackageController::class, 'updateStatus'])->name('packages.status');
 
+    Route::resource('promo-codes', \App\Http\Controllers\Admin\PromoCodeController::class);
+    Route::post('promo-codes/{id}/status', [\App\Http\Controllers\Admin\PromoCodeController::class, 'updateStatus'])->name('promo-codes.status');
+
     Route::get('other-fees', [\App\Http\Controllers\Admin\FinanceSettingController::class, 'index'])->name('other-fees.index');
     Route::post('other-fees', [\App\Http\Controllers\Admin\FinanceSettingController::class, 'update'])->name('other-fees.update');
 
@@ -295,9 +298,7 @@ Route::get('/seed', function () {
 });
 
 
-Route::get('/practitioner-profile', function () {
-    return view('practitioner-profile');
-})->name('practitioner-profile');
+
 
 Route::get('/preview-otp-mail', function () {
     return new App\Mail\AdminOTPMail('123456');

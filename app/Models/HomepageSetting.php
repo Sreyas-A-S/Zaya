@@ -45,4 +45,34 @@ class HomepageSetting extends Model
         return $cache[$langKey];
     }
 
+    /**
+     * Get all settings for a language with English fallback.
+     */
+    public static function getAllSettings(string $language = 'en', ?string $prefix = null): array
+    {
+        static $cache = [];
+
+        $cacheKey = $language . ($prefix ? '|' . $prefix : '');
+
+        if (!isset($cache[$cacheKey])) {
+            $enQuery = self::where('language', 'en');
+            if ($prefix) {
+                $enQuery->where('key', 'like', $prefix . '%');
+            }
+            $enSettings = $enQuery->pluck('value', 'key')->toArray();
+
+            if ($language !== 'en') {
+                $langQuery = self::where('language', $language);
+                if ($prefix) {
+                    $langQuery->where('key', 'like', $prefix . '%');
+                }
+                $langSettings = $langQuery->pluck('value', 'key')->toArray();
+                $cache[$cacheKey] = array_merge($enSettings, $langSettings);
+            } else {
+                $cache[$cacheKey] = $enSettings;
+            }
+        }
+
+        return $cache[$cacheKey];
+    }
 }

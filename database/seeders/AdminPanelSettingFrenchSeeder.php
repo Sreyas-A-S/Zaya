@@ -273,6 +273,14 @@ class AdminPanelSettingFrenchSeeder extends Seeder
                 'language' => 'fr',
             ],
             [
+                'key' => 'admin_panel_sidebar_promo_codes',
+                'value' => 'Codes promo',
+                'type' => 'text',
+                'section' => 'admin_panel',
+                'max_length' => 40,
+                'language' => 'fr',
+            ],
+            [
                 'key' => 'admin_panel_sidebar_other_fees',
                 'value' => 'Autres frais',
                 'type' => 'text',

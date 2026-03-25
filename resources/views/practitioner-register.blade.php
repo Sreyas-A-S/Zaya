@@ -20,7 +20,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
     <style>
-        .iti { width: 100% !important; display: block !important; }
+        .iti {
+            width: 100% !important;
+            display: block !important;
+        }
     </style>
 </head>
 
@@ -83,25 +86,25 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('First Name') }}</label>
-                                <input type="text" 
-                                        name="first_name" 
-                                        value="{{ old('first_name') }}"
-                                        pattern="^[A-Z][a-zA-Z\s]*$"
-                                        title="First name must start with a capital letter and contain only alphabets"
-                                        class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                        placeholder="{{ __('Enter First Name') }}" 
-                                        required>
+                                <input type="text"
+                                    name="first_name"
+                                    value="{{ old('first_name') }}"
+                                    pattern="^[A-Z][a-zA-Z\s]*$"
+                                    title="First name must start with a capital letter and contain only alphabets"
+                                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                    placeholder="{{ __('Enter First Name') }}"
+                                    required>
                             </div>
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Last Name') }}</label>
-                                <input type="text" 
-                                        name="last_name" 
-                                        value="{{ old('last_name') }}"
-                                        pattern="^[A-Z][a-zA-Z\s]*$"
-                                        title="Last name must start with a capital letter and contain only alphabets"
-                                        class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                        placeholder="{{ __('Enter Last Name') }}" 
-                                        required>
+                                <input type="text"
+                                    name="last_name"
+                                    value="{{ old('last_name') }}"
+                                    pattern="^[A-Z][a-zA-Z\s]*$"
+                                    title="Last name must start with a capital letter and contain only alphabets"
+                                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                    placeholder="{{ __('Enter Last Name') }}"
+                                    required>
                             </div>
                         </div>
                         <div class="flex flex-col items-center order-first md:order-last">
@@ -156,26 +159,27 @@
                     <!-- Password & Confirm Password -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                                                        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Password') }}</label>
-                                                        <div class="relative">
-                                                            <input type="password" name="password" 
-                                                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}"
-                                                                title="Must contain at least 8 characters, including NUMBER, UPPERCASE, LOWERCASE and SYMBOL"
-                                                                class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                                                placeholder="{{ __('Enter Password') }}" 
-                                                                required>
-                                                            <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
-                                                        </div>
-                                                    </div>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Password') }}</label>
+                            <div class="relative">
+                                <input type="password" name="password"
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}"
+                                    title="Must contain at least 8 characters, including NUMBER, UPPERCASE, LOWERCASE and SYMBOL"
+                                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                    placeholder="{{ __('Enter Password') }}"
+                                    required>
+                                <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
+                            </div>
+                        </div>
                         <div>
-                                                        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Confirm Password') }}</label>
-                                                        <div class="relative">
-                                                            <input type="password" name="password_confirmation"
-                                                                class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                                                placeholder="{{ __('Confirm Password') }}" required>
-                                                            <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
-                                                        </div>
-                                                    </div>                    </div>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Confirm Password') }}</label>
+                            <div class="relative">
+                                <input type="password" name="password_confirmation"
+                                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                    placeholder="{{ __('Confirm Password') }}" required>
+                                <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- DOB & Country -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -252,81 +256,81 @@
                     <div id="education-container">
                         <div class="bg-[#F6F6F6] rounded-[24px] py-10 px-6 md:px-12 mb-8 education-block" id="education-block-0">
                             <!-- Row 1: Education Type, Institution Name, Duration -->
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                            <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Education Type') }}</label>
-                                <div class="custom-select-wrapper w-full">
-                                    <div class="custom-select" id="education-type-select-0">
-                                        <div class="custom-select-trigger cursor-pointer">
-                                            <span id="education-type-selected-0">{{ __('Select') }}</span>
-                                            <i class="ri-arrow-down-s-line arrow text-gray-400"></i>
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                                <div>
+                                    <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Education Type') }}</label>
+                                    <div class="custom-select-wrapper w-full">
+                                        <div class="custom-select" id="education-type-select-0">
+                                            <div class="custom-select-trigger cursor-pointer">
+                                                <span id="education-type-selected-0">{{ __('Select') }}</span>
+                                                <i class="ri-arrow-down-s-line arrow text-gray-400"></i>
+                                            </div>
+                                            <div class="custom-options">
+                                                <div class="custom-option" data-value="degree">{{ __('Degree') }}</div>
+                                                <div class="custom-option" data-value="diploma">{{ __('Diploma') }}</div>
+                                                <div class="custom-option" data-value="certification">{{ __('Certification') }}</div>
+                                            </div>
                                         </div>
-                                        <div class="custom-options">
-                                            <div class="custom-option" data-value="degree">{{ __('Degree') }}</div>
-                                            <div class="custom-option" data-value="diploma">{{ __('Diploma') }}</div>
-                                            <div class="custom-option" data-value="certification">{{ __('Certification') }}</div>
-                                        </div>
+                                        <input type="hidden" name="education[0][type]" id="education-type-input-0" required>
                                     </div>
-                                    <input type="hidden" name="education[0][type]" id="education-type-input-0" required>
+                                </div>
+                                <div>
+                                    <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Institution Name') }}</label>
+                                    <input type="text" name="education[0][institution]"
+                                        class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                        placeholder="{{ __('Enter Institution Name') }}" required>
+                                </div>
+                                <div>
+                                    <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Duration') }}<span
+                                            class="italic text-[#737373] text-[1rem] font-normal">{{ __('(Hours/Years)') }}</span></label>
+                                    <input type="text" name="education[0][duration]"
+                                        class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                        placeholder="{{ __('Enter Duration') }}" required>
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Institution Name') }}</label>
-                                <input type="text" name="education[0][institution]"
-                                    class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="{{ __('Enter Institution Name') }}" required>
-                            </div>
-                            <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Duration') }}<span
-                                        class="italic text-[#737373] text-[1rem] font-normal">{{ __('(Hours/Years)') }}</span></label>
-                                <input type="text" name="education[0][duration]"
-                                    class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="{{ __('Enter Duration') }}" required>
-                            </div>
-                        </div>
 
-                        <!-- Row 2: Address Line 1, Address Line 2 -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                            <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Address Line 1') }}</label>
-                                <input type="text" name="education[0][address_line_1]"
-                                    class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="{{ __('Address Line 1') }}">
+                            <!-- Row 2: Address Line 1, Address Line 2 -->
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                                <div>
+                                    <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Address Line 1') }}</label>
+                                    <input type="text" name="education[0][address_line_1]"
+                                        class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                        placeholder="{{ __('Address Line 1') }}">
+                                </div>
+                                <div>
+                                    <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Address Line 2') }}</label>
+                                    <input type="text" name="education[0][address_line_2]"
+                                        class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                        placeholder="{{ __('Address Line 2') }}">
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Address Line 2') }}</label>
-                                <input type="text" name="education[0][address_line_2]"
-                                    class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="{{ __('Address Line 2') }}">
-                            </div>
-                        </div>
 
-                        <!-- Row 3: City, State, Country -->
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-                            <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('City') }}</label>
-                                <input type="text" name="education[0][city]"
-                                    class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="{{ __('Enter City') }}">
-                            </div>
-                            <div>
-                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('State') }}</label>
-                                <input type="text" name="education[0][state]"
-                                    class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="{{ __('Enter State') }}">
-                            </div>
-                            <div class="education-country-wrapper">
-                                <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Country') }}</label>
-                                <select id="education-country-select-0" name="education[0][country]"
-                                    class="education-country-select w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]" data-default="" required>
-                                    <option value="">{{ __('Select Country') }}</option>
-                                </select>
+                            <!-- Row 3: City, State, Country -->
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                                <div>
+                                    <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('City') }}</label>
+                                    <input type="text" name="education[0][city]"
+                                        class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                        placeholder="{{ __('Enter City') }}">
+                                </div>
+                                <div>
+                                    <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('State') }}</label>
+                                    <input type="text" name="education[0][state]"
+                                        class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                        placeholder="{{ __('Enter State') }}">
+                                </div>
+                                <div class="education-country-wrapper">
+                                    <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Country') }}</label>
+                                    <select id="education-country-select-0" name="education[0][country]"
+                                        class="education-country-select w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]" data-default="" required>
+                                        <option value="">{{ __('Select Country') }}</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="mb-8">
+                    <div class="mb-8">
                         <h3 class="text-2xl font-medium text-gray-900 mb-4">{{ __('Professional Bio') }}</h3>
                         <textarea name="professional_bio"
                             class="w-full py-4 px-5 bg-[#F5F5F5] rounded-2xl outline-none text-[0.95rem] text-gray-700 transition-all duration-300 min-h-[200px] resize-y placeholder:text-gray-400 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
@@ -341,18 +345,18 @@
                         <div class="mb-8 practice-group" data-input="ayurvedic-input">
                             <h4 class="font-medium text-gray-900 mb-4 text-xl">{{ __('Ayurvedic Wellness Consultation:') }}</h4>
                             <p class="text-gray-700 text-lg mb-4">{{ __('Focuses on nutritional and lifestyle guidance rooted in Ayurvedic principles:') }}</p>
-                            <input type="text" name="ayurvedic_practices_custom" id="ayurvedic-input" 
+                            <input type="text" name="ayurvedic_practices_custom" id="ayurvedic-input"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
                                 placeholder="{{ __('Choose your practice areas') }}">
                             <div class="flex flex-wrap gap-4">
                                 @foreach($wellnessConsultations as $consultation)
-                                    @if(strtolower($consultation->name) !== 'other')
-                                        <label
-                                            class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
-                                            <input type="checkbox" name="ayurvedic_practices[]" value="{{ $consultation->name }}" class="sr-only">
-                                            {{ $consultation->name }}
-                                        </label>
-                                    @endif
+                                @if(strtolower($consultation->name) !== 'other')
+                                <label
+                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
+                                    <input type="checkbox" name="ayurvedic_practices[]" value="{{ $consultation->name }}" class="sr-only">
+                                    {{ $consultation->name }}
+                                </label>
+                                @endif
                                 @endforeach
                                 <label
                                     class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
@@ -367,18 +371,18 @@
                         <div class="mb-8 practice-group" data-input="massage-input">
                             <h4 class="text-xl font-medium text-gray-900 mb-4">{{ __('Massage & Body Therapists:') }}</h4>
                             <p class="text-gray-700 text-lg mb-4">{{ __('Includes specific traditional physical treatments and specialized care:') }}</p>
-                            <input type="text" name="massage_practices_custom" id="massage-input" 
+                            <input type="text" name="massage_practices_custom" id="massage-input"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
                                 placeholder="{{ __('Choose your practice areas') }}">
                             <div class="flex flex-wrap gap-4">
                                 @foreach($bodyTherapies as $bodyTherapy)
-                                    @if(strtolower($bodyTherapy->name) !== 'other')
-                                        <label
-                                            class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
-                                            <input type="checkbox" name="massage_practices[]" value="{{ $bodyTherapy->name }}" class="sr-only">
-                                            {{ $bodyTherapy->name }}
-                                        </label>
-                                    @endif
+                                @if(strtolower($bodyTherapy->name) !== 'other')
+                                <label
+                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
+                                    <input type="checkbox" name="massage_practices[]" value="{{ $bodyTherapy->name }}" class="sr-only">
+                                    {{ $bodyTherapy->name }}
+                                </label>
+                                @endif
                                 @endforeach
                                 <label
                                     class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
@@ -392,18 +396,18 @@
                         <!-- Other Modalities -->
                         <div class="mb-8 practice-group" data-input="modalities-input">
                             <h4 class="text-xl font-medium text-gray-900 mb-4">{{ __('Other Modalities:') }}</h4>
-                            <input type="text" name="other_modalities_custom" id="modalities-input" 
+                            <input type="text" name="other_modalities_custom" id="modalities-input"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)] mb-4 cursor-default"
                                 placeholder="{{ __('Choose your practice areas') }}">
                             <div class="flex flex-wrap gap-4">
                                 @foreach($otherModalities as $modality)
-                                    @if(strtolower($modality->name) !== 'other')
-                                        <label
-                                            class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:border-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
-                                            <input type="checkbox" name="other_modalities[]" value="{{ $modality->name }}" class="sr-only">
-                                            {{ $modality->name }}
-                                        </label>
-                                    @endif
+                                @if(strtolower($modality->name) !== 'other')
+                                <label
+                                    class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:border-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
+                                    <input type="checkbox" name="other_modalities[]" value="{{ $modality->name }}" class="sr-only">
+                                    {{ $modality->name }}
+                                </label>
+                                @endif
                                 @endforeach
                                 <label
                                     class="practice-tag select-none inline-flex items-center py-2 px-4 border border-gray-200 rounded-full text-base text-gray-700 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] focus-within:ring-2 focus-within:ring-[#FABD4D] focus-within:ring-offset-1">
@@ -439,41 +443,41 @@
 
                     <div id="certification-container">
                         <div class="bg-[#F5F5F5] rounded-xl mb-6 certification-block" id="certification-block-0">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-10">
-                            <div>
-                                <label class="block text-gray-600 text-lg mb-4">{{ __('ID Proof') }}</label>
-                                <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-                                    <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
-                                        <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                        <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-10">
+                                <div>
+                                    <label class="block text-gray-600 text-lg mb-4">{{ __('ID Proof') }}</label>
+                                    <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                        <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                            <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
+                                            <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
+                                        </div>
+                                        <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
+                                        <input type="file" name="doc_id_proof" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                                     </div>
-                                    <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
-                                    <input type="file" name="doc_id_proof" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-600 text-lg mb-4">{{ __('Training / Diploma') }}</label>
+                                    <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                        <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                            <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
+                                            <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
+                                        </div>
+                                        <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
+                                        <input type="file" name="doc_certificates" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-600 text-lg mb-4">{{ __('Experience') }}<span class="text-gray-400">{{ __('(if any)') }}</span></label>
+                                    <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
+                                        <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
+                                            <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
+                                            <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
+                                        </div>
+                                        <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
+                                        <input type="file" name="doc_experience" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-gray-600 text-lg mb-4">{{ __('Training / Diploma') }}</label>
-                                <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-                                    <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
-                                        <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                        <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
-                                    </div>
-                                    <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
-                                    <input type="file" name="doc_certificates" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-gray-600 text-lg mb-4">{{ __('Experience') }}<span class="text-gray-400">{{ __('(if any)') }}</span></label>
-                                <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-                                    <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
-                                        <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                                        <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
-                                    </div>
-                                    <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
-                                    <input type="file" name="doc_experience" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                                </div>
-                            </div>
-                        </div>
                         </div>
                     </div>
 
@@ -527,7 +531,7 @@
                             </div>
                         </div>
                         <div class="bg-[#FFECC8] rounded-lg py-6 px-10 flex justify-end items-center mb-4">
-                            
+
                         </div>
                     </div>
 
@@ -696,7 +700,7 @@
                 <!-- Main Check Circle -->
                 <div class="w-full h-full bg-[#60E48C] rounded-full flex items-center justify-center relative z-10 shadow-lg shadow-[#60E48C]/30">
                     <svg width="40" height="30" viewBox="0 0 40 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 15L15 26L36 4" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 15L15 26L36 4" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </div>
             </div>
@@ -705,7 +709,7 @@
             <h3 class="text-[#209F59] text-[28px] font-medium mb-4">{{ __('Thank you!') }}</h3>
             <h4 class="text-[#333333] text-[20px] font-semibold mb-3">{{ __('Your Application Submitted!') }}</h4>
             <p class="text-[#737373] text-[15px] leading-relaxed mb-6 font-normal">{{ __('Your application will be reviewed within 20 days.') }}<br>{{ __('Stay connect with us!') }}</p>
-            
+
             <button onclick="closeThankYouPopup()" class="hidden"></button>
         </div>
     </div>
@@ -725,9 +729,9 @@
                 </div>
             </div>
             <div class="p-6 border-t border-gray-100 flex justify-end gap-3">
-                <button type="button" onclick="closeCropperModal()" 
+                <button type="button" onclick="closeCropperModal()"
                     class="px-6 py-2.5 rounded-full border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-all duration-200">{{ __('Cancel') }}</button>
-                <button type="button" id="cropSave" 
+                <button type="button" id="cropSave"
                     class="px-8 py-2.5 rounded-full bg-[#F5A623] text-[#423131] font-medium hover:bg-[#E09518] transition-all duration-200 shadow-sm shadow-[#F5A623]/20">{{ __('Crop & Save') }}</button>
             </div>
         </div>
@@ -736,7 +740,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const phoneInput = document.querySelector("#phone");
             if (phoneInput) {
                 const iti = window.intlTelInput(phoneInput, {
@@ -840,13 +844,20 @@
             const nextBtnText = document.getElementById('next-btn-text');
 
             if (currentTab === 1) {
-                backBtnText.textContent = '{{ __('← Back to Website') }}';
+                backBtnText.textContent = '{{ __('←
+                Back to Website ') }}';
             } else {
-                backBtnText.textContent = '{{ __('Back') }}';
+                backBtnText.textContent = '{{ __('
+                Back ') }}';
             }
 
-            // Keep the CTA consistent across steps
-            nextBtnText.textContent = '{{ __('Save & Continue') }}';
+            if (currentTab === totalTabs) {
+                nextBtnText.textContent = '{{ __('
+                Submit ') }}';
+            } else {
+                nextBtnText.textContent = '{{ __('
+                Save & Continue ') }}';
+            }
         }
 
         function showTab(tabNumber) {
@@ -862,7 +873,10 @@
             }
             currentTab = tabNumber;
             updateStepIndicator();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
 
         function validateStep() {
@@ -876,13 +890,15 @@
 
             inputs.forEach(input => {
                 let errorMsg = null;
-                
+
                 if (input.hasAttribute('required') && !input.value.trim() && input.type !== 'radio' && input.type !== 'checkbox' && input.type !== 'file') {
-                    errorMsg = '{{ __('This field is required') }}';
+                    errorMsg = '{{ __('
+                    This field is required ') }}';
                 } else if (input.type === 'radio' && input.hasAttribute('required')) {
                     const group = currentTabEl.querySelectorAll(`input[name="${input.name}"]`);
                     const checked = Array.from(group).some(r => r.checked);
-                    if (!checked) errorMsg = '{{ __('Please select an option') }}';
+                    if (!checked) errorMsg = '{{ __('
+                    Please select an option ') }}';
                 } else if (!input.checkValidity()) {
                     errorMsg = input.title || input.validationMessage;
                 } else if (input.name === 'dob' && input.value) {
@@ -894,7 +910,8 @@
                         age--;
                     }
                     if (age < 18) {
-                        errorMsg = '{{ __('You must be at least 18 years old') }}';
+                        errorMsg = '{{ __('
+                        You must be at least 18 years old ') }}';
                     }
                 }
 
@@ -903,10 +920,10 @@
                     const err = document.createElement('p');
                     err.className = 'error-message text-red-500 text-sm mt-1 absolute';
                     err.textContent = errorMsg;
-                    
+
                     // Add position relative to parent to stick the error to the bottom appropriately
                     const parent = input.parentElement;
-                    if(parent) {
+                    if (parent) {
                         parent.style.position = 'relative';
                         parent.appendChild(err);
                     }
@@ -918,7 +935,9 @@
                     this.classList.remove('border-red-500', 'focus:border-red-500');
                     const err = this.parentElement ? this.parentElement.querySelector('.error-message') : null;
                     if (err) err.remove();
-                }, { once: true });
+                }, {
+                    once: true
+                });
             });
 
             if (currentTab === 1) {
@@ -928,17 +947,20 @@
                     conf.classList.add('border-red-500', 'focus:border-red-500');
                     const err = document.createElement('p');
                     err.className = 'error-message text-red-500 text-sm mt-1 absolute left-6';
-                    err.textContent = '{{ __('The password confirmation does not match') }}';
+                    err.textContent = '{{ __('
+                    The password confirmation does not match ') }}';
                     conf.parentElement.style.position = 'relative';
                     conf.parentElement.appendChild(err);
                     isValid = false;
-                    
+
                     // Add real-time clearance for confirmation
                     conf.addEventListener('input', function() {
                         this.classList.remove('border-red-500', 'focus:border-red-500');
                         const errEl = this.parentElement ? this.parentElement.querySelector('.error-message') : null;
                         if (errEl) errEl.remove();
-                    }, { once: true });
+                    }, {
+                        once: true
+                    });
                 }
             }
 
@@ -959,7 +981,7 @@
                 const form = document.getElementById('practitioner-form');
                 const nextBtn = document.getElementById('next-btn');
                 const btnText = document.getElementById('next-btn-text');
-                
+
                 const originalText = btnText.textContent;
                 btnText.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Submitting...';
                 nextBtn.disabled = true;
@@ -993,13 +1015,13 @@
                         } else if (data.message) {
                             errorMessage = data.message;
                         }
-                        
+
                         if (typeof showZayaToast === 'function') {
                             showZayaToast(errorMessage, 'error');
                         } else {
                             alert(errorMessage);
                         }
-                        
+
                         nextBtn.disabled = false;
                         btnText.textContent = originalText;
                     }
@@ -1051,7 +1073,7 @@
         }
 
         document.querySelectorAll('.practice-tag').forEach(tag => {
-            tag.addEventListener('click', function (e) {
+            tag.addEventListener('click', function(e) {
                 e.preventDefault(); // Prevent default label behavior
 
                 const checkbox = this.querySelector('input[type="checkbox"]');
@@ -1078,7 +1100,7 @@
 
         // Upload box click handlers
         document.querySelectorAll('.upload-box').forEach(box => {
-            box.addEventListener('click', function (e) {
+            box.addEventListener('click', function(e) {
                 const input = this.querySelector('input[type="file"]');
                 if (input && e.target !== input) input.click();
             });
@@ -1098,18 +1120,18 @@
         });
 
         // Photo upload preview with cropping
-        document.getElementById('profile-photo').addEventListener('change', function (e) {
+        document.getElementById('profile-photo').addEventListener('change', function(e) {
             const files = e.target.files;
             if (files && files.length > 0) {
                 const reader = new FileReader();
-                reader.onload = function (event) {
+                reader.onload = function(event) {
                     if (cropper) {
                         cropper.destroy();
                     }
                     cropperImage.src = event.target.result;
                     cropperModal.classList.remove('hidden');
                     cropperModal.classList.add('flex');
-                    
+
                     cropper = new Cropper(cropperImage, {
                         aspectRatio: 1,
                         viewMode: 1,
@@ -1149,9 +1171,9 @@
             label.style.backgroundSize = 'cover';
             label.style.backgroundPosition = 'center';
             label.innerHTML = '';
-            
+
             document.getElementById('croppedImage').value = base64data;
-            
+
             cropperModal.classList.add('hidden');
             cropperModal.classList.remove('flex');
             if (cropper) {
@@ -1160,73 +1182,850 @@
             }
         });
 
-        const countriesData = [
-            { code: "AF", name: "Afghanistan", flag: "🇦🇫" }, { code: "AL", name: "Albania", flag: "🇦🇱" }, { code: "DZ", name: "Algeria", flag: "🇩🇿" },
-            { code: "AD", name: "Andorra", flag: "🇦🇩" }, { code: "AO", name: "Angola", flag: "🇦🇴" }, { code: "AG", name: "Antigua and Barbuda", flag: "🇦🇬" },
-            { code: "AR", name: "Argentina", flag: "🇦🇷" }, { code: "AM", name: "Armenia", flag: "🇦🇲" }, { code: "AU", name: "Australia", flag: "🇦🇺" },
-            { code: "AT", name: "Austria", flag: "🇦🇹" }, { code: "AZ", name: "Azerbaijan", flag: "🇦🇿" }, { code: "BS", name: "Bahamas", flag: "🇧🇸" },
-            { code: "BH", name: "Bahrain", flag: "🇧🇭" }, { code: "BD", name: "Bangladesh", flag: "🇧🇩" }, { code: "BB", name: "Barbados", flag: "🇧🇧" },
-            { code: "BY", name: "Belarus", flag: "🇧🇾" }, { code: "BE", name: "Belgium", flag: "🇧🇪" }, { code: "BZ", name: "Belize", flag: "🇧🇿" },
-            { code: "BJ", name: "Benin", flag: "🇧🇯" }, { code: "BT", name: "Bhutan", flag: "🇧🇹" }, { code: "BO", name: "Bolivia", flag: "🇧🇴" },
-            { code: "BA", name: "Bosnia and Herzegovina", flag: "🇧🇦" }, { code: "BW", name: "Botswana", flag: "🇧🇼" }, { code: "BR", name: "Brazil", flag: "🇧🇷" },
-            { code: "BN", name: "Brunei", flag: "🇧🇳" }, { code: "BG", name: "Bulgaria", flag: "🇧🇬" }, { code: "BF", name: "Burkina Faso", flag: "🇧🇫" },
-            { code: "BI", name: "Burundi", flag: "🇧🇮" }, { code: "CV", name: "Cabo Verde", flag: "🇨🇻" }, { code: "KH", name: "Cambodia", flag: "🇰🇭" },
-            { code: "CM", name: "Cameroon", flag: "🇨🇲" }, { code: "CA", name: "Canada", flag: "🇨🇦" }, { code: "CF", name: "Central African Republic", flag: "🇨🇫" },
-            { code: "TD", name: "Chad", flag: "🇹🇩" }, { code: "CL", name: "Chile", flag: "🇨🇱" }, { code: "CN", name: "China", flag: "🇨🇳" },
-            { code: "CO", name: "Colombia", flag: "🇨🇴" }, { code: "KM", name: "Comoros", flag: "🇰🇲" }, { code: "CG", name: "Congo", flag: "🇨🇬" },
-            { code: "CD", name: "Congo (DRC)", flag: "🇨🇩" }, { code: "CR", name: "Costa Rica", flag: "🇨🇷" }, { code: "CI", name: "Côte d'Ivoire", flag: "🇨🇮" },
-            { code: "HR", name: "Croatia", flag: "🇭🇷" }, { code: "CU", name: "Cuba", flag: "🇨🇺" }, { code: "CY", name: "Cyprus", flag: "🇨🇾" },
-            { code: "CZ", name: "Czechia", flag: "🇨🇿" }, { code: "DK", name: "Denmark", flag: "🇩🇰" }, { code: "DJ", name: "Djibouti" },
-            { code: "DM", name: "Dominica", flag: "🇩🇲" }, { code: "DO", name: "Dominican Republic", flag: "🇩🇴" }, { code: "EC", name: "Ecuador", flag: "🇪🇨" },
-            { code: "EG", name: "Egypt", flag: "🇪🇬" }, { code: "SV", name: "El Salvador", flag: "🇸🇻" }, { code: "GQ", name: "Equatorial Guinea", flag: "🇬🇶" },
-            { code: "ER", name: "Eritrea", flag: "🇪🇷" }, { code: "EE", name: "Estonia", flag: "🇪🇪" }, { code: "SZ", name: "Eswatini", flag: "🇸🇿" },
-            { code: "ET", name: "Ethiopia", flag: "🇪🇹" }, { code: "FJ", name: "Fiji", flag: "🇫🇯" }, { code: "FI", name: "Finland", flag: "🇫🇮" },
-            { code: "FR", name: "France", flag: "🇫🇷" }, { code: "GA", name: "Gabon", flag: "🇬🇦" }, { code: "GM", name: "Gambia", flag: "🇬🇲" },
-            { code: "GE", name: "Georgia", flag: "🇬🇪" }, { code: "DE", name: "Germany", flag: "🇩🇪" }, { code: "GH", name: "Ghana", flag: "🇬🇭" },
-            { code: "GR", name: "Greece", flag: "🇬🇷" }, { code: "GD", name: "Grenada", flag: "🇬🇩" }, { code: "GT", name: "Guatemala", flag: "🇬🇹" },
-            { code: "GN", name: "Guinea", flag: "🇬🇳" }, { code: "GW", name: "Guinea-Bissau", flag: "🇬🇼" }, { code: "GY", name: "Guyana", flag: "🇬🇾" },
-            { code: "HT", name: "Haiti", flag: "🇭🇹" }, { code: "HN", name: "Honduras", flag: "🇭🇳" }, { code: "HU", name: "Hungary", flag: "🇭🇺" },
-            { code: "IS", name: "Iceland", flag: "🇮🇸" }, { code: "IN", name: "India", flag: "🇮🇳" }, { code: "ID", name: "Indonesia", flag: "🇮🇩" },
-            { code: "IR", name: "Iran", flag: "🇮🇷" }, { code: "IQ", name: "Iraq", flag: "🇮🇶" }, { code: "IE", name: "Ireland", flag: "🇮🇪" },
-            { code: "IL", name: "Israel", flag: "🇮🇱" }, { code: "IT", name: "Italy", flag: "🇮🇹" }, { code: "JM", name: "Jamaica", flag: "🇯🇲" },
-            { code: "JP", name: "Japan", flag: "🇯🇵" }, { code: "JO", name: "Jordan", flag: "🇯🇴" }, { code: "KZ", name: "Kazakhstan", flag: "🇰🇿" },
-            { code: "KE", name: "Kenya", flag: "🇰🇪" }, { code: "KI", name: "Kiribati" }, { code: "KP", name: "North Korea", flag: "🇰🇵" },
-            { code: "KR", name: "South Korea", flag: "🇰🇷" }, { code: "KW", name: "Kuwait", flag: "🇰🇼" }, { code: "KG", name: "Kyrgyzstan", flag: "🇰🇬" },
-            { code: "LA", name: "Laos", flag: "🇱🇦" }, { code: "LV", name: "Latvia", flag: "🇱🇻" }, { code: "LB", name: "Lebanon", flag: "🇱🇧" },
-            { code: "LS", name: "Lesotho", flag: "🇱🇸" }, { code: "LR", name: "Liberia", flag: "🇱🇷" }, { code: "LY", name: "Libya", flag: "🇱🇾" },
-            { code: "LI", name: "Liechtenstein", flag: "🇱🇮" }, { code: "LT", name: "Lithuania", flag: "🇱🇹" }, { code: "LU", name: "Luxembourg", flag: "🇱🇺" },
-            { code: "MG", name: "Madagascar", flag: "🇲🇬" }, { code: "MW", name: "Malawi", flag: "🇲🇼" }, { code: "MY", name: "Malaysia", flag: "🇲🇾" },
-            { code: "MV", name: "Maldives", flag: "🇲🇻" }, { code: "ML", name: "Mali", flag: "🇲🇱" }, { code: "MT", name: "Malta", flag: "🇲🇹" },
-            { code: "MH", name: "Marshall Islands", flag: "🇲🇭" }, { code: "MR", name: "Mauritania", flag: "🇲🇷" }, { code: "MU", name: "Mauritius", flag: "🇲🇺" },
-            { code: "MX", name: "Mexico", flag: "🇲🇽" }, { code: "FM", name: "Micronesia", flag: "🇫🇲" }, { code: "MD", name: "Moldova", flag: "🇲🇩" },
-            { code: "MC", name: "Monaco", flag: "🇲🇨" }, { code: "MN", name: "Mongolia", flag: "🇲🇳" }, { code: "ME", name: "Montenegro", flag: "🇲🇪" },
-            { code: "MA", name: "Morocco", flag: "🇲🇦" }, { code: "MZ", name: "Mozambique" }, { code: "MM", name: "Myanmar", flag: "🇲🇲" },
-            { code: "NA", name: "Namibia", flag: "🇳🇦" }, { code: "NR", name: "Nauru", flag: "🇳🇷" }, { code: "NP", name: "Nepal", flag: "🇳🇵" },
-            { code: "NL", name: "Netherlands", flag: "🇳🇱" }, { code: "NZ", name: "New Zealand", flag: "🇳🇿" }, { code: "NI", name: "Nicaragua", flag: "🇳🇮" },
-            { code: "NE", name: "Niger", flag: "🇳🇪" }, { code: "NG", name: "Nigeria", flag: "🇳🇬" }, { code: "MK", name: "North Macedonia", flag: "🇲🇰" },
-            { code: "NO", name: "Norway", flag: "🇳🇴" }, { code: "OM", name: "Oman", flag: "🇴🇲" }, { code: "PK", name: "Pakistan", flag: "🇵🇰" },
-            { code: "PW", name: "Palau", flag: "🇵🇼" }, { code: "PS", name: "Palestine", flag: "🇵🇸" }, { code: "PA", name: "Panama", flag: "🇵🇦" },
-            { code: "PG", name: "Papua New Guinea", flag: "🇵🇬" }, { code: "PY", name: "Paraguay" }, { code: "PE", name: "Peru", flag: "🇵🇪" },
-            { code: "PH", name: "Philippines", flag: "🇵🇭" }, { code: "PL", name: "Poland", flag: "🇵🇱" }, { code: "PT", name: "Portugal", flag: "🇵🇹" },
-            { code: "QA", name: "Qatar", flag: "🇶🇦" }, { code: "RO", name: "Romania", flag: "🇷🇴" }, { code: "RU", name: "Russia", flag: "🇷🇺" },
-            { code: "RW", name: "Rwanda", flag: "🇷🇼" }, { code: "KN", name: "Saint Kitts and Nevis" }, { code: "LC", name: "Saint Lucia", flag: "🇱🇨" },
-            { code: "VC", name: "Saint Vincent and the Grenadines", flag: "🇻🇨" }, { code: "WS", name: "Samoa", flag: "🇼🇸" }, { code: "SM", name: "San Marino", flag: "🇸🇲" },
-            { code: "ST", name: "São Tomé and Príncipe", flag: "🇸🇹" }, { code: "SA", name: "Saudi Arabia", flag: "🇸🇦" }, { code: "SN", name: "Senegal", flag: "🇸🇳" },
-            { code: "RS", name: "Serbia", flag: "🇷🇸" }, { code: "SC", name: "Seychelles", flag: "🇸🇨" }, { code: "SL", name: "Sierra Leone", flag: "🇸🇱" },
-            { code: "SG", name: "Singapore", flag: "🇸🇬" }, { code: "SK", name: "Slovakia", flag: "🇸🇰" }, { code: "SI", name: "Slovenia", flag: "🇸🇮" },
-            { code: "SB", name: "Solomon Islands", flag: "🇸🇧" }, { code: "SO", name: "Somalia", flag: "🇸🇴" }, { code: "ZA", name: "South Africa" },
-            { code: "SS", name: "South Sudan", flag: "🇸🇸" }, { code: "ES", name: "Spain", flag: "🇪🇸" }, { code: "LK", name: "Sri Lanka", flag: "🇱🇰" },
-            { code: "SD", name: "Sudan", flag: "🇸🇩" }, { code: "SR", name: "Suriname", flag: "🇸🇷" }, { code: "SE", name: "Sweden", flag: "🇸🇪" },
-            { code: "CH", name: "Switzerland", flag: "🇨🇭" }, { code: "SY", name: "Syria", flag: "🇸🇾" }, { code: "TW", name: "Taiwan", flag: "🇹🇼" },
-            { code: "TJ", name: "Tajikistan", flag: "🇹🇯" }, { code: "TZ", name: "Tanzania", flag: "🇹🇿" }, { code: "TH", name: "Thailand", flag: "🇹🇭" },
-            { code: "TL", name: "Timor-Leste", flag: "🇹🇱" }, { code: "TG", name: "Togo", flag: "🇹🇬" }, { code: "TO", name: "Tonga", flag: "🇹🇴" },
-            { code: "TT", name: "Trinidad and Tobago", flag: "🇹🇹" }, { code: "TN", name: "Tunisia", flag: "🇹🇳" }, { code: "TR", name: "Turkey", flag: "🇹🇷" },
-            { code: "TM", name: "Turkmenistan", flag: "🇹🇲" }, { code: "TV", name: "Tuvalu", flag: "🇹🇻" }, { code: "UG", name: "Uganda", flag: "🇺🇬" },
-            { code: "UA", name: "Ukraine", flag: "🇺🇦" }, { code: "AE", name: "United Arab Emirates", flag: "🇦🇪" }, { code: "GB", name: "United Kingdom", flag: "🇬🇧" },
-            { code: "US", name: "United States", flag: "🇺🇸" }, { code: "UY", name: "Uruguay", flag: "🇺🇾" }, { code: "UZ", name: "Uzbekistan", flag: "🇺🇿" },
-            { code: "VU", name: "Vanuatu", flag: "🇻🇺" }, { code: "VA", name: "Vatican City", flag: "🇻🇦" }, { code: "VE", name: "Venezuela", flag: "🇻🇪" },
-            { code: "VN", name: "Vietnam", flag: "🇻🇳" }, { code: "YE", name: "Yemen", flag: "🇾🇪" }, { code: "ZM", name: "Zambia", flag: "🇿🇲" },
-            { code: "ZW", name: "Zimbabwe", flag: "🇿🇼" }
+        const countriesData = [{
+                code: "AF",
+                name: "Afghanistan",
+                flag: "🇦🇫"
+            }, {
+                code: "AL",
+                name: "Albania",
+                flag: "🇦🇱"
+            }, {
+                code: "DZ",
+                name: "Algeria",
+                flag: "🇩🇿"
+            },
+            {
+                code: "AD",
+                name: "Andorra",
+                flag: "🇦🇩"
+            }, {
+                code: "AO",
+                name: "Angola",
+                flag: "🇦🇴"
+            }, {
+                code: "AG",
+                name: "Antigua and Barbuda",
+                flag: "🇦🇬"
+            },
+            {
+                code: "AR",
+                name: "Argentina",
+                flag: "🇦🇷"
+            }, {
+                code: "AM",
+                name: "Armenia",
+                flag: "🇦🇲"
+            }, {
+                code: "AU",
+                name: "Australia",
+                flag: "🇦🇺"
+            },
+            {
+                code: "AT",
+                name: "Austria",
+                flag: "🇦🇹"
+            }, {
+                code: "AZ",
+                name: "Azerbaijan",
+                flag: "🇦🇿"
+            }, {
+                code: "BS",
+                name: "Bahamas",
+                flag: "🇧🇸"
+            },
+            {
+                code: "BH",
+                name: "Bahrain",
+                flag: "🇧🇭"
+            }, {
+                code: "BD",
+                name: "Bangladesh",
+                flag: "🇧🇩"
+            }, {
+                code: "BB",
+                name: "Barbados",
+                flag: "🇧🇧"
+            },
+            {
+                code: "BY",
+                name: "Belarus",
+                flag: "🇧🇾"
+            }, {
+                code: "BE",
+                name: "Belgium",
+                flag: "🇧🇪"
+            }, {
+                code: "BZ",
+                name: "Belize",
+                flag: "🇧🇿"
+            },
+            {
+                code: "BJ",
+                name: "Benin",
+                flag: "🇧🇯"
+            }, {
+                code: "BT",
+                name: "Bhutan",
+                flag: "🇧🇹"
+            }, {
+                code: "BO",
+                name: "Bolivia",
+                flag: "🇧🇴"
+            },
+            {
+                code: "BA",
+                name: "Bosnia and Herzegovina",
+                flag: "🇧🇦"
+            }, {
+                code: "BW",
+                name: "Botswana",
+                flag: "🇧🇼"
+            }, {
+                code: "BR",
+                name: "Brazil",
+                flag: "🇧🇷"
+            },
+            {
+                code: "BN",
+                name: "Brunei",
+                flag: "🇧🇳"
+            }, {
+                code: "BG",
+                name: "Bulgaria",
+                flag: "🇧🇬"
+            }, {
+                code: "BF",
+                name: "Burkina Faso",
+                flag: "🇧🇫"
+            },
+            {
+                code: "BI",
+                name: "Burundi",
+                flag: "🇧🇮"
+            }, {
+                code: "CV",
+                name: "Cabo Verde",
+                flag: "🇨🇻"
+            }, {
+                code: "KH",
+                name: "Cambodia",
+                flag: "🇰🇭"
+            },
+            {
+                code: "CM",
+                name: "Cameroon",
+                flag: "🇨🇲"
+            }, {
+                code: "CA",
+                name: "Canada",
+                flag: "🇨🇦"
+            }, {
+                code: "CF",
+                name: "Central African Republic",
+                flag: "🇨🇫"
+            },
+            {
+                code: "TD",
+                name: "Chad",
+                flag: "🇹🇩"
+            }, {
+                code: "CL",
+                name: "Chile",
+                flag: "🇨🇱"
+            }, {
+                code: "CN",
+                name: "China",
+                flag: "🇨🇳"
+            },
+            {
+                code: "CO",
+                name: "Colombia",
+                flag: "🇨🇴"
+            }, {
+                code: "KM",
+                name: "Comoros",
+                flag: "🇰🇲"
+            }, {
+                code: "CG",
+                name: "Congo",
+                flag: "🇨🇬"
+            },
+            {
+                code: "CD",
+                name: "Congo (DRC)",
+                flag: "🇨🇩"
+            }, {
+                code: "CR",
+                name: "Costa Rica",
+                flag: "🇨🇷"
+            }, {
+                code: "CI",
+                name: "Côte d'Ivoire",
+                flag: "🇨🇮"
+            },
+            {
+                code: "HR",
+                name: "Croatia",
+                flag: "🇭🇷"
+            }, {
+                code: "CU",
+                name: "Cuba",
+                flag: "🇨🇺"
+            }, {
+                code: "CY",
+                name: "Cyprus",
+                flag: "🇨🇾"
+            },
+            {
+                code: "CZ",
+                name: "Czechia",
+                flag: "🇨🇿"
+            }, {
+                code: "DK",
+                name: "Denmark",
+                flag: "🇩🇰"
+            }, {
+                code: "DJ",
+                name: "Djibouti"
+            },
+            {
+                code: "DM",
+                name: "Dominica",
+                flag: "🇩🇲"
+            }, {
+                code: "DO",
+                name: "Dominican Republic",
+                flag: "🇩🇴"
+            }, {
+                code: "EC",
+                name: "Ecuador",
+                flag: "🇪🇨"
+            },
+            {
+                code: "EG",
+                name: "Egypt",
+                flag: "🇪🇬"
+            }, {
+                code: "SV",
+                name: "El Salvador",
+                flag: "🇸🇻"
+            }, {
+                code: "GQ",
+                name: "Equatorial Guinea",
+                flag: "🇬🇶"
+            },
+            {
+                code: "ER",
+                name: "Eritrea",
+                flag: "🇪🇷"
+            }, {
+                code: "EE",
+                name: "Estonia",
+                flag: "🇪🇪"
+            }, {
+                code: "SZ",
+                name: "Eswatini",
+                flag: "🇸🇿"
+            },
+            {
+                code: "ET",
+                name: "Ethiopia",
+                flag: "🇪🇹"
+            }, {
+                code: "FJ",
+                name: "Fiji",
+                flag: "🇫🇯"
+            }, {
+                code: "FI",
+                name: "Finland",
+                flag: "🇫🇮"
+            },
+            {
+                code: "FR",
+                name: "France",
+                flag: "🇫🇷"
+            }, {
+                code: "GA",
+                name: "Gabon",
+                flag: "🇬🇦"
+            }, {
+                code: "GM",
+                name: "Gambia",
+                flag: "🇬🇲"
+            },
+            {
+                code: "GE",
+                name: "Georgia",
+                flag: "🇬🇪"
+            }, {
+                code: "DE",
+                name: "Germany",
+                flag: "🇩🇪"
+            }, {
+                code: "GH",
+                name: "Ghana",
+                flag: "🇬🇭"
+            },
+            {
+                code: "GR",
+                name: "Greece",
+                flag: "🇬🇷"
+            }, {
+                code: "GD",
+                name: "Grenada",
+                flag: "🇬🇩"
+            }, {
+                code: "GT",
+                name: "Guatemala",
+                flag: "🇬🇹"
+            },
+            {
+                code: "GN",
+                name: "Guinea",
+                flag: "🇬🇳"
+            }, {
+                code: "GW",
+                name: "Guinea-Bissau",
+                flag: "🇬🇼"
+            }, {
+                code: "GY",
+                name: "Guyana",
+                flag: "🇬🇾"
+            },
+            {
+                code: "HT",
+                name: "Haiti",
+                flag: "🇭🇹"
+            }, {
+                code: "HN",
+                name: "Honduras",
+                flag: "🇭🇳"
+            }, {
+                code: "HU",
+                name: "Hungary",
+                flag: "🇭🇺"
+            },
+            {
+                code: "IS",
+                name: "Iceland",
+                flag: "🇮🇸"
+            }, {
+                code: "IN",
+                name: "India",
+                flag: "🇮🇳"
+            }, {
+                code: "ID",
+                name: "Indonesia",
+                flag: "🇮🇩"
+            },
+            {
+                code: "IR",
+                name: "Iran",
+                flag: "🇮🇷"
+            }, {
+                code: "IQ",
+                name: "Iraq",
+                flag: "🇮🇶"
+            }, {
+                code: "IE",
+                name: "Ireland",
+                flag: "🇮🇪"
+            },
+            {
+                code: "IL",
+                name: "Israel",
+                flag: "🇮🇱"
+            }, {
+                code: "IT",
+                name: "Italy",
+                flag: "🇮🇹"
+            }, {
+                code: "JM",
+                name: "Jamaica",
+                flag: "🇯🇲"
+            },
+            {
+                code: "JP",
+                name: "Japan",
+                flag: "🇯🇵"
+            }, {
+                code: "JO",
+                name: "Jordan",
+                flag: "🇯🇴"
+            }, {
+                code: "KZ",
+                name: "Kazakhstan",
+                flag: "🇰🇿"
+            },
+            {
+                code: "KE",
+                name: "Kenya",
+                flag: "🇰🇪"
+            }, {
+                code: "KI",
+                name: "Kiribati"
+            }, {
+                code: "KP",
+                name: "North Korea",
+                flag: "🇰🇵"
+            },
+            {
+                code: "KR",
+                name: "South Korea",
+                flag: "🇰🇷"
+            }, {
+                code: "KW",
+                name: "Kuwait",
+                flag: "🇰🇼"
+            }, {
+                code: "KG",
+                name: "Kyrgyzstan",
+                flag: "🇰🇬"
+            },
+            {
+                code: "LA",
+                name: "Laos",
+                flag: "🇱🇦"
+            }, {
+                code: "LV",
+                name: "Latvia",
+                flag: "🇱🇻"
+            }, {
+                code: "LB",
+                name: "Lebanon",
+                flag: "🇱🇧"
+            },
+            {
+                code: "LS",
+                name: "Lesotho",
+                flag: "🇱🇸"
+            }, {
+                code: "LR",
+                name: "Liberia",
+                flag: "🇱🇷"
+            }, {
+                code: "LY",
+                name: "Libya",
+                flag: "🇱🇾"
+            },
+            {
+                code: "LI",
+                name: "Liechtenstein",
+                flag: "🇱🇮"
+            }, {
+                code: "LT",
+                name: "Lithuania",
+                flag: "🇱🇹"
+            }, {
+                code: "LU",
+                name: "Luxembourg",
+                flag: "🇱🇺"
+            },
+            {
+                code: "MG",
+                name: "Madagascar",
+                flag: "🇲🇬"
+            }, {
+                code: "MW",
+                name: "Malawi",
+                flag: "🇲🇼"
+            }, {
+                code: "MY",
+                name: "Malaysia",
+                flag: "🇲🇾"
+            },
+            {
+                code: "MV",
+                name: "Maldives",
+                flag: "🇲🇻"
+            }, {
+                code: "ML",
+                name: "Mali",
+                flag: "🇲🇱"
+            }, {
+                code: "MT",
+                name: "Malta",
+                flag: "🇲🇹"
+            },
+            {
+                code: "MH",
+                name: "Marshall Islands",
+                flag: "🇲🇭"
+            }, {
+                code: "MR",
+                name: "Mauritania",
+                flag: "🇲🇷"
+            }, {
+                code: "MU",
+                name: "Mauritius",
+                flag: "🇲🇺"
+            },
+            {
+                code: "MX",
+                name: "Mexico",
+                flag: "🇲🇽"
+            }, {
+                code: "FM",
+                name: "Micronesia",
+                flag: "🇫🇲"
+            }, {
+                code: "MD",
+                name: "Moldova",
+                flag: "🇲🇩"
+            },
+            {
+                code: "MC",
+                name: "Monaco",
+                flag: "🇲🇨"
+            }, {
+                code: "MN",
+                name: "Mongolia",
+                flag: "🇲🇳"
+            }, {
+                code: "ME",
+                name: "Montenegro",
+                flag: "🇲🇪"
+            },
+            {
+                code: "MA",
+                name: "Morocco",
+                flag: "🇲🇦"
+            }, {
+                code: "MZ",
+                name: "Mozambique"
+            }, {
+                code: "MM",
+                name: "Myanmar",
+                flag: "🇲🇲"
+            },
+            {
+                code: "NA",
+                name: "Namibia",
+                flag: "🇳🇦"
+            }, {
+                code: "NR",
+                name: "Nauru",
+                flag: "🇳🇷"
+            }, {
+                code: "NP",
+                name: "Nepal",
+                flag: "🇳🇵"
+            },
+            {
+                code: "NL",
+                name: "Netherlands",
+                flag: "🇳🇱"
+            }, {
+                code: "NZ",
+                name: "New Zealand",
+                flag: "🇳🇿"
+            }, {
+                code: "NI",
+                name: "Nicaragua",
+                flag: "🇳🇮"
+            },
+            {
+                code: "NE",
+                name: "Niger",
+                flag: "🇳🇪"
+            }, {
+                code: "NG",
+                name: "Nigeria",
+                flag: "🇳🇬"
+            }, {
+                code: "MK",
+                name: "North Macedonia",
+                flag: "🇲🇰"
+            },
+            {
+                code: "NO",
+                name: "Norway",
+                flag: "🇳🇴"
+            }, {
+                code: "OM",
+                name: "Oman",
+                flag: "🇴🇲"
+            }, {
+                code: "PK",
+                name: "Pakistan",
+                flag: "🇵🇰"
+            },
+            {
+                code: "PW",
+                name: "Palau",
+                flag: "🇵🇼"
+            }, {
+                code: "PS",
+                name: "Palestine",
+                flag: "🇵🇸"
+            }, {
+                code: "PA",
+                name: "Panama",
+                flag: "🇵🇦"
+            },
+            {
+                code: "PG",
+                name: "Papua New Guinea",
+                flag: "🇵🇬"
+            }, {
+                code: "PY",
+                name: "Paraguay"
+            }, {
+                code: "PE",
+                name: "Peru",
+                flag: "🇵🇪"
+            },
+            {
+                code: "PH",
+                name: "Philippines",
+                flag: "🇵🇭"
+            }, {
+                code: "PL",
+                name: "Poland",
+                flag: "🇵🇱"
+            }, {
+                code: "PT",
+                name: "Portugal",
+                flag: "🇵🇹"
+            },
+            {
+                code: "QA",
+                name: "Qatar",
+                flag: "🇶🇦"
+            }, {
+                code: "RO",
+                name: "Romania",
+                flag: "🇷🇴"
+            }, {
+                code: "RU",
+                name: "Russia",
+                flag: "🇷🇺"
+            },
+            {
+                code: "RW",
+                name: "Rwanda",
+                flag: "🇷🇼"
+            }, {
+                code: "KN",
+                name: "Saint Kitts and Nevis"
+            }, {
+                code: "LC",
+                name: "Saint Lucia",
+                flag: "🇱🇨"
+            },
+            {
+                code: "VC",
+                name: "Saint Vincent and the Grenadines",
+                flag: "🇻🇨"
+            }, {
+                code: "WS",
+                name: "Samoa",
+                flag: "🇼🇸"
+            }, {
+                code: "SM",
+                name: "San Marino",
+                flag: "🇸🇲"
+            },
+            {
+                code: "ST",
+                name: "São Tomé and Príncipe",
+                flag: "🇸🇹"
+            }, {
+                code: "SA",
+                name: "Saudi Arabia",
+                flag: "🇸🇦"
+            }, {
+                code: "SN",
+                name: "Senegal",
+                flag: "🇸🇳"
+            },
+            {
+                code: "RS",
+                name: "Serbia",
+                flag: "🇷🇸"
+            }, {
+                code: "SC",
+                name: "Seychelles",
+                flag: "🇸🇨"
+            }, {
+                code: "SL",
+                name: "Sierra Leone",
+                flag: "🇸🇱"
+            },
+            {
+                code: "SG",
+                name: "Singapore",
+                flag: "🇸🇬"
+            }, {
+                code: "SK",
+                name: "Slovakia",
+                flag: "🇸🇰"
+            }, {
+                code: "SI",
+                name: "Slovenia",
+                flag: "🇸🇮"
+            },
+            {
+                code: "SB",
+                name: "Solomon Islands",
+                flag: "🇸🇧"
+            }, {
+                code: "SO",
+                name: "Somalia",
+                flag: "🇸🇴"
+            }, {
+                code: "ZA",
+                name: "South Africa"
+            },
+            {
+                code: "SS",
+                name: "South Sudan",
+                flag: "🇸🇸"
+            }, {
+                code: "ES",
+                name: "Spain",
+                flag: "🇪🇸"
+            }, {
+                code: "LK",
+                name: "Sri Lanka",
+                flag: "🇱🇰"
+            },
+            {
+                code: "SD",
+                name: "Sudan",
+                flag: "🇸🇩"
+            }, {
+                code: "SR",
+                name: "Suriname",
+                flag: "🇸🇷"
+            }, {
+                code: "SE",
+                name: "Sweden",
+                flag: "🇸🇪"
+            },
+            {
+                code: "CH",
+                name: "Switzerland",
+                flag: "🇨🇭"
+            }, {
+                code: "SY",
+                name: "Syria",
+                flag: "🇸🇾"
+            }, {
+                code: "TW",
+                name: "Taiwan",
+                flag: "🇹🇼"
+            },
+            {
+                code: "TJ",
+                name: "Tajikistan",
+                flag: "🇹🇯"
+            }, {
+                code: "TZ",
+                name: "Tanzania",
+                flag: "🇹🇿"
+            }, {
+                code: "TH",
+                name: "Thailand",
+                flag: "🇹🇭"
+            },
+            {
+                code: "TL",
+                name: "Timor-Leste",
+                flag: "🇹🇱"
+            }, {
+                code: "TG",
+                name: "Togo",
+                flag: "🇹🇬"
+            }, {
+                code: "TO",
+                name: "Tonga",
+                flag: "🇹🇴"
+            },
+            {
+                code: "TT",
+                name: "Trinidad and Tobago",
+                flag: "🇹🇹"
+            }, {
+                code: "TN",
+                name: "Tunisia",
+                flag: "🇹🇳"
+            }, {
+                code: "TR",
+                name: "Turkey",
+                flag: "🇹🇷"
+            },
+            {
+                code: "TM",
+                name: "Turkmenistan",
+                flag: "🇹🇲"
+            }, {
+                code: "TV",
+                name: "Tuvalu",
+                flag: "🇹🇻"
+            }, {
+                code: "UG",
+                name: "Uganda",
+                flag: "🇺🇬"
+            },
+            {
+                code: "UA",
+                name: "Ukraine",
+                flag: "🇺🇦"
+            }, {
+                code: "AE",
+                name: "United Arab Emirates",
+                flag: "🇦🇪"
+            }, {
+                code: "GB",
+                name: "United Kingdom",
+                flag: "🇬🇧"
+            },
+            {
+                code: "US",
+                name: "United States",
+                flag: "🇺🇸"
+            }, {
+                code: "UY",
+                name: "Uruguay",
+                flag: "🇺🇾"
+            }, {
+                code: "UZ",
+                name: "Uzbekistan",
+                flag: "🇺🇿"
+            },
+            {
+                code: "VU",
+                name: "Vanuatu",
+                flag: "🇻🇺"
+            }, {
+                code: "VA",
+                name: "Vatican City",
+                flag: "🇻🇦"
+            }, {
+                code: "VE",
+                name: "Venezuela",
+                flag: "🇻🇪"
+            },
+            {
+                code: "VN",
+                name: "Vietnam",
+                flag: "🇻🇳"
+            }, {
+                code: "YE",
+                name: "Yemen",
+                flag: "🇾🇪"
+            }, {
+                code: "ZM",
+                name: "Zambia",
+                flag: "🇿🇲"
+            },
+            {
+                code: "ZW",
+                name: "Zimbabwe",
+                flag: "🇿🇼"
+            }
         ];
 
         let educationCount = 1;
@@ -1234,7 +2033,7 @@
         function addEducation() {
             const container = document.getElementById('education-container');
             const index = educationCount++;
-            
+
             const educationHTML = `
                 <div class="bg-[#F6F6F6] rounded-[24px] py-10 px-6 md:px-12 mb-8 education-block" id="education-block-${index}">
                     <div class="flex justify-between items-center mb-6">
@@ -1317,12 +2116,12 @@
                     </div>
                 </div>
             `;
-            
+
             container.insertAdjacentHTML('beforeend', educationHTML);
-            
+
             // Initialize dynamic elements
             setupCustomSelect(`education-type-select-${index}`, `education-type-input-${index}`, `education-type-selected-${index}`);
-            
+
             // Use a 100ms timeout to ensure DOM is fully ready for TomSelect
             setTimeout(() => {
                 if (window.initCountrySelector) {
@@ -1341,7 +2140,7 @@
         function addCertification() {
             const container = document.getElementById('certification-container');
             const index = certificationCount++;
-            
+
             const certHTML = `
                 <div class="bg-[#F5F5F5] rounded-xl mb-6 certification-block" id="certification-block-${index}">
                     <div class="flex justify-between items-center px-10 pt-6">
@@ -1387,9 +2186,9 @@
                     </div>
                 </div>
             `;
-            
+
             container.insertAdjacentHTML('beforeend', certHTML);
-            
+
             // Re-initialize upload box listeners for new blocks
             initializeUploadBoxes();
         }
@@ -1415,12 +2214,12 @@
                 // Remove old listener to avoid duplicates if any
                 const newBox = box.cloneNode(true);
                 box.parentNode.replaceChild(newBox, box);
-                
-                newBox.addEventListener('click', function (e) {
+
+                newBox.addEventListener('click', function(e) {
                     const input = this.querySelector('input[type="file"]');
                     if (input && e.target !== input) input.click();
                 });
-                
+
                 const fileInput = newBox.querySelector('input[type="file"]');
                 if (fileInput) {
                     fileInput.addEventListener('change', function(e) {
@@ -1465,7 +2264,7 @@
                 checkLangFormState();
                 const circle = this.nextElementSibling;
                 const dot = circle.querySelector('.inner-dot');
-                if(this.checked) {
+                if (this.checked) {
                     circle.style.borderColor = '#FABC41';
                     dot.style.backgroundColor = '#FABC41';
                 } else {
@@ -1474,7 +2273,7 @@
                 }
             }));
 
-            langAddBtn.addEventListener('click', function () {
+            langAddBtn.addEventListener('click', function() {
                 const langName = langInput.value.trim();
                 const selectedSkills = Array.from(langCheckboxes)
                     .filter(cb => cb.checked)
@@ -1509,7 +2308,7 @@
                 checkLangFormState();
             });
 
-            window.removeLang = function (id) {
+            window.removeLang = function(id) {
                 const tag = document.getElementById(id);
                 if (tag) {
                     tag.style.animation = "popOut 0.25s forwards";
@@ -1530,7 +2329,7 @@
             const options = select.querySelectorAll('.custom-option');
 
             // Toggle dropdown
-            trigger.addEventListener('click', function (e) {
+            trigger.addEventListener('click', function(e) {
                 e.preventDefault();
                 // Close other open selects
                 document.querySelectorAll('.custom-select').forEach(s => {
@@ -1541,7 +2340,7 @@
 
             // Handle option clicks
             options.forEach(option => {
-                option.addEventListener('click', function () {
+                option.addEventListener('click', function() {
                     const value = this.getAttribute('data-value');
                     const text = this.textContent.trim();
 
@@ -1556,7 +2355,7 @@
             });
 
             // Click outside closes dropdown
-            document.addEventListener('click', function (e) {
+            document.addEventListener('click', function(e) {
                 if (!select.contains(e.target)) {
                     select.classList.remove('open');
                 }
@@ -1579,6 +2378,7 @@
                 direction: "asc"
             }
         });
+
         function toggleOtherInput(checkbox, targetId) {
             const target = document.getElementById(targetId);
             if (checkbox.checked) {

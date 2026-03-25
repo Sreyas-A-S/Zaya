@@ -70,25 +70,12 @@
                         <div class="max-h-[360px] overflow-y-auto px-1 custom-scrollbar flex flex-col gap-0.5">
                             <button type="button"
                                 class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="ayurveda">Ayurveda & Panchakarma</button>
-                            <button type="button"
-                                class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="mindfulness">Mindfulness Practitioner</button>
-                            <button type="button"
-                                class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="yoga">Yoga Therapy</button>
-                            <button type="button"
-                                class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="art">Art Therapy</button>
-                            <button type="button"
-                                class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none"
-                                data-value="clinical">Clinical Psychology</button>
-                            <button type="button"
-                                class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="sound">Sound Therapy</button>
-                            <button type="button"
-                                class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
-                                data-value="hypno">Hypnotherapy</button>
+                                data-value="">All Services</button>
+                            @foreach($services as $service)
+                                <button type="button"
+                                    class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
+                                    data-value="{{ $service->id }}">{{ $service->title }}</button>
+                            @endforeach
                         </div>
                     </div>
                 </div>

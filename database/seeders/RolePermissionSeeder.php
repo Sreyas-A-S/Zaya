@@ -27,6 +27,7 @@ class RolePermissionSeeder extends Seeder
             'Roles' => ['view', 'create', 'edit', 'delete'],
             'Services' => ['view', 'create', 'edit', 'delete', 'assign-engineer'],
             'Packages' => ['view', 'create', 'edit', 'delete', 'update-status'],
+            'Promo Codes' => ['view', 'create', 'edit', 'delete', 'update-status'],
             'Other Fees' => ['view', 'create', 'edit', 'delete', 'update-status'],
             'Credentials' => ['view', 'edit'],
             'Master Data' => ['view', 'create', 'edit', 'delete'],
@@ -81,7 +82,7 @@ class RolePermissionSeeder extends Seeder
         // 4. Financial Manager - Focus on Packages, Other Fees
         $financialManager = Role::updateOrCreate(['name' => 'Financial Manager']);
         $financialManager->permissions()->sync(
-            Permission::whereIn('group', ['Dashboard', 'Packages', 'Other Fees'])->get()
+            Permission::whereIn('group', ['Dashboard', 'Packages', 'Promo Codes', 'Other Fees'])->get()
         );
 
         // 5. Content Manager - Services, Master Data, CMS

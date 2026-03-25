@@ -90,7 +90,12 @@
                                         <div class="row g-4">
                                             @foreach($group as $setting)
                                             <div class="col-12">
-                                                <label class="form-label fw-bold">{{ str_replace('_', ' ', ucfirst($setting->key)) }}</label>
+                                                <label class="form-label fw-bold">
+                                                    {{ str_replace('_', ' ', ucfirst($setting->key)) }}
+                                                    @if(isset($setting->is_global) && $setting->is_global)
+                                                        <span class="badge badge-light-success ms-2" style="font-size: 10px;">Global</span>
+                                                    @endif
+                                                </label>
 
                                                 @if($setting->type === 'text')
                                                 <input type="text" id="{{ $setting->key }}" name="{{ $setting->key }}" value="{{ $setting->value }}" class="form-control" placeholder="Enter content..." {{ $setting->max_length ? 'maxlength='.$setting->max_length : '' }}>

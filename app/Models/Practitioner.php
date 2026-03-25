@@ -87,6 +87,11 @@ class Practitioner extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function userServices()
+    {
+        return $this->hasMany(UserService::class, 'user_id', 'user_id');
+    }
+
     public function qualifications()
     {
         return $this->hasMany(PractitionerQualification::class, 'practitioner_id');

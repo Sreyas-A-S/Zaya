@@ -25,7 +25,7 @@
                     </p>
 
                     <div class="flex flex-col items-start gap-10">
-                        <a href="{{ route('book-session', ['practitioner' => $practitioner->slug]) }}"
+                        <a href="{{ route('book-session', ['practitioner' => $practitioner->slug, 'service_id' => request('service_id')]) }}"
                             class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg">
                             {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
                         </a>
@@ -241,7 +241,7 @@
                 <p class="text-gray-700 text-base md:text-lg text-center md:text-left">
                     {{ $site_settings['practitioner_cta_text'] ?? 'Ready to start your wellness journey with' }} {{ $practitioner->first_name }} {{ $practitioner->last_name }}?
                 </p>
-                <a href="{{ route('book-session', ['practitioner' => $practitioner->slug]) }}"
+                <a href="{{ route('book-session', ['practitioner' => $practitioner->slug, 'service_id' => request('service_id')]) }}"
                     class="bg-secondary text-white px-8 py-3 rounded-full font-normal hover:bg-primary transition-colors text-sm md:text-base whitespace-nowrap">
                     {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
                 </a>

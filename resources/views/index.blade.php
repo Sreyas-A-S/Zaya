@@ -268,7 +268,7 @@
                                 class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ $settings['blog_post_1_read_time'] ?? '7 min Read' }}</span>
                         </div>
                         <h3 id="blog_post_1_title" class="text-white font-sans! text-base font-normal">
-                            <a href="{{ route('blogs') }}">
+                            <a href="{{ $settings['blog_post_1_link'] ?? route('blogs') }}" target="_blank">
                                 {{ $settings['blog_post_1_title'] ?? 'The Art of Resfull Sleep' }}
                             </a>
                         </h3>
@@ -291,7 +291,7 @@
                                 class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ $settings['blog_post_2_read_time'] ?? '15 min Read' }}</span>
                         </div>
                         <h3 id="blog_post_2_title" class="text-white font-sans! text-base font-normal">
-                            <a href="{{ route('blogs') }}">
+                            <a href="{{ $settings['blog_post_2_link'] ?? route('blogs') }}" target="_blank">
                                 {{ $settings['blog_post_2_title'] ?? 'Balancing in Summer' }}
                             </a>
                         </h3>
@@ -300,7 +300,7 @@
                 <!-- Girl Image -->
                 <div class="flex-1 relative overflow-hidden group min-h-[320px] animate-on-scroll"
                     style="transition-delay: 200ms;">
-                    <img src="{{ asset('frontend/assets/yoga-dress-girl.png') }}" alt="Wellness Lifestyle"
+                    <img src="{{ isset($settings['blog_post_3_image']) ? (Str::startsWith($settings['blog_post_3_image'], 'frontend/') ? asset($settings['blog_post_3_image']) : asset('storage/' . $settings['blog_post_3_image'])) : asset('frontend/assets/yoga-dress-girl.png') }}" alt="Wellness Lifestyle"
                         class="w-full h-full object-cover transition-transform duration-700 scale-110 group-hover:scale-105">
 
                     <!-- Play Button (Always Visible) -->
@@ -314,11 +314,10 @@
                         class="absolute inset-0 bg-black/40 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-between z-10">
                         <div class="flex justify-end">
                             <span id="blog_post_3_read_time"
-                                class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">15
-                                min Read</span>
+                                class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ $settings['blog_post_3_read_time'] ?? '15 min Read' }}</span>
                         </div>
                         <h3 id="blog_post_3_title" class="text-white font-sans! text-base font-normal">
-                            <a href="{{ route('blogs') }}">
+                            <a href="{{ $settings['blog_post_3_link'] ?? route('blogs') }}" target="_blank">
                                 {{ $settings['blog_post_3_title'] ?? 'Morning Rituals for Energy' }}
                             </a>
                         </h3>

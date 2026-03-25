@@ -241,6 +241,13 @@ class AdminPanelSettingSeeder extends Seeder
                 'max_length' => 40,
             ],
             [
+                'key' => 'admin_panel_sidebar_promo_codes',
+                'value' => 'Promo Codes',
+                'type' => 'text',
+                'section' => 'admin_panel',
+                'max_length' => 40,
+            ],
+            [
                 'key' => 'admin_panel_sidebar_other_fees',
                 'value' => 'Other Fees',
                 'type' => 'text',

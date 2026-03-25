@@ -41,12 +41,7 @@ class WebController extends Controller
             $testimonial->is_liked = $testimonial->likes()->where('ip_address', $ip)->exists();
         });
         $services = Service::where('status', true)->orderBy('order_column')->get();
-        $settings = HomepageSetting::where('language', $language)->pluck('value', 'key');
-
-        // Fallback to English if no settings found for current language
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('language', 'en')->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getAllSettings($language);
 
         return view('index', compact('practitioners', 'testimonials', 'services', 'settings', 'language', 'languages'));
     }
@@ -59,12 +54,7 @@ class WebController extends Controller
     public function aboutUs()
     {
         $language = App::getLocale();
-        $settings = HomepageSetting::where('language', $language)->pluck('value', 'key');
-
-        // Fallback to English if no settings found for current language
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('language', 'en')->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getAllSettings($language);
 
         $testimonials = Testimonial::withCount(['likes', 'replies'])->where('status', 'approved')->latest()->get();
         $ip = request()->ip();
@@ -77,16 +67,7 @@ class WebController extends Controller
     public function services(Request $request)
     {
         $language = App::getLocale();
-        $settings = HomepageSetting::where('section', 'services_page')
-            ->where('language', $language)
-            ->pluck('value', 'key');
-
-        // Fallback to English if no settings found for current language
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('section', 'services_page')
-                ->where('language', 'en')
-                ->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getSectionValues('services_page', $language);
 
         $query = Service::where('status', true);
 
@@ -123,12 +104,7 @@ class WebController extends Controller
     public function gallery()
     {
         $language = App::getLocale();
-        $settings = HomepageSetting::where('language', $language)->pluck('value', 'key');
-
-        // Fallback to English if no settings found for current language
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('language', 'en')->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getAllSettings($language);
 
         return view('gallery', compact('settings'));
     }
@@ -136,12 +112,7 @@ class WebController extends Controller
     public function findPractitioner(Request $request)
     {
         $language = App::getLocale();
-        $settings = HomepageSetting::where('language', $language)->pluck('value', 'key');
-
-        // Fallback to English if no settings found for current language
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('language', 'en')->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getAllSettings($language);
 
         $pincode = session('global_pincode');
         $query = Practitioner::with(['user', 'reviews'])->where('status', 'active');
@@ -152,29 +123,33 @@ class WebController extends Controller
 
         if ($request->filled('service')) {
             $service = $request->service;
-            $query->where(function ($q) use ($service) {
-                $q->whereJsonContains('consultations', $service)
-                    ->orWhereJsonContains('body_therapies', $service)
-                    ->orWhereJsonContains('other_modalities', $service);
+            $query->whereHas('userServices', function ($q) use ($service) {
+                if (is_numeric($service)) {
+                    $q->where('service_id', $service);
+                } else {
+                    $q->whereHas('service', function ($sq) use ($service) {
+                        $sq->where('slug', $service)
+                           ->orWhereHas('categories', function ($cq) use ($service) {
+                               $cq->where('slug', $service);
+                           });
+                    });
+                }
             });
         }
 
         if ($request->filled('mode')) {
             $mode = $request->mode;
-            if ($mode === 'online') {
-                // Assuming you have something for this, or just logic
-            } else if ($mode === 'offline') {
-                // ...
-            }
+            // Mode filtering can be added here if practitioners have a mode field
         }
 
         $practitioners = $query->paginate(12)->onEachSide(1)->withQueryString();
+        $services = Service::where('status', 'active')->orderBy('title')->get();
 
         if ($request->ajax()) {
             return view('partials.frontend.practitioner-grid', compact('practitioners', 'pincode'))->render();
         }
 
-        return view('find-practitioner', compact('settings', 'practitioners', 'pincode'));
+        return view('find-practitioner', compact('settings', 'practitioners', 'pincode', 'services'));
     }
 
     public function findPractitionerPost(Request $request)
@@ -196,8 +171,9 @@ class WebController extends Controller
             ->where(function ($q) use ($query) {
                 $q->where('first_name', 'LIKE', "%{$query}%")
                     ->orWhere('last_name', 'LIKE', "%{$query}%")
-                    ->orWhere('consultations', 'LIKE', "%{$query}%")
-                    ->orWhere('other_modalities', 'LIKE', "%{$query}%");
+                    ->orWhereHas('userServices.service', function($sq) use ($query) {
+                        $sq->where('title', 'LIKE', "%{$query}%");
+                    });
             })
             ->limit(4)
             ->get();
@@ -219,11 +195,14 @@ class WebController extends Controller
         ];
 
         foreach ($practitioners as $p) {
-            $specialty = !empty($p->consultations) && is_array($p->consultations) ? $p->consultations[0] : 'Practitioner';
+            $specialty = 'Practitioner';
+            if ($p->user && $p->user->userServices->first()) {
+                $specialty = $p->user->userServices->first()->service->title;
+            }
             $results['practitioners'][] = [
-                'name' => $p->first_name . ' ' . $p->last_name,
+                'name' => ($p->first_name ?? '') . ' ' . ($p->last_name ?? ''),
                 'slug' => $p->slug,
-                'image' => $p->profile_photo_path ? asset('storage/' . $p->profile_photo_path) : asset('frontend/assets/lilly-profile-pic.png'),
+                'image' => $p->user && $p->user->profile_pic ? (str_starts_with($p->user->profile_pic, 'http') ? $p->user->profile_pic : asset('storage/' . $p->user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png'),
                 'subtitle' => $specialty . ($p->city ? ' • ' . $p->city : '')
             ];
         }
@@ -233,7 +212,7 @@ class WebController extends Controller
             $results['treatments'][] = [
                 'name' => $s->title,
                 'slug' => $s->slug,
-                'image' => $s->image ? (str_starts_with($s->image, 'frontend/') ? asset($s->image) : asset('storage/' . $s->image)) : asset('admiro/assets/images/user/user.png'),
+                'image' => $s->image ? (str_starts_with($s->image, 'frontend/') ? asset($s->image) : asset('storage/' . $s->image)) : asset('frontend/assets/service-placeholder.png'),
                 'subtitle' => $category
             ];
         }
@@ -268,11 +247,7 @@ class WebController extends Controller
     public function practitionerDetail($slug)
     {
         $language = App::getLocale();
-        $settings = HomepageSetting::where('language', $language)->pluck('value', 'key');
-
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('language', 'en')->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getAllSettings($language);
 
         $practitioner = Practitioner::with(['user', 'reviews'])->where('slug', $slug)->firstOrFail();
         return view('practitioner-detail', compact('practitioner', 'settings'));
@@ -282,11 +257,7 @@ class WebController extends Controller
     {
         $query = $request->get('query');
         $language = App::getLocale();
-        $settings = HomepageSetting::where('language', $language)->pluck('value', 'key');
-
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('language', 'en')->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getAllSettings($language);
 
         $practitioners = Practitioner::with(['user', 'reviews'])->where('status', 'active');
 
@@ -394,25 +365,21 @@ class WebController extends Controller
             $selectedPractitioner = $practitioners->first();
         }
 
-        // Filter services based on selected practitioner
-        $practitionerServices = [];
-        if ($selectedPractitioner) {
-            $practitionerServices = array_merge(
-                $selectedPractitioner->consultations ?? [],
-                $selectedPractitioner->body_therapies ?? [],
-                $selectedPractitioner->other_modalities ?? []
-            );
+        // Filter services based on selected practitioner using the new user_services table
+        if ($selectedPractitioner && $selectedPractitioner->user) {
+            $services = Service::where('status', 'active')
+                ->whereHas('userServices', function($q) use ($selectedPractitioner) {
+                    $q->where('user_id', $selectedPractitioner->user_id);
+                })
+                ->get();
+        } else {
+            $services = Service::where('status', 'active')->get();
         }
 
-        if (!empty($practitionerServices)) {
-            $services = Service::where('status', true)
-                ->whereIn('title', $practitionerServices)
-                ->get();
-
-            // If some modalities don't have a matching Service entry, we might want to create "virtual" services or just skip.
-            // For now, let's also pass the raw list to allow future flexibility.
-        } else {
-            $services = Service::where('status', true)->get();
+        // Handle prefilled service from request
+        $prefilledService = null;
+        if ($request->filled('service_id')) {
+            $prefilledService = Service::find($request->service_id);
         }
 
         $languages = \App\Models\Language::where('status', 'active')
@@ -420,22 +387,13 @@ class WebController extends Controller
             ->get();
         $consultationPreferences = \App\Models\ClientConsultationPreference::all();
 
-        return view('book-session', compact('practitioners', 'selectedPractitioner', 'services', 'languages', 'consultationPreferences'));
+        return view('book-session', compact('practitioners', 'selectedPractitioner', 'services', 'languages', 'consultationPreferences', 'prefilledService'));
     }
 
     public function contactUs()
     {
         $language = \Illuminate\Support\Facades\App::getLocale();
-        $settings = \App\Models\HomepageSetting::where('key', 'like', 'contact_%')
-            ->where('language', $language)
-            ->pluck('value', 'key');
-
-        // Fallback to English if no settings found for current language
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = \App\Models\HomepageSetting::where('key', 'like', 'contact_%')
-                ->where('language', 'en')
-                ->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getAllSettings($language, 'contact_');
 
         $faqs = \App\Models\Faq::where('language', $language)->where('status', true)->get();
 
@@ -578,12 +536,7 @@ class WebController extends Controller
     public function blogs(Request $request)
     {
         $language = App::getLocale();
-        $settings = HomepageSetting::where('language', $language)->pluck('value', 'key');
-
-        // Fallback to English if no settings found for current language
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('language', 'en')->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getAllSettings($language);
 
         // Fetch authors for the filter dropdown
         $authors = [];
@@ -791,12 +744,7 @@ class WebController extends Controller
     public function announcements(Request $request)
     {
         $language = App::getLocale();
-        $settings = HomepageSetting::where('language', $language)->pluck('value', 'key');
-
-        // Fallback to English if no settings found for current language
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('language', 'en')->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getAllSettings($language);
 
         $currentPage = (int) $request->get('page', 1);
         $perPage = 9;
@@ -867,12 +815,7 @@ class WebController extends Controller
     public function announcementDetail($slug)
     {
         $language = App::getLocale();
-        $settings = HomepageSetting::where('language', $language)->pluck('value', 'key');
-
-        // Fallback to English if no settings found for current language
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('language', 'en')->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getAllSettings($language);
 
         // Fetch single announcement by slug
         // 1. Try singular
@@ -951,12 +894,7 @@ class WebController extends Controller
     public function blogDetail($slug)
     {
         $language = App::getLocale();
-        $settings = HomepageSetting::where('language', $language)->pluck('value', 'key');
-
-        // Fallback to English if no settings found for current language
-        if ($settings->isEmpty() && $language !== 'en') {
-            $settings = HomepageSetting::where('language', 'en')->pluck('value', 'key');
-        }
+        $settings = HomepageSetting::getAllSettings($language);
 
         // Fetch single post by slug
         $posts = $this->fetchFromWordPress('posts', [
