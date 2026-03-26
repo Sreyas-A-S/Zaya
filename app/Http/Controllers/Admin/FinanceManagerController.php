@@ -13,6 +13,9 @@ use Yajra\DataTables\Facades\DataTables;
 
 use App\Traits\AdminFilterTrait;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeUserMail;
+
 class FinanceManagerController extends Controller
 {
     use AdminFilterTrait;
@@ -187,15 +190,22 @@ class FinanceManagerController extends Controller
             'last_name'  => $request->lastname,
             'email'      => $request->email,
             'password'   => Hash::make($request->password),
-            'national_id' => $request->country,
-            'languages'  => $request->language,
+            'national_id'=> $request->country,
+            'languages'  => $request->language, 
             'role'       => 'financial-manager',
             'status'     => $request->status ?? 'pending',
-            'profile_pic' => $profilePic,
+            'profile_pic'=> $profilePic,
             'phone'      => $request->phone,
         ]);
 
+        try {
+            Mail::to($request->email)->send(new WelcomeUserMail($request->email, $request->password, url('/zaya-login')));
+        } catch (\Exception $e) {
+            \Log::error('Finance Manager Creation Welcome Email Error: ' . $e->getMessage());
+        }
+
         return response()->json(['success' => true, 'message' => 'Finance Manager Created Successfully']);
+
     }
 
     /**

@@ -18,6 +18,12 @@
         </a>
     @endif
 
+    <!-- Profile -->
+    <a href="{{ route('profile') }}" 
+        class="leading-none text-lg {{ request()->routeIs('profile') ? 'text-secondary border-b-2 border-secondary pb-1' : 'text-[#8F8F8F]' }} font-normal whitespace-nowrap cursor-pointer transition-colors">
+        {{ __('Profile') }}
+    </a>
+
     <!-- Health Journey (Dashboard Tab for now) -->
     @if(request()->routeIs('dashboard'))
         <button onclick="if(typeof switchMobileTab === 'function') switchMobileTab('health')" 
@@ -70,10 +76,11 @@
         </a>
     @endif
 
-    <!-- Profile -->
-    <a href="{{ route('profile') }}" 
-        class="leading-none text-lg {{ request()->routeIs('profile') ? 'text-secondary border-b-2 border-secondary pb-1' : 'text-[#8F8F8F]' }} font-normal whitespace-nowrap cursor-pointer transition-colors">
-        {{ __('Profile') }}
+    <!-- Logout -->
+    <a href="javascript:void(0)" 
+        onclick="openLogoutModal()"
+        class="leading-none text-lg text-red-400 font-normal whitespace-nowrap cursor-pointer transition-colors">
+        {{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}
     </a>
 </div>
 

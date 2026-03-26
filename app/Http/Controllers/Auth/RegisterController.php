@@ -23,6 +23,9 @@ use Illuminate\Support\Facades\Redirect;
 use App\Traits\ImageUploadTrait;
 use Illuminate\Validation\Rule;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeUserMail;
+
 class RegisterController extends Controller
 {
     use ImageUploadTrait;
@@ -106,6 +109,12 @@ class RegisterController extends Controller
             }
 
             DB::commit();
+
+            try {
+                Mail::to($user->email)->send(new WelcomeUserMail($user->email, $request->password, url('/zaya-login')));
+            } catch (\Exception $e) {
+                \Log::error('Public Registration Welcome Email Error: ' . $e->getMessage());
+            }
 
             // For "Join our team" roles, do not auto-login; send user to login page.
             if (in_array($request->role, $teamRoles, true)) {
