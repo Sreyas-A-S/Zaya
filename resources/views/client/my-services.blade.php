@@ -45,6 +45,9 @@
 
 @section('content')
 @php
+    $practitionerRoles = ['practitioner', 'doctor', 'mindfulness_practitioner', 'mindfulness-practitioner', 'yoga_therapist', 'yoga-therapist'];
+    $isPractitioner = in_array(auth()->user()->role, $practitionerRoles);
+@endphp
 
 @if(!$isPractitioner)
 <div class="flex flex-col items-center justify-center py-24 bg-white rounded-[40px] border-2 border-dashed border-[#2E4B3D]/10 text-center px-8 shadow-sm">

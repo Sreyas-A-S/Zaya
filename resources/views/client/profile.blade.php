@@ -366,6 +366,7 @@
                     <div>
                         <p class="text-base font-medium text-gray-800">{{ $booking->user->name }}</p>
                         <p class="text-sm text-gray-400 mt-0.5">{{ \Carbon\Carbon::parse($booking->booking_date)->isToday() ? 'Today' : \Carbon\Carbon::parse($booking->booking_date)->format('M d, Y') }}</p>
+
                     </div>
                 </div>
                 <div class="text-sm text-gray-400 hidden sm:block">
@@ -640,7 +641,39 @@
             </div>
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
-                <input type="password" name="new_password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none">
+                <div class="relative">
+                    <input type="password" id="new_password" name="new_password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none pr-12">
+                    <button type="button" onclick="togglePasswordVisibility('new_password')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-secondary">
+                        <i class="ri-eye-line" id="new_password_eye"></i>
+                    </button>
+                </div>
+                
+                <!-- Password Strength Checklist -->
+                <div id="password-requirements" class="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-100 hidden">
+                    <p class="text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">Password Requirements</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                        <div class="flex items-center gap-2 text-sm" id="req-length">
+                            <i class="ri-checkbox-circle-fill text-gray-300 transition-colors"></i>
+                            <span class="text-gray-500 transition-colors">8+ Characters</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm" id="req-upper">
+                            <i class="ri-checkbox-circle-fill text-gray-300 transition-colors"></i>
+                            <span class="text-gray-500 transition-colors">Uppercase Letter</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm" id="req-lower">
+                            <i class="ri-checkbox-circle-fill text-gray-300 transition-colors"></i>
+                            <span class="text-gray-500 transition-colors">Lowercase Letter</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm" id="req-number">
+                            <i class="ri-checkbox-circle-fill text-gray-300 transition-colors"></i>
+                            <span class="text-gray-500 transition-colors">At least one number</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm" id="req-special">
+                            <i class="ri-checkbox-circle-fill text-gray-300 transition-colors"></i>
+                            <span class="text-gray-500 transition-colors">Special character</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Confirm New Password</label>
@@ -1115,12 +1148,83 @@
     function openPasswordModal() {
         document.getElementById('passwordModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        resetPasswordValidation();
     }
 
     function closePasswordModal() {
         document.getElementById('passwordModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
         document.getElementById('changePasswordForm').reset();
+        resetPasswordValidation();
+    }
+
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const eye = document.getElementById(inputId + '_eye');
+        if (input.type === 'password') {
+            input.type = 'text';
+            eye.classList.remove('ri-eye-line');
+            eye.classList.add('ri-eye-off-line');
+        } else {
+            input.type = 'password';
+            eye.classList.remove('ri-eye-off-line');
+            eye.classList.add('ri-eye-line');
+        }
+    }
+
+    const newPasswordInput = document.getElementById('new_password');
+    const requirementsBox = document.getElementById('password-requirements');
+    
+    function resetPasswordValidation() {
+        requirementsBox.classList.add('hidden');
+        const reqs = ['req-length', 'req-upper', 'req-lower', 'req-number', 'req-special'];
+        reqs.forEach(id => {
+            const el = document.getElementById(id);
+            el.querySelector('i').className = 'ri-checkbox-circle-fill text-gray-300 transition-colors';
+            el.querySelector('span').className = 'text-gray-500 transition-colors';
+        });
+    }
+
+    if (newPasswordInput) {
+        newPasswordInput.addEventListener('input', function() {
+            const val = this.value;
+            if (val.length > 0) {
+                requirementsBox.classList.remove('hidden');
+            } else {
+                requirementsBox.classList.add('hidden');
+            }
+
+            const checks = {
+                'req-length': val.length >= 8,
+                'req-upper': /[A-Z]/.test(val),
+                'req-lower': /[a-z]/.test(val),
+                'req-number': /[0-9]/.test(val),
+                'req-special': /[!@#$%^&*(),.?":{}|<>]/.test(val)
+            };
+
+            let allPassed = true;
+            Object.keys(checks).forEach(id => {
+                const passed = checks[id];
+                const el = document.getElementById(id);
+                const icon = el.querySelector('i');
+                const text = el.querySelector('span');
+
+                if (passed) {
+                    icon.className = 'ri-checkbox-circle-fill text-green-500 transition-colors';
+                    text.className = 'text-green-600 font-bold transition-colors';
+                } else {
+                    icon.className = 'ri-checkbox-circle-fill text-gray-300 transition-colors';
+                    text.className = 'text-gray-500 transition-colors';
+                    allPassed = false;
+                }
+            });
+
+            // Optional: You can disable the submit button until allPassed is true
+            const submitBtn = document.getElementById('changePasswordForm').querySelector('button[type="submit"]');
+            submitBtn.disabled = !allPassed;
+            submitBtn.style.opacity = allPassed ? '1' : '0.5';
+            submitBtn.style.cursor = allPassed ? 'pointer' : 'not-allowed';
+        });
     }
 
     document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
