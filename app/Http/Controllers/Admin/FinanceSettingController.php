@@ -17,7 +17,23 @@ class FinanceSettingController extends Controller
     public function index()
     {
         $language = session('locale', 'en');
-        
+
+        $defaults = [
+            ['key' => 'client_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'practitioner_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'doctor_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'client_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'practitioner_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'doctor_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'en'],
+        ];
+
+        foreach ($defaults as $def) {
+            HomepageSetting::updateOrCreate(
+                ['key' => $def['key'], 'language' => 'en'],
+                $def
+            );
+        }
+
         // 1. Fetch current language settings
         $currentSettings = HomepageSetting::where('section', 'finance')
             ->where('language', $language)
@@ -28,24 +44,6 @@ class FinanceSettingController extends Controller
         $defaultSettings = HomepageSetting::where('section', 'finance')
             ->where('language', 'en')
             ->get();
-
-        // 3. If English is also missing (first time), let's ensure at least basic structure exists
-        if ($defaultSettings->isEmpty()) {
-            // Seed defaults if absolutely nothing exists
-            $defaults = [
-                ['key' => 'client_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
-                ['key' => 'practitioner_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
-                ['key' => 'doctor_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
-            ];
-            
-            foreach ($defaults as $def) {
-                HomepageSetting::updateOrCreate(['key' => $def['key'], 'language' => 'en'], $def);
-            }
-            
-            $defaultSettings = HomepageSetting::where('section', 'finance')
-                ->where('language', 'en')
-                ->get();
-        }
 
         $settings = $defaultSettings->map(function($setting) use ($currentSettings, $language) {
             if ($currentSettings->has($setting->key)) {

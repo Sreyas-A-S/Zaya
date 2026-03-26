@@ -559,24 +559,14 @@
                     </div>
                 </div>
 
-                <!-- Row 6: Promocode and Captcha -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
-                    <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Promocode</label>
-                        <div class="relative">
-                            <input type="text" name="promocode" placeholder="CODE1234"
-                                class="reg-input pr-[110px] w-full">
-                            <button type="button"
-                                class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2 rounded-full hover:bg-[#E8AA32] transition-colors text-sm font-medium cursor-pointer">
-                                Apply
-                            </button>
-                        </div>
-                    </div>
+                <!-- Row 6: Zip Code -->
+                <div class="grid grid-cols-1 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Zip Code') }}</label>
-                        <input type="text" name="zip_code" value="{{ old('zip_code') }}" class="reg-input" 
-                                placeholder="{{ __('Enter Zip Code') }}" required maxlength="8" pattern="\d*" title="{{ __('Maximum 8 numerical values allowed') }}"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
+                        <input type="text" name="zip_code" value="{{ old('zip_code') }}" class="reg-input h-[52px]"
+                            placeholder="{{ __('Enter Zip Code') }}" required maxlength="8" pattern="\d*"
+                            title="{{ __('Maximum 8 numerical values allowed') }}"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
                     </div>
                 </div>
 
@@ -661,8 +651,72 @@
                     </div>
                 </div>
 
+                @if($clientRegistrationFeeEnabled)
+                <!-- Payment & Promocode (from Admin > Other Fees) -->
+                <div class="mb-10 border-t border-gray-200 pt-10">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 items-end">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Registration Fee Amount') }}</label>
+                            <div class="relative w-full">
+                                <div class="w-full h-[52px] bg-[#F5F5F5] rounded-full flex items-center pl-6 pr-2">
+                                    <span class="text-gray-900 text-[0.95rem] font-medium">
+                                        &#8377; {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
+                                    </span>
+                                    <input type="hidden" name="registration_fee" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
+                                    <input type="hidden" name="registration_fee_actual" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
+                                    <button type="button" disabled aria-disabled="true"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-sm font-medium opacity-50 cursor-not-allowed">
+                                        {{ __('Pay') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Promocode') }}</label>
+                            <div class="relative w-full">
+                                <input type="text" name="promocode" id="promocode-input" placeholder="CODE1234"
+                                    class="w-full h-[52px] pl-6 pr-28 bg-white rounded-full border border-dashed border-gray-300 outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#FABC41] focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)]">
+                                <button type="button" id="promo-apply-btn"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full transition-colors text-sm font-medium hover:bg-[#e0a932]">
+                                    {{ __('Apply') }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="promo-breakdown" class="hidden mt-6 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Actual Registration Fee') }}</label>
+                                <input type="text" id="promo-actual-fee" readonly
+                                    class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Discount Percentage') }}</label>
+                                <input type="text" id="promo-discount-percentage" readonly
+                                    class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Total Discount Amount') }}</label>
+                                <input type="text" id="promo-discount-amount" readonly
+                                    class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Total Payable Fee') }}</label>
+                                <input type="text" id="promo-total-fee" readonly
+                                    class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+                            </div>
+
+                            <input type="hidden" name="promo_code" id="promo-code-hidden" value="">
+                            <input type="hidden" name="promo_discount_percentage" id="promo-discount-percentage-hidden" value="">
+                            <input type="hidden" name="promo_discount_amount" id="promo-discount-amount-hidden" value="">
+                            <input type="hidden" name="promo_total_fee" id="promo-total-fee-hidden" value="">
+                        </div>
+                    </div>
+                </div>
+
+                @endif
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
-                    <div class="md:col-span-1">
+                    <div class="md:col-span-2">
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }}</label>
                         <div class="flex items-center gap-4">
                             <div class="bg-white rounded-full flex items-center justify-center h-[52px] w-[150px] overflow-hidden relative shrink-0 border border-gray-200">
@@ -713,6 +767,8 @@
             </form>
         </div>
     </div>
+
+
 
     <!-- Client Thank You Popup Modal -->
     <div id="thank-you-popup" class="fixed inset-0 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
@@ -1058,6 +1114,135 @@
             if (e.target === this) {
                 closeThankYouPopup();
             }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const currencySymbol = '\u20B9';
+            const promoInput = document.getElementById('promocode-input');
+            const promoApplyBtn = document.getElementById('promo-apply-btn');
+            const promoBreakdown = document.getElementById('promo-breakdown');
+
+            const promoActualFee = document.getElementById('promo-actual-fee');
+            const promoDiscountPercentage = document.getElementById('promo-discount-percentage');
+            const promoDiscountAmount = document.getElementById('promo-discount-amount');
+            const promoTotalFee = document.getElementById('promo-total-fee');
+
+            const promoCodeHidden = document.getElementById('promo-code-hidden');
+            const promoDiscountPercentageHidden = document.getElementById('promo-discount-percentage-hidden');
+            const promoDiscountAmountHidden = document.getElementById('promo-discount-amount-hidden');
+            const promoTotalFeeHidden = document.getElementById('promo-total-fee-hidden');
+
+            const feeInput = document.querySelector('input[name="registration_fee"]');
+            const feeActualInput = document.querySelector('input[name="registration_fee_actual"]');
+
+            const roleInput = document.querySelector('input[name="role"]');
+            const roleValue = roleInput ? roleInput.value : 'client';
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+            function renderFee(value) {
+                const feeDisplay = feeInput?.closest('.relative')?.querySelector('span');
+                const displayValue = value !== undefined ? value : feeInput?.value;
+                if (feeInput && feeDisplay) {
+                    feeDisplay.textContent = `${currencySymbol} ${Number(displayValue || 0).toFixed(2)}`;
+                }
+            }
+
+            if (feeInput) {
+                renderFee(feeInput.value);
+            }
+
+            function clearPromo() {
+                promoBreakdown?.classList.add('hidden');
+                if (promoActualFee) promoActualFee.value = '';
+                if (promoDiscountPercentage) promoDiscountPercentage.value = '';
+                if (promoDiscountAmount) promoDiscountAmount.value = '';
+                if (promoTotalFee) promoTotalFee.value = '';
+
+                promoCodeHidden && (promoCodeHidden.value = '');
+                promoDiscountPercentageHidden && (promoDiscountPercentageHidden.value = '');
+                promoDiscountAmountHidden && (promoDiscountAmountHidden.value = '');
+                promoTotalFeeHidden && (promoTotalFeeHidden.value = '');
+
+                if (feeInput && feeActualInput) {
+                    feeInput.value = feeActualInput.value || feeInput.value;
+                    renderFee(feeInput.value);
+                }
+            }
+
+            promoInput?.addEventListener('input', () => {
+                if (promoCodeHidden && promoCodeHidden.value) {
+                    clearPromo();
+                }
+            });
+
+            promoApplyBtn?.addEventListener('click', async () => {
+                const code = promoInput?.value.trim() || '';
+                if (!code) {
+                    if (typeof showZayaToast === 'function') {
+                        showZayaToast('Please enter a promo code.', 'error');
+                    }
+                    return;
+                }
+
+                const originalText = promoApplyBtn.textContent;
+                promoApplyBtn.disabled = true;
+                promoApplyBtn.textContent = 'Applying...';
+
+                try {
+                    const response = await fetch("{{ route('promo.validate') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({ code, role: roleValue })
+                    });
+
+                    const data = await response.json().catch(() => ({}));
+
+                    if (!response.ok) {
+                        const message = data?.message || 'Invalid promo code.';
+                        clearPromo();
+                        if (typeof showZayaToast === 'function') {
+                            showZayaToast(message, 'error');
+                        }
+                        return;
+                    }
+
+                    promoActualFee && (promoActualFee.value = `${currencySymbol} ${data.base_fee}`);
+                    promoDiscountPercentage && (promoDiscountPercentage.value = `${data.discount_percentage}%`);
+                    promoDiscountAmount && (promoDiscountAmount.value = `${currencySymbol} ${data.discount_amount}`);
+                    promoTotalFee && (promoTotalFee.value = `${currencySymbol} ${data.total_fee}`);
+
+                    promoCodeHidden && (promoCodeHidden.value = data.code || code);
+                    promoDiscountPercentageHidden && (promoDiscountPercentageHidden.value = data.discount_percentage || '');
+                    promoDiscountAmountHidden && (promoDiscountAmountHidden.value = data.discount_amount || '');
+                    promoTotalFeeHidden && (promoTotalFeeHidden.value = data.total_fee || '');
+
+                    if (feeInput && data.total_fee) {
+                        feeInput.value = data.total_fee;
+                        renderFee(data.total_fee);
+                    }
+
+                    promoBreakdown?.classList.remove('hidden');
+
+                    if (typeof showZayaToast === 'function') {
+                        showZayaToast('Promo code applied successfully.', 'success');
+                    }
+                } catch (error) {
+                    clearPromo();
+                    if (typeof showZayaToast === 'function') {
+                        showZayaToast('Unable to apply promo code. Please try again.', 'error');
+                    }
+                } finally {
+                    promoApplyBtn.disabled = false;
+                    promoApplyBtn.textContent = originalText;
+                }
+            });
         });
     </script>
     <!-- Thank You Popup -->

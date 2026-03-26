@@ -33,13 +33,38 @@
                         @csrf
                         <div class="row g-4">
                             @foreach($settings as $setting)
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">{{ str_replace('_', ' ', ucfirst($setting->key)) }}</label>
+                                @php
+                                    $fieldLabel = ucwords(str_replace('_', ' ', $setting->key));
+                                    $placeholder = str_replace('_', ' ', $setting->key);
+                                    $inputId = $setting->key . '-input';
+                                    $isChecked = filter_var($setting->value, FILTER_VALIDATE_BOOLEAN);
+                                @endphp
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold" for="{{ $inputId }}">{{ $fieldLabel }}</label>
 
-                                @if($setting->type === 'number' || $setting->type === 'text')
-                                <input type="{{ $setting->type === 'number' ? 'number' : 'text' }}" step="0.01" name="{{ $setting->key }}" value="{{ $setting->value }}" class="form-control" placeholder="Enter {{ str_replace('_', ' ', $setting->key) }}...">
-                                @endif
-                            </div>
+                                    @if($setting->type === 'number' || $setting->type === 'text')
+                                        <input type="{{ $setting->type === 'number' ? 'number' : 'text' }}"
+                                            step="0.01"
+                                            name="{{ $setting->key }}"
+                                            id="{{ $inputId }}"
+                                            value="{{ $setting->value }}"
+                                            class="form-control"
+                                            placeholder="Enter {{ $placeholder }}...">
+                                    @elseif($setting->type === 'boolean')
+                                        <div class="form-check form-switch mt-2">
+                                            <input type="hidden" name="{{ $setting->key }}" value="0">
+                                            <input class="form-check-input" type="checkbox"
+                                                role="switch"
+                                                id="{{ $inputId }}"
+                                                name="{{ $setting->key }}"
+                                                value="1"
+                                                {{ $isChecked ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="{{ $inputId }}">
+                                                Show {{ strtolower($fieldLabel) }} in registration panels
+                                            </label>
+                                        </div>
+                                    @endif
+                                </div>
                             @endforeach
                         </div>
 

@@ -602,7 +602,7 @@
                             </div>
 
                             <!-- Vertical Divider -->
-                            <div class="hidden lg:block w-px bg-[#E5E5E5] h-[46px] self-start"></div>
+                            <div class="hidden lg:block w-px bg-[#E5E5E5] self-stretch"></div>
 
                             <!-- Right Side: Display Languages -->
                             <div class="w-full lg:w-[50%] flex flex-wrap gap-3 content-start pt-1"
@@ -613,55 +613,71 @@
                     </div>
 
                     <!-- Payment & Captcha Section -->
-                    <div class="mb-12 border-t border-[#E5E5E5] pt-12">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12">
-                            <!-- Registration Fee Amount -->
-                            <div>
-                                <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Registration Fee Amount') }}</label>
-                                <div class="relative w-full">
-                                    <div class="w-full h-[58px] bg-[#F5F5F5] rounded-full flex items-center pl-8 pr-2">
-                                        <span class="text-gray-900 text-[1.05rem] font-medium">€ 10.00</span>
-                                        <input type="hidden" name="registration_fee" value="10.00">
-                                        <button type="button"
-                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer">{{ __('Pay') }}</button>
+                    @if($practitionerRegistrationFeeEnabled)
+                        <div class='mb-12 border-t border-[#E5E5E5] pt-12'>
+                            <div class='grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12'>
+                                <div>
+                                    <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Registration Fee Amount') }}</label>
+                                    <div class='relative w-full'>
+                                        <div class='w-full h-[58px] bg-[#F5F5F5] rounded-full flex items-center pl-8 pr-2' data-registration-fee-container>
+                                            <span class='text-gray-900 text-[1.05rem] font-medium'>€ 10.00</span>
+                                            <input type='hidden' name='registration_fee' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
+                                            <input type='hidden' name='registration_fee_actual' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
+                                            <button type='button' class='absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer'>{{ __('Pay') }}</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Promocode -->
-                            <div>
-                                <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Promocode') }}</label>
-                                <div class="relative w-full">
-                                    <input type="text" name="promocode" placeholder="CODE1234"
-                                        class="w-full h-[58px] pl-6 pr-28 bg-white rounded-full border border-dashed border-[#CFCFCF] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#FABC41] focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)]">
-                                    <button type="button"
-                                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-7 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer">{{ __('Apply') }}</button>
+                                <div>
+                                    <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Promocode') }}</label>
+                                    <div class='relative w-full'>
+                                        <input type='text' name='promocode' id='promocode-input' placeholder='CODE1234' class='w-full h-[58px] pl-6 pr-28 bg-white rounded-full border border-dashed border-[#CFCFCF] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#FABC41] focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)]'>
+                                        <button type='button' id='promo-apply-btn' class='absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-7 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer'>{{ __('Apply') }}</button>
+                                    </div>
+                                </div>
+
+                                <div id='promo-breakdown' class='hidden mt-6 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto'>
+                                    <div>
+                                        <label class='block text-gray-700 font-normal mb-3 text-base'>{{ __('Actual Registration Fee') }}</label>
+                                        <input type='text' id='promo-actual-fee' readonly class='w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700'>
+                                    </div>
+                                    <div>
+                                        <label class='block text-gray-700 font-normal mb-3 text-base'>{{ __('Discount Percentage') }}</label>
+                                        <input type='text' id='promo-discount-percentage' readonly class='w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700'>
+                                    </div>
+                                    <div>
+                                        <label class='block text-gray-700 font-normal mb-3 text-base'>{{ __('Total Discount Amount') }}</label>
+                                        <input type='text' id='promo-discount-amount' readonly class='w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700'>
+                                    </div>
+                                    <div>
+                                        <label class='block text-gray-700 font-normal mb-3 text-base'>{{ __('Total Payable Fee') }}</label>
+                                        <input type='text' id='promo-total-fee' readonly class='w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700'>
+                                    </div>
+
+                                    <input type='hidden' name='promo_code' id='promo-code-hidden' value=''>
+                                    <input type='hidden' name='promo_discount_percentage' id='promo-discount-percentage-hidden' value=''>
+                                    <input type='hidden' name='promo_discount_amount' id='promo-discount-amount-hidden' value=''>
+                                    <input type='hidden' name='promo_total_fee' id='promo-total-fee-hidden' value=''>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Captcha Verification -->
-                        <div
-                            class="bg-gradient-to-r from-[#FFFFFF] via-[#F0F0F0] to-[#FFFFFF] p-12 flex flex-col items-center justify-center">
-                            <h3 class="text-xl font-medium text-gray-800 mb-6">{{ __('Captcha Verification') }}</h3>
-                            <div class="flex items-center justify-center gap-3">
-                                <div
-                                    class="bg-white border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1">
-                                    <img src="{{ route('captcha') }}"
-                                        id="captcha-img"
-                                        alt="Captcha"
-                                        class="w-full h-full object-contain filter contrast-125 mix-blend-multiply">
+                            <div class='bg-gradient-to-r from-[#FFFFFF] via-[#F0F0F0] to-[#FFFFFF] p-12 flex flex-col items-center justify-center'>
+                                <h3 class='text-xl font-medium text-gray-800 mb-6'>{{ __('Captcha Verification') }}</h3>
+                                <div class='flex items-center justify-center gap-3'>
+                                    <div class='bg-white border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1'>
+                                        <img src='{{ route('captcha') }}' id='captcha-img' alt='Captcha' class='w-full h-full object-contain filter contrast-125 mix-blend-multiply'>
+                                    </div>
+                                    <button type='button' onclick='refreshCaptcha()' class='w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white transition-all hover:bg-[#154a96] border-none cursor-pointer shadow-sm'>
+                                        <i class='ri-refresh-line text-2xl'></i>
+                                    </button>
+                                    <input type='text' name='captcha' placeholder='{{ __('Enter Code') }}' class='h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#1B5CB8] focus:shadow-[0_0_0_3px_rgba(27,92,184,0.1)]' required>
                                 </div>
-                                <button type="button"
-                                    onclick="refreshCaptcha()"
-                                    class="w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white transition-all hover:bg-[#154a96] border-none cursor-pointer shadow-sm">
-                                    <i class="ri-refresh-line text-2xl"></i>
-                                </button>
-                                <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}"
-                                    class="h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#1B5CB8] focus:shadow-[0_0_0_3px_rgba(27,92,184,0.1)]" required>
+                                @error('captcha')
+                                    <span class='text-red-500 text-xs mt-1 pl-4 block'>{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </form>
         </div>
@@ -738,9 +754,142 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            function renderRegistrationFee() {
+                const feeContainer = document.querySelector('[data-registration-fee-container]');
+                if (!feeContainer) return;
+                const feeInput = feeContainer.querySelector('input[name="registration_fee"]');
+                const feeText = feeContainer.querySelector('span');
+                if (!feeInput || !feeText) return;
+                feeText.textContent = `\u20AC ${feeInput.value || '0.00'}`;
+            }
+
+            renderRegistrationFee();
+
+            // Promo code apply + fee breakdown
+            const promoInput = document.getElementById('promocode-input');
+            const promoApplyBtn = document.getElementById('promo-apply-btn');
+            const promoBreakdown = document.getElementById('promo-breakdown');
+
+            const promoActualFee = document.getElementById('promo-actual-fee');
+            const promoDiscountPercentage = document.getElementById('promo-discount-percentage');
+            const promoDiscountAmount = document.getElementById('promo-discount-amount');
+            const promoTotalFee = document.getElementById('promo-total-fee');
+
+            const promoCodeHidden = document.getElementById('promo-code-hidden');
+            const promoDiscountPercentageHidden = document.getElementById('promo-discount-percentage-hidden');
+            const promoDiscountAmountHidden = document.getElementById('promo-discount-amount-hidden');
+            const promoTotalFeeHidden = document.getElementById('promo-total-fee-hidden');
+
+            const feeInput = document.querySelector('input[name="registration_fee"]');
+            const feeActualInput = document.querySelector('input[name="registration_fee_actual"]');
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+            const roleValue = document.querySelector('input[name=\"role\"]')?.value || 'practitioner';
+
+            function clearPromo() {
+                if (promoBreakdown) promoBreakdown.classList.add('hidden');
+                if (promoActualFee) promoActualFee.value = '';
+                if (promoDiscountPercentage) promoDiscountPercentage.value = '';
+                if (promoDiscountAmount) promoDiscountAmount.value = '';
+                if (promoTotalFee) promoTotalFee.value = '';
+
+                if (promoCodeHidden) promoCodeHidden.value = '';
+                if (promoDiscountPercentageHidden) promoDiscountPercentageHidden.value = '';
+                if (promoDiscountAmountHidden) promoDiscountAmountHidden.value = '';
+                if (promoTotalFeeHidden) promoTotalFeeHidden.value = '';
+
+                if (feeInput && feeActualInput) {
+                    feeInput.value = feeActualInput.value || feeInput.value;
+                    renderRegistrationFee();
+                }
+            }
+
+            if (promoInput) {
+                promoInput.addEventListener('input', function() {
+                    // If user edits the code after applying, reset breakdown + fee
+                    if (promoCodeHidden && promoCodeHidden.value) {
+                        clearPromo();
+                    }
+                });
+            }
+
+            if (promoApplyBtn) {
+                promoApplyBtn.addEventListener('click', async function() {
+                    const code = promoInput ? promoInput.value.trim() : '';
+                    if (!code) {
+                        if (typeof showZayaToast === 'function') {
+                            showZayaToast('Please enter a promo code.', 'error');
+                        }
+                        return;
+                    }
+
+                    const originalText = promoApplyBtn.textContent;
+                    promoApplyBtn.disabled = true;
+                    promoApplyBtn.textContent = 'Applying...';
+
+                    try {
+                        const response = await fetch("{{ route('promo.validate') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({ code, role: roleValue })
+                        });
+
+                        const data = await response.json().catch(() => ({}));
+
+                        if (!response.ok) {
+                            const message = data && data.message ? data.message : 'Invalid promo code.';
+                            clearPromo();
+                            if (typeof showZayaToast === 'function') {
+                                showZayaToast(message, 'error');
+                            } else {
+                                alert(message);
+                            }
+                            return;
+                        }
+
+                        if (promoActualFee) promoActualFee.value = `\u20AC ${data.base_fee}`;
+                        if (promoDiscountPercentage) promoDiscountPercentage.value = `${data.discount_percentage}%`;
+                        if (promoDiscountAmount) promoDiscountAmount.value = `\u20AC ${data.discount_amount}`;
+                        if (promoTotalFee) promoTotalFee.value = `\u20AC ${data.total_fee}`;
+
+                        if (promoCodeHidden) promoCodeHidden.value = data.code || code;
+                        if (promoDiscountPercentageHidden) promoDiscountPercentageHidden.value = data.discount_percentage || '';
+                        if (promoDiscountAmountHidden) promoDiscountAmountHidden.value = data.discount_amount || '';
+                        if (promoTotalFeeHidden) promoTotalFeeHidden.value = data.total_fee || '';
+
+                        if (feeInput && data.total_fee) {
+                            feeInput.value = data.total_fee;
+                            renderRegistrationFee();
+                        }
+
+                        if (promoBreakdown) promoBreakdown.classList.remove('hidden');
+
+                        if (typeof showZayaToast === 'function') {
+                            showZayaToast('Promo code applied successfully.', 'success');
+                        }
+                    } catch (e) {
+                        clearPromo();
+                        if (typeof showZayaToast === 'function') {
+                            showZayaToast('Unable to apply promo code. Please try again.', 'error');
+                        } else {
+                            alert('Unable to apply promo code. Please try again.');
+                        }
+                    } finally {
+                        promoApplyBtn.disabled = false;
+                        promoApplyBtn.textContent = originalText;
+                    }
+                });
+            }
+
             const phoneInput = document.querySelector("#phone");
             if (phoneInput) {
                 const iti = window.intlTelInput(phoneInput, {
@@ -844,19 +993,15 @@
             const nextBtnText = document.getElementById('next-btn-text');
 
             if (currentTab === 1) {
-                backBtnText.textContent = '{{ __('←
-                Back to Website ') }}';
+                backBtnText.textContent = '{{ __('Back to Website ') }}';
             } else {
-                backBtnText.textContent = '{{ __('
-                Back ') }}';
+                backBtnText.textContent = '{{ __('Back') }}';
             }
 
             if (currentTab === totalTabs) {
-                nextBtnText.textContent = '{{ __('
-                Submit ') }}';
+                nextBtnText.textContent = '{{ __('Submit') }}';
             } else {
-                nextBtnText.textContent = '{{ __('
-                Save & Continue ') }}';
+                nextBtnText.textContent = '{{ __('Save & Continue') }}';
             }
         }
 
@@ -892,13 +1037,11 @@
                 let errorMsg = null;
 
                 if (input.hasAttribute('required') && !input.value.trim() && input.type !== 'radio' && input.type !== 'checkbox' && input.type !== 'file') {
-                    errorMsg = '{{ __('
-                    This field is required ') }}';
+                    errorMsg = '{{ __('This field is required ') }}';
                 } else if (input.type === 'radio' && input.hasAttribute('required')) {
                     const group = currentTabEl.querySelectorAll(`input[name="${input.name}"]`);
                     const checked = Array.from(group).some(r => r.checked);
-                    if (!checked) errorMsg = '{{ __('
-                    Please select an option ') }}';
+                    if (!checked) errorMsg = '{{ __('Please select an option ') }}';
                 } else if (!input.checkValidity()) {
                     errorMsg = input.title || input.validationMessage;
                 } else if (input.name === 'dob' && input.value) {
@@ -910,8 +1053,7 @@
                         age--;
                     }
                     if (age < 18) {
-                        errorMsg = '{{ __('
-                        You must be at least 18 years old ') }}';
+                        errorMsg = '{{ __('You must be at least 18 years old ') }}';
                     }
                 }
 
@@ -947,8 +1089,7 @@
                     conf.classList.add('border-red-500', 'focus:border-red-500');
                     const err = document.createElement('p');
                     err.className = 'error-message text-red-500 text-sm mt-1 absolute left-6';
-                    err.textContent = '{{ __('
-                    The password confirmation does not match ') }}';
+                    err.textContent = '{{ __('The password confirmation does not match ') }}';
                     conf.parentElement.style.position = 'relative';
                     conf.parentElement.appendChild(err);
                     isValid = false;
@@ -1078,6 +1219,9 @@
 
                 const checkbox = this.querySelector('input[type="checkbox"]');
                 checkbox.checked = !checkbox.checked;
+                // We toggle the checkbox manually, so fire a real change event too.
+                // This ensures inline/onchange handlers (like "Other") run and cleanup happens.
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
 
                 if (checkbox.checked) {
                     this.classList.remove('border-gray-200', 'bg-white', 'text-gray-700');
@@ -2368,14 +2512,20 @@
         }
 
         // Initialize TomSelect for lang-input
-        new TomSelect("#lang-input", {
-            create: true,
-            sortField: {
-                field: "text",
-                direction: "asc"
-            }
-        });
+        (function initLangTomSelect() {
+            const langInput = document.querySelector('#lang-input');
+            if (!langInput) return;
+            if (langInput.tomselect) return;
+            if (typeof TomSelect === 'undefined') return;
 
+            new TomSelect(langInput, {
+                create: true,
+                sortField: {
+                    field: 'text',
+                    direction: 'asc'
+                }
+            });
+        })();
         function toggleOtherInput(checkbox, targetId) {
             const target = document.getElementById(targetId);
             if (checkbox.checked) {

@@ -9,7 +9,18 @@ use App\Models\BlogLike;
 use App\Models\ContactUs;
 use App\Models\HomepageSetting;
 use App\Models\Language;
+use App\Models\PromoCode;
 use App\Models\Practitioner;
+use App\Models\Specialization;
+use App\Models\AyurvedaExpertise;
+use App\Models\HealthCondition;
+use App\Models\ExternalTherapy;
+use App\Models\YogaExpertise;
+use App\Models\MindfulnessService;
+use App\Models\ClientConcern;
+use App\Models\TranslatorService;
+use App\Models\TranslatorSpecialization;
+use App\Models\Country;
 use App\Models\Service;
 use App\Models\Testimonial;
 use App\Mail\ContactUsMail;
@@ -302,7 +313,13 @@ class WebController extends Controller
         $consultationPreferences = \App\Models\ClientConsultationPreference::all();
         $languages = \App\Models\Language::where('status', 'active')->get();
 
-        return view('client-register', compact('redirect', 'consultationPreferences', 'languages'));
+        $language = session('locale', 'en');
+        $financeSettings = HomepageSetting::getSectionValues('finance', $language);
+        $clientRegistrationFee = $financeSettings['client_registration_fee'] ?? '0';
+        $clientRegistrationFee = is_numeric($clientRegistrationFee) ? (float) $clientRegistrationFee : 0.0;
+        $clientRegistrationFeeEnabled = filter_var($financeSettings['client_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
+
+        return view('client-register', compact('redirect', 'consultationPreferences', 'languages', 'clientRegistrationFee', 'clientRegistrationFeeEnabled'));
     }
 
     public function practitionerRegister()
@@ -311,7 +328,129 @@ class WebController extends Controller
         $bodyTherapies = \App\Models\BodyTherapy::where('status', true)->get();
         $otherModalities = \App\Models\PractitionerModality::where('status', true)->get();
 
-        return view('practitioner-register', compact('wellnessConsultations', 'bodyTherapies', 'otherModalities'));
+        $language = session('locale', 'en');
+        $financeSettings = HomepageSetting::getSectionValues('finance', $language);
+        $practitionerRegistrationFee = $financeSettings['practitioner_registration_fee'] ?? '0';
+        $practitionerRegistrationFee = is_numeric($practitionerRegistrationFee) ? (float) $practitionerRegistrationFee : 0.0;
+        $practitionerRegistrationFeeEnabled = filter_var($financeSettings['practitioner_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
+
+        return view('practitioner-register', compact(
+            'wellnessConsultations',
+            'bodyTherapies',
+            'otherModalities',
+            'practitionerRegistrationFee',
+            'practitionerRegistrationFeeEnabled'
+        ));
+    }
+
+    public function joinRegister(string $role)
+    {
+        $normalized = str_replace('_', '-', strtolower(trim($role)));
+        $map = [
+            'doctor' => ['role' => 'doctor', 'label' => 'Ayurvedic Doctor'],
+            'mindfulness-practitioner' => ['role' => 'mindfulness_practitioner', 'label' => 'Mindfulness Practitioner'],
+            'yoga-therapist' => ['role' => 'yoga_therapist', 'label' => 'Yoga Therapist'],
+            'translator' => ['role' => 'translator', 'label' => 'Translator'],
+        ];
+
+        if (!isset($map[$normalized])) {
+            abort(404);
+        }
+
+        $joinRole = $map[$normalized]['role'];
+        $language = session('locale', 'en');
+
+        $viewData = [
+            'joinRole' => $joinRole,
+            'joinRoleLabel' => $map[$normalized]['label'],
+            'languages' => Language::where('status', 'active')->get(),
+            'countries' => Country::where('status', 'active')->orderBy('name')->get(),
+        ];
+
+        if ($joinRole === 'doctor') {
+            $viewData['specializations'] = Specialization::where('status', 1)->get();
+            $viewData['consultationExpertise'] = AyurvedaExpertise::where('status', 1)->get();
+            $viewData['healthConditions'] = HealthCondition::where('status', 1)->get();
+            $viewData['externalTherapies'] = ExternalTherapy::where('status', 1)->get();
+            $viewData['financeSettings'] = HomepageSetting::getSectionValues('finance', $language);
+        } elseif ($joinRole === 'mindfulness_practitioner') {
+            $viewData['mindfulnessServices'] = MindfulnessService::where('status', 1)->get();
+            $viewData['clientConcerns'] = ClientConcern::where('status', 1)->get();
+            $viewData['consultationModes'] = ["Video", "Audio", "Chat", "Group Sessions"];
+        } elseif ($joinRole === 'yoga_therapist') {
+            $viewData['areasOfExpertise'] = YogaExpertise::where('status', 1)->get();
+            $viewData['consultationModes'] = ["Video", "Audio", "Chat", "Group Sessions"];
+        } elseif ($joinRole === 'translator') {
+            $viewData['translatorServices'] = TranslatorService::where('status', 1)->get();
+            $viewData['translatorSpecializations'] = TranslatorSpecialization::where('status', 1)->get();
+        }
+
+        return view('team-register', $viewData);
+    }
+
+    public function validatePromoCode(Request $request)
+    {
+        $request->validate([
+            'code' => ['required', 'string', 'max:255'],
+        ]);
+
+        $role = $request->input('role', 'practitioner');
+        $feeKey = match ($role) {
+            'client' => 'client_registration_fee',
+            'doctor' => 'doctor_registration_fee',
+            default => 'practitioner_registration_fee',
+        };
+
+        $language = session('locale', 'en');
+        $financeSettings = HomepageSetting::getSectionValues('finance', $language);
+        $baseFee = $financeSettings[$feeKey] ?? '0';
+        $baseFee = is_numeric($baseFee) ? (float) $baseFee : 0.0;
+        $feeEnabledKey = $feeKey . '_enabled';
+        $feeEnabled = filter_var($financeSettings[$feeEnabledKey] ?? '1', FILTER_VALIDATE_BOOLEAN);
+        if (!$feeEnabled) {
+            return response()->json(['message' => 'Fee is currently disabled.'], 422);
+        }
+
+        $code = trim((string) $request->input('code'));
+        $promo = PromoCode::whereRaw('LOWER(code) = ?', [mb_strtolower($code)])->first();
+
+        if (!$promo || !$promo->status) {
+            return response()->json(['message' => 'Invalid promo code.'], 422);
+        }
+
+        if ($promo->expiry_date && $promo->expiry_date->isPast()) {
+            return response()->json(['message' => 'Promo code has expired.'], 422);
+        }
+
+        if (!is_null($promo->usage_limit) && (int) $promo->used_count >= (int) $promo->usage_limit) {
+            return response()->json(['message' => 'Promo code usage limit reached.'], 422);
+        }
+
+        $reward = is_numeric($promo->reward) ? (float) $promo->reward : 0.0;
+
+        $discountAmount = 0.0;
+        $discountPercentage = 0.0;
+        if ($promo->type === 'percentage') {
+            $discountPercentage = max(0.0, min(100.0, $reward));
+            $discountAmount = $baseFee * ($discountPercentage / 100.0);
+        } else { // fixed
+            $discountAmount = max(0.0, $reward);
+            $discountAmount = min($discountAmount, $baseFee);
+            $discountPercentage = $baseFee > 0 ? ($discountAmount / $baseFee) * 100.0 : 0.0;
+        }
+
+        $discountAmount = min($discountAmount, $baseFee);
+        $totalFee = max(0.0, $baseFee - $discountAmount);
+
+        return response()->json([
+            'code' => $promo->code,
+            'type' => $promo->type,
+            'reward' => (float) $reward,
+            'base_fee' => number_format($baseFee, 2, '.', ''),
+            'discount_percentage' => number_format($discountPercentage, 2, '.', ''),
+            'discount_amount' => number_format($discountAmount, 2, '.', ''),
+            'total_fee' => number_format($totalFee, 2, '.', ''),
+        ]);
     }
 
     public function serviceDetail($slug)

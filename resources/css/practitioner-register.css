@@ -52,8 +52,14 @@ h6 {
    ======================================== */
 #nationality-select+.ts-wrapper,
 #country-select+.ts-wrapper,
-.education-country-select+.ts-wrapper {
+.education-country-select+.ts-wrapper,
+#lang-input+.ts-wrapper {
     width: 100%;
+}
+
+#lang-input+.ts-wrapper {
+    position: relative;
+    z-index: 0;
 }
 
 #nationality-select+.ts-wrapper .ts-control,
@@ -83,14 +89,33 @@ h6 {
     align-items: center;
 }
 
+#lang-input+.ts-wrapper .ts-control {
+    padding: 14px 56px 14px 24px;
+    background: #F5F5F5;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    font-size: 0.95rem;
+    color: #374151;
+    transition: all 0.3s ease;
+    height: 51px;
+    display: flex;
+    align-items: center;
+}
+
+#lang-input+.ts-wrapper .ts-control::after {
+    display: none;
+}
+
 #nationality-select+.ts-wrapper .ts-control>*,
 #country-select+.ts-wrapper .ts-control>*,
+#lang-input+.ts-wrapper .ts-control>*,
 .education-country-select+.ts-wrapper .ts-control>* {
     vertical-align: top;
 }
 
 #nationality-select+.ts-wrapper .ts-control>.item,
 #country-select+.ts-wrapper .ts-control>.item,
+#lang-input+.ts-wrapper .ts-control>.item,
 .education-country-select+.ts-wrapper .ts-control>.item {
     margin: 0;
     padding: 0;
@@ -103,12 +128,17 @@ h6 {
     background: #EFEFEF;
 }
 
+#lang-input+.ts-wrapper .ts-control:hover {
+    background: #EFEFEF;
+}
+
 .education-country-select+.ts-wrapper .ts-control:hover {
     background: #FAFAFA;
 }
 
 #nationality-select+.ts-wrapper.focus .ts-control,
 #country-select+.ts-wrapper.focus .ts-control,
+#lang-input+.ts-wrapper.focus .ts-control,
 .education-country-select+.ts-wrapper.focus .ts-control {
     border-color: #97563D;
     background: white;
@@ -117,18 +147,21 @@ h6 {
 
 #nationality-select+.ts-wrapper .ts-control input,
 #country-select+.ts-wrapper .ts-control input,
+#lang-input+.ts-wrapper .ts-control input,
 .education-country-select+.ts-wrapper .ts-control input {
     color: #374151;
 }
 
 #nationality-select+.ts-wrapper .ts-control input::placeholder,
 #country-select+.ts-wrapper .ts-control input::placeholder,
+#lang-input+.ts-wrapper .ts-control input::placeholder,
 .education-country-select+.ts-wrapper .ts-control input::placeholder {
     color: #9CA3AF;
 }
 
 #nationality-select+.ts-wrapper .ts-dropdown,
 #country-select+.ts-wrapper .ts-dropdown,
+#lang-input+.ts-wrapper .ts-dropdown,
 .education-country-select+.ts-wrapper .ts-dropdown {
     border: 1px solid #E5E7EB;
     border-radius: 16px;
@@ -140,6 +173,7 @@ h6 {
 
 #nationality-select+.ts-wrapper .ts-dropdown .ts-dropdown-content,
 #country-select+.ts-wrapper .ts-dropdown .ts-dropdown-content,
+#lang-input+.ts-wrapper .ts-dropdown .ts-dropdown-content,
 .education-country-select+.ts-wrapper .ts-dropdown .ts-dropdown-content {
     max-height: 200px;
     padding: 8px 0;

@@ -1510,6 +1510,25 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
                     const defaultProfile = "{{ asset('admiro/assets/images/user/user.png') }}";
 
+                    const normalizeList = (value) => {
+                        if (!value) return [];
+                        if (Array.isArray(value)) return value;
+                        let parsed = [];
+                        if (typeof value === 'string') {
+                            try {
+                                parsed = JSON.parse(value);
+                            } catch (e) {
+                                parsed = value.split(',').map(item => item.trim()).filter(Boolean);
+                            }
+                        } else if (typeof value === 'object') {
+                            if (value instanceof Object && Object.values(value).every(v => typeof v !== 'object')) {
+                                return Object.values(value).map(String);
+                            }
+                            parsed = Object.keys(value).filter(Boolean);
+                        }
+                        return parsed;
+                    };
+
                     const renderLanguages = (langs) => {
                         if (!langs) return '<span class="text-muted">None</span>';
                         let data = langs;
@@ -1646,12 +1665,18 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 <div class="tab-pane fade" id="v-expert">
                                     <h6 class="fw-bold mb-3">Areas of Expertise</h6>
                                     <div class="d-flex flex-wrap gap-2 mb-4">
-                                        ${t.areas_of_expertise ? t.areas_of_expertise.map(a => `<span class="badge bg-light text-dark border">${a}</span>`).join('') : 'None'}
+                                    ${(() => {
+                                        const list = normalizeList(t.areas_of_expertise);
+                                        return list.length ? list.map(a => `<span class="badge bg-light text-dark border">${a}</span>`).join('') : 'None';
+                                    })()}
                                     </div>
                                     <h6 class="fw-bold mb-3">Setup</h6>
                                     <p class="text-muted small mb-1">Modes</p>
                                     <div class="d-flex flex-wrap gap-2 mb-3">
-                                         ${t.consultation_modes ? t.consultation_modes.join(', ') : 'None'}
+                                    ${(() => {
+                                        const list = normalizeList(t.consultation_modes);
+                                        return list.length ? list.join(', ') : 'None';
+                                    })()}
                                     </div>
                                     <p class="text-muted small mb-1">Languages</p>
                                     <div class="d-flex flex-wrap gap-2">
