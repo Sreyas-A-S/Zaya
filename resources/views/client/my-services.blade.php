@@ -243,7 +243,7 @@
                     @endif
                 </div>
                 <div class="px-4 py-2 rounded-xl bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-wide">
-                    Auto email uses your lead time
+                    Auto email sends 60 min before
                 </div>
             </div>
         </div>
@@ -252,23 +252,20 @@
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <p class="text-[11px] font-black text-secondary/50 uppercase tracking-[0.2em] mb-1">Reminder Settings</p>
-                    <h3 class="text-xl font-black text-secondary">When to send video link</h3>
-                    <p class="text-sm text-gray-500 mt-1">We email the Agora session link to you and the client this many minutes before an online booking.</p>
+                    <h3 class="text-xl font-black text-secondary">Video link reminder timing</h3>
+                    <p class="text-sm text-gray-500 mt-1">The system always emails the Agora session link to you and the client 60 minutes before an online booking.</p>
                 </div>
             </div>
-            <form action="{{ route('my-services.reminder') }}" method="POST" class="max-w-xl">
-                @csrf
+            <div class="max-w-xl">
                 <div class="flex flex-col sm:flex-row gap-4 items-center">
                     <div class="relative w-full sm:w-60">
-                        <input type="number" name="reminder_lead_time" min="5" max="1440" value="{{ $reminderLeadTime }}" required
-                               class="w-full border border-gray-200 rounded-2xl px-4 py-3 font-bold text-secondary focus:border-secondary focus:ring-4 focus:ring-secondary/10 transition-all outline-none">
+                        <input type="number" value="60" disabled
+                               class="w-full border border-gray-200 rounded-2xl px-4 py-3 font-bold text-secondary bg-gray-50 cursor-not-allowed outline-none">
                         <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold uppercase">Minutes</span>
                     </div>
-                    <button type="submit" class="px-6 py-3 bg-secondary text-white rounded-2xl font-bold hover:bg-opacity-95 shadow-md">
-                        Save Lead Time
-                    </button>
+                    <span class="text-sm text-gray-500 font-medium">Fixed default reminder time</span>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

@@ -324,22 +324,7 @@ class ProfileController extends Controller
 
     public function updateReminderSettings(Request $request)
     {
-        $validated = $request->validate([
-            'reminder_lead_time' => 'required|integer|min:5|max:1440',
-        ]);
-
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $profile = $user->practitioner ?? $user->doctor ?? $user->mindfulnessPractitioner ?? $user->yogaTherapist ?? null;
-
-        if (!$profile) {
-            return back()->with('error', 'Reminder settings are not available for your profile.');
-        }
-
-        $profile->reminder_lead_time = $validated['reminder_lead_time'];
-        $profile->save();
-
-        return back()->with('status', 'Reminder lead time updated.');
+        return back()->with('status', 'Reminder emails are sent 60 minutes before the session.');
     }
 
     public function getAvailableServices()
@@ -730,16 +715,16 @@ class ProfileController extends Controller
     public function joinSession($channel)
     {
         $user = Auth::user();
-        $appId = config('services.agora.app_id');
+        $appId = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_id'));
         
         \Log::info("User joining session:", [
             'user' => $user->id,
             'channel' => $channel,
-            'has_app_id' => !empty($appId),
-            'app_id_preview' => $appId ? substr($appId, 0, 5) . '...' : 'NONE'
+            'appId_length' => strlen($appId),
+            'appId_preview' => substr($appId, 0, 5) . '...'
         ]);
 
-        if (!$appId) {
+        if (empty($appId)) {
             return back()->with('error', 'Video consultation is not configured (Missing App ID).');
         }
 
@@ -748,8 +733,9 @@ class ProfileController extends Controller
 
     public function generateToken(Request $request)
     {
-        $appId = config('services.agora.app_id');
-        $appCertificate = config('services.agora.app_certificate');
+        $appId = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_id'));
+        $appCertificate = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_certificate'));
+        
         $validated = $request->validate([
             'channel' => ['required', 'string', 'max:64', 'regex:/^[A-Za-z0-9_-]+$/'],
             'uid' => ['nullable', 'integer', 'min:1'],
@@ -758,15 +744,15 @@ class ProfileController extends Controller
         $channelName = $validated['channel'];
         $uid = $validated['uid'] ?? Auth::id() ?? 1;
         
-        \Log::info("Agora Token Request:", [
+        \Log::info("Agora Token Request DEBUG:", [
             'channel' => $channelName,
             'uid' => $uid,
-            'has_app_id' => !empty($appId),
+            'appId_length' => strlen($appId),
             'has_cert' => !empty($appCertificate)
         ]);
 
-        if (!$appId || !$appCertificate) {
-            return response()->json(['token' => null, 'error' => 'Agora credentials missing']);
+        if (empty($appId) || empty($appCertificate)) {
+            return response()->json(['token' => null, 'error' => 'Agora credentials missing or invalid']);
         }
 
         $role = \App\Services\Agora\RtcTokenBuilder::ROLE_PUBLISHER;
@@ -780,10 +766,11 @@ class ProfileController extends Controller
             $channelName, 
             $uid, 
             $role, 
+            $expireTimeInSeconds,
             $privilegeExpiredTs
         );
 
-        \Log::info("Generated Token: " . substr($token, 0, 10) . "...");
+        \Log::info("Generated Token DEBUG: " . $token);
 
         return response()->json([
             'token' => $token, 

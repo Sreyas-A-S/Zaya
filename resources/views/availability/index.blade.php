@@ -204,12 +204,12 @@
                     </div>
 
                     <div class="mb-6">
-                        <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-3">Session Reminder Lead Time (Minutes)</label>
+                        <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-3">Session Reminder Lead Time</label>
                         <div class="flex gap-3">
-                            <input type="number" name="reminder_lead_time" value="{{ $profile->reminder_lead_time ?? 60 }}" min="5" max="1440" class="flex-1 border border-gray-100 bg-gray-50 rounded-2xl px-5 py-4 text-base outline-none focus:border-secondary transition-all">
+                            <input type="number" value="60" disabled class="flex-1 border border-gray-100 bg-gray-50 rounded-2xl px-5 py-4 text-base outline-none cursor-not-allowed">
                             <div class="flex items-center text-xs text-gray-400 px-4">
                                 <i class="ri-information-line mr-1"></i>
-                                When to send the video link email before session.
+                                Reminder emails are sent 60 minutes before the session.
                             </div>
                         </div>
                     </div>

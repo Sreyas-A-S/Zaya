@@ -46,35 +46,43 @@
         <!-- Video Area -->
         <div class="relative aspect-video bg-[#0A1209] group" id="meeting-stage">
             
-            <!-- Pre-Join Screen (User Gesture Trigger) -->
+            <!-- Pre-Join Screen -->
             <div id="join-overlay" class="absolute inset-0 z-[100] bg-secondary flex flex-col items-center justify-center text-center p-6 transition-all duration-500">
                 <div class="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mb-8">
                     <i class="ri-vidicon-fill text-white text-5xl"></i>
                 </div>
                 <h2 class="text-3xl font-bold text-white mb-4">Ready to Join?</h2>
                 <p class="text-white/60 mb-10 max-w-md text-lg">Ensure your camera and microphone are connected before entering the session.</p>
+                
+                <div id="setup-feedback" class="mb-6 text-white/80 text-sm hidden">
+                    <i class="ri-loader-4-line animate-spin mr-2"></i> Checking devices...
+                </div>
+
                 <button id="start-btn" onclick="startSession()" class="px-12 py-4 bg-white text-secondary rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl flex items-center gap-3 cursor-pointer">
                     <i class="ri-door-open-fill"></i>
                     Join Meeting Now
                 </button>
+                
                 <p id="browser-warning" class="mt-8 text-yellow-300 text-sm hidden">
                     <i class="ri-error-warning-line"></i> 
                     Warning: Browser requires HTTPS for camera access.
                 </p>
             </div>
 
-            <!-- Main Remote Video -->
-            <div id="remote-player" class="w-full h-full"></div>
+            <!-- Main Remote Video Container -->
+            <div id="remote-playerlist" class="w-full h-full flex flex-wrap items-center justify-center gap-2">
+                <!-- Remote players will be appended here -->
+            </div>
 
-            <!-- Waiting Screen Overlay -->
+            <!-- Waiting Screen Overlay (shown when no remote user) -->
             <div id="remote-waiting" class="absolute inset-0 flex items-center justify-center z-10 bg-[#0A1209]">
                 <div class="text-center p-6">
                     <div class="w-20 h-20 border-2 border-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6 relative">
                         <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya" class="w-10 opacity-20">
                         <div class="absolute inset-0 border-t-2 border-secondary rounded-full animate-spin"></div>
                     </div>
-                    <h3 class="text-white text-xl font-light mb-2">Connecting to Practitioner</h3>
-                    <p class="text-white/30 text-xs tracking-wide">Please ensure your camera and mic are enabled.</p>
+                    <h3 class="text-white text-xl font-light mb-2">Waiting for Participant</h3>
+                    <p class="text-white/30 text-xs tracking-wide">The session will begin as soon as others join.</p>
                 </div>
             </div>
 
@@ -83,6 +91,9 @@
                 <div id="local-player" class="w-full h-full"></div>
                 <div class="absolute top-2 left-2 opacity-0 group-hover/local:opacity-100 transition-opacity">
                     <span class="text-[8px] text-white bg-black/40 backdrop-blur-md px-2 py-0.5 rounded-full uppercase font-bold tracking-tighter">You</span>
+                </div>
+                <div id="local-muted-overlay" class="absolute inset-0 bg-black/60 flex items-center justify-center hidden">
+                    <i class="ri-video-off-fill text-white text-2xl"></i>
                 </div>
             </div>
 
@@ -131,7 +142,7 @@
         <div class="p-6 bg-white flex items-center justify-between border-t border-gray-50">
             <div class="flex items-center gap-3">
                 <i class="ri-shield-check-line text-secondary"></i>
-                <p class="text-xs text-gray-400 font-medium italic">End-to-end encrypted medical consultation</p>
+                <p class="text-xs text-gray-400 font-medium italic">End-to-end encrypted secure session</p>
             </div>
             <div class="flex items-center gap-2">
                 <div class="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -156,8 +167,8 @@
                 <select id="mic-select" class="w-full border border-gray-100 bg-gray-50 rounded-xl px-4 py-3 text-sm outline-none focus:border-secondary transition-all"></select>
             </div>
         </div>
-        <button onclick="toggleSettings()" class="mt-8 w-full py-4 bg-secondary text-white rounded-xl font-bold hover:opacity-90 transition-all cursor-pointer">
-            Save & Exit
+        <button onclick="applySettings()" class="mt-8 w-full py-4 bg-secondary text-white rounded-xl font-bold hover:opacity-90 transition-all cursor-pointer">
+            Save & Apply
         </button>
     </div>
 </div>
@@ -169,6 +180,7 @@
 <style>
     .agora_video_player { object-fit: cover !important; border-radius: inherit; }
     #local-player video { transform: rotateY(180deg); }
+    .remote-video-container { position: relative; flex: 1; min-width: 300px; height: 100%; border-radius: inherit; overflow: hidden; background: #000; }
 </style>
 @endpush
 
@@ -182,20 +194,28 @@
             document.getElementById('browser-warning').classList.remove('hidden');
         }
 
-        // --- GLOBAL FUNCTIONS (WINDOW SCOPE) ---
+        // Timer Logic
+        let startTime = Date.now();
+        setInterval(() => {
+            const now = Date.now();
+            const diff = Math.floor((now - startTime) / 1000);
+            const h = Math.floor(diff / 3600).toString().padStart(2, '0');
+            const m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
+            const s = (diff % 60).toString().padStart(2, '0');
+            const timerEl = document.getElementById('timer');
+            if (timerEl) timerEl.innerText = `${h}:${m}:${s}`;
+        }, 1000);
+
+        // --- GLOBAL FUNCTIONS ---
         window.copyMeetingLink = () => {
             const url = window.location.href;
             navigator.clipboard.writeText(url).then(() => {
-                if (window.showZayaToast) {
-                    showZayaToast('Meeting link copied to clipboard!', 'Share Session');
-                } else {
-                    alert('Meeting link copied!');
-                }
+                alert('Meeting link copied to clipboard!');
             });
         };
 
         window.togglePiP = async () => {
-            const video = document.querySelector('#remote-player video');
+            const video = document.querySelector('#remote-playerlist video');
             if (video) {
                 try {
                     if (video !== document.pictureInPictureElement) {
@@ -213,62 +233,96 @@
             if (isHidden) {
                 modal.classList.replace('opacity-0', 'opacity-100');
                 modal.classList.remove('pointer-events-none');
+                loadDevices();
             } else {
                 modal.classList.replace('opacity-100', 'opacity-0');
                 modal.classList.add('pointer-events-none');
             }
         };
 
-        window.leave = () => {
-            if (localTracks.audioTrack) localTracks.audioTrack.close();
-            if (localTracks.videoTrack) localTracks.videoTrack.close();
-            client.leave();
+        window.applySettings = async () => {
+            const camId = document.getElementById('camera-select').value;
+            const micId = document.getElementById('mic-select').value;
+            
+            try {
+                if (localTracks.videoTrack) {
+                    await localTracks.videoTrack.setDevice(camId);
+                }
+                if (localTracks.audioTrack) {
+                    await localTracks.audioTrack.setDevice(micId);
+                }
+                toggleSettings();
+            } catch (e) {
+                console.error("Failed to apply device settings:", e);
+                alert("Could not switch devices. Please try again.");
+            }
+        };
+
+        async function loadDevices() {
+            const devices = await AgoraRTC.getDevices();
+            const camSelect = document.getElementById('camera-select');
+            const micSelect = document.getElementById('mic-select');
+            
+            if (camSelect && micSelect) {
+                camSelect.innerHTML = '';
+                micSelect.innerHTML = '';
+                devices.filter(d => d.kind === 'videoinput').forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.deviceId;
+                    opt.text = c.label || `Camera ${camSelect.length + 1}`;
+                    camSelect.appendChild(opt);
+                });
+                devices.filter(d => d.kind === 'audioinput').forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.deviceId;
+                    opt.text = m.label || `Microphone ${micSelect.length + 1}`;
+                    micSelect.appendChild(opt);
+                });
+            }
+        }
+
+        window.leave = async () => {
+            if (localTracks.audioTrack) {
+                localTracks.audioTrack.stop();
+                localTracks.audioTrack.close();
+            }
+            if (localTracks.videoTrack) {
+                localTracks.videoTrack.stop();
+                localTracks.videoTrack.close();
+            }
+            if (client) {
+                await client.leave();
+            }
             window.location.href = "{{ route('conferences.index') }}";
         };
 
-        // --- AGORA LOGIC ---
-        const rawAppId = "{{ $appId }}";
-        const trimmedAppId = rawAppId.trim();
-        const tokenOverride = @json(request('token'));
+        // --- AGORA CORE ---
+        const appId = "{{ $appId }}".trim();
+        const channel = "{{ trim($channel) }}";
+        const uid = {{ (int) ($user->id ?? 1) }};
         
-        let options = { 
-            appId: trimmedAppId, 
-            channel: "{{ trim($channel) }}", 
-            token: tokenOverride || null, 
-            uid: {{ (int) ($user->id ?? 1) }}
-        };
-        
-        console.log("DEBUG: Agora Config Status:");
-        console.log("- App ID Length:", options.appId.length);
-        console.log("- App ID Preview:", options.appId.substring(0,5) + "..." + options.appId.substring(options.appId.length-5));
-        
-        if (!options.appId || options.appId.length < 10) {
-            console.error("CRITICAL: Agora App ID is invalid or empty.");
-            alert("Configuration Error: Agora App ID is invalid. Please check your .env file.");
+        console.log("DEBUG: Agora Initial Config:", { appId, channel, uid });
+
+        if (!appId || appId.length < 5) {
+            console.error("Invalid Agora App ID");
+            alert("Configuration error: Invalid Agora App ID.");
             return;
         }
 
         let client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
         let localTracks = { videoTrack: null, audioTrack: null };
-        let screenTrack = null;
         let remoteUsers = {};
+        let screenTrack = null;
         let isSharing = false;
 
-        // Fetch Token from Backend
         async function fetchToken() {
-            if (options.token) {
-                console.log("- Using token override (Preview):", options.token.substring(0,10) + "...");
-                return options.token;
-            }
             try {
-                const response = await fetch(`{{ route('agora.token') }}?channel=${encodeURIComponent(options.channel)}&uid=${options.uid}`);
+                const url = `{{ route('agora.token') }}?channel=${encodeURIComponent(channel)}&uid=${uid}`;
+                console.log("DEBUG: Fetching token from:", url);
+                const response = await fetch(url);
                 const data = await response.json();
-                if (data.token) {
-                    console.log("- Token Received (Preview):", data.token.substring(0,10) + "...");
-                }
-                if (data.uid) {
-                    options.uid = data.uid;
-                }
+                console.log("DEBUG: Token Data received:", data);
+                if (data.error) throw new Error(data.error);
                 return data.token;
             } catch (e) {
                 console.error("Token fetch failed:", e);
@@ -276,22 +330,58 @@
             }
         }
 
-        // Start Session (User Gesture Required)
         window.startSession = async () => {
             const btn = document.getElementById('start-btn');
+            const feedback = document.getElementById('setup-feedback');
             btn.disabled = true;
             btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Initializing...';
+            feedback.classList.remove('hidden');
 
-            await join();
-            
-            // Hide Overlay
-            const overlay = document.getElementById('join-overlay');
-            overlay.style.opacity = '0';
-            overlay.style.pointerEvents = 'none';
-            setTimeout(() => overlay.remove(), 500);
+            try {
+                // 1. Get Devices
+                feedback.innerText = "Requesting permissions...";
+                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
+                
+                // 2. Fetch Token
+                feedback.innerText = "Securing connection...";
+                const token = await fetchToken();
+                if (!token) throw new Error("Failed to generate access token.");
+
+                // 3. Join Channel
+                feedback.innerText = "Entering room...";
+                console.log("DEBUG: client.join starting with:", { appId, channel, token, uid });
+                await client.join(appId, channel, token, uid);
+                console.log("DEBUG: client.join succeeded.");
+                
+                // 4. Play and Publish
+                localTracks.videoTrack.play("local-player");
+                await client.publish(Object.values(localTracks));
+
+                // 5. Success - Hide Overlay
+                const overlay = document.getElementById('join-overlay');
+                overlay.style.opacity = '0';
+                overlay.style.pointerEvents = 'none';
+                setTimeout(() => overlay.remove(), 500);
+
+                // Setup listeners
+                setupClientListeners();
+
+            } catch (e) {
+                console.error("Start Session Error:", e);
+                let msg = "Could not join the session. ";
+                if (e.message.includes("Permission denied")) msg += "Camera/Microphone access was denied.";
+                else if (e.message.includes("token")) msg += "Authentication failed.";
+                else msg += e.message;
+                
+                alert(msg);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ri-door-open-fill"></i> Retry Joining';
+                feedback.classList.add('hidden');
+            }
         };
 
-        async function join() {
+        function setupClientListeners() {
             client.on("user-published", handleUserPublished);
             client.on("user-unpublished", handleUserUnpublished);
             
@@ -305,144 +395,107 @@
                 const labelEl = document.getElementById('net-label');
                 if (labelEl) labelEl.innerText = `Network: ${labels[q.downlinkNetworkQuality] || 'Stable'}`;
             });
-
-            try {
-                console.log("Checking App ID validity...");
-                if (options.appId.length < 10) {
-                    throw new Error("Invalid App ID format. Check your .env file.");
-                }
-
-                // REQUEST PERMISSIONS FIRST
-                console.log("Requesting microphone track...");
-                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack().catch(err => {
-                    console.error("Mic Access Denied:", err);
-                    throw new Error("Microphone access was denied or no device found.");
-                });
-
-                console.log("Requesting camera track...");
-                localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack().catch(err => {
-                    console.error("Camera Access Denied:", err);
-                    throw new Error("Camera access was denied or no device found.");
-                });
-
-                options.token = await fetchToken();
-                if (!options.token) {
-                    throw new Error("Failed to generate secure access token.");
-                }
-                
-                console.log("Attempting Secure Join...");
-                await client.join(options.appId, options.channel, options.token, options.uid);
-                console.log("Joined successfully.");
-
-                localTracks.videoTrack.play("local-player");
-                await client.publish(Object.values(localTracks));
-
-                const devices = await AgoraRTC.getDevices();
-                const camSelect = document.getElementById('camera-select');
-                const micSelect = document.getElementById('mic-select');
-                if (camSelect && micSelect) {
-                    camSelect.innerHTML = ''; micSelect.innerHTML = '';
-                    devices.filter(d => d.kind === 'videoinput').forEach(c => camSelect.innerHTML += `<option value="${c.deviceId}">${c.label || 'Camera ' + (camSelect.length+1)}</option>`);
-                    devices.filter(d => d.kind === 'audioinput').forEach(m => micSelect.innerHTML += `<option value="${m.deviceId}">${m.label || 'Mic ' + (micSelect.length+1)}</option>`);
-                }
-            } catch (e) {
-                console.error("Agora Critical Error:", e);
-                let msg = e.message;
-                
-                if (e.message.includes("dynamic use static key")) {
-                    msg = "Security Mismatch: Your Agora project is in 'Testing Mode' but we are sending a secure token. \n\nFIX: Go to Agora Console and ENABLE 'App Certificate' for this project.";
-                } else if (e.message.includes("invalid vendor key")) {
-                    msg = "Invalid App ID: The ID in your .env does not match any project in your Agora Console.";
-                }
-                
-                alert("Connection Failed: " + msg);
-                const btn = document.getElementById('start-btn');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="ri-door-open-fill"></i> Retry Joining';
-            }        }
+        }
 
         async function handleUserPublished(user, mediaType) {
             await client.subscribe(user, mediaType);
+            
             if (mediaType === "video") {
+                const remotePlayerList = document.getElementById("remote-playerlist");
                 const waiting = document.getElementById("remote-waiting");
                 if (waiting) waiting.classList.add('hidden');
-                user.videoTrack.play("remote-player");
+
+                // Create container for remote user
+                let playerContainer = document.getElementById(`player-${user.uid}`);
+                if (!playerContainer) {
+                    playerContainer = document.createElement("div");
+                    playerContainer.id = `player-${user.uid}`;
+                    playerContainer.className = "remote-video-container";
+                    remotePlayerList.appendChild(playerContainer);
+                }
+                user.videoTrack.play(playerContainer.id);
             }
-            if (mediaType === "audio") user.audioTrack.play();
+            
+            if (mediaType === "audio") {
+                user.audioTrack.play();
+            }
             remoteUsers[user.uid] = user;
         }
 
         function handleUserUnpublished(user) {
-            const waiting = document.getElementById("remote-waiting");
-            if (waiting) waiting.classList.remove('hidden');
+            const playerContainer = document.getElementById(`player-${user.uid}`);
+            if (playerContainer) playerContainer.remove();
+            
             delete remoteUsers[user.uid];
+            
+            if (Object.keys(remoteUsers).length === 0) {
+                const waiting = document.getElementById("remote-waiting");
+                if (waiting) waiting.classList.remove('hidden');
+            }
         }
 
-        function syncControlIcons(isMuted, isVideoOff) {
-            const micClass = isMuted ? 'ri-mic-off-fill text-red-500' : 'ri-mic-fill';
-            const videoClass = isVideoOff ? 'ri-video-off-fill text-red-500' : 'ri-video-on-fill';
-
-            const micIcon = document.getElementById('mic-icon');
-            const micIconMobile = document.getElementById('mic-icon-mobile');
-            const vidIcon = document.getElementById('vid-icon');
-            const vidIconMobile = document.getElementById('vid-icon-mobile');
-
-            if (micIcon) micIcon.className = micClass;
-            if (micIconMobile) micIconMobile.className = micClass;
-            if (vidIcon) vidIcon.className = videoClass;
-            if (vidIconMobile) vidIconMobile.className = videoClass;
-        }
-
-        function syncScreenShareIcons(sharing) {
-            const screenClass = sharing ? 'ri-stop-circle-fill text-red-500' : 'ri-screen-share-line';
-            const screenIcon = document.getElementById('screen-icon');
-            const screenIconMobile = document.getElementById('screen-icon-mobile');
-
-            if (screenIcon) screenIcon.className = screenClass;
-            if (screenIconMobile) screenIconMobile.className = screenClass;
-        }
-
+        // Control Toggles
         async function toggleAudio() {
+            if (!localTracks.audioTrack) return;
             const isMuted = !localTracks.audioTrack.muted;
             await localTracks.audioTrack.setMuted(isMuted);
-            syncControlIcons(isMuted, localTracks.videoTrack?.muted ?? false);
+            
+            const icon = isMuted ? 'ri-mic-off-fill text-red-500' : 'ri-mic-fill';
+            document.getElementById('mic-icon').className = icon;
+            document.getElementById('mic-icon-mobile').className = icon;
         }
 
         async function toggleVideo() {
+            if (!localTracks.videoTrack) return;
             const isOff = !localTracks.videoTrack.muted;
             await localTracks.videoTrack.setMuted(isOff);
-            syncControlIcons(localTracks.audioTrack?.muted ?? false, isOff);
+            
+            const icon = isOff ? 'ri-video-off-fill text-red-500' : 'ri-video-on-fill';
+            document.getElementById('vid-icon').className = icon;
+            document.getElementById('vid-icon-mobile').className = icon;
+            document.getElementById('local-muted-overlay').classList.toggle('hidden', !isOff);
         }
 
         async function toggleScreenShare() {
             if (!isSharing) {
-                screenTrack = await AgoraRTC.createScreenVideoTrack();
-                await client.unpublish(localTracks.videoTrack);
-                await client.publish(screenTrack);
-                screenTrack.play("local-player");
-                isSharing = true;
-                syncScreenShareIcons(true);
+                try {
+                    screenTrack = await AgoraRTC.createScreenVideoTrack();
+                    await client.unpublish(localTracks.videoTrack);
+                    await client.publish(screenTrack);
+                    screenTrack.play("local-player");
+                    
+                    screenTrack.on("track-ended", () => {
+                        if (isSharing) toggleScreenShare();
+                    });
+
+                    isSharing = true;
+                    updateScreenShareUI(true);
+                } catch (e) {
+                    console.error("Screen share failed:", e);
+                }
             } else {
                 await client.unpublish(screenTrack);
-                screenTrack.stop(); screenTrack.close();
+                screenTrack.stop();
+                screenTrack.close();
                 await client.publish(localTracks.videoTrack);
                 localTracks.videoTrack.play("local-player");
                 isSharing = false;
-                syncScreenShareIcons(false);
+                updateScreenShareUI(false);
             }
+        }
+
+        function updateScreenShareUI(sharing) {
+            const icon = sharing ? 'ri-stop-circle-fill text-red-500' : 'ri-screen-share-line';
+            document.getElementById('screen-icon').className = icon;
+            document.getElementById('screen-icon-mobile').className = icon;
         }
 
         document.getElementById('audio-toggle').onclick = toggleAudio;
         document.getElementById('video-toggle').onclick = toggleVideo;
         document.getElementById('screen-share-btn').onclick = toggleScreenShare;
-
-        const mobileAudioToggle = document.getElementById('audio-toggle-mobile');
-        const mobileVideoToggle = document.getElementById('video-toggle-mobile');
-        const mobileScreenShareToggle = document.getElementById('screen-share-btn-mobile');
-
-        if (mobileAudioToggle) mobileAudioToggle.onclick = toggleAudio;
-        if (mobileVideoToggle) mobileVideoToggle.onclick = toggleVideo;
-        if (mobileScreenShareToggle) mobileScreenShareToggle.onclick = toggleScreenShare;
+        document.getElementById('audio-toggle-mobile').onclick = toggleAudio;
+        document.getElementById('video-toggle-mobile').onclick = toggleVideo;
+        document.getElementById('screen-share-btn-mobile').onclick = toggleScreenShare;
     });
 </script>
 @endsection

@@ -305,6 +305,12 @@ Route::get('/seed', function () {
     return '<pre>' . Artisan::output() . '</pre>';
 });
 
+Route::get('/schedule-run', function () {
+    set_time_limit(300);
+    Artisan::call('schedule:run');
+    return '<pre>' . Artisan::output() . '</pre>';
+});
+
 
 
 
