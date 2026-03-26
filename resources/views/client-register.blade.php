@@ -427,7 +427,8 @@
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('First Name') }}</label>
                         <input type="text" name="first_name" value="{{ old('first_name') }}"
                             class="reg-input @error('first_name') border-red-500! @enderror"
-                            placeholder="{{ __('Enter First Name') }}" required pattern="^[A-Z][a-zA-Z\s]*$" title="{{ __('First name must start with a capital letter and contain only alphabets') }}">
+                            placeholder="{{ __('Enter First Name') }}" required  pattern="^[A-Z][a-zA-Z\s]{0,39}$"
+                            maxlength="40" title="{{ __('First letter must be capital. Only letters and spaces allowed. Max 40 characters.') }}">
                         @error('first_name')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
@@ -435,13 +436,13 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Middle Name') }}</label>
                         <input type="text" name="middle_name" value="{{ old('middle_name') }}" class="reg-input"
-                            placeholder="{{ __('Enter Middle Name') }}" pattern="^[a-zA-Z][a-zA-Z\s]*$" title="{{ __('Middle name can start with a small or capital letter and must contain only alphabets') }}">
+                            placeholder="{{ __('Enter Middle Name') }}" pattern="^[a-zA-Z][a-zA-Z\s]{0,39}$"  maxlength="40"  title="{{ __('Middle name can start with a small or capital letter and must contain only alphabets') }}">
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Last Name') }}</label>
                         <input type="text" name="last_name" value="{{ old('last_name') }}"
                             class="reg-input @error('last_name') border-red-500! @enderror"
-                            placeholder="{{ __('Enter Last Name') }}" required pattern="^[A-Z][a-zA-Z\s]*$" title="{{ __('Last name must start with a capital letter and contain only alphabets') }}">
+                            placeholder="{{ __('Enter Last Name') }}" required pattern="^[A-Z][a-zA-Z\s]{0,39}$"  maxlength="40" title="{{ __('Last name must start with a capital letter and contain only alphabets') }}">
                         @error('last_name')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
