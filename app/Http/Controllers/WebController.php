@@ -20,7 +20,6 @@ use App\Models\MindfulnessService;
 use App\Models\ClientConcern;
 use App\Models\TranslatorService;
 use App\Models\TranslatorSpecialization;
-use App\Models\Country;
 use App\Models\Service;
 use App\Models\Testimonial;
 use App\Mail\ContactUsMail;
@@ -323,10 +322,11 @@ class WebController extends Controller
         $clientRegistrationFee = is_numeric($clientRegistrationFee) ? (float) $clientRegistrationFee : 0.0;
         $clientRegistrationFeeEnabled = filter_var($financeSettings['client_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
         $clientRegistrationCurrency = strtoupper($financeSettings['client_registration_fee_currency'] ?? 'EUR');
+        $countryNameToCode = \App\Models\Country::pluck('code', 'name')->map(fn($c) => strtoupper($c));
 
         $defaultCurrency = $this->deriveCurrencyFromCountry($request->get('country', ''));
 
-        return view('client-register', compact('redirect', 'consultationPreferences', 'languages', 'clientRegistrationFee', 'clientRegistrationFeeEnabled', 'defaultCurrency', 'clientRegistrationCurrency'));
+        return view('client-register', compact('redirect', 'consultationPreferences', 'languages', 'clientRegistrationFee', 'clientRegistrationFeeEnabled', 'defaultCurrency', 'clientRegistrationCurrency', 'countryNameToCode'));
     }
 
     public function practitionerRegister()

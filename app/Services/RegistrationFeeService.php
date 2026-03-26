@@ -25,6 +25,8 @@ class RegistrationFeeService
         $language = session('locale', 'en');
         $settings = HomepageSetting::getSectionValues('finance', $language);
         $fee = (float) ($settings[$map[$role]['fee']] ?? 0);
+        $currencyKey = $map[$role]['fee'] . '_currency';
+        $feeCurrency = strtoupper($settings[$currencyKey] ?? config('currencies.default', 'EUR'));
         $enabled = filter_var($settings[$map[$role]['enabled']] ?? '1', FILTER_VALIDATE_BOOLEAN);
 
         if (!$enabled || $fee <= 0) {
@@ -46,7 +48,7 @@ class RegistrationFeeService
         $orderId = 'mock_plink_' . uniqid();
         $paymentUrl = null;
 
-        $currency = $this->deriveCurrencyFromUser($user);
+        $currency = $feeCurrency ?? $this->deriveCurrencyFromUser($user);
 
         try {
             $response = Http::withOptions(['verify' => (bool) $verifySsl])

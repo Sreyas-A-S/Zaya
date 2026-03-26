@@ -40,10 +40,12 @@ class FinanceSettingController extends Controller
         ];
 
         foreach ($defaults as $def) {
-            HomepageSetting::updateOrCreate(
-                ['key' => $def['key'], 'language' => 'en'],
-                $def
-            );
+            $exists = HomepageSetting::where('key', $def['key'])
+                ->where('language', 'en')
+                ->exists();
+            if (!$exists) {
+                HomepageSetting::create($def);
+            }
         }
 
         // 1. Fetch current language settings

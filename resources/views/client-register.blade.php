@@ -19,6 +19,9 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.1/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
+    <script>
+        window.countryNameToCode = @json($countryNameToCode ?? []);
+    </script>
     <style>
         .iti { width: 100% !important; display: block !important; }
         /* Custom Gender Select Dropdown Styles */
@@ -421,6 +424,7 @@
         $currSymbol = $currencySymbols[$currCode] ?? $currCode;
         $registrationCurrency = strtoupper($clientRegistrationCurrency ?? 'EUR');
         $registrationCurrencySymbol = $currencySymbols[$registrationCurrency] ?? $registrationCurrency;
+        $registrationCurrencyCode = $registrationCurrency;
     @endphp
     <!-- Main Content -->
     <div class="flex-1 relative overflow-x-hidden">
@@ -693,8 +697,9 @@
                                     <span class="text-gray-900 text-[0.95rem] font-medium" id="registration-fee-display">
                                         {{ $registrationCurrencySymbol }} {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
                                     </span>
-                                    <input type="hidden" name="registration_fee" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
-                                    <input type="hidden" name="registration_fee_actual" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
+                                    <input type="hidden" name="registration_fee" id="registration_fee" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
+                                    <input type="hidden" name="registration_fee_actual" id="registration_fee_actual" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
+                                    <input type="hidden" name="registration_fee_currency" id="registration-fee-currency" value="{{ $registrationCurrencyCode }}">
                                     <button type="submit"
                                         class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-sm font-medium hover:bg-[#e0a932] transition-colors shadow-sm">
                                         {{ __('Pay & Register') }}
@@ -993,10 +998,10 @@
                                 const zipInput = document.querySelector("input[name='zip_code']");
                                 if (zipInput && !zipInput.value) zipInput.value = data.postal;
 
-                                // Update Nationality Select (TomSelect)
+                                // Update Nationality Select (TomSelect) using country code
                                 const nationalitySelect = document.querySelector('#nationality-select');
-                                if (nationalitySelect && nationalitySelect.tomselect) {
-                                    nationalitySelect.tomselect.setValue(data.country_name);
+                                if (nationalitySelect && nationalitySelect.tomselect && data.country_code) {
+                                    nationalitySelect.tomselect.setValue(data.country_code);
                                 }
 
                                 callback(data.country_code);
@@ -1165,23 +1170,98 @@
             const promoDiscountAmountHidden = document.getElementById('promo-discount-amount-hidden');
             const promoTotalFeeHidden = document.getElementById('promo-total-fee-hidden');
 
-            const feeInput = document.querySelector('input[name="registration_fee"]');
-            const feeActualInput = document.querySelector('input[name="registration_fee_actual"]');
+            const feeInput = document.getElementById('registration_fee');
+            const feeActualInput = document.getElementById('registration_fee_actual');
+            const feeCurrencyInput = document.getElementById('registration-fee-currency');
             const countryToCurrency = @json(config('currencies.country_to_currency', []));
             const countrySelect = document.getElementById('nationality-select');
+            const fallbackRates = {
+                'EUR': { 'USD': 1.1, 'INR': 89, 'GBP': 0.85, 'AED': 4.04 },
+                'USD': { 'EUR': 0.91, 'INR': 81, 'GBP': 0.77, 'AED': 3.67 },
+                'INR': { 'EUR': 0.0112, 'USD': 0.0123, 'GBP': 0.0095, 'AED': 0.045 },
+                'GBP': { 'EUR': 1.18, 'USD': 1.30, 'INR': 104, 'AED': 4.77 },
+                'AED': { 'EUR': 0.25, 'USD': 0.27, 'INR': 22, 'GBP': 0.21 },
+            };
 
             const roleInput = document.querySelector('input[name="role"]');
             const roleValue = roleInput ? roleInput.value : 'client';
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-            // Registration fee currency stays fixed from finance settings; no dynamic update on country select
+            async function convertFee(targetCountryCode) {
+                if (!feeInput || !feeActualInput) return;
+                const baseCurrency = @json($registrationCurrencyCode);
+                const baseAmount = parseFloat(feeActualInput.value || feeInput.value || 0);
+                if (!baseAmount) return;
+
+                const derivedCurrency = (() => {
+                    if (!targetCountryCode) return baseCurrency;
+                    const raw = Array.isArray(targetCountryCode) ? targetCountryCode[0] : (targetCountryCode || '');
+                    const code = raw.toUpperCase();
+                    if (countryToCurrency[code]) return countryToCurrency[code];
+                    if (countryToCurrency[code.slice(0,2)]) return countryToCurrency[code.slice(0,2)];
+                    const nameCode = window.countryNameToCode ? window.countryNameToCode[raw] : null;
+                    if (nameCode && countryToCurrency[nameCode]) return countryToCurrency[nameCode];
+                    return baseCurrency;
+                })();
+
+                const symbol = currencySymbols[derivedCurrency] || derivedCurrency;
+                currencySymbol = symbol;
+                feeCurrencyInput && (feeCurrencyInput.value = derivedCurrency);
+
+                console.debug('convertFee', { baseCurrency, derivedCurrency, baseAmount });
+
+                const applyValue = (val) => {
+                    feeInput.value = val.toFixed(2);
+                    renderFee(val);
+                };
+
+                try {
+                    // Primary: Frankfurter (ECB) – no key required
+                    const ffUrl = `https://api.frankfurter.app/latest?from=${baseCurrency}&to=${derivedCurrency}`;
+                    const resp = await fetch(ffUrl);
+                    const data = await resp.json();
+                    if (data?.rates?.[derivedCurrency]) {
+                        const rate = parseFloat(data.rates[derivedCurrency]);
+                        applyValue(baseAmount * rate);
+                        return;
+                    }
+                    throw new Error('Frankfurter rate missing');
+                } catch (_) {
+                    try {
+                        // Fallback: exchangerate.host – free, no key
+                        const resp = await fetch(`https://api.exchangerate.host/convert?from=${baseCurrency}&to=${derivedCurrency}&amount=${baseAmount}`);
+                        const data = await resp.json();
+                        const converted = data && data.result ? parseFloat(data.result) : baseAmount;
+                        applyValue(converted);
+                        return;
+                    } catch (e2) {
+                        const rate = fallbackRates[baseCurrency]?.[derivedCurrency];
+                        const converted = rate ? baseAmount * rate : baseAmount;
+                        applyValue(converted);
+                    }
+                }
+            }
+
+            if (countrySelect && countrySelect.tomselect) {
+                convertFee(countrySelect.tomselect.getValue());
+                countrySelect.tomselect.on('change', (val) => convertFee(val));
+            } else if (countrySelect) {
+                convertFee(countrySelect.value);
+                countrySelect.addEventListener('change', (e) => convertFee(e.target.value));
+                setTimeout(() => {
+                    if (countrySelect.tomselect) {
+                        countrySelect.tomselect.on('change', (val) => convertFee(val));
+                    }
+                }, 500);
+            }
 
             function renderFee(value) {
                 const feeDisplay = feeInput?.closest('.relative')?.querySelector('span');
                 const displayValue = value !== undefined ? value : feeInput?.value;
+                const currCode = feeCurrencyInput?.value || '';
                 if (feeInput && feeDisplay) {
-                    feeDisplay.textContent = `${currencySymbol} ${Number(displayValue || 0).toFixed(2)}`;
+                    feeDisplay.textContent = `${currencySymbol} ${Number(displayValue || 0).toFixed(2)}${currCode ? ' ('+currCode+')' : ''}`;
                 }
             }
 
@@ -1190,9 +1270,18 @@
             }
 
             if (countrySelect) {
-                const initial = countrySelect.value || countrySelect.dataset.default;
-                if (initial) updateCurrencyFromCountry(initial);
-                countrySelect.addEventListener('change', (e) => updateCurrencyFromCountry(e.target.value));
+                const initial = countrySelect.value || countrySelect.dataset.default || countrySelect.tomselect?.getValue();
+                convertFee(initial);
+                if (countrySelect.tomselect) {
+                    countrySelect.tomselect.on('change', (val) => convertFee(val));
+                } else {
+                    countrySelect.addEventListener('change', (e) => convertFee(e.target.value));
+                    setTimeout(() => {
+                        if (countrySelect.tomselect) {
+                            countrySelect.tomselect.on('change', (val) => convertFee(val));
+                        }
+                    }, 500);
+                }
             }
 
             function clearPromo() {
