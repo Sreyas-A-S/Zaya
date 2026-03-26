@@ -12,6 +12,7 @@ class UserService extends Model
         'rate',
         'duration',
         'status',
+        'currency',
     ];
 
     public function user()

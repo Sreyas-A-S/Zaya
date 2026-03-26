@@ -31,19 +31,43 @@
     }
     .select2-dropdown {
         border-radius: 0.75rem;
-        border: 1px solid #f3f4f6;
-        box-shadow: 0 10px 20px -8px rgba(0,0,0,0.15);
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 14px 30px -18px rgba(0,0,0,0.35);
         overflow: hidden;
+        background: #ffffff;
+        padding: 4px 0;
     }
     .select2-results__option {
         padding: 10px 14px;
+        font-weight: 700;
+        color: #1f2937;
     }
     .select2-results__option--highlighted {
-        background: #F8FAF9;
-        color: #2E4B3D;
+        background: #F3F6F4;
+        color: #1f2937;
     }
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Inline loader for select fetch */
+    .inline-loader {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        border: 2px solid #d1d5db;
+        border-top-color: #2E4B3D;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    .select-wrapper {
+        position: relative;
+    }
+    @keyframes spin {
+        to { transform: translateY(-50%) rotate(360deg); }
+    }
 
     /* Custom visual tweaks for better contrast */
     .service-card-header {
@@ -104,7 +128,8 @@
                 <div class="h-44 relative flex-shrink-0">
                     <img src="{{ $firstRate->service->image ? asset('storage/' . $firstRate->service->image) : asset('frontend/assets/service-placeholder.png') }}" 
                          alt="{{ $firstRate->service->title }}" 
-                         class="w-full h-full object-cover">
+                         class="w-full h-full object-cover"
+                         onerror="this.onerror=null;this.src='{{ asset('frontend/assets/service-placeholder.png') }}';">
                     <div class="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/90 via-[#1A1A1A]/30 to-transparent"></div>
                     <div class="absolute bottom-5 left-7 right-14">
                         <h3 class="text-white text-2xl font-black leading-tight tracking-tight">{{ $firstRate->service->title }}</h3>
@@ -197,7 +222,7 @@
                                 <i class="ri-apps-2-fill text-secondary"></i>
                                 Select Service
                             </label>
-                            <div class="bg-white rounded-xl sm:rounded-2xl border border-gray-200">
+                            <div class="bg-white rounded-xl sm:rounded-2xl border border-gray-200 select-wrapper">
                                 <select id="service-select-0" name="services[0][service_id]" required class="service-selector w-full">
                                     <option value="" disabled selected>Loading services...</option>
                                 </select>
@@ -223,8 +248,16 @@
                                     <div>
                                         <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
                                         <div class="flex gap-2 sm:gap-3">
+                                            <select name="services[0][currency]" class="currency-select h-[54px] sm:h-[58px] bg-gray-100 border border-gray-200 rounded-lg px-3 text-sm font-semibold text-gray-700 focus:border-secondary focus:ring-2 focus:ring-secondary/10" disabled>
+                                                @php $curr = $defaultCurrency ?? 'INR'; @endphp
+                                                <option value="INR" {{ $curr === 'INR' ? 'selected' : '' }}>INR</option>
+                                                <option value="USD" {{ $curr === 'USD' ? 'selected' : '' }}>USD</option>
+                                                <option value="EUR" {{ $curr === 'EUR' ? 'selected' : '' }}>EUR</option>
+                                                <option value="GBP" {{ $curr === 'GBP' ? 'selected' : '' }}>GBP</option>
+                                                <option value="AED" {{ $curr === 'AED' ? 'selected' : '' }}>AED</option>
+                                            </select>
                                             <div class="relative flex-1">
-                                                <span class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">₹</span>
+                                                <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">₹</span>
                                                 <input type="number" name="services[0][rates][0][rate]" step="0.01" required placeholder="0.00" class="w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
                                             </div>
                                             <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
@@ -281,15 +314,20 @@
 </div>
 
 @push('scripts')
+<script>
+    const DEFAULT_CURRENCY = "{{ $defaultCurrency ?? 'INR' }}";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     let serviceRowIndex = 1;
     let select2Instances = {};
+    const CURRENCY_SYMBOLS = {INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ'};
     let cachedAvailableServices = null;
     let isFetchingServices = false;
     let fetchPromise = null;
 
-    async function fetchAvailableServices() {
+async function fetchAvailableServices() {
         if (cachedAvailableServices) return cachedAvailableServices;
         if (isFetchingServices) return fetchPromise;
         
@@ -302,7 +340,7 @@
                     cachedAvailableServices = res.data;
                     const modalTitle = document.getElementById('modal-title');
                     if (modalTitle) {
-                        modalTitle.innerText = `Configure Services (${cachedAvailableServices.length} available)`;
+                        modalTitle.innerText = `Configure Services`;
                     }
                     return cachedAvailableServices;
                 }
@@ -317,10 +355,37 @@
         return fetchPromise;
     }
 
+    function toggleSelectLoader(el, show) {
+        const wrapper = el.closest('.select-wrapper');
+        if (!wrapper) return;
+        let spinner = wrapper.querySelector('.inline-loader');
+        if (show) {
+            if (!spinner) {
+                spinner = document.createElement('span');
+                spinner.className = 'inline-loader';
+                wrapper.appendChild(spinner);
+            }
+        } else if (spinner) {
+            spinner.remove();
+        }
+    }
+
+    function getSelectedServiceIds(excludeId = null) {
+        const selects = document.querySelectorAll('.service-selector');
+        const ids = [];
+        selects.forEach(sel => {
+            if (excludeId && sel.id === excludeId) return;
+            const val = $(sel).val();
+            if (val) ids.push(String(val));
+        });
+        return ids;
+    }
+
     async function initSelect2(elementId) {
         const el = document.getElementById(elementId);
         if (!el) return;
 
+        toggleSelectLoader(el, true);
         const services = await fetchAvailableServices();
 
         // destroy existing instance if any
@@ -328,13 +393,45 @@
             $(el).select2('destroy');
         }
 
-        const data = services.map(s => ({ id: s.id, text: s.title }));
+        const selectedIds = getSelectedServiceIds(elementId);
+        const data = services
+            .filter(s => !selectedIds.includes(String(s.id)) || String(s.id) === String(el.value))
+            .map(s => ({ id: s.id, text: s.title }));
 
         select2Instances[elementId] = $(el).select2({
             data,
             placeholder: 'Choose a service...',
             width: '100%',
             dropdownParent: $('#addServiceModal'),
+        });
+        $(el).on('change', () => refreshAllSelects(elementId));
+        toggleSelectLoader(el, false);
+    }
+
+    async function refreshAllSelects(changedId = null) {
+        const selects = document.querySelectorAll('.service-selector');
+        for (const sel of selects) {
+            const id = sel.id;
+            await initSelect2(id);
+        }
+    }
+
+    function attachCurrencyListeners(context = document) {
+        const selects = context.querySelectorAll('.currency-select');
+        selects.forEach(select => {
+            const handler = () => {
+                const sym = CURRENCY_SYMBOLS[select.value] || select.value;
+                const row = select.closest('.rate-row') || select.closest('.service-row');
+                const span = row ? row.querySelector('.currency-symbol') : null;
+                if (span) span.textContent = sym;
+            };
+            select.addEventListener('change', handler);
+            // set default selection when creating new rows
+            if (!select.dataset.boundDefault) {
+                select.value = DEFAULT_CURRENCY;
+                select.dataset.boundDefault = '1';
+            }
+            handler();
         });
     }
 
@@ -355,7 +452,7 @@
                         <i class="ri-apps-2-fill text-secondary"></i>
                         Select Service
                     </label>
-                    <div class="bg-white rounded-xl sm:rounded-2xl border border-gray-200">
+                    <div class="bg-white rounded-xl sm:rounded-2xl border border-gray-200 select-wrapper">
                         <select id="${id}" name="services[${currentIdx}][service_id]" required class="service-selector w-full">
                             <option value="" disabled selected>Loading services...</option>
                         </select>
@@ -379,16 +476,23 @@
                             </div>
                             <div>
                                 <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
-                                <div class="flex gap-2 sm:gap-3">
-                                    <div class="relative flex-1">
-                                        <span class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">₹</span>
-                                        <input type="number" name="services[${currentIdx}][rates][0][rate]" step="0.01" required placeholder="0.00" class="w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
+                                        <div class="flex gap-2 sm:gap-3">
+                                            <select name="services[${currentIdx}][currency]" class="currency-select h-[54px] sm:h-[58px] bg-gray-100 border border-gray-200 rounded-lg px-3 text-sm font-semibold text-gray-700 focus:border-secondary focus:ring-2 focus:ring-secondary/10" disabled>
+                                                <option value="INR">INR</option>
+                                                <option value="USD">USD</option>
+                                                <option value="EUR">EUR</option>
+                                                <option value="GBP">GBP</option>
+                                                <option value="AED">AED</option>
+                                            </select>
+                                            <div class="relative flex-1">
+                                                <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">₹</span>
+                                                <input type="number" name="services[${currentIdx}][rates][0][rate]" step="0.01" required placeholder="0.00" class="w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
+                                            </div>
+                                            <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
+                                                <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
-                                        <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <button type="button" onclick="addRateRow(${currentIdx}, this)" class="w-full sm:w-auto bg-white border-2 border-dashed border-secondary/20 text-secondary px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 shadow-sm">
@@ -401,6 +505,7 @@
         
         container.appendChild(row);
         initSelect2(id);
+        attachCurrencyListeners(row);
         serviceRowIndex++;
         container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
     }
@@ -534,6 +639,7 @@
             if (document.getElementById(firstSelectId) && !select2Instances[firstSelectId]) {
                 initSelect2(firstSelectId);
             }
+            attachCurrencyListeners();
         }, 10);
         
         document.body.style.overflow = 'hidden';

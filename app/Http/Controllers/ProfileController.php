@@ -298,7 +298,9 @@ class ProfileController extends Controller
             ->get()
             ->groupBy('service_id');
 
-        return view('client.my-services', compact('user', 'myServices'));
+        $defaultCurrency = $this->deriveCurrency($user);
+
+        return view('client.my-services', compact('user', 'myServices', 'defaultCurrency'));
     }
 
     public function getAvailableServices()
@@ -306,14 +308,8 @@ class ProfileController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Get services already linked to this user
-        $myServiceIds = UserService::where('user_id', $user->id)
-            ->pluck('service_id')
-            ->toArray();
-
-        // Fetch remaining active services
+        // Fetch all active services (allow reselection of already added services for additional rate sets)
         $availableServices = Service::where('status', '!=', 0)
-            ->whereNotIn('id', $myServiceIds)
             ->orderBy('title')
             ->get(['id', 'title']);
 
@@ -330,12 +326,14 @@ class ProfileController extends Controller
             'services.*.rates' => 'required|array|min:1',
             'services.*.rates.*.rate' => 'required|numeric|min:0',
             'services.*.rates.*.duration' => 'required|integer|min:1',
+            'services.*.currency' => 'nullable|string|size:3',
         ]);
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
         foreach ($request->services as $serviceData) {
+            $currency = $serviceData['currency'] ?? $this->deriveCurrency($user);
             foreach ($serviceData['rates'] as $rateData) {
                 UserService::updateOrCreate(
                     [
@@ -345,7 +343,8 @@ class ProfileController extends Controller
                     ],
                     [
                         'rate' => $rateData['rate'], 
-                        'status' => 'active'
+                        'status' => 'active',
+                        'currency' => strtoupper($currency)
                     ]
                 );
             }
@@ -372,6 +371,23 @@ class ProfileController extends Controller
         UserService::where('user_id', $user->id)->where('service_id', $service_id)->delete();
 
         return back()->with('status', 'Service and all its rates removed successfully!');
+    }
+
+    private function deriveCurrency($user)
+    {
+        $country = $user->country ?? $user->practitioner->country ?? $user->doctor->country ?? null;
+        $map = [
+            'IN' => 'INR', 'IND' => 'INR', 'INDIA' => 'INR',
+            'US' => 'USD', 'USA' => 'USD', 'UNITED STATES' => 'USD',
+            'GB' => 'GBP', 'UK' => 'GBP', 'UNITED KINGDOM' => 'GBP',
+            'AE' => 'AED', 'UAE' => 'AED',
+            'EU' => 'EUR', 'FR' => 'EUR', 'DE' => 'EUR', 'ES' => 'EUR', 'IT' => 'EUR',
+        ];
+        if ($country) {
+            $code = strtoupper(trim($country));
+            return $map[$code] ?? $map[strtoupper(substr($code,0,2))] ?? config('app.currency', 'INR');
+        }
+        return config('app.currency', 'INR');
     }
 
     public function updateProfilePic(Request $request)

@@ -93,6 +93,14 @@
         $practitionerRole = $activePractitioner->other_modalities[0] ?? 'Practitioner';
         $practitionerRating = $activePractitioner ? number_format($activePractitioner->average_rating, 1) : '0.0';
         $practitionerLocation = $activePractitioner ? $activePractitioner->city_state : 'Location not set';
+        $practitionerConditions = $activePractitioner ? (array) ($activePractitioner->consultations ?? []) : [];
+        if (empty($practitionerConditions) && $activePractitioner && !empty($activePractitioner->other_modalities)) {
+            $practitionerConditions = (array) $activePractitioner->other_modalities;
+        }
+        // Collect practitioner service durations/rates
+        $practitionerServices = $activePractitioner && $activePractitioner->user
+            ? $activePractitioner->user->userServices()->with('service')->where('status', 'active')->get()->groupBy('service_id')
+            : collect();
         @endphp
 
         <!-- Step Indicator -->
@@ -237,45 +245,18 @@
 
                     <!-- Condition Tags -->
                     <div class="flex flex-wrap gap-2" id="condition-tags-wrapper">
-                        <label
-                            class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
-                                type="checkbox" name="conditions[]" value="identifying_imbalances" class="sr-only">
-                            <span data-i18n="Identifying Imbalances">{{ __('Identifying Imbalances') }}</span></label>
-                        <label
-                            class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
-                                type="checkbox" name="conditions[]" value="preventative_lifestyle_guidance"
-                                class="sr-only">
-                            <span data-i18n="Preventative Lifestyle Guidance">{{ __('Preventative Lifestyle Guidance') }}</span></label>
-                        <label
-                            class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
-                                type="checkbox" name="conditions[]" value="holistic_restoration" class="sr-only">
-                            <span data-i18n="Holistic Restoration">{{ __('Holistic Restoration') }}</span></label>
-                        <label
-                            class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
-                                type="checkbox" name="conditions[]" value="natural_healing" class="sr-only">
-                            <span data-i18n="Natural Healing">{{ __('Natural Healing') }}</span></label>
-                        <label
-                            class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
-                                type="checkbox" name="conditions[]" value="prakriti" class="sr-only">
-                            <span data-i18n="Prakriti">{{ __('Prakriti') }}</span></label>
-                        <label
-                            class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
-                                type="checkbox" name="conditions[]" value="identifying_imbalances_2"
-                                class="sr-only">
-                            Identifying Imbalances</label>
-                        <label
-                            class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
-                                type="checkbox" name="conditions[]" value="preventative_lifestyle_guidance_2"
-                                class="sr-only">
-                            Preventative Lifestyle Guidance</label>
-                        <label
-                            class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
-                                type="checkbox" name="conditions[]" value="holistic_restoration_2" class="sr-only">
-                            Holistic Restoration</label>
-                        <label
-                            class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]"><input
-                                type="checkbox" name="conditions[]" value="prakriti_2" class="sr-only">
-                            Prakriti</label>
+                        @forelse($practitionerConditions as $condition)
+                            @php $label = is_array($condition) ? ($condition['title'] ?? $condition['name'] ?? '') : $condition; @endphp
+                            @if(!empty($label))
+                            <label
+                                class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]">
+                                <input type="checkbox" name="conditions[]" value="{{ $label }}" class="sr-only">
+                                <span>{{ $label }}</span>
+                            </label>
+                            @endif
+                        @empty
+                            <p class="text-sm text-gray-500">{{ __('This practitioner has not listed specific conditions.') }}</p>
+                        @endforelse
                     </div>
                 </div>
 
@@ -343,6 +324,11 @@
                                 <input type="hidden" name="services[{{ $service->id }}][title]" value="{{ $service->title }}">
                             </div>
                             <div class="relative flex-1">
+                                @php
+                                    $rates = $practitionerServices->get($service->id) ?? collect();
+                                    $defaultRate = $rates->first();
+                                    $defaultDurationLabel = $defaultRate ? ($defaultRate->duration . ' Min') : 'Duration';
+                                @endphp
                                 <div class="duration-picker-trigger h-full py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
                                     onclick="
                                                 const dd = this.nextElementSibling.nextElementSibling; 
@@ -360,66 +346,41 @@
                                                     if(typeof smartPosition !== 'undefined') { smartPosition(this, dd); } 
                                                 }">
                                     <span class="text-sm text-[#252525] font-medium duration-label">
-                                       {{ ((isset($prefilledService) && $prefilledService->id == $service->id) || (!isset($prefilledService) && $loop->first)) ? '1 Hour' : 'Duration' }}
+                                       {{ $defaultDurationLabel }}
                                     </span>
                                     <i class="ri-arrow-down-s-line text-gray-700 text-lg"></i>
                                     </div>
                                     <input type="hidden" name="services[{{ $service->id }}][duration]" class="duration-value" 
-                                    value="{{ ((isset($prefilledService) && $prefilledService->id == $service->id) || (!isset($prefilledService) && $loop->first)) ? '1 Hour' : '' }}">
+                                    value="{{ $defaultRate ? ($defaultRate->duration . ' Min') : '' }}">
                                 <!-- Dropdown Menu -->
                                 <div
                                     class="duration-dropdown hidden absolute left-0 w-72 bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 z-50">
                                     <div class="p-2">
-                                        <!-- Option 1 -->
+                                        @forelse($rates as $idx => $rate)
+                                        @php
+                                            $label = ($rate->duration ?? '') . ' Min';
+                                            $price = $rate->rate ?? 0;
+                                        @endphp
                                         <label
                                             class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
                                             <div class="flex items-center gap-3">
-                                                <input type="radio" name="temp_duration_{{ $service->id }}" value="45 Mins"
-                                                    class="peer hidden">
+                                                <input type="radio" name="temp_duration_{{ $service->id }}" value="{{ $label }}"
+                                                    class="peer hidden" {{ $idx === 0 ? 'checked' : '' }}>
                                                 <div
                                                     class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
                                                     <div
                                                         class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
                                                     </div>
                                                 </div>
-                                                <span class="text-[15px] text-[#404040]">45 Mins</span>
+                                                <span class="text-[15px] text-[#404040]">{{ $label }}</span>
                                             </div>
-                                            <span class="text-[15px] font-medium text-[#29724C]">€ 50</span>
+                                            <span class="text-[15px] font-medium text-[#29724C]">₹ {{ number_format($price, 2) }}</span>
                                         </label>
-
-                                        <!-- Option 2 -->
-                                        <label
-                                            class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
-                                            <div class="flex items-center gap-3">
-                                                <input type="radio" name="temp_duration_{{ $service->id }}" value="1 Hour"
-                                                    class="peer hidden" checked>
-                                                <div
-                                                    class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
-                                                    <div
-                                                        class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
-                                                    </div>
-                                                </div>
-                                                <span class="text-[15px] text-[#404040]">1 Hour</span>
-                                            </div>
-                                            <span class="text-[15px] font-medium text-[#29724C]">€ 100</span>
-                                        </label>
-
-                                        <!-- Option 3 -->
-                                        <label
-                                            class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
-                                            <div class="flex items-center gap-3">
-                                                <input type="radio" name="temp_duration_{{ $service->id }}" value="2 Hours"
-                                                    class="peer hidden">
-                                                <div
-                                                    class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
-                                                    <div
-                                                        class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
-                                                    </div>
-                                                </div>
-                                                <span class="text-[15px] text-[#404040]">2 Hours</span>
-                                            </div>
-                                            <span class="text-[15px] font-medium text-[#29724C]">€ 150</span>
-                                        </label>
+                                        @empty
+                                        <div class="px-4 py-3 text-sm text-gray-500">
+                                            {{ __('No durations set by this practitioner for this service.') }}
+                                        </div>
+                                        @endforelse
                                     </div>
 
                                     <hr class="border-gray-100 m-0">
@@ -978,7 +939,7 @@
                     let duration = "Duration";
                     let day = "Day";
                     let time = "Time";
-                    let price = 100; // Placeholder price logic
+                    let price = 0; // will be set from selected rate
 
                     if (scheduleItem) {
                         duration = scheduleItem.querySelector('.duration-value').value || "Duration";
@@ -991,7 +952,7 @@
                             const priceSpan = durationRadio.closest('label').querySelector('.text-\\[\\#29724C\\]');
                             if (priceSpan) {
                                 const priceText = priceSpan.textContent.replace(/[^\d.]/g, '');
-                                price = parseFloat(priceText) || 100;
+                                price = parseFloat(priceText) || 0;
                             }
                         }
                     }
@@ -1037,9 +998,9 @@
                 const showTest = testToggle && testToggle.checked;
                 if (priceContainer) {
                     if (showTest) {
-                        priceContainer.innerHTML = `INR 1.00 <span class="text-xl text-gray-400 font-normal">/ TEST</span>`;
+                        priceContainer.innerHTML = `₹ ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ TEST</span>`;
                     } else {
-                        priceContainer.innerHTML = `€ ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ EUR</span>`;
+                        priceContainer.innerHTML = `₹ ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ INR</span>`;
                     }
                 }
             }
@@ -1506,6 +1467,12 @@
             hiddenInput.value = dateStr;
             dropdown.classList.add('hidden');
             if (typeof updateStep3Services === 'function') updateStep3Services();
+
+            // Focus time picker after selecting date
+            const timeTrigger = container.nextElementSibling?.querySelector('.time-picker-trigger');
+            if (timeTrigger) {
+                timeTrigger.focus();
+            }
         }
     </script>
 
@@ -1527,15 +1494,29 @@
         }
 
         // ===== Time Picker Logic =====
-        const AVAILABLE_SLOTS = [
-            '10.00 AM', '11.30 AM', '12.00 PM',
-            '12.30 PM', '1.30 PM', '2.00 PM',
-            '4.00 PM', '5.00 PM', '6.00 PM'
-        ];
+        const PRACTITIONER_ID = {{ $activePractitioner->id ?? 'null' }};
+        let AVAILABLE_SLOTS = [];
+
+        async function loadSlotsForDate(dateStr) {
+            if (!PRACTITIONER_ID || !dateStr) return [];
+            try {
+                const res = await fetch(`{{ url('/api/available-slots') }}/${PRACTITIONER_ID}/${dateStr}`);
+                const data = await res.json();
+                if (data && Array.isArray(data.slots)) {
+                    return data.slots.map(s => s.time);
+                }
+            } catch (e) {
+                console.error('Slot fetch error', e);
+            }
+            return [];
+        }
 
         function parseTimeToMinutes(timeStr) {
-            const [time, modifier] = timeStr.split(' ');
-            let [hours, minutes] = time.split('.').map(Number);
+            if (!timeStr) return 0;
+            const [time, modifier] = timeStr.trim().split(' ');
+            let parts = time.includes(':') ? time.split(':') : time.split('.');
+            let hours = parseInt(parts[0] || '0', 10);
+            let minutes = parseInt(parts[1] || '0', 10);
             if (hours === 12) {
                 hours = modifier === 'AM' ? 0 : 12;
             } else if (modifier === 'PM') {
@@ -1548,6 +1529,13 @@
             const container = trigger.closest('.relative');
             const dropdown = container.querySelector('.time-picker-dropdown');
             const content = container.querySelector('.time-picker-content');
+            const dayContainer = container.previousElementSibling;
+            const dayInput = dayContainer?.querySelector('.day-value');
+
+            if (!dayInput || !dayInput.value) {
+                showToast('Please select a date first.', 'warning');
+                return;
+            }
 
             // Close all others
             document.querySelectorAll('.calendar-dropdown, .time-picker-dropdown').forEach(d => {
@@ -1561,28 +1549,26 @@
                 // Determine Date Label
                 let dateLabel = "Today";
                 let isToday = true;
-                const dayContainer = container.previousElementSibling;
-                if (dayContainer) {
-                    const dayInput = dayContainer.querySelector('.day-value');
-                    if (dayInput && dayInput.value) {
-                        const parts = dayInput.value.split('-');
-                        const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                        const mon = SHORT_MONTH_NAMES[d.getMonth()];
-                        dateLabel = `${mon} ${d.getDate()}, ${d.getFullYear()}`;
+                if (dayInput && dayInput.value) {
+                    const parts = dayInput.value.split('-');
+                    const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    const mon = SHORT_MONTH_NAMES[d.getMonth()];
+                    dateLabel = `${mon} ${d.getDate()}, ${d.getFullYear()}`;
 
-                        const dStart = new Date(d);
-                        dStart.setHours(0, 0, 0, 0);
-                        const todayStart = new Date();
-                        todayStart.setHours(0, 0, 0, 0);
-                        isToday = dStart.getTime() === todayStart.getTime();
-                    }
+                    const dStart = new Date(d);
+                    dStart.setHours(0, 0, 0, 0);
+                    const todayStart = new Date();
+                    todayStart.setHours(0, 0, 0, 0);
+                    isToday = dStart.getTime() === todayStart.getTime();
                 }
 
                 // Get current value
                 const timeInput = container.querySelector('.time-value');
                 const selectedTime = timeInput.value;
 
-                renderTimePicker(content, dateLabel, selectedTime, isToday);
+                const dayValue = dayInput?.value || '';
+                const dateForFetch = dayValue || new Date().toISOString().slice(0,10);
+                renderTimePicker(content, dateForFetch, selectedTime, isToday, dateLabel);
                 dropdown.classList.remove('hidden');
                 smartPosition(trigger, dropdown);
             } else {
@@ -1591,18 +1577,23 @@
             }
         }
 
-        function renderTimePicker(wrapper, dateStr, selectedTime, isToday) {
+        async function renderTimePicker(wrapper, dateValue, selectedTime, isToday, displayLabel = null) {
             let html = `
                 <div class="time-picker-header">
-                    <div class="time-picker-title">Available Slots on ${dateStr}</div>
+                    <div class="time-picker-title">Available Slots on ${displayLabel || dateValue}</div>
                 </div>
                 <div class="time-slots-grid">
             `;
 
             const now = new Date();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const slots = await loadSlotsForDate(dateValue);
 
-            AVAILABLE_SLOTS.forEach(slot => {
+            if (!slots || slots.length === 0) {
+                html += `<div class="col-span-full text-sm text-gray-500 px-2 pb-4">No slots available for this day.</div>`;
+            }
+
+            slots.forEach(slot => {
                 const slotMinutes = parseTimeToMinutes(slot);
                 const isPast = isToday && (slotMinutes < currentMinutes);
 

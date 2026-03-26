@@ -44,9 +44,6 @@ class WebController extends Controller
         $languages = Language::all();
         $practitioners = Practitioner::with(['user', 'reviews'])
             ->where('status', 'active')
-            ->whereHas('userServices', function($q) {
-                $q->where('status', 'active');
-            })
             ->latest()
             ->take(8)
             ->get();
@@ -129,14 +126,11 @@ class WebController extends Controller
         $language = App::getLocale();
         $settings = HomepageSetting::getAllSettings($language);
 
-        $pincode = session('global_pincode');
+        $pincode = trim((string) $request->query('pincode', ''));
         $query = Practitioner::with(['user', 'reviews'])
-            ->where('status', 'active')
-            ->whereHas('userServices', function ($q) {
-                $q->where('status', 'active');
-            });
+            ->where('status', 'active');
 
-        if ($pincode) {
+        if ($pincode !== '') {
             $query->where('zip_code', 'LIKE', "%{$pincode}%");
         }
 
@@ -174,11 +168,11 @@ class WebController extends Controller
     public function findPractitionerPost(Request $request)
     {
         $pincode = trim((string) $request->input('pincode', ''));
+        $params = [];
         if ($pincode !== '') {
-            session(['global_pincode' => $pincode]);
+            $params['pincode'] = $pincode;
         }
-
-        return redirect()->route('find-practitioner');
+        return redirect()->route('find-practitioner', $params);
     }
 
     public function search(Request $request)
@@ -187,9 +181,6 @@ class WebController extends Controller
 
         // Search Practitioners
         $practitioners = Practitioner::where('status', 'active')
-            ->whereHas('userServices', function ($q) {
-                $q->where('status', 'active');
-            })
             ->where(function ($q) use ($query) {
                 $q->where('first_name', 'LIKE', "%{$query}%")
                     ->orWhere('last_name', 'LIKE', "%{$query}%")

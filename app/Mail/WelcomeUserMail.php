@@ -46,8 +46,8 @@ class WelcomeUserMail extends Mailable
 
         if ($this->role && in_array($this->role, $practitionerRoles)) {
             $title = 'Welcome to ' . config('app.name');
-            $intro = 'Great news! Your profile is now active. You can start offering sessions on Zaya Wellness.';
-            $outro = 'Log in, finalize your profile details, and open your calendar for bookings.';
+            $intro = 'We’re pleased to confirm that your practitioner profile is now active on Zaya Wellness. You can begin accepting clients immediately.';
+            $outro = 'Please log in to review your profile, confirm your availability, and publish your services so clients can book with you. Login: ' . $this->loginUrl;
         } else {
             $title = 'Welcome to ' . config('app.name');
             $intro = 'Your account has been created successfully. Use the credentials below to log in and start your wellness journey.';
