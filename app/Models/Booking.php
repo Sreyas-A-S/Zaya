@@ -25,6 +25,7 @@ class Booking extends Model
         'booking_date',
         'booking_time',
         'total_price',
+        'currency',
         'status',
         'reminder_sent',
         'razorpay_order_id',

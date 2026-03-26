@@ -15,6 +15,7 @@ class RegistrationFeeService
             'mindfulness_practitioner' => ['fee' => 'mindfulness_registration_fee', 'enabled' => 'mindfulness_registration_fee_enabled', 'label' => 'Mindfulness Counsellor'],
             'yoga_therapist' => ['fee' => 'yoga_registration_fee', 'enabled' => 'yoga_registration_fee_enabled', 'label' => 'Yoga Therapist'],
             'translator' => ['fee' => 'translator_registration_fee', 'enabled' => 'translator_registration_fee_enabled', 'label' => 'Translator'],
+            'client' => ['fee' => 'client_registration_fee', 'enabled' => 'client_registration_fee_enabled', 'label' => 'Client'],
         ];
 
         if (!isset($map[$role])) {
@@ -45,12 +46,14 @@ class RegistrationFeeService
         $orderId = 'mock_plink_' . uniqid();
         $paymentUrl = null;
 
+        $currency = $this->deriveCurrencyFromUser($user);
+
         try {
             $response = Http::withOptions(['verify' => (bool) $verifySsl])
                 ->withBasicAuth($razorpayKey, $razorpaySecret)
                 ->post('https://api.razorpay.com/v1/payment_links', [
                     'amount' => (int) round($fee * 100),
-                    'currency' => 'INR',
+                    'currency' => $currency,
                     'description' => 'Registration Fee - ' . $map[$role]['label'],
                     'customer' => [
                         'name' => $user->name,
@@ -84,8 +87,27 @@ class RegistrationFeeService
             'payment_url' => $paymentUrl,
             'order_id' => $orderId,
             'amount' => $fee,
-            'currency' => 'INR',
+            'currency' => $currency,
             'role_label' => $map[$role]['label'],
         ];
+    }
+
+    private function deriveCurrencyFromUser($user): string
+    {
+        $country = null;
+        if (isset($user->country)) {
+            $country = $user->country;
+        } elseif (isset($user->patient) && $user->patient) {
+            $country = $user->patient->country;
+        } elseif (isset($user->practitioner) && $user->practitioner) {
+            $country = $user->practitioner->country;
+        }
+
+        $map = config('currencies.country_to_currency', []);
+        if ($country) {
+            $code = strtoupper(trim($country));
+            return $map[$code] ?? $map[substr($code, 0, 2)] ?? config('currencies.default', 'INR');
+        }
+        return config('currencies.default', 'INR');
     }
 }

@@ -57,10 +57,10 @@
 
                 <!-- Select Service Custom Dropdown -->
                 <div class="relative w-full md:w-1/4 custom-dropdown">
-                    <input type="hidden" name="service" value="">
+                    <input type="hidden" name="service" value="{{ $selectedService->id ?? request('service') }}">
                     <button type="button"
                         class="dropdown-button w-full border border-[#db8871] rounded-full px-6 py-3.5 text-base md:text-lg text-[#db8871] bg-white flex justify-between items-center transition-colors focus:outline-none shadow-sm cursor-pointer">
-                        <span class="dropdown-selected truncate">{{ $settings['find_practitioner_service_placeholder'] ?? 'Select Service' }}</span>
+                        <span class="dropdown-selected truncate">{{ $selectedService->title ?? ($settings['find_practitioner_service_placeholder'] ?? 'Select Service') }}</span>
                         <i
                             class="ri-arrow-down-s-line text-[#db8871] text-xl transition-transform duration-300 pointer-events-none dropdown-icon"></i>
                     </button>
@@ -73,7 +73,7 @@
                                 data-value="">All Services</button>
                             @foreach($services as $service)
                                 <button type="button"
-                                    class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
+                                    class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer {{ isset($selectedService) && $selectedService->id === $service->id ? 'font-medium text-[#db8871]' : '' }}"
                                     data-value="{{ $service->id }}">{{ $service->title }}</button>
                             @endforeach
                         </div>

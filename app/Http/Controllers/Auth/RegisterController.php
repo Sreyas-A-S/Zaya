@@ -126,6 +126,14 @@ class RegisterController extends Controller
                     }
                 } else {
                     Mail::to($user->email)->send(new WelcomeUserMail($user->email, $request->password, url('/zaya-login'), $user->role));
+                    if ($link = $feeService->createPaymentLink($user, 'client')) {
+                        Mail::to($user->email)->send(
+                            new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+                        );
+                        // Prefer directing the user to pay immediately if possible
+                        $this->guard()->login($user);
+                        return redirect()->away($link['payment_url']);
+                    }
                 }
             } catch (\Exception $e) {
                 \Log::error('Public Registration Welcome Email Error: ' . $e->getMessage());

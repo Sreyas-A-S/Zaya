@@ -51,7 +51,12 @@
                                     <td>{{ $booking->user->name ?? 'N/A' }}</td>
                                     <td>{{ $booking->practitioner->user->name ?? 'N/A' }}</td>
                                     <td>{{ $booking->booking_date ? $booking->booking_date->format('M d, Y') : 'N/A' }}</td>
-                                    <td>€ {{ number_format($booking->total_price, 2) }}</td>
+                                    @php
+                                        $currencyCode = strtoupper($booking->currency ?? config('app.currency', 'INR'));
+                                        $symbols = config('currencies.symbols', []);
+                                        $currencySymbol = $symbols[$currencyCode] ?? $currencyCode;
+                                    @endphp
+                                    <td>{{ $currencySymbol }} {{ number_format($booking->total_price, 2) }}</td>
                                     <td>
                                         <span class="badge {{ $booking->status === 'Paid' ? 'bg-success' : 'bg-warning' }}">
                                             {{ ucfirst($booking->status) }}

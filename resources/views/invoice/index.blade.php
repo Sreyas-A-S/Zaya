@@ -39,10 +39,26 @@
                 max-width: 100% !important;
             }
         }
+
+        /* Ensure centered layout for screen and PDF */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #invoice-card {
+            margin: 0 auto;
+        }
     </style>
 </head>
 
 <body class="min-h-screen py-10 flex flex-col items-center">
+    @php
+        $site_settings = $site_settings ?? [];
+        $currencyCode = strtoupper($booking->currency ?? config('app.currency', 'INR'));
+        $symbols = config('currencies.symbols', []);
+        $currencySymbol = $symbols[$currencyCode] ?? $currencyCode;
+    @endphp
 
     <!-- Top Status Icon & Header -->
     <div class="text-center mb-8 mt-4 no-print">
@@ -146,7 +162,7 @@
             </div>
             <div class="flex items-center gap-4">
                 <span class="bg-[#eef1f6] text-gray-600 text-[11px] font-medium px-3 py-1 rounded-full">{{ ucfirst($booking->status ?? 'Paid') }}</span>
-                <span class="text-[22px] font-bold text-gray-800">€ {{ number_format($booking->total_price, 2) }}</span>
+                <span class="text-[22px] font-bold text-gray-800">{{ $currencySymbol }} {{ number_format($booking->total_price, 2) }}</span>
             </div>
         </div>
 
@@ -231,9 +247,9 @@
     </div>
 
     <!-- Book Another Session CTA -->
-    <div class="mb-6 no-print">
+    <div class="mb-6 no-print mt-6">
         <a href="{{ route('book-session', ['practitioner' => $booking->practitioner->slug]) }}" 
-           class="inline-flex items-center gap-2 px-8 py-3 bg-secondary text-white font-semibold text-[15px] rounded-full hover:bg-[#1e3a2f] transition-all shadow-md">
+           class="inline-flex items-center gap-2 px-8 py-3 bg-[#1e3a2f] text-white font-semibold text-[15px] rounded-full hover:bg-[#16261f] transition-all shadow-md">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
@@ -280,6 +296,9 @@
 
             try {
                 if (navigator.share) {
+                    // Abort if a share is already in progress
+                    if (shareInvoice.isSharing) return;
+                    shareInvoice.isSharing = true;
                     await navigator.share(shareData);
                 } else {
                     // Fallback to clipboard
@@ -288,8 +307,11 @@
                 }
             } catch (err) {
                 console.error('Error sharing:', err);
+            } finally {
+                shareInvoice.isSharing = false;
             }
         }
+        shareInvoice.isSharing = false;
 
         // Download Functionality
         document.getElementById('download-btn').addEventListener('click', function() {

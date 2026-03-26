@@ -285,9 +285,15 @@
                                 <div>
                                     <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Duration') }}<span
                                             class="italic text-[#737373] text-[1rem] font-normal">{{ __('(Hours/Years)') }}</span></label>
-                                    <input type="text" name="education[0][duration]"
-                                        class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                        placeholder="{{ __('Enter Duration') }}" required>
+                                    <div class="flex gap-3">
+                                        <input type="number" min="0" step="0.1" name="education[0][duration]"
+                                            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+                                            placeholder="{{ __('Enter Duration') }}" required>
+                                        <select name="education[0][duration_unit]" class="w-32 py-3.5 px-4 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
+                                            <option value="hours">{{ __('Hours') }}</option>
+                                            <option value="years">{{ __('Years') }}</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 

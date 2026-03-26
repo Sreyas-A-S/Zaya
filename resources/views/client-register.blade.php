@@ -388,10 +388,15 @@
         .animate-pop-in {
             animation: popIn 0.3s ease-out forwards;
         }
-    </style>
+</style>
 </head>
 
 <body class="bg-white min-h-screen flex flex-col">
+    @php
+        $currCode = strtoupper($defaultCurrency ?? config('app.currency', 'INR'));
+        $currencySymbols = config('currencies.symbols', []);
+        $currSymbol = $currencySymbols[$currCode] ?? $currCode;
+    @endphp
     <!-- Main Content -->
     <div class="flex-1 relative overflow-x-hidden">
         <!-- Floating Leaves -->
@@ -660,14 +665,14 @@
                             <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Registration Fee Amount') }}</label>
                             <div class="relative w-full">
                                 <div class="w-full h-[52px] bg-[#F5F5F5] rounded-full flex items-center pl-6 pr-2">
-                                    <span class="text-gray-900 text-[0.95rem] font-medium">
-                                        &#8377; {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
+                                    <span class="text-gray-900 text-[0.95rem] font-medium" id="registration-fee-display">
+                                        {{ $currSymbol }} {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
                                     </span>
                                     <input type="hidden" name="registration_fee" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
                                     <input type="hidden" name="registration_fee_actual" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
-                                    <button type="button" disabled aria-disabled="true"
-                                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-sm font-medium opacity-50 cursor-not-allowed">
-                                        {{ __('Pay') }}
+                                    <button type="submit"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-sm font-medium hover:bg-[#e0a932] transition-colors shadow-sm">
+                                        {{ __('Pay & Register') }}
                                     </button>
                                 </div>
                             </div>
@@ -1119,7 +1124,8 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const currencySymbol = '\u20B9';
+            const currencySymbols = @json(config('currencies.symbols', []));
+            let currencySymbol = @json($currSymbol);
             const promoInput = document.getElementById('promocode-input');
             const promoApplyBtn = document.getElementById('promo-apply-btn');
             const promoBreakdown = document.getElementById('promo-breakdown');
@@ -1136,11 +1142,27 @@
 
             const feeInput = document.querySelector('input[name="registration_fee"]');
             const feeActualInput = document.querySelector('input[name="registration_fee_actual"]');
+            const countryToCurrency = @json(config('currencies.country_to_currency', []));
+            const countrySelect = document.getElementById('nationality-select');
 
             const roleInput = document.querySelector('input[name="role"]');
             const roleValue = roleInput ? roleInput.value : 'client';
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+            function updateCurrencyFromCountry(countryCode) {
+                if (!countryCode) return;
+                const code = countryCode.toUpperCase();
+                const derived = countryToCurrency[code] || countryToCurrency[code.slice(0,2)] || 'INR';
+                currencySymbol = currencySymbols[derived] || derived;
+                renderFee();
+                if (promoBreakdown && !promoBreakdown.classList.contains('hidden')) {
+                    // Re-render promo breakdown amounts with new symbol
+                    if (promoActualFee && promoActualFee.value) promoActualFee.value = `${currencySymbol} ${feeActualInput?.value || feeInput?.value || 0}`;
+                    if (promoDiscountAmount && promoDiscountAmount.value) promoDiscountAmount.value = `${currencySymbol} ${(promoDiscountAmountHidden?.value || 0)}`;
+                    if (promoTotalFee && promoTotalFee.value) promoTotalFee.value = `${currencySymbol} ${(promoTotalFeeHidden?.value || feeInput?.value || 0)}`;
+                }
+            }
 
             function renderFee(value) {
                 const feeDisplay = feeInput?.closest('.relative')?.querySelector('span');
@@ -1152,6 +1174,12 @@
 
             if (feeInput) {
                 renderFee(feeInput.value);
+            }
+
+            if (countrySelect) {
+                const initial = countrySelect.value || countrySelect.dataset.default;
+                if (initial) updateCurrencyFromCountry(initial);
+                countrySelect.addEventListener('change', (e) => updateCurrencyFromCountry(e.target.value));
             }
 
             function clearPromo() {

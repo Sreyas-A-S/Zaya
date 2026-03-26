@@ -75,7 +75,6 @@
 
     <!-- Main Content -->
     <div class="w-full">
-
         @php
         $isLoggedIn = auth()->check();
         $isClient = $isLoggedIn && in_array(auth()->user()->role, ['client', 'patient']);
@@ -101,7 +100,20 @@
         $practitionerServices = $activePractitioner && $activePractitioner->user
             ? $activePractitioner->user->userServices()->with('service')->where('status', 'active')->get()->groupBy('service_id')
             : collect();
+        $countryCurrencyMap = [
+            'IN' => 'INR','IND' => 'INR','INDIA' => 'INR',
+            'US' => 'USD','USA' => 'USD','UNITED STATES' => 'USD',
+            'GB' => 'GBP','UK' => 'GBP','UNITED KINGDOM' => 'GBP',
+            'AE' => 'AED','UAE' => 'AED',
+            'EU' => 'EUR','FR' => 'EUR','DE' => 'EUR','ES' => 'EUR','IT' => 'EUR',
+        ];
+        $practitionerCountry = $activePractitioner->country ?? $activePractitioner->user->country ?? null;
+        $derivedCurrency = $practitionerCountry ? ($countryCurrencyMap[strtoupper($practitionerCountry)] ?? config('app.currency', 'INR')) : config('app.currency', 'INR');
+        $defaultCurrencyBooking = optional($practitionerServices->flatten()->first())->currency ?? $derivedCurrency;
+        $currencySymbols = ['INR' => '₹', 'USD' => '$', 'EUR' => '€', 'GBP' => '£', 'AED' => 'د.إ'];
+        $defaultCurrencySymbol = $currencySymbols[$defaultCurrencyBooking] ?? $defaultCurrencyBooking;
         @endphp
+        <input type="hidden" id="booking-currency" name="currency" value="{{ $defaultCurrencyBooking }}">
 
         <!-- Step Indicator -->
         <div
@@ -328,6 +340,9 @@
                                     $rates = $practitionerServices->get($service->id) ?? collect();
                                     $defaultRate = $rates->first();
                                     $defaultDurationLabel = $defaultRate ? ($defaultRate->duration . ' Min') : 'Duration';
+                                    $defaultCurrency = $defaultRate->currency ?? $derivedCurrency;
+                                    $symbols = ['INR' => '₹', 'USD' => '$', 'EUR' => '€', 'GBP' => '£', 'AED' => 'د.إ'];
+                                    $defaultSymbol = $symbols[$defaultCurrency] ?? $defaultCurrency;
                                 @endphp
                                 <div class="duration-picker-trigger h-full py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
                                     onclick="
@@ -374,7 +389,8 @@
                                                 </div>
                                                 <span class="text-[15px] text-[#404040]">{{ $label }}</span>
                                             </div>
-                                            <span class="text-[15px] font-medium text-[#29724C]">₹ {{ number_format($price, 2) }}</span>
+                                            @php $symbol = $symbols[$rate->currency ?? $defaultCurrency] ?? ($rate->currency ?? $defaultCurrency); @endphp
+                                            <span class="text-[15px] font-medium text-[#29724C]" data-currency="{{ $rate->currency ?? $defaultCurrency }}" data-symbol="{{ $symbol }}">{{ $symbol }} {{ number_format($price, 2) }}</span>
                                         </label>
                                         @empty
                                         <div class="px-4 py-3 text-sm text-gray-500">
@@ -682,6 +698,7 @@
             const needTranslator = document.getElementById('need-translator')?.checked;
             const fromLanguage = document.getElementById('from-language-value')?.value;
             const toLanguage = document.getElementById('to-language-value')?.value;
+            const currency = document.getElementById('booking-currency')?.value || 'INR';
 
             // Get first service schedule info for primary booking
             const firstServiceName = selectedServices[0]?.value.toLowerCase();
@@ -708,7 +725,8 @@
                 to_language: toLanguage,
                 booking_date: bookingDate,
                 booking_time: bookingTime,
-                total_price: totalPrice
+                total_price: totalPrice,
+                currency: currency
             };
 
             let paymentWindow = null;
@@ -733,6 +751,7 @@
 
                 if (response.ok && data.success && data.redirect_url) {
                     showToast(data.message || 'Booking created!', 'success');
+                    sessionStorage.setItem('booking_reset', '1');
 
                     if (data.open_in_new_tab) {
                         if (paymentWindow && !paymentWindow.closed) {
@@ -940,6 +959,7 @@
                     let day = "Day";
                     let time = "Time";
                     let price = 0; // will be set from selected rate
+                    let currencySymbol = lastCurrencySymbol;
 
                     if (scheduleItem) {
                         duration = scheduleItem.querySelector('.duration-value').value || "Duration";
@@ -949,15 +969,19 @@
                         // Extract numeric price from duration if possible, otherwise default
                         const durationRadio = scheduleItem.querySelector('input[type="radio"]:checked');
                         if (durationRadio) {
-                            const priceSpan = durationRadio.closest('label').querySelector('.text-\\[\\#29724C\\]');
+                            const priceSpan = durationRadio.closest('label').querySelector('[data-symbol]');
                             if (priceSpan) {
+                                currencySymbol = priceSpan.dataset.symbol || currencySymbol;
                                 const priceText = priceSpan.textContent.replace(/[^\d.]/g, '');
                                 price = parseFloat(priceText) || 0;
+                                const currencyCode = priceSpan.dataset.currency || 'INR';
+                                document.getElementById('booking-currency').value = currencyCode;
                             }
                         }
                     }
 
                     total += price;
+                    lastCurrencySymbol = currencySymbol;
 
                     const html = `
                         <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
@@ -971,7 +995,7 @@
                                 </div>
                             </div>
                             <div class="md:col-span-4 text-center md:border-l md:border-r border-gray-200 h-full flex items-center justify-start lg:justify-center">
-                                <span class="text-xl font-medium text-gray-900">€ ${price.toFixed(2)}</span>
+                                <span class="text-xl font-medium text-gray-900">${currencySymbol} ${price.toFixed(2)}</span>
                             </div>
                             <div class="md:col-span-3 text-right">
                                 <button type="button"
@@ -988,19 +1012,20 @@
                     container.insertAdjacentHTML('beforeend', html);
                 });
 
-                updateTotalPrice(total);
+                updateTotalPrice(total, lastCurrencySymbol);
             }
 
-            function updateTotalPrice(total) {
+            function updateTotalPrice(total, currencySymbol = '₹') {
                 const priceContainer = document.querySelector('.text-4xl.font-medium.text-gray-900');
                 lastComputedTotal = total;
                 const testToggle = document.getElementById('test-payment-toggle');
                 const showTest = testToggle && testToggle.checked;
+                const currencyCode = document.getElementById('booking-currency')?.value || 'INR';
                 if (priceContainer) {
                     if (showTest) {
-                        priceContainer.innerHTML = `₹ ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ TEST</span>`;
+                        priceContainer.innerHTML = `${currencySymbol} ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ TEST</span>`;
                     } else {
-                        priceContainer.innerHTML = `₹ ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ INR</span>`;
+                        priceContainer.innerHTML = `${currencySymbol} ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ ${currencyCode}</span>`;
                     }
                 }
             }
@@ -1496,6 +1521,13 @@
         // ===== Time Picker Logic =====
         const PRACTITIONER_ID = {{ $activePractitioner->id ?? 'null' }};
         let AVAILABLE_SLOTS = [];
+        const FALLBACK_SLOTS = [
+            '09:00 AM','10:00 AM','11:00 AM','12:00 PM',
+            '02:00 PM','03:00 PM','04:00 PM','05:00 PM'
+        ];
+        const DEFAULT_CURRENCY = "{{ $defaultCurrencyBooking }}";
+        const CURRENCY_SYMBOLS = {INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ'};
+        let lastCurrencySymbol = CURRENCY_SYMBOLS[DEFAULT_CURRENCY] || DEFAULT_CURRENCY;
 
         async function loadSlotsForDate(dateStr) {
             if (!PRACTITIONER_ID || !dateStr) return [];
@@ -1503,12 +1535,13 @@
                 const res = await fetch(`{{ url('/api/available-slots') }}/${PRACTITIONER_ID}/${dateStr}`);
                 const data = await res.json();
                 if (data && Array.isArray(data.slots)) {
-                    return data.slots.map(s => s.time);
+                    const times = data.slots.map(s => s.time).filter(Boolean);
+                    return times.length ? times : FALLBACK_SLOTS;
                 }
             } catch (e) {
                 console.error('Slot fetch error', e);
             }
-            return [];
+            return FALLBACK_SLOTS;
         }
 
         function parseTimeToMinutes(timeStr) {
@@ -1825,6 +1858,21 @@
                 }
             });
         }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('booking_reset') === '1') {
+                sessionStorage.removeItem('booking_reset');
+                document.querySelectorAll('.service-tag-label input[type="checkbox"]').forEach(cb => cb.checked = false);
+                document.querySelectorAll('.duration-value').forEach(el => el.value = '');
+                document.querySelectorAll('.day-value, .time-value').forEach(el => el.value = '');
+                document.querySelectorAll('.duration-label').forEach(el => el.textContent = 'Duration');
+                document.querySelectorAll('.day-label').forEach(el => el.textContent = 'Day');
+                document.querySelectorAll('.time-label').forEach(el => el.textContent = 'Time');
+                const priceContainer = document.querySelector('.text-4xl.font-medium.text-gray-900');
+                if (priceContainer) priceContainer.innerHTML = '₹ 0.00 <span class="text-xl text-gray-400 font-normal">/ INR</span>';
+            }
+        });
     </script>
     <script src="{{ asset('frontend/script.js') }}"></script>
 </body>

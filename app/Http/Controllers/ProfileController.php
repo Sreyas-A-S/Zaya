@@ -307,8 +307,38 @@ class ProfileController extends Controller
             ->groupBy('service_id');
 
         $defaultCurrency = $this->deriveCurrency($user);
+        $profile = $user->practitioner ?? $user->doctor ?? $user->mindfulnessPractitioner ?? $user->yogaTherapist ?? null;
+        $reminderLeadTime = $profile->reminder_lead_time ?? 60;
 
-        return view('client.my-services', compact('user', 'myServices', 'defaultCurrency'));
+        $nextOnlineBooking = Booking::where('practitioner_id', $user->profile_id)
+            ->where('mode', 'online')
+            ->where('status', 'confirmed')
+            ->whereDate('booking_date', '>=', now()->toDateString())
+            ->orderBy('booking_date')
+            ->orderBy('booking_time')
+            ->first();
+
+        return view('client.my-services', compact('user', 'myServices', 'defaultCurrency', 'reminderLeadTime', 'nextOnlineBooking'));
+    }
+
+    public function updateReminderSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'reminder_lead_time' => 'required|integer|min:5|max:1440',
+        ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $profile = $user->practitioner ?? $user->doctor ?? $user->mindfulnessPractitioner ?? $user->yogaTherapist ?? null;
+
+        if (!$profile) {
+            return back()->with('error', 'Reminder settings are not available for your profile.');
+        }
+
+        $profile->reminder_lead_time = $validated['reminder_lead_time'];
+        $profile->save();
+
+        return back()->with('status', 'Reminder lead time updated.');
     }
 
     public function getAvailableServices()
@@ -384,18 +414,21 @@ class ProfileController extends Controller
     private function deriveCurrency($user)
     {
         $country = $user->country ?? $user->practitioner->country ?? $user->doctor->country ?? null;
-        $map = [
-            'IN' => 'INR', 'IND' => 'INR', 'INDIA' => 'INR',
-            'US' => 'USD', 'USA' => 'USD', 'UNITED STATES' => 'USD',
-            'GB' => 'GBP', 'UK' => 'GBP', 'UNITED KINGDOM' => 'GBP',
-            'AE' => 'AED', 'UAE' => 'AED',
-            'EU' => 'EUR', 'FR' => 'EUR', 'DE' => 'EUR', 'ES' => 'EUR', 'IT' => 'EUR',
-        ];
+        $map = config('currencies.country_to_currency', []);
+        $fallback = config('currencies.default', config('app.currency', 'INR'));
+
         if ($country) {
             $code = strtoupper(trim($country));
-            return $map[$code] ?? $map[strtoupper(substr($code,0,2))] ?? config('app.currency', 'INR');
+            if (isset($map[$code])) {
+                return $map[$code];
+            }
+            $alpha2 = strtoupper(substr($code, 0, 2));
+            if (isset($map[$alpha2])) {
+                return $map[$alpha2];
+            }
         }
-        return config('app.currency', 'INR');
+
+        return $fallback;
     }
 
     public function updateProfilePic(Request $request)

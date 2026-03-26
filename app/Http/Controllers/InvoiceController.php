@@ -55,6 +55,7 @@ class InvoiceController extends Controller
                 'booking_date' => now(),
                 'booking_time' => '10:00 AM',
                 'total_price' => 100.00,
+                'currency' => config('app.currency', 'INR'),
                 'status' => 'Paid',
                 'service_ids' => [1, 2],
                 'user' => (object)[

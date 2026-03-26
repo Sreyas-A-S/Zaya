@@ -59,7 +59,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-4 w-full sm:w-auto">
-                <a href="{{ route('book-session', ['service_id' => $service->id]) }}"
+                <a href="{{ route('find-practitioner', ['service' => $service->slug ?? $service->id]) }}"
                     class="flex-1 sm:flex-none bg-secondary text-white px-8 py-4 rounded-full font-bold hover:bg-primary transition-all shadow-xl shadow-secondary/10 flex items-center justify-center gap-2 group">
                     <span class="text-nowrap">Book a Session</span>
                     <i class="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
@@ -126,7 +126,7 @@
     <div class="container mx-auto px-4 md:px-6 max-w-2xl">
         <h2 class="text-xl md:text-4xl font-sans! font-medium text-primary mb-4">Ready to restore your natural rhythm?</h2>
         <p class="text-gray-500 mb-8 text-sm md:text-base lg:text-xl">Join a global community committed to authentic, expert-led wellness.</p>
-        <a href="{{ route('book-session', ['service_id' => $service->id]) }}" class="inline-block bg-secondary text-white px-10 py-4 rounded-full font-normal hover:bg-primary transition-all shadow-lg">Book a Session</a>
+        <a href="{{ route('find-practitioner', ['service' => $service->slug ?? $service->id]) }}" class="inline-block bg-secondary text-white px-10 py-4 rounded-full font-normal hover:bg-primary transition-all shadow-lg">Book a Session</a>
     </div>
 </section>
 

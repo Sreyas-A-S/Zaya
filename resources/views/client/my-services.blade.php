@@ -5,6 +5,10 @@
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
+    .tab-pill { padding: 10px 18px; border-radius: 9999px; font-weight: 800; font-size: 14px; border: 1px solid transparent; transition: all .2s ease; }
+    .tab-pill.active { background: #1e3a2f; color: #fff; border-color: #1e3a2f; box-shadow: 0 12px 30px -18px #1e3a2f; }
+    .tab-pill.inactive { background: #F4F6F5; color: #6B7280; border-color: #e5e7eb; }
+
     /* Select2 Custom Styling */
     .select2-container--default .select2-selection--single {
         height: 52px;
@@ -128,6 +132,12 @@
         </script>
     @endif
 
+    <div class="flex gap-3 mt-2 mb-2">
+        <button id="tab-services-btn" class="tab-pill active" onclick="switchMyServicesTab('services')">Services</button>
+        <button id="tab-video-btn" class="tab-pill inactive" onclick="switchMyServicesTab('video')">Video Link & Reminder</button>
+    </div>
+
+    <div id="services-tab">
     <!-- Services Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         @forelse($myServices as $serviceId => $rates)
@@ -207,6 +217,59 @@
                 </button>
             </div>
         @endforelse
+    </div>
+    </div>
+
+    <div id="video-tab" class="hidden space-y-6">
+        <div class="bg-white rounded-[28px] border border-[#2E4B3D]/12 shadow-sm p-6">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <p class="text-[11px] font-black text-secondary/50 uppercase tracking-[0.2em] mb-1">Next Online Session</p>
+                    @php
+                        $agoraLink = $nextOnlineBooking ? route('conference.join', ['channel' => $nextOnlineBooking->invoice_no]) : null;
+                    @endphp
+                    @if($nextOnlineBooking)
+                        <h3 class="text-xl font-black text-secondary mb-1">{{ $nextOnlineBooking->booking_date?->format('M d, Y') }} &middot; {{ $nextOnlineBooking->booking_time }}</h3>
+                        <p class="text-sm text-gray-500 mb-3">Client: {{ $nextOnlineBooking->user->name ?? 'Client' }} · Invoice: {{ $nextOnlineBooking->invoice_no }}</p>
+                        <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+                            <span class="px-4 py-2 rounded-full bg-[#F3F6F4] text-secondary text-sm font-semibold break-all">{{ $agoraLink }}</span>
+                            <button type="button" onclick="copyAgoraLink('{{ $agoraLink }}')" class="px-4 py-2 bg-secondary text-white rounded-full text-sm font-bold hover:bg-opacity-95 shadow-md flex items-center gap-2">
+                                <i class="ri-file-copy-line"></i> Copy Link
+                            </button>
+                        </div>
+                    @else
+                        <h3 class="text-xl font-black text-secondary mb-1">No upcoming online sessions</h3>
+                        <p class="text-sm text-gray-500">Links are generated per confirmed online booking and emailed automatically.</p>
+                    @endif
+                </div>
+                <div class="px-4 py-2 rounded-xl bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-wide">
+                    Auto email uses your lead time
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-[28px] border border-[#2E4B3D]/12 shadow-sm p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-[11px] font-black text-secondary/50 uppercase tracking-[0.2em] mb-1">Reminder Settings</p>
+                    <h3 class="text-xl font-black text-secondary">When to send video link</h3>
+                    <p class="text-sm text-gray-500 mt-1">We email the Agora session link to you and the client this many minutes before an online booking.</p>
+                </div>
+            </div>
+            <form action="{{ route('my-services.reminder') }}" method="POST" class="max-w-xl">
+                @csrf
+                <div class="flex flex-col sm:flex-row gap-4 items-center">
+                    <div class="relative w-full sm:w-60">
+                        <input type="number" name="reminder_lead_time" min="5" max="1440" value="{{ $reminderLeadTime }}" required
+                               class="w-full border border-gray-200 rounded-2xl px-4 py-3 font-bold text-secondary focus:border-secondary focus:ring-4 focus:ring-secondary/10 transition-all outline-none">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold uppercase">Minutes</span>
+                    </div>
+                    <button type="submit" class="px-6 py-3 bg-secondary text-white rounded-2xl font-bold hover:bg-opacity-95 shadow-md">
+                        Save Lead Time
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 @endif
@@ -709,6 +772,43 @@ async function fetchAvailableServices() {
         const deleteModal = document.getElementById('deleteConfirmModal');
         if (event.target == addModal) closeAddServiceModal();
         if (event.target == deleteModal) closeDeleteModal();
+    }
+
+    function switchMyServicesTab(tab) {
+        const servicesTab = document.getElementById('services-tab');
+        const videoTab = document.getElementById('video-tab');
+        const btnServices = document.getElementById('tab-services-btn');
+        const btnVideo = document.getElementById('tab-video-btn');
+
+        if (tab === 'services') {
+            servicesTab.classList.remove('hidden');
+            videoTab.classList.add('hidden');
+            btnServices.classList.add('active');
+            btnServices.classList.remove('inactive');
+            btnVideo.classList.add('inactive');
+            btnVideo.classList.remove('active');
+        } else {
+            servicesTab.classList.add('hidden');
+            videoTab.classList.remove('hidden');
+            btnVideo.classList.add('active');
+            btnVideo.classList.remove('inactive');
+            btnServices.classList.add('inactive');
+            btnServices.classList.remove('active');
+        }
+    }
+
+    function copyAgoraLink(link) {
+        navigator.clipboard.writeText(link).then(() => {
+            alert('Link copied to clipboard');
+        }).catch(() => {
+            const temp = document.createElement('input');
+            temp.value = link;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            alert('Link copied to clipboard');
+        });
     }
 </script>
 @endpush

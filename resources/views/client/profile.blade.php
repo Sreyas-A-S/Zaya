@@ -63,6 +63,7 @@
     $nationality = $user->nationality ? $user->nationality->name : ($profile->nationality ?? 'Not set');
     $phone = $profile->phone ?? ($user->phone ?? 'Not set');
     $email = $user->email;
+    $patient = $user->patient ?? null;
     
     // Address logic
     if (in_array($user->role, ['doctor', 'yoga_therapist'])) {
@@ -137,13 +138,22 @@
         <!-- Profile Card -->
         <div class="bg-white rounded-xl px-5 pt-12 pb-5 flex flex-col items-center border border-[#2E4B3D]/12">
             <div class="relative mb-6">
-                <img id="user-profile-img" src="{{ $user->profile_pic ? (str_starts_with($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}"
-                    alt="{{ $user->name }}" class="w-38 h-38 rounded-full object-cover">
+                @php
+                    $avatar = $user->profile_pic
+                        ? (str_starts_with($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic))
+                        : asset('frontend/assets/profile-avatar-illustration.png');
+                @endphp
+                <img id="user-profile-img" src="{{ $avatar }}"
+                    alt="{{ $user->name }}" class="w-38 h-38 rounded-full object-cover"
+                    onerror="this.src='{{ asset('frontend/assets/profile-avatar-illustration.png') }}'">
                 <label for="profile_pic_input"
                     class="absolute -bottom-1 right-0 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-secondary cursor-pointer hover:bg-gray-200 transition-colors border-2 border-white shadow-sm">
                     <i class="ri-pencil-line text-lg"></i>
                     <input type="file" id="profile_pic_input" class="hidden" accept="image/*">
                 </label>
+                <button type="button" onclick="openRemovePicModal()" class="absolute -bottom-1 left-0 w-10 h-10 bg-white rounded-full flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors border-2 border-white shadow-sm">
+                    <i class="ri-delete-bin-line text-lg"></i>
+                </button>
             </div>
 
             <h2 class="text-2xl font-bold font-sans! text-secondary mb-1">{{ $user->name }}</h2>
@@ -153,30 +163,31 @@
                 <a href="javascript:void(0)" onclick="openPasswordModal()"
                     class="flex items-center text-gray-400 hover:text-gray-700 transition-colors text-lg">
                     <i class="ri-lock-line mr-3 text-lg"></i>
-                    <span class="font-normal">Change Password</span>
+                    <span class="font-normal">{{ __('Change Password') }}</span>
                 </a>
                 <a href="{{ route('logout') }}"
-                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                    onclick="event.preventDefault(); openLogoutModal();"
                     class="flex items-center text-gray-400 hover:text-gray-700 transition-colors text-lg">
                     <i class="ri-logout-box-line mr-3 text-lg"></i>
-                    <span class="font-normal">Logout</span>
+                    <span class="font-normal">{{ __('Logout') }}</span>
                 </a>
             </div>
 
-            <!-- Healing Sanctuary -->
+            @if(in_array($user->role, ['practitioner','doctor','mindfulness_practitioner','yoga_therapist']))
+            <!-- Practitioner Gallery -->
             <div class="w-full mt-20 relative">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-medium font-sans! text-gray-800">Healing Sanctuary</h3>
-                    <button onclick="openGalleryModal()" class="text-gray-400 hover:text-secondary transition-colors">
-                        <i class="ri-pencil-line text-xl"></i>
-                    </button>
-                </div>
+                    <h3 class="text-xl font-medium font-sans! text-gray-800">{{ __('Practitioner Gallery') }}</h3>
+            <button onclick="openGalleryModal()" class="text-gray-400 hover:text-secondary transition-colors">
+                <i class="ri-pencil-line text-xl"></i>
+            </button>
+        </div>
                 <div class="grid grid-cols-2 gap-3">
                     @forelse($sanctuaryImages->take(3) as $index => $img)
                         @if($index === 2 && $sanctuaryImages->count() > 3)
                             <div class="relative cursor-pointer group" onclick="openGalleryModal()">
                                 <img src="{{ asset('storage/' . $img->image_path) }}"
-                                    alt="Sanctuary {{ $index + 1 }}"
+                                    alt="Gallery {{ $index + 1 }}"
                                     class="h-[110px] w-full object-cover rounded-xl shadow-sm">
                                 <div class="absolute inset-0 bg-secondary/30 backdrop-blur-[2px] rounded-xl flex items-center justify-center border border-white/20 shadow-inner group-hover:bg-secondary/40 transition-all">
                                     <span class="text-white text-xl font-bold tracking-wider">+{{ $sanctuaryImages->count() - 2 }}</span>
@@ -184,17 +195,18 @@
                             </div>
                         @else
                             <img src="{{ asset('storage/' . $img->image_path) }}"
-                                alt="Sanctuary {{ $index + 1 }}"
+                                alt="Gallery {{ $index + 1 }}"
                                 class="{{ $index === 0 ? 'col-span-2 h-[140px]' : 'h-[110px]' }} w-full object-cover rounded-xl shadow-sm">
                         @endif
                     @empty
                         <div class="col-span-2 py-8 bg-gray-50 rounded-xl border border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400">
                             <i class="ri-image-add-line text-3xl mb-2"></i>
-                            <p class="text-sm">No sanctuary images</p>
+                            <p class="text-sm">{{ __('No gallery images') }}</p>
                         </div>
                     @endforelse
                 </div>
             </div>
+            @endif
         </div>
 
 
@@ -206,7 +218,7 @@
 
         <!-- Personal Details Card -->
         <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12 relative">
-            <button class="absolute top-8 right-8 text-gray-400 hover:text-secondary transition-colors">
+            <button type="button" onclick="openPersonalEditModal()" class="absolute top-8 right-8 text-gray-400 hover:text-secondary transition-colors">
                 <i class="ri-pencil-line text-2xl"></i>
             </button>
 
@@ -687,6 +699,63 @@
     </div>
 </div>
 
+<!-- Personal Details Edit Modal -->
+<div id="personal-edit-modal" class="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[32px] w-full max-w-[520px] overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-200" id="personalEditContent">
+        <div class="p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-secondary">{{ __('Edit Personal Details') }}</h3>
+                <button type="button" onclick="closePersonalEditModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400">
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
+            </div>
+            <form method="POST" action="{{ route('profile.updateProfessional') }}">
+                @csrf
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                    <div>
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Phone') }}</label>
+                        <input type="text" name="phone" value="{{ old('phone', $phone !== 'Not set' ? $phone : '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Email') }}</label>
+                        <input type="email" value="{{ $email }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-100 text-gray-500 cursor-not-allowed" readonly>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Nationality') }}</label>
+                        <input type="text" name="nationality" value="{{ old('nationality', $nationality !== 'Not set' ? $nationality : '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('City, State') }}</label>
+                        <input type="text" name="city_state" value="{{ old('city_state', $patient?->city_state ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closePersonalEditModal()" class="px-5 py-3 rounded-xl border border-gray-200 text-gray-600">{{ __('Cancel') }}</button>
+                    <button type="submit" class="px-6 py-3 rounded-xl bg-secondary text-white hover:bg-opacity-90">{{ __('Save') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Remove Profile Pic Modal -->
+<div id="removePicModal" class="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[32px] w-full max-w-[340px] overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-200" id="removePicModalContent">
+        <div class="p-8 text-center">
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-red-100">
+                <i class="ri-delete-bin-7-line text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-secondary mb-2">{{ __('Remove profile picture?') }}</h3>
+            <p class="text-gray-500 mb-6 leading-relaxed text-sm">{{ __('This will revert your avatar to the default illustration.') }}</p>
+            
+            <div class="flex flex-col gap-3">
+                <button type="button" onclick="confirmRemovePic()" class="w-full py-3 bg-red-500 text-white font-semibold rounded-2xl hover:bg-red-600 transition-all text-base shadow-md shadow-red-100">{{ __('Yes, remove it') }}</button>
+                <button type="button" onclick="closeRemovePicModal()" class="w-full py-3 bg-gray-50 text-gray-600 font-semibold rounded-2xl hover:bg-gray-100 transition-all text-base">{{ __('Cancel') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -1062,6 +1131,78 @@
 
     let imageIdToDelete = null;
 
+    function openRemovePicModal() {
+        const modal = document.getElementById('removePicModal');
+        const content = document.getElementById('removePicModalContent');
+        if (!modal || !content) return;
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeRemovePicModal() {
+        const modal = document.getElementById('removePicModal');
+        const content = document.getElementById('removePicModalContent');
+        if (!modal || !content) return;
+        content.classList.add('scale-95', 'opacity-0');
+        content.classList.remove('scale-100', 'opacity-100');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }, 200);
+    }
+
+    function confirmRemovePic() {
+        fetch('{{ route("profile.updatePic") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ remove: true })
+        })
+        .then(response => response.json())
+        .then(res => {
+            if (res.success) {
+                showToast(res.message || '{{ __("Profile picture removed.") }}');
+                document.getElementById('user-profile-img').src = '{{ asset('frontend/assets/profile-avatar-illustration.png') }}';
+            } else {
+                showToast(res.message || 'Remove failed', 'error');
+            }
+        })
+        .catch(() => showToast('Network error occurred.', 'error'))
+        .finally(() => closeRemovePicModal());
+    }
+
+    function openPersonalEditModal() {
+        const modal = document.getElementById('personal-edit-modal');
+        const content = document.getElementById('personalEditContent');
+        if (!modal || !content) return;
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closePersonalEditModal() {
+        const modal = document.getElementById('personal-edit-modal');
+        const content = document.getElementById('personalEditContent');
+        if (!modal || !content) return;
+        content.classList.add('scale-95', 'opacity-0');
+        content.classList.remove('scale-100', 'opacity-100');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }, 200);
+    }
+
     function openDeleteModal(id) {
         imageIdToDelete = id;
         document.getElementById('deleteConfirmModal').classList.remove('hidden');
@@ -1077,6 +1218,14 @@
             document.body.style.overflow = 'auto';
         }
     }
+
+    // Close remove-pic modal when clicking backdrop
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('removePicModal');
+        if (modal && !modal.classList.contains('hidden') && e.target === modal) {
+            closeRemovePicModal();
+        }
+    });
 
     document.getElementById('confirm-delete-btn').addEventListener('click', function() {
         if (!imageIdToDelete) return;
@@ -1360,4 +1509,22 @@
     }
 </script>
 @endpush
+
+<!-- Remove Profile Pic Modal -->
+<div id="removePicModal" class="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[32px] w-full max-w-[340px] overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-200" id="removePicModalContent">
+        <div class="p-8 text-center">
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-red-100">
+                <i class="ri-delete-bin-7-line text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-secondary mb-2">{{ __('Remove profile picture?') }}</h3>
+            <p class="text-gray-500 mb-6 leading-relaxed text-sm">{{ __('This will revert your avatar to the default illustration.') }}</p>
+            
+            <div class="flex flex-col gap-3">
+                <button type="button" onclick="confirmRemovePic()" class="w-full py-3 bg-red-500 text-white font-semibold rounded-2xl hover:bg-red-600 transition-all text-base shadow-md shadow-red-100">{{ __('Yes, remove it') }}</button>
+                <button type="button" onclick="closeRemovePicModal()" class="w-full py-3 bg-gray-50 text-gray-600 font-semibold rounded-2xl hover:bg-gray-100 transition-all text-base">{{ __('Cancel') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

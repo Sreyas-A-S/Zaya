@@ -31,6 +31,15 @@ use Illuminate\Support\Facades\Mail;
 class WebController extends Controller
 {
     protected $blogService;
+    private function deriveCurrencyFromCountry(?string $country): string
+    {
+        $map = config('currencies.country_to_currency', []);
+        if ($country) {
+            $code = strtoupper(trim($country));
+            return $map[$code] ?? $map[substr($code, 0, 2)] ?? config('currencies.default', 'INR');
+        }
+        return config('currencies.default', 'INR');
+    }
 
     public function __construct(WordPressBlogService $blogService)
     {
@@ -130,12 +139,16 @@ class WebController extends Controller
         $query = Practitioner::with(['user', 'reviews'])
             ->where('status', 'active');
 
+        $selectedService = null;
         if ($pincode !== '') {
             $query->where('zip_code', 'LIKE', "%{$pincode}%");
         }
 
         if ($request->filled('service')) {
             $service = $request->service;
+            $selectedService = is_numeric($service)
+                ? Service::find($service)
+                : Service::where('slug', $service)->first();
             $query->whereHas('userServices', function ($q) use ($service) {
                 if (is_numeric($service)) {
                     $q->where('service_id', $service);
@@ -162,7 +175,7 @@ class WebController extends Controller
             return view('partials.frontend.practitioner-grid', compact('practitioners', 'pincode'))->render();
         }
 
-        return view('find-practitioner', compact('settings', 'practitioners', 'pincode', 'services'));
+        return view('find-practitioner', compact('settings', 'practitioners', 'pincode', 'services', 'selectedService'));
     }
 
     public function findPractitionerPost(Request $request)
@@ -310,7 +323,9 @@ class WebController extends Controller
         $clientRegistrationFee = is_numeric($clientRegistrationFee) ? (float) $clientRegistrationFee : 0.0;
         $clientRegistrationFeeEnabled = filter_var($financeSettings['client_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
 
-        return view('client-register', compact('redirect', 'consultationPreferences', 'languages', 'clientRegistrationFee', 'clientRegistrationFeeEnabled'));
+        $defaultCurrency = $this->deriveCurrencyFromCountry($request->get('country', ''));
+
+        return view('client-register', compact('redirect', 'consultationPreferences', 'languages', 'clientRegistrationFee', 'clientRegistrationFeeEnabled', 'defaultCurrency'));
     }
 
     public function practitionerRegister()

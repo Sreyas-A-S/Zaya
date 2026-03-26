@@ -14,6 +14,13 @@ class PractitionerAvailabilityService
     public function getAvailableSlots($practitionerId, $date)
     {
         $dateObj = Carbon::parse($date);
+        $practitioner = \App\Models\Practitioner::find($practitionerId);
+        if ($practitioner && $practitioner->booking_window_days) {
+            $maxDate = Carbon::today()->addDays((int) $practitioner->booking_window_days);
+            if ($dateObj->gt($maxDate)) {
+                return [];
+            }
+        }
         $dayOfWeek = $dateObj->dayOfWeek;
 
         // 1. Fetch criteria for this day
@@ -60,7 +67,7 @@ class PractitionerAvailabilityService
                     'time' => $current->format('h:i A'),
                     'start_raw' => $current->format('H:i:s'),
                     'duration' => $duration,
-                    'notice' => $block->min_notice_hours ?? 24
+                    'notice' => $block->min_notice_hours ?? 0
                 ];
                 $current->addMinutes($duration);
             }
@@ -99,7 +106,7 @@ class PractitionerAvailabilityService
             $now = Carbon::now();
             $availableSlots = array_filter($availableSlots, function($slot) use ($now) {
                 $slotTime = Carbon::parse($slot['start_raw']);
-                $noticeHours = $slot['notice'];
+                $noticeHours = $slot['notice'] ?? 0;
                 return $now->copy()->addHours($noticeHours)->lte($slotTime);
             });
         }

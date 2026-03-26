@@ -38,6 +38,7 @@ class BookingController extends Controller
             'booking_date' => 'required|date|after_or_equal:today',
             'booking_time' => 'required|string',
             'total_price' => 'required|numeric',
+            'currency' => 'nullable|string|size:3',
             'from_language' => 'nullable|string',
             'to_language' => 'nullable|string',
             'situation' => 'nullable|string',
@@ -59,6 +60,7 @@ class BookingController extends Controller
         $booking->booking_date = $request->booking_date;
         $booking->booking_time = $request->booking_time;
         $booking->total_price = $request->total_price;
+        $booking->currency = strtoupper($request->input('currency', config('app.currency', 'INR')));
         $booking->status = 'pending';
         
         // Generate unique invoice number: ZAYA-YYYYMMDD-XXXXX
@@ -75,6 +77,7 @@ class BookingController extends Controller
         // --- Razorpay Payment Link Creation ---
         $razorpayKey = config('services.razorpay.key');
         $razorpaySecret = config('services.razorpay.secret');
+        $currency = $booking->currency ?? config('app.currency', 'INR');
         
         $paymentUrl = null;
         $orderId = 'mock_plink_' . uniqid();
@@ -91,7 +94,7 @@ class BookingController extends Controller
                     ->withBasicAuth($razorpayKey, $razorpaySecret)
                     ->post('https://api.razorpay.com/v1/payment_links', [
                         'amount' => (int)round($request->total_price * 100),
-                        'currency' => 'INR',
+                        'currency' => $currency,
                         'description' => 'Session Booking with ' . ($booking->practitioner->user->name ?? 'Practitioner'),
                         'customer' => [
                             'name' => Auth::user()->name,
@@ -124,6 +127,7 @@ class BookingController extends Controller
             // If Razorpay is not configured (common in local/dev), still allow the booking flow
             // to continue by redirecting the user to their invoice page.
             if (!$paymentConfigured) {
+                session()->forget(['selected_practitioner', 'practitioner_id', 'active_practitioner']);
                 return response()->json([
                     'success' => true,
                     'message' => 'Booking created! Payment gateway is not configured; showing invoice instead.',
@@ -164,6 +168,9 @@ class BookingController extends Controller
             $booking->razorpay_payment_id = $paymentId;
             $booking->payment_details = $request->all();
             $booking->save();
+
+            // Clear practitioner selection kept in session
+            session()->forget(['selected_practitioner', 'practitioner_id', 'active_practitioner']);
 
             // Send Emails
             try {
