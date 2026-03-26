@@ -82,6 +82,7 @@ Route::get('/blog/{slug}', [WebController::class, 'blogDetail'])->name('blog-det
 Route::get('/book-session/{practitioner?}', [WebController::class, 'bookSession'])->name('book-session');
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
 Route::get('/bookings/payment/callback', [BookingController::class, 'paymentCallback'])->name('bookings.payment.callback');
+Route::get('/registration-fees/callback', [\App\Http\Controllers\Admin\RegistrationFeeController::class, 'callback'])->name('registration-fees.callback');
 Route::get('/fetch-translators', [BookingController::class, 'fetchTranslators'])->name('fetch-translators');
 Route::get('/api/available-slots/{practitioner}/{date}', [\App\Http\Controllers\AvailabilityController::class, 'getGeneratedSlots'])->name('api.available-slots');
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');

@@ -3,35 +3,44 @@
 @section('title', 'My Services')
 
 @push('styles')
-<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
-    /* Tom Select Custom Styling */
-    .ts-control {
-        border-radius: 0.75rem !important;
-        padding: 0.75rem 1rem !important;
-        border: 1px solid #e5e7eb !important;
-        background-color: #fff !important;
-        font-size: 1rem !important;
-        line-height: 1.5rem !important;
-        transition: all 0.2s !important;
+    /* Select2 Custom Styling */
+    .select2-container--default .select2-selection--single {
+        height: 52px;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
     }
-    .ts-wrapper.focus .ts-control {
-        border-color: #2E4B3D !important;
-        box-shadow: 0 0 0 2px rgba(46, 75, 61, 0.1) !important;
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 52px;
+        right: 12px;
     }
-    .ts-dropdown {
-        border-radius: 0.75rem !important;
-        margin-top: 0.5rem !important;
-        border: 1px solid #f3f4f6 !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-        overflow: hidden !important;
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        padding-left: 4px;
+        color: #111827;
+        font-weight: 700;
     }
-    .ts-dropdown .active {
-        background-color: #F8FAF9 !important;
-        color: #2E4B3D !important;
+    .select2-container--default .select2-selection--single:focus,
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        outline: none;
+        border-color: #2E4B3D;
+        box-shadow: 0 0 0 2px rgba(46, 75, 61, 0.15);
     }
-    .ts-dropdown .option {
-        padding: 0.75rem 1rem !important;
+    .select2-dropdown {
+        border-radius: 0.75rem;
+        border: 1px solid #f3f4f6;
+        box-shadow: 0 10px 20px -8px rgba(0,0,0,0.15);
+        overflow: hidden;
+    }
+    .select2-results__option {
+        padding: 10px 14px;
+    }
+    .select2-results__option--highlighted {
+        background: #F8FAF9;
+        color: #2E4B3D;
     }
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
@@ -45,7 +54,7 @@
 
 @section('content')
 @php
-    $practitionerRoles = ['practitioner', 'doctor', 'mindfulness_practitioner', 'mindfulness-practitioner', 'yoga_therapist', 'yoga-therapist'];
+    $practitionerRoles = ['practitioner', 'doctor', 'mindfulness_practitioner', 'mindfulness-practitioner', 'yoga_therapist', 'yoga-therapist', 'translator'];
     $isPractitioner = in_array(auth()->user()->role, $practitionerRoles);
 @endphp
 
@@ -66,14 +75,14 @@
 @else
 <div class="flex flex-col gap-8">
     <!-- Header Section -->
-    <div class="flex justify-between items-center bg-white rounded-2xl px-8 py-10 border border-[#2E4B3D]/12 shadow-sm">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white rounded-2xl px-6 py-8 sm:px-8 sm:py-10 border border-[#2E4B3D]/12 shadow-sm gap-6">
         <div>
-            <h2 class="text-3xl font-black text-secondary mb-2 tracking-tight">My Services</h2>
-            <p class="text-gray-500 font-medium">Manage your professional offerings and tiered pricing.</p>
+            <h2 class="text-2xl sm:text-3xl font-black text-secondary mb-1 sm:mb-2 tracking-tight">My Services</h2>
+            <p class="text-gray-500 text-sm sm:text-base font-medium">Manage your professional offerings and tiered pricing.</p>
         </div>
-        <button onclick="openAddServiceModal()" class="bg-secondary text-white px-8 py-4 rounded-2xl font-bold hover:bg-opacity-95 transform hover:-translate-y-0.5 transition-all flex items-center gap-3 shadow-xl shadow-secondary/25">
-            <i class="ri-add-fill text-2xl"></i>
-            <span class="text-lg">Add New Service</span>
+        <button onclick="openAddServiceModal()" class="w-full sm:w-auto bg-secondary text-white px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold hover:bg-opacity-95 transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 shadow-xl shadow-secondary/25">
+            <i class="ri-add-fill text-xl sm:text-2xl"></i>
+            <span class="text-base sm:text-lg">Add New Service</span>
         </button>
     </div>
 
@@ -165,73 +174,67 @@
 @endif
 
 <!-- Add Service Modal -->
-<div id="addServiceModal" class="fixed inset-0 bg-[#1A1A1A]/60 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-[40px] w-full max-w-3xl overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-300" id="addModalContent">
-        <div class="px-10 py-8 border-b border-gray-100 flex justify-between items-center bg-[#F8FAF9]">
-        <div>
-        <h3 class="text-2xl font-black text-secondary tracking-tight">Configure Services ({{ $availableServices->count() }} available)</h3>
-        <p class="text-gray-500 text-sm font-medium">Add multiple services and pricing tiers</p>
-        </div>            <button onclick="closeAddServiceModal()" class="w-12 h-12 bg-white rounded-2xl text-gray-400 hover:text-secondary hover:shadow-md transition-all flex items-center justify-center border border-gray-100">
-                <i class="ri-close-line text-3xl"></i>
+<div id="addServiceModal" class="fixed inset-0 bg-[#1A1A1A]/60 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white rounded-3xl sm:rounded-[40px] w-full max-w-3xl overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-300" id="addModalContent">
+        <div class="px-6 py-6 sm:px-10 sm:py-8 border-b border-gray-100 flex justify-between items-center bg-[#F8FAF9]">
+            <div>
+                <h3 class="text-xl sm:text-2xl font-black text-secondary tracking-tight" id="modal-title">Configure Services</h3>
+                <p class="text-gray-500 text-xs sm:text-sm font-medium">Add multiple services and pricing tiers</p>
+            </div>
+            <button onclick="closeAddServiceModal()" class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-xl sm:rounded-2xl text-gray-400 hover:text-secondary hover:shadow-md transition-all flex items-center justify-center border border-gray-100">
+                <i class="ri-close-line text-2xl sm:text-3xl"></i>
             </button>
         </div>
         
-        <form action="{{ route('my-services.store') }}" method="POST" class="px-10 py-10">
+        <form action="{{ route('my-services.store') }}" method="POST" class="px-6 py-6 sm:px-10 sm:py-10">
             @csrf
-            <div id="services-container" class="space-y-10 max-h-[55vh] overflow-y-auto pr-4 scrollbar-hide">
+            <div id="services-container" class="space-y-6 sm:space-y-10 max-h-[65vh] overflow-y-auto pr-2 sm:pr-4 scrollbar-hide">
                 <!-- Initial Row -->
-                <div class="service-row bg-[#F0F4F2] p-8 rounded-[32px] border border-[#2E4B3D]/10 relative group shadow-sm">
-                    <div class="space-y-8">
+                <div class="service-row bg-[#F0F4F2] p-5 sm:p-8 rounded-2xl sm:rounded-[32px] border border-[#2E4B3D]/10 relative group shadow-sm">
+                    <div class="space-y-6 sm:space-y-8">
                         <div>
-                            <label class="flex items-center gap-2 text-sm font-black text-secondary mb-3 uppercase tracking-wider">
+                            <label class="flex items-center gap-2 text-xs sm:text-sm font-black text-secondary mb-2 sm:mb-3 uppercase tracking-wider">
                                 <i class="ri-apps-2-fill text-secondary"></i>
                                 Select Service
                             </label>
-                            <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
+                            <div class="bg-white rounded-xl sm:rounded-2xl border border-gray-200">
                                 <select id="service-select-0" name="services[0][service_id]" required class="service-selector w-full">
-                                    @if($availableServices->isEmpty())
-                                        <option value="" disabled selected>No more services available</option>
-                                    @else
-                                        <option value="" disabled selected>Choose a service...</option>
-                                        @foreach($availableServices as $service)
-                                            <option value="{{ $service->id }}">{{ $service->title }}</option>
-                                        @endforeach
-                                    @endif
+                                    <option value="" disabled selected>Loading services...</option>
                                 </select>
                             </div>
                         </div>
                         
                         <!-- Rates Container -->
-                        <div class="space-y-5">
-                            <label class="flex items-center gap-2 text-[11px] font-black text-secondary/50 uppercase tracking-[0.2em]">
+                        <div class="space-y-4 sm:space-y-5">
+                            <label class="flex items-center gap-2 text-[10px] sm:text-[11px] font-black text-secondary/50 uppercase tracking-[0.2em]">
                                 <i class="ri-price-tag-3-fill"></i>
                                 Pricing Tiers
                             </label>
-                            <div class="rates-container space-y-4">
-                                <div class="rate-row grid grid-cols-1 sm:grid-cols-2 gap-6 items-end bg-white p-6 rounded-2xl border border-[#2E4B3D]/5 shadow-sm">
+                            <div class="rates-container space-y-3 sm:space-y-4">
+                                <div class="rate-row grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 shadow-sm">
                                     <div>
-                                        <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Duration</label>
+                                        <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Duration</label>
                                         <div class="relative">
-                                            <i class="ri-time-fill absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 text-lg"></i>
-                                            <input type="number" name="services[0][rates][0][duration]" required placeholder="60" class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary">
-                                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold uppercase">Min</span>
+                                            <i class="ri-time-fill absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 text-base sm:text-lg"></i>
+                                            <input type="number" name="services[0][rates][0][duration]" required placeholder="60" class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-sm sm:text-base">
+                                            <span class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] sm:text-xs font-bold uppercase">Min</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Rate</label>
-                                        <div class="flex gap-3">
+                                        <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
+                                        <div class="flex gap-2 sm:gap-3">
                                             <div class="relative flex-1">
-                                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-lg">₹</span>
-                                                <input type="number" name="services[0][rates][0][rate]" step="0.01" required placeholder="0.00" class="w-full pl-10 pr-4 py-3.5 rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-lg">
+                                                <span class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">₹</span>
+                                                <input type="number" name="services[0][rates][0][rate]" step="0.01" required placeholder="0.00" class="w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
                                             </div>
-                                            <button type="button" class="w-14 h-[54px] rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
-                                                <i class="ri-delete-bin-fill text-xl"></i>
+                                            <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
+                                                <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <button type="button" onclick="addRateRow(0, this)" class="bg-white border-2 border-dashed border-secondary/20 text-secondary px-6 py-3 rounded-xl font-black text-sm flex items-center gap-2 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 shadow-sm">
+                            <button type="button" onclick="addRateRow(0, this)" class="w-full sm:w-auto bg-white border-2 border-dashed border-secondary/20 text-secondary px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 shadow-sm">
                                 <i class="ri-add-line text-lg"></i>
                                 Add Another Duration
                             </button>
@@ -241,12 +244,12 @@
             </div>
 
             <!-- Footer Actions -->
-            <div class="mt-10 flex flex-col sm:flex-row gap-4 pt-8 border-t border-gray-100">
-                <button type="button" onclick="addServiceRow()" class="flex-[0.4] px-6 py-4 bg-white border-2 border-secondary text-secondary font-black rounded-2xl hover:bg-secondary hover:text-white transition-all flex items-center justify-center gap-3 shadow-lg shadow-secondary/5">
+            <div class="mt-6 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4 pt-6 sm:pt-8 border-t border-gray-100">
+                <button type="button" onclick="addServiceRow()" class="px-6 py-3.5 sm:py-4 bg-white border-2 border-secondary text-secondary font-black rounded-xl sm:rounded-2xl hover:bg-secondary hover:text-white transition-all flex items-center justify-center gap-2 sm:gap-3 shadow-lg shadow-secondary/5 text-sm sm:text-base">
                     <i class="ri-add-circle-fill text-xl"></i>
                     Another Service
                 </button>
-                <button type="submit" class="flex-1 px-8 py-4 bg-secondary text-white font-black rounded-2xl hover:bg-opacity-95 transform hover:-translate-y-0.5 transition-all shadow-2xl shadow-secondary/30 text-lg tracking-tight">
+                <button type="submit" class="px-8 py-3.5 sm:py-4 bg-secondary text-white font-black rounded-xl sm:rounded-2xl hover:bg-opacity-95 transform hover:-translate-y-0.5 transition-all shadow-2xl shadow-secondary/30 text-base sm:text-lg tracking-tight">
                     Save All Services
                 </button>
             </div>
@@ -278,94 +281,117 @@
 </div>
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     let serviceRowIndex = 1;
-    let tomSelectInstances = {};
+    let select2Instances = {};
+    let cachedAvailableServices = null;
+    let isFetchingServices = false;
+    let fetchPromise = null;
 
-    function initTomSelect(elementId) {
+    async function fetchAvailableServices() {
+        if (cachedAvailableServices) return cachedAvailableServices;
+        if (isFetchingServices) return fetchPromise;
+        
+        isFetchingServices = true;
+        fetchPromise = (async () => {
+            try {
+                const response = await fetch("{{ route('api.available-services') }}");
+                const res = await response.json();
+                if (res.status) {
+                    cachedAvailableServices = res.data;
+                    const modalTitle = document.getElementById('modal-title');
+                    if (modalTitle) {
+                        modalTitle.innerText = `Configure Services (${cachedAvailableServices.length} available)`;
+                    }
+                    return cachedAvailableServices;
+                }
+            } catch (error) {
+                console.error('Error fetching services:', error);
+            } finally {
+                isFetchingServices = false;
+            }
+            return [];
+        })();
+        
+        return fetchPromise;
+    }
+
+    async function initSelect2(elementId) {
         const el = document.getElementById(elementId);
         if (!el) return;
-        
-        if (tomSelectInstances[elementId]) {
-            tomSelectInstances[elementId].destroy();
+
+        const services = await fetchAvailableServices();
+
+        // destroy existing instance if any
+        if (select2Instances[elementId]) {
+            $(el).select2('destroy');
         }
-        
-        tomSelectInstances[elementId] = new TomSelect(el, {
-            create: false,
-            sortField: { field: "text", direction: "asc" },
+
+        const data = services.map(s => ({ id: s.id, text: s.title }));
+
+        select2Instances[elementId] = $(el).select2({
+            data,
             placeholder: 'Choose a service...',
-            allowEmptyOption: true,
-            maxOptions: 100,
+            width: '100%',
+            dropdownParent: $('#addServiceModal'),
         });
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const firstSelect = document.querySelector('.service-selector');
-        if (firstSelect) {
-            const id = `service-select-0`;
-            firstSelect.id = id;
-            initTomSelect(id);
-        }
-    });
-
-    function addServiceRow() {
+    async function addServiceRow() {
         const container = document.getElementById('services-container');
         const id = `service-select-${serviceRowIndex}`;
         const currentIdx = serviceRowIndex;
         
         const row = document.createElement('div');
-        row.className = 'service-row bg-[#F0F4F2] p-8 rounded-[32px] border border-[#2E4B3D]/10 relative group animate-in fade-in slide-in-from-top-6 duration-500 shadow-sm mb-10';
+        row.className = 'service-row bg-[#F0F4F2] p-5 sm:p-8 rounded-2xl sm:rounded-[32px] border border-[#2E4B3D]/10 relative group animate-in fade-in slide-in-from-top-6 duration-500 shadow-sm mb-6 sm:mb-10';
         row.innerHTML = `
-            <button type="button" onclick="confirmRemoveServiceRow(this)" class="absolute -top-4 -right-4 w-12 h-12 bg-white text-red-500 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all duration-300 shadow-xl border border-gray-100 group-hover:scale-110">
-                <i class="ri-delete-bin-fill text-xl"></i>
+            <button type="button" onclick="confirmRemoveServiceRow(this)" class="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-10 h-10 sm:w-12 sm:h-12 bg-white text-red-500 rounded-xl sm:rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all duration-300 shadow-xl border border-gray-100 group-hover:scale-110">
+                <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
             </button>
-            <div class="space-y-8">
+            <div class="space-y-6 sm:space-y-8">
                 <div>
-                    <label class="flex items-center gap-2 text-sm font-black text-secondary mb-3 uppercase tracking-wider">
+                    <label class="flex items-center gap-2 text-xs sm:text-sm font-black text-secondary mb-2 sm:mb-3 uppercase tracking-wider">
                         <i class="ri-apps-2-fill text-secondary"></i>
                         Select Service
                     </label>
-                    <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
+                    <div class="bg-white rounded-xl sm:rounded-2xl border border-gray-200">
                         <select id="${id}" name="services[${currentIdx}][service_id]" required class="service-selector w-full">
-                            <option value="" disabled selected>Choose a service...</option>
-                            @foreach($availableServices as $service)
-                                <option value="{{ $service->id }}">{{ $service->title }}</option>
-                            @endforeach
+                            <option value="" disabled selected>Loading services...</option>
                         </select>
                     </div>
                 </div>
                 
-                <div class="space-y-5">
-                    <label class="flex items-center gap-2 text-[11px] font-black text-secondary/50 uppercase tracking-[0.2em]">
+                <div class="space-y-4 sm:space-y-5">
+                    <label class="flex items-center gap-2 text-[10px] sm:text-[11px] font-black text-secondary/50 uppercase tracking-[0.2em]">
                         <i class="ri-price-tag-3-fill"></i>
                         Pricing Tiers
                     </label>
-                    <div class="rates-container space-y-4">
-                        <div class="rate-row grid grid-cols-1 sm:grid-cols-2 gap-6 items-end bg-white p-6 rounded-2xl border border-[#2E4B3D]/5 shadow-sm">
+                    <div class="rates-container space-y-3 sm:space-y-4">
+                        <div class="rate-row grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 shadow-sm">
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Duration</label>
+                                <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Duration</label>
                                 <div class="relative">
-                                    <i class="ri-time-fill absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 text-lg"></i>
-                                    <input type="number" name="services[${currentIdx}][rates][0][duration]" required placeholder="60" class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary">
-                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold uppercase">Min</span>
+                                    <i class="ri-time-fill absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 text-base sm:text-lg"></i>
+                                    <input type="number" name="services[${currentIdx}][rates][0][duration]" required placeholder="60" class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-sm sm:text-base">
+                                    <span class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] sm:text-xs font-bold uppercase">Min</span>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Rate</label>
-                                <div class="flex gap-3">
+                                <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
+                                <div class="flex gap-2 sm:gap-3">
                                     <div class="relative flex-1">
-                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-lg">₹</span>
-                                        <input type="number" name="services[${currentIdx}][rates][0][rate]" step="0.01" required placeholder="0.00" class="w-full pl-10 pr-4 py-3.5 rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-lg">
+                                        <span class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">₹</span>
+                                        <input type="number" name="services[${currentIdx}][rates][0][rate]" step="0.01" required placeholder="0.00" class="w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
                                     </div>
-                                    <button type="button" class="w-14 h-[54px] rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
-                                        <i class="ri-delete-bin-fill text-xl"></i>
+                                    <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
+                                        <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button type="button" onclick="addRateRow(${currentIdx}, this)" class="bg-white border-2 border-dashed border-secondary/20 text-secondary px-6 py-3 rounded-xl font-black text-sm flex items-center gap-2 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 shadow-sm">
+                    <button type="button" onclick="addRateRow(${currentIdx}, this)" class="w-full sm:w-auto bg-white border-2 border-dashed border-secondary/20 text-secondary px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 shadow-sm">
                         <i class="ri-add-line text-lg"></i>
                         Add Another Duration
                     </button>
@@ -374,7 +400,7 @@
         `;
         
         container.appendChild(row);
-        initTomSelect(id);
+        initSelect2(id);
         serviceRowIndex++;
         container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
     }
@@ -384,25 +410,25 @@
         const rateIdx = container.querySelectorAll('.rate-row').length;
         
         const row = document.createElement('div');
-        row.className = 'rate-row grid grid-cols-1 sm:grid-cols-2 gap-6 items-end bg-white p-6 rounded-2xl border border-[#2E4B3D]/5 animate-in fade-in slide-in-from-top-4 duration-300 shadow-sm';
+        row.className = 'rate-row grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 animate-in fade-in slide-in-from-top-4 duration-300 shadow-sm';
         row.innerHTML = `
             <div>
-                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Duration</label>
+                <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Duration</label>
                 <div class="relative">
-                    <i class="ri-time-fill absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 text-lg"></i>
-                    <input type="number" name="services[${serviceIdx}][rates][${rateIdx}][duration]" required placeholder="60" class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary">
-                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold uppercase">Min</span>
+                    <i class="ri-time-fill absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 text-base sm:text-lg"></i>
+                    <input type="number" name="services[${serviceIdx}][rates][${rateIdx}][duration]" required placeholder="60" class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-sm sm:text-base">
+                    <span class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] sm:text-xs font-bold uppercase">Min</span>
                 </div>
             </div>
             <div>
-                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Rate</label>
-                <div class="flex gap-3">
+                <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
+                <div class="flex gap-2 sm:gap-3">
                     <div class="relative flex-1">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-lg">₹</span>
-                        <input type="number" name="services[${serviceIdx}][rates][${rateIdx}][rate]" step="0.01" required placeholder="0.00" class="w-full pl-10 pr-4 py-3.5 rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-lg">
+                        <span class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">₹</span>
+                        <input type="number" name="services[${serviceIdx}][rates][${rateIdx}][rate]" step="0.01" required placeholder="0.00" class="w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
                     </div>
-                    <button type="button" onclick="confirmRemoveRateRow(this)" class="w-14 h-[54px] rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100">
-                        <i class="ri-delete-bin-fill text-xl"></i>
+                    <button type="button" onclick="confirmRemoveRateRow(this)" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100">
+                        <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
                     </button>
                 </div>
             </div>
@@ -452,9 +478,9 @@
             () => {
                 const row = button.closest('.service-row');
                 const selectId = row.querySelector('.service-selector').id;
-                if (tomSelectInstances[selectId]) {
-                    tomSelectInstances[selectId].destroy();
-                    delete tomSelectInstances[selectId];
+                if (select2Instances[selectId]) {
+                    $(row).find('.service-selector').select2('destroy');
+                    delete select2Instances[selectId];
                 }
                 row.classList.add('fade-out', 'slide-out-to-top-4');
                 setTimeout(() => row.remove(), 300);
@@ -502,6 +528,12 @@
         setTimeout(() => {
             content.classList.remove('scale-95', 'opacity-0');
             content.classList.add('scale-100', 'opacity-100');
+            
+            // Initialize Select2 for the first row if not already done
+            const firstSelectId = 'service-select-0';
+            if (document.getElementById(firstSelectId) && !select2Instances[firstSelectId]) {
+                initSelect2(firstSelectId);
+            }
         }, 10);
         
         document.body.style.overflow = 'hidden';
@@ -523,9 +555,9 @@
             const rows = container.querySelectorAll('.service-row');
             for (let i = 1; i < rows.length; i++) {
                 const selectId = rows[i].querySelector('.service-selector').id;
-                if (tomSelectInstances[selectId]) {
-                    tomSelectInstances[selectId].destroy();
-                    delete tomSelectInstances[selectId];
+                if (select2Instances[selectId]) {
+                    $(rows[i]).find('.service-selector').select2('destroy');
+                    delete select2Instances[selectId];
                 }
                 rows[i].remove();
             }
@@ -536,10 +568,11 @@
                 firstRates[i].remove();
             }
             
-            if (tomSelectInstances['service-select-0']) {
-                tomSelectInstances['service-select-0'].clear();
+            if (select2Instances['service-select-0']) {
+                $('#service-select-0').val(null).trigger('change');
             }
             serviceRowIndex = 1;
+            cachedAvailableServices = null; // Reset cache so it refreshes next time
         }, 300);
     }
 

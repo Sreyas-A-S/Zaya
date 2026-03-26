@@ -167,7 +167,7 @@ class UserManagerController extends Controller
         ]);
 
         try {
-            Mail::to($request->email)->send(new WelcomeUserMail($request->email, $request->password, url('/zaya-login')));
+            Mail::to($request->email)->send(new WelcomeUserMail($request->email, $request->password, url('/zaya-login'), 'user-manager'));
         } catch (\Exception $e) {
             \Log::error('User Manager Creation Welcome Email Error: ' . $e->getMessage());
         }

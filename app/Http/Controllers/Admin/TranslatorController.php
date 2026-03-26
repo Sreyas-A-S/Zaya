@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Translator;
 use App\Mail\WelcomeUserMail;
+use App\Mail\PractitionerApplicationSubmittedMail;
+use App\Mail\RegistrationFeePaymentLinkMail;
+use App\Services\RegistrationFeeService;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
@@ -239,7 +242,14 @@ class TranslatorController extends Controller
 
             $plainPassword = $validatedData['password'];
             Session::put('welcome_password_' . $user->id, $plainPassword);
-            Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));
+            Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail('Translator'));
+
+            $feeService = app(RegistrationFeeService::class);
+            if ($link = $feeService->createPaymentLink($user, $user->role)) {
+                Mail::to($user->email)->send(
+                    new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+                );
+            }
             Session::forget('welcome_password_' . $user->id);
 
             $translatorData = array_merge($validatedData, [
@@ -257,6 +267,7 @@ class TranslatorController extends Controller
                 $translatorData['gov_id_upload'],
                 $translatorData['cancelled_cheque']
             );
+            $translatorData['status'] = 'inactive';
 
             if ($request->hasFile('profile_photo')) {
                 $translatorData['profile_photo_path'] = $request->file('profile_photo')->store('translator_photos', 'public');
@@ -470,9 +481,17 @@ class TranslatorController extends Controller
         }
 
         $translator = Translator::where('user_id', $id)->firstOrFail();
+        $previousStatus = $translator->status;
         $translator->update([
             'status' => $status
         ]);
+
+        if ($previousStatus !== 'active' && $status === 'active') {
+            $user = $translator->user;
+            if ($user) {
+                Mail::to($user->email)->send(new WelcomeUserMail($user->email, null, url('/zaya-login'), $user->role));
+            }
+        }
 
         return response()->json(['success' => 'Status updated successfully!']);
     }

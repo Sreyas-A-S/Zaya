@@ -177,7 +177,7 @@
             </div>
         @endif
 
-        @if(!empty($credentials))
+        @if(!empty($credentials) && (!empty($credentials['password']) || !empty($credentials['login_url'])))
             <table class="table">
                 <tr>
                     <td class="label">Login URL:</td>
@@ -187,10 +187,12 @@
                     <td class="label">Email:</td>
                     <td>{{ $credentials['email'] ?? '' }}</td>
                 </tr>
+                @if(!empty($credentials['password']))
                 <tr>
                     <td class="label">Password:</td>
                     <td>{{ $credentials['password'] ?? '' }}</td>
                 </tr>
+                @endif
             </table>
         @endif
 

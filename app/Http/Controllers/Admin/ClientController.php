@@ -211,7 +211,7 @@ class ClientController extends Controller
 
         $plainPassword = $validatedData['password'];
         Session::put('welcome_password_' . $user->id, $plainPassword);
-        Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));
+        Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login'), $user->role));
         Session::forget('welcome_password_' . $user->id);
 
         $age = $validatedData['dob'] ? Carbon::parse($validatedData['dob'])->age : null;

@@ -10,6 +10,9 @@ use App\Models\WellnessConsultation;
 use App\Models\BodyTherapy;
 use App\Models\PractitionerModality;
 use App\Mail\WelcomeUserMail;
+use App\Mail\PractitionerApplicationSubmittedMail;
+use App\Mail\RegistrationFeePaymentLinkMail;
+use App\Services\RegistrationFeeService;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
@@ -203,7 +206,14 @@ class PractitionerController extends Controller
 
             $plainPassword = $validatedData['password'];
             Session::put('welcome_password_' . $user->id, $plainPassword);
-            Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));
+            Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail('Practitioner'));
+
+            $feeService = app(RegistrationFeeService::class);
+            if ($link = $feeService->createPaymentLink($user, $user->role)) {
+                Mail::to($user->email)->send(
+                    new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+                );
+            }
             Session::forget('welcome_password_' . $user->id);
 
             $practitionerData = [
@@ -229,6 +239,7 @@ class PractitionerController extends Controller
                 'can_translate_english' => $validatedData['can_translate_english'] ?? false,
                 'profile_bio' => $request->professional_bio ?? $request->summary ?? $validatedData['profile_bio'] ?? null,
                 'reminder_lead_time' => $validatedData['reminder_lead_time'] ?? 60,
+                'status' => 'inactive',
             ];
 
             if ($request->hasFile('profile_photo')) {
@@ -442,9 +453,17 @@ class PractitionerController extends Controller
         }
 
         $practitioner = Practitioner::where('user_id', $id)->firstOrFail();
+        $previousStatus = $practitioner->status;
         $practitioner->update([
             'status' => $status
         ]);
+
+        if ($previousStatus !== 'active' && $status === 'active') {
+            $user = $practitioner->user;
+            if ($user) {
+                Mail::to($user->email)->send(new WelcomeUserMail($user->email, null, url('/zaya-login'), $user->role));
+            }
+        }
 
         return response()->json(['success' => 'Status updated successfully!']);
     }

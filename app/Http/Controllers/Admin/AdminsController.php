@@ -203,7 +203,7 @@ class AdminsController extends Controller
         User::create($payload);
 
         try {
-            Mail::to($request->email)->send(new WelcomeUserMail($request->email, $request->password, url('/zaya-login')));
+            Mail::to($request->email)->send(new WelcomeUserMail($request->email, $request->password, url('/zaya-login'), 'admin'));
         } catch (\Exception $e) {
             \Log::error('Admin Creation Welcome Email Error: ' . $e->getMessage());
         }

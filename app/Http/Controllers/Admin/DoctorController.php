@@ -11,6 +11,9 @@ use App\Models\AyurvedaExpertise;
 use App\Models\HealthCondition;
 use App\Models\ExternalTherapy;
 use App\Mail\WelcomeUserMail;
+use App\Mail\PractitionerApplicationSubmittedMail;
+use App\Mail\RegistrationFeePaymentLinkMail;
+use App\Services\RegistrationFeeService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -263,7 +266,14 @@ class DoctorController extends Controller
 
         $plainPassword = $validatedData['password'];
         Session::put('welcome_password_' . $user->id, $plainPassword);
-        Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));
+        Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail('Doctor'));
+
+        $feeService = app(RegistrationFeeService::class);
+        if ($link = $feeService->createPaymentLink($user, $user->role)) {
+            Mail::to($user->email)->send(
+                new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+            );
+        }
         Session::forget('welcome_password_' . $user->id);
 
         $profilePhotoPath = $request->hasFile('profile_photo') ? $request->file('profile_photo')->store('doctor_documents/profile_photos', 'public') : null;
@@ -344,6 +354,7 @@ class DoctorController extends Controller
             'policies_agreed' => true,
             'prescription_understanding_agreed' => true,
             'confidentiality_consented' => true,
+            'status' => 'inactive',
         ]);
 
         return response()->json(['success' => 'Doctor registered successfully!']);
@@ -568,9 +579,17 @@ class DoctorController extends Controller
         }
 
         $doctor = Doctor::where('user_id', $id)->firstOrFail();
+        $previousStatus = $doctor->status;
         $doctor->update([
             'status' => $status
         ]);
+
+        if ($previousStatus !== 'active' && $status === 'active') {
+            $user = $doctor->user;
+            if ($user) {
+                Mail::to($user->email)->send(new WelcomeUserMail($user->email, null, url('/zaya-login'), $user->role));
+            }
+        }
 
         return response()->json(['success' => 'Status updated successfully!']);
     }

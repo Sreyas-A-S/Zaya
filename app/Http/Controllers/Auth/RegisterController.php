@@ -25,6 +25,9 @@ use Illuminate\Validation\Rule;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeUserMail;
+use App\Mail\PractitionerApplicationSubmittedMail;
+use App\Mail\RegistrationFeePaymentLinkMail;
+use App\Services\RegistrationFeeService;
 
 class RegisterController extends Controller
 {
@@ -111,7 +114,19 @@ class RegisterController extends Controller
             DB::commit();
 
             try {
-                Mail::to($user->email)->send(new WelcomeUserMail($user->email, $request->password, url('/zaya-login')));
+                $feeService = app(RegistrationFeeService::class);
+                $isTeamRole = in_array($user->role, $teamRoles, true);
+
+                if ($isTeamRole) {
+                    Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail(ucwords(str_replace('_', ' ', $user->role))));
+                    if ($link = $feeService->createPaymentLink($user, $user->role)) {
+                        Mail::to($user->email)->send(
+                            new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+                        );
+                    }
+                } else {
+                    Mail::to($user->email)->send(new WelcomeUserMail($user->email, $request->password, url('/zaya-login'), $user->role));
+                }
             } catch (\Exception $e) {
                 \Log::error('Public Registration Welcome Email Error: ' . $e->getMessage());
             }

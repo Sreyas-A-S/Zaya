@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\YogaTherapist;
 use App\Mail\WelcomeUserMail;
+use App\Mail\PractitionerApplicationSubmittedMail;
+use App\Mail\RegistrationFeePaymentLinkMail;
+use App\Services\RegistrationFeeService;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
@@ -206,7 +209,14 @@ class YogaTherapistController extends Controller
 
             $plainPassword = $validatedData['password'];
             Session::put('welcome_password_' . $user->id, $plainPassword);
-            Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));
+            Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail('Yoga Therapist'));
+
+            $feeService = app(RegistrationFeeService::class);
+            if ($link = $feeService->createPaymentLink($user, $user->role)) {
+                Mail::to($user->email)->send(
+                    new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+                );
+            }
             Session::forget('welcome_password_' . $user->id);
 
             $therapistData = $validatedData;
@@ -218,6 +228,7 @@ class YogaTherapistController extends Controller
                 $therapistData['gov_id_upload'],
                 $therapistData['cancelled_cheque']
             );
+            $therapistData['status'] = 'inactive';
 
             if ($request->filled('cropped_image')) {
                 $therapistData['profile_photo_path'] = $this->uploadBase64($request->cropped_image, 'yoga_photos');
@@ -430,9 +441,17 @@ class YogaTherapistController extends Controller
         }
 
         $therapist = YogaTherapist::where('user_id', $id)->firstOrFail();
+        $previousStatus = $therapist->status;
         $therapist->update([
             'status' => $status
         ]);
+
+        if ($previousStatus !== 'active' && $status === 'active') {
+            $user = $therapist->user;
+            if ($user) {
+                Mail::to($user->email)->send(new WelcomeUserMail($user->email, null, url('/zaya-login'), $user->role));
+            }
+        }
 
         return response()->json(['success' => 'Status updated successfully!']);
     }

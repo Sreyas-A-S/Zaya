@@ -38,8 +38,8 @@ Route::middleware(['auth', 'isClient'])->group(function () {
 
     // My Services Routes
     Route::get('/my-services', [ProfileController::class, 'myServices'])->name('my-services.index');
-    Route::post('/my-services', [ProfileController::class, 'storeService'])->name('my-services.store');
-    Route::delete('/my-services/{id}', [ProfileController::class, 'deleteService'])->name('my-services.delete');
+    Route::get('/api/available-services', [ProfileController::class, 'getAvailableServices'])->name('api.available-services');
+    Route::post('/my-services', [ProfileController::class, 'storeService'])->name('my-services.store');    Route::delete('/my-services/{id}', [ProfileController::class, 'deleteService'])->name('my-services.delete');
     Route::delete('/my-services/group/{service_id}', [ProfileController::class, 'deleteServiceGroup'])->name('my-services.delete-group');
 
     Route::get('/api/referrable-practitioners', [BookingController::class, 'fetchReferrablePractitioners'])->name('api.referrable-practitioners');

@@ -25,6 +25,12 @@ class FinanceSettingController extends Controller
             ['key' => 'client_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'en'],
             ['key' => 'practitioner_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'en'],
             ['key' => 'doctor_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'mindfulness_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'mindfulness_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'yoga_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'yoga_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'translator_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'translator_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'en'],
         ];
 
         foreach ($defaults as $def) {

@@ -199,7 +199,7 @@ class FinanceManagerController extends Controller
         ]);
 
         try {
-            Mail::to($request->email)->send(new WelcomeUserMail($request->email, $request->password, url('/zaya-login')));
+            Mail::to($request->email)->send(new WelcomeUserMail($request->email, $request->password, url('/zaya-login'), 'financial-manager'));
         } catch (\Exception $e) {
             \Log::error('Finance Manager Creation Welcome Email Error: ' . $e->getMessage());
         }

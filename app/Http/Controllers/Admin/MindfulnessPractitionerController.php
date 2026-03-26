@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\MindfulnessPractitioner;
 use App\Mail\WelcomeUserMail;
+use App\Mail\PractitionerApplicationSubmittedMail;
+use App\Mail\RegistrationFeePaymentLinkMail;
+use App\Services\RegistrationFeeService;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
@@ -201,14 +204,21 @@ class MindfulnessPractitionerController extends Controller
                 'role' => 'mindfulness_practitioner',
             ]);
 
-            // Send Welcome Email
             $plainPassword = $validatedData['password'];
             Session::put('welcome_password_' . $user->id, $plainPassword);
-            Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));
+            Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail('Mindfulness Counsellor'));
+
+            $feeService = app(RegistrationFeeService::class);
+            if ($link = $feeService->createPaymentLink($user, $user->role)) {
+                Mail::to($user->email)->send(
+                    new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+                );
+            }
             Session::forget('welcome_password_' . $user->id);
 
             $practitionerData = $validatedData;
             unset($practitionerData['email'], $practitionerData['password'], $practitionerData['certificates'], $practitionerData['gov_id_upload'], $practitionerData['cancelled_cheque']);
+            $practitionerData['status'] = 'inactive';
 
             if ($request->filled('cropped_image')) {
                 $practitionerData['profile_photo_path'] = $this->uploadBase64($request->cropped_image, 'mindfulness_photos');
@@ -408,9 +418,17 @@ class MindfulnessPractitionerController extends Controller
         }
 
         $practitioner = MindfulnessPractitioner::where('user_id', $id)->firstOrFail();
+        $previousStatus = $practitioner->status;
         $practitioner->update([
             'status' => $status
         ]);
+
+        if ($previousStatus !== 'active' && $status === 'active') {
+            $user = $practitioner->user;
+            if ($user) {
+                Mail::to($user->email)->send(new WelcomeUserMail($user->email, null, url('/zaya-login'), $user->role));
+            }
+        }
 
         return response()->json(['success' => 'Status updated successfully!']);
     }

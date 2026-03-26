@@ -291,19 +291,37 @@ class ProfileController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        
+
+        // Get services already linked to this user
         $myServices = UserService::with('service')
             ->where('user_id', $user->id)
             ->get()
             ->groupBy('service_id');
-            
-        $availableServices = Service::whereNotIn('id', $myServices->keys())
-            ->where('status', true)
-            ->get();
 
-        return view('client.my-services', compact('user', 'myServices', 'availableServices'));
+        return view('client.my-services', compact('user', 'myServices'));
     }
 
+    public function getAvailableServices()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Get services already linked to this user
+        $myServiceIds = UserService::where('user_id', $user->id)
+            ->pluck('service_id')
+            ->toArray();
+
+        // Fetch remaining active services
+        $availableServices = Service::where('status', '!=', 0)
+            ->whereNotIn('id', $myServiceIds)
+            ->orderBy('title')
+            ->get(['id', 'title']);
+
+        return response()->json([
+            'status' => true,
+            'data' => $availableServices
+        ]);
+    }
     public function storeService(Request $request)
     {
         $request->validate([
