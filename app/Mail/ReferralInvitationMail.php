@@ -21,6 +21,7 @@ class ReferralInvitationMail extends Mailable
     public function __construct(Referral $referral)
     {
         $this->referral = $referral->load(['user', 'referredBy', 'referredTo']);
+        $this->mailer('info');
     }
 
     /**

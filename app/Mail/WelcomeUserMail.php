@@ -21,6 +21,7 @@ class WelcomeUserMail extends Mailable
         $this->email = $email;
         $this->plainPassword = $plainPassword;
         $this->loginUrl = $loginUrl;
+        $this->mailer('info');
     }
 
     public function envelope(): Envelope

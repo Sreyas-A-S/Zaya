@@ -21,6 +21,7 @@ class ContactUsMail extends Mailable
     public function __construct(ContactUs $messageData)
     {
         $this->messageData = $messageData;
+        $this->mailer('info');
     }
 
     /**

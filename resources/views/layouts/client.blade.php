@@ -258,6 +258,8 @@
                 </div>
             </header>
 
+            @include('partials.client-mobile-nav')
+
             @yield('content')
 
             <!-- Padding for scroll -->

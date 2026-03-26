@@ -128,19 +128,6 @@
 @endif
 
 <!-- Mobile Tab Navigation -->
-<div class="lg:hidden flex space-x-6 overflow-x-auto scrollbar-hide mb-5">
-    <a href="{{ route('dashboard') }}"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Dashboard</a>
-    <button class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Health
-        Journey</button>
-    <a href="{{ route('bookings.index') }}"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Bookings</a>
-    <button class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Transaction
-        Vault</button>
-    <a href="{{ route('my-services.index') }}" class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">My Services</a>
-    <a href="{{ route('profile') }}"
-        class="leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1">{{ __('Profile') }}</a>
-</div>
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
@@ -259,6 +246,7 @@
             </div>
         </div>
 
+        @if(!in_array($user->role, ['client', 'patient']))
         <!-- Specialities & Conditions Card -->
         <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12">
             <!-- Specialities -->
@@ -295,10 +283,12 @@
                 </div>
             </div>
         </div>
+        @endif
 
     </div>
 </div>
 
+@if(!in_array($user->role, ['client', 'patient']))
 <!-- 4 Stats Banner -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 mt-8">
     <div
@@ -410,6 +400,7 @@
     </div>
 
 </div>
+@endif
 
 <!-- Specialities Modal -->
 <div id="specialitiesModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">

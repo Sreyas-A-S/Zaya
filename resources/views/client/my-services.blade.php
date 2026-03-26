@@ -44,21 +44,23 @@
 @endpush
 
 @section('content')
-<!-- Mobile Tab Navigation -->
-<div class="lg:hidden flex space-x-6 overflow-x-auto scrollbar-hide mb-5">
-    <a href="{{ route('dashboard') }}"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Dashboard</a>
-    <button class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Health
-        Journey</button>
-    <a href="{{ route('bookings.index') }}"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Bookings</a>
-    <button class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Transaction
-        Vault</button>
-    <a href="{{ route('my-services.index') }}" class="leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1">My Services</a>
-    <a href="{{ route('profile') }}"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">{{ __('Profile') }}</a>
-</div>
+@php
 
+@if(!$isPractitioner)
+<div class="flex flex-col items-center justify-center py-24 bg-white rounded-[40px] border-2 border-dashed border-[#2E4B3D]/10 text-center px-8 shadow-sm">
+    <div class="w-28 h-28 bg-[#F8FAF9] rounded-full flex items-center justify-center mb-8 shadow-inner">
+        <i class="ri-shield-user-line text-6xl text-[#2E4B3D]/20"></i>
+    </div>
+    <h3 class="text-3xl font-black text-secondary mb-3 tracking-tight">Access Restricted</h3>
+    <p class="text-gray-500 font-medium max-w-md mb-10 leading-relaxed text-lg">
+        This page is exclusively for Practitioners and Therapists to manage their professional offerings. 
+        It appears you are not registered with a practitioner role.
+    </p>
+    <a href="{{ route('dashboard') }}" class="bg-secondary text-white px-10 py-4 rounded-2xl font-black hover:bg-opacity-95 transform hover:-translate-y-1 transition-all shadow-xl shadow-secondary/20">
+        Return to Dashboard
+    </a>
+</div>
+@else
 <div class="flex flex-col gap-8">
     <!-- Header Section -->
     <div class="flex justify-between items-center bg-white rounded-2xl px-8 py-10 border border-[#2E4B3D]/12 shadow-sm">
@@ -157,6 +159,7 @@
         @endforelse
     </div>
 </div>
+@endif
 
 <!-- Add Service Modal -->
 <div id="addServiceModal" class="fixed inset-0 bg-[#1A1A1A]/60 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
