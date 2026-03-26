@@ -58,9 +58,10 @@ class DoctorController extends Controller
                     'doctors.profile_photo_path',
                     'doctors.city',
                     'doctors.state',
+                    'doctors.nationality',
+                    'doctors.country',
                     'doctors.status',
                     'doctors.gender',
-                    'doctors.country',
                     'doctors.first_name',
                     'doctors.last_name'
                 ]);
@@ -98,7 +99,7 @@ class DoctorController extends Controller
                 ->orderColumn('name', 'users.name $1')
                 ->orderColumn('email', 'users.email $1')
                 ->orderColumn('phone', 'doctors.phone $1')
-                ->orderColumn('country', 'doctors.country $1')
+                ->orderColumn('nationality', 'doctors.nationality $1')
                 ->orderColumn('status', 'doctors.status $1')
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at ? \Carbon\Carbon::parse($row->created_at)->format('Y-m-d H:i') : '';

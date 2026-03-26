@@ -158,7 +158,7 @@
                                         <div class="col-md-4">
                                             <label class="form-label">First Name <span class="text-danger">*</span></label>
                                             <input class="form-control validate-char-limit" type="text" name="first_name" required maxlength="50" data-max="50"
-                                                pattern="^[A-Za-z\s]{2,50}$" title="Only letters allowed (2-50 characters)">
+                                                pattern="^[A-Za-z\s]{1,50}$" title="Only letters allowed (1-50 characters)">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                         </div>
 

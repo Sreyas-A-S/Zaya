@@ -1338,8 +1338,8 @@
                     name: 'doctors.phone'
                 },
                 {
-                    data: 'country',
-                    name: 'doctors.country'
+                    data: 'nationality',
+                    name: 'doctors.nationality'
                 },
                 {
                     data: 'status',
