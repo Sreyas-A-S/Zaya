@@ -93,6 +93,14 @@
                 <a href="{{ route('dashboard') }}" class="flex items-center px-8 py-3 {{ request()->routeIs('dashboard') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-user-line mr-3 text-lg"></i> <span id="client_panel_sidebar_dashboard" data-i18n="Dashboard">{{ __($site_settings['client_panel_sidebar_dashboard'] ?? 'Dashboard') }}</span>
                 </a>
+                <a href="javascript:void(0)"
+                    onclick="openLogoutModal()"
+                    class="flex items-center px-8 py-3 text-red-400 hover:bg-red-50 hover:text-red-600 font-normal transition-colors">
+                    <i class="ri-logout-box-line mr-3 text-lg"></i> <span id="client_panel_sidebar_logout" data-i18n="Logout">{{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}</span>
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                    @csrf
+                </form>
                 <a href="#"
                     class="flex items-center px-8 py-3 text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary  font-normal transition-colors">
                     <i class="ri-pulse-line mr-3 text-lg"></i> <span id="client_panel_sidebar_health_journey" data-i18n="Health Journey">{{ __($site_settings['client_panel_sidebar_health_journey'] ?? 'Health Journey') }}</span>
@@ -121,14 +129,6 @@
                     class="flex items-center px-8 py-3 {{ request()->routeIs('profile') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-user-settings-line mr-3 text-lg"></i> <span id="client_panel_sidebar_profile" data-i18n="Profile">{{ __('Profile') }}</span>
                 </a>
-                <a href="{{ route('logout') }}"
-                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                    class="flex items-center px-8 py-3 text-red-400 hover:bg-red-50 hover:text-red-600 font-normal transition-colors mt-auto">
-                    <i class="ri-logout-box-line mr-3 text-lg"></i> <span id="client_panel_sidebar_logout" data-i18n="Logout">{{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}</span>
-                </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                    @csrf
-                </form>
             </nav>
         </div>
         <img src="{{ asset('frontend/assets/client-profile-floating-img.png') }}" alt="Floating Image"
@@ -515,7 +515,53 @@
                 empty.classList.remove('hidden');
             });
         }
+
+        function openLogoutModal() {
+            const modal = document.getElementById('logoutConfirmModal');
+            const content = document.getElementById('logoutModalContent');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeLogoutModal() {
+            const modal = document.getElementById('logoutConfirmModal');
+            const content = document.getElementById('logoutModalContent');
+            content.classList.add('scale-95', 'opacity-0');
+            content.classList.remove('scale-100', 'opacity-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 200);
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('logoutConfirmModal');
+            if (event.target == modal) closeLogoutModal();
+        });
     </script>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutConfirmModal" class="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[40px] w-full max-w-[340px] overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-200" id="logoutModalContent">
+            <div class="p-10 text-center">
+                <div class="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-red-100">
+                    <i class="ri-logout-box-r-line text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-black text-secondary mb-3 tracking-tight">Confirm Logout?</h3>
+                <p class="text-gray-500 mb-8 leading-relaxed font-medium text-base">Are you sure you want to end your session and logout of the portal?</p>
+                
+                <div class="flex flex-col gap-3">
+                    <button type="button" onclick="document.getElementById('logout-form').submit();" class="w-full py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 transition-all text-lg shadow-xl shadow-red-200">Yes, Logout</button>
+                    <button type="button" onclick="closeLogoutModal()" class="w-full py-4 bg-gray-50 text-gray-500 font-black rounded-2xl hover:bg-gray-100 transition-all text-lg">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
     @stack('scripts')
 </body>
 

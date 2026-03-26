@@ -18,6 +18,13 @@
         </a>
     @endif
 
+    <!-- Logout -->
+    <a href="javascript:void(0)" 
+        onclick="openLogoutModal()"
+        class="leading-none text-lg text-red-400 font-normal whitespace-nowrap cursor-pointer transition-colors">
+        {{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}
+    </a>
+
     <!-- Health Journey (Dashboard Tab for now) -->
     @if(request()->routeIs('dashboard'))
         <button onclick="if(typeof switchMobileTab === 'function') switchMobileTab('health')" 
