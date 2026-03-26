@@ -65,20 +65,33 @@
                 <form id="other-fee-form">
                     @csrf
                     <input type="hidden" id="other-fee-id" name="id">
-                    <div class="mb-3">
-                        <label class="form-label">Fee Name</label>
-                        <input type="text" class="form-control" id="other-fee-name" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Rate</label>
-                        <input type="number" step="0.01" class="form-control" id="other-fee-rate" name="rate" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <select class="form-control" id="other-fee-status" name="status" required>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
+                    <div class="d-flex flex-column flex-md-row align-items-start gap-3">
+                        <div class="flex-fill">
+                            <div class="mb-3">
+                                <label class="form-label">Fee Name</label>
+                                <input type="text" class="form-control" id="other-fee-name" name="name" required>
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label">Rate &amp; Currency</label>
+                                <div class="input-group">
+                                    <select class="form-select w-auto" id="other-fee-currency" name="currency">
+                                        <option value="EUR">EUR</option>
+                                        <option value="USD">USD</option>
+                                        <option value="INR">INR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="AED">AED</option>
+                                    </select>
+                                    <input type="number" step="0.01" class="form-control" id="other-fee-rate" name="rate" required placeholder="Amount">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ms-md-auto d-flex flex-column align-items-end justify-content-start">
+                            <label class="form-label d-block text-end mb-2">Status</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="other-fee-status" name="status" value="active" checked>
+                                <label class="form-check-label" for="other-fee-status">Active</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
@@ -99,6 +112,7 @@
             processing: true,
             serverSide: true,
             ajax: "{{ route('admin.other-fees.index') }}",
+            order: [[1, 'asc']],
             columns: [
                 {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                 {data: 'name', name: 'name'},
@@ -136,7 +150,8 @@
                 $('#other-fee-id').val(data.id);
                 $('#other-fee-name').val(data.name);
                 $('#other-fee-rate').val(data.rate);
-                $('#other-fee-status').val(data.status);
+                $('#other-fee-currency').val(data.currency || 'EUR');
+                $('#other-fee-status').prop('checked', data.status === 'active');
                 $('#other-fee-modal').modal('show');
             });
         });
@@ -146,6 +161,8 @@
         $('#other-fee-form')[0].reset();
         $('#other-fee-id').val('');
         $('#modal-title').text('Add New Fee');
+        $('#other-fee-status').prop('checked', true);
+        $('#other-fee-currency').val('EUR');
         $('#other-fee-modal').modal('show');
     }
 

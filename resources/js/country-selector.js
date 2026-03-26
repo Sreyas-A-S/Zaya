@@ -8,7 +8,7 @@ export function initCountrySelector(selector = '#nationality-select', defaultVal
 
     const tomSelect = new TomSelect(element, {
         options: countries.map(country => ({
-            value: country.name, // Use name instead of code to match admin system
+            value: country.code, // store ISO code to prevent arbitrary text
             text: country.name,
             code: country.code.toLowerCase() // For flag-icons CSS class
         })),
@@ -18,6 +18,8 @@ export function initCountrySelector(selector = '#nationality-select', defaultVal
         maxItems: 1,
         maxOptions: 300,
         create: false,
+        persist: false,
+        closeAfterSelect: true,
         placeholder: 'Select Country',
         render: {
             option: function (data, escape) {
@@ -38,13 +40,12 @@ export function initCountrySelector(selector = '#nationality-select', defaultVal
 
     // Set default value
     if (defaultValue) {
-        // Try to match value (name) or the legacy code
-        let targetValue = defaultValue;
-        const matchingCountry = countries.find(c => c.code === defaultValue || c.name === defaultValue);
+        let targetValue = defaultValue.toUpperCase();
+        const matchingCountry = countries.find(c => c.code === targetValue || c.name === defaultValue);
         if (matchingCountry) {
-            targetValue = matchingCountry.name;
+            targetValue = matchingCountry.code;
         }
-        tomSelect.setValue(targetValue);
+        tomSelect.setValue(targetValue, true);
     }
 
     return tomSelect;

@@ -182,11 +182,34 @@
             color: #9CA3AF;
         }
 
-        .reg-input:focus {
-            border-color: #97563D;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(151, 86, 61, 0.1);
-        }
+    .reg-input:focus {
+        border-color: #97563D;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(151, 86, 61, 0.1);
+    }
+
+    /* Intl Tel Input pill styling */
+    .iti { width: 100% !important; }
+    .iti--allow-dropdown input[type=tel], .iti--allow-dropdown input[type=text] {
+        border-radius: 9999px !important;
+        background: #F5F5F5 !important;
+        border: 1px solid transparent !important;
+        padding-left: 96px !important;
+    }
+    .iti--allow-dropdown input[type=tel]:focus, .iti--allow-dropdown input[type=text]:focus {
+        border-color: #97563D !important;
+        background: #fff !important;
+        box-shadow: 0 0 0 3px rgba(151, 86, 61, 0.1) !important;
+    }
+    .iti--allow-dropdown .iti__flag-container {
+        border-radius: 9999px 0 0 9999px;
+        background: #F5F5F5;
+        border: 1px solid transparent;
+        border-right: 0;
+    }
+    .iti--allow-dropdown .iti__selected-flag {
+        border-radius: 9999px 0 0 9999px !important;
+    }
 
         /* Date Input Custom Styles */
         .date-input-wrapper {
@@ -393,9 +416,11 @@
 
 <body class="bg-white min-h-screen flex flex-col">
     @php
-        $currCode = strtoupper($defaultCurrency ?? config('app.currency', 'INR'));
         $currencySymbols = config('currencies.symbols', []);
+        $currCode = strtoupper($defaultCurrency ?? config('app.currency', 'INR'));
         $currSymbol = $currencySymbols[$currCode] ?? $currCode;
+        $registrationCurrency = strtoupper($clientRegistrationCurrency ?? 'EUR');
+        $registrationCurrencySymbol = $currencySymbols[$registrationCurrency] ?? $registrationCurrency;
     @endphp
     <!-- Main Content -->
     <div class="flex-1 relative overflow-x-hidden">
@@ -657,7 +682,7 @@
                     </div>
                 </div>
 
-                @if($clientRegistrationFeeEnabled)
+                @if($clientRegistrationFeeEnabled && ($clientRegistrationFee ?? 0) > 0)
                 <!-- Payment & Promocode (from Admin > Other Fees) -->
                 <div class="mb-10 border-t border-gray-200 pt-10">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 items-end">
@@ -666,7 +691,7 @@
                             <div class="relative w-full">
                                 <div class="w-full h-[52px] bg-[#F5F5F5] rounded-full flex items-center pl-6 pr-2">
                                     <span class="text-gray-900 text-[0.95rem] font-medium" id="registration-fee-display">
-                                        {{ $currSymbol }} {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
+                                        {{ $registrationCurrencySymbol }} {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
                                     </span>
                                     <input type="hidden" name="registration_fee" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
                                     <input type="hidden" name="registration_fee_actual" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
@@ -1125,7 +1150,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const currencySymbols = @json(config('currencies.symbols', []));
-            let currencySymbol = @json($currSymbol);
+            let currencySymbol = @json($registrationCurrencySymbol);
             const promoInput = document.getElementById('promocode-input');
             const promoApplyBtn = document.getElementById('promo-apply-btn');
             const promoBreakdown = document.getElementById('promo-breakdown');
@@ -1150,19 +1175,7 @@
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-            function updateCurrencyFromCountry(countryCode) {
-                if (!countryCode) return;
-                const code = countryCode.toUpperCase();
-                const derived = countryToCurrency[code] || countryToCurrency[code.slice(0,2)] || 'INR';
-                currencySymbol = currencySymbols[derived] || derived;
-                renderFee();
-                if (promoBreakdown && !promoBreakdown.classList.contains('hidden')) {
-                    // Re-render promo breakdown amounts with new symbol
-                    if (promoActualFee && promoActualFee.value) promoActualFee.value = `${currencySymbol} ${feeActualInput?.value || feeInput?.value || 0}`;
-                    if (promoDiscountAmount && promoDiscountAmount.value) promoDiscountAmount.value = `${currencySymbol} ${(promoDiscountAmountHidden?.value || 0)}`;
-                    if (promoTotalFee && promoTotalFee.value) promoTotalFee.value = `${currencySymbol} ${(promoTotalFeeHidden?.value || feeInput?.value || 0)}`;
-                }
-            }
+            // Registration fee currency stays fixed from finance settings; no dynamic update on country select
 
             function renderFee(value) {
                 const feeDisplay = feeInput?.closest('.relative')?.querySelector('span');

@@ -322,10 +322,11 @@ class WebController extends Controller
         $clientRegistrationFee = $financeSettings['client_registration_fee'] ?? '0';
         $clientRegistrationFee = is_numeric($clientRegistrationFee) ? (float) $clientRegistrationFee : 0.0;
         $clientRegistrationFeeEnabled = filter_var($financeSettings['client_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
+        $clientRegistrationCurrency = strtoupper($financeSettings['client_registration_fee_currency'] ?? 'EUR');
 
         $defaultCurrency = $this->deriveCurrencyFromCountry($request->get('country', ''));
 
-        return view('client-register', compact('redirect', 'consultationPreferences', 'languages', 'clientRegistrationFee', 'clientRegistrationFeeEnabled', 'defaultCurrency'));
+        return view('client-register', compact('redirect', 'consultationPreferences', 'languages', 'clientRegistrationFee', 'clientRegistrationFeeEnabled', 'defaultCurrency', 'clientRegistrationCurrency'));
     }
 
     public function practitionerRegister()
