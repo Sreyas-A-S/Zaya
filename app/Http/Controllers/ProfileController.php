@@ -185,8 +185,16 @@ class ProfileController extends Controller
     public function transactions(Request $request)
     {
         $user = Auth::user();
-        $invoices = \App\Models\Booking::where('user_id', $user->id)
-            ->whereNotNull('razorpay_payment_id')
+        $invoices = \App\Models\Booking::with(['practitioner.user', 'translator.user'])
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+                if ($user->practitioner) {
+                    $q->orWhere('practitioner_id', $user->practitioner->id);
+                }
+                if ($user->translator) {
+                    $q->orWhere('translator_id', $user->translator->id);
+                }
+            })
             ->latest()
             ->paginate(15);
 

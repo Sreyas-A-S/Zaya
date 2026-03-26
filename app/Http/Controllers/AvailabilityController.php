@@ -70,7 +70,7 @@ class AvailabilityController extends Controller
         // 2. Generate and create slots
         $start = \Carbon\Carbon::parse($request->start_time);
         $end = \Carbon\Carbon::parse($request->end_time);
-        $duration = $request->slot_duration;
+        $duration = (int) $request->slot_duration;
 
         $current = $start->copy();
         while ($current->copy()->addMinutes($duration)->lte($end)) {
@@ -267,7 +267,7 @@ class AvailabilityController extends Controller
             // Generate and create slots, marking the "off" ones
             $start = \Carbon\Carbon::parse($request->start_time);
             $end = \Carbon\Carbon::parse($request->end_time);
-            $duration = $request->slot_duration;
+            $duration = (int) $request->slot_duration;
 
             $current = $start->copy();
             while ($current->copy()->addMinutes($duration)->lte($end)) {

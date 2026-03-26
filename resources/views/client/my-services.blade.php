@@ -111,12 +111,21 @@
     </div>
 
     @if(session('status'))
-        <div class="px-6 py-4 bg-[#F0FDF4] border border-green-200 text-[#166534] rounded-2xl flex items-center shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+        <div id="status-alert" class="px-6 py-4 bg-[#F0FDF4] border border-green-200 text-[#166534] rounded-2xl flex items-center shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
             <div class="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center mr-4">
                 <i class="ri-checkbox-circle-fill text-2xl text-green-600"></i>
             </div>
             <span class="font-bold">{{ session('status') }}</span>
         </div>
+        <script>
+            setTimeout(() => {
+                const alert = document.getElementById('status-alert');
+                if (alert) {
+                    alert.classList.add('opacity-0', 'translate-y-2');
+                    setTimeout(() => alert.remove(), 300);
+                }
+            }, 3000);
+        </script>
     @endif
 
     <!-- Services Grid -->
@@ -125,11 +134,15 @@
             @php $firstRate = $rates->first(); @endphp
             <div class="bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden hover:shadow-2xl hover:shadow-secondary/5 transition-all duration-500 group flex flex-col h-full">
                 <!-- Card Header -->
+                @php
+                    $serviceImage = $firstRate->service->image ? asset('storage/' . $firstRate->service->image) : asset('frontend/assets/service-placeholder.png');
+                    $placeholderImage = asset('frontend/assets/service-placeholder.png');
+                @endphp
                 <div class="h-44 relative flex-shrink-0">
-                    <img src="{{ $firstRate->service->image ? asset('storage/' . $firstRate->service->image) : asset('frontend/assets/service-placeholder.png') }}" 
+                    <img src="{{ $serviceImage }}" 
                          alt="{{ $firstRate->service->title }}" 
                          class="w-full h-full object-cover"
-                         onerror="this.onerror=null;this.src='{{ asset('frontend/assets/service-placeholder.png') }}';">
+                         onerror="this.onerror=null;this.src='{{ $placeholderImage }}';">
                     <div class="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/90 via-[#1A1A1A]/30 to-transparent"></div>
                     <div class="absolute bottom-5 left-7 right-14">
                         <h3 class="text-white text-2xl font-black leading-tight tracking-tight">{{ $firstRate->service->title }}</h3>
@@ -176,7 +189,7 @@
                                 {{ $rates->count() }} {{ Str::plural('Rate', $rates->count()) }} Active
                             </span>
                         </div>
-                        <button class="text-secondary font-black text-sm hover:underline flex items-center gap-2 transition-all">
+                        <button onclick="manageService({{ $serviceId }})" class="text-secondary font-black text-sm hover:underline flex items-center gap-2 transition-all">
                             <i class="ri-settings-3-fill"></i> Manage Details
                         </button>
                     </div>
@@ -643,6 +656,15 @@ async function fetchAvailableServices() {
         }, 10);
         
         document.body.style.overflow = 'hidden';
+    }
+    function manageService(serviceId) {
+        openAddServiceModal();
+        setTimeout(() => {
+            const select = document.getElementById('service-select-0');
+            if (select) {
+                $(select).val(String(serviceId)).trigger('change');
+            }
+        }, 250);
     }
 
     function closeAddServiceModal() {

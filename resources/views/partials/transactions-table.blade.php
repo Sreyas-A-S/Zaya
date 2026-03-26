@@ -33,7 +33,7 @@
                             Session Payment - Order #{{ $invoice->razorpay_order_id ?? 'N/A' }}
                         </td>
                         <td class="px-6 py-4 text-sm text-secondary font-medium">
-                            € {{ number_format($invoice->total_price, 2) }}
+                            ₹ {{ number_format($invoice->total_price, 2) }}
                         </td>
                         <td class="px-6 py-4">
                             <span class="px-3 py-1 inline-flex text-[10px] leading-5 font-bold rounded-full uppercase bg-green-50 text-green-600">
