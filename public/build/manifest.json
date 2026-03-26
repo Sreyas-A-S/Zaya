@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-BJzJ66R2.css",
+    "file": "assets/app-CSgC8IXh.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -18,7 +18,7 @@
     ]
   },
   "resources/css/practitioner-register.css": {
-    "file": "assets/practitioner-register-B0kcQJB0.css",
+    "file": "assets/practitioner-register-DaTThWXP.css",
     "src": "resources/css/practitioner-register.css",
     "isEntry": true,
     "name": "practitioner-register",
