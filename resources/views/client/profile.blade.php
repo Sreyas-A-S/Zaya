@@ -60,26 +60,22 @@
     $age = $profile && $profile->dob ? \Carbon\Carbon::parse($profile->dob)->age . ' Years' : 'Not set';
     $gender = $profile && $profile->gender ? ucfirst($profile->gender) : ($user->gender ? ucfirst($user->gender) : 'Not set');
     $dob = $profile && $profile->dob ? \Carbon\Carbon::parse($profile->dob)->format('M d, Y') : 'Not set';
-    $nationality = $user->nationality ? $user->nationality->name : ($profile->nationality ?? 'Not set');
+    $nationality = $profile->nationality ?? ($user->nationality ? $user->nationality->name : 'Not set');
     $phone = $profile->phone ?? ($user->phone ?? 'Not set');
     $email = $user->email;
     $patient = $user->patient ?? null;
     
     // Address logic
-    if (in_array($user->role, ['doctor', 'yoga_therapist'])) {
-        $address = $profile->city_state ?? ($profile->city ? $profile->city . ', ' . $profile->state : 'Not set');
-    } else {
-        $addressParts = array_filter([
-            $profile->residential_address ?? null,
-            $profile->address_line_1 ?? null,
-            $profile->address_line_2 ?? null,
-            $profile->city ?? null,
-            $profile->state ?? null,
-            $profile->zip_code ?? null,
-            $profile->country ?? null
-        ]);
-        $address = !empty($addressParts) ? implode(', ', $addressParts) : 'Not set';
-    }
+    $addressParts = array_filter([
+        $profile->residential_address ?? null,
+        $profile->address_line_1 ?? null,
+        $profile->address_line_2 ?? null,
+        $profile->city ?? null,
+        $profile->state ?? null,
+        $profile->zip_code ?? null,
+        $profile->country ?? null
+    ]);
+    $address = !empty($addressParts) ? implode(', ', $addressParts) : ($profile->city_state ?? 'Not set');
 
     // Specialities & Conditions
     $specialities = [];
@@ -141,11 +137,11 @@
                 @php
                     $avatar = $user->profile_pic
                         ? (str_starts_with($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic))
-                        : asset('frontend/assets/profile-avatar-illustration.png');
+                        : asset('frontend/assets/profile-dummy-img.png');
                 @endphp
                 <img id="user-profile-img" src="{{ $avatar }}"
                     alt="{{ $user->name }}" class="w-38 h-38 rounded-full object-cover"
-                    onerror="this.src='{{ asset('frontend/assets/profile-avatar-illustration.png') }}'">
+                    onerror="this.src='{{ asset('frontend/assets/profile-dummy-img.png') }}'">
                 <label for="profile_pic_input"
                     class="absolute -bottom-1 right-0 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-secondary cursor-pointer hover:bg-gray-200 transition-colors border-2 border-white shadow-sm">
                     <i class="ri-pencil-line text-lg"></i>
@@ -709,7 +705,7 @@
                     <i class="ri-close-line text-2xl"></i>
                 </button>
             </div>
-            <form method="POST" action="{{ route('profile.updateProfessional') }}">
+            <form method="POST" action="{{ route('profile.updatePersonal') }}">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                     <div>
@@ -717,16 +713,56 @@
                         <input type="text" name="phone" value="{{ old('phone', $phone !== 'Not set' ? $phone : '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
                     </div>
                     <div>
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Gender') }}</label>
+                        <select name="gender" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-white focus:border-secondary outline-none">
+                            <option value="">{{ __('Select gender') }}</option>
+                            @foreach (['male' => 'Male', 'female' => 'Female', 'transgender' => 'Transgender', 'other' => 'Other'] as $value => $label)
+                                <option value="{{ $value }}" {{ old('gender', $profile->gender ?? $user->gender ?? '') === $value ? 'selected' : '' }}>{{ __($label) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('DOB') }}</label>
+                        <input type="date" name="dob" value="{{ old('dob', $profile && $profile->dob ? \Illuminate\Support\Carbon::parse($profile->dob)->format('Y-m-d') : '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                    </div>
+                    <div>
                         <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Email') }}</label>
                         <input type="email" value="{{ $email }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-100 text-gray-500 cursor-not-allowed" readonly>
                     </div>
                     <div>
                         <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Nationality') }}</label>
-                        <input type="text" name="nationality" value="{{ old('nationality', $nationality !== 'Not set' ? $nationality : '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                        <select name="nationality" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-white focus:border-secondary outline-none">
+                            <option value="">{{ __('Select nationality') }}</option>
+                            @foreach($countries as $country)
+                                <option value="{{ $country->name }}" {{ old('nationality', $nationality !== 'Not set' ? $nationality : '') === $country->name ? 'selected' : '' }}>
+                                    {{ $country->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                     <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('City, State') }}</label>
-                        <input type="text" name="city_state" value="{{ old('city_state', $patient?->city_state ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Address Line 1') }}</label>
+                        <input type="text" name="address_line_1" value="{{ old('address_line_1', $profile->address_line_1 ?? $profile->residential_address ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Address Line 2') }}</label>
+                        <input type="text" name="address_line_2" value="{{ old('address_line_2', $profile->address_line_2 ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('City') }}</label>
+                        <input type="text" name="city" value="{{ old('city', $profile->city ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('State') }}</label>
+                        <input type="text" name="state" value="{{ old('state', $profile->state ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Zip Code') }}</label>
+                        <input type="text" name="zip_code" value="{{ old('zip_code', $profile->zip_code ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Country') }}</label>
+                        <input type="text" name="country" value="{{ old('country', $profile->country ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
                     </div>
                 </div>
                 <div class="flex justify-end gap-3">
@@ -1170,7 +1206,7 @@
         .then(res => {
             if (res.success) {
                 showToast(res.message || '{{ __("Profile picture removed.") }}');
-                document.getElementById('user-profile-img').src = '{{ asset('frontend/assets/profile-avatar-illustration.png') }}';
+                document.getElementById('user-profile-img').src = '{{ asset('frontend/assets/profile-dummy-img.png') }}';
             } else {
                 showToast(res.message || 'Remove failed', 'error');
             }

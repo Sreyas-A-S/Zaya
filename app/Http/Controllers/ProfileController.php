@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Country;
 use App\Models\Service;
 use App\Models\UserService;
 use App\Models\PractitionerGallery;
@@ -475,6 +476,50 @@ class ProfileController extends Controller
         return back()->with('status', 'Password updated successfully!');
     }
 
+    public function updatePersonalDetails(Request $request)
+    {
+        $validated = $request->validate([
+            'phone' => 'nullable|string|max:20',
+            'gender' => 'nullable|in:male,female,transgender,other',
+            'dob' => 'nullable|date|before:today',
+            'nationality' => 'nullable|string|max:255|exists:countries,name',
+            'address_line_1' => 'nullable|string|max:500',
+            'address_line_2' => 'nullable|string|max:500',
+            'city' => 'nullable|string|max:255',
+            'state' => 'nullable|string|max:255',
+            'zip_code' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:255',
+        ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $profile = $user->profile;
+
+        if (!$profile) {
+            return back()->with('error', 'Profile not found.');
+        }
+
+        $user->phone = $validated['phone'] ?? null;
+        $user->gender = $validated['gender'] ?? null;
+        $user->national_id = !empty($validated['nationality'])
+            ? Country::where('name', $validated['nationality'])->value('id')
+            : null;
+        $user->save();
+
+        $profileData = [];
+        foreach (['phone', 'gender', 'dob', 'nationality', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'country'] as $field) {
+            if (\Schema::hasColumn($profile->getTable(), $field)) {
+                $profileData[$field] = $validated[$field] ?? null;
+            }
+        }
+
+        if (!empty($profileData)) {
+            $profile->update($profileData);
+        }
+
+        return back()->with('status', 'Personal details updated successfully!');
+    }
+
     public function profile()
     {
         /** @var \App\Models\User $user */
@@ -546,9 +591,15 @@ class ProfileController extends Controller
                 break;
         }
 
+        $countries = Country::query()
+            ->where('status', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
+
         return view('client.profile', compact(
             'user',
             'profile',
+            'countries',
             'totalSessions',
             'totalClients',
             'todaySessions',
@@ -699,8 +750,13 @@ class ProfileController extends Controller
     {
         $appId = config('services.agora.app_id');
         $appCertificate = config('services.agora.app_certificate');
-        $channelName = $request->channel;
-        $uid = $request->uid ?? 0;
+        $validated = $request->validate([
+            'channel' => ['required', 'string', 'max:64', 'regex:/^[A-Za-z0-9_-]+$/'],
+            'uid' => ['nullable', 'integer', 'min:1'],
+        ]);
+
+        $channelName = $validated['channel'];
+        $uid = $validated['uid'] ?? Auth::id() ?? 1;
         
         \Log::info("Agora Token Request:", [
             'channel' => $channelName,
@@ -731,7 +787,9 @@ class ProfileController extends Controller
 
         return response()->json([
             'token' => $token, 
-            'expire' => $privilegeExpiredTs
+            'expire' => $privilegeExpiredTs,
+            'uid' => $uid,
+            'channel' => $channelName,
         ]);
     }
 }

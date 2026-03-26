@@ -249,6 +249,14 @@ class AdminPanelSettingFrenchSeeder extends Seeder
                 'language' => 'fr',
             ],
             [
+                'key' => 'admin_panel_sidebar_service_packages',
+                'value' => 'Forfaits de services',
+                'type' => 'text',
+                'section' => 'admin_panel',
+                'max_length' => 60,
+                'language' => 'fr',
+            ],
+            [
                 'key' => 'admin_panel_sidebar_service_categories',
                 'value' => 'Catégories de services',
                 'type' => 'text',

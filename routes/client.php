@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/dashboard', [ProfileController::class, 'index'])->name('dashboard');
     Route::post('/update-consent', [ProfileController::class, 'updateConsent'])->name('profile.updateConsent');
+    Route::get('/consultations', [ProfileController::class, 'bookings'])->name('consultations.index');
     Route::get('/bookings', [ProfileController::class, 'bookings'])->name('bookings.index');
     Route::get('/transactions', [ProfileController::class, 'transactions'])->name('transactions.index');
     Route::get('/conference-history', [ProfileController::class, 'conferences'])->name('conferences.index');
@@ -30,6 +31,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::post('/data-access/verify', [\App\Http\Controllers\DataAccessController::class, 'verifyOTP'])->name('data-access.verify');
     Route::get('/client-profile/{id}', [ProfileController::class, 'viewClientProfile'])->name('client.profile.view');
     Route::get('/profile', [ProfileController::class, 'profile'])->name('profile');
+    Route::post('/profile/update-personal', [ProfileController::class, 'updatePersonalDetails'])->name('profile.updatePersonal');
     Route::post('/profile/update-pic', [ProfileController::class, 'updateProfilePic'])->name('profile.updatePic');
     Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
     Route::post('/profile/update-professional', [ProfileController::class, 'updateProfessionalDetails'])->name('profile.updateProfessional');

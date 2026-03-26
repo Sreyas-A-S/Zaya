@@ -60,20 +60,39 @@
                 </div>
 
                 @if($category === 'Packages')
-                    <!-- Package Filter Tabs -->
-                    <div class="flex flex-wrap justify-start md:justify-center items-center gap-2 mb-10 w-full">
-                        <a href="javascript:void(0)"
-                            class="bg-[#F5F5F5] text-gray-500 hover:text-gray-800 px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm lg:text-base font-normal transition-all hover:bg-gray-200" data-i18n="All">{{ __('All') }}</a>
-                        <a href="javascript:void(0)"
-                            class="bg-secondary text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm lg:text-base font-normal transition-all" data-i18n="Ayurveda + Yoga">{{ __('Ayurveda + Yoga') }}</a>
-                        <a href="javascript:void(0)"
-                            class="bg-[#F5F5F5] text-gray-500 hover:text-gray-800 px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm lg:text-base font-normal transition-all hover:bg-gray-200" data-i18n="Yoga + Counselling">{{ __('Yoga + Counselling') }}</a>
-                        <a href="javascript:void(0)"
-                            class="bg-[#F5F5F5] text-gray-500 hover:text-gray-800 px-4 md:px-6 py-2 md:py-2.5 rounded-full text-sm lg:text-base font-normal transition-all hover:bg-gray-200" data-i18n="Counselling + Ayurveda">{{ __('Counselling + Ayurveda') }}</a>
-                    </div>
-                @endif
-
-                <!-- Rendered Category Services Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12" id="services-grid">
+                    @forelse($servicePackages as $package)
+                        <article class="block">
+                            <div class="w-full aspect-video overflow-hidden mb-5 bg-gray-100">
+                                <img src="{{ $package->cover_image_url }}"
+                                    alt="{{ $package->title }}"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h3 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-2">
+                                    {{ __($package->title) }}
+                                </h3>
+                                @if($package->description)
+                                    <p class="text-gray-500 text-base leading-relaxed font-light mb-4">
+                                        {{ __($package->description) }}
+                                    </p>
+                                @endif
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($package->service_titles as $serviceTitle)
+                                        <span class="inline-flex px-4 py-2 bg-[#F5F5F5] text-gray-700 rounded-full text-sm">
+                                            {{ __($serviceTitle) }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </article>
+                    @empty
+                        <div class="col-span-full py-20 text-center">
+                            <p class="text-gray-500 text-lg italic">{{ __('No service packages found.') }}</p>
+                        </div>
+                    @endforelse
+                </div>
+                @else
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12" id="services-grid">
                     @forelse($services as $service)
                         <a href="{{ $service->slug ? route('service-detail', $service->slug) : '#' }}" class="block group cursor-pointer">
@@ -109,6 +128,7 @@
                         </div>
                     @endforelse
                 </div>
+                @endif
             </div>
         </section>
 

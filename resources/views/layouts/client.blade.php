@@ -101,6 +101,10 @@
                     class="flex items-center px-8 py-3 text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary  font-normal transition-colors">
                     <i class="ri-pulse-line mr-3 text-lg"></i> <span id="client_panel_sidebar_health_journey" data-i18n="Health Journey">{{ __($site_settings['client_panel_sidebar_health_journey'] ?? 'Health Journey') }}</span>
                 </a>
+                <a href="{{ route('consultations.index') }}"
+                    class="flex items-center px-8 py-3 {{ request()->routeIs('consultations.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
+                    <i class="ri-stethoscope-line mr-3 text-lg"></i> <span id="client_panel_sidebar_consultation" data-i18n="Consultation">{{ __($site_settings['client_panel_sidebar_consultation'] ?? 'Consultation') }}</span>
+                </a>
                 <a href="{{ route('bookings.index') }}"
                     class="flex items-center px-8 py-3 {{ request()->routeIs('bookings.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-calendar-event-line mr-3 text-lg"></i> <span id="client_panel_sidebar_bookings" data-i18n="Bookings">{{ __($site_settings['client_panel_sidebar_bookings'] ?? 'Bookings') }}</span>

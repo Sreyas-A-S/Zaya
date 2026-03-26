@@ -21,6 +21,7 @@ use App\Models\ClientConcern;
 use App\Models\TranslatorService;
 use App\Models\TranslatorSpecialization;
 use App\Models\Service;
+use App\Models\ServicePackage;
 use App\Models\Testimonial;
 use App\Mail\ContactUsMail;
 use App\Services\WordPressBlogService;
@@ -88,37 +89,87 @@ class WebController extends Controller
     {
         $language = App::getLocale();
         $settings = HomepageSetting::getSectionValues('services_page', $language);
-
-        $query = Service::where('status', true);
-
         $categoryName = $request->query('category') ?? $request->query('servicescategory');
+        $servicePackages = collect();
 
-        if ($categoryName) {
-            $query->where(function ($q) use ($categoryName) {
-                // Check in categories
-                $q->whereHas('categories', function ($sq) use ($categoryName) {
-                    $sq->where('name', 'like', "%$categoryName%");
-                })
-                // OR check in service title (fallback)
-                ->orWhere('title', 'like', "%$categoryName%");
-            });
+        if ($categoryName === 'Packages') {
+            $packageQuery = ServicePackage::where('status', true)
+                ->orderBy('order_column', 'asc')
+                ->orderByDesc('id');
+
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $packageQuery->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%$search%")
+                        ->orWhere('description', 'like', "%$search%");
+                });
+            }
+
+            $servicePackages = $packageQuery->get()->map(function ($package) {
+                $services = $package->services;
+                $imageUrl = asset('frontend/assets/wellness-based-ayurveda-consultation.png');
+
+                if ($package->cover_image) {
+                    $imageUrl = asset('storage/' . $package->cover_image);
+                } elseif ($services->isNotEmpty()) {
+                    $coverService = $services->first();
+                    if ($coverService->image) {
+                        if (str_starts_with($coverService->image, 'http')) {
+                            $imageUrl = $coverService->image;
+                        } elseif (file_exists(public_path('storage/' . $coverService->image))) {
+                            $imageUrl = asset('storage/' . $coverService->image);
+                        } elseif (file_exists(public_path($coverService->image))) {
+                            $imageUrl = asset($coverService->image);
+                        }
+                    }
+                }
+
+                $package->cover_image_url = $imageUrl;
+                $package->service_titles = $services->pluck('title')->values();
+
+                return $package;
+            })->filter(function ($package) use ($request) {
+                if (! $request->filled('search')) {
+                    return true;
+                }
+
+                $search = mb_strtolower($request->search);
+
+                return $package->service_titles->contains(function ($title) use ($search) {
+                    return str_contains(mb_strtolower($title), $search);
+                }) || str_contains(mb_strtolower((string) $package->title), $search)
+                    || str_contains(mb_strtolower((string) $package->description), $search);
+            })->values();
+
+            $services = collect();
+        } else {
+            $query = Service::where('status', true);
+
+            if ($categoryName) {
+                $query->where(function ($q) use ($categoryName) {
+                    $q->whereHas('categories', function ($sq) use ($categoryName) {
+                        $sq->where('name', 'like', "%$categoryName%");
+                    })
+                    ->orWhere('title', 'like', "%$categoryName%");
+                });
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%$search%")
+                        ->orWhere('description', 'like', "%$search%");
+                });
+            }
+
+            $services = $query->orderBy('order_column', 'asc')->get();
         }
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%$search%")
-                    ->orWhere('description', 'like', "%$search%");
-            });
-        }
-
-        $services = $query->orderBy('order_column', 'asc')->get();
 
         if ($request->ajax()) {
             return view('partials.frontend.services-grid', compact('services'))->render();
         }
 
-        return view('services', compact('settings', 'services'));
+        return view('services', compact('settings', 'services', 'servicePackages'));
     }
 
     public function gallery()

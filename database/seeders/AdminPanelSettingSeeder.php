@@ -220,6 +220,13 @@ class AdminPanelSettingSeeder extends Seeder
                 'max_length' => 50,
             ],
             [
+                'key' => 'admin_panel_sidebar_service_packages',
+                'value' => 'Service Packages',
+                'type' => 'text',
+                'section' => 'admin_panel',
+                'max_length' => 60,
+            ],
+            [
                 'key' => 'admin_panel_sidebar_service_categories',
                 'value' => 'Service Categories',
                 'type' => 'text',

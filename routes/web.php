@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\TranslatorController;
 use App\Http\Controllers\Admin\YogaTherapistController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\ServicePackageController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\PincodeController;
 use App\Http\Controllers\AdminController;
@@ -142,6 +143,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::resource('services', ServiceController::class);
     Route::post('services/{id}/status', [ServiceController::class, 'updateStatus'])->name('services.status');
     Route::delete('services/image/{id}', [ServiceController::class, 'deleteGalleryImage'])->name('services.delete-image');
+    Route::resource('service-packages', ServicePackageController::class);
+    Route::post('service-packages/{id}/status', [ServicePackageController::class, 'updateStatus'])->name('service-packages.status');
 
     Route::resource('packages', \App\Http\Controllers\Admin\PackageController::class);
     Route::post('packages/{id}/status', [\App\Http\Controllers\Admin\PackageController::class, 'updateStatus'])->name('packages.status');

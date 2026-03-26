@@ -118,6 +118,7 @@
                 </a>
                 <ul class="sidebar-submenu">
                     <li> <a href="{{ route('admin.services.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_all_services'] ?? 'All Services' }}</a></li>
+                    <li> <a href="{{ route('admin.service-packages.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_service_packages'] ?? 'Service Packages' }}</a></li>
                     @if(auth()->user()->hasPermission('master-data-view'))
                     <li> <a href="{{ route('admin.master-data.index', 'service_categories') }}">{{ $adminPanelSettings['admin_panel_sidebar_service_categories'] ?? 'Service Categories' }}</a></li>
                     @endif

@@ -37,6 +37,12 @@
         </a>
     @endif
 
+    <!-- Consultation -->
+    <a href="{{ route('consultations.index') }}"
+        class="leading-none text-lg {{ request()->routeIs('consultations.index') ? 'text-secondary border-b-2 border-secondary pb-1' : 'text-[#8F8F8F]' }} font-normal whitespace-nowrap cursor-pointer transition-colors">
+        {{ __($site_settings['client_panel_sidebar_consultation'] ?? 'Consultation') }}
+    </a>
+
     <!-- Bookings -->
     <a href="{{ route('bookings.index') }}" 
         class="leading-none text-lg {{ request()->routeIs('bookings.index') ? 'text-secondary border-b-2 border-secondary pb-1' : 'text-[#8F8F8F]' }} font-normal whitespace-nowrap cursor-pointer transition-colors">

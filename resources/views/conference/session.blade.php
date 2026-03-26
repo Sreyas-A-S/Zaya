@@ -86,8 +86,8 @@
                 </div>
             </div>
 
-            <!-- On-Video Hover Controls -->
-            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
+            <!-- Desktop Hover Controls -->
+            <div class="hidden md:block absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
                 <div class="flex items-center justify-center gap-6">
                     <!-- Mic -->
                     <button id="audio-toggle" class="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all active:scale-90 cursor-pointer">
@@ -106,6 +106,24 @@
                         <i class="ri-phone-fill text-2xl rotate-[135deg]"></i>
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Mobile Controls -->
+        <div class="md:hidden px-4 py-4 bg-[#0A1209] border-t border-white/10">
+            <div class="grid grid-cols-4 gap-3">
+                <button id="audio-toggle-mobile" class="h-12 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-center text-white active:scale-95 transition-all">
+                    <i class="ri-mic-fill text-xl" id="mic-icon-mobile"></i>
+                </button>
+                <button id="video-toggle-mobile" class="h-12 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-center text-white active:scale-95 transition-all">
+                    <i class="ri-video-on-fill text-xl" id="vid-icon-mobile"></i>
+                </button>
+                <button id="screen-share-btn-mobile" class="h-12 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-center text-white active:scale-95 transition-all">
+                    <i class="ri-screen-share-line text-xl" id="screen-icon-mobile"></i>
+                </button>
+                <button onclick="leave()" class="h-12 bg-red-500 rounded-2xl flex items-center justify-center text-white active:scale-95 shadow-lg shadow-red-500/20 transition-all">
+                    <i class="ri-phone-fill text-xl rotate-[135deg]"></i>
+                </button>
             </div>
         </div>
 
@@ -211,12 +229,13 @@
         // --- AGORA LOGIC ---
         const rawAppId = "{{ $appId }}";
         const trimmedAppId = rawAppId.trim();
+        const tokenOverride = @json(request('token'));
         
         let options = { 
             appId: trimmedAppId, 
             channel: "{{ trim($channel) }}", 
-            token: null, 
-            uid: 0 
+            token: tokenOverride || null, 
+            uid: {{ (int) ($user->id ?? 1) }}
         };
         
         console.log("DEBUG: Agora Config Status:");
@@ -237,11 +256,18 @@
 
         // Fetch Token from Backend
         async function fetchToken() {
+            if (options.token) {
+                console.log("- Using token override (Preview):", options.token.substring(0,10) + "...");
+                return options.token;
+            }
             try {
-                const response = await fetch(`{{ route('agora.token') }}?channel=${options.channel}&uid=${options.uid}`);
+                const response = await fetch(`{{ route('agora.token') }}?channel=${encodeURIComponent(options.channel)}&uid=${options.uid}`);
                 const data = await response.json();
                 if (data.token) {
                     console.log("- Token Received (Preview):", data.token.substring(0,10) + "...");
+                }
+                if (data.uid) {
+                    options.uid = data.uid;
                 }
                 return data.token;
             } catch (e) {
@@ -352,36 +378,71 @@
             delete remoteUsers[user.uid];
         }
 
-        // Audio/Video Toggle
-        document.getElementById('audio-toggle').onclick = async () => {
+        function syncControlIcons(isMuted, isVideoOff) {
+            const micClass = isMuted ? 'ri-mic-off-fill text-red-500' : 'ri-mic-fill';
+            const videoClass = isVideoOff ? 'ri-video-off-fill text-red-500' : 'ri-video-on-fill';
+
+            const micIcon = document.getElementById('mic-icon');
+            const micIconMobile = document.getElementById('mic-icon-mobile');
+            const vidIcon = document.getElementById('vid-icon');
+            const vidIconMobile = document.getElementById('vid-icon-mobile');
+
+            if (micIcon) micIcon.className = micClass;
+            if (micIconMobile) micIconMobile.className = micClass;
+            if (vidIcon) vidIcon.className = videoClass;
+            if (vidIconMobile) vidIconMobile.className = videoClass;
+        }
+
+        function syncScreenShareIcons(sharing) {
+            const screenClass = sharing ? 'ri-stop-circle-fill text-red-500' : 'ri-screen-share-line';
+            const screenIcon = document.getElementById('screen-icon');
+            const screenIconMobile = document.getElementById('screen-icon-mobile');
+
+            if (screenIcon) screenIcon.className = screenClass;
+            if (screenIconMobile) screenIconMobile.className = screenClass;
+        }
+
+        async function toggleAudio() {
             const isMuted = !localTracks.audioTrack.muted;
             await localTracks.audioTrack.setMuted(isMuted);
-            document.getElementById('mic-icon').className = isMuted ? 'ri-mic-off-fill text-red-500' : 'ri-mic-fill';
-        };
+            syncControlIcons(isMuted, localTracks.videoTrack?.muted ?? false);
+        }
 
-        document.getElementById('video-toggle').onclick = async () => {
+        async function toggleVideo() {
             const isOff = !localTracks.videoTrack.muted;
             await localTracks.videoTrack.setMuted(isOff);
-            document.getElementById('vid-icon').className = isOff ? 'ri-video-off-fill text-red-500' : 'ri-video-on-fill';
-        };
+            syncControlIcons(localTracks.audioTrack?.muted ?? false, isOff);
+        }
 
-        document.getElementById('screen-share-btn').onclick = async () => {
+        async function toggleScreenShare() {
             if (!isSharing) {
                 screenTrack = await AgoraRTC.createScreenVideoTrack();
                 await client.unpublish(localTracks.videoTrack);
                 await client.publish(screenTrack);
                 screenTrack.play("local-player");
                 isSharing = true;
-                document.getElementById('screen-icon').className = 'ri-stop-circle-fill text-red-500';
+                syncScreenShareIcons(true);
             } else {
                 await client.unpublish(screenTrack);
                 screenTrack.stop(); screenTrack.close();
                 await client.publish(localTracks.videoTrack);
                 localTracks.videoTrack.play("local-player");
                 isSharing = false;
-                document.getElementById('screen-icon').className = 'ri-screen-share-line';
+                syncScreenShareIcons(false);
             }
-        };
+        }
+
+        document.getElementById('audio-toggle').onclick = toggleAudio;
+        document.getElementById('video-toggle').onclick = toggleVideo;
+        document.getElementById('screen-share-btn').onclick = toggleScreenShare;
+
+        const mobileAudioToggle = document.getElementById('audio-toggle-mobile');
+        const mobileVideoToggle = document.getElementById('video-toggle-mobile');
+        const mobileScreenShareToggle = document.getElementById('screen-share-btn-mobile');
+
+        if (mobileAudioToggle) mobileAudioToggle.onclick = toggleAudio;
+        if (mobileVideoToggle) mobileVideoToggle.onclick = toggleVideo;
+        if (mobileScreenShareToggle) mobileScreenShareToggle.onclick = toggleScreenShare;
     });
 </script>
 @endsection

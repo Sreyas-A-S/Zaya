@@ -67,6 +67,7 @@ class ClientPanelSettingFrenchSeeder extends Seeder
             // Sidebar
             ['key' => 'client_panel_sidebar_dashboard', 'value' => 'Tableau de bord', 'type' => 'text', 'section' => 'client_panel_sidebar'],
             ['key' => 'client_panel_sidebar_health_journey', 'value' => 'Parcours de santé', 'type' => 'text', 'section' => 'client_panel_sidebar'],
+            ['key' => 'client_panel_sidebar_consultation', 'value' => 'Consultation', 'type' => 'text', 'section' => 'client_panel_sidebar'],
             ['key' => 'client_panel_sidebar_bookings', 'value' => 'Réservations', 'type' => 'text', 'section' => 'client_panel_sidebar'],
             ['key' => 'client_panel_sidebar_conference_history', 'value' => 'Historique des conférences', 'type' => 'text', 'section' => 'client_panel_sidebar'],
             ['key' => 'client_panel_sidebar_transaction_vault', 'value' => 'Coffre-fort des transactions', 'type' => 'text', 'section' => 'client_panel_sidebar'],

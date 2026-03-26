@@ -17,6 +17,10 @@ class ClinicalDocument extends Model
         'file_size',
     ];
 
+    protected $casts = [
+        'file_name' => 'encrypted',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

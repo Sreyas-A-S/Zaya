@@ -15,7 +15,7 @@
     <div id="modal-backdrop" class="fixed inset-0 bg-black/50 transition-opacity"></div>
 
     <div class="fixed inset-0 z-10 overflow-y-auto">
-        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+        <div id="booking-modal-container" class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
             <!-- Modal panel -->
             <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-2xl shadow-xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
                 <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
@@ -53,8 +53,13 @@
         document.body.style.overflow = 'auto';
     }
 
-    // Close on backdrop click
+    // Close on outside click
     document.getElementById('modal-backdrop').addEventListener('click', closeBookingModal);
+    document.getElementById('booking-modal-container').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeBookingModal();
+        }
+    });
 
     async function viewBookingDetails(id) {
         openBookingModal();

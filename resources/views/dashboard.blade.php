@@ -11,7 +11,6 @@
         <div id="section-identity" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
             <div class="flex justify-between items-center mb-6">
                 <h2 id="client_panel_identity_hub_title" class="text-xl font-medium font-sans! text-secondary" data-i18n="{{ $site_settings['client_panel_identity_hub_title'] ?? 'Identity Hub' }}">{{ __($site_settings['client_panel_identity_hub_title'] ?? 'Identity Hub') }}</h2>
-                <button class="text-gray-400 hover:text-gray-600"><i class="ri-pencil-line"></i></button>
             </div>
 
             @php

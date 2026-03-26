@@ -67,6 +67,7 @@ class ClientPanelSettingSeeder extends Seeder
             // Sidebar
             ['key' => 'client_panel_sidebar_dashboard', 'value' => 'Dashboard', 'type' => 'text', 'section' => 'client_panel_sidebar'],
             ['key' => 'client_panel_sidebar_health_journey', 'value' => 'Health Journey', 'type' => 'text', 'section' => 'client_panel_sidebar'],
+            ['key' => 'client_panel_sidebar_consultation', 'value' => 'Consultation', 'type' => 'text', 'section' => 'client_panel_sidebar'],
             ['key' => 'client_panel_sidebar_bookings', 'value' => 'Bookings', 'type' => 'text', 'section' => 'client_panel_sidebar'],
             ['key' => 'client_panel_sidebar_conference_history', 'value' => 'Conference History', 'type' => 'text', 'section' => 'client_panel_sidebar'],
             ['key' => 'client_panel_sidebar_transaction_vault', 'value' => 'Transaction Vault', 'type' => 'text', 'section' => 'client_panel_sidebar'],

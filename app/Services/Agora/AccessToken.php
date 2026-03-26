@@ -50,14 +50,16 @@ class ServiceRtc extends Service
     {
         parent::__construct(self::SERVICE_TYPE);
         $this->channelName = $channelName;
-        $this->uid = (string)$uid;
+        $this->uid = $uid;
     }
 
     public function pack()
     {
         $out = parent::pack();
+        // Pack string with 2-byte length
         $out .= pack("v", strlen($this->channelName)) . $this->channelName;
-        $out .= pack("v", strlen($this->uid)) . $this->uid;
+        // IMPORTANT: Integer UID must be packed as 4-byte uint32 (V) for buildTokenWithUid
+        $out .= pack("V", (int)$this->uid);
         return $out;
     }
 }
@@ -94,10 +96,20 @@ class AccessToken
         }
 
         $data = $this->pack();
+        
+        // Agora V7 Token structure: 
+        // 1. Calculate signature using HMAC-SHA256
         $signature = hash_hmac("sha256", $data, $this->appCertificate, true);
         
-        // ZLIB_ENCODING_DEFLATE is the standard for Agora v7 tokens
-        $compressed = zlib_encode($signature . $data, ZLIB_ENCODING_DEFLATE);
+        // 2. Add CRC32 of AppID and CRC32 of Data
+        $appIdCrc = crc32($this->appId) & 0xFFFFFFFF;
+        $dataCrc = crc32($data) & 0xFFFFFFFF;
+        
+        // 3. The actual content to compress is [Signature (32 bytes) + AppID_CRC (4 bytes) + Data_CRC (4 bytes) + Data]
+        $content = $signature . pack("V", $appIdCrc) . pack("V", $dataCrc) . $data;
+        
+        // 4. Compress using ZLIB (standard deflate)
+        $compressed = zlib_encode($content, ZLIB_ENCODING_DEFLATE);
         
         return self::VERSION . base64_encode($compressed);
     }
@@ -114,7 +126,7 @@ class AccessToken
             $out .= $service->pack();
         }
 
-        // Standard Agora v7 requires AppID to be packed as a string (with 2-byte length prefix)
+        // AppID must be packed with 2-byte length prefix
         return pack("v", strlen($this->appId)) . $this->appId . $out;
     }
 }

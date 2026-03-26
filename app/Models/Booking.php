@@ -40,7 +40,7 @@ class Booking extends Model
         'booking_date' => 'date',
         'total_price' => 'decimal:2',
         'reminder_sent' => 'boolean',
-        'payment_details' => 'array',
+        'payment_details' => 'encrypted:array',
         'conditions' => 'encrypted',
         'situation' => 'encrypted',
     ];

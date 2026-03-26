@@ -20,7 +20,8 @@
     </div>
 
     <!-- Participants -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 {{ in_array($user->role, ['client', 'patient']) ? '' : 'md:grid-cols-2' }} gap-6">
+        @unless(in_array($user->role, ['client', 'patient']))
         <div class="bg-gray-50 p-4 rounded-xl">
             <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-3">Client Information</p>
             <div class="flex items-center gap-3">
@@ -32,6 +33,7 @@
                 </div>
             </div>
         </div>
+        @endunless
         <div class="bg-gray-50 p-4 rounded-xl">
             <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-3">Practitioner Information</p>
             <div class="flex items-center gap-3">
