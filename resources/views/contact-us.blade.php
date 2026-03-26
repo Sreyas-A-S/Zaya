@@ -140,14 +140,15 @@
 
             <!-- First Name -->
            <div>
-    <label class="block text-base text-secondary font-normal mb-2">
-        First Name <span class="text-red-500">*</span>
+    <label class="block text-base text-secondary font-normal mb-2" data-i18n="First Name">
+        {{ __('First Name') }} <span class="text-red-500">*</span>
     </label>
 
     <input type="text"
         id="first_name"
         name="first_name"
-        placeholder="Your First Name"
+        placeholder="{{ __('Your First Name') }}"
+        data-i18n="Your First Name"
         class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none"
         maxlength="50"
         required
@@ -159,14 +160,15 @@
 
             <!-- Last Name -->
           <div>
-    <label class="block text-base text-secondary font-normal mb-2">
-        Last Name <span class="text-red-500">*</span>
+    <label class="block text-base text-secondary font-normal mb-2" data-i18n="Last Name">
+        {{ __('Last Name') }} <span class="text-red-500">*</span>
     </label>
 
     <input type="text"
         id="last_name"
         name="last_name"
-        placeholder="Your Last Name"
+        placeholder="{{ __('Your Last Name') }}"
+        data-i18n="Your Last Name"
         class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none"
         maxlength="50"
         required
@@ -178,14 +180,15 @@
 </div>
             <!-- Email -->
             <div>
-                <label class="block text-base text-secondary font-normal mb-2">
-                    Email <span class="text-red-500">*</span>
+                <label class="block text-base text-secondary font-normal mb-2" data-i18n="Email">
+                    {{ __('Email') }} <span class="text-red-500">*</span>
                 </label>
 
                 <input type="email"
                     id="email"
                     name="email"
-                    placeholder="Your Email"
+                    placeholder="{{ __('Your Email') }}"
+                    data-i18n="Your Email"
                     class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none"
                     maxlength="255"
                     required>
@@ -195,14 +198,15 @@
 
             <!-- Phone No -->
             <div>
-                <label class="block text-base text-secondary font-normal mb-2">
-                    Phone No <span class="text-red-500">*</span>
+                <label class="block text-base text-secondary font-normal mb-2" data-i18n="Phone No.">
+                    {{ __('Phone No.') }} <span class="text-red-500">*</span>
                 </label>
 
                 <input type="tel"
                     id="phone"
                     name="phone"
-                    placeholder="Your Phone No"
+                    placeholder="{{ __('Your Phone No') }}"
+                    data-i18n="Your Phone No"
                     class="w-full border border-[#C5C5C5] rounded-full px-6 py-3 text-secondary focus:border-primary focus:outline-none"
                     maxlength="15"
                     inputmode="numeric"
@@ -214,32 +218,33 @@
 
             <!-- I am a -->
             <div>
-                <label id="contact-label-user-type" class="block text-base text-secondary font-normal mb-3">{{ __('I am a') }}</label>
+                <label id="contact-label-user-type" class="block text-base text-secondary font-normal mb-3" data-i18n="I am a">{{ __('I am a') }}</label>
                 <div class="flex gap-8">
                     <label class="flex items-center gap-3 cursor-pointer group">
                         <input type="checkbox" name="user_type[]" value="client"
                             class="w-5 h-5 border-gray-300 rounded-sm text-gray-600 focus:ring-0 focus:ring-offset-0 bg-[#E8E8E8]"
                             checked>
-                        <span id="contact-user-type-client" class="text-secondary text-base font-normal">{{ __('Client') }}</span>
+                        <span id="contact-user-type-client" class="text-secondary text-base font-normal" data-i18n="Client">{{ __('Client') }}</span>
                     </label>
                     <label class="flex items-center gap-3 cursor-pointer group">
                         <input type="checkbox" name="user_type[]" value="practitioner"
                             class="w-5 h-5 border-gray-300 rounded-sm text-gray-600 focus:ring-0 focus:ring-offset-0 bg-[#E8E8E8]">
-                        <span id="contact-user-type-practitioner" class="text-secondary text-base font-normal">{{ __('Practitioner') }}</span>
+                        <span id="contact-user-type-practitioner" class="text-secondary text-base font-normal" data-i18n="Practitioner">{{ __('Practitioner') }}</span>
                     </label>
                 </div>
             </div>
 
             <!-- Message -->
            <div>
-            <label class="block text-base text-secondary font-normal mb-2">
-                Message <span class="text-red-500">*</span>
+            <label class="block text-base text-secondary font-normal mb-2" data-i18n="Message">
+                {{ __('Message') }} <span class="text-red-500">*</span>
             </label>
 
             <textarea
                 id="message"
                 name="message"
-                placeholder="Your Message"
+                placeholder="{{ __('Your Message') }}"
+                data-i18n="Your Message"
                 class="w-full border border-[#C5C5C5] rounded-2xl px-6 py-3 text-secondary focus:border-primary focus:outline-none"></textarea>
 
             <span id="message_error" class="text-red-500 text-sm mt-1 hidden"></span>
