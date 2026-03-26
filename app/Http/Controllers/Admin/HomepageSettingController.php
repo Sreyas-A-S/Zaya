@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\HomepageSetting;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\ImageUploadTrait;
 
 class HomepageSettingController extends Controller
 {
+    use ImageUploadTrait;
+
     public function __construct()
     {
         $this->middleware('permission:home-page-view')->only(['index']);
@@ -20,12 +23,12 @@ class HomepageSettingController extends Controller
         $language = session('locale', 'en');
         
         // Get all settings for current language
-        $currentSettings = HomepageSetting::whereNotIn('section', ['about_page', 'services_page', 'contact', 'general'])
+        $currentSettings = HomepageSetting::whereNotIn('section', ['about_page', 'services_page', 'contact', 'general', 'gallery_page'])
             ->where('language', $language)
             ->get()
             ->keyBy('key');
 
-        $defaultSettings = HomepageSetting::whereNotIn('section', ['about_page', 'services_page', 'contact', 'general'])
+        $defaultSettings = HomepageSetting::whereNotIn('section', ['about_page', 'services_page', 'contact', 'general', 'gallery_page'])
             ->where('language', 'en')
             ->get();
 
@@ -54,7 +57,7 @@ class HomepageSettingController extends Controller
             // Return a "dummy" model instance for the form
             $newSetting = $setting->replicate();
             $newSetting->language = $language;
-            $newSetting->value = ''; 
+            $newSetting->value = ($setting->type === 'image') ? $setting->value : ''; 
             return $newSetting;
         })->groupBy('section');
 
@@ -68,6 +71,9 @@ class HomepageSettingController extends Controller
         $globalKeys = ['blog_post_1_link', 'blog_post_2_link', 'blog_post_3_link'];
 
         foreach ($data as $key => $value) {
+            // Skip cropped data keys
+            if (str_ends_with($key, '_cropped')) continue;
+
             $isGlobal = in_array($key, $globalKeys);
             $targetLanguage = $isGlobal ? 'en' : $language;
 
@@ -78,17 +84,26 @@ class HomepageSettingController extends Controller
                 // Validate max length if applicable
                 if ($setting->max_length && is_string($value) && strlen($value) > $setting->max_length) {
                     if ($request->ajax()) {
-                        return response()->json(['success' => false, 'message' => "The {$key} field cannot be longer than {$setting->max_length} characters."], 422);
+                        return response()->json(['success' => false, 'message' => "The " . str_replace('_', ' ', $key) . " field cannot be longer than {$setting->max_length} characters."], 422);
                     }
                     return redirect()->back()->withErrors(["{$key}" => "The {$key} field cannot be longer than {$setting->max_length} characters."]);
                 }
-                if ($setting->type === 'image' && $request->hasFile($key)) {
-                    // Delete old image if exists
-                    if ($setting->value && Storage::disk('public')->exists($setting->value)) {
-                        Storage::disk('public')->delete($setting->value);
+
+                if ($setting->type === 'image') {
+                    $croppedKey = $key . '_cropped';
+                    if ($request->filled($croppedKey)) {
+                        if ($setting->value && !str_contains($setting->value, 'frontend/assets') && Storage::disk('public')->exists($setting->value)) {
+                            Storage::disk('public')->delete($setting->value);
+                        }
+                        $path = $this->uploadBase64($request->input($croppedKey), 'homepage');
+                        $setting->update(['value' => $path]);
+                    } elseif ($request->hasFile($key)) {
+                        if ($setting->value && !str_contains($setting->value, 'frontend/assets') && Storage::disk('public')->exists($setting->value)) {
+                            Storage::disk('public')->delete($setting->value);
+                        }
+                        $path = $request->file($key)->store('homepage', 'public');
+                        $setting->update(['value' => $path]);
                     }
-                    $path = $request->file($key)->store('homepage', 'public');
-                    $setting->update(['value' => $path]);
                 } else if ($setting->type !== 'image') {
                     $setting->update(['value' => $value]);
                 }
@@ -98,13 +113,20 @@ class HomepageSettingController extends Controller
                 if ($originalSetting) {
                     $val = is_string($value) ? $value : $originalSetting->value;
                     
-                    if ($originalSetting->type === 'image' && $request->hasFile($key)) {
-                        $val = $request->file($key)->store('homepage', 'public');
+                    if ($originalSetting->type === 'image') {
+                        $croppedKey = $key . '_cropped';
+                        if ($request->filled($croppedKey)) {
+                            $val = $this->uploadBase64($request->input($croppedKey), 'homepage');
+                        } elseif ($request->hasFile($key)) {
+                            $val = $request->file($key)->store('homepage', 'public');
+                        } else {
+                            $val = $originalSetting->value;
+                        }
                     }
 
                     HomepageSetting::create([
                         'key' => $key,
-                        'value' => $val,
+                        'value' => $val ?? '',
                         'type' => $originalSetting->type,
                         'section' => $originalSetting->section,
                         'max_length' => $originalSetting->max_length,

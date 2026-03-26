@@ -132,7 +132,7 @@
                         <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
                             <i class="ri-dashboard-line text-lg"></i> {{ __('Dashboard') }}
                         </a>
-                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
+                        <a href="{{ route('profile') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
                             <i class="ri-user-settings-line text-lg"></i> {{ __('My Profile') }}
                         </a>
                         <form method="POST" action="{{ route('logout') }}" id="logout-form-desktop" class="hidden">
@@ -224,6 +224,18 @@
                             if (element) {
                                 if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                                     element.placeholder = data.data[key];
+                                } else if (element.tagName === 'IMG') {
+                                    // Handle image settings - update src and alt if title is available
+                                    const value = data.data[key];
+                                    const src = value.startsWith('frontend/assets/') ? `{{ asset('') }}${value}` : `{{ asset('storage') }}/${value}`;
+                                    element.src = src;
+                                    
+                                    // Try to find a related title for alt text (e.g. sanctuary_title for sanctuary_img_X)
+                                    const section = key.split('_')[1]; // gallery_sanctuary_img_1 -> sanctuary
+                                    const titleKey = `gallery_${section}_title`;
+                                    if (data.data[titleKey]) {
+                                        element.alt = data.data[titleKey];
+                                    }
                                 } else if (element.tagName === 'A' || element.tagName === 'BUTTON' || element.tagName === 'SPAN' || element.tagName === 'H1' || element.tagName === 'H2' || element.tagName === 'H3' || element.tagName === 'P') {
                                     // For elements with children (like icons), we only want to update the text part
                                     // This is a bit tricky, but innerHTML is okay if settings don't have HTML usually.
@@ -291,8 +303,15 @@
                         @endif
 
                         console.log("Language changed dynamically to:", targetLocale);
-                        // Reload for pages with dynamic content from other tables like FAQs
-                        location.reload();
+                        // Reload for pages with complex dynamic content that cannot be easily patched via AJAX
+                        // such as those with lists from database that depend on current locale
+                        const reloadNeededPages = ['/blogs', '/find-practitioner', '/contact-us', '/book-session'];
+                        const currentPath = window.location.pathname;
+                        const shouldReload = reloadNeededPages.some(path => currentPath.includes(path));
+                        
+                        if (shouldReload) {
+                            location.reload();
+                        }
                     }
                 })
                 .catch(error => {

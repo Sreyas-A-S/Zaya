@@ -201,6 +201,7 @@ class MindfulnessPractitionerController extends Controller
                 'role' => 'mindfulness_practitioner',
             ]);
 
+            // Send Welcome Email
             $plainPassword = $validatedData['password'];
             Session::put('welcome_password_' . $user->id, $plainPassword);
             Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login')));

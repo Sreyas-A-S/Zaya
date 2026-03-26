@@ -3,20 +3,6 @@
 @section('title', 'Client Profile')
 
 @section('content')
-<!-- Mobile Tab Navigation -->
-<div class="lg:hidden flex space-x-6 overflow-x-auto scrollbar-hide mb-5">
-    <button onclick="switchMobileTab('dashboard')" id="client_panel_sidebar_dashboard_mobile"
-        class="leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1" data-i18n="Dashboard">{{ __($site_settings['client_panel_sidebar_dashboard'] ?? 'Dashboard') }}</button>
-    <button onclick="switchMobileTab('health')" id="client_panel_sidebar_health_journey_mobile"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors" data-i18n="Health Journey">{{ __($site_settings['client_panel_sidebar_health_journey'] ?? 'Health Journey') }}</button>
-    <a href="{{ route('bookings.index') }}" id="client_panel_sidebar_bookings_mobile"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors" data-i18n="Bookings">{{ __($site_settings['client_panel_sidebar_bookings'] ?? 'Bookings') }}</a>
-    <button onclick="switchMobileTab('transactions')" id="client_panel_sidebar_transaction_vault_mobile"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors" data-i18n="Transaction Vault">{{ __($site_settings['client_panel_sidebar_transaction_vault'] ?? 'Transaction Vault') }}</button>
-    <a href="{{ route('my-services.index') }}" class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">My Services</a>
-    <a href="{{ route('profile') }}" id="client_panel_sidebar_profile_mobile"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors" data-i18n="Profile">{{ __('Profile') }}</a>
-</div>
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 md:gap-8 md:mb-8 mb-5">
     <!-- Left Column -->
@@ -530,6 +516,13 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        // Handle tab switching via URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab');
+        if (tab && ['dashboard', 'health', 'transactions'].includes(tab)) {
+            switchMobileTab(tab);
+        }
+
         const docInput = document.getElementById('document-input');
         const uploadBtn = document.getElementById('client_panel_upload_btn');
         const dropZone = document.getElementById('drop-zone');

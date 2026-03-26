@@ -3,20 +3,6 @@
 @section('title', 'My Bookings')
 
 @section('content')
-<!-- Mobile Tab Navigation -->
-<div class="lg:hidden flex space-x-6 overflow-x-auto scrollbar-hide mb-5">
-    <a href="{{ route('dashboard') }}"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Dashboard</a>
-    <button class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Health
-        Journey</button>
-    <a href="{{ route('bookings.index') }}"
-        class="leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1">Bookings</a>
-    <button class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Transaction
-        Vault</button>
-    <a href="{{ route('my-services.index') }}" class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">My Services</a>
-    <a href="{{ route('profile') }}"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">{{ __('Profile') }}</a>
-</div>
 
 <!-- Bookings Content -->
 <div id="bookings-wrapper">

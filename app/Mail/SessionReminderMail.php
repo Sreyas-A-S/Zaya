@@ -25,6 +25,7 @@ class SessionReminderMail extends Mailable
         $this->booking = $booking;
         $this->type = $type;
         $this->agoraLink = $agoraLink;
+        $this->mailer('info');
     }
 
     /**

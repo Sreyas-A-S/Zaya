@@ -22,6 +22,7 @@ class DataAccessOTPMail extends Mailable
     {
         $this->otp = $otp;
         $this->requesterName = $requesterName;
+        $this->mailer('info');
     }
 
     /**

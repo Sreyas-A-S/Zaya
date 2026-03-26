@@ -484,8 +484,7 @@ class HomepageSettingSeeder extends Seeder
                 'type' => 'textarea',
                 'section' => 'contact_page',
                 'max_length' => 100
-            ],
-            [
+            ],            [
                 'key' => 'contact_info_working_hours',
                 'value' => 'Mon - Fri: 9 AM - 6 PM<br>Sat: 10 AM - 2 PM',
                 'type' => 'textarea',

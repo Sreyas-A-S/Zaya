@@ -58,7 +58,7 @@ return [
             'password' => env('MAIL_NOREPLY_PASSWORD'),
             'encryption' => env('MAIL_NOREPLY_ENCRYPTION', env('MAIL_ENCRYPTION')),
             'from' => [
-                'address' => env('MAIL_NOREPLY_FROM_ADDRESS', 'noreply@zayawellness.com'),
+                'address' => env('MAIL_NOREPLY_FROM_ADDRESS', 'noreply@logiprompt.com'),
                 'name' => env('MAIL_NOREPLY_FROM_NAME', env('MAIL_FROM_NAME')),
             ],
         ],
@@ -67,11 +67,11 @@ return [
             'transport' => 'smtp',
             'host' => env('MAIL_INFO_HOST', env('MAIL_HOST')),
             'port' => env('MAIL_INFO_PORT', env('MAIL_PORT')),
-            'username' => env('MAIL_INFO_USERNAME'),
-            'password' => env('MAIL_INFO_PASSWORD'),
+            'username' => env('MAIL_INFO_USERNAME', env('MAIL_USERNAME')),
+            'password' => env('MAIL_INFO_PASSWORD', env('MAIL_PASSWORD')),
             'encryption' => env('MAIL_INFO_ENCRYPTION', env('MAIL_ENCRYPTION')),
             'from' => [
-                'address' => env('MAIL_INFO_FROM_ADDRESS', 'info@zayawellness.com'),
+                'address' => env('MAIL_INFO_FROM_ADDRESS', env('MAIL_FROM_ADDRESS')),
                 'name' => env('MAIL_INFO_FROM_NAME', env('MAIL_FROM_NAME')),
             ],
         ],

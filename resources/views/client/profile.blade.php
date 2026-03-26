@@ -5,10 +5,53 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 <style>
     .cropper-container { max-height: 400px; width: 100%; }
     #cropper-image { max-width: 100%; display: block; }
     .progress-bar-fill { transition: width 0.3s ease; }
+    /* Tom Select Custom Styling */
+    .ts-control {
+        border-radius: 0.75rem !important;
+        padding: 0.5rem 0.75rem !important;
+        border: 1px solid #e5e7eb !important;
+        background-color: #fff !important;
+        font-size: 1rem !important;
+        line-height: 1.5rem !important;
+        transition: all 0.2s !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+    }
+    .ts-wrapper.focus .ts-control {
+        border-color: #2E4B3D !important;
+        box-shadow: 0 0 0 2px rgba(46, 75, 61, 0.1) !important;
+    }
+    /* Tom Select Pill Styling */
+    .ts-control .item {
+        background: rgba(46, 75, 61, 0.1) !important;
+        color: #2E4B3D !important;
+        border-radius: 9999px !important;
+        padding: 3px 12px !important;
+        border: 1px solid rgba(46, 75, 61, 0.1) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        font-weight: 600 !important;
+        margin: 2px !important;
+        font-size: 0.9rem !important;
+    }
+    .ts-control .item .remove {
+        border-left: none !important;
+        margin-left: 6px !important;
+        padding: 0 4px !important;
+        border-radius: 0 9999px 9999px 0 !important;
+        color: rgba(46, 75, 61, 0.4) !important;
+        font-size: 1.1em !important;
+    }
+    .ts-control .item .remove:hover {
+        background: transparent !important;
+        color: #F3324C !important;
+    }
 </style>
 @endpush
 
@@ -85,19 +128,6 @@
 @endif
 
 <!-- Mobile Tab Navigation -->
-<div class="lg:hidden flex space-x-6 overflow-x-auto scrollbar-hide mb-5">
-    <a href="{{ route('dashboard') }}"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Dashboard</a>
-    <button class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Health
-        Journey</button>
-    <a href="{{ route('bookings.index') }}"
-        class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Bookings</a>
-    <button class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">Transaction
-        Vault</button>
-    <a href="{{ route('my-services.index') }}" class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">My Services</a>
-    <a href="{{ route('profile') }}"
-        class="leading-none text-lg text-secondary font-normal whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1">{{ __('Profile') }}</a>
-</div>
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
@@ -216,20 +246,21 @@
             </div>
         </div>
 
+        @if(!in_array($user->role, ['client', 'patient']))
         <!-- Specialities & Conditions Card -->
         <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12">
             <!-- Specialities -->
             <div class="relative mb-8">
-                <button onclick="openProfessionalModal()" class="absolute top-0 right-0 text-gray-400 hover:text-secondary transition-colors">
+                <button onclick="openSpecialitiesModal()" class="absolute top-0 right-0 text-gray-400 hover:text-secondary transition-colors">
                     <i class="ri-pencil-line text-2xl"></i>
                 </button>
 
                 <h2 class="text-2xl font-medium font-sans! text-secondary mb-8">Specialities</h2>
-                <div class="flex flex-wrap gap-2.5">
+                <div class="flex flex-wrap gap-2.5" id="specialities-display-container">
                     @forelse($specialities as $speciality)
                         <span class="px-6 py-2 bg-[#F6F6F6] text-gray-700 text-lg rounded-full">{{ is_array($speciality) ? implode(', ', $speciality) : $speciality }}</span>
                     @empty
-                        <span class="text-gray-400 text-lg">No specialities listed.</span>
+                        <span class="text-gray-400 text-lg no-items-msg">No specialities listed.</span>
                     @endforelse
                 </div>
             </div>
@@ -238,24 +269,26 @@
 
             <!-- Conditions I support -->
             <div class="relative">
-                <button onclick="openProfessionalModal()" class="absolute top-0 right-0 text-gray-400 hover:text-[#2B4C3B] transition-colors">
+                <button onclick="openConditionsModal()" class="absolute top-0 right-0 text-gray-400 hover:text-[#2B4C3B] transition-colors">
                     <i class="ri-pencil-line text-2xl"></i>
                 </button>
 
                 <h2 class="text-2xl font-medium font-sans! text-secondary mb-8">Conditions I support</h2>
-                <div class="flex flex-wrap gap-2.5">
+                <div class="flex flex-wrap gap-2.5" id="conditions-display-container">
                     @forelse($conditions as $condition)
                         <span class="px-6 py-2 bg-[#F6F6F6] text-gray-700 text-lg rounded-full">{{ is_array($condition) ? implode(', ', $condition) : $condition }}</span>
                     @empty
-                        <span class="text-gray-400 text-lg">No conditions listed.</span>
+                        <span class="text-gray-400 text-lg no-items-msg">No conditions listed.</span>
                     @endforelse
                 </div>
             </div>
         </div>
+        @endif
 
     </div>
 </div>
 
+@if(!in_array($user->role, ['client', 'patient']))
 <!-- 4 Stats Banner -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 mt-8">
     <div
@@ -333,6 +366,7 @@
                     <div>
                         <p class="text-base font-medium text-gray-800">{{ $booking->user->name }}</p>
                         <p class="text-sm text-gray-400 mt-0.5">{{ \Carbon\Carbon::parse($booking->booking_date)->isToday() ? 'Today' : \Carbon\Carbon::parse($booking->booking_date)->format('M d, Y') }}</p>
+
                     </div>
                 </div>
                 <div class="text-sm text-gray-400 hidden sm:block">
@@ -367,29 +401,69 @@
     </div>
 
 </div>
+@endif
 
-<!-- Edit Professional Details Modal -->
-<div id="professionalModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+<!-- Specialities Modal -->
+<div id="specialitiesModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
         <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
-            <h3 class="text-2xl font-bold text-secondary">Edit Professional Details</h3>
-            <button onclick="closeProfessionalModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <h3 class="text-2xl font-bold text-secondary">Edit Specialities</h3>
+            <button onclick="closeSpecialitiesModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
                 <i class="ri-close-line text-3xl"></i>
             </button>
         </div>
-        <form action="{{ route('profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
+        <form id="specialitiesForm" action="{{ route('profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
             @csrf
+            <input type="hidden" name="update_type" value="specialities">
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Specialities (Comma separated)</label>
-                <textarea name="specialities" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none resize-none">{{ implode(', ', $specialities) }}</textarea>
-            </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Conditions I support (Comma separated)</label>
-                <textarea name="conditions" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none resize-none">{{ implode(', ', $conditions) }}</textarea>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Select Specialities</label>
+                <select id="specialities-select" name="specialities[]" multiple placeholder="Select or type specialities...">
+                    @foreach($allSpecialities as $item)
+                        <option value="{{ $item }}" {{ in_array($item, $specialities) ? 'selected' : '' }}>{{ $item }}</option>
+                    @endforeach
+                    @foreach($specialities as $item)
+                        @if(!$allSpecialities->contains($item))
+                            <option value="{{ $item }}" selected>{{ $item }}</option>
+                        @endif
+                    @endforeach
+                </select>
             </div>
             <div class="flex gap-4 pt-4">
-                <button type="button" onclick="closeProfessionalModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
-                <button type="submit" class="flex-1 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all shadow-lg">Save Changes</button>
+                <button type="button" onclick="closeSpecialitiesModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all shadow-lg">Save Specialities</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Conditions Modal -->
+<div id="conditionsModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+        <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="text-2xl font-bold text-secondary">Edit Conditions I Support</h3>
+            <button onclick="closeConditionsModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="ri-close-line text-3xl"></i>
+            </button>
+        </div>
+        <form id="conditionsForm" action="{{ route('profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
+            @csrf
+            <input type="hidden" name="update_type" value="conditions">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Select Conditions</label>
+                <select id="conditions-select" name="conditions[]" multiple placeholder="Select or type conditions...">
+                    @foreach($allConditions as $item)
+                        <option value="{{ $item }}" {{ in_array($item, $conditions) ? 'selected' : '' }}>{{ $item }}</option>
+                    @endforeach
+                    @foreach($conditions as $item)
+                        @if(!$allConditions->contains($item))
+                            <option value="{{ $item }}" selected>{{ $item }}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="closeConditionsModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all shadow-lg">Save Conditions</button>
             </div>
         </form>
     </div>
@@ -567,7 +641,39 @@
             </div>
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
-                <input type="password" name="new_password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none">
+                <div class="relative">
+                    <input type="password" id="new_password" name="new_password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none pr-12">
+                    <button type="button" onclick="togglePasswordVisibility('new_password')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-secondary">
+                        <i class="ri-eye-line" id="new_password_eye"></i>
+                    </button>
+                </div>
+                
+                <!-- Password Strength Checklist -->
+                <div id="password-requirements" class="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-100 hidden">
+                    <p class="text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">Password Requirements</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                        <div class="flex items-center gap-2 text-sm" id="req-length">
+                            <i class="ri-checkbox-circle-fill text-gray-300 transition-colors"></i>
+                            <span class="text-gray-500 transition-colors">8+ Characters</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm" id="req-upper">
+                            <i class="ri-checkbox-circle-fill text-gray-300 transition-colors"></i>
+                            <span class="text-gray-500 transition-colors">Uppercase Letter</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm" id="req-lower">
+                            <i class="ri-checkbox-circle-fill text-gray-300 transition-colors"></i>
+                            <span class="text-gray-500 transition-colors">Lowercase Letter</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm" id="req-number">
+                            <i class="ri-checkbox-circle-fill text-gray-300 transition-colors"></i>
+                            <span class="text-gray-500 transition-colors">At least one number</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm" id="req-special">
+                            <i class="ri-checkbox-circle-fill text-gray-300 transition-colors"></i>
+                            <span class="text-gray-500 transition-colors">Special character</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Confirm New Password</label>
@@ -584,6 +690,7 @@
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
     let cropper = null;
     let currentViewCategory = 'sanctuary';
@@ -597,15 +704,123 @@
     const progressText = document.getElementById('upload-percentage');
     const categoryNameSpan = document.getElementById('target-category-name');
 
-    function openProfessionalModal() {
-        document.getElementById('professionalModal').classList.remove('hidden');
+    // Multi-Select Instances
+    let specialitiesSelect, conditionsSelect;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Tom Select for Specialities
+        const specEl = document.getElementById('specialities-select');
+        if (specEl) {
+            specialitiesSelect = new TomSelect('#specialities-select', {
+                plugins: ['remove_button'],
+                create: true,
+                persist: false,
+                placeholder: 'Select or type specialities...',
+                maxItems: 15,
+            });
+        }
+
+        // Initialize Tom Select for Conditions
+        const condEl = document.getElementById('conditions-select');
+        if (condEl) {
+            conditionsSelect = new TomSelect('#conditions-select', {
+                plugins: ['remove_button'],
+                create: true,
+                persist: false,
+                placeholder: 'Select or type conditions...',
+                maxItems: 15,
+            });
+        }
+    });
+
+    function openSpecialitiesModal() {
+        document.getElementById('specialitiesModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     }
 
-    function closeProfessionalModal() {
-        document.getElementById('professionalModal').classList.add('hidden');
+    function closeSpecialitiesModal() {
+        document.getElementById('specialitiesModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
+
+    function openConditionsModal() {
+        document.getElementById('conditionsModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeConditionsModal() {
+        document.getElementById('conditionsModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Dynamic Updates for Specialities and Conditions
+    function handleProfessionalFormSubmit(formId, modalId, displayContainerId) {
+        const form = document.getElementById(formId);
+        if (!form) return;
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
+            
+            submitBtn.innerText = 'Saving...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(res => {
+                if (res.success) {
+                    showToast(res.message);
+                    
+                    // Update the display container
+                    const container = document.getElementById(displayContainerId);
+                    if (container && res.items) {
+                        container.innerHTML = '';
+                        if (res.items.length > 0) {
+                            res.items.forEach(item => {
+                                const span = document.createElement('span');
+                                span.className = 'px-6 py-2 bg-[#F6F6F6] text-gray-700 text-lg rounded-full';
+                                span.innerText = Array.isArray(item) ? item.join(', ') : item;
+                                container.appendChild(span);
+                            });
+                        } else {
+                            const emptySpan = document.createElement('span');
+                            emptySpan.className = 'text-gray-400 text-lg no-items-msg';
+                            emptySpan.innerText = formId === 'specialitiesForm' ? 'No specialities listed.' : 'No conditions listed.';
+                            container.appendChild(emptySpan);
+                        }
+                    }
+                    
+                    if (modalId === 'specialitiesModal') closeSpecialitiesModal();
+                    else closeConditionsModal();
+                } else {
+                    showToast(res.message || 'Update failed', 'error');
+                }
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            })
+            .catch(err => {
+                showToast('An error occurred.', 'error');
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        handleProfessionalFormSubmit('specialitiesForm', 'specialitiesModal', 'specialities-display-container');
+        handleProfessionalFormSubmit('conditionsForm', 'conditionsModal', 'conditions-display-container');
+    });
 
     function openGalleryModal() {
         document.getElementById('galleryModal').classList.remove('hidden');
@@ -933,12 +1148,83 @@
     function openPasswordModal() {
         document.getElementById('passwordModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        resetPasswordValidation();
     }
 
     function closePasswordModal() {
         document.getElementById('passwordModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
         document.getElementById('changePasswordForm').reset();
+        resetPasswordValidation();
+    }
+
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const eye = document.getElementById(inputId + '_eye');
+        if (input.type === 'password') {
+            input.type = 'text';
+            eye.classList.remove('ri-eye-line');
+            eye.classList.add('ri-eye-off-line');
+        } else {
+            input.type = 'password';
+            eye.classList.remove('ri-eye-off-line');
+            eye.classList.add('ri-eye-line');
+        }
+    }
+
+    const newPasswordInput = document.getElementById('new_password');
+    const requirementsBox = document.getElementById('password-requirements');
+    
+    function resetPasswordValidation() {
+        requirementsBox.classList.add('hidden');
+        const reqs = ['req-length', 'req-upper', 'req-lower', 'req-number', 'req-special'];
+        reqs.forEach(id => {
+            const el = document.getElementById(id);
+            el.querySelector('i').className = 'ri-checkbox-circle-fill text-gray-300 transition-colors';
+            el.querySelector('span').className = 'text-gray-500 transition-colors';
+        });
+    }
+
+    if (newPasswordInput) {
+        newPasswordInput.addEventListener('input', function() {
+            const val = this.value;
+            if (val.length > 0) {
+                requirementsBox.classList.remove('hidden');
+            } else {
+                requirementsBox.classList.add('hidden');
+            }
+
+            const checks = {
+                'req-length': val.length >= 8,
+                'req-upper': /[A-Z]/.test(val),
+                'req-lower': /[a-z]/.test(val),
+                'req-number': /[0-9]/.test(val),
+                'req-special': /[!@#$%^&*(),.?":{}|<>]/.test(val)
+            };
+
+            let allPassed = true;
+            Object.keys(checks).forEach(id => {
+                const passed = checks[id];
+                const el = document.getElementById(id);
+                const icon = el.querySelector('i');
+                const text = el.querySelector('span');
+
+                if (passed) {
+                    icon.className = 'ri-checkbox-circle-fill text-green-500 transition-colors';
+                    text.className = 'text-green-600 font-bold transition-colors';
+                } else {
+                    icon.className = 'ri-checkbox-circle-fill text-gray-300 transition-colors';
+                    text.className = 'text-gray-500 transition-colors';
+                    allPassed = false;
+                }
+            });
+
+            // Optional: You can disable the submit button until allPassed is true
+            const submitBtn = document.getElementById('changePasswordForm').querySelector('button[type="submit"]');
+            submitBtn.disabled = !allPassed;
+            submitBtn.style.opacity = allPassed ? '1' : '0.5';
+            submitBtn.style.cursor = allPassed ? 'pointer' : 'not-allowed';
+        });
     }
 
     document.getElementById('changePasswordForm').addEventListener('submit', function(e) {

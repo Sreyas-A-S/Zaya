@@ -107,6 +107,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
     Route::post('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [AdminController::class, 'updatePassword'])->name('profile.password.update');
+    Route::get('/gallery-settings', [\App\Http\Controllers\Admin\GallerySettingController::class, 'index'])->name('gallery-settings.index');
+    Route::post('/gallery-settings', [\App\Http\Controllers\Admin\GallerySettingController::class, 'update'])->name('gallery-settings.update');
     Route::resource('countries', CountryController::class);
     Route::post('countries/{id}/status', [CountryController::class, 'updateStatus'])->name('countries.status');
     Route::resource('doctors', DoctorController::class);

@@ -43,6 +43,10 @@ class WebController extends Controller
         $language = App::getLocale();
         $languages = Language::all();
         $practitioners = Practitioner::with(['user', 'reviews'])
+            ->where('status', 'active')
+            ->whereHas('userServices', function($q) {
+                $q->where('status', 'active');
+            })
             ->latest()
             ->take(8)
             ->get();
@@ -126,7 +130,11 @@ class WebController extends Controller
         $settings = HomepageSetting::getAllSettings($language);
 
         $pincode = session('global_pincode');
-        $query = Practitioner::with(['user', 'reviews'])->where('status', 'active');
+        $query = Practitioner::with(['user', 'reviews'])
+            ->where('status', 'active')
+            ->whereHas('userServices', function ($q) {
+                $q->where('status', 'active');
+            });
 
         if ($pincode) {
             $query->where('zip_code', 'LIKE', "%{$pincode}%");
@@ -154,7 +162,7 @@ class WebController extends Controller
         }
 
         $practitioners = $query->paginate(12)->onEachSide(1)->withQueryString();
-        $services = Service::where('status', 'active')->orderBy('title')->get();
+        $services = Service::where('status', true)->orderBy('title')->get();
 
         if ($request->ajax()) {
             return view('partials.frontend.practitioner-grid', compact('practitioners', 'pincode'))->render();
@@ -179,6 +187,9 @@ class WebController extends Controller
 
         // Search Practitioners
         $practitioners = Practitioner::where('status', 'active')
+            ->whereHas('userServices', function ($q) {
+                $q->where('status', 'active');
+            })
             ->where(function ($q) use ($query) {
                 $q->where('first_name', 'LIKE', "%{$query}%")
                     ->orWhere('last_name', 'LIKE', "%{$query}%")
@@ -186,11 +197,11 @@ class WebController extends Controller
                         $sq->where('title', 'LIKE', "%{$query}%");
                     });
             })
-            ->limit(4)
+            ->take(5)
             ->get();
 
         // Search Services (Treatments)
-        $services = Service::with('categories')->where('status', 'active')
+        $services = Service::with('categories')->where('status', true)
             ->where(function ($q) use ($query) {
                 $q->where('title', 'LIKE', "%{$query}%")
                     ->orWhereHas('categories', function ($cq) use ($query) {
@@ -270,7 +281,11 @@ class WebController extends Controller
         $language = App::getLocale();
         $settings = HomepageSetting::getAllSettings($language);
 
-        $practitioners = Practitioner::with(['user', 'reviews'])->where('status', 'active');
+        $practitioners = Practitioner::with(['user', 'reviews'])
+            ->where('status', 'active')
+            ->whereHas('userServices', function ($q) {
+                $q->where('status', 'active');
+            });
 
         if (!empty($query)) {
             $practitioners->where(function ($q) use ($query) {
@@ -489,7 +504,12 @@ class WebController extends Controller
 
     public function bookSession(Request $request, $practitioner = null)
     {
-        $practitioners = Practitioner::with(['user', 'reviews'])->where('status', 'active')->get();
+        $practitioners = Practitioner::with(['user', 'reviews'])
+            ->where('status', 'active')
+            ->whereHas('userServices', function ($q) {
+                $q->where('status', 'active');
+            })
+            ->get();
         $selectedPractitioner = null;
 
         if ($practitioner) {
@@ -506,13 +526,13 @@ class WebController extends Controller
 
         // Filter services based on selected practitioner using the new user_services table
         if ($selectedPractitioner && $selectedPractitioner->user) {
-            $services = Service::where('status', 'active')
+            $services = Service::where('status', true)
                 ->whereHas('userServices', function($q) use ($selectedPractitioner) {
                     $q->where('user_id', $selectedPractitioner->user_id);
                 })
                 ->get();
         } else {
-            $services = Service::where('status', 'active')->get();
+            $services = Service::where('status', true)->get();
         }
 
         // Handle prefilled service from request

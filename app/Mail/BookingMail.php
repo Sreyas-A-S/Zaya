@@ -20,6 +20,7 @@ class BookingMail extends Mailable
     {
         $this->booking = $booking->load(['user', 'practitioner.user', 'translator.user']);
         $this->type = $type;
+        $this->mailer('info');
     }
 
     public function envelope(): Envelope

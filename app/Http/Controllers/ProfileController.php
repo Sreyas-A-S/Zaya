@@ -282,7 +282,9 @@ class ProfileController extends Controller
             ->latest()
             ->get();
 
-        return view('practitioner.client-profile', compact('client', 'recordings', 'bookings'));
+        $user = Auth::user();
+
+        return view('practitioner.client-profile', compact('user', 'client', 'recordings', 'bookings'));
     }
 
     public function myServices()
@@ -292,42 +294,66 @@ class ProfileController extends Controller
         
         $myServices = UserService::with('service')
             ->where('user_id', $user->id)
-            ->get();
+            ->get()
+            ->groupBy('service_id');
             
-        $availableServices = Service::whereNotIn('id', $myServices->pluck('service_id'))
-            ->where('status', 'active')
+        $availableServices = Service::whereNotIn('id', $myServices->keys())
+            ->where('status', true)
             ->get();
 
-        return view('client.my-services', compact('myServices', 'availableServices'));
+        return view('client.my-services', compact('user', 'myServices', 'availableServices'));
     }
 
     public function storeService(Request $request)
     {
         $request->validate([
-            'service_id' => 'required|exists:services,id',
-            'rate' => 'required|numeric|min:0',
-            'duration' => 'required|integer|min:1',
+            'services' => 'required|array|min:1',
+            'services.*.service_id' => 'required|exists:services,id',
+            'services.*.rates' => 'required|array|min:1',
+            'services.*.rates.*.rate' => 'required|numeric|min:0',
+            'services.*.rates.*.duration' => 'required|integer|min:1',
         ]);
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        UserService::updateOrCreate(
-            ['user_id' => $user->id, 'service_id' => $request->service_id],
-            ['rate' => $request->rate, 'duration' => $request->duration, 'status' => 'active']
-        );
+        foreach ($request->services as $serviceData) {
+            foreach ($serviceData['rates'] as $rateData) {
+                UserService::updateOrCreate(
+                    [
+                        'user_id' => $user->id, 
+                        'service_id' => $serviceData['service_id'],
+                        'duration' => $rateData['duration']
+                    ],
+                    [
+                        'rate' => $rateData['rate'], 
+                        'status' => 'active'
+                    ]
+                );
+            }
+        }
 
-        return back()->with('status', 'Service added successfully!');
+        return back()->with('status', 'Services and rates added successfully!');
     }
 
     public function deleteService($id)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        
+
         UserService::where('user_id', $user->id)->where('id', $id)->delete();
 
-        return back()->with('status', 'Service removed successfully!');
+        return back()->with('status', 'Rate removed successfully!');
+    }
+
+    public function deleteServiceGroup($service_id)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        UserService::where('user_id', $user->id)->where('service_id', $service_id)->delete();
+
+        return back()->with('status', 'Service and all its rates removed successfully!');
     }
 
     public function updateProfilePic(Request $request)
@@ -418,19 +444,47 @@ class ProfileController extends Controller
 
         $gallery = PractitionerGallery::where('user_id', $user->id)->get()->groupBy('category');
 
+        // Master Data for Specialities & Conditions
+        $allSpecialities = [];
+        $allConditions = [];
+
+        switch ($user->role) {
+            case 'practitioner':
+                $allSpecialities = \App\Models\WellnessConsultation::where('status', true)->pluck('name');
+                $allConditions = \App\Models\BodyTherapy::where('status', true)->pluck('name');
+                break;
+            case 'doctor':
+                $allSpecialities = \App\Models\Specialization::where('status', true)->pluck('name');
+                $allConditions = \App\Models\HealthCondition::where('status', true)->pluck('name');
+                break;
+            case 'mindfulness_practitioner':
+                $allSpecialities = \App\Models\MindfulnessService::where('status', true)->pluck('name');
+                $allConditions = \App\Models\ClientConcern::where('status', true)->pluck('name');
+                break;
+            case 'yoga_therapist':
+                // Yoga therapist specialities are currently free text or generic
+                $allConditions = \App\Models\YogaExpertise::pluck('name');
+                break;
+            case 'translator':
+                $allSpecialities = \App\Models\TranslatorSpecialization::where('status', true)->pluck('name');
+                $allConditions = \App\Models\TranslatorService::where('status', true)->pluck('name');
+                break;
+        }
+
         return view('client.profile', compact(
-            'user', 
-            'profile', 
-            'totalSessions', 
-            'totalClients', 
-            'todaySessions', 
-            'upcomingSessions', 
+            'user',
+            'profile',
+            'totalSessions',
+            'totalClients',
+            'todaySessions',
+            'upcomingSessions',
             'servicesHistory', 
             'upcomingServices',
-            'gallery'
+            'gallery',
+            'allSpecialities',
+            'allConditions'
         ));
-    }
-
+        }
     public function uploadGalleryImage(Request $request)
     {
         $request->validate([
@@ -505,39 +559,46 @@ class ProfileController extends Controller
         $profile = $user->profile;
         if (!$profile) return back()->with('error', 'Profile not found.');
 
-        // Simple comma-separated to array conversion
-        $specialities = array_filter(array_map('trim', explode(',', $request->specialities)));
-        $conditions = array_filter(array_map('trim', explode(',', $request->conditions)));
-
+        $updateType = $request->input('update_type');
         $data = [];
-        switch ($user->role) {
-            case 'practitioner':
-                $data['consultations'] = $specialities;
-                $data['body_therapies'] = $conditions;
-                break;
-            case 'doctor':
-                $data['specialization'] = $specialities;
-                $data['health_conditions_treated'] = $conditions;
-                break;
-            case 'mindfulness_practitioner':
-                $data['practitioner_type'] = $specialities;
-                $data['client_concerns'] = $conditions;
-                break;
-            case 'yoga_therapist':
-                $data['yoga_therapist_type'] = $specialities;
-                $data['areas_of_expertise'] = $conditions;
-                break;
-            case 'translator':
-                $data['fields_of_specialization'] = $specialities;
-                $data['services_offered'] = $conditions;
-                break;
+
+        if ($updateType === 'specialities') {
+            $specialities = $request->input('specialities', []);
+            switch ($user->role) {
+                case 'practitioner': $data['consultations'] = $specialities; break;
+                case 'doctor': $data['specialization'] = $specialities; break;
+                case 'mindfulness_practitioner': $data['practitioner_type'] = $specialities; break;
+                case 'yoga_therapist': $data['yoga_therapist_type'] = $specialities; break;
+                case 'translator': $data['fields_of_specialization'] = $specialities; break;
+            }
+        } elseif ($updateType === 'conditions') {
+            $conditions = $request->input('conditions', []);
+            switch ($user->role) {
+                case 'practitioner': $data['body_therapies'] = $conditions; break;
+                case 'doctor': $data['health_conditions_treated'] = $conditions; break;
+                case 'mindfulness_practitioner': $data['client_concerns'] = $conditions; break;
+                case 'yoga_therapist': $data['areas_of_expertise'] = $conditions; break;
+                case 'translator': $data['services_offered'] = $conditions; break;
+            }
         }
 
         if (!empty($data)) {
             $profile->update($data);
         }
 
-        return back()->with('status', 'Professional details updated successfully!');
+        $label = $updateType === 'specialities' ? 'Specialities' : 'Conditions';
+        $items = ($updateType === 'specialities') ? ($data['consultations'] ?? $data['specialization'] ?? $data['practitioner_type'] ?? $data['yoga_therapist_type'] ?? $data['fields_of_specialization'] ?? []) : ($data['body_therapies'] ?? $data['health_conditions_treated'] ?? $data['client_concerns'] ?? $data['areas_of_expertise'] ?? $data['services_offered'] ?? []);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "{$label} updated successfully!",
+                'items' => $items,
+                'update_type' => $updateType
+            ]);
+        }
+
+        return back()->with('status', "{$label} updated successfully!");
     }
 
     public function joinSession($channel)

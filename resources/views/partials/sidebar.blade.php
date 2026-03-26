@@ -277,6 +277,9 @@
                     @if(auth()->user()->hasPermission('services-page-view'))
                     <li> <a href="{{ route('admin.services-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_services_page_settings'] ?? 'Services Page Settings' }}</a></li>
                     @endif
+                    @if(auth()->user()->hasPermission('gallery-page-view'))
+                    <li> <a href="{{ route('admin.gallery-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_gallery_settings'] ?? 'Gallery Settings' }}</a></li>
+                    @endif
                     @if(auth()->user()->hasPermission('home-page-view'))
                     <li> <a href="{{ route('admin.find-practitioner-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_find_practitioner_settings'] ?? 'Find Practitioner Settings' }}</a></li>
                     @endif
