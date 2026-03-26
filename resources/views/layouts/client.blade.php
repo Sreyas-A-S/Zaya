@@ -93,14 +93,10 @@
                 <a href="{{ route('dashboard') }}" class="flex items-center px-8 py-3 {{ request()->routeIs('dashboard') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-user-line mr-3 text-lg"></i> <span id="client_panel_sidebar_dashboard" data-i18n="Dashboard">{{ __($site_settings['client_panel_sidebar_dashboard'] ?? 'Dashboard') }}</span>
                 </a>
-                <a href="javascript:void(0)"
-                    onclick="openLogoutModal()"
-                    class="flex items-center px-8 py-3 text-red-400 hover:bg-red-50 hover:text-red-600 font-normal transition-colors">
-                    <i class="ri-logout-box-line mr-3 text-lg"></i> <span id="client_panel_sidebar_logout" data-i18n="Logout">{{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}</span>
+                <a href="{{ route('profile') }}"
+                    class="flex items-center px-8 py-3 {{ request()->routeIs('profile') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
+                    <i class="ri-user-settings-line mr-3 text-lg"></i> <span id="client_panel_sidebar_profile" data-i18n="Profile">{{ __('Profile') }}</span>
                 </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                    @csrf
-                </form>
                 <a href="#"
                     class="flex items-center px-8 py-3 text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary  font-normal transition-colors">
                     <i class="ri-pulse-line mr-3 text-lg"></i> <span id="client_panel_sidebar_health_journey" data-i18n="Health Journey">{{ __($site_settings['client_panel_sidebar_health_journey'] ?? 'Health Journey') }}</span>
@@ -125,10 +121,14 @@
                     class="flex items-center px-8 py-3 {{ request()->routeIs('my-services.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-shake-hands-line mr-3 text-lg"></i> <span id="client_panel_sidebar_my_services" data-i18n="My Services">{{ __('My Services') }}</span>
                 </a>
-                <a href="{{ route('profile') }}"
-                    class="flex items-center px-8 py-3 {{ request()->routeIs('profile') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
-                    <i class="ri-user-settings-line mr-3 text-lg"></i> <span id="client_panel_sidebar_profile" data-i18n="Profile">{{ __('Profile') }}</span>
+                <a href="javascript:void(0)"
+                    onclick="openLogoutModal()"
+                    class="flex items-center px-8 py-3 text-red-400 hover:bg-red-50 hover:text-red-600 font-normal transition-colors">
+                    <i class="ri-logout-box-line mr-3 text-lg"></i> <span id="client_panel_sidebar_logout" data-i18n="Logout">{{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}</span>
                 </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                    @csrf
+                </form>
             </nav>
         </div>
         <img src="{{ asset('frontend/assets/client-profile-floating-img.png') }}" alt="Floating Image"

@@ -17,6 +17,9 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Schema;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeUserMail;
+
 class AdminsController extends Controller
 {
     use AdminFilterTrait;
@@ -198,6 +201,12 @@ class AdminsController extends Controller
         }
 
         User::create($payload);
+
+        try {
+            Mail::to($request->email)->send(new WelcomeUserMail($request->email, $request->password, url('/zaya-login')));
+        } catch (\Exception $e) {
+            \Log::error('Admin Creation Welcome Email Error: ' . $e->getMessage());
+        }
 
         return response()->json(['success' => true, 'message' => 'Admin created successfully.']);
     }
