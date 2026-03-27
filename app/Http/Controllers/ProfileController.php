@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Conference;
 use App\Models\Country;
 use App\Models\ConsultationForm;
 use App\Models\Service;
 use App\Models\UserService;
 use App\Models\PractitionerGallery;
 use App\Traits\ImageUploadTrait;
+use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -172,23 +174,57 @@ class ProfileController extends Controller
         return response()->json(['message' => 'Consent updated successfully', 'consent' => $profile->data_sharing_consent]);
     }
 
-    public function bookings(Request $request)
+    public function conferences(Request $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        
-        $isConsultations = $request->routeIs('consultations.index');
-        $bookingsQuery = $this->getBookingQuery($user, !$isConsultations);
 
-        $bookings = $bookingsQuery
-            ->latest()
-            ->paginate(10);
+        $isConsultations = $request->routeIs('consultations.index');
+
+        // Show actual recorded conference sessions
+        $query = Conference::with(['booking.practitioner.user', 'booking.user'])
+            ->whereHas('booking', function($q) use ($user, $isConsultations) {
+                if ($isConsultations) {
+                    $q->where('practitioner_id', $user->profile_id);
+                } else {
+                    $q->where('user_id', $user->id);
+                }
+            });
+
+        $conferences = $query->latest()->paginate(15);
 
         if ($request->ajax()) {
-            return view('partials.bookings-table', compact('user', 'bookings'))->render();
+            return view('partials.conferences-table', compact('user', 'conferences'))->render();
         }
 
-        return view('bookings', compact('user', 'bookings'));
+        return view('bookings', compact('user', 'conferences'));
+    }
+
+    public function storeConference(Request $request)
+    {
+        $request->validate([
+            'booking_id' => 'required|exists:bookings,id',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date',
+            'provider' => 'required|string',
+            'room_name' => 'nullable|string',
+        ]);
+
+        $start = Carbon::parse($request->start_time);
+        $end = Carbon::parse($request->end_time);
+        $duration = $start->diffInMinutes($end);
+
+        $conference = Conference::create([
+            'booking_id' => $request->booking_id,
+            'start_time' => $start,
+            'end_time' => $end,
+            'duration_minutes' => $duration,
+            'provider' => $request->provider,
+            'room_name' => $request->room_name,
+            'metadata' => $request->metadata ?? [],
+        ]);
+
+        return response()->json(['success' => true, 'conference' => $conference]);
     }
 
     public function showConsultationForm(Request $request, $id)

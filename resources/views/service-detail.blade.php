@@ -155,8 +155,11 @@
             navigator.share({ title: '{{ $service->title }} | Zaya Wellness', url: window.location.href }).catch(console.error);
         } else {
             navigator.clipboard.writeText(window.location.href).then(() => {
-                if (window.showZayaToast) showZayaToast('Link copied to clipboard!', 'Service Shared');
-                else alert('Link copied to clipboard!');
+                if (window.showZayaToast) {
+                    showZayaToast('Link copied to clipboard!', 'Success', 'Share');
+                } else {
+                    alert('Link copied to clipboard!');
+                }
             });
         }
     }

@@ -296,11 +296,31 @@
         };
         const windowId = Math.random().toString(36).slice(2);
 
+        // Session Tracking
+        const bookingId = {{ $booking->id ?? 'null' }};
+        const sessionStartTime = new Date();
+
+        const storeConferenceSession = () => {
+            if (!bookingId) return;
+            const sessionEndTime = new Date();
+            const data = {
+                booking_id: bookingId,
+                start_time: sessionStartTime.toISOString(),
+                end_time: sessionEndTime.toISOString(),
+                provider: provider,
+                room_name: channel,
+                _token: '{{ csrf_token() }}'
+            };
+            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            navigator.sendBeacon("{{ route('conference.store') }}", blob);
+        };
+        window.addEventListener('beforeunload', storeConferenceSession);
+
         // Timer Logic
-        let startTime = Date.now();
+        let timerStartTime = Date.now();
         setInterval(() => {
             const now = Date.now();
-            const diff = Math.floor((now - startTime) / 1000);
+            const diff = Math.floor((now - timerStartTime) / 1000);
             const h = Math.floor(diff / 3600).toString().padStart(2, '0');
             const m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
             const s = (diff % 60).toString().padStart(2, '0');
@@ -312,7 +332,11 @@
         window.copyMeetingLink = () => {
             const url = provider === 'jaas' ? publicShareUrl : window.location.href;
             navigator.clipboard.writeText(url).then(() => {
-                alert('Meeting link copied to clipboard!');
+                if (window.showZayaToast) {
+                    showZayaToast('Meeting link copied to clipboard!', 'Success', 'Live Session');
+                } else {
+                    alert('Meeting link copied to clipboard!');
+                }
             });
         };
 

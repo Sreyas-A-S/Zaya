@@ -303,7 +303,11 @@
                 } else {
                     // Fallback to clipboard
                     await navigator.clipboard.writeText(window.location.href);
+                    if (window.showZayaToast) {
+                    showZayaToast('Invoice link copied to clipboard!', 'Success', 'Billing');
+                } else {
                     alert('Invoice link copied to clipboard!');
+                }
                 }
             } catch (err) {
                 console.error('Error sharing:', err);

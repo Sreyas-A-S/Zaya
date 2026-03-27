@@ -16,40 +16,42 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-[#F9F9F9]">
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">SL No.</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{{ ($user->role === 'client' || $user->role === 'patient') ? 'Practitioner' : 'Client' }}</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Mode</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                        <th class="px-6 py-4 text-xs font-bold text-[#5F6A63] uppercase tracking-wider">Date & Time</th>
+                        <th class="px-6 py-4 text-xs font-bold text-[#5F6A63] uppercase tracking-wider">{{ ($user->role === 'client' || $user->role === 'patient') ? 'Practitioner' : 'Client' }}</th>
+                        <th class="px-6 py-4 text-xs font-bold text-[#5F6A63] uppercase tracking-wider">Duration</th>
+                        <th class="px-6 py-4 text-xs font-bold text-[#5F6A63] uppercase tracking-wider">Provider</th>
+                        <th class="px-6 py-4 text-xs font-bold text-[#5F6A63] uppercase tracking-wider text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#2E4B3D]/12">
                     @forelse($conferences as $conference)
                     <tr class="hover:bg-[#FDFDFD] transition-colors">
-                        <td class="px-6 py-4 text-sm font-medium text-secondary">
-                            {{ $loop->iteration + ($conferences->currentPage() - 1) * $conferences->perPage() }}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-bold text-secondary">{{ $conference->start_time?->format('M d, Y') }}</div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">{{ $conference->start_time?->format('h:i A') }}</div>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center">
-                                <div class="w-8 h-8 rounded-full bg-gray-100 mr-3 flex items-center justify-center overflow-hidden">
-                                    @if($user->role === 'client' || $user->role === 'patient')
-                                        <i class="ri-user-star-line text-secondary"></i>
-                                    @else
-                                        <i class="ri-user-line text-gray-400"></i>
-                                    @endif
+                                <div class="w-8 h-8 rounded-full bg-gray-100 mr-3 flex items-center justify-center overflow-hidden border border-gray-200">
+                                    @php
+                                        $targetUser = ($user->role === 'client' || $user->role === 'patient') 
+                                            ? ($conference->booking->practitioner->user ?? null)
+                                            : ($conference->booking->user ?? null);
+                                    @endphp
+                                    <img src="{{ ($targetUser && $targetUser->profile_pic) ? (str_starts_with($targetUser->profile_pic, 'http') ? $targetUser->profile_pic : asset('storage/' . $targetUser->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" class="w-full h-full object-cover">
                                 </div>
                                 <span class="text-sm font-medium text-gray-900">
-                                    {{ ($user->role === 'client' || $user->role === 'patient') ? ($conference->practitioner->user->name ?? 'Practitioner') : ($conference->user->name ?? 'Client') }}
+                                    {{ $targetUser->name ?? 'N/A' }}
                                 </span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-500">
-                            {{ $conference->booking_date->format('M d, Y') }} at {{ $conference->booking_time }}
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 inline-flex text-[10px] leading-5 font-bold rounded-full uppercase bg-blue-50 text-blue-600">
-                                {{ ucfirst($conference->mode) }}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 inline-flex text-[10px] leading-5 font-black uppercase tracking-widest rounded-full bg-emerald-50 text-emerald-600">
+                                {{ $conference->duration_minutes }} mins
                             </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-[10px] text-gray-500 uppercase font-black">{{ $conference->provider }}</span>
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-3">
@@ -60,7 +62,7 @@
                                     </a>
                                 @endif
                                 
-                                <button onclick="viewBookingDetails({{ $conference->id }})" class="px-4 py-2 rounded-full bg-gray-50 text-secondary hover:bg-gray-100 transition-all flex items-center gap-2 text-xs font-bold border border-gray-100">
+                                <button onclick="viewBookingDetails({{ $conference->booking_id }})" class="px-4 py-2 rounded-full bg-gray-50 text-secondary hover:bg-gray-100 transition-all flex items-center gap-2 text-xs font-bold border border-gray-100">
                                     <i class="ri-eye-line text-lg"></i>
                                     Details
                                 </button>
