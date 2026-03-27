@@ -206,7 +206,7 @@
 
                     <div class="flex justify-end gap-4">
                         <a href="{{ route('index') }}" class="text-[#594B4B] font-normal text-base bg-transparent border-none py-3.5 px-6 hover:text-gray-700">{{ __('Cancel') }}</a>
-                        <button type="submit" class="bg-[#F5A623] text-[#423131] py-3.5 px-10 rounded-full font-normal text-base hover:bg-[#A87139] hover:text-white border-none">{{ __('Submit Application') }}</button>
+                        <button type="submit" class="bg-[#F5A623] text-[#423131] py-3.5 px-10 rounded-full font-normal text-base hover:bg-[#A87139] hover:text-white border-none">{{ __('Complete Application') }}</button>
                     </div>
                 </div>
             </form>
