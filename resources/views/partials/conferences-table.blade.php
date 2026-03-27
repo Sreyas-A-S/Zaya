@@ -2,12 +2,14 @@
     <div class="bg-white rounded-2xl border border-[#2E4B3D]/12 overflow-hidden mb-8">
         <div class="p-6 border-b border-[#2E4B3D]/12 flex flex-col sm:flex-row justify-between items-center gap-4">
             <h2 class="text-xl font-medium text-secondary">Conference History</h2>
-            <a href="{{ route('conference.join', ['channel' => 'zaya-' . strtolower(Str::random(10))]) }}" 
-               target="_blank" 
-               class="px-6 py-3 bg-secondary text-white rounded-full font-medium flex items-center gap-2 hover:bg-opacity-90 shadow-lg shadow-secondary/10 transition-all">
-                <i class="ri-vidicon-fill text-lg"></i>
-                Start Instant Meeting
-            </a>
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ route('conference.join', ['channel' => 'zaya-' . strtolower(Str::random(10)), 'provider' => 'jaas']) }}" 
+                   target="_blank" 
+                   class="px-5 py-3 bg-[#F3F6F4] text-secondary rounded-full font-medium flex items-center gap-2 hover:bg-[#E8EFEA] transition-all border border-[#2E4B3D]/10">
+                    <i class="ri-team-line text-lg"></i>
+                    Start Video Meet
+                </a>
+            </div>
         </div>
 
         <div class="overflow-x-auto">

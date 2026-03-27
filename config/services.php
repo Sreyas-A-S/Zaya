@@ -76,4 +76,12 @@ return [
         'app_certificate' => env('AGORA_APP_CERTIFICATE'),
     ],
 
+    'jaas' => [
+        'domain' => env('JAAS_DOMAIN', env('JAAAS_DOMAIN', '8x8.vc')),
+        'app_id' => env('JAAS_APP_ID', env('JAAAS_APP_ID')),
+        'kid' => env('JAAS_API_KEY_ID', env('JAAAS_API_KEY_ID')),
+        'private_key' => env('JAAS_PRIVATE_KEY', env('JAAAS_PRIVATE_KEY')),
+        'private_key_path' => env('JAAS_PRIVATE_KEY_PATH', env('JAAAS_PRIVATE_KEY_PATH')),
+    ],
+
 ];

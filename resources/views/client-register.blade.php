@@ -1173,7 +1173,7 @@
             const feeInput = document.getElementById('registration_fee');
             const feeActualInput = document.getElementById('registration_fee_actual');
             const feeCurrencyInput = document.getElementById('registration-fee-currency');
-            const countryToCurrency = @json(config('currencies.country_to_currency', []));
+            const countryToCurrency = @json(config('currencies.country_to_currency', []));  
             const countrySelect = document.getElementById('nationality-select');
             const fallbackRates = {
                 'EUR': { 'USD': 1.1, 'INR': 89, 'GBP': 0.85, 'AED': 4.04 },

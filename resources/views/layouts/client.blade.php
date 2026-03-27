@@ -2,6 +2,7 @@
 <html lang="en">
 @php
     $user = $user ?? Auth::user();
+    $isMeetingPopout = $isMeetingPopout ?? false;
 @endphp
 <head>
     <meta charset="UTF-8">
@@ -74,7 +75,7 @@
     @stack('styles')
 </head>
 
-<body class="flex h-screen overflow-hidden text-gray-800 bg-white">
+<body class="flex h-screen overflow-hidden text-gray-800 bg-white {{ $isMeetingPopout ? 'meeting-popout' : '' }}">
 
     <!-- Global Preloader -->
     <div id="global-preloader">
@@ -82,6 +83,7 @@
     </div>
 
     <!-- Sidebar -->
+    @if(!$isMeetingPopout)
     <aside class="w-[288px] bg-[#FFFFFF] border-r border-[#2E4B3D]/12 hidden lg:flex lg:flex-col h-full shrink-0">
         <div>
             <a href="{{ route('home') }}"
@@ -138,11 +140,24 @@
         <img src="{{ asset('frontend/assets/client-profile-floating-img.png') }}" alt="Floating Image"
             class="w-[248px] h-auto absolute bottom-0 left-0 pointer-events-none">
     </aside>
+    @endif
 
     <!-- Main Content -->
-    <main class="flex-1 h-full overflow-y-auto bg-[#F6F7F7]">
-        <div class="w-full px-5 py-4 lg:px-10 lg:py-10">
+    <main class="flex-1 h-full {{ $isMeetingPopout ? 'overflow-hidden bg-[#07110b] meeting-popout-main' : 'overflow-y-auto bg-[#F6F7F7]' }}">
+        <div class="w-full {{ $isMeetingPopout ? 'h-full p-0' : 'px-5 py-4 lg:px-10 lg:py-10' }}">
+            @if(!$isMeetingPopout && session('error'))
+            <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 text-red-800 px-4 py-3 text-sm font-medium shadow-sm">
+                {{ session('error') }}
+            </div>
+            @endif
 
+            @if(!$isMeetingPopout && session('status'))
+            <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-800 px-4 py-3 text-sm font-medium shadow-sm">
+                {{ session('status') }}
+            </div>
+            @endif
+
+            @if(!$isMeetingPopout)
             <!-- Header -->
             <header
                 class="flex flex-col lg:flex-row flex-wrap gap-y-5 justify-center lg:justify-between lg:items-center mb-10">
@@ -261,6 +276,7 @@
                     </a>
                 </div>
             </header>
+            @endif
 
             @include('partials.client-mobile-nav')
 

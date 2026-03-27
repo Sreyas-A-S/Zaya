@@ -8,6 +8,7 @@ use App\Models\Service;
 use App\Models\UserService;
 use App\Models\PractitionerGallery;
 use App\Traits\ImageUploadTrait;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -712,23 +713,126 @@ class ProfileController extends Controller
         return back()->with('status', "{$label} updated successfully!");
     }
 
-    public function joinSession($channel)
+    public function joinSession(Request $request, $channel)
     {
         $user = Auth::user();
         $appId = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_id'));
+        $provider = strtolower((string) $request->query('provider', 'agora'));
+        $provider = in_array($provider, ['agora', 'jaas', 'jitsi']) ? $provider : 'agora';
+        $provider = $provider === 'jitsi' ? 'jaas' : $provider;
+        $isMeetingPopout = $request->query('popout') === '1';
+        $agoraAvailable = !empty($appId);
+        $jaasDomain = rtrim((string) config('services.jaas.domain', '8x8.vc'), '/');
+        $jaasAppId = trim((string) config('services.jaas.app_id'));
+        $jaasRoomSlug = preg_replace('/[^A-Za-z0-9_-]+/', '-', 'zaya-' . $channel);
+        $jaasRoomSlug = trim($jaasRoomSlug, '-');
+        if ($jaasRoomSlug === '') {
+            $jaasRoomSlug = 'zaya-meeting';
+        }
+        $jaasRoomName = $jaasAppId !== '' ? $jaasAppId . '/' . $jaasRoomSlug : $jaasRoomSlug;
+        $jaasToken = $provider === 'jaas' ? $this->buildJaasToken($user, $jaasRoomSlug) : null;
+        $jaasError = null;
+
+        if ($provider === 'jaas' && empty($jaasAppId)) {
+            $jaasError = 'JaaS App ID is missing. Set JAAS_APP_ID in your .env file.';
+        } elseif ($provider === 'jaas' && empty($jaasToken)) {
+            $jaasError = 'JaaS token could not be generated. Check the JaaS private key and API key ID.';
+        }
         
         \Log::info("User joining session:", [
             'user' => $user->id,
             'channel' => $channel,
+            'provider' => $provider,
             'appId_length' => strlen($appId),
             'appId_preview' => substr($appId, 0, 5) . '...'
         ]);
 
-        if (empty($appId)) {
-            return back()->with('error', 'Video consultation is not configured (Missing App ID).');
+        return view('conference.session', compact(
+            'user',
+            'channel',
+            'appId',
+            'provider',
+            'isMeetingPopout',
+            'agoraAvailable',
+            'jaasDomain',
+            'jaasAppId',
+            'jaasRoomSlug',
+            'jaasRoomName',
+            'jaasToken',
+            'jaasError'
+        ));
+    }
+
+    private function buildJaasToken($user, string $roomSlug): ?string
+    {
+        $jaasAppId = trim((string) config('services.jaas.app_id'));
+        $kid = trim((string) config('services.jaas.kid'));
+        $privateKey = trim((string) config('services.jaas.private_key'));
+        $privateKeyPath = trim((string) config('services.jaas.private_key_path'));
+
+        if ($privateKey === '' && $privateKeyPath !== '' && file_exists($privateKeyPath)) {
+            $privateKey = trim((string) file_get_contents($privateKeyPath));
         }
 
-        return view('conference.session', compact('user', 'channel', 'appId'));
+        if ($privateKey !== '') {
+            $privateKey = str_replace(["\\r\\n", "\\n", "\\r"], "\n", $privateKey);
+            $privateKey = str_replace("\r\n", "\n", $privateKey);
+            $privateKey = trim($privateKey);
+        }
+
+        if ($jaasAppId === '' || $kid === '' || $privateKey === '') {
+            return null;
+        }
+
+        $now = now()->getTimestamp();
+        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'], true);
+
+        $payload = [
+            'aud' => 'jitsi',
+            'iss' => 'chat',
+            'sub' => $jaasAppId,
+                    'room' => $roomSlug,
+                    'nbf' => $now - 30,
+                    'exp' => $now + 7200,
+                    'context' => [
+                'user' => [
+                    'id' => (string) $user->id,
+                    'name' => (string) $user->name,
+                    'email' => (string) ($user->email ?? ''),
+                    'moderator' => $isModerator ? 'true' : 'false',
+                ],
+                'features' => [
+                    'livestreaming' => 'false',
+                    'outbound-call' => 'false',
+                    'transcription' => 'false',
+                    'recording' => 'false',
+                ],
+                'room' => [
+                    'regex' => false,
+                ],
+            ],
+        ];
+
+        try {
+            $key = openssl_pkey_get_private($privateKey);
+            if ($key === false) {
+                \Log::error('Failed to parse JaaS private key', [
+                    'user_id' => $user->id ?? null,
+                    'room' => $roomSlug,
+                ]);
+                return null;
+            }
+
+            return JWT::encode($payload, $key, 'RS256', $kid);
+        } catch (\Throwable $e) {
+            \Log::error('Failed to build JaaS token', [
+                'error' => $e->getMessage(),
+                'user_id' => $user->id ?? null,
+                'room' => $roomSlug,
+            ]);
+
+            return null;
+        }
     }
 
     public function generateToken(Request $request)

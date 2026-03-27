@@ -3,18 +3,21 @@
 @section('title', 'Live Session | Zaya Wellness')
 
 @section('content')
+@if(!$isMeetingPopout)
 <!-- Mobile Tab Navigation -->
-<div class="lg:hidden flex space-x-6 overflow-x-auto scrollbar-hide mb-5">
+<div id="conference-mobile-nav" class="lg:hidden flex space-x-6 overflow-x-auto scrollbar-hide mb-5">
     <a href="{{ route('dashboard') }}" class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap transition-colors">Dashboard</a>
     <a href="{{ route('conferences.index') }}" class="leading-none text-lg text-secondary font-normal whitespace-nowrap transition-colors border-b-2 border-secondary pb-1">Live Session</a>
 </div>
+@endif
 
-<div class="max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto {{ $isMeetingPopout ? 'h-full max-w-none' : '' }}">
     <!-- Meeting Portal Card -->
-    <div class="bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)]">
+    <div class="{{ $isMeetingPopout ? 'h-full overflow-hidden rounded-none border-0 shadow-none bg-[#07110B]' : 'bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)]' }}">
         
+        @if(!$isMeetingPopout)
         <!-- Meeting Header -->
-        <div class="p-6 border-b border-[#2E4B3D]/12 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#FDFDFD]">
+        <div id="conference-meeting-header" class="p-6 border-b border-[#2E4B3D]/12 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#FDFDFD]">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-secondary/5 rounded-2xl flex items-center justify-center">
                     <i class="ri-vidicon-fill text-secondary text-2xl animate-pulse"></i>
@@ -34,41 +37,114 @@
                 <button onclick="copyMeetingLink()" class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer" title="Copy Meeting Link">
                     <i class="ri-share-forward-line text-xl"></i>
                 </button>
-                <button onclick="togglePiP()" class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer" title="Picture in Picture">
+                @if($provider !== 'jaas')
+                <a href="{{ route('conference.join', ['channel' => $channel, 'provider' => 'agora']) }}" class="px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase border {{ $provider === 'agora' ? 'bg-secondary text-white border-secondary' : 'bg-white text-secondary border-[#2E4B3D]/15 hover:bg-[#F3F6F4]' }}">
+                    Video Meet
+                </a>
+                @endif
+                <a href="{{ route('conference.join', ['channel' => $channel, 'provider' => 'jaas']) }}" class="px-4 py-2 rounded-full text-xs font-bold tracking-wide uppercase border {{ $provider === 'jaas' ? 'bg-secondary text-white border-secondary' : 'bg-white text-secondary border-[#2E4B3D]/15 hover:bg-[#F3F6F4]' }}">
+                    Video Meet
+                </a>
+                <button onclick="togglePiP()" class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer" title="Compact View">
                     <i class="ri-picture-in-picture-2-fill text-xl"></i>
                 </button>
+                @if($provider !== 'jaas')
                 <button onclick="toggleSettings()" class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer" title="Device Settings">
                     <i class="ri-settings-4-fill text-xl"></i>
                 </button>
+                @endif
             </div>
         </div>
+        @endif
 
         <!-- Video Area -->
-        <div class="relative aspect-video bg-[#0A1209] group" id="meeting-stage">
+        <div class="relative {{ $isMeetingPopout ? 'h-full bg-[#07110B]' : 'aspect-video bg-[#0A1209]' }} group" id="meeting-stage">
+            @if(!empty($jaasError))
+            <div class="absolute inset-0 z-[120] bg-black/85 flex items-center justify-center p-6">
+                <div class="max-w-xl w-full bg-white rounded-[28px] p-8 shadow-2xl border border-red-100">
+                    <div class="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mb-5">
+                        <i class="ri-error-warning-line text-2xl text-red-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-secondary mb-3">Video Meet could not start</h2>
+                    <p class="text-gray-600 leading-relaxed mb-5">{{ $jaasError }}</p>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button onclick="switchProvider('agora')" class="px-5 py-3 rounded-full bg-secondary text-white font-semibold">
+                            Try Agora instead
+                        </button>
+                        <a href="{{ route('conferences.index') }}" class="px-5 py-3 rounded-full border border-gray-200 text-gray-700 font-semibold text-center">
+                            Back to history
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if(!$agoraAvailable && $provider === 'agora')
+            <div class="absolute top-4 left-4 right-4 z-[110] bg-amber-50 text-amber-800 border border-amber-200 rounded-2xl px-4 py-3 text-sm font-medium shadow-lg">
+                Video Meet is not configured on this server. Switch using the button above to continue the session.
+            </div>
+            @endif
             
             <!-- Pre-Join Screen -->
             <div id="join-overlay" class="absolute inset-0 z-[100] bg-secondary flex flex-col items-center justify-center text-center p-6 transition-all duration-500">
                 <div class="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mb-8">
                     <i class="ri-vidicon-fill text-white text-5xl"></i>
                 </div>
-                <h2 class="text-3xl font-bold text-white mb-4">Ready to Join?</h2>
-                <p class="text-white/60 mb-10 max-w-md text-lg">Ensure your camera and microphone are connected before entering the session.</p>
-                
-                <div id="setup-feedback" class="mb-6 text-white/80 text-sm hidden">
-                    <i class="ri-loader-4-line animate-spin mr-2"></i> Checking devices...
-                </div>
 
-                <button id="start-btn" onclick="startSession()" class="px-12 py-4 bg-white text-secondary rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl flex items-center gap-3 cursor-pointer">
-                    <i class="ri-door-open-fill"></i>
-                    Join Meeting Now
-                </button>
-                
-                <p id="browser-warning" class="mt-8 text-yellow-300 text-sm hidden">
-                    <i class="ri-error-warning-line"></i> 
-                    Warning: Browser requires HTTPS for camera access.
-                </p>
+                @if($provider === 'jaas' && $isMeetingPopout)
+                    <h2 class="text-3xl font-bold text-white mb-4">Connecting Video Meet</h2>
+                    <p class="text-white/60 mb-10 max-w-md text-lg">
+                        Syncing the room and joining automatically.
+                    </p>
+                    <div id="setup-feedback" class="mb-6 text-white/80 text-sm">
+                        <i class="ri-loader-4-line animate-spin mr-2"></i> Opening meeting...
+                    </div>
+                    <p class="text-white/45 text-xs uppercase tracking-[0.3em] font-semibold">Pop-out mode</p>
+                @else
+                    <h2 class="text-3xl font-bold text-white mb-4">{{ $provider === 'jaas' ? 'Join Video Meet' : 'Ready to Join?' }}</h2>
+                    <p class="text-white/60 mb-10 max-w-md text-lg">
+                        @if($provider === 'jaas')
+                        Use the alternate video meeting if the primary one is unavailable.
+                        @else
+                            Ensure your camera and microphone are connected before entering the session.
+                        @endif
+                    </p>
+                    
+                    <div id="setup-feedback" class="mb-6 text-white/80 text-sm hidden">
+                        <i class="ri-loader-4-line animate-spin mr-2"></i> Checking devices...
+                    </div>
+
+                    <button id="start-btn" onclick="startSession()" class="px-12 py-4 bg-white text-secondary rounded-full font-bold text-xl hover:scale-105 transition-all shadow-2xl flex items-center gap-3 cursor-pointer">
+                        <i class="ri-door-open-fill"></i>
+                        {{ $provider === 'jaas' ? 'Join Video Meet' : 'Join Meeting Now' }}
+                    </button>
+                    @if($provider === 'agora')
+                    <button onclick="switchProvider('jaas')" class="mt-4 px-8 py-3 border border-white/15 rounded-full text-white/90 text-sm font-semibold hover:bg-white/10 transition-colors">
+                        Use Video Meet instead
+                    </button>
+                    @endif
+                    
+                    <p id="browser-warning" class="mt-8 text-yellow-300 text-sm hidden">
+                        <i class="ri-error-warning-line"></i> 
+                        Warning: Browser requires HTTPS for camera access.
+                    </p>
+                @endif
             </div>
 
+            @if($provider === 'jaas')
+            <div class="absolute inset-0">
+                <div id="jitsi-meet-container" class="w-full h-full"></div>
+            </div>
+            <button id="pip-exit-btn" onclick="togglePiP()" class="hidden absolute top-4 right-4 z-[130] items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/15 px-4 py-2 text-white text-sm font-semibold shadow-lg hover:bg-white/20 transition-colors">
+                <i class="ri-fullscreen-exit-line text-base"></i>
+                Exit compact view
+            </button>
+            @if(!$isMeetingPopout)
+            <div class="absolute bottom-6 left-6 z-20 bg-black/40 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-xs font-semibold tracking-wide">
+                Video Meet room: {{ $jaasRoomSlug }}
+            </div>
+            @endif
+            @else
             <!-- Main Remote Video Container -->
             <div id="remote-playerlist" class="w-full h-full flex flex-wrap items-center justify-center gap-2">
                 <!-- Remote players will be appended here -->
@@ -118,10 +194,12 @@
                     </button>
                 </div>
             </div>
+            @endif
         </div>
 
         <!-- Mobile Controls -->
-        <div class="md:hidden px-4 py-4 bg-[#0A1209] border-t border-white/10">
+        @if(!$isMeetingPopout)
+        <div id="conference-mobile-controls" class="md:hidden px-4 py-4 bg-[#0A1209] border-t border-white/10">
             <div class="grid grid-cols-4 gap-3">
                 <button id="audio-toggle-mobile" class="h-12 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-center text-white active:scale-95 transition-all">
                     <i class="ri-mic-fill text-xl" id="mic-icon-mobile"></i>
@@ -137,21 +215,25 @@
                 </button>
             </div>
         </div>
+        @endif
 
         <!-- Footer Info -->
-        <div class="p-6 bg-white flex items-center justify-between border-t border-gray-50">
+        @if(!$isMeetingPopout)
+        <div id="conference-meeting-footer" class="p-6 bg-white flex items-center justify-between border-t border-gray-50">
             <div class="flex items-center gap-3">
                 <i class="ri-shield-check-line text-secondary"></i>
-                <p class="text-xs text-gray-400 font-medium italic">End-to-end encrypted secure session</p>
+                <p class="text-xs text-gray-400 font-medium italic">{{ $provider === 'jaas' ? 'Video Meet secure session' : 'End-to-end encrypted secure session' }}</p>
             </div>
             <div class="flex items-center gap-2">
                 <div class="w-2 h-2 bg-green-500 rounded-full"></div>
                 <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest" id="net-label">Network: Excellent</span>
             </div>
         </div>
+        @endif
     </div>
 </div>
 
+@if($provider !== 'jaas')
 <!-- Settings Modal -->
 <div id="settings-modal" class="fixed inset-0 z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 px-4">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleSettings()"></div>
@@ -172,8 +254,11 @@
         </button>
     </div>
 </div>
+@endif
 
+@if(!$isMeetingPopout)
 <div class="h-10"></div>
+@endif
 @endsection
 
 @push('styles')
@@ -181,18 +266,89 @@
     .agora_video_player { object-fit: cover !important; border-radius: inherit; }
     #local-player video { transform: rotateY(180deg); }
     .remote-video-container { position: relative; flex: 1; min-width: 300px; height: 100%; border-radius: inherit; overflow: hidden; background: #000; }
+    #jitsi-meet-container iframe { width: 100%; height: 100%; border: 0; }
+    body.meeting-pip-mode {
+        overflow: hidden;
+        background: #07110b;
+    }
+    body.meeting-pip-mode #conference-meeting-header,
+    body.meeting-pip-mode #conference-meeting-footer,
+    body.meeting-pip-mode #conference-mobile-controls,
+    body.meeting-pip-mode #conference-mobile-nav,
+    body.meeting-pip-mode #settings-modal {
+        display: none !important;
+    }
+    body.meeting-pip-mode #pip-exit-btn {
+        display: inline-flex !important;
+    }
+    body.meeting-pip-mode #meeting-stage {
+        min-height: 0;
+        height: 100%;
+        border-radius: 24px;
+        overflow: hidden;
+    }
+    body.meeting-pip-mode .max-w-6xl.mx-auto {
+        max-width: none;
+        width: 100%;
+        height: 100%;
+        padding: 12px;
+    }
+    body.meeting-pip-mode .max-w-6xl.mx-auto > div {
+        height: 100%;
+    }
+    body.meeting-pip-mode aside,
+    body.meeting-pip-mode main > div > header {
+        display: none !important;
+    }
+    body.meeting-pip-mode main {
+        overflow: hidden !important;
+        background: transparent !important;
+    }
+    body.meeting-pip-mode main > div {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        width: min(420px, calc(100vw - 32px));
+        height: min(320px, calc(100vh - 32px));
+        padding: 0 !important;
+        z-index: 999;
+    }
+    body.meeting-pip-mode .max-w-6xl.mx-auto > div {
+        background: #07110b !important;
+        border: 0 !important;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35) !important;
+    }
 </style>
 @endpush
 
 @section('scripts')
+@if($provider !== 'jaas')
 <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js"></script>
+@endif
+@if($provider === 'jaas')
+<script src="https://{{ $jaasDomain }}/{{ $jaasAppId }}/external_api.js"></script>
+@endif
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        
-        // --- SECURE ORIGIN CHECK ---
-        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-            document.getElementById('browser-warning').classList.remove('hidden');
-        }
+        const provider = "{{ $provider }}";
+        const agoraAvailable = {{ $agoraAvailable ? 'true' : 'false' }};
+        const channel = "{{ trim($channel) }}";
+        const uid = {{ (int) ($user->id ?? 1) }};
+        const jitsiDomain = "{{ $jaasDomain }}";
+        const jitsiRoom = "{{ $jaasRoomName }}";
+        const jitsiJwt = @json($jaasToken);
+        const conferencesUrl = "{{ route('conferences.index') }}";
+        let isPiPMode = false;
+
+        let jitsiApi = null;
+        let meetingSyncChannel = null;
+        let isApplyingRemoteSync = false;
+        let meetingState = {
+            audioMuted: false,
+            videoMuted: false,
+            screenSharing: false,
+        };
+        const windowId = Math.random().toString(36).slice(2);
 
         // Timer Logic
         let startTime = Date.now();
@@ -215,6 +371,22 @@
         };
 
         window.togglePiP = async () => {
+            if (provider === 'jaas') {
+                isPiPMode = !isPiPMode;
+                document.body.classList.toggle('meeting-pip-mode', isPiPMode);
+
+                if (isPiPMode) {
+                    const stage = document.getElementById('meeting-stage');
+                    if (stage) {
+                        stage.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                    }
+                }
+                const pipButton = document.getElementById('pip-exit-btn');
+                if (pipButton) {
+                    pipButton.classList.toggle('hidden', !isPiPMode);
+                }
+                return;
+            }
             const video = document.querySelector('#remote-playerlist video');
             if (video) {
                 try {
@@ -227,7 +399,32 @@
             }
         };
 
+        document.addEventListener('keydown', (event) => {
+            if (provider !== 'jaas' || !isPiPMode) {
+                return;
+            }
+
+            if (event.key === 'Escape') {
+                isPiPMode = false;
+                document.body.classList.remove('meeting-pip-mode');
+                const pipButton = document.getElementById('pip-exit-btn');
+                if (pipButton) {
+                    pipButton.classList.add('hidden');
+                }
+            }
+        });
+
+        window.switchProvider = (nextProvider) => {
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.set('provider', nextProvider);
+            window.location.href = nextUrl.toString();
+        };
+
         window.toggleSettings = () => {
+            if (provider === 'jaas') {
+                alert('Device settings are managed inside Video Meet.');
+                return;
+            }
             const modal = document.getElementById('settings-modal');
             const isHidden = modal.classList.contains('opacity-0');
             if (isHidden) {
@@ -241,6 +438,9 @@
         };
 
         window.applySettings = async () => {
+            if (provider === 'jaas') {
+                return;
+            }
             const camId = document.getElementById('camera-select').value;
             const micId = document.getElementById('mic-select').value;
             
@@ -257,6 +457,286 @@
                 alert("Could not switch devices. Please try again.");
             }
         };
+
+        window.leave = async () => {
+            if (provider === 'jaas') {
+                postMeetingSync({ type: 'leave' });
+                if (jitsiApi) {
+                    jitsiApi.dispose();
+                    jitsiApi = null;
+                }
+                window.location.href = conferencesUrl;
+                return;
+            }
+
+            if (localTracks.audioTrack) {
+                localTracks.audioTrack.stop();
+                localTracks.audioTrack.close();
+            }
+            if (localTracks.videoTrack) {
+                localTracks.videoTrack.stop();
+                localTracks.videoTrack.close();
+            }
+            if (client) {
+                await client.leave();
+            }
+            window.location.href = conferencesUrl;
+        };
+
+        function initJitsiSession() {
+            const container = document.getElementById('jitsi-meet-container');
+            if (!container) {
+                throw new Error('Video Meet container is missing.');
+            }
+            if (typeof JitsiMeetExternalAPI === 'undefined') {
+                throw new Error('Video Meet SDK failed to load.');
+            }
+
+            jitsiApi = new JitsiMeetExternalAPI(jitsiDomain, {
+                roomName: jitsiRoom,
+                parentNode: container,
+                width: '100%',
+                height: '100%',
+                jwt: jitsiJwt,
+                configOverwrite: {
+                    prejoinPageEnabled: false,
+                    startWithAudioMuted: false,
+                    startWithVideoMuted: false,
+                    disableDeepLinking: true
+                },
+                interfaceConfigOverwrite: {
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_WATERMARK_FOR_GUESTS: false,
+                    TOOLBAR_BUTTONS: [
+                        'microphone', 'camera', 'desktop', 'fullscreen', 'fodeviceselection',
+                        'hangup', 'chat', 'raisehand', 'tileview', 'select-background',
+                        'mute-everyone', 'videoquality'
+                    ]
+                },
+                userInfo: {
+                    displayName: "{{ addslashes($user->name ?? 'Guest') }}"
+                }
+            });
+
+            jitsiApi.addEventListeners({
+                audioMuteStatusChanged: ({ muted }) => {
+                    meetingState.audioMuted = !!muted;
+                    updateJaasControlIcons();
+                    if (!isApplyingRemoteSync) {
+                        postMeetingSync({ type: 'state-sync', state: meetingState });
+                    }
+                },
+                videoMuteStatusChanged: ({ muted }) => {
+                    meetingState.videoMuted = !!muted;
+                    updateJaasControlIcons();
+                    if (!isApplyingRemoteSync) {
+                        postMeetingSync({ type: 'state-sync', state: meetingState });
+                    }
+                },
+                contentSharingParticipantsChanged: ({ data }) => {
+                    meetingState.screenSharing = Array.isArray(data) && data.length > 0;
+                    updateJaasControlIcons();
+                    if (!isApplyingRemoteSync) {
+                        postMeetingSync({ type: 'state-sync', state: meetingState });
+                    }
+                },
+                readyToClose: () => {
+                    window.location.href = conferencesUrl;
+                }
+            });
+        }
+
+        function initMeetingSync() {
+            if (provider !== 'jaas' || typeof BroadcastChannel === 'undefined') {
+                return;
+            }
+
+            const syncKey = `video-meet-sync:${channel}`;
+            meetingSyncChannel = new BroadcastChannel(syncKey);
+
+            meetingSyncChannel.onmessage = (event) => {
+                const data = event.data || {};
+                if (!data.type || data.sourceId === windowId) {
+                    return;
+                }
+
+                if (data.type === 'request-state') {
+                    postMeetingSync({ type: 'state-sync', state: meetingState });
+                    return;
+                }
+
+                if (data.type === 'state-sync' && data.state) {
+                    applySyncedState(data.state);
+                    return;
+                }
+
+                if (data.type === 'leave') {
+                    if (jitsiApi) {
+                        jitsiApi.dispose();
+                        jitsiApi = null;
+                    }
+                    window.location.href = conferencesUrl;
+                }
+            };
+
+            window.addEventListener('beforeunload', () => {
+                if (meetingSyncChannel) {
+                    meetingSyncChannel.close();
+                    meetingSyncChannel = null;
+                }
+            });
+        }
+
+        function postMeetingSync(message) {
+            if (!meetingSyncChannel) {
+                return;
+            }
+
+            meetingSyncChannel.postMessage({
+                ...message,
+                sourceId: windowId,
+            });
+        }
+
+        function updateJaasControlIcons() {
+            const audioIcon = meetingState.audioMuted ? 'ri-mic-off-fill text-red-500' : 'ri-mic-fill';
+            const videoIcon = meetingState.videoMuted ? 'ri-video-off-fill text-red-500' : 'ri-video-on-fill';
+            const screenIcon = meetingState.screenSharing ? 'ri-stop-circle-fill text-red-500' : 'ri-screen-share-line';
+
+            const audioIconDesktop = document.getElementById('mic-icon');
+            const audioIconMobile = document.getElementById('mic-icon-mobile');
+            const videoIconDesktop = document.getElementById('vid-icon');
+            const videoIconMobile = document.getElementById('vid-icon-mobile');
+            const screenIconDesktop = document.getElementById('screen-icon');
+            const screenIconMobile = document.getElementById('screen-icon-mobile');
+            const mutedOverlay = document.getElementById('local-muted-overlay');
+
+            if (audioIconDesktop) audioIconDesktop.className = audioIcon;
+            if (audioIconMobile) audioIconMobile.className = audioIcon;
+            if (videoIconDesktop) videoIconDesktop.className = videoIcon;
+            if (videoIconMobile) videoIconMobile.className = videoIcon;
+            if (screenIconDesktop) screenIconDesktop.className = screenIcon;
+            if (screenIconMobile) screenIconMobile.className = screenIcon;
+            if (mutedOverlay) mutedOverlay.classList.toggle('hidden', !meetingState.videoMuted);
+        }
+
+        function applySyncedState(nextState) {
+            if (!jitsiApi) {
+                meetingState = { ...meetingState, ...nextState };
+                updateJaasControlIcons();
+                return;
+            }
+
+            isApplyingRemoteSync = true;
+
+            try {
+                if (typeof nextState.audioMuted === 'boolean' && meetingState.audioMuted !== nextState.audioMuted) {
+                    jitsiApi.executeCommand('toggleAudio');
+                }
+
+                if (typeof nextState.videoMuted === 'boolean' && meetingState.videoMuted !== nextState.videoMuted) {
+                    jitsiApi.executeCommand('toggleVideo');
+                }
+
+                if (typeof nextState.screenSharing === 'boolean' && meetingState.screenSharing !== nextState.screenSharing) {
+                    try {
+                        jitsiApi.executeCommand('toggleShareScreen');
+                    } catch (e) {
+                        console.warn('Screen share sync unavailable:', e);
+                    }
+                }
+            } finally {
+                setTimeout(() => {
+                    isApplyingRemoteSync = false;
+                }, 250);
+            }
+        }
+
+        if (provider === 'jaas') {
+            initMeetingSync();
+
+            async function toggleJaasAudio() {
+                if (!jitsiApi) return;
+                jitsiApi.executeCommand('toggleAudio');
+            }
+
+            async function toggleJaasVideo() {
+                if (!jitsiApi) return;
+                jitsiApi.executeCommand('toggleVideo');
+            }
+
+            async function toggleJaasScreenShare() {
+                if (!jitsiApi) return;
+                try {
+                    jitsiApi.executeCommand('toggleShareScreen');
+                } catch (e) {
+                    console.warn('Screen share toggle failed:', e);
+                }
+            }
+
+            window.startSession = async () => {
+                const btn = document.getElementById('start-btn');
+                const feedback = document.getElementById('setup-feedback');
+
+                if (!jitsiJwt) {
+                    const errorText = @json($jaasError ?? 'Video Meet is not configured correctly.');
+                    if (feedback) {
+                        feedback.classList.remove('hidden');
+                        feedback.innerText = errorText;
+                    }
+                    alert(errorText);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="ri-door-open-fill"></i> Retry Joining';
+                    }
+                    return;
+                }
+
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Connecting...';
+                }
+                if (feedback) {
+                    feedback.classList.remove('hidden');
+                    feedback.innerText = 'Opening Video Meet...';
+                }
+
+                try {
+                    initJitsiSession();
+                    updateJaasControlIcons();
+                    postMeetingSync({ type: 'request-state' });
+                    const overlay = document.getElementById('join-overlay');
+                    overlay.style.opacity = '0';
+                    overlay.style.pointerEvents = 'none';
+                    setTimeout(() => overlay.remove(), 500);
+                } catch (e) {
+                    console.error('Video Meet start error:', e);
+                    alert('Could not open Video Meet. ' + e.message);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="ri-door-open-fill"></i> Retry Joining';
+                    }
+                    if (feedback) {
+                        feedback.classList.add('hidden');
+                    }
+                }
+            };
+
+            const audioBtn = document.getElementById('audio-toggle');
+            const videoBtn = document.getElementById('video-toggle');
+            const screenBtn = document.getElementById('screen-share-btn');
+            const audioBtnMobile = document.getElementById('audio-toggle-mobile');
+            const videoBtnMobile = document.getElementById('video-toggle-mobile');
+            const screenBtnMobile = document.getElementById('screen-share-btn-mobile');
+            if (audioBtn) audioBtn.onclick = toggleJaasAudio;
+            if (videoBtn) videoBtn.onclick = toggleJaasVideo;
+            if (screenBtn) screenBtn.onclick = toggleJaasScreenShare;
+            if (audioBtnMobile) audioBtnMobile.onclick = toggleJaasAudio;
+            if (videoBtnMobile) videoBtnMobile.onclick = toggleJaasVideo;
+            if (screenBtnMobile) screenBtnMobile.onclick = toggleJaasScreenShare;
+
+            return;
+        }
 
         async function loadDevices() {
             const devices = await AgoraRTC.getDevices();
@@ -281,31 +761,22 @@
             }
         }
 
-        window.leave = async () => {
-            if (localTracks.audioTrack) {
-                localTracks.audioTrack.stop();
-                localTracks.audioTrack.close();
-            }
-            if (localTracks.videoTrack) {
-                localTracks.videoTrack.stop();
-                localTracks.videoTrack.close();
-            }
-            if (client) {
-                await client.leave();
-            }
-            window.location.href = "{{ route('conferences.index') }}";
-        };
-
         // --- AGORA CORE ---
         const appId = "{{ $appId }}".trim();
-        const channel = "{{ trim($channel) }}";
-        const uid = {{ (int) ($user->id ?? 1) }};
         
         console.log("DEBUG: Agora Initial Config:", { appId, channel, uid });
 
-        if (!appId || appId.length < 5) {
+            if (!appId || appId.length < 5) {
             console.error("Invalid Agora App ID");
-            alert("Configuration error: Invalid Agora App ID.");
+            const startBtn = document.getElementById('start-btn');
+            if (startBtn) {
+                startBtn.innerText = "Use Video Meet instead";
+                startBtn.onclick = () => window.switchProvider('jaas');
+            }
+            if (!agoraAvailable) {
+                return;
+            }
+            alert("Configuration error: Invalid Agora App ID. Switching video modes is recommended.");
             return;
         }
 
@@ -346,7 +817,9 @@
                 // 2. Fetch Token
                 feedback.innerText = "Securing connection...";
                 const token = await fetchToken();
-                if (!token) throw new Error("Failed to generate access token.");
+                if (!token) {
+                    throw new Error("Failed to generate access token. Use the alternate video mode if this continues to fail.");
+                }
 
                 // 3. Join Channel
                 feedback.innerText = "Entering room...";
@@ -378,6 +851,10 @@
                 btn.disabled = false;
                 btn.innerHTML = '<i class="ri-door-open-fill"></i> Retry Joining';
                 feedback.classList.add('hidden');
+                if (!agoraAvailable) {
+                    btn.innerText = 'Use Video Meet instead';
+                    btn.onclick = () => window.switchProvider('jaas');
+                }
             }
         };
 
