@@ -3,30 +3,16 @@
 @section('title', 'Service Packages')
 
 @section('styles')
-<link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/select2.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 <style>
-    /* Select2 Fixes */
-    .select2-container {
-        width: 100% !important;
-        display: block;
+    /* TomSelect Fixes */
+    .ts-control {
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+        border: 1px solid #d9dde7 !important;
     }
-
-    .select2-container--default .select2-selection--multiple {
-        min-height: 45px;
-        border: 1px solid #d9dde7;
-        border-radius: 8px;
-        padding: 5px 10px;
-    }
-
-    .select2-container--default.select2-container--focus .select2-selection--multiple {
-        border-color: #5c61f2;
-        outline: 0;
-    }
-
-    .select2-dropdown {
-        border-color: #d9dde7;
-        border-radius: 10px;
-        z-index: 9999;
+    .ts-dropdown {
+        z-index: 1070 !important;
     }
 
     /* Cropper Styles */
@@ -173,44 +159,51 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('admiro/assets/js/select2/select2.full.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
     $(function () {
-        // --- Select2 Logic ---
-        function initSelect2() {
-            if ($.fn.select2) {
-                $('#service-package-services').select2({
+        // --- TomSelect Logic ---
+        let serviceSelect;
+        function initTomSelect() {
+            const el = document.getElementById('service-package-services');
+            if (el && !el.tomselect) {
+                serviceSelect = new TomSelect(el, {
+                    plugins: ['remove_button'],
                     placeholder: "Search and choose services",
-                    allowClear: true,
-                    width: '100%',
-                    dropdownParent: $('#service-package-modal')
+                    allowEmptyOption: true,
+                    maxOptions: null,
                 });
             }
         }
 
-        // Re-init on modal open
-        $('#service-package-modal').on('shown.bs.modal', function() {
-            initSelect2();
-        });
+        initTomSelect();
 
         // --- Cropper Logic ---
         let packageCropper;
-        const cropperModal = new bootstrap.Modal(document.getElementById('package-cropper-modal'));
+        const $cropperModal = $('#package-cropper-modal');
         const cropperImage = document.getElementById('package-cropper-image');
 
         $('#package-image-input').on('change', function() {
             const files = this.files;
             if (files && files.length > 0) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    cropperImage.src = e.target.result;
-                    cropperModal.show();
-                };
-                reader.readAsDataURL(files[0]);
+                const file = files[0];
+                if (/^image\/\w+/.test(file.type)) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        cropperImage.src = e.target.result;
+                        $cropperModal.modal('show');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    if (typeof showToast === 'function') showToast('Please choose an image file.', 'error');
+                }
             }
         });
 
-        document.getElementById('package-cropper-modal').addEventListener('shown.bs.modal', function() {
+        $cropperModal.on('shown.bs.modal', function() {
+            if (packageCropper) {
+                packageCropper.destroy();
+            }
             packageCropper = new Cropper(cropperImage, {
                 aspectRatio: 1.5,
                 viewMode: 1,
@@ -224,9 +217,7 @@
                 cropBoxResizable: true,
                 toggleDragModeOnDblclick: false,
             });
-        });
-
-        document.getElementById('package-cropper-modal').addEventListener('hidden.bs.modal', function() {
+        }).on('hidden.bs.modal', function() {
             if (packageCropper) {
                 packageCropper.destroy();
                 packageCropper = null;
@@ -246,7 +237,7 @@
             $('#cropped-package-cover').val(base64Data);
             $('#package-preview-img').attr('src', base64Data);
             $('.package-preview-container').removeClass('d-none');
-            cropperModal.hide();
+            $cropperModal.modal('hide');
         });
 
         // --- DataTable Logic ---
@@ -308,7 +299,9 @@
                     $('.package-preview-container').addClass('d-none');
                 }
 
-                $('#service-package-services').val(data.service_ids || []).trigger('change');
+                if (serviceSelect) {
+                    serviceSelect.setValue(data.service_ids || []);
+                }
                 $('#service-package-modal').modal('show');
             });
         });
@@ -344,7 +337,9 @@
     function openServicePackageModal() {
         $('#service-package-form')[0].reset();
         $('#service-package-id').val('');
-        $('#service-package-services').val([]).trigger('change');
+        if (typeof TomSelect !== 'undefined' && document.getElementById('service-package-services').tomselect) {
+            document.getElementById('service-package-services').tomselect.clear();
+        }
         $('#service-package-modal-title').text('Add Service Package');
         $('#package-image-input').val('');
         $('#cropped-package-cover').val('');

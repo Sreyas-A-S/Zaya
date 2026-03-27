@@ -174,32 +174,6 @@ class ProfileController extends Controller
         return response()->json(['message' => 'Consent updated successfully', 'consent' => $profile->data_sharing_consent]);
     }
 
-    public function conferences(Request $request)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-
-        $isConsultations = $request->routeIs('consultations.index');
-
-        // Show actual recorded conference sessions
-        $query = Conference::with(['booking.practitioner.user', 'booking.user'])
-            ->whereHas('booking', function($q) use ($user, $isConsultations) {
-                if ($isConsultations) {
-                    $q->where('practitioner_id', $user->profile_id);
-                } else {
-                    $q->where('user_id', $user->id);
-                }
-            });
-
-        $conferences = $query->latest()->paginate(15);
-
-        if ($request->ajax()) {
-            return view('partials.conferences-table', compact('user', 'conferences'))->render();
-        }
-
-        return view('bookings', compact('user', 'conferences'));
-    }
-
     public function storeConference(Request $request)
     {
         $request->validate([
