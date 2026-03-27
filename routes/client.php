@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\BookingController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/dashboard', [ProfileController::class, 'index'])->name('dashboard');
+    Route::get('/health-journey', [ProfileController::class, 'healthJourney'])->name('health-journey.index');
     Route::post('/update-consent', [ProfileController::class, 'updateConsent'])->name('profile.updateConsent');
     Route::get('/consultations', [ProfileController::class, 'bookings'])->name('consultations.index');
     Route::get('/bookings', [ProfileController::class, 'bookings'])->name('bookings.index');
@@ -13,6 +15,8 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/conference-history', [ProfileController::class, 'conferences'])->name('conferences.index');
     Route::get('/recordings/{id}', [ProfileController::class, 'showRecording'])->name('recordings.show');
     Route::get('/conference/session/{channel}', [ProfileController::class, 'joinSession'])->name('conference.join');
+    Route::get('/bookings/{id}/consultation-form', [ProfileController::class, 'showConsultationForm'])->name('bookings.consultation-form.show');
+    Route::post('/bookings/{id}/consultation-form', [ProfileController::class, 'storeConsultationForm'])->name('bookings.consultation-form.store');
     Route::get('/agora/token', [ProfileController::class, 'generateToken'])->name('agora.token');
     Route::get('/invoice/{invoice_no}', [InvoiceController::class, 'show'])->name('invoice.show');
     Route::get('/bookings/{id}/details', [ProfileController::class, 'showDetails'])->name('bookings.details');
@@ -66,3 +70,5 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::post('/notifications/mark-all-as-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
     Route::delete('/notifications/{id}', [\App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('notifications.destroy');
 });
+
+Route::get('/conference/share/{channel}', [ProfileController::class, 'publicJoinSession'])->name('conference.share');

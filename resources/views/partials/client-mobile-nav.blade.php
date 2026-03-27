@@ -24,30 +24,29 @@
         {{ __('Profile') }}
     </a>
 
-    <!-- Health Journey (Dashboard Tab for now) -->
-    @if(request()->routeIs('dashboard'))
-        <button onclick="if(typeof switchMobileTab === 'function') switchMobileTab('health')" 
-            class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">
-            {{ __($site_settings['client_panel_sidebar_health_journey'] ?? 'Health Journey') }}
-        </button>
-    @else
-        <a href="{{ route('dashboard') }}?tab=health" 
-            class="leading-none text-lg text-[#8F8F8F] font-normal whitespace-nowrap cursor-pointer transition-colors">
-            {{ __($site_settings['client_panel_sidebar_health_journey'] ?? 'Health Journey') }}
-        </a>
+    <!-- Health Journey -->
+    @if(in_array($user->role, ['client', 'patient']))
+    <a href="{{ route('health-journey.index') }}" 
+        class="leading-none text-lg {{ request()->routeIs('health-journey.index') ? 'text-secondary border-b-2 border-secondary pb-1' : 'text-[#8F8F8F]' }} font-normal whitespace-nowrap cursor-pointer transition-colors">
+        {{ __($site_settings['client_panel_sidebar_health_journey'] ?? 'Health Journey') }}
+    </a>
     @endif
 
     <!-- Consultation -->
+    @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist', 'translator']))
     <a href="{{ route('consultations.index') }}"
         class="leading-none text-lg {{ request()->routeIs('consultations.index') ? 'text-secondary border-b-2 border-secondary pb-1' : 'text-[#8F8F8F]' }} font-normal whitespace-nowrap cursor-pointer transition-colors">
         {{ __($site_settings['client_panel_sidebar_consultation'] ?? 'Consultation') }}
     </a>
+    @endif
 
     <!-- Bookings -->
+    @if(in_array($user->role, ['client', 'patient']))
     <a href="{{ route('bookings.index') }}" 
         class="leading-none text-lg {{ request()->routeIs('bookings.index') ? 'text-secondary border-b-2 border-secondary pb-1' : 'text-[#8F8F8F]' }} font-normal whitespace-nowrap cursor-pointer transition-colors">
         {{ __($site_settings['client_panel_sidebar_bookings'] ?? 'Bookings') }}
     </a>
+    @endif
 
     <!-- Conference History -->
     <a href="{{ route('conferences.index') }}" 

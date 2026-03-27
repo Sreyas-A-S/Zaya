@@ -15,16 +15,16 @@ class SessionReminderMail extends Mailable
 
     public $booking;
     public $type;
-    public $agoraLink;
+    public $videoLink;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Booking $booking, string $type, string $agoraLink)
+    public function __construct(Booking $booking, string $type, string $videoLink)
     {
         $this->booking = $booking;
         $this->type = $type;
-        $this->agoraLink = $agoraLink;
+        $this->videoLink = $videoLink;
         $this->mailer('info');
     }
 
@@ -53,7 +53,7 @@ class SessionReminderMail extends Mailable
                 'intro' => $intro,
                 'booking' => $this->booking,
                 'type' => $this->type,
-                'agoraLink' => $this->agoraLink,
+                'videoLink' => $this->videoLink,
             ],
         );
     }

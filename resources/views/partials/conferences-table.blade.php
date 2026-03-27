@@ -52,13 +52,19 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
-                            @if($conference->recording_url)
-                                <a href="{{ route('recordings.show', ['id' => $conference->id]) }}" target="_blank" class="text-secondary hover:underline flex items-center justify-end">
-                                    <i class="ri-play-circle-line mr-1 text-lg"></i> Watch Recording
-                                </a>
-                            @else
-                                <span class="text-gray-300 italic">No recording available</span>
-                            @endif
+                            <div class="flex items-center justify-end gap-3">
+                                @if($conference->recording_url)
+                                    <a href="{{ $conference->recording_url }}" target="_blank" class="px-4 py-2 rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-all flex items-center gap-2 text-xs font-bold">
+                                        <i class="ri-play-circle-line text-lg"></i>
+                                        Watch Recording
+                                    </a>
+                                @endif
+                                
+                                <button onclick="viewBookingDetails({{ $conference->id }})" class="px-4 py-2 rounded-full bg-gray-50 text-secondary hover:bg-gray-100 transition-all flex items-center gap-2 text-xs font-bold border border-gray-100">
+                                    <i class="ri-eye-line text-lg"></i>
+                                    Details
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     @empty

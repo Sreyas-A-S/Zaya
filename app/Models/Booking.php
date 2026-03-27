@@ -31,6 +31,7 @@ class Booking extends Model
         'razorpay_order_id',
         'razorpay_payment_id',
         'razorpay_payment_url',
+        'recording_url',
         'payment_details'
     ];
 
@@ -63,5 +64,10 @@ class Booking extends Model
     public function translator()
     {
         return $this->belongsTo(Translator::class);
+    }
+
+    public function consultationForm()
+    {
+        return $this->hasOne(ConsultationForm::class);
     }
 }

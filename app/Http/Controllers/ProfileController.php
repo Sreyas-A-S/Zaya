@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Country;
+use App\Models\ConsultationForm;
 use App\Models\Service;
 use App\Models\UserService;
 use App\Models\PractitionerGallery;
@@ -11,18 +12,19 @@ use App\Traits\ImageUploadTrait;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Arr;
 
 class ProfileController extends Controller
 {
     use ImageUploadTrait;
 
-    private function getBookingQuery($user)
+    private function getBookingQuery($user, $forceClientView = false)
     {
         $role = $user->role;
         $profileId = $user->profile_id;
         $query = Booking::with(['practitioner.user', 'user']);
 
-        if ($role === 'client' || $role === 'patient') {
+        if ($forceClientView || $role === 'client' || $role === 'patient') {
             $query->where('user_id', $user->id);
         } elseif ($role === 'translator') {
             $query->where('translator_id', $profileId);
@@ -172,8 +174,13 @@ class ProfileController extends Controller
 
     public function bookings(Request $request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
-        $bookings = $this->getBookingQuery($user)
+        
+        $isConsultations = $request->routeIs('consultations.index');
+        $bookingsQuery = $this->getBookingQuery($user, !$isConsultations);
+
+        $bookings = $bookingsQuery
             ->latest()
             ->paginate(10);
 
@@ -182,6 +189,81 @@ class ProfileController extends Controller
         }
 
         return view('bookings', compact('user', 'bookings'));
+    }
+
+    public function showConsultationForm(Request $request, $id)
+    {
+        $user = Auth::user();
+        $booking = Booking::with(['practitioner.user', 'user', 'translator.user'])->findOrFail($id);
+
+        $consultationFormRole = in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'], true)
+            ? $user->role
+            : null;
+        $isOwner = $booking->user_id === $user->id || $booking->practitioner_id === $user->profile_id;
+
+        if (!$consultationFormRole || !$isOwner) {
+            abort(403);
+        }
+
+        $consultationSchema = [];
+        $schemaPath = resource_path('schemas/consultation/' . $consultationFormRole . '.json');
+        if (file_exists($schemaPath)) {
+            $decoded = json_decode((string) file_get_contents($schemaPath), true);
+            if (is_array($decoded)) {
+                $consultationSchema = $decoded;
+            }
+        }
+
+        $existingForm = ConsultationForm::where('booking_id', $booking->id)
+            ->where('doctor_id', $user->id)
+            ->latest('created_at')
+            ->first();
+
+        $consultationPayload = $existingForm->payload ?? [];
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'booking_id' => $booking->id,
+                'payload' => $consultationPayload,
+            ]);
+        }
+
+        return view('consultation-form', compact(
+            'user',
+            'booking',
+            'consultationSchema',
+            'consultationPayload',
+            'existingForm',
+            'consultationFormRole'
+        ));
+    }
+
+    public function storeConsultationForm(Request $request, $id)
+    {
+        $user = Auth::user();
+        $booking = Booking::with(['practitioner.user', 'user'])->findOrFail($id);
+
+        $consultationFormRole = in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'], true)
+            ? $user->role
+            : null;
+        $isOwner = $booking->user_id === $user->id || $booking->practitioner_id === $user->profile_id;
+
+        if (!$consultationFormRole || !$isOwner) {
+            abort(403);
+        }
+
+        $payload = Arr::except($request->all(), ['_token', '_method']);
+
+        ConsultationForm::create([
+            'booking_id' => $booking->id,
+            'doctor_id' => $user->id,
+            'payload' => $payload,
+        ]);
+
+        return redirect()
+            ->route('bookings.consultation-form.show', $booking->id)
+            ->with('status', 'Consultation form saved successfully.');
     }
 
     public function transactions(Request $request)
@@ -205,6 +287,21 @@ class ProfileController extends Controller
         }
 
         return view('transactions', compact('user', 'invoices'));
+    }
+
+    public function healthJourney()
+    {
+        $user = Auth::user();
+        $clinicalDocuments = $user->clinicalDocuments()->latest()->get();
+        
+        // Only show bookings that have a consultation form attached
+        $consultations = Booking::with(['practitioner.user', 'consultationForm'])
+            ->where('user_id', $user->id)
+            ->whereHas('consultationForm')
+            ->latest()
+            ->get();
+
+        return view('health-journey', compact('user', 'clinicalDocuments', 'consultations'));
     }
 
     public function conferences(Request $request)
@@ -713,9 +810,22 @@ class ProfileController extends Controller
         return back()->with('status', "{$label} updated successfully!");
     }
 
-    public function joinSession(Request $request, $channel)
+    public function joinSession(Request $request, $channel, bool $isPublicMeeting = false)
     {
         $user = Auth::user();
+        $isPublicMeeting = $isPublicMeeting || !$user;
+        if (!$user) {
+            $guestName = trim((string) $request->query('name', 'Guest'));
+            $user = (object) [
+                'id' => 0,
+                'name' => $guestName !== '' ? $guestName : 'Guest',
+                'email' => null,
+                'role' => 'guest',
+                'profile_pic' => null,
+                'profile' => null,
+                'unreadNotifications' => collect(),
+            ];
+        }
         $appId = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_id'));
         $provider = strtolower((string) $request->query('provider', 'agora'));
         $provider = in_array($provider, ['agora', 'jaas', 'jitsi']) ? $provider : 'agora';
@@ -753,6 +863,7 @@ class ProfileController extends Controller
             'appId',
             'provider',
             'isMeetingPopout',
+            'isPublicMeeting',
             'agoraAvailable',
             'jaasDomain',
             'jaasAppId',
@@ -761,6 +872,11 @@ class ProfileController extends Controller
             'jaasToken',
             'jaasError'
         ));
+    }
+
+    public function publicJoinSession(Request $request, $channel)
+    {
+        return $this->joinSession($request, $channel, true);
     }
 
     private function buildJaasToken($user, string $roomSlug): ?string

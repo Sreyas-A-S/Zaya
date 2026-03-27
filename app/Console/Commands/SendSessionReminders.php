@@ -59,19 +59,19 @@ class SendSessionReminders extends Command
                 if ($now->diffInMinutes($startTime, false) <= $leadTime && $now->diffInMinutes($startTime, false) >= -10) {
                     
                     // Generate the Agora link using invoice_no as channel name
-                    $agoraLink = route('conference.join', ['channel' => $booking->invoice_no]);
+                    $videoLink = route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']);
 
                     // Send to Client
-                    Mail::to($booking->user->email)->send(new SessionReminderMail($booking, 'client', $agoraLink));
+                    Mail::to($booking->user->email)->send(new SessionReminderMail($booking, 'client', $videoLink));
                     
                     // Send to Practitioner
                     if ($booking->practitioner && $booking->practitioner->user) {
-                        Mail::to($booking->practitioner->user->email)->send(new SessionReminderMail($booking, 'practitioner', $agoraLink));
+                        Mail::to($booking->practitioner->user->email)->send(new SessionReminderMail($booking, 'practitioner', $videoLink));
                     }
                     
                     // Send to Translator
                     if ($booking->need_translator && $booking->translator && $booking->translator->user) {
-                        Mail::to($booking->translator->user->email)->send(new SessionReminderMail($booking, 'translator', $agoraLink));
+                        Mail::to($booking->translator->user->email)->send(new SessionReminderMail($booking, 'translator', $videoLink));
                     }
 
                     $booking->reminder_sent = true;

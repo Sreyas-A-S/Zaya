@@ -55,11 +55,10 @@
                 @endif
             </div>
 
-            <a href="{{ $agoraLink }}" class="join-button">Join Video Session</a>
             
             <p class="notice">
                 If the button above doesn't work, copy and paste this link into your browser:<br>
-                <span style="word-break: break-all; color: #2E4B3C; font-weight: 500;">{{ $agoraLink }}</span>
+                <span style="word-break: break-all; color: #2E4B3C; font-weight: 500;">{{ $videoLink }}</span>
             </p>
         </div>
 

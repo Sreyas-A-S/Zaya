@@ -84,6 +84,12 @@
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-3">
+                                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner_id === $user->profile_id)
+                                <a href="{{ route('bookings.consultation-form.show', $booking->id) }}" class="text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1">
+                                    <i class="ri-file-list-3-line text-lg"></i>
+                                    <span>Consultation Form</span>
+                                </a>
+                                @endif
                                 <button onclick="viewBookingDetails({{ $booking->id }})" class="text-secondary hover:text-primary transition-colors flex items-center gap-1">
                                     <i class="ri-eye-line text-lg"></i>
                                     <span>View</span>

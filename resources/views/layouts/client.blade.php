@@ -3,6 +3,7 @@
 @php
     $user = $user ?? Auth::user();
     $isMeetingPopout = $isMeetingPopout ?? false;
+    $isPublicMeeting = $isPublicMeeting ?? false;
 @endphp
 <head>
     <meta charset="UTF-8">
@@ -48,6 +49,30 @@
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
 
+        body.public-meeting {
+            background: #07110b;
+        }
+
+        body.public-meeting #global-preloader {
+            display: none;
+        }
+
+        body.public-meeting aside,
+        body.public-meeting main > div > header,
+        body.public-meeting .client-mobile-nav {
+            display: none !important;
+        }
+
+        body.public-meeting main {
+            overflow: hidden !important;
+            background: #07110b !important;
+        }
+
+        body.public-meeting main > div {
+            height: 100%;
+            padding: 0 !important;
+        }
+
         .preloader-logo {
             width: 100px;
             height: 100px;
@@ -75,7 +100,7 @@
     @stack('styles')
 </head>
 
-<body class="flex h-screen overflow-hidden text-gray-800 bg-white {{ $isMeetingPopout ? 'meeting-popout' : '' }}">
+<body class="flex h-screen overflow-hidden text-gray-800 bg-white {{ $isMeetingPopout ? 'meeting-popout' : '' }} {{ $isPublicMeeting ? 'public-meeting' : '' }}">
 
     <!-- Global Preloader -->
     <div id="global-preloader">
@@ -83,7 +108,7 @@
     </div>
 
     <!-- Sidebar -->
-    @if(!$isMeetingPopout)
+    @if(!$isMeetingPopout && !$isPublicMeeting)
     <aside class="w-[288px] bg-[#FFFFFF] border-r border-[#2E4B3D]/12 hidden lg:flex lg:flex-col h-full shrink-0">
         <div>
             <a href="{{ route('home') }}"
@@ -99,18 +124,24 @@
                     class="flex items-center px-8 py-3 {{ request()->routeIs('profile') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-user-settings-line mr-3 text-lg"></i> <span id="client_panel_sidebar_profile" data-i18n="Profile">{{ __('Profile') }}</span>
                 </a>
-                <a href="#"
-                    class="flex items-center px-8 py-3 text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary  font-normal transition-colors">
+                @if(in_array($user->role, ['client', 'patient']))
+                <a href="{{ route('health-journey.index') }}"
+                    class="flex items-center px-8 py-3 {{ request()->routeIs('health-journey.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-pulse-line mr-3 text-lg"></i> <span id="client_panel_sidebar_health_journey" data-i18n="Health Journey">{{ __($site_settings['client_panel_sidebar_health_journey'] ?? 'Health Journey') }}</span>
                 </a>
+                @endif
+                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist', 'translator']))
                 <a href="{{ route('consultations.index') }}"
-                    class="flex items-center px-8 py-3 {{ request()->routeIs('consultations.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
+                    class="flex items-center px-8 py-3 {{ (request()->routeIs('consultations.index') || request()->routeIs('bookings.consultation-form.*')) ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-stethoscope-line mr-3 text-lg"></i> <span id="client_panel_sidebar_consultation" data-i18n="Consultation">{{ __($site_settings['client_panel_sidebar_consultation'] ?? 'Consultation') }}</span>
                 </a>
+                @endif
+                @if(in_array($user->role, ['client', 'patient']))
                 <a href="{{ route('bookings.index') }}"
                     class="flex items-center px-8 py-3 {{ request()->routeIs('bookings.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-calendar-event-line mr-3 text-lg"></i> <span id="client_panel_sidebar_bookings" data-i18n="Bookings">{{ __($site_settings['client_panel_sidebar_bookings'] ?? 'Bookings') }}</span>
                 </a>
+                @endif
                 <a href="{{ route('conferences.index') }}"
                     class="flex items-center px-8 py-3 {{ request()->routeIs('conferences.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-vidicon-line mr-3 text-lg"></i> <span id="client_panel_sidebar_conference_history" data-i18n="Conference History">{{ __($site_settings['client_panel_sidebar_conference_history'] ?? 'Conference History') }}</span>
@@ -119,6 +150,7 @@
                     class="flex items-center px-8 py-3 {{ request()->routeIs('transactions.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-wallet-3-line mr-3 text-lg"></i> <span id="client_panel_sidebar_transaction_vault" data-i18n="Transaction Vault">{{ __($site_settings['client_panel_sidebar_transaction_vault'] ?? 'Transaction Vault') }}</span>
                 </a>
+                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
                 <a href="{{ route('time-slots.index') }}"
                     class="flex items-center px-8 py-3 {{ request()->routeIs('time-slots.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-time-line mr-3 text-lg"></i> <span id="client_panel_sidebar_time_slots" data-i18n="Time Slots">{{ __($site_settings['client_panel_sidebar_time_slots'] ?? 'Time Slots') }}</span>
@@ -127,6 +159,7 @@
                     class="flex items-center px-8 py-3 {{ request()->routeIs('my-services.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-shake-hands-line mr-3 text-lg"></i> <span id="client_panel_sidebar_my_services" data-i18n="My Services">{{ __('My Services') }}</span>
                 </a>
+                @endif
                 <a href="javascript:void(0)"
                     onclick="openLogoutModal()"
                     class="flex items-center px-8 py-3 text-red-400 hover:bg-red-50 hover:text-red-600 font-normal transition-colors">
@@ -143,21 +176,21 @@
     @endif
 
     <!-- Main Content -->
-    <main class="flex-1 h-full {{ $isMeetingPopout ? 'overflow-hidden bg-[#07110b] meeting-popout-main' : 'overflow-y-auto bg-[#F6F7F7]' }}">
-        <div class="w-full {{ $isMeetingPopout ? 'h-full p-0' : 'px-5 py-4 lg:px-10 lg:py-10' }}">
-            @if(!$isMeetingPopout && session('error'))
+    <main class="flex-1 h-full {{ $isMeetingPopout ? 'overflow-hidden bg-[#07110b] meeting-popout-main' : ($isPublicMeeting ? 'overflow-hidden bg-[#07110b] public-meeting-main' : 'overflow-y-auto bg-[#F6F7F7]') }}">
+        <div class="w-full {{ ($isMeetingPopout || $isPublicMeeting) ? 'h-full p-0' : 'px-5 py-4 lg:px-10 lg:py-10' }}">
+            @if(!$isMeetingPopout && !$isPublicMeeting && session('error'))
             <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 text-red-800 px-4 py-3 text-sm font-medium shadow-sm">
                 {{ session('error') }}
             </div>
             @endif
 
-            @if(!$isMeetingPopout && session('status'))
+            @if(!$isMeetingPopout && !$isPublicMeeting && session('status'))
             <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-800 px-4 py-3 text-sm font-medium shadow-sm">
                 {{ session('status') }}
             </div>
             @endif
 
-            @if(!$isMeetingPopout)
+            @if(!$isMeetingPopout && !$isPublicMeeting)
             <!-- Header -->
             <header
                 class="flex flex-col lg:flex-row flex-wrap gap-y-5 justify-center lg:justify-between lg:items-center mb-10">
@@ -175,7 +208,7 @@
                         $currentLocale = App::getLocale();
                         @endphp
                         <button type="button"
-                            class="relative flex items-center bg-gray-100 rounded-full h-[44px] px-1 border border-gray-200 cursor-pointer focus:outline-none"
+                            class="relative flex items-center bg-gray-100 rounded-full h-[44px] px-1 border border-gray-200 cursor-pointer focus:outline-none d-none hidden"
                             onclick="toggleLanguage('{{ $currentLocale == $lang1->code ? $lang2->code : $lang1->code }}')">
                             <!-- Sliding Pill -->
                             <div id="lang-toggle-pill-mobile"
@@ -253,7 +286,7 @@
                     $lang2 = $available_languages->skip(1)->first();
                     $currentLocale = App::getLocale();
                     @endphp
-                    <div class="hidden lg:block">
+                    <div class="hidden lg:block d-none !hidden">
                         <button type="button"
                             class="relative flex items-center bg-gray-100 rounded-full h-[44px] px-1 border border-gray-200 cursor-pointer focus:outline-none"
                             onclick="toggleLanguage('{{ $currentLocale == $lang1->code ? $lang2->code : $lang1->code }}')">
@@ -278,7 +311,9 @@
             </header>
             @endif
 
+            @if(!$isMeetingPopout && !$isPublicMeeting)
             @include('partials.client-mobile-nav')
+            @endif
 
             @yield('content')
 
@@ -291,6 +326,18 @@
 
     @yield('scripts')
     <script>
+        function openPopoutMeeting(channel, provider = 'jaas') {
+            const width = 480;
+            const height = 360;
+            const left = window.screen.width - width - 20;
+            const top = window.screen.height - height - 80;
+            
+            const url = `{{ url('/conference/session') }}/${channel}?provider=${provider}&popout=1`;
+            
+            window.open(url, `meeting_${channel}`, 
+                `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=no`);
+        }
+
         function toggleLanguage(targetLocale) {
             fetch(`{{ url('/lang') }}/${targetLocale}`, {
                     method: "POST",

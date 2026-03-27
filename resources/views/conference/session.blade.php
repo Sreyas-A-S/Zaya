@@ -135,10 +135,6 @@
             <div class="absolute inset-0">
                 <div id="jitsi-meet-container" class="w-full h-full"></div>
             </div>
-            <button id="pip-exit-btn" onclick="togglePiP()" class="hidden absolute top-4 right-4 z-[130] items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/15 px-4 py-2 text-white text-sm font-semibold shadow-lg hover:bg-white/20 transition-colors">
-                <i class="ri-fullscreen-exit-line text-base"></i>
-                Exit compact view
-            </button>
             @if(!$isMeetingPopout)
             <div class="absolute bottom-6 left-6 z-20 bg-black/40 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-xs font-semibold tracking-wide">
                 Video Meet room: {{ $jaasRoomSlug }}
@@ -267,57 +263,6 @@
     #local-player video { transform: rotateY(180deg); }
     .remote-video-container { position: relative; flex: 1; min-width: 300px; height: 100%; border-radius: inherit; overflow: hidden; background: #000; }
     #jitsi-meet-container iframe { width: 100%; height: 100%; border: 0; }
-    body.meeting-pip-mode {
-        overflow: hidden;
-        background: #07110b;
-    }
-    body.meeting-pip-mode #conference-meeting-header,
-    body.meeting-pip-mode #conference-meeting-footer,
-    body.meeting-pip-mode #conference-mobile-controls,
-    body.meeting-pip-mode #conference-mobile-nav,
-    body.meeting-pip-mode #settings-modal {
-        display: none !important;
-    }
-    body.meeting-pip-mode #pip-exit-btn {
-        display: inline-flex !important;
-    }
-    body.meeting-pip-mode #meeting-stage {
-        min-height: 0;
-        height: 100%;
-        border-radius: 24px;
-        overflow: hidden;
-    }
-    body.meeting-pip-mode .max-w-6xl.mx-auto {
-        max-width: none;
-        width: 100%;
-        height: 100%;
-        padding: 12px;
-    }
-    body.meeting-pip-mode .max-w-6xl.mx-auto > div {
-        height: 100%;
-    }
-    body.meeting-pip-mode aside,
-    body.meeting-pip-mode main > div > header {
-        display: none !important;
-    }
-    body.meeting-pip-mode main {
-        overflow: hidden !important;
-        background: transparent !important;
-    }
-    body.meeting-pip-mode main > div {
-        position: fixed;
-        right: 16px;
-        bottom: 16px;
-        width: min(420px, calc(100vw - 32px));
-        height: min(320px, calc(100vh - 32px));
-        padding: 0 !important;
-        z-index: 999;
-    }
-    body.meeting-pip-mode .max-w-6xl.mx-auto > div {
-        background: #07110b !important;
-        border: 0 !important;
-        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35) !important;
-    }
 </style>
 @endpush
 
@@ -338,6 +283,7 @@
         const jitsiRoom = "{{ $jaasRoomName }}";
         const jitsiJwt = @json($jaasToken);
         const conferencesUrl = "{{ route('conferences.index') }}";
+        const publicShareUrl = @json(route('conference.share', ['channel' => $channel, 'provider' => 'jaas']));
         let isPiPMode = false;
 
         let jitsiApi = null;
@@ -364,7 +310,7 @@
 
         // --- GLOBAL FUNCTIONS ---
         window.copyMeetingLink = () => {
-            const url = window.location.href;
+            const url = provider === 'jaas' ? publicShareUrl : window.location.href;
             navigator.clipboard.writeText(url).then(() => {
                 alert('Meeting link copied to clipboard!');
             });
@@ -372,19 +318,14 @@
 
         window.togglePiP = async () => {
             if (provider === 'jaas') {
-                isPiPMode = !isPiPMode;
-                document.body.classList.toggle('meeting-pip-mode', isPiPMode);
-
                 if (isPiPMode) {
-                    const stage = document.getElementById('meeting-stage');
-                    if (stage) {
-                        stage.scrollIntoView({ block: 'center', behavior: 'smooth' });
-                    }
+                    // If already in popout window, this won't be called usually
+                    return;
                 }
-                const pipButton = document.getElementById('pip-exit-btn');
-                if (pipButton) {
-                    pipButton.classList.toggle('hidden', !isPiPMode);
-                }
+                
+                // Open new small window and leave this one
+                openPopoutMeeting(channel, provider);
+                window.location.href = conferencesUrl;
                 return;
             }
             const video = document.querySelector('#remote-playerlist video');
