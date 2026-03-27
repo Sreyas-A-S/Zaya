@@ -314,6 +314,20 @@ class ProfileController extends Controller
         return view('health-journey', compact('user', 'clinicalDocuments', 'consultations'));
     }
 
+    public function bookings(Request $request)
+    {
+        $user = Auth::user();
+        $bookings = $this->getBookingQuery($user)
+            ->latest()
+            ->paginate(15);
+
+        if ($request->ajax()) {
+            return view('partials.bookings-table', compact('user', 'bookings'))->render();
+        }
+
+        return view('bookings', compact('user', 'bookings'));
+    }
+
     public function conferences(Request $request)
     {
         $user = Auth::user();
@@ -839,9 +853,11 @@ class ProfileController extends Controller
         $appId = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_id'));
         $provider = strtolower((string) $request->query('provider', 'agora'));
         $provider = in_array($provider, ['agora', 'jaas', 'jitsi']) ? $provider : 'agora';
-        $provider = $provider === 'jitsi' ? 'jaas' : $provider;
+        
         $isMeetingPopout = $request->query('popout') === '1';
         $agoraAvailable = !empty($appId);
+
+        // JaaS (8x8) config
         $jaasDomain = rtrim((string) config('services.jaas.domain', '8x8.vc'), '/');
         $jaasAppId = trim((string) config('services.jaas.app_id'));
         $jaasRoomSlug = preg_replace('/[^A-Za-z0-9_-]+/', '-', 'zaya-' . $channel);
@@ -853,18 +869,26 @@ class ProfileController extends Controller
         $jaasToken = $provider === 'jaas' ? $this->buildJaasToken($user, $jaasRoomSlug) : null;
         $jaasError = null;
 
+        // Free Jitsi config
+        $jitsiDomain = rtrim((string) config('services.jitsi.domain', 'meet.jit.si'), '/');
+        $jitsiRoom = $jaasRoomSlug;
+
         if ($provider === 'jaas' && empty($jaasAppId)) {
             $jaasError = 'JaaS App ID is missing. Set JAAS_APP_ID in your .env file.';
         } elseif ($provider === 'jaas' && empty($jaasToken)) {
             $jaasError = 'JaaS token could not be generated. Check the JaaS private key and API key ID.';
         }
+
+        // Try to find the booking for session tracking
+        $booking = \App\Models\Booking::where('id', function($query) use ($channel) {
+            $query->select('id')->from('bookings')->whereRaw("LOWER(REPLACE(invoice_no, '-', '')) = LOWER(?)", [str_replace('zaya-', '', $channel)]);
+        })->orWhere('id', (int)str_replace('zaya-', '', $channel))->first();
         
         \Log::info("User joining session:", [
             'user' => $user->id,
             'channel' => $channel,
             'provider' => $provider,
-            'appId_length' => strlen($appId),
-            'appId_preview' => substr($appId, 0, 5) . '...'
+            'appId_length' => strlen($appId)
         ]);
 
         return view('conference.session', compact(
@@ -880,7 +904,10 @@ class ProfileController extends Controller
             'jaasRoomSlug',
             'jaasRoomName',
             'jaasToken',
-            'jaasError'
+            'jaasError',
+            'jitsiDomain',
+            'jitsiRoom',
+            'booking'
         ));
     }
 

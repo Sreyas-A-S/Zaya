@@ -84,4 +84,8 @@ return [
         'private_key_path' => env('JAAS_PRIVATE_KEY_PATH', env('JAAAS_PRIVATE_KEY_PATH')),
     ],
 
+    'jitsi' => [
+        'domain' => env('JITSI_DOMAIN', 'meet.jit.si'),
+    ],
+
 ];
