@@ -8,9 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('consultation_forms', function (Blueprint $table) {
-            $table->dropUnique(['booking_id', 'doctor_id']);
-        });
+        $indexName = 'consultation_forms_booking_id_doctor_id_unique';
+        $results = DB::select("SHOW INDEX FROM consultation_forms WHERE Key_name = ?", [$indexName]);
+        
+        if (count($results) > 0) {
+            Schema::table('consultation_forms', function (Blueprint $table) use ($indexName) {
+                $table->dropUnique($indexName);
+            });
+        }
     }
 
     public function down(): void

@@ -79,6 +79,29 @@
             animation: pulse-smooth 2s infinite ease-in-out;
         }
 
+        /* Custom Sidebar Scrollbar */
+        .custom-sidebar-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-sidebar-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-sidebar-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(46, 75, 61, 0.1);
+            border-radius: 10px;
+        }
+
+        .custom-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(46, 75, 61, 0.2);
+        }
+
+        .custom-sidebar-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(46, 75, 61, 0.1) transparent;
+        }
+
         @keyframes pulse-smooth {
             0% {
                 transform: scale(1);
@@ -109,8 +132,8 @@
 
     <!-- Sidebar -->
     @if(!$isMeetingPopout && !$isPublicMeeting)
-    <aside class="w-[288px] bg-[#FFFFFF] border-r border-[#2E4B3D]/12 hidden lg:flex lg:flex-col h-full shrink-0">
-        <div>
+    <aside class="w-[288px] bg-[#FFFFFF] border-r border-[#2E4B3D]/12 hidden lg:flex lg:flex-col h-full shrink-0 relative">
+        <div class="flex-1 overflow-y-auto pb-48 custom-sidebar-scrollbar">
             <a href="{{ route('home') }}"
                 class="flex items-center pt-8 ps-8 pe-2 pb-2 text-gray-500 hover:text-gray-800 text-sm font-medium mb-4">
                 <i class="ri-arrow-left-line mr-2"></i> <span id="client_panel_back_btn" data-i18n="{{ $site_settings['client_panel_back_btn'] ?? 'Back' }}">{{ __($site_settings['client_panel_back_btn'] ?? 'Back') }}</span>
@@ -171,7 +194,7 @@
             </nav>
         </div>
         <img src="{{ asset('frontend/assets/client-profile-floating-img.png') }}" alt="Floating Image"
-            class="w-[248px] h-auto absolute bottom-0 left-0 pointer-events-none">
+            class="w-[248px] h-auto absolute bottom-0 left-0 pointer-events-none z-0">
     </aside>
     @endif
 
