@@ -210,7 +210,7 @@
                     </h2>
                     <div class="inline-flex gap-4">
                         <button type="button"
-                            class="session-mode-btn px-6 py-2 rounded-full text-base font-base transition-all duration-200 bg-[#EAEAEA] text-[#747474] cursor-pointer"
+                            class="session-mode-btn px-6 py-2 rounded-full text-base font-base transition-all duration-200 bg-[#FABD4D] text-[#423131] cursor-pointer"
                             data-mode="online" data-i18n="Online">{{ __('Online') }}</button>
                         <button type="button"
                             class="session-mode-btn px-6 py-2 rounded-full text-base font-base transition-all duration-200 bg-[#EAEAEA] text-[#747474] cursor-pointer"
@@ -324,7 +324,7 @@
                 </div>
 
                 <!-- Scheduling Section -->
-                <div class="grid grid-cols-1 gap-6 mb-8" id="service-schedule-container">
+                <div class="grid grid-cols-1 gap-6 mb-8 hidden" id="service-schedule-container">
                     @forelse($services as $service)
                     <div class="service-schedule-item" data-service-name="{{ strtolower($service->title) }}" data-service-id="{{ $service->id }}">
                         <h4 class="font-normal text-gray-400 mb-4">Service <span class="service-index">{{ $loop->iteration }}</span></h4>
@@ -622,7 +622,7 @@
                 style="background: linear-gradient(90deg, #FFFFFF 0%, #F0F0F0 48%, #FFFFFF 100%);">
                 <p class="text-gray-400 text-sm mb-1">Total</p>
                 <div class="text-4xl font-medium text-gray-900 flex items-center justify-center gap-2">
-                    € 100.00 <span class="text-xl text-gray-400 font-normal">/ EUR</span>
+                    {{ $defaultCurrencySymbol }} 0.00 <span class="text-xl text-gray-400 font-normal">/ {{ $defaultCurrencyBooking }}</span>
                 </div>
             </div>
 
@@ -729,13 +729,6 @@
                 currency: currency
             };
 
-            let paymentWindow = null;
-            try {
-                paymentWindow = window.open('about:blank', '_blank');
-            } catch (_) {
-                paymentWindow = null;
-            }
-
             try {
                 const response = await fetch('{{ route('bookings.store') }}', {
                         method: 'POST',
@@ -750,35 +743,20 @@
                 const data = await response.json();
 
                 if (response.ok && data.success && data.redirect_url) {
-                    showToast(data.message || 'Booking created!', 'success');
+                    showToast(data.message || 'Booking created! Redirecting to payment...', 'success');
                     sessionStorage.setItem('booking_reset', '1');
-
-                    if (data.open_in_new_tab) {
-                        if (paymentWindow && !paymentWindow.closed) {
-                            paymentWindow.location.href = data.redirect_url;
-                            paymentWindow.focus();
-                        } else {
-                            window.location.href = data.redirect_url;
-                        }
-                    } else {
-                        if (paymentWindow && !paymentWindow.closed) {
-                            paymentWindow.close();
-                        }
+                    
+                    // Direct redirection in current window
+                    setTimeout(() => {
                         window.location.href = data.redirect_url;
-                    }
+                    }, 800);
                 } else {
-                    if (paymentWindow && !paymentWindow.closed) {
-                        paymentWindow.close();
-                    }
                     showToast(data.message || 'Error creating booking. Please try again.', 'error');
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                 }
             } catch (error) {
                 console.error('Booking Error:', error);
-                if (paymentWindow && !paymentWindow.closed) {
-                    paymentWindow.close();
-                }
                 showToast('Something went wrong. Please check console for details.', 'error');
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -888,8 +866,8 @@
 
             for (const checkbox of selectedServices) {
                 const label = checkbox.closest('.service-tag-label');
-                const serviceNameLower = (label?.dataset?.serviceName || checkbox.value || '').toLowerCase();
-                const scheduleItem = document.querySelector(`.service-schedule-item[data-service-name="${serviceNameLower}"]`);
+                const serviceId = label?.dataset?.serviceId;
+                const scheduleItem = document.querySelector(`.service-schedule-item[data-service-id="${serviceId}"]`);
                 const bookingDate = scheduleItem?.querySelector('.day-value')?.value;
                 const bookingTime = scheduleItem?.querySelector('.time-value')?.value;
 
@@ -923,6 +901,9 @@
 
         // Translator checkbox toggle
         document.addEventListener('DOMContentLoaded', function() {
+            // Fetch off days when page loads
+            fetchOffDays();
+            
             showStep(currentStep);
             // Service tags selection and syncing with search box
             const selectedServicesContainer = document.getElementById('selected-services-container');
@@ -951,10 +932,11 @@
                 selectedServices.forEach(checkbox => {
                     const label = checkbox.closest('.service-tag-label');
                     const serviceName = checkbox.value;
-                    const serviceNameLower = (label.dataset.serviceName || serviceName).toLowerCase();
+                    const serviceNameLower = serviceName.toLowerCase();
+                    const serviceId = label.dataset.serviceId;
 
                     // Find scheduling details in Step 2
-                    const scheduleItem = document.querySelector(`.service-schedule-item[data-service-name="${serviceNameLower}"]`);
+                    const scheduleItem = document.querySelector(`.service-schedule-item[data-service-id="${serviceId}"]`);
                     let duration = "Duration";
                     let day = "Day";
                     let time = "Time";
@@ -1000,7 +982,7 @@
                             <div class="md:col-span-3 text-right">
                                 <button type="button"
                                     onclick="showStep(2); setTimeout(() => {
-                                        const target = document.querySelector('.service-schedule-item[data-service-name=\\'${serviceNameLower}\\']');
+                                        const target = document.querySelector('.service-schedule-item[data-service-id=\\'${serviceId}\\']');
                                         if (target) target.scrollIntoView({behavior: 'smooth', block: 'center'});
                                     }, 100);"
                                     class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-8 py-2.5 rounded-full text-sm font-medium transition-colors border-none cursor-pointer">
@@ -1015,7 +997,7 @@
                 updateTotalPrice(total, lastCurrencySymbol);
             }
 
-            function updateTotalPrice(total, currencySymbol = '₹') {
+            function updateTotalPrice(total, currencySymbol = lastCurrencySymbol) {
                 const priceContainer = document.querySelector('.text-4xl.font-medium.text-gray-900');
                 lastComputedTotal = total;
                 const testToggle = document.getElementById('test-payment-toggle');
@@ -1074,6 +1056,17 @@
                 }
 
                 syncScheduleWithSelection(checkedBoxes);
+                
+                // Toggle scheduling section visibility
+                const scheduleContainer = document.getElementById('service-schedule-container');
+                if (scheduleContainer) {
+                    if (checkedBoxes.length > 0) {
+                        scheduleContainer.classList.remove('hidden');
+                    } else {
+                        scheduleContainer.classList.add('hidden');
+                    }
+                }
+
                 updateStep3Services(); // Update Step 3 list
             }
 
@@ -1417,8 +1410,6 @@
 
             let html = '';
             html += '<div class="cal-header">';
-            // Add event.stopPropagation() to prevent document click handler from closing the dropdown,
-            // because replacing innerHTML detaches the button, making closest('.calendar-dropdown') fail.
             html += `<button type="button" class="cal-nav-btn cal-prev" onclick="changeMonth(event, this, ${year}, ${month}, -1)"><i class="ri-arrow-left-s-line"></i></button>`;
             html += `<span class="cal-title">${SHORT_MONTH_NAMES[month]} ${year}</span>`;
             html += `<button type="button" class="cal-nav-btn cal-next" onclick="changeMonth(event, this, ${year}, ${month}, 1)"><i class="ri-arrow-right-s-line"></i></button>`;
@@ -1444,9 +1435,21 @@
                 const cellDate = new Date(year, month, d);
                 cellDate.setHours(0, 0, 0, 0);
                 const isPast = cellDate < today;
+                
+                // Check if date is in off days list
+                const isSpecificOffDay = CACHED_OFF_DAYS.includes(dateStr);
+                
+                // Check if day of week is a weekly off day (0=Sun, 1=Mon, ..., 6=Sat)
+                // Note: JavaScript getDay() uses same indexing as Carbon dayOfWeek
+                const dayOfWeek = cellDate.getDay();
+                const isWeeklyOffDay = CACHED_OFF_DAY_INDEXES.includes(dayOfWeek);
+                
+                const isOffDay = isSpecificOffDay || isWeeklyOffDay;
 
                 if (isPast) {
                     html += `<div class="cal-cell cal-date cal-disabled">${d}</div>`;
+                } else if (isOffDay) {
+                    html += `<div class="cal-cell cal-date cal-off-day" title="Practitioner is not available">${d}</div>`;
                 } else {
                     html += `<div class="cal-cell cal-date" data-date="${dateStr}" onclick="selectDate(this, '${dateStr}')">${d}</div>`;
                 }
@@ -1519,29 +1522,79 @@
         }
 
         // ===== Time Picker Logic =====
-        const PRACTITIONER_ID = {{ $activePractitioner->id ?? 'null' }};
+        let PRACTITIONER_ID = {{ $activePractitioner->id ?? 'null' }};
         let AVAILABLE_SLOTS = [];
+        let CACHED_OFF_DAYS = [];  // Store fetched off days
+        let CACHED_OFF_DAY_INDEXES = []; // Store off day indexes (0-6)
+
+        // Function to update PRACTITIONER_ID (used by external selection if needed)
+        function updateActivePractitioner(id) {
+            console.log('Updating active practitioner to:', id);
+            PRACTITIONER_ID = id;
+            // Refetch off days when practitioner changes
+            fetchOffDays();
+        }
+
+        // Cache for booked slots
+        let CACHED_BOOKED_SLOTS = [];
+
+        // Fetch off days on page load
+        async function fetchOffDays() {
+            if (!PRACTITIONER_ID) return;
+            try {
+                const res = await fetch(`{{ url('/api/off-days') }}/${PRACTITIONER_ID}`);
+                const data = await res.json();
+                if (data) {
+                    CACHED_OFF_DAYS = data.off_days || [];
+                    CACHED_OFF_DAY_INDEXES = data.off_day_indexes || [];
+                    console.log('Loaded off days:', {specific: CACHED_OFF_DAYS, weeklyIndexes: CACHED_OFF_DAY_INDEXES});
+                }
+            } catch (e) {
+                console.error('Error fetching off days:', e);
+            }
+        }
+
+        // Fetch booked slots for a specific date
+        async function fetchBookedSlotsForDate(dateStr) {
+            if (!PRACTITIONER_ID || !dateStr) return [];
+            try {
+                const res = await fetch(`{{ url('/api/booked-slots') }}/${PRACTITIONER_ID}/${dateStr}`);
+                const data = await res.json();
+                if (data && Array.isArray(data.booked_slots)) {
+                    console.log('Loaded booked slots for', dateStr, ':', data.booked_slots);
+                    return data.booked_slots;
+                }
+            } catch (e) {
+                console.error('Error fetching booked slots:', e);
+            }
+            return [];
+        }
+
         const FALLBACK_SLOTS = [
             '09:00 AM','10:00 AM','11:00 AM','12:00 PM',
             '02:00 PM','03:00 PM','04:00 PM','05:00 PM'
         ];
         const DEFAULT_CURRENCY = "{{ $defaultCurrencyBooking }}";
-        const CURRENCY_SYMBOLS = {INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ'};
+        const CURRENCY_SYMBOLS = {!! json_encode(config('currencies.symbols', [])) !!};
         let lastCurrencySymbol = CURRENCY_SYMBOLS[DEFAULT_CURRENCY] || DEFAULT_CURRENCY;
 
         async function loadSlotsForDate(dateStr) {
+            console.log('Loading slots for:', dateStr, 'Practitioner:', PRACTITIONER_ID);
             if (!PRACTITIONER_ID || !dateStr) return [];
             try {
-                const res = await fetch(`{{ url('/api/available-slots') }}/${PRACTITIONER_ID}/${dateStr}`);
+                const url = `{{ url('/api/available-slots') }}/${PRACTITIONER_ID}/${dateStr}`;
+                console.log('Fetching from URL:', url);
+                const res = await fetch(url);
                 const data = await res.json();
+                console.log('Received slot data:', data);
                 if (data && Array.isArray(data.slots)) {
                     const times = data.slots.map(s => s.time).filter(Boolean);
-                    return times.length ? times : FALLBACK_SLOTS;
+                    return times;
                 }
             } catch (e) {
                 console.error('Slot fetch error', e);
             }
-            return FALLBACK_SLOTS;
+            return [];
         }
 
         function parseTimeToMinutes(timeStr) {
@@ -1611,6 +1664,26 @@
         }
 
         async function renderTimePicker(wrapper, dateValue, selectedTime, isToday, displayLabel = null) {
+            // Show loading state
+            wrapper.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-10 px-4">
+                    <div class="w-8 h-8 border-4 border-[#F5A623] border-t-transparent rounded-full animate-spin mb-3"></div>
+                    <p class="text-sm text-gray-500 font-medium">Fetching available slots...</p>
+                </div>
+            `;
+
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const slots = await loadSlotsForDate(dateValue);
+            const bookedSlots = await fetchBookedSlotsForDate(dateValue);
+
+            // If no slots available, show message and don't display the header/grid
+            if (!slots || slots.length === 0) {
+                const html = `<div class="text-center py-6 text-sm text-gray-500">No available slots for this practitioner on the selected date.</div>`;
+                wrapper.innerHTML = html;
+                return;
+            }
+
             let html = `
                 <div class="time-picker-header">
                     <div class="time-picker-title">Available Slots on ${displayLabel || dateValue}</div>
@@ -1618,20 +1691,15 @@
                 <div class="time-slots-grid">
             `;
 
-            const now = new Date();
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
-            const slots = await loadSlotsForDate(dateValue);
-
-            if (!slots || slots.length === 0) {
-                html += `<div class="col-span-full text-sm text-gray-500 px-2 pb-4">No slots available for this day.</div>`;
-            }
-
             slots.forEach(slot => {
                 const slotMinutes = parseTimeToMinutes(slot);
                 const isPast = isToday && (slotMinutes < currentMinutes);
+                const isBooked = bookedSlots.includes(slot);
 
                 if (isPast) {
-                    html += `<div class="time-slot disabled" style="opacity: 0.3; cursor: not-allowed; pointer-events: none;">${slot}</div>`;
+                    html += `<div class="time-slot disabled" title="Time has passed" style="opacity: 0.3; cursor: not-allowed; pointer-events: none;">${slot}</div>`;
+                } else if (isBooked) {
+                    html += `<div class="time-slot booked" title="Already booked" style="opacity: 0.4; cursor: not-allowed; pointer-events: none; background-color: #fee2e2; border-color: #dc2626; color: #991b1b;">${slot}</div>`;
                 } else {
                     const isSel = (slot === selectedTime) ? 'selected' : '';
                     html += `<div class="time-slot ${isSel}" onclick="selectTimeSlot(this)">${slot}</div>`;

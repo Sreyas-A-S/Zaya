@@ -44,10 +44,20 @@ class AppServiceProvider extends ServiceProvider
                 $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
             }
             
+            $userBalance = 0;
+            $currentUser = auth()->user();
+            if ($currentUser) {
+                // Calculate balance from practitioner shares and referrer shares
+                $earned = \App\Models\Transaction::where('practitioner_id', $currentUser->id)->sum('practitioner_share');
+                $referralEarned = \App\Models\Transaction::where('referrer_id', $currentUser->id)->sum('referrer_share');
+                $userBalance = $earned + $referralEarned;
+            }
+            
             $view->with([
                 'site_settings' => $settings,
                 'available_languages' => $availableLanguages,
-                'current_locale' => $language
+                'current_locale' => $language,
+                'user_balance' => $userBalance
             ]);
         });
     }

@@ -51,6 +51,14 @@
                     <span class="label">Mode:</span>
                     <span class="value">{{ strtoupper($booking->mode) }}</span>
                 </div>
+                
+                @if($booking->referral && $booking->referral->referredBy)
+                <div class="detail-row">
+                    <span class="label">Referral From:</span>
+                    <span class="value">{{ $booking->referral->referredBy->name }}</span>
+                </div>
+                @endif
+
                 @if($type === 'client')
                 <div class="detail-row">
                     <span class="label">Practitioner:</span>
@@ -85,9 +93,9 @@
         </div>
 
         <div class="footer">
-            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
-            <p>Where Indian Wisdom Meets Modern Wellness</p>
-            <p><a href="{{ config('app.url') }}">Visit our Website</a></p>
+            <p style="color: #F8E0BB; margin-bottom: 10px;">&copy; {{ date('Y') }} Zaya Wellness. All rights reserved.</p>
+            <p style="color: #ffffff; font-weight: 500; opacity: 0.9;">Where Indian Wisdom Meets Modern Wellness</p>
+            <p style="margin-top: 20px;"><a href="{{ config('app.url') }}" style="color: #F8E0BB; text-decoration: none; border: 1px solid #F8E0BB; padding: 8px 20px; border-radius: 99px; font-size: 12px;">Visit our Website</a></p>
         </div>
     </div>
 </body>

@@ -37,18 +37,15 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Code</th>
+                                    <th>Context</th>
                                     <th>Type</th>
                                     <th>Reward</th>
-                                    <th>Usage Limit</th>
-                                    <th>Used Count</th>
+                                    <th>Limit/Used</th>
                                     <th>Expiry Date</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {{-- Data will be populated via AJAX --}}
-                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -71,56 +68,76 @@
                     <input type="hidden" id="promo-code-id" name="id">
                     
                     <div class="row g-3">
-                        <!-- Code Field -->
                         <div class="col-md-6">
-                            <label class="form-label fw-bold"><i class="ri-qr-code-line me-1"></i>Promo Code</label>
+                            <label class="form-label fw-bold">Promo Code</label>
                             <input type="text" class="form-control" id="promo-code-code" name="code" 
                                    placeholder="e.g. SUMMER2026" required style="text-transform: uppercase;">
-                            <div class="form-text text-muted">Unique identifier used by customers.</div>
                         </div>
 
-                        <!-- Status Field -->
                         <div class="col-md-6">
-                            <label class="form-label fw-bold"><i class="ri-toggle-line me-1"></i>Status</label>
+                            <label class="form-label fw-bold">Usage Context</label>
+                            <select class="form-select" id="promo-code-usage_type" name="usage_type" required>
+                                <option value="booking">Booking Only</option>
+                                <option value="registration">Registration Only</option>
+                                <option value="both">Both Registration & Booking</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Discount Type</label>
+                            <select class="form-select" id="promo-code-type" name="type" required>
+                                <option value="fixed">Fixed Amount</option>
+                                <option value="percentage">Percentage (%)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Reward Value</label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" class="form-control" id="promo-code-reward" name="reward" required placeholder="0.00">
+                                <span class="input-group-text" id="reward-addon">₹</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Description</label>
+                            <textarea class="form-control" id="promo-code-description" name="description" rows="2" placeholder="Describe the purpose of this code..."></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold mb-2 d-block">Additional Benefits</label>
+                            <div class="d-flex flex-wrap gap-3">
+                                <div class="form-check checkbox-primary">
+                                    <input class="form-check-input benefit-checkbox" type="checkbox" name="benefits[]" value="Free First Session" id="benefit-free">
+                                    <label class="form-check-label" for="benefit-free">Free First Session</label>
+                                </div>
+                                <div class="form-check checkbox-secondary">
+                                    <input class="form-check-input benefit-checkbox" type="checkbox" name="benefits[]" value="Referral Bonus" id="benefit-referral">
+                                    <label class="form-check-label" for="benefit-referral">Referral Bonus</label>
+                                </div>
+                                <div class="form-check checkbox-success">
+                                    <input class="form-check-input benefit-checkbox" type="checkbox" name="benefits[]" value="Priority Support" id="benefit-support">
+                                    <label class="form-check-label" for="benefit-support">Priority Support</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Usage Limit</label>
+                            <input type="number" class="form-control" id="promo-code-usage_limit" name="usage_limit" placeholder="Unlimited">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Expiry Date</label>
+                            <input type="date" class="form-control" id="promo-code-expiry_date" name="expiry_date">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Status</label>
                             <select class="form-select" id="promo-code-status" name="status" required>
                                 <option value="1">Active</option>
                                 <option value="0">Inactive</option>
                             </select>
-                            <div class="form-text text-muted">Toggle visibility and usability.</div>
-                        </div>
-
-                        <!-- Type Field -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold"><i class="ri-settings-3-line me-1"></i>Discount Type</label>
-                            <select class="form-select" id="promo-code-type" name="type" required>
-                                <option value="fixed">Fixed Amount ($)</option>
-                                <option value="percentage">Percentage (%)</option>
-                            </select>
-                            <div class="form-text text-muted">How the reward is calculated.</div>
-                        </div>
-
-                        <!-- Reward Field -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold"><i class="ri-money-dollar-circle-line me-1"></i>Reward Value</label>
-                            <div class="input-group">
-                                <input type="number" step="0.01" class="form-control" id="promo-code-reward" name="reward" required placeholder="0.00">
-                                <span class="input-group-text" id="reward-addon">$</span>
-                            </div>
-                            <div class="form-text text-muted">Enter the discount amount or percentage.</div>
-                        </div>
-
-                        <!-- Usage Limit Field -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold"><i class="ri-user-follow-line me-1"></i>Usage Limit</label>
-                            <input type="number" class="form-control" id="promo-code-usage_limit" name="usage_limit" placeholder="Unlimited">
-                            <div class="form-text text-muted">Total times this code can be used (empty for unlimited).</div>
-                        </div>
-
-                        <!-- Expiry Date Field -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold"><i class="ri-calendar-event-line me-1"></i>Expiry Date</label>
-                            <input type="date" class="form-control" id="promo-code-expiry_date" name="expiry_date">
-                            <div class="form-text text-muted">The code will expire at the end of this day.</div>
                         </div>
                     </div>
                 </div>
@@ -146,7 +163,7 @@
             <div class="modal-body text-center py-4">
                 <i class="ri-error-warning-line text-danger" style="font-size: 50px;"></i>
                 <h4 class="mt-3">Are you sure?</h4>
-                <p class="text-muted">Do you really want to delete this promo code? This action cannot be undone.</p>
+                <p class="text-muted">Do you really want to delete this promo code?</p>
                 <input type="hidden" id="delete-promo-code-id">
             </div>
             <div class="modal-footer border-top-0 justify-content-center">
@@ -162,15 +179,8 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
-        // Handle Reward Addon Toggle
         $('#promo-code-type').on('change', function() {
-            const type = $(this).val();
-            const addon = $('#reward-addon');
-            if (type === 'percentage') {
-                addon.text('%');
-            } else {
-                addon.text('$');
-            }
+            $('#reward-addon').text($(this).val() === 'percentage' ? '%' : '₹');
         });
 
         var table = $('#promo-codes-table').DataTable({
@@ -180,10 +190,15 @@
             columns: [
                 {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                 {data: 'code', name: 'code'},
+                {data: 'usage_type', name: 'usage_type'},
                 {data: 'type', name: 'type'},
                 {data: 'reward', name: 'reward'},
-                {data: 'usage_limit', name: 'usage_limit'},
-                {data: 'used_count', name: 'used_count'},
+                {
+                    data: null, 
+                    render: function(data) {
+                        return (data.usage_limit || '∞') + ' / ' + data.used_count;
+                    }
+                },
                 {data: 'expiry_date', name: 'expiry_date'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
@@ -194,8 +209,7 @@
             e.preventDefault();
             var id = $('#promo-code-id').val();
             var url = id ? "{{ url('admin/promo-codes') }}/" + id : "{{ route('admin.promo-codes.store') }}";
-            var method = id ? 'PUT' : 'POST';
-
+            
             $.ajax({
                 url: url,
                 type: 'POST', 
@@ -203,23 +217,10 @@
                 success: function(response) {
                     $('#promo-code-modal').modal('hide');
                     table.ajax.reload();
-                    if (typeof showToast === 'function') {
-                        showToast(response.success);
-                    } else {
-                        alert(response.success);
-                    }
+                    showToast(response.success);
                 },
                 error: function(xhr) {
-                    var errors = xhr.responseJSON.errors;
-                    var errorMsg = 'Error occurred while saving data.';
-                    if (errors) {
-                        errorMsg = Object.values(errors).flat().join('\n');
-                    }
-                    if (typeof showToast === 'function') {
-                        showToast(errorMsg, 'error');
-                    } else {
-                        alert(errorMsg);
-                    }
+                    showToast(Object.values(xhr.responseJSON.errors || {}).flat().join('\n') || 'Error saving data', 'error');
                 }
             });
         });
@@ -230,12 +231,23 @@
                 $('#modal-title').text('Edit Promo Code');
                 $('#promo-code-id').val(data.id);
                 $('#promo-code-code').val(data.code);
+                $('#promo-code-usage_type').val(data.usage_type);
                 $('#promo-code-type').val(data.type);
                 $('#promo-code-reward').val(data.reward);
-                $('#reward-addon').text(data.type === 'percentage' ? '%' : '$');
+                $('#promo-code-description').val(data.description);
+                $('#reward-addon').text(data.type === 'percentage' ? '%' : '₹');
                 $('#promo-code-usage_limit').val(data.usage_limit);
                 $('#promo-code-expiry_date').val(data.expiry_date ? data.expiry_date.split('T')[0] : '');
                 $('#promo-code-status').val(data.status ? 1 : 0);
+                
+                // Reset and set benefits
+                $('.benefit-checkbox').prop('checked', false);
+                if (data.benefits) {
+                    data.benefits.forEach(b => {
+                        $(`.benefit-checkbox[value="${b}"]`).prop('checked', true);
+                    });
+                }
+
                 $('#promo-code-modal').modal('show');
             });
         });
@@ -248,13 +260,23 @@
 
         $('#confirm-delete-btn').on('click', function() {
             var id = $('#delete-promo-code-id').val();
-            $('#delete-form-' + id).submit();
+            $.ajax({
+                url: "{{ url('admin/promo-codes') }}/" + id,
+                type: 'DELETE',
+                data: { _token: "{{ csrf_token() }}" },
+                success: function() {
+                    $('#delete-confirmation-modal').modal('hide');
+                    table.ajax.reload();
+                    showToast('Promo code deleted successfully');
+                }
+            });
         });
     });
 
     function openCreateModal() {
         $('#promo-code-form')[0].reset();
         $('#promo-code-id').val('');
+        $('.benefit-checkbox').prop('checked', false);
         $('#modal-title').text('Add New Promo Code');
         $('#promo-code-modal').modal('show');
     }
@@ -263,16 +285,10 @@
         $.ajax({
             url: "{{ url('admin/promo-codes') }}/" + id + "/status",
             type: 'POST',
-            data: {
-                _token: "{{ csrf_token() }}",
-                status: status
-            },
+            data: { _token: "{{ csrf_token() }}", status: status },
             success: function(response) {
                 showToast(response.success);
                 $('#promo-codes-table').DataTable().ajax.reload(null, false);
-            },
-            error: function() {
-                showToast('Error updating status', 'error');
             }
         });
     }

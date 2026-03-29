@@ -58,7 +58,7 @@ class SendSessionReminders extends Command
                 // We also check if the session hasn't already started long ago (e.g., within the last 15 mins is fine if we just missed it)
                 if ($now->diffInMinutes($startTime, false) <= $leadTime && $now->diffInMinutes($startTime, false) >= -10) {
                     
-                    // Generate the Agora link using invoice_no as channel name
+                    // Generate the secure video link using invoice_no as channel name
                     $videoLink = route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']);
 
                     // Send to Client

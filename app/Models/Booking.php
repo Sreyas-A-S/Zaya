@@ -70,4 +70,17 @@ class Booking extends Model
     {
         return $this->hasOne(ConsultationForm::class);
     }
+
+    public function referral()
+    {
+        return $this->hasOne(Referral::class, 'referral_no', 'invoice_no');
+    }
+
+    /**
+     * Referrals created from this booking session.
+     */
+    public function referralsFromThisSession()
+    {
+        return $this->hasMany(Referral::class, 'booking_id');
+    }
 }

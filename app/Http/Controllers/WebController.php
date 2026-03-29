@@ -325,7 +325,34 @@ class WebController extends Controller
         $language = App::getLocale();
         $settings = HomepageSetting::getAllSettings($language);
 
-        $practitioner = Practitioner::with(['user', 'reviews'])->where('slug', $slug)->firstOrFail();
+        // Try lookup by slug across all professional profile models
+        $practitioner = Practitioner::with(['user', 'reviews'])->where('slug', $slug)->first();
+        
+        if (!$practitioner) {
+            $practitioner = Doctor::with(['user', 'reviews'])->where('slug', $slug)->first();
+        }
+        if (!$practitioner) {
+            $practitioner = MindfulnessPractitioner::with(['user', 'reviews'])->where('slug', $slug)->first();
+        }
+        if (!$practitioner) {
+            $practitioner = YogaTherapist::with(['user', 'reviews'])->where('slug', $slug)->first();
+        }
+
+        // Fallback to ID-based lookup if slug didn't match and it's numeric
+        if (!$practitioner && is_numeric($slug)) {
+            $practitioner = Practitioner::with(['user', 'reviews'])->find($slug)
+                ?? Doctor::with(['user', 'reviews'])->find($slug)
+                ?? MindfulnessPractitioner::with(['user', 'reviews'])->find($slug)
+                ?? YogaTherapist::with(['user', 'reviews'])->find($slug);
+        }
+
+        if (!$practitioner) {
+            abort(404);
+        }
+
+        // Add a helper attribute for easy access to bio and name across different models if needed
+        // but for now we'll rely on the blade handling it or common naming conventions
+        
         return view('practitioner-detail', compact('practitioner', 'settings'));
     }
 
@@ -595,7 +622,9 @@ class WebController extends Controller
 
         // Handle prefilled service from request
         $prefilledService = null;
-        if ($request->filled('service_id')) {
+        if ($request->filled('service')) {
+            $prefilledService = Service::where('slug', $request->service)->first();
+        } elseif ($request->filled('service_id')) {
             $prefilledService = Service::find($request->service_id);
         }
 

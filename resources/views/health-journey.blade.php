@@ -12,10 +12,10 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <!-- Left: Clinical Documents -->
-        <div class="lg:col-span-12 space-y-8">
-            <div id="section-clinical" class="bg-white rounded-[2rem] p-6 md:p-8 border border-[#2E4B3D]/12 shadow-sm">
+        <div class="lg:col-span-7 space-y-8">
+            <div id="section-clinical" class="bg-white rounded-[2rem] p-6 md:p-8 border border-[#2E4B3D]/12 shadow-sm h-full">
                 <h2 class="text-2xl font-bold text-secondary mb-6 flex items-center gap-3">
                     <i class="ri-file-list-3-line text-[#FABD4D]"></i> Clinical Document Portal
                 </h2>
@@ -25,22 +25,20 @@
                     @csrf
                     <input type="file" id="document-input" name="document" class="hidden" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
                     <div id="drop-zone"
-                        class="border-2 border-dashed border-[#8FC0A8] rounded-[2rem] p-10 text-center bg-gray-50/50 mb-8 cursor-pointer hover:bg-white hover:border-secondary transition-all group">
-                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
-                            <i class="ri-upload-cloud-2-line text-2xl text-secondary"></i>
+                        class="border-2 border-dashed border-[#8FC0A8] rounded-[2rem] p-8 text-center bg-gray-50/50 mb-8 cursor-pointer hover:bg-white hover:border-secondary transition-all group">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm group-hover:scale-110 transition-transform">
+                            <i class="ri-upload-cloud-2-line text-xl text-secondary"></i>
                         </div>
-                        <p class="text-lg font-bold text-secondary mb-1">Drag and Drop files here</p>
-                        <p class="text-sm text-gray-500 mb-6">Upload X-Rays, MRIs, Blood tests and other clinical documents</p>
+                        <p class="text-base font-bold text-secondary mb-1">Drag and Drop files</p>
                         <button type="button" id="client_panel_upload_btn"
-                            class="inline-flex items-center justify-center px-8 py-3 bg-secondary text-white rounded-full text-sm font-bold hover:bg-primary transition-all shadow-lg shadow-secondary/20">
+                            class="inline-flex items-center justify-center px-6 py-2 bg-secondary text-white rounded-full text-xs font-bold hover:bg-primary transition-all shadow-lg shadow-secondary/20 mt-2">
                             Select Files
                         </button>
-                        <p class="text-xs text-gray-400 mt-4 uppercase tracking-widest font-bold">JPG, PNG, PDF (Max 20MB)</p>
                     </div>
                 </form>
 
                 <!-- Documents Grid -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="documents-wrapper">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4" id="documents-wrapper">
                     @forelse($clinicalDocuments as $doc)
                     <div class="group bg-white p-4 rounded-2xl relative flex flex-col items-center justify-center border border-gray-100 hover:border-secondary/20 hover:shadow-xl hover:shadow-gray-200/40 transition-all" id="doc-{{ $doc->id }}">
                         <button onclick="deleteDocument({{ $doc->id }})"
@@ -81,33 +79,33 @@
                     @endforelse
                 </div>
             </div>
+        </div>
 
-            <!-- Consultation History -->
-            <div class="bg-white rounded-[2rem] p-6 md:p-8 border border-[#2E4B3D]/12 shadow-sm">
+        <!-- Right: Consultation History -->
+        <div class="lg:col-span-5">
+            <div class="bg-white rounded-[2rem] p-6 md:p-8 border border-[#2E4B3D]/12 shadow-sm h-full">
                 <h2 class="text-2xl font-bold text-secondary mb-6 flex items-center gap-3">
-                    <i class="ri-history-line text-[#FABD4D]"></i> Consultation History
+                    <i class="ri-history-line text-[#FABD4D]"></i> History
                 </h2>
 
                 <div class="space-y-4">
                     @forelse($consultations as $consultation)
-                    <div class="flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border border-gray-50 hover:border-secondary/10 hover:bg-gray-50/30 transition-all gap-4">
+                    <div class="flex flex-col p-5 rounded-2xl border border-gray-50 hover:border-secondary/10 hover:bg-gray-50/30 transition-all gap-4">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 rounded-full bg-white border border-gray-100 flex-shrink-0 overflow-hidden">
                                 <img src="{{ $consultation->practitioner->profile_photo_path ? asset('storage/' . $consultation->practitioner->profile_photo_path) : asset('frontend/assets/profile-dummy-img.png') }}" 
                                      class="w-full h-full object-cover">
                             </div>
                             <div>
-                                <h3 class="font-bold text-secondary">{{ $consultation->practitioner->user->name ?? 'Practitioner' }}</h3>
-                                <p class="text-xs text-gray-500">{{ $consultation->booking_date->format('M d, Y') }} • {{ $consultation->booking_time }}</p>
+                                <h3 class="font-bold text-secondary leading-tight">{{ $consultation->practitioner->user->name ?? 'Practitioner' }}</h3>
+                                <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1">{{ $consultation->booking_date->format('M d, Y') }} • {{ $consultation->booking_time }}</p>
                             </div>
                         </div>
                         
-                        <div class="flex items-center gap-3">
-                            <a href="{{ route('bookings.consultation-form.show', $consultation->id) }}" 
-                               class="px-5 py-2.5 rounded-full bg-white border border-gray-200 text-secondary text-xs font-bold hover:border-secondary hover:text-secondary transition-all flex items-center gap-2">
-                                <i class="ri-file-list-3-line"></i> View Consultation Details
-                            </a>
-                        </div>
+                        <a href="{{ route('bookings.details-view', $consultation->id) }}" 
+                           class="w-full py-3 rounded-xl bg-[#F9FBF9] border border-[#2E4B3D]/12 text-secondary text-xs font-black uppercase tracking-widest hover:bg-secondary hover:text-white transition-all flex items-center justify-center gap-2">
+                            <i class="ri-file-list-3-line"></i> View Details
+                        </a>
                     </div>
                     @empty
                     <div class="py-12 text-center">
@@ -119,6 +117,68 @@
                     @endforelse
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Data Access Management -->
+    <div id="section-access" class="bg-white rounded-[2rem] p-6 md:p-8 border border-[#2E4B3D]/12 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+                <h2 class="text-2xl font-bold text-secondary flex items-center gap-3">
+                    <i class="ri-shield-keyhole-line text-[#FABD4D]"></i> Data Access Management
+                </h2>
+                <p class="text-sm text-gray-500 mt-1">Manage which practitioners and doctors can view your health data and clinical records.</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-gray-50">
+                        <th class="pb-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Professional</th>
+                        <th class="pb-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Role</th>
+                        <th class="pb-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Last Verified</th>
+                        <th class="pb-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Access Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    @forelse($dataAccessRequests as $request)
+                    <tr class="group">
+                        <td class="py-5">
+                            <div class="flex items-center gap-3">
+                                <img src="{{ $request->requester->profile_pic ? (str_starts_with($request->requester->profile_pic, 'http') ? $request->requester->profile_pic : asset('storage/' . $request->requester->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" 
+                                     class="w-10 h-10 rounded-xl object-cover border border-gray-100 shadow-sm">
+                                <span class="text-sm font-bold text-secondary">{{ $request->requester->name }}</span>
+                            </div>
+                        </td>
+                        <td class="py-5">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ str_replace('_', ' ', $request->requester->role) }}</span>
+                        </td>
+                        <td class="py-5 text-xs text-gray-500">
+                            {{ $request->approved_at ? $request->approved_at->format('M d, Y') : 'N/A' }}
+                        </td>
+                        <td class="py-5 text-right">
+                            <div class="flex items-center justify-end gap-4">
+                                <span class="text-[10px] font-bold uppercase tracking-tighter {{ $request->status === 'approved' ? 'text-emerald-600' : 'text-gray-400' }}">
+                                    {{ $request->status === 'approved' ? 'Access Enabled' : 'Access Revoked' }}
+                                </span>
+                                <button onclick="toggleProfessionalAccess(this, {{ $request->id }})" 
+                                        data-status="{{ $request->status }}"
+                                        class="w-10 h-5 {{ $request->status === 'approved' ? 'bg-secondary' : 'bg-gray-300' }} rounded-full relative flex items-center transition-colors cursor-pointer">
+                                    <div class="w-4 h-4 bg-white rounded-full absolute left-0.5 shadow-sm transition-transform duration-300 {{ $request->status === 'approved' ? 'translate-x-5' : '' }}"></div>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="py-12 text-center text-gray-400 font-medium">
+                            No practitioners have requested access to your data yet.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -358,6 +418,71 @@ function deleteDocument(id) {
             if (window.showZayaToast) showZayaToast('Document deleted successfully.', 'Clinical Portal');
         });
     }
+}
+
+function toggleProfessionalAccess(btn, requestId) {
+    const dot = btn.querySelector('div');
+    const label = btn.previousElementSibling;
+    const isCurrentlyActive = btn.getAttribute('data-status') === 'approved';
+    const newState = !isCurrentlyActive;
+
+    // Optimistic UI update
+    if (newState) {
+        btn.classList.remove('bg-gray-300');
+        btn.classList.add('bg-secondary');
+        dot.classList.add('translate-x-5');
+        label.innerText = 'Access Enabled';
+        label.classList.remove('text-gray-400');
+        label.classList.add('text-emerald-600');
+        btn.setAttribute('data-status', 'approved');
+    } else {
+        btn.classList.remove('bg-secondary');
+        btn.classList.add('bg-gray-300');
+        dot.classList.remove('translate-x-5');
+        label.innerText = 'Access Revoked';
+        label.classList.remove('text-emerald-600');
+        label.classList.add('text-gray-400');
+        btn.setAttribute('data-status', 'revoked');
+    }
+
+    fetch("{{ route('data-access.toggle') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            request_id: requestId,
+            enabled: newState
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (window.showZayaToast) {
+            showZayaToast(data.success, 'Privacy Management');
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        // Revert UI on error
+        if (isCurrentlyActive) {
+            btn.classList.remove('bg-gray-300');
+            btn.classList.add('bg-secondary');
+            dot.classList.add('translate-x-5');
+            label.innerText = 'Access Enabled';
+            label.classList.remove('text-gray-400');
+            label.classList.add('text-emerald-600');
+            btn.setAttribute('data-status', 'approved');
+        } else {
+            btn.classList.remove('bg-secondary');
+            btn.classList.add('bg-gray-300');
+            dot.classList.remove('translate-x-5');
+            label.innerText = 'Access Revoked';
+            label.classList.remove('text-emerald-600');
+            label.classList.add('text-gray-400');
+            btn.setAttribute('data-status', 'revoked');
+        }
+    });
 }
 </script>
 @endsection

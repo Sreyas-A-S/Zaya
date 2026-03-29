@@ -196,6 +196,20 @@ h6 {
     pointer-events: none;
 }
 
+.cal-cell.cal-date.cal-off-day {
+    color: #DC2626;
+    background-color: #FEE2E2;
+    cursor: not-allowed;
+    pointer-events: none;
+    font-weight: 500;
+    border: 1px solid #FECACA;
+}
+
+.cal-cell.cal-date.cal-off-day:hover {
+    background-color: #FEE2E2;
+    color: #DC2626;
+}
+
 /* ===== Time Picker Dropdown ===== */
 .time-picker-dropdown {
     position: absolute;
@@ -260,6 +274,21 @@ h6 {
     color: #fff;
     font-weight: 500;
     box-shadow: 0 2px 4px rgba(72, 187, 120, 0.2);
+}
+
+.time-slot.booked {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+    border: 1px solid #dc2626;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    opacity: 0.6;
+    font-weight: 500;
+}
+
+.time-slot.booked:hover {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
 }
 
 .time-picker-footer {

@@ -161,7 +161,10 @@
                         </div>
                         <p class="text-xs text-gray-400">{{ $booking->booking_date->translatedFormat('M d, Y') }} - {{ $booking->booking_time }}</p>
                     </div>
-                    <span class="px-3 py-1 bg-[#EEF2EF] text-[#2FA749] text-xs font-normal rounded-full capitalize">{{ __($booking->status) }}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 bg-[#EEF2EF] text-[#2FA749] text-xs font-normal rounded-full capitalize">{{ __($booking->status) }}</span>
+                        <a href="{{ route('bookings.details-view', $booking->id) }}" class="text-[10px] font-bold text-secondary hover:underline uppercase tracking-tighter">View Details</a>
+                    </div>
                 </div>
                 @empty
                 <p id="client_panel_no_upcoming_msg" class="text-center text-gray-500 text-sm py-6" data-i18n="{{ $site_settings['client_panel_no_upcoming_msg'] ?? 'No upcoming sessions.' }}">{{ __($site_settings['client_panel_no_upcoming_msg'] ?? 'No upcoming sessions.') }}</p>
@@ -192,7 +195,10 @@
                         </div>
                         <p class="text-xs text-gray-400">{{ $booking->booking_date->translatedFormat('M d, Y') }} - {{ $booking->booking_time }}</p>
                     </div>
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-normal rounded-full capitalize">{{ __('Completed') }}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-normal rounded-full capitalize">{{ __('Completed') }}</span>
+                        <a href="{{ route('bookings.details-view', $booking->id) }}" class="text-[10px] font-bold text-secondary hover:underline uppercase tracking-tighter">View Details</a>
+                    </div>
                 </div>
                 @empty
                 <p id="client_panel_no_completed_msg" class="text-center text-gray-500 text-sm py-10" data-i18n="{{ $site_settings['client_panel_no_completed_msg'] ?? 'No completed sessions recently.' }}">{{ __($site_settings['client_panel_no_completed_msg'] ?? 'No completed sessions recently.') }}</p>

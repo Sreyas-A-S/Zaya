@@ -33,16 +33,18 @@
         <div class="content">
             <h1>Expert Session Recommendation</h1>
             <p>Hello {{ $referral->user->name }},</p>
-            <p>Your practitioner, <strong>{{ $referral->referredBy->name }}</strong>, has referred you to <strong>{{ $referral->referredTo->name }}</strong> for a specialized session. They believe this will be beneficial for your wellness journey.</p>
+            <p>We are writing to inform you that you are being referred to a new specialist by your current practitioner.</p>
+            <p><strong>{{ $referral->referredBy->name }}</strong> has recommended <strong>{{ $referral->referredTo->name }}</strong> for a specialized session to further support your wellness journey.</p>
 
             <div class="referral-card">
                 <div class="practitioner-info">
                     <div>
                         <span class="label">Referred To:</span>
                         <span class="value">{{ $referral->referredTo->name }}</span>
+                        <a href="{{ $referral->referredTo->profile_url }}" style="color: #97563D; font-size: 12px; font-weight: 700; text-decoration: underline; margin-top: 5px; display: inline-block;">View Profile</a>
                     </div>
                 </div>
-                <div style="margin-top: 15px; border-top: 1px solid #edf2f7; pt: 15px;">
+                <div style="margin-top: 15px; border-top: 1px solid #edf2f7; padding-top: 15px;">
                     <span class="label">Session Amount:</span>
                     <span class="value">€ {{ number_format($referral->amount, 2) }}</span>
                 </div>
@@ -58,9 +60,9 @@
         </div>
 
         <div class="footer">
-            <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
-            <p>Where Indian Wisdom Meets Modern Wellness</p>
-            <p><a href="{{ config('app.url') }}">Visit our Website</a></p>
+            <p style="color: #F8E0BB; margin-bottom: 10px;">&copy; {{ date('Y') }} Zaya Wellness. All rights reserved.</p>
+            <p style="color: #ffffff; font-weight: 500; opacity: 0.9;">Where Indian Wisdom Meets Modern Wellness</p>
+            <p style="margin-top: 20px;"><a href="{{ config('app.url') }}" style="color: #F8E0BB; text-decoration: none; border: 1px solid #F8E0BB; padding: 8px 20px; border-radius: 99px; font-size: 12px;">Visit our Website</a></p>
         </div>
     </div>
 </body>

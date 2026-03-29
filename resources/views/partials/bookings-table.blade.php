@@ -83,21 +83,40 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
-                            <div class="flex items-center justify-end gap-3">
-                                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner_id === $user->profile_id)
-                                <a href="{{ route('bookings.consultation-form.show', $booking->id) }}" class="text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1">
-                                    <i class="ri-file-list-3-line text-lg"></i>
-                                    <span>Consultation Form</span>
-                                </a>
-                                @endif
-                                <button onclick="viewBookingDetails({{ $booking->id }})" class="text-secondary hover:text-primary transition-colors flex items-center gap-1">
-                                    <i class="ri-eye-line text-lg"></i>
-                                    <span>View</span>
+                            <div class="relative inline-block text-left action-dropdown">
+                                <button type="button" class="text-gray-400 hover:text-secondary focus:outline-none dropdown-trigger p-2">
+                                    <i class="ri-more-2-fill text-xl"></i>
                                 </button>
-                                @if($booking->razorpay_payment_url && $booking->status === 'pending')
-                                    <a href="{{ $booking->razorpay_payment_url }}" target="_blank" class="text-secondary hover:underline">Pay Now</a>
-                                @endif
-                                <button class="text-gray-400 hover:text-secondary"><i class="ri-more-2-fill text-lg"></i></button>
+
+                                <div class="dropdown-menu absolute right-0 mt-2 w-56 rounded-xl shadow-xl bg-white border border-[#2E4B3D]/12 divide-y divide-gray-50 focus:outline-none z-[100] hidden">
+                                    <div class="py-1">
+                                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner_id === $user->profile_id)
+                                        <a href="{{ route('bookings.consultation-form.show', $booking->id) }}" class="group flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                                            <i class="ri-file-list-3-line mr-3 text-lg text-emerald-600"></i>
+                                            Consultation Form
+                                        </a>
+                                        @endif
+                                        
+                                        <a href="{{ route('bookings.details-view', $booking->id) }}" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-secondary transition-colors text-left">
+                                            <i class="ri-eye-line mr-3 text-lg text-secondary"></i>
+                                            View Details
+                                        </a>
+
+                                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner_id === $user->profile_id)
+                                        <button onclick="openReferModal({{ $booking->id }}, {{ $booking->user_id }})" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-left">
+                                            <i class="ri-user-shared-line mr-3 text-lg text-orange-500"></i>
+                                            Refer
+                                        </button>
+                                        @endif
+
+                                        @if($booking->razorpay_payment_url && $booking->status === 'pending')
+                                        <a href="{{ $booking->razorpay_payment_url }}" target="_blank" class="group flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                                            <i class="ri-bank-card-line mr-3 text-lg text-blue-600"></i>
+                                            Pay Now
+                                        </a>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>

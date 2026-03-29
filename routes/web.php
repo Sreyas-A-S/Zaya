@@ -86,6 +86,8 @@ Route::get('/bookings/payment/callback', [BookingController::class, 'paymentCall
 Route::get('/registration-fees/callback', [\App\Http\Controllers\Admin\RegistrationFeeController::class, 'callback'])->name('registration-fees.callback');
 Route::get('/fetch-translators', [BookingController::class, 'fetchTranslators'])->name('fetch-translators');
 Route::get('/api/available-slots/{practitioner}/{date}', [\App\Http\Controllers\AvailabilityController::class, 'getGeneratedSlots'])->name('api.available-slots');
+Route::get('/api/off-days/{practitioner}', [\App\Http\Controllers\AvailabilityController::class, 'getOffDays'])->name('api.off-days');
+Route::get('/api/booked-slots/{practitioner}/{date}', [\App\Http\Controllers\AvailabilityController::class, 'getBookedSlots'])->name('api.booked-slots');
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
 Route::post('/contact-us', [WebController::class, 'storeContact'])->name('contact-us.store');
 Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
@@ -154,6 +156,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
 
     Route::get('other-fees', [\App\Http\Controllers\Admin\FinanceSettingController::class, 'index'])->name('other-fees.index');
     Route::post('other-fees', [\App\Http\Controllers\Admin\FinanceSettingController::class, 'update'])->name('other-fees.update');
+
+    // Financial Tracking
+    Route::get('financial/transactions', [\App\Http\Controllers\Admin\FinancialController::class, 'index'])->name('financial.index');
+    Route::get('financial/practitioner-balances', [\App\Http\Controllers\Admin\FinancialController::class, 'practitionerBalances'])->name('financial.practitioners');
 
     Route::get('credentials', [\App\Http\Controllers\Admin\CredentialController::class, 'index'])->name('credentials.index');
     Route::post('credentials/{id}/password', [\App\Http\Controllers\Admin\CredentialController::class, 'updatePassword'])->name('credentials.update-password');
@@ -275,6 +281,7 @@ Route::get('/optimize', function () {
     Artisan::call('optimize');
     return 'Application optimized successfully!';
 });
+
 
 Route::get('/migrate', function () {
     set_time_limit(300);

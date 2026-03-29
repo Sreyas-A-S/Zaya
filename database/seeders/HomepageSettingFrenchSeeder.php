@@ -879,6 +879,29 @@ class HomepageSettingFrenchSeeder extends Seeder
                 'max_length' => 50,
                 'language' => 'fr',
             ],
+
+            // Finance Section
+            ['key' => 'client_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'client_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'client_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'practitioner_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'practitioner_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'practitioner_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'doctor_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'doctor_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'doctor_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'mindfulness_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'mindfulness_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'mindfulness_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'yoga_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'yoga_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'yoga_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'translator_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'translator_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'translator_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'company_booking_commission', 'value' => '10', 'type' => 'number', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'company_referral_commission', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'fr'],
+            ['key' => 'practitioner_referral_commission', 'value' => '5', 'type' => 'number', 'section' => 'finance', 'language' => 'fr'],
         ];
 
         foreach ($settings as $setting) {

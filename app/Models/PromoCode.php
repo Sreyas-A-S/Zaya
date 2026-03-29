@@ -12,7 +12,10 @@ class PromoCode extends Model
     protected $fillable = [
         'code',
         'type',
+        'usage_type',
         'reward',
+        'description',
+        'benefits',
         'usage_limit',
         'used_count',
         'expiry_date',
@@ -25,5 +28,6 @@ class PromoCode extends Model
         'used_count' => 'integer',
         'usage_limit' => 'integer',
         'reward' => 'decimal:2',
+        'benefits' => 'array',
     ];
 }

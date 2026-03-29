@@ -49,10 +49,17 @@
     @endif
 
     <!-- Conference History -->
+    @if(in_array($user->role, ['client', 'patient']))
+    <a href="{{ route('conferences.index') }}" 
+        class="leading-none text-lg {{ request()->routeIs('conferences.index') ? 'text-secondary border-b-2 border-secondary pb-1' : 'text-[#8F8F8F]' }} font-normal whitespace-nowrap cursor-pointer transition-colors">
+        {{ __('My Conferences') }}
+    </a>
+    @else
     <a href="{{ route('conferences.index') }}" 
         class="leading-none text-lg {{ request()->routeIs('conferences.index') ? 'text-secondary border-b-2 border-secondary pb-1' : 'text-[#8F8F8F]' }} font-normal whitespace-nowrap cursor-pointer transition-colors">
         {{ __($site_settings['client_panel_sidebar_conference_history'] ?? 'Conferences') }}
     </a>
+    @endif
 
     <!-- Transaction Vault -->
     @if(request()->routeIs('dashboard'))
@@ -66,6 +73,12 @@
             {{ __($site_settings['client_panel_sidebar_transaction_vault'] ?? 'Transaction Vault') }}
         </a>
     @endif
+
+    <!-- Reviews -->
+    <a href="{{ route('reviews.index') }}" 
+        class="leading-none text-lg {{ request()->routeIs('reviews.index') ? 'text-secondary border-b-2 border-secondary pb-1' : 'text-[#8F8F8F]' }} font-normal whitespace-nowrap cursor-pointer transition-colors">
+        {{ __('Reviews') }}
+    </a>
 
     @if($isPractitioner)
         <!-- Time Slots -->

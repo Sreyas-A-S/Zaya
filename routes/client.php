@@ -20,6 +20,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/agora/token', [ProfileController::class, 'generateToken'])->name('agora.token');
     Route::get('/invoice/{invoice_no}', [InvoiceController::class, 'show'])->name('invoice.show');
     Route::get('/bookings/{id}/details', [ProfileController::class, 'showDetails'])->name('bookings.details');
+    Route::get('/bookings/{id}/details-view', [ProfileController::class, 'showDetailsView'])->name('bookings.details-view');
 
     // Clinical Document Routes
     Route::post('/clinical-documents', [ProfileController::class, 'uploadDocument'])->name('clinical-documents.upload');
@@ -28,11 +29,14 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     // Referral Routes
     Route::post('/bookings/{id}/refer', [\App\Http\Controllers\ReferralController::class, 'store'])->name('bookings.refer');
     Route::get('/referrals/{referral_no}/pay', [\App\Http\Controllers\ReferralController::class, 'pay'])->name('referrals.pay');
+    Route::post('/referrals/{referral_no}/resend-otp', [\App\Http\Controllers\ReferralController::class, 'resendOTP'])->name('referrals.resend-otp');
+    Route::post('/referrals/{referral_no}/verify-consent', [\App\Http\Controllers\ReferralController::class, 'verifyConsent'])->name('referrals.verify-consent');
     Route::get('/referrals/payment/callback', [\App\Http\Controllers\ReferralController::class, 'paymentCallback'])->name('referrals.payment.callback');
 
     // Data Access Routes (OTP)
     Route::post('/data-access/request', [\App\Http\Controllers\DataAccessController::class, 'requestAccess'])->name('data-access.request');
     Route::post('/data-access/verify', [\App\Http\Controllers\DataAccessController::class, 'verifyOTP'])->name('data-access.verify');
+    Route::post('/data-access/toggle', [\App\Http\Controllers\DataAccessController::class, 'toggleAccess'])->name('data-access.toggle');
     Route::get('/client-profile/{id}', [ProfileController::class, 'viewClientProfile'])->name('client.profile.view');
     Route::get('/profile', [ProfileController::class, 'profile'])->name('profile');
     Route::post('/profile/update-personal', [ProfileController::class, 'updatePersonalDetails'])->name('profile.updatePersonal');
@@ -66,6 +70,10 @@ Route::middleware(['auth', 'isClient'])->group(function () {
 
     // Conference Session Storage
     Route::post('/conference/store', [ProfileController::class, 'storeConference'])->name('conference.store');
+
+    // Reviews
+    Route::get('/reviews', [ProfileController::class, 'reviews'])->name('reviews.index');
+    Route::post('/reviews', [ProfileController::class, 'storeReview'])->name('reviews.store');
 
     // Notifications
     Route::get('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');

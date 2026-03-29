@@ -9,6 +9,26 @@ class Doctor extends Model
 {
     use HasFactory;
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (!$model->slug) {
+                $name = trim(($model->first_name ?? '') . ' ' . ($model->last_name ?? ''));
+                if (empty($name)) {
+                    $name = ($model->user ? $model->user->name : null) ?? 'doctor-' . time();
+                }
+                $baseSlug = \Illuminate\Support\Str::slug($name);
+                $slug = $baseSlug ?: 'doctor-' . time();
+                $count = 1;
+                while (\App\Models\Doctor::where('slug', $slug)->exists()) {
+                    $slug = $baseSlug . '-' . $count++;
+                }
+                $model->slug = $slug;
+            }
+        });
+    }
+
     protected $table = 'doctors';
     protected $guarded = [];
 

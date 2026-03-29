@@ -37,6 +37,9 @@ class FinanceSettingController extends Controller
             ['key' => 'translator_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
             ['key' => 'translator_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance', 'language' => 'en'],
             ['key' => 'translator_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'company_booking_commission', 'value' => '10', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'company_referral_commission', 'value' => '0', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
+            ['key' => 'practitioner_referral_commission', 'value' => '5', 'type' => 'number', 'section' => 'finance', 'language' => 'en'],
         ];
 
         foreach ($defaults as $def) {

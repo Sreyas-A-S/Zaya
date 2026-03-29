@@ -470,13 +470,20 @@ function openPractitionerModal() {
                 const slug = this.dataset.slug;
                 
                 // Redirect to the booking page for this practitioner
-                // Preserve service_id if it's in the current URL
+                // Preserve service if it's in the current URL
                 const urlParams = new URLSearchParams(window.location.search);
-                const serviceId = urlParams.get('service_id');
+                const service = urlParams.get('service');
                 
+                // If we are already on the book-session page, we might want to just update the UI
+                if (window.location.pathname.startsWith('/book-session')) {
+                    if (typeof updateActivePractitioner === 'function') {
+                        updateActivePractitioner(id);
+                    }
+                }
+
                 let redirectUrl = `/book-session/${slug}`;
-                if (serviceId) {
-                    redirectUrl += `?service_id=${serviceId}`;
+                if (service) {
+                    redirectUrl += `?service=${service}`;
                 }
                 
                 window.location.href = redirectUrl;

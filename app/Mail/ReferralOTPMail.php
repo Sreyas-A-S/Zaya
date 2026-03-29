@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
+
+class ReferralOTPMail extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    public $otp;
+    public $requesterName;
+    public $professionalNames;
+
+    /**
+     * Create a new message instance.
+     */
+    public function __construct($otp, $requesterName, $professionalNames)
+    {
+        $this->otp = $otp;
+        $this->requesterName = $requesterName;
+        $this->professionalNames = $professionalNames;
+        $this->mailer('info');
+    }
+
+    /**
+     * Get the message envelope.
+     */
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Security OTP: Referral & Data Sharing Consent',
+        );
+    }
+
+    /**
+     * Get the message content definition.
+     */
+    public function content(): Content
+    {
+        return new Content(
+            view: 'emails.referral-otp',
+            with: [
+                'otp' => $this->otp,
+                'requesterName' => $this->requesterName,
+                'professionalNames' => $this->professionalNames,
+            ],
+        );
+    }
+
+    /**
+     * Get the attachments for the message.
+     *
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     */
+    public function attachments(): array
+    {
+        return [];
+    }
+}

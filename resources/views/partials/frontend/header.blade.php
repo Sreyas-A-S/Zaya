@@ -138,7 +138,7 @@
                         <form method="POST" action="{{ route('logout') }}" id="logout-form-desktop" class="hidden">
                             @csrf
                         </form>
-                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form-desktop').submit();" class="flex items-center gap-3 px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                        <a href="#" onclick="event.preventDefault(); openLogoutModalHeader();" class="flex items-center gap-3 px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors">
                             <i class="ri-logout-box-r-line text-lg"></i> {{ __('Logout') }}
                         </a>
                     </div>
@@ -303,9 +303,15 @@
                         @endif
 
                         console.log("Language changed dynamically to:", targetLocale);
+                        
+                        // Dispatch custom event for pages that want to handle refresh via AJAX
+                        document.dispatchEvent(new CustomEvent('zaya:language-changed', { 
+                            detail: { locale: targetLocale } 
+                        }));
+
                         // Reload for pages with complex dynamic content that cannot be easily patched via AJAX
-                        // such as those with lists from database that depend on current locale
-                        const reloadNeededPages = ['/blogs', '/find-practitioner', '/contact-us', '/book-session'];
+                        // and don't listen to the custom event (or need full reload anyway)
+                        const reloadNeededPages = ['/blogs', '/contact-us', '/book-session'];
                         const currentPath = window.location.pathname;
                         const shouldReload = reloadNeededPages.some(path => currentPath.includes(path));
                         
@@ -320,5 +326,52 @@
                     window.location.href = `{{ url('/lang') }}/${targetLocale}`;
                 });
         }
+
+        // Logout Modal Functions
+        function openLogoutModalHeader() {
+            const modal = document.getElementById('logoutConfirmModalHeader');
+            const content = document.getElementById('logoutModalContentHeader');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeLogoutModalHeader() {
+            const modal = document.getElementById('logoutConfirmModalHeader');
+            const content = document.getElementById('logoutModalContentHeader');
+            content.classList.add('scale-95', 'opacity-0');
+            content.classList.remove('scale-100', 'opacity-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 200);
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('logoutConfirmModalHeader');
+            if (event.target == modal) closeLogoutModalHeader();
+        });
     </script>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutConfirmModalHeader" class="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[40px] w-full max-w-[340px] overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-200" id="logoutModalContentHeader">
+            <div class="p-10 text-center">
+                <div class="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-red-100">
+                    <i class="ri-logout-box-r-line text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-black text-secondary mb-3 tracking-tight">{{ __('Confirm Logout?') }}</h3>
+                <p class="text-gray-500 mb-8 leading-relaxed font-medium text-base">{{ __('Are you sure you want to end your session and logout?') }}</p>
+                
+                <div class="flex flex-col gap-3">
+                    <button type="button" onclick="document.getElementById('logout-form-desktop').submit();" class="w-full py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 transition-all text-lg shadow-xl shadow-red-200">{{ __('Yes, Logout') }}</button>
+                    <button type="button" onclick="closeLogoutModalHeader()" class="w-full py-4 bg-gray-50 text-gray-500 font-black rounded-2xl hover:bg-gray-100 transition-all text-lg">{{ __('Cancel') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </header>

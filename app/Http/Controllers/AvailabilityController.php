@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use App\Models\PractitionerAvailability;
 use App\Models\Practitioner;
+use App\Models\BookingReservation;
 use App\Services\PractitionerAvailabilityService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -144,15 +147,80 @@ class AvailabilityController extends Controller
         ]);
     }
 
-    public function getGeneratedSlots(Request $request, $practitionerId, $date)
+    public function getGeneratedSlots(Request $request, $practitioner, $date)
     {
         $service = new PractitionerAvailabilityService();
-        $slots = $service->getAvailableSlots($practitionerId, $date);
+        $slots = $service->getAvailableSlots($practitioner, $date);
 
         return response()->json([
             'date' => $date,
             'slots' => $slots
         ]);
+    }
+
+    public function getOffDays($practitioner)
+    {
+        // Find practitioner by ID or slug
+        $p = is_numeric($practitioner) 
+            ? Practitioner::find($practitioner)
+            : Practitioner::where('slug', $practitioner)->first();
+            
+        if (!$p) {
+            return response()->json(['off_days' => [], 'off_day_indexes' => []], 404);
+        }
+
+        // Get weekly off days (by day_of_week)
+        $offDayIndexes = PractitionerAvailability::where('practitioner_id', $p->id)
+            ->whereNull('specific_date')
+            ->whereNull('start_time')
+            ->where('is_available', false)
+            ->pluck('day_of_week')
+            ->toArray();
+
+        // Get specific date off days (future dates only, within next 30 days)
+        $offDateDays = PractitionerAvailability::where('practitioner_id', $p->id)
+            ->whereNotNull('specific_date')
+            ->whereNull('start_time')
+            ->where('is_available', false)
+            ->where('specific_date', '>=', Carbon::today()->toDateString())
+            ->where('specific_date', '<=', Carbon::today()->addDays(30)->toDateString())
+            ->pluck('specific_date')
+            ->map(fn($date) => $date) // Convert to string format YYYY-MM-DD
+            ->toArray();
+
+        return response()->json([
+            'off_days' => $offDateDays,
+            'off_day_indexes' => $offDayIndexes
+        ]);
+    }
+
+    public function getBookedSlots($practitioner, $date)
+    {
+        // Find practitioner by ID or slug
+        $p = is_numeric($practitioner) 
+            ? Practitioner::find($practitioner)
+            : Practitioner::where('slug', $practitioner)->first();
+            
+        if (!$p) {
+            return response()->json(['booked_slots' => []], 404);
+        }
+
+        try {
+            // Get only truly booked slots (confirmed, paid) for this date
+            $bookedSlots = Booking::where('practitioner_id', $p->id)
+                ->where('booking_date', $date)
+                ->whereIn('status', ['confirmed', 'paid', 'completed'])
+                ->pluck('booking_time')
+                ->toArray();
+
+            return response()->json([
+                'date' => $date,
+                'booked_slots' => $bookedSlots
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error in getBookedSlots: ' . $e->getMessage());
+            return response()->json(['booked_slots' => []], 200);
+        }
     }
 
     public function resetToWeekly(Request $request)
@@ -203,6 +271,12 @@ class AvailabilityController extends Controller
 
         $offDays = $request->input('off_days', []);
 
+        // Clear all future custom overrides to ensure new weekly settings take effect as requested
+        PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->whereNotNull('specific_date')
+            ->where('specific_date', '>=', now()->toDateString())
+            ->delete();
+
         // 1. Remove all current weekly off records
         PractitionerAvailability::where('practitioner_id', $profile->id)
             ->whereNull('specific_date')
@@ -242,6 +316,12 @@ class AvailabilityController extends Controller
         ]);
 
         $offSlots = $request->off_slots ? explode(',', $request->off_slots) : [];
+
+        // Clear all future custom overrides to ensure new weekly settings take effect as requested
+        PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->whereNotNull('specific_date')
+            ->where('specific_date', '>=', now()->toDateString())
+            ->delete();
 
         // Get days that are NOT off days
         $offDayIndexes = PractitionerAvailability::where('practitioner_id', $profile->id)

@@ -8,6 +8,8 @@ use App\Models\Country;
 use App\Models\ConsultationForm;
 use App\Models\Service;
 use App\Models\UserService;
+use App\Models\Practitioner;
+use App\Models\PractitionerReview;
 use App\Models\PractitionerGallery;
 use App\Traits\ImageUploadTrait;
 use Carbon\Carbon;
@@ -167,11 +169,23 @@ class ProfileController extends Controller
             return response()->json(['message' => 'Profile not supported'], 404);
         }
 
+        $consent = $request->consent ? 1 : 0;
+
         $profile->update([
-            'data_sharing_consent' => $request->consent ? 1 : 0
+            'data_sharing_consent' => $consent
         ]);
 
-        return response()->json(['message' => 'Consent updated successfully', 'consent' => $profile->data_sharing_consent]);
+        // Bulk update individual access requests to match global preference
+        \App\Models\DataAccessRequest::where('client_id', $user->id)
+            ->whereIn('status', ['approved', 'revoked'])
+            ->update([
+                'status' => $consent ? 'approved' : 'revoked'
+            ]);
+
+        return response()->json([
+            'message' => $consent ? 'All professional access enabled.' : 'All professional access revoked.',
+            'consent' => $profile->data_sharing_consent
+        ]);
     }
 
     public function storeConference(Request $request)
@@ -279,24 +293,27 @@ class ProfileController extends Controller
     public function transactions(Request $request)
     {
         $user = Auth::user();
-        $invoices = \App\Models\Booking::with(['practitioner.user', 'translator.user'])
+        
+        // Fetch from new Transaction model instead of just Bookings
+        $query = \App\Models\Transaction::with(['user', 'practitioner', 'booking', 'referral'])
             ->where(function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-                if ($user->practitioner) {
-                    $q->orWhere('practitioner_id', $user->practitioner->id);
-                }
-                if ($user->translator) {
-                    $q->orWhere('translator_id', $user->translator->id);
-                }
-            })
-            ->latest()
-            ->paginate(15);
+                $q->where('user_id', $user->id)
+                  ->orWhere('practitioner_id', $user->id)
+                  ->orWhere('referrer_id', $user->id);
+            });
+
+        $transactions = $query->latest()->paginate(15);
+
+        // Calculate balance for the summary card
+        $earned = \App\Models\Transaction::where('practitioner_id', $user->id)->sum('practitioner_share');
+        $referralEarned = \App\Models\Transaction::where('referrer_id', $user->id)->sum('referrer_share');
+        $totalBalance = $earned + $referralEarned;
 
         if ($request->ajax()) {
-            return view('partials.transactions-table', compact('user', 'invoices'))->render();
+            return view('partials.transactions-table', compact('user', 'transactions'))->render();
         }
 
-        return view('transactions', compact('user', 'invoices'));
+        return view('transactions', compact('user', 'transactions', 'totalBalance'));
     }
 
     public function healthJourney()
@@ -311,7 +328,14 @@ class ProfileController extends Controller
             ->latest()
             ->get();
 
-        return view('health-journey', compact('user', 'clinicalDocuments', 'consultations'));
+        $dataAccessRequests = \App\Models\DataAccessRequest::with('requester')
+            ->where('client_id', $user->id)
+            ->whereIn('status', ['approved', 'revoked'])
+            ->latest()
+            ->get()
+            ->unique('requester_id');
+
+        return view('health-journey', compact('user', 'clinicalDocuments', 'consultations', 'dataAccessRequests'));
     }
 
     public function bookings(Request $request)
@@ -381,6 +405,76 @@ class ProfileController extends Controller
         $services = Service::whereIn('id', $serviceIds)->get();
 
         return view('partials.booking-details-modal-content', compact('user', 'booking', 'services'))->render();
+    }
+
+    public function showDetailsView($id)
+    {
+        $user = Auth::user();
+        $booking = Booking::with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo'])
+            ->findOrFail($id);
+
+        // Permissions check
+        $isParticipant = ($booking->user_id === $user->id) || 
+                         ($booking->practitioner && $booking->practitioner->user_id === $user->id) ||
+                         ($booking->translator && $booking->translator->user_id === $user->id);
+
+        if (!$isParticipant && !in_array($user->role, ['admin', 'super-admin'])) {
+            $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
+            if (!$hasAccess) {
+                return redirect()->route('bookings.index')->with('error', 'Unauthorized access.');
+            }
+        }
+
+        $serviceIds = is_array($booking->service_ids) ? $booking->service_ids : [];
+        $services = Service::whereIn('id', $serviceIds)->get();
+
+        // Build referral history chain
+        $referralChain = [];
+        
+        // 1. Ancestors (Who referred to this session?)
+        $current = $booking;
+        while ($current && $current->referral) {
+            $parentReferral = $current->referral;
+            $parentBooking = Booking::with('practitioner.user')->find($parentReferral->booking_id);
+            if ($parentBooking) {
+                array_unshift($referralChain, [
+                    'type' => 'parent',
+                    'booking' => $parentBooking,
+                    'practitioner' => $parentBooking->practitioner->user->name ?? 'Unknown',
+                    'referred_to' => $current->practitioner->user->name ?? 'Unknown',
+                    'date' => $parentReferral->created_at
+                ]);
+                $current = $parentBooking;
+            } else {
+                break;
+            }
+        }
+
+        // 2. This session (Current node in the chain)
+        $referralChain[] = [
+            'type' => 'current',
+            'booking' => $booking,
+            'practitioner' => $booking->practitioner->user->name ?? 'Unknown',
+            'is_active' => true
+        ];
+
+        // 3. Descendants (Who did this session refer to?)
+        foreach ($booking->referralsFromThisSession as $childRef) {
+            $childBooking = Booking::with('practitioner.user')->where('invoice_no', $childRef->referral_no)->first();
+            $referralChain[] = [
+                'type' => 'child',
+                'referral' => $childRef,
+                'booking' => $childBooking,
+                'practitioner' => $childRef->referredTo->name ?? 'Unknown',
+                'status' => $childRef->status,
+                'date' => $childRef->created_at
+            ];
+        }
+
+        // Consent Status
+        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($booking->practitioner->user_id ?? 0, $booking->user_id);
+
+        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent'));
     }
 
     public function viewClientProfile($id)
@@ -860,7 +954,7 @@ class ProfileController extends Controller
         // JaaS (8x8) config
         $jaasDomain = rtrim((string) config('services.jaas.domain', '8x8.vc'), '/');
         $jaasAppId = trim((string) config('services.jaas.app_id'));
-        $jaasRoomSlug = preg_replace('/[^A-Za-z0-9_-]+/', '-', 'zaya-' . $channel);
+        $jaasRoomSlug = preg_replace('/[^A-Za-z0-9_-]+/', '-', (string)$channel);
         $jaasRoomSlug = trim($jaasRoomSlug, '-');
         if ($jaasRoomSlug === '') {
             $jaasRoomSlug = 'zaya-meeting';
@@ -1035,5 +1129,68 @@ class ProfileController extends Controller
             'uid' => $uid,
             'channel' => $channelName,
         ]);
+    }
+
+    public function reviews()
+    {
+        $user = Auth::user();
+        
+        // Reviews written by this user
+        $myReviews = PractitionerReview::with('practitioner.user')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
+        // Reviews received by this user (if they are a professional)
+        $receivedReviews = collect();
+        if ($user->profile_id && in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'])) {
+            $receivedReviews = PractitionerReview::with('user')
+                ->where('practitioner_id', $user->profile_id)
+                ->where('status', true)
+                ->latest()
+                ->get();
+        }
+
+        // List of professionals this user has had sessions with
+        $reviewablePractitioners = Booking::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->with('practitioner.user')
+            ->get()
+            ->pluck('practitioner')
+            ->unique('id')
+            ->filter();
+
+        return view('reviews', compact('user', 'myReviews', 'receivedReviews', 'reviewablePractitioners'));
+    }
+
+    public function storeReview(Request $request)
+    {
+        $request->validate([
+            'practitioner_id' => 'required|exists:practitioners,id',
+            'rating' => 'required|integer|min:1|max:5',
+            'review' => 'required|string|max:1000',
+        ]);
+
+        $user = Auth::user();
+
+        // Optional: Check if they actually had a session
+        $hadSession = Booking::where('user_id', $user->id)
+            ->where('practitioner_id', $request->practitioner_id)
+            ->where('status', 'completed')
+            ->exists();
+
+        if (!$hadSession) {
+            return back()->with('error', 'You can only review professionals you have had a completed session with.');
+        }
+
+        PractitionerReview::create([
+            'user_id' => $user->id,
+            'practitioner_id' => $request->practitioner_id,
+            'rating' => $request->rating,
+            'review' => $request->review,
+            'status' => true, // Auto-approve for now or set to false for moderation
+        ]);
+
+        return back()->with('status', 'Review submitted successfully!');
     }
 }

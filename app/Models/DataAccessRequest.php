@@ -12,6 +12,8 @@ class DataAccessRequest extends Model
     protected $fillable = [
         'requester_id',
         'client_id',
+        'type',
+        'meta',
         'otp',
         'status',
         'expires_at',
@@ -19,6 +21,7 @@ class DataAccessRequest extends Model
     ];
 
     protected $casts = [
+        'meta' => 'array',
         'expires_at' => 'datetime',
         'approved_at' => 'datetime',
     ];

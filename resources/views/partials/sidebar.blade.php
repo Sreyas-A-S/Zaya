@@ -135,13 +135,15 @@
                 </a>
                 <ul class="sidebar-submenu">
                     @if(auth()->user()->hasPermission('packages-view'))
-                    <li> <a href="{{ route('admin.packages.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_packages'] ?? 'Packages' }}</a></li>
+                    <li class="d-none"> <a href="{{ route('admin.packages.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_packages'] ?? 'Packages' }}</a></li>
                     @endif
                     @if(auth()->user()->hasPermission('promo-codes-view'))
                     <li> <a href="{{ route('admin.promo-codes.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_promo_codes'] ?? 'Promo Codes' }}</a></li>
                     @endif
                     @if(auth()->user()->hasPermission('other-fees-view'))
                     <li> <a href="{{ route('admin.other-fees.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_other_fees'] ?? 'Other Fees' }}</a></li>
+                    <li> <a href="{{ route('admin.financial.index') }}">Transactions</a></li>
+                    <li> <a href="{{ route('admin.financial.practitioners') }}">Practitioner Balances</a></li>
                     @endif
                 </ul>
             </li>

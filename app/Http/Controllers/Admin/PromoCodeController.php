@@ -42,8 +42,15 @@ class PromoCodeController extends Controller
                         </div>
                     ';
                 })
+                ->editColumn('usage_type', function($row) {
+                    return ucfirst($row->usage_type);
+                })
                 ->editColumn('reward', function($row) {
-                    return $row->type == 'percentage' ? $row->reward . '%' : '$' . $row->reward;
+                    $html = $row->type == 'percentage' ? $row->reward . '%' : '$' . $row->reward;
+                    if ($row->benefits && count($row->benefits) > 0) {
+                        $html .= ' <span class="badge bg-info text-white" title="'.implode(', ', $row->benefits).'">+Benefits</span>';
+                    }
+                    return $html;
                 })
                 ->editColumn('expiry_date', function($row) {
                     return $row->expiry_date ? $row->expiry_date->format('Y-m-d') : 'N/A';
@@ -54,7 +61,7 @@ class PromoCodeController extends Controller
                     
                     return '<span class="badge ' . $badgeClass . ' cursor-pointer" onclick="updateStatus('.$row->id.', '.($row->status ? 0 : 1).')" style="cursor: pointer;">' . $statusText . '</span>';
                 })
-                ->rawColumns(['action', 'status'])
+                ->rawColumns(['action', 'status', 'reward'])
                 ->make(true);
         }
 
@@ -69,7 +76,10 @@ class PromoCodeController extends Controller
         $request->validate([
             'code' => 'required|string|unique:promo_codes,code|max:255',
             'type' => 'required|in:fixed,percentage',
+            'usage_type' => 'required|in:registration,booking,both',
             'reward' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+            'benefits' => 'nullable|array',
             'usage_limit' => 'nullable|integer|min:1',
             'expiry_date' => 'nullable|date|after_or_equal:today',
             'status' => 'required|boolean',
@@ -99,7 +109,10 @@ class PromoCodeController extends Controller
         $request->validate([
             'code' => 'required|string|max:255|unique:promo_codes,code,'.$id,
             'type' => 'required|in:fixed,percentage',
+            'usage_type' => 'required|in:registration,booking,both',
             'reward' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+            'benefits' => 'nullable|array',
             'usage_limit' => 'nullable|integer|min:1',
             'expiry_date' => 'nullable|date|after_or_equal:today',
             'status' => 'required|boolean',

@@ -34,3 +34,14 @@ if (! function_exists('zaya_decrypt')) {
         }
     }
 }
+
+if (! function_exists('get_currency_symbol')) {
+    /**
+     * Get currency symbol from code.
+     */
+    function get_currency_symbol(string $code): string
+    {
+        $symbols = config('currencies.symbols', []);
+        return $symbols[strtoupper($code)] ?? $code;
+    }
+}

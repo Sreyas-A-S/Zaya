@@ -768,6 +768,29 @@ class HomepageSettingSeeder extends Seeder
                 'section' => 'practitioner_page',
                 'max_length' => 50
             ],
+
+            // Finance Section
+            ['key' => 'client_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance'],
+            ['key' => 'client_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance'],
+            ['key' => 'client_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance'],
+            ['key' => 'practitioner_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance'],
+            ['key' => 'practitioner_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance'],
+            ['key' => 'practitioner_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance'],
+            ['key' => 'doctor_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance'],
+            ['key' => 'doctor_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance'],
+            ['key' => 'doctor_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance'],
+            ['key' => 'mindfulness_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance'],
+            ['key' => 'mindfulness_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance'],
+            ['key' => 'mindfulness_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance'],
+            ['key' => 'yoga_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance'],
+            ['key' => 'yoga_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance'],
+            ['key' => 'yoga_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance'],
+            ['key' => 'translator_registration_fee', 'value' => '0', 'type' => 'number', 'section' => 'finance'],
+            ['key' => 'translator_registration_fee_currency', 'value' => 'EUR', 'type' => 'text', 'section' => 'finance'],
+            ['key' => 'translator_registration_fee_enabled', 'value' => '1', 'type' => 'boolean', 'section' => 'finance'],
+            ['key' => 'company_booking_commission', 'value' => '10', 'type' => 'number', 'section' => 'finance'],
+            ['key' => 'company_referral_commission', 'value' => '0', 'type' => 'number', 'section' => 'finance'],
+            ['key' => 'practitioner_referral_commission', 'value' => '5', 'type' => 'number', 'section' => 'finance'],
         ];
 
         foreach ($settings as $setting) {

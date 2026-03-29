@@ -11,6 +11,7 @@ class Referral extends Model
 
     protected $fillable = [
         'referral_no',
+        'batch_no',
         'booking_id',
         'user_id',
         'referred_by_id',

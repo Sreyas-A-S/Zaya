@@ -3,237 +3,234 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\BookingReservation; // Will eventually phase out
 use App\Models\Practitioner;
 use App\Models\Service;
 use App\Models\Translator;
 use App\Models\Language;
-use App\Mail\BookingMail;
+use App\Models\User;
+use App\Traits\FinancialTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class BookingController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth')->except(['fetchTranslators']);
-    }
+    use FinancialTrait;
 
+    /**
+     * Step 1: Request Booking. 
+     * Instead of locking the DB, we just return a payment link.
+     */
     public function store(Request $request)
     {
-        // Enforce Client/Patient only
-        if (!in_array(auth()->user()->role, ['client', 'patient'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Only clients can book sessions. Please login with a client account.'
-            ], 403);
-        }
-
         $request->validate([
             'practitioner_id' => 'required|exists:practitioners,id',
             'service_ids' => 'required|array',
-            'service_ids.*' => 'exists:services,id',
-            'mode' => 'required|in:online,in-person',
+            'mode' => 'required|string|in:online,in-person',
             'booking_date' => 'required|date|after_or_equal:today',
             'booking_time' => 'required|string',
-            'total_price' => 'required|numeric',
-            'currency' => 'nullable|string|size:3',
-            'from_language' => 'nullable|string',
-            'to_language' => 'nullable|string',
-            'situation' => 'nullable|string',
-            'conditions' => 'nullable|string',
+            'total_price' => 'required|numeric|min:0',
+            'currency' => 'nullable|string'
         ]);
 
-        $booking = new Booking();
-        $booking->user_id = Auth::id();
-        $booking->practitioner_id = $request->practitioner_id;
-        $booking->service_ids = $request->service_ids;
-        $booking->mode = $request->mode;
-        $booking->conditions = $request->conditions;
-        $booking->situation = $request->situation;
-        $booking->need_translator = $request->boolean('need_translator');
-        $booking->from_language = $request->from_language;
-        $booking->to_language = $request->to_language;
-        $booking->language_id = $request->language_id;
-        $booking->translator_id = $request->translator_id;
-        $booking->booking_date = $request->booking_date;
-        $booking->booking_time = $request->booking_time;
-        $booking->total_price = $request->total_price;
-        $booking->currency = strtoupper($request->input('currency', config('app.currency', 'INR')));
-        $booking->status = 'pending';
-        
-        // Generate unique invoice number: ZAYA-YYYYMMDD-XXXXX
-        $today = date('Ymd');
-        $lastBooking = Booking::where('invoice_no', 'like', "ZAYA-$today-%")->orderBy('id', 'desc')->first();
-        $sequence = 1;
-        if ($lastBooking && preg_match('/-(\d+)$/', $lastBooking->invoice_no, $matches)) {
-            $sequence = intval($matches[1]) + 1;
-        }
-        $booking->invoice_no = "ZAYA-$today-" . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+        $practitioner = Practitioner::with('user')->findOrFail($request->practitioner_id);
+        $currency = $request->currency ?? 'INR';
 
-        $booking->save(); // Save first to get the ID
+        // Final check before showing payment link
+        if (!$this->checkSlotAvailability($request->practitioner_id, $request->booking_date, $request->booking_time)) {
+            return response()->json(['success' => false, 'message' => 'This slot was just taken. Please choose another time.'], 422);
+        }
+
+        // We use a token to identify the transaction context in callback
+        // We can still store a temporary record for "Intent", but it won't BLOCK the calendar.
+        $reservationToken = Str::random(40);
         
         // --- Razorpay Payment Link Creation ---
         $razorpayKey = config('services.razorpay.key');
         $razorpaySecret = config('services.razorpay.secret');
-        $currency = $booking->currency ?? config('app.currency', 'INR');
-        
+        $paymentConfigured = !empty($razorpayKey) && !empty($razorpaySecret);
         $paymentUrl = null;
-        $orderId = 'mock_plink_' . uniqid();
-
-        $paymentConfigured = $razorpayKey && $razorpaySecret && !str_contains((string) $razorpayKey, 'dummy');
 
         if ($paymentConfigured) {
-            $verifySsl = config('services.razorpay.verify_ssl');
-            if ($verifySsl === null) {
-                $verifySsl = !app()->environment('local');
-            }
+            $amountInSubunits = (int)round($request->total_price * 100);
+            
             try {
-                $response = Http::withOptions(['verify' => (bool) $verifySsl])
-                    ->withBasicAuth($razorpayKey, $razorpaySecret)
+                $response = Http::withBasicAuth($razorpayKey, $razorpaySecret)
                     ->post('https://api.razorpay.com/v1/payment_links', [
-                        'amount' => (int)round($request->total_price * 100),
+                        'amount' => $amountInSubunits,
                         'currency' => $currency,
-                        'description' => 'Session Booking with ' . ($booking->practitioner->user->name ?? 'Practitioner'),
+                        'description' => 'Session Booking with ' . ($practitioner->user->name ?? 'Practitioner'),
                         'customer' => [
                             'name' => Auth::user()->name,
                             'email' => Auth::user()->email,
                             'contact' => Auth::user()->phone ?? '',
                         ],
-                        'callback_url' => route('bookings.payment.callback'),
+                        'callback_url' => route('bookings.payment.callback', ['token' => $reservationToken]),
                         'callback_method' => 'get',
                         'notes' => [
-                            'booking_id' => $booking->id
+                            'practitioner_id' => $request->practitioner_id,
+                            'booking_date' => $request->booking_date,
+                            'booking_time' => $request->booking_time,
+                            'service_ids' => implode(',', $request->service_ids),
+                            'mode' => $request->mode,
+                            'conditions' => $request->conditions,
+                            'total_price' => $request->total_price,
+                            'currency' => $currency
                         ]
                     ]);
 
                 if ($response->successful()) {
                     $paymentUrl = $response->json('short_url');
-                    $orderId = $response->json('id');
-                } else {
-                    \Log::error('Razorpay Payment Link Error: ' . $response->body());
                 }
             } catch (\Exception $e) {
                 \Log::error('Razorpay Connection Error: ' . $e->getMessage());
             }
         }
 
-        $booking->razorpay_order_id = $orderId;
-        $booking->razorpay_payment_url = $paymentUrl;
-        $booking->save();
-
         if (!$paymentUrl) {
-            // If Razorpay is not configured (common in local/dev), still allow the booking flow
-            // to continue by redirecting the user to their invoice page.
-            if (!$paymentConfigured) {
-                session()->forget(['selected_practitioner', 'practitioner_id', 'active_practitioner']);
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Booking created! Payment gateway is not configured; showing invoice instead.',
-                    'booking' => $booking,
-                    'redirect_url' => route('invoice.show', $booking->invoice_no),
-                    'open_in_new_tab' => false,
-                ]);
-            }
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Payment gateway is unavailable. Please try again later.',
-                'booking' => $booking,
-                'redirect_url' => null,
-                'open_in_new_tab' => false,
-            ], 503);
+            // If payment fails or is not configured, we might allow manual confirmation if admin allows
+            // or just return error.
+            return response()->json(['success' => false, 'message' => 'Payment gateway unavailable.'], 503);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Booking created! Opening payment gateway...',
-            'booking' => $booking,
             'redirect_url' => $paymentUrl,
-            'open_in_new_tab' => true,
         ]);
     }
 
+    /**
+     * Step 2: Callback. 
+     * This is where the actual validation and booking happens.
+     */
     public function paymentCallback(Request $request)
     {
         $paymentLinkId = $request->razorpay_payment_link_id;
         $status = $request->razorpay_payment_link_status;
         $paymentId = $request->razorpay_payment_id;
+        
+        // Fetch details from Razorpay to be safe
+        $razorpayKey = config('services.razorpay.key');
+        $razorpaySecret = config('services.razorpay.secret');
+        $response = Http::withBasicAuth($razorpayKey, $razorpaySecret)
+            ->get("https://api.razorpay.com/v1/payment_links/{$paymentLinkId}");
 
-        $booking = Booking::where('razorpay_order_id', $paymentLinkId)->firstOrFail();
+        if (!$response->successful() || $status !== 'paid') {
+            return redirect()->route('home')->with('error', 'Payment not completed or verified.');
+        }
 
-        if ($status === 'paid') {
-            $booking->status = 'confirmed';
-            $booking->razorpay_payment_id = $paymentId;
-            $booking->payment_details = $request->all();
-            $booking->save();
+        $pData = $response->json();
+        $notes = $pData['notes'];
 
-            // Clear practitioner selection kept in session
-            session()->forget(['selected_practitioner', 'practitioner_id', 'active_practitioner']);
+        // CRITICAL: Final availability check now that money is received
+        $isAvailable = $this->checkSlotAvailability(
+            $notes['practitioner_id'], 
+            $notes['booking_date'], 
+            $notes['booking_time']
+        );
 
-            // Send Emails
-            try {
-                // To Client
-                Mail::to($booking->user->email)->send(new BookingMail($booking, 'client'));
-                
-                // To Practitioner
-                if ($booking->practitioner && $booking->practitioner->user) {
-                    Mail::to($booking->practitioner->user->email)->send(new BookingMail($booking, 'practitioner'));
+        if ($isAvailable) {
+            // SUCCESS PATH
+            $booking = Booking::create([
+                'invoice_no' => 'ZAYA-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
+                'user_id' => Auth::id(),
+                'practitioner_id' => $notes['practitioner_id'],
+                'service_ids' => explode(',', $notes['service_ids']),
+                'mode' => $notes['mode'],
+                'conditions' => $notes['conditions'] ?? null,
+                'booking_date' => $notes['booking_date'],
+                'booking_time' => $notes['booking_time'],
+                'total_price' => $notes['total_price'],
+                'currency' => $notes['currency'],
+                'status' => 'confirmed',
+                'razorpay_order_id' => $paymentLinkId,
+                'razorpay_payment_id' => $paymentId,
+            ]);
+
+            // Record Financial Transaction
+            $practitioner = Practitioner::find($booking->practitioner_id);
+            $this->recordTransaction([
+                'type' => 'booking',
+                'amount' => $booking->total_price,
+                'user_id' => $booking->user_id,
+                'practitioner_id' => $practitioner->user_id ?? null,
+                'booking_id' => $booking->id,
+                'payment_id' => $paymentId,
+                'currency' => $booking->currency ?? 'INR',
+            ]);
+
+            return redirect()->route('invoice.show', $booking->invoice_no)->with('success', 'Booking confirmed!');
+        } else {
+            // OVERBOOKED PATH (Someone paid faster for the same slot)
+            // We still create the booking but mark it as 'pending_reschedule' 
+            // and notify admin to handle refund or move.
+            $booking = Booking::create([
+                'invoice_no' => 'ZAYA-OVB-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
+                'user_id' => Auth::id(),
+                'practitioner_id' => $notes['practitioner_id'],
+                'service_ids' => explode(',', $notes['service_ids']),
+                'mode' => $notes['mode'],
+                'conditions' => $notes['conditions'] ?? null,
+                'booking_date' => $notes['booking_date'],
+                'booking_time' => $notes['booking_time'],
+                'total_price' => $notes['total_price'],
+                'currency' => $notes['currency'],
+                'status' => 'pending_reschedule', // Special status
+                'razorpay_order_id' => $paymentLinkId,
+                'razorpay_payment_id' => $paymentId,
+            ]);
+
+            \Log::warning("OVERBOOKING DETECTED for Booking ID #{$booking->id}. Payment received but slot was taken.");
+
+            return redirect()->route('dashboard')->with('warning', 'Payment received, but this slot was just booked by someone else. Our team will contact you to reschedule or provide a full refund.');
+        }
+    }
+
+    private function checkSlotAvailability($practitionerId, $date, $time)
+    {
+        return !Booking::where('practitioner_id', $practitionerId)
+            ->where('booking_date', $date)
+            ->where('booking_time', $time)
+            ->whereIn('status', ['confirmed', 'completed', 'paid'])
+            ->exists();
+    }
+
+    public function fetchReferrablePractitioners(Request $request)
+    {
+        $roles = $request->input('roles', []);
+        $query = $request->input('query');
+        $bookingId = $request->input('booking_id');
+        $currentUser = Auth::user();
+
+        if (empty($roles)) return response()->json([]);
+
+        $booking = $bookingId ? Booking::find($bookingId) : null;
+        $usersQuery = User::whereIn('role', $roles)->where('status', 'active')->where('id', '!=', $currentUser->id);
+
+        if ($query) $usersQuery->where('name', 'LIKE', "%{$query}%");
+
+        $users = $usersQuery->limit(5)->get();
+
+        $results = $users->map(function ($u) use ($booking) {
+            $handlesService = false; $serviceFee = 0;
+            if ($booking && in_array($u->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'])) {
+                $userServices = \App\Models\UserService::where('user_id', $u->id)->whereIn('service_id', $booking->service_ids ?? [])->get();
+                if ($userServices->isNotEmpty()) {
+                    $handlesService = true;
+                    $serviceFee = $userServices->sum('rate');
                 }
-                
-                // To Translator
-                if ($booking->need_translator && $booking->translator && $booking->translator->user) {
-                    Mail::to($booking->translator->user->email)->send(new BookingMail($booking, 'translator'));
-                }
-            } catch (\Exception $e) {
-                \Log::error('Booking Email Error: ' . $e->getMessage());
             }
+            return [
+                'id' => $u->id, 'name' => $u->name, 'role' => $u->role,
+                'role_label' => str_replace('_', ' ', ucfirst($u->role)),
+                'handles_service' => $handlesService, 'service_fee' => $serviceFee,
+                'profile_pic' => $u->profile_pic ? (str_starts_with($u->profile_pic, 'http') ? $u->profile_pic : asset('storage/' . $u->profile_pic)) : asset('frontend/assets/profile-dummy-img.png'),
+            ];
+        });
 
-            return redirect()->route('invoice.show', $booking->invoice_no)->with('success', 'Payment successful! Your booking is confirmed.');
-        }
-
-        $booking->payment_details = $request->all();
-        $booking->save();
-
-        return redirect()->route('home')->with('error', 'Payment was not completed. Please try again or contact support.');
-    }
-
-
-    public function fetchTranslators(Request $request)
-    {
-        $fromId = $request->from_language_id;
-        $toId = $request->to_language_id;
-        
-        $fromLang = Language::find($fromId);
-        $toLang = Language::find($toId);
-        
-        if (!$fromLang || !$toLang) {
-            return response()->json([]);
-        }
-
-        // Fetch translators who can speak both languages
-        $translators = Translator::where('status', 'active')
-            ->where(function($query) use ($fromLang) {
-                $query->whereJsonContains('target_languages', $fromLang->name)
-                      ->orWhereJsonContains('source_languages', $fromLang->name)
-                      ->orWhereJsonContains('additional_languages', $fromLang->name);
-            })
-            ->where(function($query) use ($toLang) {
-                $query->whereJsonContains('target_languages', $toLang->name)
-                      ->orWhereJsonContains('source_languages', $toLang->name)
-                      ->orWhereJsonContains('additional_languages', $toLang->name);
-            })->get();
-        
-        return response()->json($translators);
-    }
-
-    public function fetchReferrablePractitioners()
-    {
-        $users = User::whereIn('role', ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'])
-            ->where('status', 'active')
-            ->get(['id', 'name', 'role']);
-            
-        return response()->json($users);
+        return response()->json($results);
     }
 }

@@ -96,7 +96,47 @@
                                     </div>
                                 @endif
                             @endforeach
+                        </div>
 
+                        <hr class="my-5">
+
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <h4 class="mb-0">Commission Configuration</h4>
+                                <p class="text-muted">Set percentage shares for bookings and referrals.</p>
+                            </div>
+
+                            @php
+                                $commissionSettings = [
+                                    'company_booking_commission' => 'Company Booking Commission (%)',
+                                    'company_referral_commission' => 'Company Referral Commission (%)',
+                                    'practitioner_referral_commission' => 'Practitioner Referral Commission (%)'
+                                ];
+                            @endphp
+
+                            @foreach($commissionSettings as $key => $label)
+                                @if(isset($settingsByKey[$key]))
+                                    @php 
+                                        $setting = $settingsByKey[$key]; 
+                                        $inputId = $key . '-input';
+                                    @endphp
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold" for="{{ $inputId }}">{{ $label }}</label>
+                                        <div class="input-group">
+                                            <input type="number" step="0.01" min="0" max="100"
+                                                name="{{ $key }}"
+                                                id="{{ $inputId }}"
+                                                value="{{ $setting->value }}"
+                                                class="form-control"
+                                                placeholder="Enter percentage (0-100)...">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+
+                        <div class="row g-4 mt-2">
                             @foreach($settings as $setting)
                                 @php
                                     $skip = false;
@@ -105,6 +145,7 @@
                                             $skip = true; break;
                                         }
                                     }
+                                    if(array_key_exists($setting->key, $commissionSettings)) $skip = true;
                                 @endphp
                                 @if($skip) @continue @endif
                                 @php

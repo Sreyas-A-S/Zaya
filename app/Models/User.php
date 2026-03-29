@@ -210,4 +210,32 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    /**
+     * Get the public profile URL for this user.
+     */
+    public function getProfileUrlAttribute()
+    {
+        $profile = $this->profile;
+        if ($profile && isset($profile->slug)) {
+            return route('practitioner-detail', $profile->slug);
+        }
+        
+        // Fallback or ID-based if we implement it in controller
+        if ($profile) {
+            return route('practitioner-detail', $profile->id);
+        }
+
+        return url('/dashboard');
+    }
+
+    public function practitionerTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'practitioner_id');
+    }
+
+    public function referrerTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'referrer_id');
+    }
 }

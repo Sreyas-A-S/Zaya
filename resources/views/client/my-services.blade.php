@@ -180,7 +180,7 @@
                                     </div>
                                     <div>
                                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-0.5">{{ $rate->duration }} Minutes</p>
-                                        <p class="text-lg font-black text-secondary tracking-tight">₹{{ number_format($rate->rate, 2) }}</p>
+                                        <p class="text-lg font-black text-secondary tracking-tight">{{ get_currency_symbol($rate->currency) }}{{ number_format($rate->rate, 2) }}</p>
                                     </div>
                                 </div>
                                 <button onclick="confirmDeleteRate({{ $rate->id }}, '{{ addslashes($firstRate->service->title) }}', {{ $rate->duration }})" 
@@ -199,7 +199,7 @@
                                 {{ $rates->count() }} {{ Str::plural('Rate', $rates->count()) }} Active
                             </span>
                         </div>
-                        <button onclick="manageService({{ $serviceId }})" class="text-secondary font-black text-sm hover:underline flex items-center gap-2 transition-all">
+                        <button onclick="manageService({{ $serviceId }}, {{ $rates->toJson() }})" class="text-secondary font-black text-sm hover:underline flex items-center gap-2 transition-all">
                             <i class="ri-settings-3-fill"></i> Manage Details
                         </button>
                     </div>
@@ -226,14 +226,14 @@
                 <div>
                     <p class="text-[11px] font-black text-secondary/50 uppercase tracking-[0.2em] mb-1">Next Online Session</p>
                     @php
-                        $agoraLink = $nextOnlineBooking ? route('conference.join', ['channel' => $nextOnlineBooking->invoice_no]) : null;
+                        $sessionLink = $nextOnlineBooking ? route('conference.join', ['channel' => $nextOnlineBooking->invoice_no]) : null;
                     @endphp
                     @if($nextOnlineBooking)
                         <h3 class="text-xl font-black text-secondary mb-1">{{ $nextOnlineBooking->booking_date?->format('M d, Y') }} &middot; {{ $nextOnlineBooking->booking_time }}</h3>
                         <p class="text-sm text-gray-500 mb-3">Client: {{ $nextOnlineBooking->user->name ?? 'Client' }} · Invoice: {{ $nextOnlineBooking->invoice_no }}</p>
                         <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
-                            <span class="px-4 py-2 rounded-full bg-[#F3F6F4] text-secondary text-sm font-semibold break-all">{{ $agoraLink }}</span>
-                            <button type="button" onclick="copyAgoraLink('{{ $agoraLink }}')" class="px-4 py-2 bg-secondary text-white rounded-full text-sm font-bold hover:bg-opacity-95 shadow-md flex items-center gap-2">
+                            <span class="px-4 py-2 rounded-full bg-[#F3F6F4] text-secondary text-sm font-semibold break-all">{{ $sessionLink }}</span>
+                            <button type="button" onclick="copySessionLink('{{ $sessionLink }}')" class="px-4 py-2 bg-secondary text-white rounded-full text-sm font-bold hover:bg-opacity-95 shadow-md flex items-center gap-2">
                                 <i class="ri-file-copy-line"></i> Copy Link
                             </button>
                         </div>
@@ -253,7 +253,7 @@
                 <div>
                     <p class="text-[11px] font-black text-secondary/50 uppercase tracking-[0.2em] mb-1">Reminder Settings</p>
                     <h3 class="text-xl font-black text-secondary">Video link reminder timing</h3>
-                    <p class="text-sm text-gray-500 mt-1">The system always emails the Agora session link to you and the client 60 minutes before an online booking.</p>
+                    <p class="text-sm text-gray-500 mt-1">The system always emails the secure video session link to you and the client 60 minutes before an online booking.</p>
                 </div>
             </div>
             <div class="max-w-xl">
@@ -395,7 +395,7 @@
 <script>
     let serviceRowIndex = 1;
     let select2Instances = {};
-    const CURRENCY_SYMBOLS = {INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ'};
+    const CURRENCY_SYMBOLS = {!! json_encode(config('currencies.symbols', [])) !!};
     let cachedAvailableServices = null;
     let isFetchingServices = false;
     let fetchPromise = null;
@@ -717,12 +717,53 @@ async function fetchAvailableServices() {
         
         document.body.style.overflow = 'hidden';
     }
-    function manageService(serviceId) {
+    function manageService(serviceId, rates = []) {
         openAddServiceModal();
         setTimeout(() => {
             const select = document.getElementById('service-select-0');
             if (select) {
                 $(select).val(String(serviceId)).trigger('change');
+            }
+
+            // Populate rates if provided
+            if (rates && rates.length > 0) {
+                const ratesContainer = document.querySelector('.rates-container');
+                // Clear existing initial row (keep only the container)
+                ratesContainer.innerHTML = '';
+                
+                rates.forEach((rate, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'rate-row grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 shadow-sm mb-4';
+                    row.innerHTML = `
+                        <div>
+                            <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Duration</label>
+                            <div class="relative">
+                                <i class="ri-time-fill absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 text-base sm:text-lg"></i>
+                                <input type="number" name="services[0][rates][${index}][duration]" value="${rate.duration}" required placeholder="60" class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-sm sm:text-base">
+                                <span class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] sm:text-xs font-bold uppercase">Min</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
+                            <div class="flex gap-2 sm:gap-3">
+                                <div class="relative flex-1">
+                                    <span class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">${CURRENCY_SYMBOLS[rate.currency] || CURRENCY_SYMBOLS[DEFAULT_CURRENCY] || '₹'}</span>
+                                    <input type="number" name="services[0][rates][${index}][rate]" value="${parseFloat(rate.rate).toFixed(2)}" step="0.01" required placeholder="0.00" class="w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
+                                </div>
+                                ${index > 0 ? `
+                                <button type="button" onclick="confirmRemoveRateRow(this)" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100">
+                                    <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
+                                </button>
+                                ` : `
+                                <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
+                                    <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
+                                </button>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                    ratesContainer.appendChild(row);
+                });
             }
         }, 250);
     }
@@ -794,9 +835,10 @@ async function fetchAvailableServices() {
         }
     }
 
-    function copyAgoraLink(link) {
+    function copySessionLink(link) {
         navigator.clipboard.writeText(link).then(() => {
-            alert('Link copied to clipboard');
+            if (window.showZayaToast) showZayaToast('Link copied to clipboard', 'Video Portal');
+            else alert('Link copied to clipboard');
         }).catch(() => {
             const temp = document.createElement('input');
             temp.value = link;
@@ -804,7 +846,8 @@ async function fetchAvailableServices() {
             temp.select();
             document.execCommand('copy');
             document.body.removeChild(temp);
-            alert('Link copied to clipboard');
+            if (window.showZayaToast) showZayaToast('Link copied to clipboard', 'Video Portal');
+            else alert('Link copied to clipboard');
         });
     }
 </script>
