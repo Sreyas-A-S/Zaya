@@ -49,6 +49,71 @@
             </div>
         </div>
 
+        <!-- Language Hub Card -->
+        @if($user->role === 'translator' && $user->translator)
+        <div id="section-language-hub" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
+            <div class="space-y-6">
+                <h2 class="text-xl font-medium font-sans! text-secondary mb-6">Language Hub</h2>
+                <div>
+                    <p class="text-base text-gray-400 mb-1">Native Language</p>
+                    <p class="text-base font-normal text-gray-800">{{ $user->translator->native_language ?? 'Not set' }}</p>
+                </div>
+                <div>
+                    <p class="text-base text-gray-400 mb-1">Source Languages (From)</p>
+                    <div class="flex flex-wrap gap-2">
+                        @forelse($user->translator->source_languages ?? [] as $lang)
+                            <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md">{{ $lang }}</span>
+                        @empty
+                            <p class="text-base font-normal text-gray-800">Not set</p>
+                        @endforelse
+                    </div>
+                </div>
+                <div>
+                    <p class="text-base text-gray-400 mb-1">Target Languages (To)</p>
+                    <div class="flex flex-wrap gap-2">
+                        @forelse($user->translator->target_languages ?? [] as $lang)
+                            <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-md">{{ $lang }}</span>
+                        @empty
+                            <p class="text-base font-normal text-gray-800">Not set</p>
+                        @endforelse
+                    </div>
+                </div>
+                @if(!empty($user->translator->fields_of_specialization))
+                <div>
+                    <p class="text-base text-gray-400 mb-1">Specialization</p>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($user->translator->fields_of_specialization as $spec)
+                            <span class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded-md">{{ $spec }}</span>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+                @if($user->translator->years_of_experience)
+                <div>
+                    <p class="text-base text-gray-400 mb-1">Experience</p>
+                    <p class="text-base font-normal text-gray-800">{{ $user->translator->years_of_experience }} Years</p>
+                </div>
+                @endif
+                @if(!empty($user->translator->services_offered))
+                <div>
+                    <p class="text-base text-gray-400 mb-1">Services</p>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($user->translator->services_offered as $service)
+                            <span class="px-2 py-1 bg-yellow-50 text-yellow-600 text-xs rounded-md">{{ $service }}</span>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+                @if($user->translator->portfolio_link)
+                <div>
+                    <p class="text-base text-gray-400 mb-1">Portfolio</p>
+                    <a href="{{ $user->translator->portfolio_link }}" target="_blank" class="text-secondary hover:underline text-sm font-medium">{{ $user->translator->portfolio_link }}</a>
+                </div>
+                @endif
+            </div>
+        </div>
+        @endif
+
         <!-- Transaction Vault Snippet (Only for Clients) -->
         @if($user->role === 'client' || $user->role === 'patient')
         <div id="section-transactions" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">

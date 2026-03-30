@@ -127,6 +127,58 @@
     </div>
 </div>
 
+<!-- Translator Modal -->
+<div id="translator-modal" class="fixed inset-0 z-[999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeTranslatorModal()"></div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-[#2E4B3D]/12">
+                <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <div>
+                        <h3 class="text-xl font-black text-secondary tracking-tight">Assign Translator</h3>
+                        <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1" id="translator-lang-pair">Find a professional translator</p>
+                    </div>
+                    <button onclick="closeTranslatorModal()" class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-all shadow-sm">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                <div class="px-8 py-8">
+                    <form id="translator-form">
+                        <input type="hidden" id="translator-booking-id">
+                        
+                        <!-- Search & Filter -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Find Professional Translator</label>
+                            <div class="relative">
+                                <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="translator-search" placeholder="Search by name..." 
+                                    oninput="debouncedFetchTranslators()"
+                                    class="w-full pl-11 pr-4 py-4 rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-sm transition-all shadow-sm">
+                            </div>
+                        </div>
+
+                        <!-- Translators List -->
+                        <div class="mb-6">
+                            <div id="translators-loader" class="hidden py-10 text-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary mx-auto"></div>
+                                <p class="text-[10px] text-gray-400 uppercase font-bold mt-3 tracking-widest">Searching Translators...</p>
+                            </div>
+                            <div id="translators-list" class="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-sidebar-scrollbar">
+                                <!-- Dynamic list items -->
+                            </div>
+                        </div>
+
+                        <button type="button" id="translator-submit-btn" onclick="submitTranslatorAssignment()" disabled class="w-full py-5 bg-secondary text-white rounded-[1.5rem] font-black text-sm hover:bg-primary transition-all shadow-2xl shadow-secondary/30 uppercase tracking-[0.2em] disabled:opacity-40 disabled:cursor-not-allowed">
+                            Assign Selected Translator
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="h-10"></div>
 @endsection
 
@@ -164,7 +216,7 @@
         list.classList.add('hidden');
 
         try {
-            const url = new URL("{{ route('api.referrable-practitioners') }}", window.location.origin);
+            const url = new URL("{{ route('referrable-practitioners-api') }}", window.location.origin);
             url.searchParams.append('booking_id', bookingId);
             if (query) url.searchParams.append('query', query);
             url.searchParams.append('roles[]', role);
@@ -288,6 +340,143 @@
     function closeReferModal() {
         document.getElementById('refer-modal').classList.add('hidden');
         document.body.style.overflow = 'auto';
+    }
+
+    // Translator Modal Logic
+    let translatorFetchTimeout = null;
+    let selectedTranslatorId = null;
+    let currentFromLang = '';
+    let currentToLang = '';
+
+    function debouncedFetchTranslators() {
+        clearTimeout(translatorFetchTimeout);
+        translatorFetchTimeout = setTimeout(fetchTranslators, 400);
+    }
+
+    async function fetchTranslators() {
+        const query = document.getElementById('translator-search').value;
+        const list = document.getElementById('translators-list');
+        const loader = document.getElementById('translators-loader');
+
+        loader.classList.remove('hidden');
+        list.classList.add('hidden');
+
+        try {
+            const url = new URL("{{ route('available-translators-api') }}", window.location.origin);
+            if (query) url.searchParams.append('query', query);
+            url.searchParams.append('from_lang', currentFromLang);
+            url.searchParams.append('to_lang', currentToLang);
+
+            const response = await fetch(url);
+            const translators = await response.json();
+
+            loader.classList.add('hidden');
+            list.classList.remove('hidden');
+
+            if (translators.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400 text-xs py-10">No translators found matching the language pair.</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            translators.forEach(t => {
+                const isSelected = selectedTranslatorId === t.id;
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-2xl border ${isSelected ? 'border-secondary bg-secondary/5' : 'border-gray-100'} flex items-center justify-between group hover:border-secondary/20 hover:bg-gray-50/50 transition-all cursor-pointer professional-item`;
+                item.onclick = () => selectTranslator(t.id);
+                
+                item.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <img src="${t.profile_photo_path}" class="w-12 h-12 rounded-xl object-cover border border-gray-100 shadow-sm">
+                        <div>
+                            <p class="text-sm font-bold text-secondary leading-tight">${t.full_name}</p>
+                            <div class="flex flex-wrap items-center gap-2 mt-1">
+                                <span class="text-[9px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-black uppercase tracking-widest">
+                                    Native: ${t.native_language}
+                                </span>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">
+                                    Exp: ${t.years_of_experience} Yrs
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-7 h-7 rounded-full border-2 ${isSelected ? 'bg-secondary border-secondary' : 'border-gray-100 bg-white'} flex items-center justify-center transition-all group-hover:border-secondary check-indicator">
+                        <i class="ri-check-line text-white ${isSelected ? 'opacity-100' : 'opacity-0'} transition-all text-lg"></i>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        } catch (error) {
+            console.error('Fetch translators error:', error);
+            loader.classList.add('hidden');
+            list.classList.remove('hidden');
+            list.innerHTML = '<p class="text-center text-red-400 text-xs py-10">Error loading translators.</p>';
+        }
+    }
+
+    function selectTranslator(id) {
+        selectedTranslatorId = (selectedTranslatorId === id) ? null : id;
+        document.getElementById('translator-submit-btn').disabled = !selectedTranslatorId;
+        fetchTranslators();
+    }
+
+    function openTranslatorModal(bookingId, fromLang, toLang) {
+        document.getElementById('translator-booking-id').value = bookingId;
+        currentFromLang = fromLang;
+        currentToLang = toLang;
+        document.getElementById('translator-lang-pair').innerText = `Language Pair: ${fromLang} → ${toLang}`;
+        document.getElementById('translator-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        
+        // Reset
+        document.getElementById('translator-search').value = '';
+        selectedTranslatorId = null;
+        document.getElementById('translator-submit-btn').disabled = true;
+        
+        fetchTranslators();
+    }
+
+    function closeTranslatorModal() {
+        document.getElementById('translator-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    async function submitTranslatorAssignment() {
+        const bookingId = document.getElementById('translator-booking-id').value;
+        const submitBtn = document.getElementById('translator-submit-btn');
+
+        if (!selectedTranslatorId) return;
+
+        submitBtn.disabled = true;
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = 'Assigning...';
+
+        try {
+            const response = await fetch(`/bookings/${bookingId}/assign-translator`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    translator_id: selectedTranslatorId
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                if (window.showZayaToast) showZayaToast(data.success, 'Translator');
+                closeTranslatorModal();
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                alert(data.error || 'Assignment failed.');
+            }
+        } catch (error) {
+            console.error('Translator Assignment Error:', error);
+            alert('An error occurred.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
     }
 
     async function submitReferral() {

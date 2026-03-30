@@ -161,6 +161,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('financial/transactions', [\App\Http\Controllers\Admin\FinancialController::class, 'index'])->name('financial.index');
     Route::get('financial/practitioner-balances', [\App\Http\Controllers\Admin\FinancialController::class, 'practitionerBalances'])->name('financial.practitioners');
 
+    // System Utilities
+    Route::get('run-scheduler', function() {
+        \Illuminate\Support\Facades\Artisan::call('schedule:run');
+        return "Scheduler executed successfully. Output: " . \Illuminate\Support\Facades\Artisan::output();
+    })->name('scheduler.run');
+
     Route::get('credentials', [\App\Http\Controllers\Admin\CredentialController::class, 'index'])->name('credentials.index');
     Route::post('credentials/{id}/password', [\App\Http\Controllers\Admin\CredentialController::class, 'updatePassword'])->name('credentials.update-password');
     Route::post('credentials/{id}/generate-link', [\App\Http\Controllers\Admin\CredentialController::class, 'generateLoginLink'])->name('credentials.generate-link');

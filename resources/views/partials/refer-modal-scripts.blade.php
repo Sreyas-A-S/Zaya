@@ -115,7 +115,7 @@
         list.classList.add('hidden');
 
         try {
-            const url = new URL("{{ route('api.referrable-practitioners') }}", window.location.origin);
+            const url = new URL("{{ route('referrable-practitioners-api') }}", window.location.origin);
             url.searchParams.append('booking_id', bookingId);
             if (query) url.searchParams.append('query', query);
             url.searchParams.append('roles[]', role);

@@ -25,6 +25,8 @@ class Booking extends Model
         'booking_date',
         'booking_time',
         'total_price',
+        'promo_code',
+        'discount_amount',
         'currency',
         'status',
         'reminder_sent',
@@ -66,9 +68,9 @@ class Booking extends Model
         return $this->belongsTo(Translator::class);
     }
 
-    public function consultationForm()
+    public function consultationForms()
     {
-        return $this->hasOne(ConsultationForm::class);
+        return $this->hasMany(ConsultationForm::class);
     }
 
     public function referral()

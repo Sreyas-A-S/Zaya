@@ -218,7 +218,7 @@ class ProfileController extends Controller
     public function showConsultationForm(Request $request, $id)
     {
         $user = Auth::user();
-        $booking = Booking::with(['practitioner.user', 'user', 'translator.user'])->findOrFail($id);
+        $booking = Booking::with(['practitioner.user', 'user', 'translator.user', 'consultationForms.doctor'])->findOrFail($id);
 
         $consultationFormRole = in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'], true)
             ? $user->role
@@ -238,10 +238,18 @@ class ProfileController extends Controller
             }
         }
 
-        $existingForm = ConsultationForm::where('booking_id', $booking->id)
-            ->where('doctor_id', $user->id)
-            ->latest('created_at')
-            ->first();
+        $formId = $request->query('form_id');
+        $isNew = $request->query('new');
+        $allForms = $booking->consultationForms()->latest()->get();
+        
+        $existingForm = null;
+        if ($formId) {
+            $existingForm = $booking->consultationForms()->find($formId);
+        }
+        
+        if (!$existingForm && !$isNew) {
+            $existingForm = $allForms->first();
+        }
 
         $consultationPayload = $existingForm->payload ?? [];
 
@@ -249,6 +257,7 @@ class ProfileController extends Controller
             return response()->json([
                 'success' => true,
                 'booking_id' => $booking->id,
+                'form_id' => $existingForm->id ?? null,
                 'payload' => $consultationPayload,
             ]);
         }
@@ -259,6 +268,7 @@ class ProfileController extends Controller
             'consultationSchema',
             'consultationPayload',
             'existingForm',
+            'allForms',
             'consultationFormRole'
         ));
     }
@@ -277,17 +287,30 @@ class ProfileController extends Controller
             abort(403);
         }
 
-        $payload = Arr::except($request->all(), ['_token', '_method']);
+        $formId = $request->input('form_id');
+        $title = $request->input('form_title');
+        $payload = Arr::except($request->all(), ['_token', '_method', 'form_id', 'form_title']);
 
-        ConsultationForm::create([
-            'booking_id' => $booking->id,
-            'doctor_id' => $user->id,
-            'payload' => $payload,
-        ]);
+        if ($formId) {
+            $form = ConsultationForm::where('booking_id', $booking->id)->findOrFail($formId);
+            $form->update([
+                'payload' => $payload,
+                'title' => $title ?: $form->title,
+            ]);
+            $msg = 'Consultation form updated successfully.';
+        } else {
+            $form = ConsultationForm::create([
+                'booking_id' => $booking->id,
+                'doctor_id' => $user->id,
+                'title' => $title ?: 'Consultation ' . (ConsultationForm::where('booking_id', $booking->id)->count() + 1),
+                'payload' => $payload,
+            ]);
+            $msg = 'New consultation follow-up saved successfully.';
+        }
 
         return redirect()
-            ->route('bookings.consultation-form.show', $booking->id)
-            ->with('status', 'Consultation form saved successfully.');
+            ->route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $form->id])
+            ->with('status', $msg);
     }
 
     public function transactions(Request $request)
@@ -322,9 +345,9 @@ class ProfileController extends Controller
         $clinicalDocuments = $user->clinicalDocuments()->latest()->get();
         
         // Only show bookings that have a consultation form attached
-        $consultations = Booking::with(['practitioner.user', 'consultationForm'])
+        $consultations = Booking::with(['practitioner.user', 'consultationForms'])
             ->where('user_id', $user->id)
-            ->whereHas('consultationForm')
+            ->whereHas('consultationForms')
             ->latest()
             ->get();
 
@@ -540,7 +563,22 @@ class ProfileController extends Controller
 
     public function updateReminderSettings(Request $request)
     {
-        return back()->with('status', 'Reminder emails are sent 60 minutes before the session.');
+        $request->validate([
+            'reminder_lead_time' => 'required|integer|min:5|max:1440',
+        ]);
+
+        $user = Auth::user();
+        $profile = $user->practitioner ?? $user->doctor ?? $user->mindfulnessPractitioner ?? $user->yogaTherapist ?? null;
+
+        if (!$profile) {
+            return back()->with('error', 'Profile not found.');
+        }
+
+        $profile->update([
+            'reminder_lead_time' => $request->reminder_lead_time
+        ]);
+
+        return back()->with('status', "Reminder timing updated to {$request->reminder_lead_time} minutes before the session.");
     }
 
     public function getAvailableServices()
@@ -558,6 +596,72 @@ class ProfileController extends Controller
             'data' => $availableServices
         ]);
     }
+
+    public function fetchAvailableTranslators(Request $request)
+    {
+        $query = $request->query('query');
+        $fromLang = $request->query('from_lang');
+        $toLang = $request->query('to_lang');
+
+        $translatorsQuery = \App\Models\Translator::with('user')
+            ->where('status', 'active');
+
+        if ($query) {
+            $translatorsQuery->where('full_name', 'LIKE', "%{$query}%");
+        }
+
+        if ($fromLang && $toLang) {
+            $translatorsQuery->where(function ($q) use ($fromLang, $toLang) {
+                // Translator should handle both languages in their source/target pairs
+                // Or handle from_lang as source and to_lang as target
+                $q->where(function ($sub) use ($fromLang, $toLang) {
+                    $sub->whereJsonContains('source_languages', $fromLang)
+                        ->whereJsonContains('target_languages', $toLang);
+                })->orWhere(function ($sub) use ($fromLang, $toLang) {
+                    // Also check reverse if applicable (some translators work both ways)
+                    $sub->whereJsonContains('source_languages', $toLang)
+                        ->whereJsonContains('target_languages', $fromLang);
+                });
+            });
+        }
+
+        $translators = $translatorsQuery->get()->map(function ($t) {
+            return [
+                'id' => $t->id,
+                'full_name' => $t->full_name,
+                'native_language' => $t->native_language,
+                'years_of_experience' => $t->years_of_experience,
+                'profile_photo_path' => $t->user->profile_pic 
+                    ? (str_starts_with($t->user->profile_pic, 'http') ? $t->user->profile_pic : asset('storage/' . $t->user->profile_pic))
+                    : asset('frontend/assets/profile-dummy-img.png'),
+            ];
+        });
+
+        return response()->json($translators);
+    }
+
+    public function assignTranslator(Request $request, $id)
+    {
+        $request->validate([
+            'translator_id' => 'required|exists:translators,id',
+        ]);
+
+        $user = Auth::user();
+        $booking = Booking::findOrFail($id);
+
+        // Security check: Only the practitioner assigned to the booking can assign a translator
+        if ($booking->practitioner_id !== $user->profile_id && !in_array($user->role, ['admin', 'super-admin'])) {
+            return response()->json(['error' => 'Unauthorized action.'], 403);
+        }
+
+        $booking->update([
+            'translator_id' => $request->translator_id,
+            'status' => 'confirmed' // Optional: move from pending to confirmed if needed
+        ]);
+
+        return response()->json(['success' => 'Translator assigned successfully!']);
+    }
+
     public function storeService(Request $request)
     {
         $request->validate([
@@ -1043,7 +1147,7 @@ class ProfileController extends Controller
                     'exp' => $now + 7200,
                     'context' => [
                 'user' => [
-                    'id' => (string) $user->id,
+                    'id' => str_pad((string)$user->id, 8, '0', STR_PAD_LEFT),
                     'name' => (string) $user->name,
                     'email' => (string) ($user->email ?? ''),
                     'moderator' => $isModerator ? 'true' : 'false',
@@ -1134,21 +1238,22 @@ class ProfileController extends Controller
     public function reviews()
     {
         $user = Auth::user();
-        
+
         // Reviews written by this user
         $myReviews = PractitionerReview::with('practitioner.user')
             ->where('user_id', $user->id)
             ->latest()
-            ->get();
+            ->paginate(10, ['*'], 'my_page');
 
         // Reviews received by this user (if they are a professional)
-        $receivedReviews = collect();
         if ($user->profile_id && in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'])) {
             $receivedReviews = PractitionerReview::with('user')
                 ->where('practitioner_id', $user->profile_id)
                 ->where('status', true)
                 ->latest()
-                ->get();
+                ->paginate(10, ['*'], 'received_page');
+        } else {
+            $receivedReviews = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10, 1, ['path' => request()->url(), 'pageName' => 'received_page']);
         }
 
         // List of professionals this user has had sessions with
@@ -1162,7 +1267,6 @@ class ProfileController extends Controller
 
         return view('reviews', compact('user', 'myReviews', 'receivedReviews', 'reviewablePractitioners'));
     }
-
     public function storeReview(Request $request)
     {
         $request->validate([

@@ -19,18 +19,18 @@
 
     <!-- Tabs -->
     <div class="flex border-b border-[#2E4B3D]/12 mb-8 overflow-x-auto no-scrollbar">
-        <button onclick="switchReviewTab('my-reviews')" id="tab-my-reviews" class="px-8 py-4 text-xs font-black uppercase tracking-[0.2em] border-b-2 border-secondary text-secondary transition-all">
+        <button onclick="switchReviewTab('my-reviews')" id="tab-my-reviews" class="px-8 py-4 text-xs font-black uppercase tracking-[0.2em] border-b-2 {{ request()->has('received_page') ? 'border-transparent text-gray-400' : 'border-secondary text-secondary' }} hover:text-secondary transition-all">
             My Reviews
         </button>
-        @if($receivedReviews->count() > 0 || in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
-        <button onclick="switchReviewTab('received-reviews')" id="tab-received-reviews" class="px-8 py-4 text-xs font-black uppercase tracking-[0.2em] border-b-2 border-transparent text-gray-400 hover:text-secondary transition-all">
+        @if($receivedReviews->total() > 0 || in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
+        <button onclick="switchReviewTab('received-reviews')" id="tab-received-reviews" class="px-8 py-4 text-xs font-black uppercase tracking-[0.2em] border-b-2 {{ request()->has('received_page') ? 'border-secondary text-secondary' : 'border-transparent text-gray-400' }} hover:text-secondary transition-all">
             Received Reviews
         </button>
         @endif
     </div>
 
     <!-- My Reviews Panel -->
-    <div id="panel-my-reviews" class="space-y-6">
+    <div id="panel-my-reviews" class="{{ request()->has('received_page') ? 'hidden' : '' }} space-y-6">
         @forelse($myReviews as $review)
         <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-8 shadow-sm group hover:border-secondary/20 transition-all">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -64,10 +64,42 @@
             <p class="text-gray-500 max-w-xs mx-auto">You haven't written any reviews for practitioners yet.</p>
         </div>
         @endforelse
+
+        @if($myReviews->hasPages())
+        <div class="px-6 py-4 border-t border-[#2E4B3D]/12 flex flex-col md:flex-row items-center justify-between gap-4 mt-8 bg-white rounded-2xl shadow-sm">
+            <div class="text-sm text-gray-500">
+                Showing <span class="font-medium text-secondary">{{ $myReviews->firstItem() }}</span> to <span class="font-medium text-secondary">{{ $myReviews->lastItem() }}</span> of <span class="font-medium text-secondary">{{ $myReviews->total() }}</span> reviews
+            </div>
+            <div class="flex items-center space-x-2 pagination-links">
+                @if($myReviews->onFirstPage())
+                    <span class="px-4 py-2 bg-gray-50 text-gray-400 rounded-lg text-sm font-medium cursor-not-allowed border border-gray-100">Prev</span>
+                @else
+                    <a href="{{ $myReviews->appends(['received_page' => request('received_page')])->previousPageUrl() }}" class="px-4 py-2 bg-white text-secondary hover:bg-gray-50 rounded-lg text-sm font-medium border border-gray-200 transition-colors">Prev</a>
+                @endif
+
+                <div class="flex items-center space-x-1">
+                    @php $start = max(1, $myReviews->currentPage() - 2); $end = min($myReviews->lastPage(), $myReviews->currentPage() + 2); @endphp
+                    @foreach ($myReviews->appends(['received_page' => request('received_page')])->getUrlRange($start, $end) as $page => $url)
+                        @if ($page == $myReviews->currentPage())
+                            <span class="w-10 h-10 flex items-center justify-center bg-secondary text-white rounded-lg text-sm font-medium">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}" class="w-10 h-10 flex items-center justify-center bg-white text-secondary hover:bg-gray-50 rounded-lg text-sm font-medium border border-gray-200 transition-colors">{{ $page }}</a>
+                        @endif
+                    @endforeach
+                </div>
+
+                @if($myReviews->hasMorePages())
+                    <a href="{{ $myReviews->appends(['received_page' => request('received_page')])->nextPageUrl() }}" class="px-4 py-2 bg-white text-secondary hover:bg-gray-50 rounded-lg text-sm font-medium border border-gray-200 transition-colors">Next</a>
+                @else
+                    <span class="px-4 py-2 bg-gray-50 text-gray-400 rounded-lg text-sm font-medium cursor-not-allowed border border-gray-100">Next</span>
+                @endif
+            </div>
+        </div>
+        @endif
     </div>
 
     <!-- Received Reviews Panel -->
-    <div id="panel-received-reviews" class="hidden space-y-6">
+    <div id="panel-received-reviews" class="{{ request()->has('received_page') ? '' : 'hidden' }} space-y-6">
         @forelse($receivedReviews as $review)
         <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-8 shadow-sm group hover:border-secondary/20 transition-all">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -101,6 +133,38 @@
             <p class="text-gray-500 max-w-xs mx-auto">You haven't received any reviews from clients yet.</p>
         </div>
         @endforelse
+
+        @if($receivedReviews->hasPages())
+        <div class="px-6 py-4 border-t border-[#2E4B3D]/12 flex flex-col md:flex-row items-center justify-between gap-4 mt-8 bg-white rounded-2xl shadow-sm">
+            <div class="text-sm text-gray-500">
+                Showing <span class="font-medium text-secondary">{{ $receivedReviews->firstItem() }}</span> to <span class="font-medium text-secondary">{{ $receivedReviews->lastItem() }}</span> of <span class="font-medium text-secondary">{{ $receivedReviews->total() }}</span> reviews
+            </div>
+            <div class="flex items-center space-x-2 pagination-links">
+                @if($receivedReviews->onFirstPage())
+                    <span class="px-4 py-2 bg-gray-50 text-gray-400 rounded-lg text-sm font-medium cursor-not-allowed border border-gray-100">Prev</span>
+                @else
+                    <a href="{{ $receivedReviews->appends(['my_page' => request('my_page')])->previousPageUrl() }}" class="px-4 py-2 bg-white text-secondary hover:bg-gray-50 rounded-lg text-sm font-medium border border-gray-200 transition-colors">Prev</a>
+                @endif
+
+                <div class="flex items-center space-x-1">
+                    @php $start = max(1, $receivedReviews->currentPage() - 2); $end = min($receivedReviews->lastPage(), $receivedReviews->currentPage() + 2); @endphp
+                    @foreach ($receivedReviews->appends(['my_page' => request('my_page')])->getUrlRange($start, $end) as $page => $url)
+                        @if ($page == $receivedReviews->currentPage())
+                            <span class="w-10 h-10 flex items-center justify-center bg-secondary text-white rounded-lg text-sm font-medium">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}" class="w-10 h-10 flex items-center justify-center bg-white text-secondary hover:bg-gray-50 rounded-lg text-sm font-medium border border-gray-200 transition-colors">{{ $page }}</a>
+                        @endif
+                    @endforeach
+                </div>
+
+                @if($receivedReviews->hasMorePages())
+                    <a href="{{ $receivedReviews->appends(['my_page' => request('my_page')])->nextPageUrl() }}" class="px-4 py-2 bg-white text-secondary hover:bg-gray-50 rounded-lg text-sm font-medium border border-gray-200 transition-colors">Next</a>
+                @else
+                    <span class="px-4 py-2 bg-gray-50 text-gray-400 rounded-lg text-sm font-medium cursor-not-allowed border border-gray-100">Next</span>
+                @endif
+            </div>
+        </div>
+        @endif
     </div>
 </div>
 

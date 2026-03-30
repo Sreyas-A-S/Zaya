@@ -253,18 +253,25 @@
                 <div>
                     <p class="text-[11px] font-black text-secondary/50 uppercase tracking-[0.2em] mb-1">Reminder Settings</p>
                     <h3 class="text-xl font-black text-secondary">Video link reminder timing</h3>
-                    <p class="text-sm text-gray-500 mt-1">The system always emails the secure video session link to you and the client 60 minutes before an online booking.</p>
+                    <p class="text-sm text-gray-500 mt-1">The system will email the secure video session link to you and the client at your preferred time before an online booking.</p>
                 </div>
             </div>
             <div class="max-w-xl">
-                <div class="flex flex-col sm:flex-row gap-4 items-center">
-                    <div class="relative w-full sm:w-60">
-                        <input type="number" value="60" disabled
-                               class="w-full border border-gray-200 rounded-2xl px-4 py-3 font-bold text-secondary bg-gray-50 cursor-not-allowed outline-none">
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold uppercase">Minutes</span>
+                <form action="{{ route('my-services.reminder') }}" method="POST" class="flex flex-col sm:flex-row gap-4 items-center">
+                    @csrf
+                    <div class="relative w-full sm:w-64">
+                        <input type="number" name="reminder_lead_time" value="{{ $reminderLeadTime }}" min="5" max="1440" required
+                               class="w-full border border-gray-200 rounded-2xl px-5 py-4 font-bold text-secondary bg-[#F9FBF9] focus:border-secondary focus:ring-4 focus:ring-secondary/5 outline-none transition-all">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-black uppercase tracking-widest">Minutes</span>
                     </div>
-                    <span class="text-sm text-gray-500 font-medium">Fixed default reminder time</span>
-                </div>
+                    <button type="submit" class="w-full sm:w-auto px-8 py-4 bg-secondary text-white rounded-2xl font-black text-sm hover:bg-primary transition-all shadow-xl shadow-secondary/20 uppercase tracking-[0.2em]">
+                        Save Preference
+                    </button>
+                </form>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-4 flex items-center gap-2">
+                    <i class="ri-information-line text-secondary text-sm"></i>
+                    Default is 60 minutes. Maximum 24 hours (1440 min).
+                </p>
             </div>
         </div>
     </div>

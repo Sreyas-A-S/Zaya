@@ -1,7 +1,7 @@
 <div id="bookings-container">
     <div class="bg-white rounded-2xl border border-[#2E4B3D]/12 overflow-hidden mb-8">
         <div class="p-6 border-b border-[#2E4B3D]/12">
-            <h2 class="text-xl font-medium text-secondary">My Bookings</h2>
+            <h2 class="text-xl font-medium text-secondary">{{ $user->role === 'translator' ? 'Translation Sessions' : 'My Bookings' }}</h2>
         </div>
 
         <div class="overflow-x-auto">
@@ -64,6 +64,19 @@
                             <span class="px-3 py-1 inline-flex text-[10px] leading-5 font-bold rounded-full uppercase {{ $booking->mode === 'online' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600' }}">
                                 {{ $booking->mode }}
                             </span>
+                            @if($booking->need_translator)
+                                <div class="mt-1">
+                                    @if($booking->translator_id)
+                                        <span class="px-2 py-0.5 inline-flex text-[9px] leading-4 font-bold rounded-md bg-emerald-50 text-emerald-600 uppercase border border-emerald-100" title="Translator: {{ $booking->translator->full_name }}">
+                                            <i class="ri-translate mr-1"></i> {{ $booking->translator->full_name }}
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-0.5 inline-flex text-[9px] leading-4 font-bold rounded-md bg-amber-50 text-amber-600 uppercase border border-amber-100">
+                                            <i class="ri-translate mr-1"></i> Needed
+                                        </span>
+                                    @endif
+                                </div>
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-sm text-secondary font-medium">
                             € {{ number_format($booking->total_price, 2) }}
@@ -107,6 +120,13 @@
                                             <i class="ri-user-shared-line mr-3 text-lg text-orange-500"></i>
                                             Refer
                                         </button>
+
+                                        @if($booking->need_translator && !$booking->translator_id)
+                                        <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language }}', '{{ $booking->to_language }}')" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left">
+                                            <i class="ri-translate mr-3 text-lg text-blue-500"></i>
+                                            Assign Translator
+                                        </button>
+                                        @endif
                                         @endif
 
                                         @if($booking->razorpay_payment_url && $booking->status === 'pending')

@@ -16,7 +16,7 @@
     <link rel="shortcut icon" href="{{ asset('frontend/assets/favicon.ico') }}" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .scrollbar-hide::-webkit-scrollbar {
@@ -153,10 +153,16 @@
                     <i class="ri-pulse-line mr-3 text-lg"></i> <span id="client_panel_sidebar_health_journey" data-i18n="Health Journey">{{ __($site_settings['client_panel_sidebar_health_journey'] ?? 'Health Journey') }}</span>
                 </a>
                 @endif
-                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist', 'translator']))
+                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
                 <a href="{{ route('consultations.index') }}"
                     class="flex items-center px-8 py-3 {{ (request()->routeIs('consultations.index') || request()->routeIs('bookings.consultation-form.*')) ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-stethoscope-line mr-3 text-lg"></i> <span id="client_panel_sidebar_consultation" data-i18n="Consultation">{{ __($site_settings['client_panel_sidebar_consultation'] ?? 'Consultation') }}</span>
+                </a>
+                @endif
+                @if($user->role === 'translator')
+                <a href="{{ route('consultations.index') }}"
+                    class="flex items-center px-8 py-3 {{ (request()->routeIs('consultations.index') || request()->routeIs('bookings.consultation-form.*')) ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
+                    <i class="ri-translate-2 mr-3 text-lg"></i> <span id="client_panel_sidebar_translation_sessions" data-i18n="Translation Sessions">{{ __('Translation Sessions') }}</span>
                 </a>
                 @endif
                 @if(in_array($user->role, ['client', 'patient']))
@@ -170,7 +176,7 @@
                     class="flex items-center px-8 py-3 {{ request()->routeIs('conferences.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-vidicon-line mr-3 text-lg"></i> <span id="client_panel_sidebar_my_conference_history" data-i18n="My Conference History">{{ __('My Conference History') }}</span>
                 </a>
-                @else
+                @elseif(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
                 <a href="{{ route('conferences.index') }}"
                     class="flex items-center px-8 py-3 {{ request()->routeIs('conferences.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-vidicon-line mr-3 text-lg"></i> <span id="client_panel_sidebar_conference_history" data-i18n="Conference History">{{ __($site_settings['client_panel_sidebar_conference_history'] ?? 'Conference History') }}</span>
@@ -400,11 +406,12 @@
                     </div>
                     @endif
 
+                    @if($user->role === 'client' || $user->role === 'patient')
                     <a href="{{ route('find-practitioner') }}"
                         class="bg-[#2B4C3B] hover:bg-[#1f372a] text-white px-5 py-2.5 rounded-full font-normal text-base transition-colors shadow-sm cursor-pointer">
                         <span id="client_panel_book_session_btn" data-i18n="{{ $site_settings['client_panel_book_session_btn'] ?? 'Book a New Consultation' }}">{{ __($site_settings['client_panel_book_session_btn'] ?? 'Book a New Consultation') }}</span>
                     </a>
-                </div>
+                    @endif                </div>
             </header>
             @endif
 

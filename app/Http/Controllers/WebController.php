@@ -477,23 +477,34 @@ class WebController extends Controller
     {
         $request->validate([
             'code' => ['required', 'string', 'max:255'],
+            'amount' => ['nullable', 'numeric', 'min:0'],
+            'usage_type' => ['nullable', 'string', 'in:registration,booking'],
         ]);
 
-        $role = $request->input('role', 'practitioner');
-        $feeKey = match ($role) {
-            'client' => 'client_registration_fee',
-            'doctor' => 'doctor_registration_fee',
-            default => 'practitioner_registration_fee',
-        };
+        $usageType = $request->input('usage_type', 'registration');
+        $baseFee = 0.0;
 
-        $language = session('locale', 'en');
-        $financeSettings = HomepageSetting::getSectionValues('finance', $language);
-        $baseFee = $financeSettings[$feeKey] ?? '0';
-        $baseFee = is_numeric($baseFee) ? (float) $baseFee : 0.0;
-        $feeEnabledKey = $feeKey . '_enabled';
-        $feeEnabled = filter_var($financeSettings[$feeEnabledKey] ?? '1', FILTER_VALIDATE_BOOLEAN);
-        if (!$feeEnabled) {
-            return response()->json(['message' => 'Fee is currently disabled.'], 422);
+        if ($usageType === 'registration') {
+            $role = $request->input('role', 'practitioner');
+            $feeKey = match ($role) {
+                'client' => 'client_registration_fee',
+                'doctor' => 'doctor_registration_fee',
+                default => 'practitioner_registration_fee',
+            };
+
+            $language = session('locale', 'en');
+            $financeSettings = HomepageSetting::getSectionValues('finance', $language);
+            $baseFee = $financeSettings[$feeKey] ?? '0';
+            $baseFee = is_numeric($baseFee) ? (float) $baseFee : 0.0;
+            
+            $feeEnabledKey = $feeKey . '_enabled';
+            $feeEnabled = filter_var($financeSettings[$feeEnabledKey] ?? '1', FILTER_VALIDATE_BOOLEAN);
+            if (!$feeEnabled) {
+                return response()->json(['message' => 'Fee is currently disabled.'], 422);
+            }
+        } else {
+            // For bookings, we use the amount passed from frontend
+            $baseFee = (float) $request->input('amount', 0);
         }
 
         $code = trim((string) $request->input('code'));
@@ -501,6 +512,11 @@ class WebController extends Controller
 
         if (!$promo || !$promo->status) {
             return response()->json(['message' => 'Invalid promo code.'], 422);
+        }
+
+        // Check usage type
+        if ($promo->usage_type !== 'both' && $promo->usage_type !== $usageType) {
+            return response()->json(['message' => 'This promo code is not applicable for ' . $usageType . '.'], 422);
         }
 
         if ($promo->expiry_date && $promo->expiry_date->isPast()) {

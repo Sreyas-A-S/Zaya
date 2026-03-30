@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
+use Illuminate\Support\Facades\Event;
+use SocialiteProviders\Manager\SocialiteWasCalled;
+use SocialiteProviders\Apple\AppleExtendSocialite;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -24,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
     {
          App::setLocale(Session::get('locale', 'en'));
         Schema::defaultStringLength(191);
+
+        Event::listen(SocialiteWasCalled::class, [AppleExtendSocialite::class, 'handle']);
 
         view()->composer('*', function ($view) {
             $language = App::getLocale();

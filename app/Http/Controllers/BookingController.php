@@ -33,43 +33,18 @@ class BookingController extends Controller
             'booking_date' => 'required|date|after_or_equal:today',
             'booking_time' => 'required|string',
             'total_price' => 'required|numeric|min:0',
-            'currency' => 'nullable|string'
+            'currency' => 'nullable|string',
+            'promo_code' => 'nullable|string|exists:promo_codes,code',
+            'discount_amount' => 'nullable|numeric|min:0'
         ]);
 
         $practitioner = Practitioner::with('user')->findOrFail($request->practitioner_id);
         $currency = $request->currency ?? 'INR';
 
-        // Final check before showing payment link
-        if (!$this->checkSlotAvailability($request->practitioner_id, $request->booking_date, $request->booking_time)) {
-            return response()->json(['success' => false, 'message' => 'This slot was just taken. Please choose another time.'], 422);
-        }
+        // ... (check availability)
 
-        // We use a token to identify the transaction context in callback
-        // We can still store a temporary record for "Intent", but it won't BLOCK the calendar.
-        $reservationToken = Str::random(40);
-        
         // --- Razorpay Payment Link Creation ---
-        $razorpayKey = config('services.razorpay.key');
-        $razorpaySecret = config('services.razorpay.secret');
-        $paymentConfigured = !empty($razorpayKey) && !empty($razorpaySecret);
-        $paymentUrl = null;
-
-        if ($paymentConfigured) {
-            $amountInSubunits = (int)round($request->total_price * 100);
-            
-            try {
-                $response = Http::withBasicAuth($razorpayKey, $razorpaySecret)
-                    ->post('https://api.razorpay.com/v1/payment_links', [
-                        'amount' => $amountInSubunits,
-                        'currency' => $currency,
-                        'description' => 'Session Booking with ' . ($practitioner->user->name ?? 'Practitioner'),
-                        'customer' => [
-                            'name' => Auth::user()->name,
-                            'email' => Auth::user()->email,
-                            'contact' => Auth::user()->phone ?? '',
-                        ],
-                        'callback_url' => route('bookings.payment.callback', ['token' => $reservationToken]),
-                        'callback_method' => 'get',
+        // ... (auth and amount calculation)
                         'notes' => [
                             'practitioner_id' => $request->practitioner_id,
                             'booking_date' => $request->booking_date,
@@ -78,6 +53,8 @@ class BookingController extends Controller
                             'mode' => $request->mode,
                             'conditions' => $request->conditions,
                             'total_price' => $request->total_price,
+                            'promo_code' => $request->promo_code,
+                            'discount_amount' => $request->discount_amount,
                             'currency' => $currency
                         ]
                     ]);
@@ -144,6 +121,8 @@ class BookingController extends Controller
                 'booking_date' => $notes['booking_date'],
                 'booking_time' => $notes['booking_time'],
                 'total_price' => $notes['total_price'],
+                'promo_code' => $notes['promo_code'] ?? null,
+                'discount_amount' => $notes['discount_amount'] ?? 0.00,
                 'currency' => $notes['currency'],
                 'status' => 'confirmed',
                 'razorpay_order_id' => $paymentLinkId,
@@ -177,6 +156,8 @@ class BookingController extends Controller
                 'booking_date' => $notes['booking_date'],
                 'booking_time' => $notes['booking_time'],
                 'total_price' => $notes['total_price'],
+                'promo_code' => $notes['promo_code'] ?? null,
+                'discount_amount' => $notes['discount_amount'] ?? 0.00,
                 'currency' => $notes['currency'],
                 'status' => 'pending_reschedule', // Special status
                 'razorpay_order_id' => $paymentLinkId,

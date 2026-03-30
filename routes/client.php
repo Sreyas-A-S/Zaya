@@ -54,7 +54,9 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::delete('/my-services/{id}', [ProfileController::class, 'deleteService'])->name('my-services.delete');
     Route::delete('/my-services/group/{service_id}', [ProfileController::class, 'deleteServiceGroup'])->name('my-services.delete-group');
 
-    Route::get('/api/referrable-practitioners', [BookingController::class, 'fetchReferrablePractitioners'])->name('api.referrable-practitioners');
+    Route::get('/api/referrable-practitioners', [BookingController::class, 'fetchReferrablePractitioners'])->name('referrable-practitioners-api');
+    Route::get('/api/available-translators', [ProfileController::class, 'fetchAvailableTranslators'])->name('available-translators-api');
+    Route::post('/bookings/{id}/assign-translator', [ProfileController::class, 'assignTranslator'])->name('bookings.assign-translator');
 
     // Availability / Time Slots
     Route::get('/time-slots', [\App\Http\Controllers\AvailabilityController::class, 'index'])->name('time-slots.index');

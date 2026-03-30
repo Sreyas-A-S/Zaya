@@ -246,6 +246,64 @@
     </div>
 </section>
 
+<!-- Form History and Actions -->
+<div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="flex-1">
+        <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Consultation History</h3>
+        <div class="flex flex-wrap gap-2">
+            @foreach($allForms as $f)
+                <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $f->id]) }}" 
+                   class="px-5 py-2.5 rounded-full text-xs font-bold transition-all border {{ ($existingForm && $existingForm->id === $f->id) ? 'bg-secondary text-white border-secondary shadow-lg' : 'bg-white text-gray-500 border-gray-200 hover:border-secondary/30 hover:text-secondary' }}">
+                    <i class="ri-file-list-3-line mr-1.5"></i>
+                    {{ $f->title ?: 'Follow-up #'.$loop->iteration }}
+                    <span class="opacity-50 ml-1 font-normal text-[10px]">{{ $f->created_at->format('M d') }}</span>
+                </a>
+            @endforeach
+            
+            @if($existingForm)
+            <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'new' => 1]) }}" 
+               class="px-5 py-2.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all">
+                <i class="ri-add-line mr-1.5"></i> New Follow-up
+            </a>
+            @endif
+        </div>
+    </div>
+</div>
+
+@if($existingForm)
+    <div class="mb-6 p-6 bg-secondary/5 border border-secondary/10 rounded-[2rem] flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-secondary shadow-sm">
+                <i class="ri-edit-2-line text-xl"></i>
+            </div>
+            <div>
+                <h4 class="text-sm font-black text-secondary">Editing: {{ $existingForm->title ?: 'Consultation Form' }}</h4>
+                <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-0.5">Created on {{ $existingForm->created_at->format('F d, Y at H:i') }}</p>
+            </div>
+        </div>
+        <button type="button" onclick="toggleTitleEdit()" class="text-xs font-bold text-secondary hover:underline">Rename Form</button>
+    </div>
+@else
+    <div class="mb-6 p-6 bg-emerald-50 border border-emerald-100 rounded-[2rem] flex items-center gap-4">
+        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-emerald-600 shadow-sm">
+            <i class="ri-add-circle-line text-xl"></i>
+        </div>
+        <div>
+            <h4 class="text-sm font-black text-emerald-700">Starting New Follow-up Consultation</h4>
+            <p class="text-[10px] text-emerald-600/60 uppercase font-bold tracking-widest mt-0.5">Fresh record for current session</p>
+        </div>
+    </div>
+@endif
+
+<div id="title-edit-box" class="hidden mb-6 p-6 bg-white border border-[#2E4B3D]/12 rounded-[2rem] shadow-sm">
+    <label class="block text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3">Form Title / Reference</label>
+    <div class="flex gap-3">
+        <input type="text" id="new-form-title" value="{{ $existingForm->title ?? 'Follow-up Consultation' }}" 
+               class="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-secondary outline-none">
+        <button type="button" onclick="applyTitle()" class="px-6 py-3 bg-secondary text-white rounded-xl font-bold text-sm">Apply</button>
+    </div>
+</div>
+
 @if(!in_array($consultationFormRole, ['doctor', 'practitioner'], true))
 @include('consultation-forms.' . $consultationFormRole, [
     'user' => $user,
@@ -346,6 +404,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     switchTab(initialTab);
 });
+
+function toggleTitleEdit() {
+    const box = document.getElementById('title-edit-box');
+    box.classList.toggle('hidden');
+}
+
+function applyTitle() {
+    const newTitle = document.getElementById('new-form-title').value;
+    if (!newTitle) return;
+    
+    // Update all hidden form title inputs
+    const inputs = document.querySelectorAll('input[name="form_title"]');
+    inputs.forEach(i => i.value = newTitle);
+    
+    // Update display
+    const editHeading = document.querySelector('h4.text-secondary');
+    if (editHeading) editHeading.innerText = 'Editing: ' + newTitle;
+    
+    toggleTitleEdit();
+}
 </script>
 @endpush
 

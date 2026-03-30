@@ -1,5 +1,7 @@
 <form method="POST" action="{{ route('bookings.consultation-form.store', $booking->id) }}" class="consultation-form-root space-y-6">
     @csrf
+    <input type="hidden" name="form_id" value="{{ $existingForm->id ?? '' }}">
+    <input type="hidden" name="form_title" value="{{ $existingForm->title ?? '' }}">
 
     <div class="space-y-6">
         <div class="consultation-tab-controls">

@@ -415,6 +415,7 @@
                                                     dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-[#252525]');
                                                     dd.classList.add('hidden');
                                                     dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
+                                                    if(typeof clearPromoCode === 'function') clearPromoCode();
                                                 ">
                                             Clear
                                         </button>
@@ -433,6 +434,7 @@
                                                     dd.classList.add('hidden');
                                                     dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
                                                     if(typeof updateStep3Services === 'function') updateStep3Services();
+                                                    if(typeof clearPromoCode === 'function') clearPromoCode();
                                                 ">
                                             Set
                                         </button>
@@ -617,6 +619,42 @@
                 </div>
             </div>
 
+            <!-- Promo Code Section -->
+            <div class="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                <h4 class="text-gray-800 font-medium mb-4 flex items-center gap-2">
+                    <i class="ri-ticket-line text-secondary text-lg"></i>
+                    Apply Promo Code
+                </h4>
+                <div class="flex gap-3">
+                    <div class="relative flex-1">
+                        <input type="text" id="promo-code-input" placeholder="Enter code here..." 
+                            class="w-full py-3.5 px-6 bg-white rounded-full border border-gray-200 outline-none text-sm text-gray-700 placeholder:text-gray-400 focus:border-secondary transition-all">
+                        <button type="button" id="clear-promo-btn" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 hidden" onclick="clearPromoCode()">
+                            <i class="ri-close-circle-fill text-xl"></i>
+                        </button>
+                    </div>
+                    <button type="button" onclick="applyPromoCode()" id="apply-promo-btn"
+                        class="bg-secondary text-white px-8 py-3.5 rounded-full font-medium text-sm hover:bg-primary transition-all shadow-sm">
+                        Apply
+                    </button>
+                </div>
+                <div id="promo-message" class="mt-3 text-xs font-medium hidden"></div>
+                
+                <!-- Discount Breakdown -->
+                <div id="discount-breakdown" class="mt-6 pt-6 border-t border-gray-200 hidden">
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm text-gray-500 font-medium">
+                            <span>Subtotal</span>
+                            <span id="breakdown-subtotal"></span>
+                        </div>
+                        <div class="flex justify-between text-sm text-emerald-600 font-bold">
+                            <span id="breakdown-label">Discount</span>
+                            <span id="breakdown-discount"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Total Price -->
             <div class="text-center py-8 mb-8"
                 style="background: linear-gradient(90deg, #FFFFFF 0%, #F0F0F0 48%, #FFFFFF 100%);">
@@ -679,8 +717,100 @@
 
         function getEffectiveTotalPrice() {
             const baseTotal = lastComputedTotal !== null ? lastComputedTotal : getDisplayedTotalPrice();
+            const discountedTotal = Math.max(0, baseTotal - promoDiscountAmount);
             const testToggle = document.getElementById('test-payment-toggle');
-            return testToggle && testToggle.checked ? 1 : baseTotal;
+            return testToggle && testToggle.checked ? 1 : discountedTotal;
+        }
+
+        let appliedPromoCode = null;
+        let promoDiscountAmount = 0;
+
+        async function applyPromoCode() {
+            const input = document.getElementById('promo-code-input');
+            const code = input.value.trim();
+            const messageEl = document.getElementById('promo-message');
+            const btn = document.getElementById('apply-promo-btn');
+            const clearBtn = document.getElementById('clear-promo-btn');
+            
+            if (!code) {
+                showToast('Please enter a promo code.', 'warning');
+                return;
+            }
+
+            const currentSubtotal = lastComputedTotal || getDisplayedTotalPrice();
+            if (currentSubtotal <= 0) {
+                showToast('Total must be greater than zero to apply a promo code.', 'warning');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i>';
+
+            try {
+                const response = await fetch('{{ route('promo.validate') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        amount: currentSubtotal,
+                        usage_type: 'booking'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    appliedPromoCode = data.code;
+                    promoDiscountAmount = parseFloat(data.discount_amount);
+                    
+                    // Update UI
+                    messageEl.textContent = `Promo code "${data.code}" applied!`;
+                    messageEl.className = 'mt-3 text-xs font-medium text-emerald-600';
+                    messageEl.classList.remove('hidden');
+                    
+                    input.readOnly = true;
+                    btn.classList.add('hidden');
+                    clearBtn.classList.remove('hidden');
+
+                    // Update breakdown and total
+                    updateStep3Services(); // This will call updateTotalPrice
+                    showToast('Promo code applied successfully!', 'success');
+                } else {
+                    messageEl.textContent = data.message || 'Invalid promo code.';
+                    messageEl.className = 'mt-3 text-xs font-medium text-red-500';
+                    messageEl.classList.remove('hidden');
+                    showToast(data.message || 'Invalid promo code.', 'error');
+                }
+            } catch (error) {
+                console.error('Promo error:', error);
+                showToast('Error validating promo code.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Apply';
+            }
+        }
+
+        function clearPromoCode() {
+            appliedPromoCode = null;
+            promoDiscountAmount = 0;
+            
+            const input = document.getElementById('promo-code-input');
+            const messageEl = document.getElementById('promo-message');
+            const btn = document.getElementById('apply-promo-btn');
+            const clearBtn = document.getElementById('clear-promo-btn');
+            
+            input.value = '';
+            input.readOnly = false;
+            btn.classList.remove('hidden');
+            clearBtn.classList.add('hidden');
+            messageEl.classList.add('hidden');
+            
+            updateStep3Services();
+            showToast('Promo code removed.', 'success');
         }
 
         async function submitBooking(btn) {
@@ -726,7 +856,9 @@
                 booking_date: bookingDate,
                 booking_time: bookingTime,
                 total_price: totalPrice,
-                currency: currency
+                currency: currency,
+                promo_code: appliedPromoCode,
+                discount_amount: promoDiscountAmount
             };
 
             try {
@@ -1000,14 +1132,27 @@
             function updateTotalPrice(total, currencySymbol = lastCurrencySymbol) {
                 const priceContainer = document.querySelector('.text-4xl.font-medium.text-gray-900');
                 lastComputedTotal = total;
+                
+                const finalTotal = Math.max(0, total - promoDiscountAmount);
                 const testToggle = document.getElementById('test-payment-toggle');
                 const showTest = testToggle && testToggle.checked;
                 const currencyCode = document.getElementById('booking-currency')?.value || 'INR';
+                
+                // Update Breakdown UI
+                const breakdownEl = document.getElementById('discount-breakdown');
+                if (promoDiscountAmount > 0) {
+                    breakdownEl.classList.remove('hidden');
+                    document.getElementById('breakdown-subtotal').textContent = `${currencySymbol} ${total.toFixed(2)}`;
+                    document.getElementById('breakdown-discount').textContent = `- ${currencySymbol} ${promoDiscountAmount.toFixed(2)}`;
+                } else {
+                    breakdownEl.classList.add('hidden');
+                }
+
                 if (priceContainer) {
                     if (showTest) {
-                        priceContainer.innerHTML = `${currencySymbol} ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ TEST</span>`;
+                        priceContainer.innerHTML = `${currencySymbol} ${finalTotal.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ TEST</span>`;
                     } else {
-                        priceContainer.innerHTML = `${currencySymbol} ${total.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ ${currencyCode}</span>`;
+                        priceContainer.innerHTML = `${currencySymbol} ${finalTotal.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ ${currencyCode}</span>`;
                     }
                 }
             }
@@ -1021,6 +1166,11 @@
             }
 
             function renderSelectedServices() {
+                // Clear promo code when services change to avoid incorrect discount amounts
+                if (appliedPromoCode) {
+                    clearPromoCode();
+                }
+
                 const checkedBoxes = document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked');
                 if (selectedServicesContainer) {
                     selectedServicesContainer.innerHTML = '';

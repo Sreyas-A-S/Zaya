@@ -44,6 +44,9 @@ return [
         'client_id' => env('APPLE_CLIENT_ID'),
         'client_secret' => env('APPLE_CLIENT_SECRET'),
         'redirect' => env('APPLE_REDIRECT_URI', 'http://127.0.0.1:8001/auth/apple/callback'),
+        'team_id' => env('APPLE_TEAM_ID'),
+        'key_id' => env('APPLE_KEY_ID'),
+        'private_key' => env('APPLE_PRIVATE_KEY'),
     ],
 
     'slack' => [

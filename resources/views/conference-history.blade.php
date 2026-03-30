@@ -4,11 +4,11 @@
 
 @section('content')
 @php
-    $practitionerRoles = ['practitioner', 'doctor', 'mindfulness_practitioner', 'mindfulness-practitioner', 'yoga_therapist', 'yoga-therapist'];
-    $isPractitioner = in_array(auth()->user()->role, $practitionerRoles);
+    $allowedRoles = ['practitioner', 'doctor', 'mindfulness_practitioner', 'mindfulness-practitioner', 'yoga_therapist', 'yoga-therapist', 'client', 'patient', 'translator'];
+    $hasAccess = in_array(auth()->user()->role, $allowedRoles);
 @endphp
 
-@if(!$isPractitioner)
+@if(!$hasAccess)
 <div class="flex flex-col items-center justify-center py-24 bg-white rounded-[40px] border-2 border-dashed border-[#2E4B3D]/10 text-center px-8 shadow-sm">
     <div class="w-28 h-28 bg-[#F8FAF9] rounded-full flex items-center justify-center mb-8 shadow-inner">
         <i class="ri-shield-user-line text-6xl text-[#2E4B3D]/20"></i>

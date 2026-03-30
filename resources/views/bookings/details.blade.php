@@ -126,6 +126,44 @@
                     @endforeach
                 </div>
             </div>
+
+            <!-- Consultation Forms Section -->
+            @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner_id === $user->profile_id)
+            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm p-8">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Consultation Records</h3>
+                        <p class="text-[10px] text-gray-400 font-bold mt-1">Clinical notes and follow-up records</p>
+                    </div>
+                    <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'new' => 1]) }}" class="w-10 h-10 rounded-full bg-secondary/5 text-secondary flex items-center justify-center hover:bg-secondary hover:text-white transition-all">
+                        <i class="ri-add-line text-xl"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @forelse($booking->consultationForms as $form)
+                    <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $form->id]) }}" 
+                       class="flex items-center justify-between p-5 rounded-2xl border border-gray-50 bg-[#F9FBF9] hover:border-secondary/20 hover:bg-white transition-all group shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
+                                <i class="ri-file-list-3-line"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-black text-secondary">{{ $form->title ?: 'Consultation Form' }}</p>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{{ $form->created_at->format('M d, Y') }}</p>
+                            </div>
+                        </div>
+                        <i class="ri-arrow-right-s-line text-gray-300 group-hover:text-secondary transition-colors"></i>
+                    </a>
+                    @empty
+                    <div class="col-span-full py-8 text-center bg-gray-50/50 rounded-3xl border border-dashed border-gray-200">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">No consultation forms recorded yet</p>
+                        <a href="{{ route('bookings.consultation-form.show', $booking->id) }}" class="inline-block mt-4 text-xs font-black text-secondary hover:underline">Create First Record →</a>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+            @endif
         </div>
 
         <!-- Sidebar Info -->

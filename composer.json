@@ -13,6 +13,8 @@
         "laravel/socialite": "^5.25",
         "laravel/tinker": "^2.10.1",
         "laravel/ui": "^4.6",
+        "socialiteproviders/apple": "^5.9",
+        "socialiteproviders/manager": "^4.9",
         "sreyas-a-s/unslay-shell": "dev-main",
         "tymon/jwt-auth": "^2.2",
         "yajra/laravel-datatables-oracle": "*",

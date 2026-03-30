@@ -12,6 +12,7 @@ class ConsultationForm extends Model
     protected $fillable = [
         'booking_id',
         'doctor_id',
+        'title',
         'payload',
     ];
 
