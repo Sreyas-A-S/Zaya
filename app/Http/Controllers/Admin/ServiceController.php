@@ -147,6 +147,13 @@ class ServiceController extends Controller
             }
         }
 
+        if ($request->has('remove_main_image') && $request->remove_main_image == '1') {
+            if ($service->image && !str_starts_with($service->image, 'frontend/')) {
+                Storage::disk('public')->delete($service->image);
+            }
+            $data['image'] = null;
+        }
+
         $service->update($data);
 
         if ($request->has('categories')) {

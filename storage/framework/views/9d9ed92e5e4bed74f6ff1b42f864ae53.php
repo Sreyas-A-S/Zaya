@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<?php
+    $user = $user ?? Auth::user();
+    $isMeetingPopout = $isMeetingPopout ?? false;
+    $isPublicMeeting = $isPublicMeeting ?? false;
+?>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title><?php echo $__env->yieldContent('title', 'Client Profile'); ?></title>
+    <!-- Favicon icon-->
+    <link rel="icon" type="image/png" href="<?php echo e(asset('frontend/assets/favicon-96x96.png')); ?>" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="<?php echo e(asset('frontend/assets/favicon.svg')); ?>" />
+    <link rel="shortcut icon" href="<?php echo e(asset('frontend/assets/favicon.ico')); ?>" />
+
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        @media (max-width: 1023px) {
+            .mobile-hidden {
+                display: none !important;
+            }
+        }
+
+        /* Preloader Styles */
+        #global-preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        body.public-meeting {
+            background: #07110b;
+        }
+
+        body.public-meeting #global-preloader {
+            display: none;
+        }
+
+        body.public-meeting aside,
+        body.public-meeting main > div > header,
+        body.public-meeting .client-mobile-nav {
+            display: none !important;
+        }
+
+        body.public-meeting main {
+            overflow: hidden !important;
+            background: #07110b !important;
+        }
+
+        body.public-meeting main > div {
+            height: 100%;
+            padding: 0 !important;
+        }
+
+        .preloader-logo {
+            width: 100px;
+            height: 100px;
+            animation: pulse-smooth 2s infinite ease-in-out;
+        }
+
+        /* Custom Sidebar Scrollbar */
+        .custom-sidebar-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-sidebar-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-sidebar-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(46, 75, 61, 0.1);
+            border-radius: 10px;
+        }
+
+        .custom-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(46, 75, 61, 0.2);
+        }
+
+        .custom-sidebar-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(46, 75, 61, 0.1) transparent;
+        }
+
+        @keyframes pulse-smooth {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+    <?php echo $__env->yieldContent('styles'); ?>
+    <?php echo $__env->yieldPushContent('styles'); ?>
+</head>
+
+<body class="flex h-screen overflow-hidden text-gray-800 bg-white <?php echo e($isMeetingPopout ? 'meeting-popout' : ''); ?> <?php echo e($isPublicMeeting ? 'public-meeting' : ''); ?>">
+
+    <!-- Global Preloader -->
+    <div id="global-preloader">
+        <img src="<?php echo e(asset('frontend/assets/zaya-logo.svg')); ?>" alt="Zaya Wellness" class="preloader-logo">
+    </div>
+
+    <!-- Sidebar -->
+    <?php if(!$isMeetingPopout && !$isPublicMeeting): ?>
+    <aside class="w-[288px] bg-[#FFFFFF] border-r border-[#2E4B3D]/12 hidden lg:flex lg:flex-col h-full shrink-0 relative">
+        <div class="flex-1 overflow-y-auto pb-48 custom-sidebar-scrollbar">
+            <a href="<?php echo e(route('home')); ?>"
+                class="flex items-center pt-8 ps-8 pe-2 pb-2 text-gray-500 hover:text-gray-800 text-sm font-medium mb-4">
+                <i class="ri-arrow-left-line mr-2"></i> <span id="client_panel_back_btn" data-i18n="<?php echo e($site_settings['client_panel_back_btn'] ?? 'Back'); ?>"><?php echo e(__($site_settings['client_panel_back_btn'] ?? 'Back')); ?></span>
+            </a>
+
+            <nav class="relative">
+                <a href="<?php echo e(route('dashboard')); ?>" class="flex items-center px-8 py-3 <?php echo e(request()->routeIs('dashboard') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-user-line mr-3 text-lg"></i> <span id="client_panel_sidebar_dashboard" data-i18n="Dashboard"><?php echo e(__($site_settings['client_panel_sidebar_dashboard'] ?? 'Dashboard')); ?></span>
+                </a>
+                <a href="<?php echo e(route('profile')); ?>"
+                    class="flex items-center px-8 py-3 <?php echo e(request()->routeIs('profile') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-user-settings-line mr-3 text-lg"></i> <span id="client_panel_sidebar_profile" data-i18n="Profile"><?php echo e(__('Profile')); ?></span>
+                </a>
+                <?php if(in_array($user->role, ['client', 'patient'])): ?>
+                <a href="<?php echo e(route('health-journey.index')); ?>"
+                    class="flex items-center px-8 py-3 <?php echo e(request()->routeIs('health-journey.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-pulse-line mr-3 text-lg"></i> <span id="client_panel_sidebar_health_journey" data-i18n="Health Journey"><?php echo e(__($site_settings['client_panel_sidebar_health_journey'] ?? 'Health Journey')); ?></span>
+                </a>
+                <?php endif; ?>
+                <?php if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'])): ?>
+                <a href="<?php echo e(route('consultations.index')); ?>"
+                    class="flex items-center px-8 py-3 <?php echo e((request()->routeIs('consultations.index') || request()->routeIs('bookings.consultation-form.*')) ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-stethoscope-line mr-3 text-lg"></i> <span id="client_panel_sidebar_consultation" data-i18n="Consultation"><?php echo e(__($site_settings['client_panel_sidebar_consultation'] ?? 'Consultation')); ?></span>
+                </a>
+                <?php endif; ?>
+                <?php if($user->role === 'translator'): ?>
+                <a href="<?php echo e(route('consultations.index')); ?>"
+                    class="flex items-center px-8 py-3 <?php echo e((request()->routeIs('consultations.index') || request()->routeIs('bookings.consultation-form.*')) ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-translate-2 mr-3 text-lg"></i> <span id="client_panel_sidebar_translation_sessions" data-i18n="Translation Sessions"><?php echo e(__('Translation Sessions')); ?></span>
+                </a>
+                <?php endif; ?>
+                <?php if(in_array($user->role, ['client', 'patient'])): ?>
+                <a href="<?php echo e(route('bookings.index')); ?>"
+                    class="flex items-center px-8 py-3 <?php echo e(request()->routeIs('bookings.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-calendar-event-line mr-3 text-lg"></i> <span id="client_panel_sidebar_bookings" data-i18n="Bookings"><?php echo e(__($site_settings['client_panel_sidebar_bookings'] ?? 'Bookings')); ?></span>
+                </a>
+                <?php endif; ?>
+                <?php if(in_array($user->role, ['client', 'patient'])): ?>
+                <a href="<?php echo e(route('conferences.index')); ?>"
+                    class="flex items-center px-8 py-3 <?php echo e(request()->routeIs('conferences.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-vidicon-line mr-3 text-lg"></i> <span id="client_panel_sidebar_my_conference_history" data-i18n="My Conference History"><?php echo e(__('My Conference History')); ?></span>
+                </a>
+                <?php elseif(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'])): ?>
+                <a href="<?php echo e(route('conferences.index')); ?>"
+                    class="flex items-center px-8 py-3 <?php echo e(request()->routeIs('conferences.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-vidicon-line mr-3 text-lg"></i> <span id="client_panel_sidebar_conference_history" data-i18n="Conference History"><?php echo e(__($site_settings['client_panel_sidebar_conference_history'] ?? 'Conference History')); ?></span>
+                </a>
+                <?php endif; ?>
+                <a href="<?php echo e(route('transactions.index')); ?>"
+                    class="flex items-center px-8 py-3 <?php echo e(request()->routeIs('transactions.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-wallet-3-line mr-3 text-lg"></i> <span id="client_panel_sidebar_transaction_vault" data-i18n="Transaction Vault"><?php echo e(__($site_settings['client_panel_sidebar_transaction_vault'] ?? 'Transaction Vault')); ?></span>
+                </a>
+                <a href="<?php echo e(route('reviews.index')); ?>"
+                    class="flex items-center px-8 py-3 <?php echo e(request()->routeIs('reviews.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-star-line mr-3 text-lg"></i> <span id="client_panel_sidebar_reviews" data-i18n="Reviews"><?php echo e(__('Reviews')); ?></span>
+                </a>
+                <?php if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'])): ?>
+                <a href="<?php echo e(route('time-slots.index')); ?>"
+                    class="flex items-center px-8 py-3 <?php echo e(request()->routeIs('time-slots.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-time-line mr-3 text-lg"></i> <span id="client_panel_sidebar_time_slots" data-i18n="Time Slots"><?php echo e(__($site_settings['client_panel_sidebar_time_slots'] ?? 'Time Slots')); ?></span>
+                </a>
+                <a href="<?php echo e(route('my-services.index')); ?>"
+                    class="flex items-center px-8 py-3 <?php echo e(request()->routeIs('my-services.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary'); ?> font-normal transition-colors">
+                    <i class="ri-shake-hands-line mr-3 text-lg"></i> <span id="client_panel_sidebar_my_services" data-i18n="My Services"><?php echo e(__('My Services')); ?></span>
+                </a>
+                <?php endif; ?>
+                <a href="javascript:void(0)"
+                    onclick="openLogoutModal()"
+                    class="flex items-center px-8 py-3 text-red-400 hover:bg-red-50 hover:text-red-600 font-normal transition-colors">
+                    <i class="ri-logout-box-line mr-3 text-lg"></i> <span id="client_panel_sidebar_logout" data-i18n="Logout"><?php echo e(__($site_settings['client_panel_sidebar_logout'] ?? 'Logout')); ?></span>
+                </a>
+                <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" class="hidden">
+                    <?php echo csrf_field(); ?>
+                </form>
+            </nav>
+        </div>
+        <img src="<?php echo e(asset('frontend/assets/client-profile-floating-img.png')); ?>" alt="Floating Image"
+            class="w-[248px] h-auto absolute bottom-0 left-0 pointer-events-none z-0">
+    </aside>
+    <?php endif; ?>
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full <?php echo e($isMeetingPopout ? 'overflow-hidden bg-[#07110b] meeting-popout-main' : ($isPublicMeeting ? 'overflow-hidden bg-[#07110b] public-meeting-main' : 'overflow-y-auto bg-[#F6F7F7]')); ?>">
+        <div class="w-full <?php echo e(($isMeetingPopout || $isPublicMeeting) ? 'h-full p-0' : 'px-5 py-4 lg:px-10 lg:py-10'); ?>">
+            <?php if(!$isMeetingPopout && !$isPublicMeeting && session('error')): ?>
+            <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 text-red-800 px-4 py-3 text-sm font-medium shadow-sm">
+                <?php echo e(session('error')); ?>
+
+            </div>
+            <?php endif; ?>
+
+            <?php if(!$isMeetingPopout && !$isPublicMeeting && session('status')): ?>
+            <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-800 px-4 py-3 text-sm font-medium shadow-sm">
+                <?php echo e(session('status')); ?>
+
+            </div>
+            <?php endif; ?>
+
+            <?php if(!$isMeetingPopout && !$isPublicMeeting): ?>
+            <!-- Header -->
+            <header
+                class="flex flex-col lg:flex-row flex-wrap gap-y-5 justify-center lg:justify-between lg:items-center mb-10">
+                <!-- mobile top header -->
+                <div class="flex flex-1 justify-between items-center pt-3 lg:hidden">
+                    <a href="<?php echo e(route('home')); ?>" class="text-gray-500 hover:text-gray-800 text-sm font-medium">
+                        <i class="ri-arrow-left-line mr-2"></i> <span id="client_panel_back_btn_mobile" data-i18n="<?php echo e($site_settings['client_panel_back_btn'] ?? 'Back'); ?>"><?php echo e(__($site_settings['client_panel_back_btn'] ?? 'Back')); ?></span>
+                    </a>
+                    <div class="flex gap-3 items-center">
+                        <!-- Language Toggle -->
+                        <?php if(isset($available_languages) && $available_languages->count() >= 2): ?>
+                        <?php
+                        $lang1 = $available_languages->first();
+                        $lang2 = $available_languages->skip(1)->first();
+                        $currentLocale = App::getLocale();
+                        ?>
+                        <button type="button"
+                            class="relative flex items-center bg-gray-100 rounded-full h-[44px] px-1 border border-gray-200 cursor-pointer focus:outline-none d-none hidden"
+                            onclick="toggleLanguage('<?php echo e($currentLocale == $lang1->code ? $lang2->code : $lang1->code); ?>')">
+                            <!-- Sliding Pill -->
+                            <div id="lang-toggle-pill-mobile"
+                                class="absolute top-1 bottom-1 left-1 w-9 bg-primary rounded-full shadow-sm transition-transform duration-300 ease-in-out <?php echo e($currentLocale == $lang2->code ? 'translate-x-full' : 'translate-x-0'); ?>">
+                            </div>
+
+                            <span id="lang-text-<?php echo e($lang1->code); ?>-mobile"
+                                class="relative z-10 w-9 text-center <?php echo e($currentLocale == $lang1->code ? 'text-white' : 'text-gray-500'); ?> text-[11px] font-bold transition-colors duration-300"><?php echo e(Str::ucfirst(substr($lang1->code, 0, 2))); ?></span>
+                            <span id="lang-text-<?php echo e($lang2->code); ?>-mobile"
+                                class="relative z-10 w-9 text-center <?php echo e($currentLocale == $lang2->code ? 'text-white' : 'text-gray-500'); ?> text-[11px] font-bold transition-colors duration-300"><?php echo e(Str::ucfirst(substr($lang2->code, 0, 2))); ?></span>
+                        </button>
+                        <?php endif; ?>
+
+                        <!-- Coin -->
+                        <div class="relative">
+                            <div onclick="toggleBalance('mobile')"
+                                class="w-10 h-10 rounded-full bg-[#FFD166] flex items-center justify-center text-white relative shadow-sm cursor-pointer hover:bg-yellow-400 transition-colors">
+                                <span class="font-bold text-lg text-yellow-100">€</span>
+                                <div class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></div>
+                            </div>
+                            
+                            <div id="balance-dropdown-mobile" class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 hidden overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                <div class="p-5 border-b border-gray-50 bg-[#F9FBF9]">
+                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Your Total Balance</p>
+                                    <h4 class="text-2xl font-black text-secondary tracking-tight">INR <?php echo e(number_format($user_balance, 2)); ?></h4>
+                                </div>
+                                <div class="p-2">
+                                    <?php
+                                        $earned = \App\Models\Transaction::where('practitioner_id', $user->id)->sum('practitioner_share');
+                                        $referralEarned = \App\Models\Transaction::where('referrer_id', $user->id)->sum('referrer_share');
+                                    ?>
+                                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="ri-calendar-check-line"></i></div>
+                                            <span class="text-xs font-bold text-gray-600">Session Earnings</span>
+                                        </div>
+                                        <span class="text-xs font-black text-secondary">₹<?php echo e(number_format($earned, 2)); ?></span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center"><i class="ri-user-shared-line"></i></div>
+                                            <span class="text-xs font-bold text-gray-600">Referral Shares</span>
+                                        </div>
+                                        <span class="text-xs font-black text-secondary">₹<?php echo e(number_format($referralEarned, 2)); ?></span>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-gray-50 text-center">
+                                    <a href="<?php echo e(route('transactions.index')); ?>" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View Transaction Vault</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notification -->
+                        <div class="relative">
+                            <div onclick="toggleNotifications('mobile')"
+                                class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 relative shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
+                                <i class="ri-notification-3-line text-lg"></i>
+                                <div id="notif-dot-mobile" class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full <?php echo e($user->unreadNotifications->count() > 0 ? '' : 'hidden'); ?>">
+                                </div>
+                            </div>
+                            <!-- Mobile Dropdown Anchor (teleport destination handled by script) -->
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-y-4 justify-center lg:justify-start text-center lg:text-left items-center gap-8">
+                    <img src="<?php echo e($user->profile_pic ? (str_starts_with($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png')); ?>" alt="Profile"
+                        class="w-25 lg:w-20 h-25 lg:h-20 rounded-full object-cover p-1 bg-white">
+                    <div>
+                        <h1 class="text-3xl lg:text-4xl font-bold font-sans! text-secondary mb-2"><?php echo e($user->name); ?></h1>
+                        <div class="flex flex-wrap gap-y-1 items-center text-gray-500 text-sm space-x-4">
+                            <span class="flex items-center"><i class="ri-map-pin-line mr-1"></i> <span id="loc-label"><?php echo e($user->profile?->city_state ?? ($user->profile?->address ?? __($site_settings['client_panel_location_not_set'] ?? 'Location not set'))); ?></span></span>
+                            <span class="flex items-center">
+                                <i class="ri-mail-line mr-1"></i> 
+                                <span id="id-label"><?php echo e(($user->role === 'client' || $user->role === 'patient') ? __('Client ID') : __('Professional ID')); ?></span>: 
+                                <?php echo e($user->profile?->client_id ?? ($user->profile?->registration_number ?? 'Z-' . (10000 + $user->id))); ?>
+
+                            </span>
+                            <span class="flex items-center text-secondary font-bold uppercase tracking-wider opacity-70">
+                                <i class="ri-user-star-line mr-1"></i>
+                                <?php echo e(str_replace('_', ' ', $user->role)); ?>
+
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center lg:justify-end items-center flex-wrap gap-y-4 space-x-4">
+                    <!-- Coin -->
+                    <div class="relative hidden lg:block">
+                        <div onclick="toggleBalance('desktop')"
+                            class="w-10 h-10 rounded-full bg-[#FFD166] flex items-center justify-center text-white relative shadow-sm cursor-pointer hover:bg-yellow-400 transition-colors">
+                            <span class="font-bold text-lg text-yellow-100">€</span>
+                            <div class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></div>
+                        </div>
+                        
+                        <div id="balance-dropdown-desktop" class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 hidden overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                            <div class="p-5 border-b border-gray-50 bg-[#F9FBF9]">
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Your Total Balance</p>
+                                <h4 class="text-2xl font-black text-secondary tracking-tight">INR <?php echo e(number_format($user_balance, 2)); ?></h4>
+                            </div>
+                            <div class="p-2">
+                                <?php
+                                    $earned = \App\Models\Transaction::where('practitioner_id', $user->id)->sum('practitioner_share');
+                                    $referralEarned = \App\Models\Transaction::where('referrer_id', $user->id)->sum('referrer_share');
+                                ?>
+                                <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="ri-calendar-check-line"></i></div>
+                                        <span class="text-xs font-bold text-gray-600">Session Earnings</span>
+                                    </div>
+                                    <span class="text-xs font-black text-secondary">₹<?php echo e(number_format($earned, 2)); ?></span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center"><i class="ri-user-shared-line"></i></div>
+                                        <span class="text-xs font-bold text-gray-600">Referral Shares</span>
+                                    </div>
+                                    <span class="text-xs font-black text-secondary">₹<?php echo e(number_format($referralEarned, 2)); ?></span>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
+                                <a href="<?php echo e(route('transactions.index')); ?>" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View Transaction Vault</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notification -->
+                    <div class="relative">
+                        <div onclick="toggleNotifications('desktop')" id="notif-btn-desktop"
+                            class="w-10 h-10 rounded-full bg-white border border-gray-200 hidden lg:flex items-center justify-center text-gray-600 relative shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
+                            <i class="ri-notification-3-line text-lg"></i>
+                            <div id="notif-dot-desktop" class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full <?php echo e($user->unreadNotifications->count() > 0 ? '' : 'hidden'); ?>"></div>
+                        </div>
+                    </div>
+
+                    <!-- Language Toggle (Desktop Only) -->
+                    <?php if(isset($available_languages) && $available_languages->count() >= 2): ?>
+                    <?php
+                    $lang1 = $available_languages->first();
+                    $lang2 = $available_languages->skip(1)->first();
+                    $currentLocale = App::getLocale();
+                    ?>
+                    <div class="hidden lg:block d-none !hidden">
+                        <button type="button"
+                            class="relative flex items-center bg-gray-100 rounded-full h-[44px] px-1 border border-gray-200 cursor-pointer focus:outline-none"
+                            onclick="toggleLanguage('<?php echo e($currentLocale == $lang1->code ? $lang2->code : $lang1->code); ?>')">
+                            <!-- Sliding Pill -->
+                            <div id="lang-toggle-pill"
+                                class="absolute top-1 bottom-1 left-1 w-9 bg-primary rounded-full shadow-sm transition-transform duration-300 ease-in-out <?php echo e($currentLocale == $lang2->code ? 'translate-x-full' : 'translate-x-0'); ?>">
+                            </div>
+
+                            <span id="lang-text-<?php echo e($lang1->code); ?>"
+                                class="relative z-10 w-9 text-center <?php echo e($currentLocale == $lang1->code ? 'text-white' : 'text-gray-500'); ?> text-[11px] font-bold transition-colors duration-300"><?php echo e(Str::ucfirst(substr($lang1->code, 0, 2))); ?></span>
+                            <span id="lang-text-<?php echo e($lang2->code); ?>"
+                                class="relative z-10 w-9 text-center <?php echo e($currentLocale == $lang2->code ? 'text-white' : 'text-gray-500'); ?> text-[11px] font-bold transition-colors duration-300"><?php echo e(Str::ucfirst(substr($lang2->code, 0, 2))); ?></span>
+                        </button>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if($user->role === 'client' || $user->role === 'patient'): ?>
+                    <a href="<?php echo e(route('find-practitioner')); ?>"
+                        class="bg-[#2B4C3B] hover:bg-[#1f372a] text-white px-5 py-2.5 rounded-full font-normal text-base transition-colors shadow-sm cursor-pointer">
+                        <span id="client_panel_book_session_btn" data-i18n="<?php echo e($site_settings['client_panel_book_session_btn'] ?? 'Book a New Consultation'); ?>"><?php echo e(__($site_settings['client_panel_book_session_btn'] ?? 'Book a New Consultation')); ?></span>
+                    </a>
+                    <?php endif; ?>                </div>
+            </header>
+            <?php endif; ?>
+
+            <?php if(!$isMeetingPopout && !$isPublicMeeting): ?>
+            <?php echo $__env->make('partials.client-mobile-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+            <?php endif; ?>
+
+            <?php echo $__env->yieldContent('content'); ?>
+
+            <!-- Padding for scroll -->
+            <div class="h-10"></div>
+        </div>
+    </main>
+
+    <?php echo $__env->make('partials.frontend.toast', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+    <?php echo $__env->yieldContent('scripts'); ?>
+    <script>
+        function openPopoutMeeting(channel, provider = 'jaas') {
+            const width = 480;
+            const height = 360;
+            const left = window.screen.width - width - 20;
+            const top = window.screen.height - height - 80;
+            
+            const url = `<?php echo e(url('/conference/session')); ?>/${channel}?provider=${provider}&popout=1`;
+            
+            window.open(url, `meeting_${channel}`, 
+                `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=no`);
+        }
+
+        function toggleLanguage(targetLocale) {
+            fetch(`<?php echo e(url('/lang')); ?>/${targetLocale}`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "<?php echo e(csrf_token()); ?>",
+                        "Accept": "application/json"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        // 1. Update translations using data-i18n
+                        if (data.translations) {
+                            document.querySelectorAll('[data-i18n]').forEach(el => {
+                                const key = el.getAttribute('data-i18n');
+                                el.textContent = data.translations[key] || key;
+                            });
+
+                             // Specific ID label update
+                             const idLabel = document.getElementById('id-label');
+                             if (idLabel) idLabel.textContent = data.translations['Client ID'] || (<?php echo e(($user->role === 'client' || $user->role === 'patient') ? 1 : 0); ?> ? 'Client ID' : 'Professional ID');
+                             
+                             // Update Settings-based elements
+                             if (data.data) {
+                                 Object.keys(data.data).forEach(key => {
+                                     document.querySelectorAll(`[id="${key}"], [id="${key}_mobile"]`).forEach(element => {
+                                         element.textContent = data.data[key];
+                                     });
+                                 });
+                             }
+                        }
+
+                        // 2. Update toggle UI (Sync all toggles)
+                        const pills = document.querySelectorAll('[id^="lang-toggle-pill"]');
+                        const langTexts = document.querySelectorAll('[id^="lang-text-"]');
+
+                        pills.forEach(pill => {
+                            <?php if(isset($available_languages) && $available_languages->count() >= 2): ?>
+                            <?php
+                                $l1 = $available_languages->first();
+                                $l2 = $available_languages->skip(1)->first();
+                            ?>
+                            if (targetLocale === '<?php echo e($l2->code); ?>') {
+                                pill.classList.remove('translate-x-0');
+                                pill.classList.add('translate-x-full');
+                            } else {
+                                pill.classList.remove('translate-x-full');
+                                pill.classList.add('translate-x-0');
+                            }
+                            <?php endif; ?>
+                        });
+
+                        langTexts.forEach(txt => {
+                            if (txt.id === `lang-text-${targetLocale}` || txt.id === `lang-text-${targetLocale}-mobile`) {
+                                txt.classList.remove('text-gray-500');
+                                txt.classList.add('text-white');
+                            } else {
+                                txt.classList.remove('text-white');
+                                txt.classList.add('text-gray-500');
+                            }
+                        });
+
+                        // 3. Update onclick for all toggle buttons
+                        <?php if(isset($available_languages) && $available_languages->count() >= 2): ?>
+                        <?php
+                            $l1 = $available_languages->first();
+                            $l2 = $available_languages->skip(1)->first();
+                        ?>
+                        const nextLocale = targetLocale === '<?php echo e($l1->code); ?>' ? '<?php echo e($l2->code); ?>' : '<?php echo e($l1->code); ?>';
+                        document.querySelectorAll('button[onclick^="toggleLanguage"]').forEach(btn => {
+                            btn.setAttribute('onclick', `toggleLanguage('${nextLocale}')`);
+                        });
+                        <?php endif; ?>
+                        
+                        console.log("Language switched dynamically to:", targetLocale);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error switching language:', error);
+                    window.location.href = `<?php echo e(url('/lang')); ?>/${targetLocale}`;
+                });
+        }
+
+        (function() {
+            const preloader = document.getElementById('global-preloader');
+            if (!preloader) return;
+
+            window.hidePreloader = () => {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+            };
+
+            window.showPreloader = () => {
+                preloader.style.opacity = '1';
+                preloader.style.visibility = 'visible';
+            };
+
+            // Hide on initial load
+            window.addEventListener('load', window.hidePreloader);
+
+            // Safety timeout - hide after 8s no matter what
+            setTimeout(window.hidePreloader, 8000);
+
+            // Handle Back/Forward Cache
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) window.hidePreloader();
+            });
+        })();
+    </script>
+    <!-- Notifications Dropdown -->
+    <div id="notifications-modal"
+        class="fixed lg:absolute z-[100] w-[calc(100vw-32px)] lg:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 pointer-events-none transition-all duration-300 transform scale-95 origin-top-right overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <h3 class="text-base font-bold text-secondary" data-i18n="Notifications"><?php echo e(__('Notifications')); ?></h3>
+            <button onclick="closeNotifDropdown()" class="text-gray-400 hover:text-gray-600 text-lg lg:hidden"><i class="ri-close-line"></i></button>
+        </div>
+        <div id="notifications-content" class="max-h-[60vh] lg:max-h-[400px] overflow-y-auto">
+            
+            <div id="notif-loader" class="p-8 text-center">
+                <i class="ri-loader-4-line text-2xl text-primary animate-spin inline-block"></i>
+            </div>
+            
+            <div id="notif-list" class="hidden"></div>
+            
+            <div id="notif-empty" class="hidden p-10 text-center">
+                <i class="ri-notification-off-line text-gray-200 text-3xl mb-2 block mx-auto"></i>
+                <p class="text-gray-400 text-xs" data-i18n="No notifications yet"><?php echo e(__('No notifications yet')); ?></p>
+            </div>
+        </div>
+        <div class="px-6 py-3 border-t border-gray-50 text-center bg-gray-50/30">
+            <a href="<?php echo e(route('notifications.index')); ?>" class="text-xs font-semibold text-primary hover:underline uppercase tracking-wider" data-i18n="View all"><?php echo e(__('View all')); ?></a>
+        </div>
+    </div>
+
+    <script>
+        function toggleNotifications(type) {
+            const dropdown = document.getElementById('notifications-modal');
+            const btn = type === 'mobile' ? document.querySelector('[onclick*="mobile"]') : document.getElementById('notif-btn-desktop');
+            const isOpen = dropdown.classList.contains('opacity-100');
+
+            if (isOpen) {
+                closeNotifDropdown();
+            } else {
+                if (type === 'desktop') {
+                    // Position absolute relative to button
+                    const rect = btn.getBoundingClientRect();
+                    dropdown.style.top = (rect.bottom + window.scrollY + 10) + 'px';
+                    dropdown.style.left = 'auto';
+                    dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+                    dropdown.classList.remove('fixed');
+                    dropdown.classList.add('absolute');
+                } else {
+                    // Mobile fixed at top
+                    dropdown.style.top = '70px';
+                    dropdown.style.left = '16px';
+                    dropdown.style.right = '16px';
+                    dropdown.style.width = 'calc(100vw - 32px)';
+                    dropdown.classList.add('fixed');
+                    dropdown.classList.remove('absolute');
+                }
+
+                dropdown.classList.remove('opacity-0', 'pointer-events-none');
+                dropdown.classList.add('opacity-100');
+                setTimeout(() => dropdown.classList.remove('scale-95'), 10);
+                
+                fetchNotifications();
+
+                // Close on outside click
+                const clickOutside = (e) => {
+                    if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+                        closeNotifDropdown();
+                        document.removeEventListener('click', clickOutside);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', clickOutside), 10);
+            }
+        }
+
+        function closeNotifDropdown() {
+            const dropdown = document.getElementById('notifications-modal');
+            dropdown.classList.add('scale-95');
+            dropdown.classList.remove('opacity-100');
+            dropdown.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function fetchNotifications() {
+            const loader = document.getElementById('notif-loader');
+            const list = document.getElementById('notif-list');
+            const empty = document.getElementById('notif-empty');
+
+            loader.classList.remove('hidden');
+            list.classList.add('hidden');
+            empty.classList.add('hidden');
+
+            fetch("<?php echo e(route('notifications.index')); ?>", {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(res => {
+                loader.classList.add('hidden');
+                if (res.data && res.data.length > 0) {
+                    list.innerHTML = '';
+                    res.data.forEach(notif => {
+                        const date = new Date(notif.created_at).toLocaleDateString();
+                        const html = `
+                            <a href="#" class="block px-6 py-4 border-b border-gray-50 hover:bg-gray-50/50 transition-colors ${notif.read_at ? 'opacity-60' : ''}">
+                                <div class="flex gap-4">
+                                    <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                        <i class="ri-notification-3-fill text-primary text-sm"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs text-gray-800 font-medium mb-1 line-clamp-2">${notif.data.message || 'New notification'}</p>
+                                        <p class="text-[10px] text-gray-400 capitalize">${date}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                        list.insertAdjacentHTML('beforeend', html);
+                    });
+                    list.classList.remove('hidden');
+                } else {
+                    empty.classList.remove('hidden');
+                }
+
+                // Update dots
+                const dotMobile = document.getElementById('notif-dot-mobile');
+                const dotDesktop = document.getElementById('notif-dot-desktop');
+                if (res.count > 0) {
+                    dotMobile?.classList.remove('hidden');
+                    dotDesktop?.classList.remove('hidden');
+                } else {
+                    dotMobile?.classList.add('hidden');
+                    dotDesktop?.classList.add('hidden');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                loader.classList.add('hidden');
+                empty.classList.remove('hidden');
+            });
+        }
+
+        function toggleBalance(type) {
+            const dropdown = document.getElementById('balance-dropdown-' + type);
+            const otherType = type === 'mobile' ? 'desktop' : 'mobile';
+            const otherDropdown = document.getElementById('balance-dropdown-' + otherType);
+            
+            // Close other dropdown
+            otherDropdown?.classList.add('hidden');
+            
+            // Toggle current
+            dropdown.classList.toggle('hidden');
+
+            if (!dropdown.classList.contains('hidden')) {
+                const closeHandler = (e) => {
+                    if (!dropdown.contains(e.target) && !e.target.closest('[onclick^="toggleBalance"]')) {
+                        dropdown.classList.add('hidden');
+                        document.removeEventListener('click', closeHandler);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', closeHandler), 10);
+            }
+        }
+
+        function openLogoutModal() {
+            const modal = document.getElementById('logoutConfirmModal');
+            const content = document.getElementById('logoutModalContent');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeLogoutModal() {
+            const modal = document.getElementById('logoutConfirmModal');
+            const content = document.getElementById('logoutModalContent');
+            content.classList.add('scale-95', 'opacity-0');
+            content.classList.remove('scale-100', 'opacity-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 200);
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('logoutConfirmModal');
+            if (event.target == modal) closeLogoutModal();
+        });
+    </script>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutConfirmModal" class="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[40px] w-full max-w-[340px] overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-200" id="logoutModalContent">
+            <div class="p-10 text-center">
+                <div class="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-red-100">
+                    <i class="ri-logout-box-r-line text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-black text-secondary mb-3 tracking-tight">Confirm Logout?</h3>
+                <p class="text-gray-500 mb-8 leading-relaxed font-medium text-base">Are you sure you want to end your session and logout of the portal?</p>
+                
+                <div class="flex flex-col gap-3">
+                    <button type="button" onclick="document.getElementById('logout-form').submit();" class="w-full py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 transition-all text-lg shadow-xl shadow-red-200">Yes, Logout</button>
+                    <button type="button" onclick="closeLogoutModal()" class="w-full py-4 bg-gray-50 text-gray-500 font-black rounded-2xl hover:bg-gray-100 transition-all text-lg">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php echo $__env->yieldPushContent('scripts'); ?>
+</body>
+
+</html>
+<?php /**PATH C:\wamp64\www\zaya\resources\views/layouts/client.blade.php ENDPATH**/ ?>

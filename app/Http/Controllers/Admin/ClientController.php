@@ -176,9 +176,9 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
-            'middle_name' => 'nullable|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
-            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'first_name' => 'required|string|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
+            'middle_name' => 'nullable|string|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'dob' => 'nullable|date',
@@ -186,8 +186,8 @@ class ClientController extends Controller
             'occupation' => 'nullable|string|max:255',
             'address_line_1' => 'required|string|max:500',
             'address_line_2' => 'nullable|string|max:500',
-            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
-            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'city' => 'required|string|max:100|regex:/^[\p{L}\s\-\'.]+$/u',
+            'state' => 'required|string|max:100|regex:/^[\p{L}\s\-\'.]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255',
             'mobile_country_code' => 'nullable|string',
@@ -197,6 +197,12 @@ class ClientController extends Controller
             'referral_type' => 'nullable|string',
             'referrer_name' => 'nullable|string|max:255',
             'profile_photo' => 'nullable|image|max:2048',
+        ], [
+            'first_name.regex' => 'First name can only contain letters, spaces, hyphens, apostrophes, and dots.',
+            'middle_name.regex' => 'Middle name can only contain letters, spaces, hyphens, apostrophes, and dots.',
+            'last_name.regex' => 'Last name can only contain letters, spaces, hyphens, apostrophes, and dots.',
+            'city.regex' => 'City can only contain letters, spaces, hyphens, apostrophes, and dots.',
+            'state.regex' => 'State can only contain letters, spaces, hyphens, apostrophes, and dots.',
         ]);
 
         $user = User::create([
@@ -254,9 +260,9 @@ class ClientController extends Controller
         $user = User::findOrFail($id);
 
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
-            'middle_name' => 'nullable|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
-            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'first_name' => 'required|string|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
+            'middle_name' => 'nullable|string|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'dob' => 'nullable|date',
@@ -264,8 +270,8 @@ class ClientController extends Controller
             'occupation' => 'nullable|string|max:255',
             'address_line_1' => 'required|string|max:500',
             'address_line_2' => 'nullable|string|max:500',
-            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
-            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'city' => 'required|string|max:100|regex:/^[\p{L}\s\-\'.]+$/u',
+            'state' => 'required|string|max:100|regex:/^[\p{L}\s\-\'.]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255',
             'mobile_country_code' => 'nullable|string',
@@ -275,6 +281,12 @@ class ClientController extends Controller
             'referral_type' => 'nullable|string',
             'referrer_name' => 'nullable|string|max:255',
             'profile_photo' => 'nullable|image|max:2048',
+        ], [
+            'first_name.regex' => 'First name can only contain letters, spaces, hyphens, apostrophes, and dots.',
+            'middle_name.regex' => 'Middle name can only contain letters, spaces, hyphens, apostrophes, and dots.',
+            'last_name.regex' => 'Last name can only contain letters, spaces, hyphens, apostrophes, and dots.',
+            'city.regex' => 'City can only contain letters, spaces, hyphens, apostrophes, and dots.',
+            'state.regex' => 'State can only contain letters, spaces, hyphens, apostrophes, and dots.',
         ]);
 
         $user->first_name = $validatedData['first_name'];

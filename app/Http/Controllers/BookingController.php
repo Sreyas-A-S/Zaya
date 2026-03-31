@@ -44,7 +44,29 @@ class BookingController extends Controller
         // ... (check availability)
 
         // --- Razorpay Payment Link Creation ---
-        // ... (auth and amount calculation)
+        $paymentUrl = null;
+        $razorpayKey = config('services.razorpay.key');
+        $razorpaySecret = config('services.razorpay.secret');
+
+        if ($razorpayKey && $razorpaySecret) {
+            try {
+                $response = Http::withBasicAuth($razorpayKey, $razorpaySecret)
+                    ->post('https://api.razorpay.com/v1/payment_links', [
+                        'amount' => (int)($request->total_price * 100),
+                        'currency' => $currency,
+                        'accept_partial' => false,
+                        'description' => 'Booking Session - Zaya Wellness',
+                        'customer' => [
+                            'name' => Auth::user()->name,
+                            'email' => Auth::user()->email,
+                            'contact' => Auth::user()->phone ?? '',
+                        ],
+                        'notify' => [
+                            'sms' => true,
+                            'email' => true,
+                        ],
+                        'callback_url' => route('booking.callback'),
+                        'callback_method' => 'get',
                         'notes' => [
                             'practitioner_id' => $request->practitioner_id,
                             'booking_date' => $request->booking_date,

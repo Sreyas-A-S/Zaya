@@ -78,7 +78,7 @@
 
     /* Use local sprite path so dropdown flags render */
     .iti__flag {
-        background-image: url("{{ asset('admiro/assets/css/images/flags.png') }}") !important;
+        background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags.png") !important;
     }
 
     #editProfileModal .iti--separate-dial-code .iti__selected-flag {

@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endpush
 
-@section('title', 'Mindfulness Practitioners')
+@section('title', 'Mindfulness Counsellors')
 
 @section('content')
 <style>
@@ -28,13 +28,13 @@
     <div class="page-title">
         <div class="row">
             <div class="col-sm-6">
-                <h3>Mindfulness Practitioners</h3>
+                <h3>Mindfulness Counsellors</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="fa-solid fa-house"></i></a></li>
                     <li class="breadcrumb-item">Practitioners</li>
-                    <li class="breadcrumb-item active">Mindfulness Practitioners</li>
+                    <li class="breadcrumb-item active">Mindfulness Counsellors</li>
                 </ol>
             </div>
         </div>
@@ -92,7 +92,7 @@
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="form-modal-title">Register Mindfulness Practitioner</h5>
+                <h5 class="modal-title" id="form-modal-title">Register Mindfulness Counsellor</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4" style="max-height: 80vh; overflow-y: auto;">
@@ -158,7 +158,7 @@
                                         <div class="col-md-4">
                                             <label class="form-label">First Name <span class="text-danger">*</span></label>
                                             <input class="form-control validate-char-limit" type="text" name="first_name" required maxlength="50" data-max="50"
-                                                pattern="^[A-Za-z\s]{1,50}$" title="Only letters allowed (1-50 characters)">
+                                                pattern="^[A-Z][A-Za-z\s]{0,49}$" title="First letter must be capital and only letters allowed">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                         </div>
 
@@ -166,7 +166,7 @@
                                         <div class="col-md-4">
                                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
                                             <input class="form-control validate-char-limit" type="text" name="last_name" required maxlength="50" data-max="50"
-                                                pattern="^[A-Za-z\s]{1,50}$" title="Only letters allowed (1-50 characters)">
+                                                pattern="^[A-Z][A-Za-z\s]{0,49}$" title="First letter must be capital and only letters allowed">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                         </div>
 
@@ -335,7 +335,7 @@
                                                 <option value="Other">Other</option>
                                             </select>
 
-                                            <small class="text-muted">Hold CTRL to select multiple</small>
+                                           
                                         </div>
 
                                         <!-- Years of Experience -->
@@ -728,7 +728,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Mindfulness Practitioner Details</h5>
+                <h5 class="modal-title">Mindfulness Counsellor Details</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="view-modal-content">
@@ -1897,17 +1897,17 @@
                 selector: 'input[name="first_name"]',
                 check: (el) => {
                     if (!el.val()) return true;
-                    return /^[a-zA-Z\s]{2,50}$/.test(el.val());
+                    return /^[A-Z][A-Za-z\s]{0,49}$/.test(el.val());
                 },
-                message: 'Only letters allowed (2-50 characters)'
+                message: 'First letter must be capital and only letters allowed'
             },
             {
                 selector: 'input[name="last_name"]',
                 check: (el) => {
                     if (!el.val()) return true;
-                    return /^[a-zA-Z\s]{1,50}$/.test(el.val());
+                    return /^[A-Z][A-Za-z\s]{0,49}$/.test(el.val());
                 },
-                message: 'Only letters allowed (1-50 characters)'
+                message: 'First letter must be capital and only letters allowed'
             },
             {
                 selector: 'input[name="phone"]',

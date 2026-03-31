@@ -16,9 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('practitioner_id')->constrained('practitioners')->onDelete('cascade');
             $table->date('booking_date');
-            $table->string('booking_time');
+            $table->string('booking_time', 50);
             $table->string('reservation_token')->unique();
-            $table->string('status')->default('reserved'); // reserved, confirmed, expired
+            $table->string('status', 20)->default('reserved'); // reserved, confirmed, expired
             $table->json('booking_data')->nullable(); // Store booking details for confirmation
             $table->timestamp('expires_at'); // Reservation expires after 15 minutes
             $table->timestamps();

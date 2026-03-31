@@ -213,7 +213,7 @@
                         <div class="col-md-4">
                             <label class="form-label">First Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control validate-char-limit" name="first_name" required 
-                                maxlength="50" data-max="50" pattern="^[A-Z][a-zA-Z\s]{1,49}$" 
+                                maxlength="50" data-max="50" pattern="^[A-Z][A-Za-z0-9\s]{1,49}$"
                                 title="First letter must be capital (Example: John)"
                                 oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)"
                                 placeholder="Enter first name">
@@ -230,7 +230,7 @@
                         <div class="col-md-4">
                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control validate-char-limit" name="last_name" required 
-                                maxlength="50" data-max="50" pattern="^[A-Z][a-zA-Z\s]{0,49}$" 
+                                maxlength="50" data-max="50" pattern="^[A-Z][A-Za-z0-9\s]{1,49}$"
                                 title="First letter must be capital (Example: S)"
                                 oninput="this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1)"
                                 placeholder="Enter last name">

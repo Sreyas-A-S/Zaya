@@ -54,7 +54,7 @@
                     @endif
 
                     @if(auth()->user()->hasPermission('mindfulness-practitioners-view'))
-                    <li> <a href="{{ route('admin.mindfulness-practitioners.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_mindfulness_practitioners'] ?? 'Mindfulness Practitioners' }}</a></li>
+                    <li> <a href="{{ route('admin.mindfulness-practitioners.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_mindfulness_practitioners'] ?? 'Mindfulness Counsellors' }}</a></li>
                     @endif
 
                     @if(auth()->user()->hasPermission('yoga-therapists-view'))

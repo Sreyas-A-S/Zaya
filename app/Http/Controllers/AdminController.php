@@ -103,16 +103,16 @@ class AdminController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'first_name' => 'required|string|min:1|max:50|regex:/^[a-zA-Z\s\-]+$/',
-            'last_name' => 'required|string|min:1|max:50|regex:/^[a-zA-Z\s\-]+$/',
+            'first_name' => 'required|string|min:1|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
+            'last_name' => 'required|string|min:1|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
             'email' => 'required|email:rfc,dns|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|min:7|max:20',
             'national_id' => 'nullable|exists:countries,id',
             'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'cropped_image' => 'nullable|string',
         ], [
-            'first_name.regex' => 'First name can only contain letters, spaces, and hyphens.',
-            'last_name.regex' => 'Last name can only contain letters, spaces, and hyphens.',
+            'first_name.regex' => 'First name can only contain letters, spaces, hyphens, apostrophes, and dots.',
+            'last_name.regex' => 'Last name can only contain letters, spaces, hyphens, apostrophes, and dots.',
             'national_id.exists' => 'Selected nationality is invalid.',
         ]);
 

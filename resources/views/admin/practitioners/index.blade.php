@@ -239,7 +239,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control validate-char-limit" name="zip_code" required maxlength="10" data-max="10" pattern="^[A-Za-z0-9\s\-]{3,10}$" placeholder="Pincode">
+                                            <input type="text" class="form-control validate-char-limit" name="zip_code" required maxlength="10" data-max="10" pattern="^[A-Za-z0-9\s\-]{3,10}$" placeholder="Zip code">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 10 characters allowed.</div>
                                         </div>
                                         <div class="col-md-6">
@@ -626,7 +626,7 @@
 <style>
     /* Fix for intl-tel-input flags showing wrong/misaligned in Admiro theme */
     .iti__flag {
-        background-image: url("{{ asset('admiro/assets/css/images/flags.png') }}") !important;
+        background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags.png") !important;
     }
     @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
         .iti__flag {

@@ -170,8 +170,8 @@ class DoctorController extends Controller
     {
         $validatedData = $request->validate([
             // A. Personal Details
-            'first_name' => 'required|string|max:40|regex:/^[a-zA-Z\s\-]+$/u',
-            'last_name' => 'required|string|max:40|regex:/^[a-zA-Z\s\-]+$/u',
+            'first_name' => 'required|string|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
             'mobile_number' => 'required|string|max:15|regex:/^[0-9\s\-\+\(\)]+$/',

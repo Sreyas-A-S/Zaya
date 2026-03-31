@@ -465,6 +465,7 @@
     function openCreateModal() {
         $('#form-modal-title').text('Add Service');
         $('#service-form')[0].reset();
+        $('#remove-main-input').remove();
         $('#form-method').val('POST');
         $('#service_id').val('');
         $('input[type="checkbox"][name="categories[]"]').prop('checked', false);
@@ -493,8 +494,8 @@
                     <img src="${img.path}" class="w-100 h-100 object-fit-cover rounded ${borderClass}">
                     ${badge}
                     <div class="media-action-overlay rounded">
-                        <button type="button" class="btn btn-primary btn-sm" onclick="setMain('existing', ${img.id})">Set Main</button>
-                        ${!isMain ? `<button type="button" class="btn btn-danger btn-sm" onclick="deleteExistingImage(event, ${img.id})"><i class="fa fa-trash"></i></button>` : ''}
+                        <button type="button" class="btn btn-primary btn-sm" onclick="setMain('existing', '${img.id}')">Set Main</button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteExistingImage(event, '${img.id}')"><i class="fa fa-trash"></i></button>
                     </div>
                 </div>
             `;
@@ -514,7 +515,7 @@
                     <div class="media-action-overlay rounded">
                         <button type="button" class="btn btn-primary btn-sm" onclick="setMain('new', ${index})">Set Main</button>
                         <button type="button" class="btn btn-warning btn-sm" onclick="openCropper(${index})"><i class="fa fa-crop"></i></button>
-                        ${!isMain ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeNewFile(event, ${index})"><i class="fa fa-trash"></i></button>` : ''}
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeNewFile(event, ${index})"><i class="fa fa-trash"></i></button>
                     </div>
                 </div>
             `;
@@ -607,13 +608,22 @@
         e.stopPropagation();
         if (!confirm('Delete this image permanently?')) return;
 
-        let url = "";
-        // Need to check if it's a gallery image or the main image (though main doesn't have delete btn in UI)
         let img = existingImages.find(i => i.id == id);
 
         if (img.type === 'main') {
-            // Should not happen as delete btn is hidden for main, but safe check
-            alert("Cannot delete the active main image. Select another main image first.");
+            $('#service-form').append('<input type="hidden" name="remove_main_image" value="1" id="remove-main-input">');
+            existingImages = existingImages.filter(i => i.id != id);
+            
+            if (mainSelection && mainSelection.type === 'existing' && mainSelection.id == id) {
+                mainSelection = null;
+            }
+            
+            if (!mainSelection && (existingImages.length > 0 || newFiles.length > 0)) {
+                if (existingImages.length > 0) setMain('existing', existingImages[0].id);
+                else if (newFiles.length > 0) setMain('new', 0);
+            }
+            
+            renderMediaGrid();
             return;
         }
 
@@ -811,6 +821,7 @@
             let id = $(this).data('id');
             $.get("{{ url('admin/services') }}/" + id + "/edit", function(data) {
                 $('#form-modal-title').text('Edit Service');
+                $('#remove-main-input').remove();
                 $('#form-method').val('PUT');
                 $('#service_id').val(data.id);
                 $('input[name="title"]').val(data.title);

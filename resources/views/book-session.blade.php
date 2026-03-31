@@ -218,7 +218,7 @@
                     </div>
                 </div>
 
-                <!-- Practitioner Card -->
+                <!-- Mindfulness Counsellor Card -->
                 <div
                     class="bg-[#F5F5F5] rounded-2xl p-6 mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
@@ -243,14 +243,14 @@
                         </div>
                     </div>
                     <button type="button" onclick="openPractitionerModal()"
-                        class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors" data-i18n="Change Practitioner">
-                        {{ __('Change Practitioner') }}
+                        class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors" data-i18n="Change Mindfulness Counsellor">
+                        {{ __('Change Mindfulness Counsellor') }}
                     </button>
                 </div>
 
-                <!-- Why do you want to meet this practitioner -->
+                <!-- Why do you want to meet this counsellor -->
                 <div class="mb-10">
-                    <h3 class="text-gray-700 font-normal mb-4 text-lg" data-i18n="Why do you want to meet this practitioner?">{{ __('Why do you want to meet this practitioner?') }}
+                    <h3 class="text-gray-700 font-normal mb-4 text-lg" data-i18n="Why do you want to meet this counsellor?">{{ __('Why do you want to meet this counsellor?') }}
                     </h3>
                     <input type="text" id="conditions-input" placeholder="{{ __('Add conditions...') }}" readonly 
                         class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400 mb-4 cursor-default" data-i18n-placeholder="Add conditions...">
@@ -267,7 +267,7 @@
                             </label>
                             @endif
                         @empty
-                            <p class="text-sm text-gray-500">{{ __('This practitioner has not listed specific conditions.') }}</p>
+                            <p class="text-sm text-gray-500">{{ __('This counsellor has not listed specific conditions.') }}</p>
                         @endforelse
                     </div>
                 </div>
@@ -520,8 +520,8 @@
                     </div>
                 </div>
                 <button type="button" onclick="openPractitionerModal()"
-                    class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors">
-                    Change Practitioner
+                    class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors" data-i18n="Change Mindfulness Counsellor">
+                    {{ __('Change Mindfulness Counsellor') }}
                 </button>
             </div>
 
@@ -659,7 +659,7 @@
             <div class="text-center py-8 mb-8"
                 style="background: linear-gradient(90deg, #FFFFFF 0%, #F0F0F0 48%, #FFFFFF 100%);">
                 <p class="text-gray-400 text-sm mb-1">Total</p>
-                <div class="text-4xl font-medium text-gray-900 flex items-center justify-center gap-2">
+                <div class="text-4xl font-medium text-gray-900 flex items-center justify-center gap-2" id="step-3-total-amount">
                     {{ $defaultCurrencySymbol }} 0.00 <span class="text-xl text-gray-400 font-normal">/ {{ $defaultCurrencyBooking }}</span>
                 </div>
             </div>
@@ -1048,6 +1048,7 @@
 
             function updateStep3Services() {
                 const container = document.getElementById('step3-services-container');
+                const step3Content = document.getElementById('step-3-content');
                 if (!container) return;
 
                 const selectedServices = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
@@ -1055,16 +1056,18 @@
 
                 if (selectedServices.length === 0) {
                     container.innerHTML = '<div class="text-sm text-gray-400">No services selected.</div>';
+                    if (step3Content) step3Content.classList.add('hidden');
                     updateTotalPrice(0);
                     return;
                 }
 
                 let total = 0;
+                let validServiceCount = 0;
+                let determinedCurrencyCode = null;
 
                 selectedServices.forEach(checkbox => {
                     const label = checkbox.closest('.service-tag-label');
                     const serviceName = checkbox.value;
-                    const serviceNameLower = serviceName.toLowerCase();
                     const serviceId = label.dataset.serviceId;
 
                     // Find scheduling details in Step 2
@@ -1072,15 +1075,22 @@
                     let duration = "Duration";
                     let day = "Day";
                     let time = "Time";
-                    let price = 0; // will be set from selected rate
+                    let price = 0; 
                     let currencySymbol = lastCurrencySymbol;
 
                     if (scheduleItem) {
-                        duration = scheduleItem.querySelector('.duration-value').value || "Duration";
+                        const durationVal = scheduleItem.querySelector('.duration-value').value;
+                        const dayVal = scheduleItem.querySelector('.day-value').value;
+                        const timeVal = scheduleItem.querySelector('.time-value').value;
+
+                        if (durationVal && dayVal && timeVal) {
+                            validServiceCount++;
+                        }
+
+                        duration = durationVal || "Duration";
                         day = scheduleItem.querySelector('.day-label').textContent || "Day";
                         time = scheduleItem.querySelector('.time-label').textContent || "Time";
 
-                        // Extract numeric price from duration if possible, otherwise default
                         const durationRadio = scheduleItem.querySelector('input[type="radio"]:checked');
                         if (durationRadio) {
                             const priceSpan = durationRadio.closest('label').querySelector('[data-symbol]');
@@ -1089,7 +1099,11 @@
                                 const priceText = priceSpan.textContent.replace(/[^\d.]/g, '');
                                 price = parseFloat(priceText) || 0;
                                 const currencyCode = priceSpan.dataset.currency || 'INR';
-                                document.getElementById('booking-currency').value = currencyCode;
+                                
+                                // Set currency code from the first service found with one
+                                if (!determinedCurrencyCode) {
+                                    determinedCurrencyCode = currencyCode;
+                                }
                             }
                         }
                     }
@@ -1126,11 +1140,28 @@
                     container.insertAdjacentHTML('beforeend', html);
                 });
 
+                // Update the hidden currency input for the entire booking
+                if (determinedCurrencyCode) {
+                    const currencyInput = document.getElementById('booking-currency');
+                    if (currencyInput) currencyInput.value = determinedCurrencyCode;
+                }
+
+                // Show/hide Step 3 based on whether we have any services selected
+                if (step3Content) {
+                    if (selectedServices.length > 0) {
+                        step3Content.classList.remove('hidden');
+                    } else {
+                        step3Content.classList.add('hidden');
+                    }
+                }
+
                 updateTotalPrice(total, lastCurrencySymbol);
             }
 
+
             function updateTotalPrice(total, currencySymbol = lastCurrencySymbol) {
-                const priceContainer = document.querySelector('.text-4xl.font-medium.text-gray-900');
+                const priceContainer = document.getElementById('step-3-total-amount');
+                const step3Content = document.getElementById('step-3-content');
                 lastComputedTotal = total;
                 
                 const finalTotal = Math.max(0, total - promoDiscountAmount);
@@ -1138,6 +1169,16 @@
                 const showTest = testToggle && testToggle.checked;
                 const currencyCode = document.getElementById('booking-currency')?.value || 'INR';
                 
+                // Show/hide payment section based on total
+                if (step3Content) {
+                    if (total > 0 || currentStep === 3) {
+                        step3Content.classList.remove('hidden');
+                    } else {
+                        // Keep hidden if total is 0, unless user explicitly stayed on step 3
+                        step3Content.classList.add('hidden');
+                    }
+                }
+
                 // Update Breakdown UI
                 const breakdownEl = document.getElementById('discount-breakdown');
                 if (promoDiscountAmount > 0) {
@@ -1829,7 +1870,7 @@
 
             // If no slots available, show message and don't display the header/grid
             if (!slots || slots.length === 0) {
-                const html = `<div class="text-center py-6 text-sm text-gray-500">No available slots for this practitioner on the selected date.</div>`;
+                const html = `<div class="text-center py-6 text-sm text-gray-500">No available slots for this counsellor on the selected date.</div>`;
                 wrapper.innerHTML = html;
                 return;
             }
@@ -1963,11 +2004,11 @@
 
             <div>
                 <div class="ps-8 pe-8 lg:ps-10 lg:pe-0 pt-8">
-                    <h2 class="text-[22px] font-medium text-[#252525] mb-6">Select Practitioner</h2>
+                    <h2 class="text-[22px] font-medium text-[#252525] mb-6">Select Mindfulness Counsellor</h2>
                     <div class="relative max-w-[380px] mb-8">
                         <i
                             class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]"></i>
-                        <input type="text" placeholder="Search Practitioner"
+                        <input type="text" placeholder="Search Mindfulness Counsellor"
                             class="w-full pl-11 pr-4 h-[48px] rounded-full border border-[#D0D0D0] text-sm text-gray-700 outline-none focus:border-[#FABD4D] transition-colors placeholder:text-[#8B8B8B]">
                     </div>
                 </div>

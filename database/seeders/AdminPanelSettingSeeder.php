@@ -130,7 +130,7 @@ class AdminPanelSettingSeeder extends Seeder
             ],
             [
                 'key' => 'admin_panel_sidebar_mindfulness_practitioners',
-                'value' => 'Mindfulness Practitioners',
+                'value' => 'Mindfulness Counsellors',
                 'type' => 'text',
                 'section' => 'admin_panel',
                 'max_length' => 60,

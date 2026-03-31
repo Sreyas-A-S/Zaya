@@ -1,0 +1,672 @@
+<?php $__env->startSection('content'); ?>
+
+    <!-- Hero Section -->
+    <section class="pt-[122px] lg:pt-[150px] pb-12 px-4 md:px-6 bg-white">
+        <div
+            class="container mx-auto relative min-h-[500px] md:min-h-[600px] rounded-3xl overflow-hidden flex items-center justify-center">
+            <!-- Background Image Slider -->
+            <div class="absolute inset-0 z-0">
+                <div class="swiper heroSlider h-full w-full">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <img src="<?php echo e(asset('frontend/assets/hero-banner-01.jpg')); ?>" alt="Wellness Spa"
+                                class="w-full h-full object-cover">
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="<?php echo e(asset('frontend/assets/hero-banner-02.jpg')); ?>" alt="Wellness Spa"
+                                class="w-full h-full object-cover">
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="<?php echo e(asset('frontend/assets/hero-banner-03.jpg')); ?>" alt="Wellness Spa"
+                                class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                <!-- Overlay -->
+                <div class="absolute inset-0 bg-black/40 z-10"></div>
+            </div>
+
+            <!-- Content (Static - Does not slide) -->
+            <div class="relative z-20 text-center px-4 sm:px-16 py-4 max-w-3xl mx-auto animate-on-scroll">
+
+                <!-- Search Bar -->
+                <form action="<?php echo e(route('find-practitioner.post')); ?>" method="POST"
+                    class="bg-white/20 backdrop-blur-md rounded-3xl md:rounded-full px-4 md:ps-6 md:pe-2 py-4 md:py-2 mb-6 lg:mb-14 flex flex-col md:flex-row items-center max-w-5xl mx-auto border border-[#FDE2D8] gap-4 md:gap-0 relative search-container">
+                    <?php echo csrf_field(); ?>
+                    <!-- Section 1 -->
+                    <div
+                        class="w-full md:flex-1 flex items-center border-b md:border-b-0 md:border-r border-white/30 pb-3 md:pb-0 md:pr-2">
+                        <i class="ri-search-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg search-icon"></i>
+                        <input id="hero_search_input" type="text"
+                            name="query"
+                            placeholder="<?php echo e($settings['hero_search_placeholder_1'] ?? 'Practitioners, Treatments...'); ?>"
+                            autocomplete="off"
+                            class="bg-transparent border-none outline-none text-[#FDE2D8] placeholder-[#FDE2D8]/80 w-full text-base font-normal">
+                    </div>
+                    <!-- Section 2 -->
+                    <div class="w-full md:flex-1 flex items-center md:pl-3 pb-2 md:pb-0 md:pr-2">
+                        <i class="ri-map-pin-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg"></i>
+                        <input id="hero_search_placeholder_2" type="text"
+                            name="pincode"
+                            value="<?php echo e(session('global_pincode')); ?>"
+                            placeholder="<?php echo e($settings['hero_search_placeholder_2'] ?? 'City, Postal code...'); ?>"
+                            maxlength="6"
+                            pattern="[0-9]{6}"
+                            inputmode="numeric"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,6);"
+                            class="bg-transparent border-none outline-none text-[#FDE2D8] placeholder-[#FDE2D8]/80 w-full text-base font-normal">
+                    </div>
+
+                    <button type="submit"
+                        class="bg-white text-secondary w-full md:w-[62px] h-12 md:h-[62px] rounded-full flex items-center justify-center hover:bg-opacity-90 transition-all gap-2">
+                        <span class="md:hidden font-medium text-[#CD8162]">Search</span>
+                        <i class="ri-search-line text-lg md:text-[26px] text-[#CD8162]"></i>
+                    </button>
+
+                    <!-- Search Results Dropdown -->
+                    <div id="hero-search-results" class="dropdown-menu absolute z-50 left-0 right-0 top-[calc(100%+16px)] bg-white border border-gray-100 rounded-2xl shadow-[0_5px_30px_rgba(0,0,0,0.1)] py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px] overflow-hidden text-left">
+                        <div class="max-h-[360px] overflow-y-auto px-1 custom-scrollbar flex flex-col gap-0.5">
+                            <!-- Results will be injected here -->
+                        </div>
+                    </div>
+                </form>
+
+
+
+                
+
+                <h1 id="hero_title" class="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-white mb-4 lg:mb-6">
+                    <?php echo e($settings['hero_title'] ?? 'Where Indian Wisdom Meets Modern Wellness'); ?>
+
+                </h1>
+                <p id="hero_subtitle" class="font-serif text-base md:text-xl text-white/90 font-normal  mb-8 lg:mb-8">
+                    <?php echo e($settings['hero_subtitle'] ?? 'Personalized wellness guided by experienced practitioners and trusted holistic experts.'); ?>
+
+                </p>
+
+                <a id="hero_button_text" href="<?php echo e(route('about-us')); ?>"
+                    class="bg-white text-primary px-6 py-3 rounded-full text-base md:text-lg font-medium border border-white hover:bg-primary hover:text-white transition-all shadow-lg hover:shadow-xl"><?php echo e($settings['hero_button_text'] ?? 'Discover Our Story'); ?></a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Services Section -->
+    <section id="services" class="pt-0 pb-6 xl:pt-2 relative">
+        <img src="<?php echo e(asset('frontend/assets/leaf-01.png')); ?>" alt="Leaf Image"
+            class="absolute -top-10 sm:top-0 md:top-0 xl:top-6 left-0 z-2 w-20 md:w-[100px] lg:w-[150px] xl:w-[200px] pointer-events-none">
+
+        <img src="<?php echo e(asset('frontend/assets/holy-basil.png')); ?>" alt="Thulasi Image"
+            class="absolute -top-10 sm:top-0 md:top-20 xl:top-16 right-0 z-2 w-[80px] md:w-[120px] lg:w-[163px] pointer-events-none">
+
+        <img src="<?php echo e(asset('frontend/assets/circle-outlines.png')); ?>" alt="Circle Outlines Image"
+            class="absolute top-40 lg:top-30 xl:top-26 right-0 z-0 w-[120px] md:w-[200px] pointer-events-none">
+
+        <div class="container mx-auto">
+            <div class="text-center mb-16 animate-on-scroll px-4">
+                <h2 id="services_title"
+                    class="text-3xl sm:text-4xl lg:text-5xl font-serif text-primary mb-2 sm:mb-3 md:mb-4 lg:mb-5 font-bold">
+                    <?php echo e($settings['services_title'] ?? 'Our Services'); ?>
+
+                </h2>
+                <h3 id="services_subtitle" class="text-secondary font-serif text-lg md:text-2xl">
+                    <?php echo e($settings['services_subtitle'] ?? 'Holistic Healing for Mind, Body & Soul'); ?>
+
+                </h3>
+                <p id="services_description" class="text-gray-500 text-base mt-6 max-w-lg mx-auto">
+                    <?php echo e($settings['services_description'] ?? 'Explore our specialized Ayurvedic treatments, transformative Yoga therapy and professional Mindfulness counseling. Connect with global experts dedicated to your wellness journey.'); ?>
+
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-14 px-4">
+                <?php $__currentLoopData = $services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <!-- Service <?php echo e($index + 1); ?> -->
+                    <a href="<?php echo e($service->slug ? route('service-detail', $service->slug) : '#'); ?>"
+                        class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
+                        style="transition-delay: <?php echo e($index * 100); ?>ms;">
+                        <div class="h-64 overflow-hidden mb-4 relative">
+                            <?php
+                                $imagePath = $service->image ? (str_starts_with($service->image, 'frontend/') ? asset($service->image) : asset('storage/' . $service->image)) : asset('admiro/assets/images/user/user.png');
+                            ?>
+                            <img src="<?php echo e($imagePath); ?>" alt="<?php echo e($service->title); ?>"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        </div>
+                        <h3 class="text-xl font-serif text-secondary mb-1"><?php echo e($service->title); ?></h3>
+                    </a>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+
+            <div class="text-center mt-12">
+                <a id="services_button_text" href="<?php echo e(route('services')); ?>"
+                    class="border border-secondary hover:border-primary text-secondary hover:bg-primary hover:text-white px-8 py-3 rounded-full transition-all text-base lg:text-lg"><?php echo e($settings['services_button_text'] ?? 'Browse All Services'); ?></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Practitioner Directory -->
+    <section id="practitioners" class="pt-10 pb-15">
+        <div class="container-fluid mx-auto relative mb-16 px-4">
+            <!-- Floating Images -->
+            <img src="<?php echo e(asset('frontend/assets/holy-basil-left.png')); ?>" alt="Holy Basil"
+                class="absolute left-0 bottom-14 md:bottom-20 w-24 md:w-30 lg:w-36 xl:w-46 pointer-events-none animate-on-scroll">
+            <img src="<?php echo e(asset('frontend/assets/leaf-04.png')); ?>" alt="Leaf"
+                class="absolute right-0 bottom-14 md:bottom-20 w-24 md:w-30 lg:w-36 xl:w-46 pointer-events-none animate-on-scroll">
+
+            <div class="text-center max-w-4xl mx-auto animate-on-scroll">
+                <h2 id="practitioners_title"
+                    class="text-3xl sm:text-4xl lg:text-5xl font-serif text-primary mb-2 sm:mb-3 md:mb-4 lg:mb-5 font-bold">
+                    <?php echo e($settings['practitioners_title'] ?? 'Practitioners Who Guide Your Journey'); ?>
+
+                </h2>
+
+                <p id="practitioners_description" class="text-gray-500 text-base leading-relaxed mb-8 max-w-3xl mx-auto">
+                    <?php echo e($settings['practitioners_description'] ?? 'Zaya practitioners are experienced, compassionate, and deeply committed to holistic healing. They guide you with personalized care and connect you to specialized experts when required. Supported by Zaya’s digital tools, practitioners focus fully on healing while the platform handles coordination and technology. They work within a trusted professional network that values ethics, collaboration, and transparency. Together, Zaya practitioners create meaningful, long-term wellness journeys.'); ?>
+
+                </p>
+
+                <div class="mb-20">
+                    <a id="practitioners_browse_btn" href="<?php echo e(route('find-practitioner')); ?>"
+                        class="bg-primary text-white px-8 py-3 rounded-full hover:bg-opacity-90 transition-all font-normal text-base lg:text-lg inline-block shadow-md">
+                        <?php echo e($settings['practitioners_browse_btn'] ?? 'Browse All Practitioners'); ?>
+
+                    </a>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="relative max-w-xl mx-auto">
+                    <input type="text"
+                        placeholder="<?php echo e($settings['practitioners_search_placeholder'] ?? 'Search Practitioner'); ?>"
+                        id="practitioners_search_placeholder" name="practitioner-search-input"
+                        class="w-full pl-10 pr-12 py-4 rounded-full border border-[#EFC6B6] bg-white focus:outline-none focus:border-primary placeholder-[#CD8162] text-primary shadow-sm transition-all text-base">
+                    <button
+                        class="absolute right-6 top-1/2 -translate-y-1/2 text-primary hover:scale-110 transition-transform">
+                        <i class="ri-search-line text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="swiper practitioner-slider pb-15!">
+                <div class="swiper-wrapper" id="practitioner-results-container">
+                    <?php echo $__env->make('partials.frontend.practitioner-slides', ['practitioners' => $practitioners, 'settings' => $settings], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                </div>
+            </div>
+        </div>
+        <div class="container mx-auto">
+            <!-- Custom Nav Arrows -->
+            <div class="flex justify-center items-center gap-6 lg:gap-12">
+                <button
+                    class="prev-practitioner w-10 h-10 lg:w-12 lg:h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer">
+                    <i class="ri-arrow-left-line text-xl"></i>
+                </button>
+                <button
+                    class="next-practitioner w-10 h-10 lg:w-12 lg:h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer">
+                    <i class="ri-arrow-right-line text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Join Team Section -->
+    <section class="pb-20 md:pb-28 bg-white text-center relative">
+        <img src="<?php echo e(asset('frontend/assets/green-monstera-leaf.png')); ?>" alt="Leaf"
+            class="absolute right-0 bottom-0 w-16 sm:w-20 xl:w-28 pointer-events-none">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <h2 id="cta_title"
+                class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary mb-6 animate-on-scroll">
+                <?php echo e($settings['cta_title'] ?? "Are you a Wellness Practitioner?"); ?>
+
+            </h2>
+            <p id="cta_description"
+                class="text-gray-500 text-base md:text-lg mb-12 leading-relaxed max-w-2xl mx-auto animate-on-scroll"
+                style="transition-delay: 100ms;">
+                <?php echo e($settings['cta_description'] ?? 'Join Zaya and become part of a trusted, practitioner-led holistic wellness network. Support your practice with expert collaboration, secure digital tools, and global reach.'); ?>
+
+            </p>
+            <a id="cta_button_text" href="<?php echo e(route('practitioner-register')); ?>"
+                class="animate-on-scroll border border-secondary text-secondary px-10 py-3 rounded-full hover:bg-secondary hover:text-white transition-all font-normal text-base lg:text-lg">
+                <?php echo e($settings['cta_button_text'] ?? 'Join as a Practitioner'); ?>
+
+            </a>
+        </div>
+    </section>
+
+    <!-- Wisdom Journal / Grid Section -->
+    <section class="py-0 bg-white">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 min-h-dvh">
+            <!-- Column 1 (Left - Large) -->
+            <div
+                class="col-span-1 md:col-span-2 lg:col-span-2 flex flex-col relative overflow-hidden bg-linear-to-br from-[#F5F5F5] to-white">
+                <div class="z-10 animate-on-scroll p-10 lg:p-16 pb-0!">
+                    <h2 id="blog_subtitle"
+                        class="text-3xl md:text-4xl font-serif font-bold text-primary mb-8 leading-tight">
+                        <?php echo nl2br($settings['blog_subtitle'] ?? 'Your Guide to Ayurvedic<br>Mastery'); ?>
+
+                    </h2>
+                    <h3 id="blog_title" class="text-xl md:text-2xl lg:text-3xl font-serif text-secondary mb-12">
+                        <?php echo e($settings['blog_title'] ?? 'Wisdom Journal'); ?>
+
+                    </h3>
+                    <a id="blog_button_text" href="<?php echo e(route('blogs')); ?>"
+                        class="border border-secondary text-secondary px-8 py-3 rounded-full hover:bg-secondary hover:text-white transition-all text-base lg:text-lg"><?php echo e($settings['blog_button_text'] ?? 'Explore Journal'); ?></a>
+                </div>
+                <!-- Plant Image (Bottom) -->
+                <div class="mt-auto flex justify-end animate-on-scroll">
+                    <img src="<?php echo e(isset($settings['blog_image_main']) ? (Str::startsWith($settings['blog_image_main'], 'frontend/') ? asset($settings['blog_image_main']) : asset('storage/' . $settings['blog_image_main'])) : asset('frontend/assets/Eucalyptus-Essential-Oil.png')); ?>"
+                        alt="Eucalyptus Essential Oil" class="w-2/3 md:w-1/2 lg:w-[70%] object-contain pointer-events-none">
+                </div>
+            </div>
+
+            <!-- Column 2 (Middle) -->
+            <div class="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col h-full">
+                <!-- Text Box -->
+                <div class="bg-accent p-8 lg:p-12 flex items-end justify-center flex-2 animate-on-scroll">
+                    <p id="blog_description" class="text-secondary text-sm/6 font-normal">
+                        <?php echo e($settings['blog_description'] ?? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod te'); ?>
+
+                    </p>
+                </div>
+                <!-- Bed Image Box -->
+                <div class="bg-[#DFA6A9] relative group overflow-hidden flex items-center justify-center flex-4 md:flex-2 animate-on-scroll"
+                    style="transition-delay: 100ms;">
+                    <img src="<?php echo e(isset($settings['blog_post_1_image']) ? (Str::startsWith($settings['blog_post_1_image'], 'frontend/') ? asset($settings['blog_post_1_image']) : asset('storage/' . $settings['blog_post_1_image'])) : asset('frontend/assets/bed-air.png')); ?>"
+                        alt="Relaxing Bed"
+                        class="w-full h-full object-cover drop-shadow-xl scale-110 group-hover:scale-105 transition-transform duration-700">
+                    <div
+                        class="absolute inset-0 bg-black/40 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-between">
+                        <div class="flex justify-end">
+                            <span id="blog_post_1_read_time"
+                                class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full"><?php echo e($settings['blog_post_1_read_time'] ?? '7 min Read'); ?></span>
+                        </div>
+                        <h3 id="blog_post_1_title" class="text-white font-sans! text-base font-normal">
+                            <a href="<?php echo e($settings['blog_post_1_link'] ?? route('blogs')); ?>" target="_blank">
+                                <?php echo e($settings['blog_post_1_title'] ?? 'The Art of Resfull Sleep'); ?>
+
+                            </a>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 3 (Right) -->
+            <div class="col-span-1 md:col-span-1 lg:col-span-2 flex flex-col h-full">
+                <!-- Medicine Image -->
+                <div class="h-64 lg:h-[30%] overflow-hidden relative group  animate-on-scroll"
+                    style="transition-delay: 100ms;">
+                    <img src="<?php echo e(isset($settings['blog_post_2_image']) ? (Str::startsWith($settings['blog_post_2_image'], 'frontend/') ? asset($settings['blog_post_2_image']) : asset('storage/' . $settings['blog_post_2_image'])) : asset('frontend/assets/ayurvedha-medicine.png')); ?>"
+                        alt="Ayurveda Medicine"
+                        class="w-full h-full object-cover transition-transform duration-700  scale-110 group-hover:scale-105">
+                    <div
+                        class="absolute inset-0 bg-black/40 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-between">
+                        <div class="flex justify-end">
+                            <span id="blog_post_2_read_time"
+                                class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full"><?php echo e($settings['blog_post_2_read_time'] ?? '15 min Read'); ?></span>
+                        </div>
+                        <h3 id="blog_post_2_title" class="text-white font-sans! text-base font-normal">
+                            <a href="<?php echo e($settings['blog_post_2_link'] ?? route('blogs')); ?>" target="_blank">
+                                <?php echo e($settings['blog_post_2_title'] ?? 'Balancing in Summer'); ?>
+
+                            </a>
+                        </h3>
+                    </div>
+                </div>
+                <!-- Girl Image -->
+                <div class="flex-1 relative overflow-hidden group min-h-[320px] animate-on-scroll"
+                    style="transition-delay: 200ms;">
+                    <img src="<?php echo e(isset($settings['blog_post_3_image']) ? (Str::startsWith($settings['blog_post_3_image'], 'frontend/') ? asset($settings['blog_post_3_image']) : asset('storage/' . $settings['blog_post_3_image'])) : asset('frontend/assets/yoga-dress-girl.png')); ?>" alt="Wellness Lifestyle"
+                        class="w-full h-full object-cover transition-transform duration-700 scale-110 group-hover:scale-105">
+
+                    <!-- Play Button (Always Visible) -->
+                    <div class="absolute top-6 left-6 z-20">
+                        <img src="<?php echo e(asset('frontend/assets/video-play-btn-white.svg')); ?>" alt="Play"
+                            class="w-14 h-14 hover:scale-110 transition-transform ">
+                    </div>
+
+                    <!-- Hover Overlay (Badge + Title) -->
+                    <div
+                        class="absolute inset-0 bg-black/40 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-between z-10">
+                        <div class="flex justify-end">
+                            <span id="blog_post_3_read_time"
+                                class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full"><?php echo e($settings['blog_post_3_read_time'] ?? '15 min Read'); ?></span>
+                        </div>
+                        <h3 id="blog_post_3_title" class="text-white font-sans! text-base font-normal">
+                            <a href="<?php echo e($settings['blog_post_3_link'] ?? route('blogs')); ?>" target="_blank">
+                                <?php echo e($settings['blog_post_3_title'] ?? 'Morning Rituals for Energy'); ?>
+
+                            </a>
+                        </h3>
+                    </div>
+                </div>
+                <!-- Dark Box -->
+                <div class="bg-secondary p-6 lg:p-12 flex items-center justify-center animate-on-scroll"
+                    style="transition-delay: 300ms;">
+                    <p id="blog_footer_text" class="text-accent text-sm/6 font-normal">
+                        <?php echo e($settings['blog_footer_text'] ?? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod te'); ?>
+
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 md:pt-28 md:pb-18 bg-white text-center relative overflow-hidden">
+        <!-- Decorative Leaf -->
+        <img src="<?php echo e(asset('frontend/assets/leaf-02.png')); ?>" alt="Leaf"
+            class="absolute right-0 bottom-0 lg:top-1/3 w-24 md:w-40 pointer-events-none">
+
+        <div class="container mx-auto px-6 max-w-4xl relative z-10">
+            <h2 id="testimonials_title"
+                class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary mb-6 animate-on-scroll">
+                <?php echo e($settings['testimonials_title'] ?? 'Real Stories, Real Experiences'); ?>
+
+            </h2>
+
+            <p id="testimonials_subtitle"
+                class="text-gray-500 text-base leading-relaxed max-w-2xl mx-auto animate-on-scroll mb-8"
+                style="transition-delay: 100ms;">
+                <?php echo e($settings['testimonials_subtitle'] ?? 'Stories from those who have experienced thoughtful care, expert guidance, and meaningful wellness journeys with Zaya.'); ?>
+
+            </p>
+
+            <div class="animate-on-scroll">
+                <span id="testimonials_badge"
+                    class="bg-[#F6F6F6] text-[#8F8F8F] px-8 py-2.5 rounded-full font-medium text-base inline-block">
+                    <?php echo e($settings['testimonials_badge'] ?? 'Testimonials'); ?>
+
+                </span>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Stories / Testimonials Slider -->
+    <section id="stories">
+        <div class="container-fluid px-0 py-14 bg-[#F5FBF5]">
+            <!-- Swiper -->
+            <div class="swiper testimonial-slider">
+                <div class="swiper-wrapper">
+
+                    <?php $__currentLoopData = $testimonials; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $testimonial): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="swiper-slide w-auto sm:max-w-[340px]">
+                            <div class="p-4">
+                                <div class="flex items-center gap-4 mb-6">
+                                    <img src="<?php echo e($testimonial->image ? asset('storage/' . $testimonial->image) : 'https://ui-avatars.com/api/?name=' . urlencode($testimonial->name)); ?>"
+                                        class="w-16 h-16 rounded-full object-cover">
+                                    <div>
+                                        <h4 class="font-bold text-[#A66E58] text-xl font-sans!"><?php echo e($testimonial->name); ?></h4>
+                                        <p class="text-sm text-gray-500 mt-1!"><?php echo e($testimonial->role); ?></p>
+                                    </div>
+                                </div>
+                                <p class="text-[#404040] text-sm/7 mb-6 line-clamp-4">"<?php echo e($testimonial->message); ?>"</p>
+                                <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-100">
+                                    <div class="text-yellow-400 text-lg flex gap-1">
+                                        <?php for($i = 1; $i <= 5; $i++): ?>
+                                            <?php if($i <= $testimonial->rating): ?>
+                                                <i class="ri-star-fill"></i>
+                                            <?php else: ?>
+                                                <i class="ri-star-line"></i>
+                                            <?php endif; ?>
+                                        <?php endfor; ?>
+                                    </div>
+                                    <div class="flex items-center gap-4 text-gray-400">
+                                        <div class="flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors testimonial-like-btn <?php echo e($testimonial->is_liked ? 'text-primary' : ''); ?>" data-id="<?php echo e($testimonial->id); ?>">
+                                            <i class="<?php echo e($testimonial->is_liked ? 'ri-thumb-up-fill' : 'ri-thumb-up-line'); ?> text-lg"></i>
+                                            <span class="text-xs font-medium"><?php echo e($testimonial->likes_count); ?></span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5">
+                                            <i class="ri-reply-line text-lg"></i>
+                                            <span class="text-xs font-medium"><?php echo e($testimonial->replies_count); ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                </div>
+            </div>
+        </div>
+        <div class="container py-16 mx-auto">
+            <!-- Custom Nav Arrows Centered Below -->
+            <div class="flex justify-center items-center gap-6 lg:gap-12 text-primary">
+                <button
+                    class="prev-testimonial w-10 h-10 lg:w-12 lg:h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer"><i
+                        class="ri-arrow-left-line text-xl"></i></button>
+                <button
+                    class="next-testimonial w-10 h-10 lg:w-12 lg:h-12 rounded-full border border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer"><i
+                        class="ri-arrow-right-line text-xl"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dropdown Styles -->
+    <style>
+        /* Custom Scrollbar for Dropdowns */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #E5E7EB;
+            border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #D1D5DB;
+        }
+
+        /* Open State Classes */
+        .dropdown-open .dropdown-menu {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+        }
+    </style>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+$(document).ready(function() {
+    function setupHeroSearch() {
+        const searchInput = $('#hero_search_input');
+        const resultsDropdown = $('#hero-search-results');
+        const resultsContainer = resultsDropdown.find('.custom-scrollbar');
+        const container = searchInput.closest('.search-container');
+        const icon = container.find('.search-icon');
+
+        let currentRequest = null;
+        let searchTimeout = null;
+
+        searchInput.on('input', function() {
+            const query = $(this).val();
+
+            if (searchTimeout) clearTimeout(searchTimeout);
+
+            if (query.length < 1) {
+                container.removeClass('dropdown-open');
+                setTimeout(() => { if(!container.hasClass('dropdown-open')) resultsContainer.empty(); }, 300);
+                if (currentRequest) currentRequest.abort();
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                if (currentRequest) currentRequest.abort();
+                
+                // Show loader inside dropdown
+                resultsContainer.html(`
+                    <div class="flex flex-col items-center justify-center py-12 gap-3">
+                        <i class="ri-loader-4-line animate-spin text-primary text-4xl"></i>
+                        <span class="text-gray-400 text-sm font-medium">Searching for results...</span>
+                    </div>
+                `);
+                container.addClass('dropdown-open');
+
+                currentRequest = $.ajax({
+                url: "<?php echo e(route('search')); ?>",
+                type: "GET",
+                data: { query: query },
+                success: function(data) {
+                    resultsContainer.empty();
+
+                    const hasPractitioners = data.practitioners && data.practitioners.length > 0;
+                    const hasTreatments = data.treatments && data.treatments.length > 0;
+
+                    if (hasPractitioners || hasTreatments) {
+                        if (hasPractitioners) {
+                            resultsContainer.append('<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Practitioners</div>');
+                            data.practitioners.forEach(function(item) {
+                                const resultItem = `
+                                    <a href="/practitioner/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                        <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
+                                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        </div>
+                                        <div class="flex flex-col text-left">
+                                            <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
+                                            <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
+                                        </div>
+                                    </a>
+                                `;
+                                resultsContainer.append(resultItem);
+                            });
+                        }
+
+                        if (hasTreatments) {
+                            resultsContainer.append('<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Treatments</div>');
+                            data.treatments.forEach(function(item) {
+                                const resultItem = `
+                                    <a href="/service/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                        <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
+                                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        </div>
+                                        <div class="flex flex-col text-left">
+                                            <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
+                                            <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
+                                        </div>
+                                    </a>
+                                `;
+                                resultsContainer.append(resultItem);
+                            });
+                        }
+                    } else {
+                        resultsContainer.html('<div class="px-5 py-8 text-gray-500 italic text-center">No results found for "'+query+'"</div>');
+                    }
+                },
+                error: function() {
+                    resultsContainer.html('<div class="px-5 py-8 text-red-400 text-center">Something went wrong. Please try again.</div>');
+                }
+            });
+            }, 300);
+        });
+
+        // Close dropdown when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.search-container').length) {
+                $('.search-container').removeClass('dropdown-open');
+            }
+        });
+    }
+
+    setupHeroSearch();
+
+    let practitionerSwiper = null;
+
+    function initPractitionerSwiper() {
+        if (practitionerSwiper) {
+            practitionerSwiper.destroy(true, true);
+        }
+
+        const slidesCount = document.querySelectorAll('.practitioner-slider .swiper-slide').length;
+        if (slidesCount > 0) {
+            practitionerSwiper = new SwiperLib('.practitioner-slider', {
+                slidesPerView: 1.5,
+                spaceBetween: 20,
+                loop: slidesCount >= 6,
+                centeredSlides: true,
+                autoplay: {
+                    delay: 3500,
+                    pauseOnMouseEnter: true,
+                    pauseOnFocus: true,
+                },
+                navigation: {
+                    nextEl: '.next-practitioner',
+                    prevEl: '.prev-practitioner',
+                },
+                breakpoints: {
+                    512: { slidesPerView: 2.3, centeredSlides: true, loop: slidesCount >= 6 },
+                    768: { slidesPerView: 3, centeredSlides: false, loop: slidesCount >= 6 },
+                    1152: { slidesPerView: 4, centeredSlides: false, loop: slidesCount >= 8 },
+                    1440: { slidesPerView: 4.4, spaceBetween: 40, centeredSlides: false, loop: slidesCount >= 10 },
+                    1920: { slidesPerView: 5, spaceBetween: 80, centeredSlides: false, loop: slidesCount >= 10 },
+                },
+            });
+        }
+    }
+
+    function setupPractitionerFilter() {
+        const searchInput = $('#practitioners_search_placeholder');
+        const resultsContainer = $('#practitioner-results-container');
+        let searchTimeout = null;
+        let currentRequest = null;
+
+        searchInput.on('input', function() {
+            const query = $(this).val();
+
+            if (searchTimeout) clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(() => {
+                if (currentRequest) currentRequest.abort();
+
+                // Show loading state in swiper
+                resultsContainer.html(`
+                    <div class="swiper-slide w-full flex items-center justify-center py-20">
+                        <div class="flex flex-col items-center gap-4">
+                            <i class="ri-loader-4-line animate-spin text-primary text-5xl"></i>
+                            <span class="text-gray-400 font-medium">Filtering practitioners...</span>
+                        </div>
+                    </div>
+                `);
+                
+                if (practitionerSwiper) {
+                    practitionerSwiper.update();
+                }
+
+                currentRequest = $.ajax({
+                    url: "<?php echo e(route('filter-practitioners')); ?>",
+                    type: "GET",
+                    data: { query: query },
+                    success: function(html) {
+                        resultsContainer.html(html);
+                        initPractitionerSwiper();
+                        if (query.length > 0 && resultsContainer.find('.swiper-slide').length === 0) {
+                             resultsContainer.html(`
+                                <div class="swiper-slide w-full flex items-center justify-center py-20">
+                                    <div class="text-gray-400 font-medium">No practitioners found for "${query}"</div>
+                                </div>
+                            `);
+                        }
+                    },
+                    error: function() {
+                        resultsContainer.html(`
+                            <div class="swiper-slide w-full flex items-center justify-center py-20">
+                                <div class="text-red-400 font-medium">Error loading practitioners.</div>
+                            </div>
+                        `);
+                    }
+                });
+            }, 400);
+        });
+    }
+
+    // Initial Swiper setup is handled by script.js, but we might need to take control
+    // if we want to ensure we have the instance. Since script.js runs on DOMContentLoaded,
+    // we can re-init here after a small delay or just wait.
+    setTimeout(initPractitionerSwiper, 500);
+    setupPractitionerFilter();
+});
+</script>
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\zaya\resources\views/index.blade.php ENDPATH**/ ?>
