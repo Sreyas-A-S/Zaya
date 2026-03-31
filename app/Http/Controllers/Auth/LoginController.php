@@ -126,6 +126,10 @@ class LoginController extends Controller
             return redirect($request->redirect);
         }
 
+        if (in_array($user->role, ['client', 'patient'])) {
+            return redirect()->route('find-practitioner');
+        }
+
         return redirect()->route('dashboard');
     }
 

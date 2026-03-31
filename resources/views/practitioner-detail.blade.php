@@ -6,6 +6,9 @@
         $lastName = $practitioner->last_name ?? $practitioner->user->last_name ?? '';
         $bio = $practitioner->profile_bio ?? $practitioner->short_doctor_bio ?? $practitioner->short_bio ?? '';
         $photo = $practitioner->profile_photo_path ?? $practitioner->profile_pic ?? '';
+
+        $serviceTitle = isset($selectedService) ? ($selectedService->title ?? '') : '';
+        $serviceDescription = isset($selectedService) ? trim(strip_tags((string) ($selectedService->description ?? ''))) : '';
         
         // Dynamic Lists
         $consultations = $practitioner->consultations ?? $practitioner->specialization ?? $practitioner->practitioner_type ?? $practitioner->yoga_therapist_type ?? [];
@@ -18,12 +21,19 @@
         if (!is_array($modalities)) $modalities = [$modalities];
 
         // Subtitle logic
-        $subtitle = $modalities[0] ?? ($consultations[0] ?? ($practitioner->user->role ?? 'Professional'));
+        $subtitle = $serviceTitle !== '' ? $serviceTitle : ($modalities[0] ?? ($consultations[0] ?? ($practitioner->user->role ?? 'Professional')));
         $subtitle = str_replace('_', ' ', ucfirst($subtitle));
 
         $avgRating = $practitioner->average_rating ?? 5.0;
         $reviewCount = $practitioner->reviews ? $practitioner->reviews->count() : 0;
-        $bookingUrl = route('book-session', ['practitioner' => $practitioner->slug, 'service' => request('service')]);
+        $serviceQuery = trim((string) request('service', ''));
+        $bookingUrl = $serviceQuery !== ''
+            ? route('book-session', ['practitioner' => $practitioner->slug, 'service' => $serviceQuery])
+            : route('book-session', ['practitioner' => $practitioner->slug]);
+
+        if ($serviceTitle !== '') {
+            $therapies = array_values(array_unique(array_filter(array_merge([$serviceTitle], $therapies))));
+        }
     @endphp
 
     <!-- Practitioner Hero Section -->
@@ -44,7 +54,7 @@
                         {{ $subtitle }}
                     </h2>
                     <p class="text-[#404040] mb-10 max-w-xl leading-relaxed text-base opacity-80">
-                        {{ $bio }}
+                        {{ $serviceDescription !== '' ? $serviceDescription : $bio }}
                     </p>
 
                     <div class="flex flex-col items-start gap-10">

@@ -13,7 +13,7 @@
 <div class="container mx-auto">
     <div id="practitioner-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-8 md:gap-x-6 md:gap-y-12">
     @forelse($practitioners as $p)
-        <a href="{{ $p->slug ? route('practitioner-detail', ['slug' => $p->slug, 'service' => request('service')]) : '#' }}"
+        <a href="{{ $p->slug ? route('practitioner-detail', request('service') ? ['slug' => $p->slug, 'service' => request('service')] : ['slug' => $p->slug]) : '#' }}"
             class="flex flex-col items-center text-center group cursor-pointer animate-on-scroll">
             <!-- Avatar -->
             <div
@@ -31,7 +31,7 @@
 
             <!-- Role -->
             <p class="font-serif text-sm md:text-base lg:text-lg italic text-secondary mt-0.5">
-                {{ $p->other_modalities[0] ?? ($p->consultations[0] ?? 'Holistic Practitioner') }}
+                {{ optional($selectedService)->title ?: ($p->other_modalities[0] ?? ($p->consultations[0] ?? 'Holistic Practitioner')) }}
             </p>
 
             <!-- Location -->

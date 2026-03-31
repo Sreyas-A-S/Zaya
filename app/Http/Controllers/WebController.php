@@ -195,18 +195,30 @@ class WebController extends Controller
         }
 
         if ($request->filled('service')) {
-            $service = $request->service;
-            $selectedService = is_numeric($service)
-                ? Service::find($service)
-                : Service::where('slug', $service)->first();
-            $query->whereHas('userServices', function ($q) use ($service) {
-                if (is_numeric($service)) {
-                    $q->where('service_id', $service);
+            $service = $request->query('service');
+            $serviceForFilter = $service;
+
+            if (is_numeric($service)) {
+                $selectedService = Service::find($service);
+            } else {
+                $selectedService = Service::where('slug', $service)->first();
+                if (!$selectedService && is_string($service) && preg_match('/-(en|fr|de|es|it|pt|nl)$/', $service)) {
+                    $baseSlug = preg_replace('/-(en|fr|de|es|it|pt|nl)$/', '', $service);
+                    $selectedService = Service::where('slug', $baseSlug)->first();
+                    if ($selectedService) {
+                        $serviceForFilter = $baseSlug;
+                    }
+                }
+            }
+
+            $query->whereHas('userServices', function ($q) use ($serviceForFilter) {
+                if (is_numeric($serviceForFilter)) {
+                    $q->where('service_id', $serviceForFilter);
                 } else {
-                    $q->whereHas('service', function ($sq) use ($service) {
-                        $sq->where('slug', $service)
-                           ->orWhereHas('categories', function ($cq) use ($service) {
-                               $cq->where('slug', $service);
+                    $q->whereHas('service', function ($sq) use ($serviceForFilter) {
+                        $sq->where('slug', $serviceForFilter)
+                           ->orWhereHas('categories', function ($cq) use ($serviceForFilter) {
+                               $cq->where('slug', $serviceForFilter);
                            });
                     });
                 }
@@ -222,7 +234,7 @@ class WebController extends Controller
         $services = Service::where('status', true)->orderBy('title')->get();
 
         if ($request->ajax()) {
-            return view('partials.frontend.practitioner-grid', compact('practitioners', 'pincode'))->render();
+            return view('partials.frontend.practitioner-grid', compact('practitioners', 'pincode', 'selectedService'))->render();
         }
 
         return view('find-practitioner', compact('settings', 'practitioners', 'pincode', 'services', 'selectedService'));
@@ -320,7 +332,7 @@ class WebController extends Controller
         return response()->json($cities->concat($zips)->take(8));
     }
 
-    public function practitionerDetail($slug)
+    public function practitionerDetail(Request $request, $slug)
     {
         $language = App::getLocale();
         $settings = HomepageSetting::getAllSettings($language);
@@ -350,10 +362,24 @@ class WebController extends Controller
             abort(404);
         }
 
+        $selectedService = null;
+        if ($request->filled('service')) {
+            $service = $request->query('service');
+            if (is_numeric($service)) {
+                $selectedService = Service::find($service);
+            } else {
+                $selectedService = Service::where('slug', $service)->first();
+                if (!$selectedService && is_string($service) && preg_match('/-(en|fr|de|es|it|pt|nl)$/', $service)) {
+                    $baseSlug = preg_replace('/-(en|fr|de|es|it|pt|nl)$/', '', $service);
+                    $selectedService = Service::where('slug', $baseSlug)->first();
+                }
+            }
+        }
+
         // Add a helper attribute for easy access to bio and name across different models if needed
         // but for now we'll rely on the blade handling it or common naming conventions
         
-        return view('practitioner-detail', compact('practitioner', 'settings'));
+        return view('practitioner-detail', compact('practitioner', 'settings', 'selectedService'));
     }
 
     public function filterPractitioners(Request $request)
@@ -382,10 +408,11 @@ class WebController extends Controller
         return view('partials.frontend.practitioner-slides', compact('practitioners', 'settings'))->render();
     }
 
-    public function zayaLogin()
+    public function zayaLogin(Request $request)
     {
+        $redirect = $request->query('redirect');
         $available_languages = \App\Models\Language::where('status', 'active')->get();
-        return view('zaya-login', compact('available_languages'));
+        return view('zaya-login', compact('available_languages', 'redirect'));
     }
 
     public function clientRegister(Request $request)
@@ -605,21 +632,57 @@ class WebController extends Controller
 
     public function bookSession(Request $request, $practitioner = null)
     {
-        $practitioners = Practitioner::with(['user', 'reviews'])
+        if ($request->has('service') && trim((string) $request->query('service')) === '') {
+            $queryParams = $request->query();
+            unset($queryParams['service']);
+            $routeParams = [];
+            if ($practitioner) {
+                $routeParams['practitioner'] = $practitioner;
+            }
+            return redirect()->route('book-session', array_merge($routeParams, $queryParams));
+        }
+
+        // Handle prefilled service from request
+        $prefilledService = null;
+        if ($request->filled('service')) {
+            $serviceSlug = trim((string) $request->query('service'));
+            $prefilledService = $serviceSlug !== '' ? Service::where('slug', $serviceSlug)->first() : null;
+
+            if (
+                !$prefilledService
+                && $serviceSlug !== ''
+                && preg_match('/-(en|fr|de|es|it|pt|nl)$/', $serviceSlug)
+            ) {
+                $baseSlug = preg_replace('/-(en|fr|de|es|it|pt|nl)$/', '', $serviceSlug);
+                $prefilledService = Service::where('slug', $baseSlug)->first();
+            }
+        } elseif ($request->filled('service_id')) {
+            $prefilledService = Service::find($request->query('service_id'));
+        }
+
+        $practitionersQuery = Practitioner::with(['user', 'reviews'])
             ->where('status', 'active')
             ->whereHas('userServices', function ($q) {
                 $q->where('status', 'active');
-            })
-            ->get();
-        $selectedPractitioner = null;
+            });
 
+        // If service is provided, only show practitioners who offer that service.
+        if ($prefilledService) {
+            $practitionersQuery->whereHas('userServices', function ($q) use ($prefilledService) {
+                $q->where('status', 'active')->where('service_id', $prefilledService->id);
+            });
+        }
+
+        $selectedPractitioner = null;
         if ($practitioner) {
-            $selectedPractitioner = Practitioner::with(['user', 'reviews'])->where('slug', $practitioner)->first();
+            $selectedPractitioner = (clone $practitionersQuery)->where('slug', $practitioner)->first();
         }
 
         if (!$selectedPractitioner && $request->filled('practitioner_id')) {
-            $selectedPractitioner = Practitioner::with(['user', 'reviews'])->find($request->practitioner_id);
+            $selectedPractitioner = (clone $practitionersQuery)->where('id', $request->query('practitioner_id'))->first();
         }
+
+        $practitioners = $practitionersQuery->get();
 
         if (!$selectedPractitioner && $practitioners->isNotEmpty()) {
             $selectedPractitioner = $practitioners->first();
@@ -634,14 +697,6 @@ class WebController extends Controller
                 ->get();
         } else {
             $services = Service::where('status', true)->get();
-        }
-
-        // Handle prefilled service from request
-        $prefilledService = null;
-        if ($request->filled('service')) {
-            $prefilledService = Service::where('slug', $request->service)->first();
-        } elseif ($request->filled('service_id')) {
-            $prefilledService = Service::find($request->service_id);
         }
 
         $languages = \App\Models\Language::where('status', 'active')

@@ -89,7 +89,7 @@
         $practitionerImage = $activePractitioner && $activePractitioner->profile_photo_path
         ? asset('storage/' . $activePractitioner->profile_photo_path)
         : asset('frontend/assets/lilly-profile-pic.png');
-        $practitionerRole = $activePractitioner->other_modalities[0] ?? 'Practitioner';
+        $practitionerRole = optional($prefilledService)->title ?: ($activePractitioner->other_modalities[0] ?? ($activePractitioner->consultations[0] ?? 'Practitioner'));
         $practitionerRating = $activePractitioner ? number_format($activePractitioner->average_rating, 1) : '0.0';
         $practitionerLocation = $activePractitioner ? $activePractitioner->city_state : 'Location not set';
         $practitionerConditions = $activePractitioner ? (array) ($activePractitioner->consultations ?? []) : [];
@@ -249,8 +249,8 @@
                         </div>
                     </div>
                     <button type="button" onclick="openPractitionerModal()"
-                        class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors" data-i18n="Change Mindfulness Counsellor">
-                        <?php echo e(__('Change Mindfulness Counsellor')); ?>
+                        class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors" data-i18n="Change Practitioner">
+                        <?php echo e(__('Change Practitioner')); ?>
 
                     </button>
                 </div>
@@ -536,8 +536,8 @@
                     </div>
                 </div>
                 <button type="button" onclick="openPractitionerModal()"
-                    class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors" data-i18n="Change Mindfulness Counsellor">
-                    <?php echo e(__('Change Mindfulness Counsellor')); ?>
+                    class="px-6 py-2.5 rounded-full border border-[#EAD0A0] text-[#423131] text-base bg-[#FFE6B7] font-normal cursor-pointer hover:bg-[#F5A623] transition-colors" data-i18n="Change Practitioner">
+                    <?php echo e(__('Change Practitioner')); ?>
 
                 </button>
             </div>
@@ -798,14 +798,15 @@
                     updateStep3Services(); // This will call updateTotalPrice
                     showToast('Promo code applied successfully!', 'success');
                 } else {
-                    messageEl.textContent = data.message || 'Invalid promo code.';
+                    const errorMsg = data.message || 'Invalid promo code.';
+                    messageEl.textContent = errorMsg;
                     messageEl.className = 'mt-3 text-xs font-medium text-red-500';
                     messageEl.classList.remove('hidden');
-                    showToast(data.message || 'Invalid promo code.', 'error');
+                    showToast(errorMsg, 'error');
                 }
             } catch (error) {
                 console.error('Promo error:', error);
-                showToast('Error validating promo code.', 'error');
+                showToast('Unable to connect to promo verification service. Please try again.', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = 'Apply';
@@ -826,6 +827,7 @@
             btn.classList.remove('hidden');
             clearBtn.classList.add('hidden');
             messageEl.classList.add('hidden');
+            messageEl.textContent = '';
             
             updateStep3Services();
             showToast('Promo code removed.', 'success');
@@ -988,9 +990,7 @@
             if (isClient && stepNumber === 1) {
                 stepNumber = 2;
             }
-            if (!isClient && stepNumber > 1) {
-                stepNumber = 1;
-            }
+            // Removed restrictive !isClient block that prevented step progression
             for (let i = 1; i <= totalSteps; i++) {
                 const content = document.getElementById(`step-${i}-content`);
                 if (i === stepNumber) {
@@ -1041,7 +1041,7 @@
 
         function previousStep() {
             if (isClient && currentStep === 2) {
-                window.location.href = <?php echo json_encode(route('login', ['redirect' => request()->fullUrl()]), 512) ?>;
+                window.location.href = <?php echo json_encode(route('find-practitioner'), 15, 512) ?>;
                 return;
             }
             if (currentStep > 1) {
@@ -1080,8 +1080,8 @@
                 }
 
                 let total = 0;
-                let validServiceCount = 0;
                 let determinedCurrencyCode = null;
+                let activeCurrencySymbol = document.querySelector('#step-3-total-amount')?.textContent.trim().split(' ')[0] || '₹';
 
                 selectedServices.forEach(checkbox => {
                     const label = checkbox.closest('.service-tag-label');
@@ -1094,40 +1094,34 @@
                     let day = "Day";
                     let time = "Time";
                     let price = 0; 
-                    let currencySymbol = lastCurrencySymbol;
+                    let currencySymbol = activeCurrencySymbol;
 
                     if (scheduleItem) {
-                        const durationVal = scheduleItem.querySelector('.duration-value').value;
-                        const dayVal = scheduleItem.querySelector('.day-value').value;
-                        const timeVal = scheduleItem.querySelector('.time-value').value;
-
-                        if (durationVal && dayVal && timeVal) {
-                            validServiceCount++;
-                        }
-
-                        duration = durationVal || "Duration";
+                        duration = scheduleItem.querySelector('.duration-value').value || "Duration";
                         day = scheduleItem.querySelector('.day-label').textContent || "Day";
                         time = scheduleItem.querySelector('.time-label').textContent || "Time";
 
-                        const durationRadio = scheduleItem.querySelector('input[type="radio"]:checked');
-                        if (durationRadio) {
-                            const priceSpan = durationRadio.closest('label').querySelector('[data-symbol]');
-                            if (priceSpan) {
-                                currencySymbol = priceSpan.dataset.symbol || currencySymbol;
-                                const priceText = priceSpan.textContent.replace(/[^\d.]/g, '');
+                        // Get price and currency from the SELECTED duration radio in the dropdown
+                        // The duration-dropdown for THIS service
+                        const durationDropdown = scheduleItem.querySelector('.duration-dropdown');
+                        const checkedRadio = durationDropdown ? durationDropdown.querySelector('input[type="radio"]:checked') : null;
+                        
+                        if (checkedRadio) {
+                            const priceEl = checkedRadio.closest('label').querySelector('[data-symbol]');
+                            if (priceEl) {
+                                currencySymbol = priceEl.dataset.symbol || currencySymbol;
+                                activeCurrencySymbol = currencySymbol;
+                                const priceText = priceEl.textContent.replace(/[^\d.]/g, '');
                                 price = parseFloat(priceText) || 0;
-                                const currencyCode = priceSpan.dataset.currency || 'INR';
                                 
-                                // Set currency code from the first service found with one
                                 if (!determinedCurrencyCode) {
-                                    determinedCurrencyCode = currencyCode;
+                                    determinedCurrencyCode = priceEl.dataset.currency;
                                 }
                             }
                         }
                     }
 
                     total += price;
-                    lastCurrencySymbol = currencySymbol;
 
                     const html = `
                         <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
@@ -1164,16 +1158,7 @@
                     if (currencyInput) currencyInput.value = determinedCurrencyCode;
                 }
 
-                // Show/hide Step 3 based on whether we have any services selected
-                if (step3Content) {
-                    if (selectedServices.length > 0) {
-                        step3Content.classList.remove('hidden');
-                    } else {
-                        step3Content.classList.add('hidden');
-                    }
-                }
-
-                updateTotalPrice(total, lastCurrencySymbol);
+                updateTotalPrice(total, activeCurrencySymbol);
             }
 
 
@@ -1187,15 +1172,7 @@
                 const showTest = testToggle && testToggle.checked;
                 const currencyCode = document.getElementById('booking-currency')?.value || 'INR';
                 
-                // Show/hide payment section based on total
-                if (step3Content) {
-                    if (total > 0 || currentStep === 3) {
-                        step3Content.classList.remove('hidden');
-                    } else {
-                        // Keep hidden if total is 0, unless user explicitly stayed on step 3
-                        step3Content.classList.add('hidden');
-                    }
-                }
+                // The visibility of step-3-content is managed by showStep()
 
                 // Update Breakdown UI
                 const breakdownEl = document.getElementById('discount-breakdown');
@@ -2022,11 +1999,11 @@
 
             <div>
                 <div class="ps-8 pe-8 lg:ps-10 lg:pe-0 pt-8">
-                    <h2 class="text-[22px] font-medium text-[#252525] mb-6">Select Mindfulness Counsellor</h2>
+                    <h2 class="text-[22px] font-medium text-[#252525] mb-6"><?php echo e(__('Select Practitioner')); ?></h2>
                     <div class="relative max-w-[380px] mb-8">
                         <i
                             class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]"></i>
-                        <input type="text" placeholder="Search Mindfulness Counsellor"
+                        <input type="text" placeholder="<?php echo e(__('Search Practitioner')); ?>"
                             class="w-full pl-11 pr-4 h-[48px] rounded-full border border-[#D0D0D0] text-sm text-gray-700 outline-none focus:border-[#FABD4D] transition-colors placeholder:text-[#8B8B8B]">
                     </div>
                 </div>
@@ -2044,7 +2021,7 @@
                             $pImage = $practitioner->profile_photo_path
                             ? asset('storage/' . $practitioner->profile_photo_path)
                             : asset('frontend/assets/lilly-profile-pic.png');
-                            $pRole = $practitioner->other_modalities[0] ?? 'Practitioner';
+                            $pRole = optional($prefilledService)->title ?: ($practitioner->other_modalities[0] ?? ($practitioner->consultations[0] ?? 'Practitioner'));
                             ?>
                             <div class="swiper-slide !w-[140px]">
                                 <div class="flex flex-col items-center group cursor-pointer text-center practitioner-select-card"

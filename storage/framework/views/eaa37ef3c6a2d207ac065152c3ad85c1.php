@@ -13,7 +13,7 @@
 <div class="container mx-auto">
     <div id="practitioner-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-8 md:gap-x-6 md:gap-y-12">
     <?php $__empty_1 = true; $__currentLoopData = $practitioners; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-        <a href="<?php echo e($p->slug ? route('practitioner-detail', ['slug' => $p->slug, 'service' => request('service')]) : '#'); ?>"
+        <a href="<?php echo e($p->slug ? route('practitioner-detail', request('service') ? ['slug' => $p->slug, 'service' => request('service')] : ['slug' => $p->slug]) : '#'); ?>"
             class="flex flex-col items-center text-center group cursor-pointer animate-on-scroll">
             <!-- Avatar -->
             <div
@@ -32,7 +32,7 @@
 
             <!-- Role -->
             <p class="font-serif text-sm md:text-base lg:text-lg italic text-secondary mt-0.5">
-                <?php echo e($p->other_modalities[0] ?? ($p->consultations[0] ?? 'Holistic Practitioner')); ?>
+                <?php echo e(optional($selectedService)->title ?: ($p->other_modalities[0] ?? ($p->consultations[0] ?? 'Holistic Practitioner'))); ?>
 
             </p>
 

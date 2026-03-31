@@ -111,7 +111,7 @@
         <div class="container mx-auto max-w-6xl">
             <!-- Practitioner Results Wrapper -->
             <div id="practitioner-results-container">
-                <?php echo $__env->make('partials.frontend.practitioner-grid', ['practitioners' => $practitioners, 'pincode' => $pincode], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                <?php echo $__env->make('partials.frontend.practitioner-grid', ['practitioners' => $practitioners, 'pincode' => $pincode, 'selectedService' => $selectedService], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
             </div>
 
             <style>

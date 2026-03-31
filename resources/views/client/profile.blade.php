@@ -645,7 +645,12 @@
             @csrf
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Current Password</label>
-                <input type="password" name="current_password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none">
+                <div class="relative">
+                    <input type="password" id="current_password" name="current_password" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none pr-12">
+                    <button type="button" onclick="togglePasswordVisibility('current_password')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-secondary">
+                        <i class="ri-eye-line" id="current_password_eye"></i>
+                    </button>
+                </div>
             </div>
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
@@ -685,7 +690,12 @@
             </div>
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Confirm New Password</label>
-                <input type="password" name="new_password_confirmation" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none">
+                <div class="relative">
+                    <input type="password" id="new_password_confirmation" name="new_password_confirmation" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none pr-12">
+                    <button type="button" onclick="togglePasswordVisibility('new_password_confirmation')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-secondary">
+                        <i class="ri-eye-line" id="new_password_confirmation_eye"></i>
+                    </button>
+                </div>
             </div>
             <div class="flex gap-4 pt-4">
                 <button type="button" onclick="closePasswordModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
@@ -1368,6 +1378,18 @@
             el.querySelector('i').className = 'ri-checkbox-circle-fill text-gray-300 transition-colors';
             el.querySelector('span').className = 'text-gray-500 transition-colors';
         });
+
+        ['current_password', 'new_password', 'new_password_confirmation'].forEach((id) => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.type = 'password';
+            }
+            const eye = document.getElementById(id + '_eye');
+            if (eye) {
+                eye.classList.remove('ri-eye-off-line');
+                eye.classList.add('ri-eye-line');
+            }
+        });
     }
 
     if (newPasswordInput) {
@@ -1459,25 +1481,34 @@
     const profilePicInput = document.getElementById('profile_pic_input');
     const profileCropImage = document.getElementById('profile-crop-image');
 
-    profilePicInput.addEventListener('change', function(e) {
+    if (profilePicInput && profileCropImage) profilePicInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function(event) {
-                if (profileCropper) profileCropper.destroy();
+                if (profileCropper) {
+                    profileCropper.destroy();
+                    profileCropper = null;
+                }
+
+                // Cropper must be initialized after the image element has finished loading,
+                // otherwise it can keep showing the previously-cropped image.
+                profileCropImage.onload = function() {
+                    profileCropImage.onload = null;
+                    profileCropper = new Cropper(profileCropImage, {
+                        aspectRatio: 1,
+                        viewMode: 2,
+                        guides: true,
+                        center: true,
+                        highlight: false,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false,
+                    });
+                };
+
                 profileCropImage.src = event.target.result;
                 openProfilePicModal();
-                
-                profileCropper = new Cropper(profileCropImage, {
-                    aspectRatio: 1,
-                    viewMode: 2,
-                    guides: true,
-                    center: true,
-                    highlight: false,
-                    cropBoxMovable: true,
-                    cropBoxResizable: true,
-                    toggleDragModeOnDblclick: false,
-                });
             };
             reader.readAsDataURL(file);
         }
@@ -1491,7 +1522,11 @@
     function closeProfilePicModal() {
         document.getElementById('profilePicModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
-        profilePicInput.value = '';
+        if (profilePicInput) profilePicInput.value = '';
+        if (profileCropImage) {
+            profileCropImage.onload = null;
+            profileCropImage.src = '';
+        }
         if (profileCropper) {
             profileCropper.destroy();
             profileCropper = null;
@@ -1499,7 +1534,10 @@
     }
 
     function uploadProfilePic() {
-        if (!profileCropper) return;
+        if (!profileCropper) {
+            showToast('Please select an image and crop it first.', 'error');
+            return;
+        }
 
         const canvas = profileCropper.getCroppedCanvas({
             width: 400,

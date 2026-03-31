@@ -111,7 +111,7 @@
         <div class="container mx-auto max-w-6xl">
             <!-- Practitioner Results Wrapper -->
             <div id="practitioner-results-container">
-                @include('partials.frontend.practitioner-grid', ['practitioners' => $practitioners, 'pincode' => $pincode])
+                @include('partials.frontend.practitioner-grid', ['practitioners' => $practitioners, 'pincode' => $pincode, 'selectedService' => $selectedService])
             </div>
 
             <style>
