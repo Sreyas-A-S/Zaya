@@ -140,6 +140,18 @@
                     }
                 </script>
 
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between px-2">
+                    <label class="flex items-center gap-2 cursor-pointer group select-none">
+                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}
+                            class="w-4 h-4 rounded border-gray-300 text-[#8B3A8A] focus:ring-[#8B3A8A] focus:ring-offset-0 cursor-pointer accent-[#8B3A8A]">
+                        <span class="text-sm text-gray-600 group-hover:text-gray-800 transition-colors">{{ __('Remember me') }}</span>
+                    </label>
+                    <a href="{{ route('client.forgot-password') }}" class="text-sm font-medium text-[#8B3A8A] hover:text-[#6D2E6D] hover:underline transition-colors">
+                        {{ __('Forgot password?') }}
+                    </a>
+                </div>
+
                 <!-- Promocode Field -->
                 <div class="relative">
                     <input type="text" name="promocode" placeholder="{{ __('Enter New Promocode') }}"

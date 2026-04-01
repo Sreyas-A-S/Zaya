@@ -19,15 +19,22 @@
             <div class="grid grid-cols-2 gap-y-6 gap-x-4 mb-6">
                 <div>
                     <p id="client_panel_age_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_age_label'] ?? 'Age' }}">{{ __($site_settings['client_panel_age_label'] ?? 'Age') }}</p>
-                    <p class="text-base font-normal text-gray-800">{{ $profile->age ?? __($site_settings['client_panel_not_set'] ?? 'Not set') }} {{ isset($profile->age) ? __($site_settings['client_panel_years'] ?? 'Years') : '' }}</p>
+                    @php
+                        $calculatedAge = (isset($profile->dob) && $profile->dob) ? (int) \Carbon\Carbon::parse($profile->dob)->diffInYears(now()) : null;
+                    @endphp
+                    <p class="text-base font-normal text-gray-800">{{ $calculatedAge ?? __($site_settings['client_panel_not_set'] ?? 'Not set') }} {{ $calculatedAge ? __($site_settings['client_panel_years'] ?? 'Years') : '' }}</p>
                 </div>
                 <div>
                     <p id="client_panel_gender_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_gender_label'] ?? 'Gender' }}">{{ __($site_settings['client_panel_gender_label'] ?? 'Gender') }}</p>
                     <p class="text-base font-normal text-gray-800">{{ ucfirst(__($profile->gender ?? ($user->gender ?? ($site_settings['client_panel_not_set'] ?? 'Not set')))) }}</p>
                 </div>
-                <div class="col-span-2">
+                <div>
                     <p id="client_panel_dob_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_dob_label'] ?? 'DOB' }}">{{ __($site_settings['client_panel_dob_label'] ?? 'DOB') }}</p>
                     <p class="text-base font-normal text-gray-800">{{ (isset($profile->dob) && $profile->dob) ? (\Carbon\Carbon::parse($profile->dob)->translatedFormat('M d, Y')) : __($site_settings['client_panel_not_set'] ?? 'Not set') }}</p>
+                </div>
+                <div>
+                    <p class="text-base text-gray-400 mb-1">{{ __('Nationality') }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ $profile->nationality ?? ($profile->country ?? ($user->nationality ? $user->nationality->name : __($site_settings['client_panel_not_set'] ?? 'Not set'))) }}</p>
                 </div>
             </div>
 
@@ -40,7 +47,7 @@
                 </div>
                 <div>
                     <p id="client_panel_phone_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_phone_label'] ?? 'Phone' }}">{{ __($site_settings['client_panel_phone_label'] ?? 'Phone') }}</p>
-                    <p class="text-base font-normal text-gray-800">{{ $profile->phone ?? ($user->phone ?? __($site_settings['client_panel_not_set'] ?? 'Not set')) }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ ($profile->mobile_country_code ? $profile->mobile_country_code . '-' : '') . ($profile->phone ?? ($user->phone ?? __($site_settings['client_panel_not_set'] ?? 'Not set'))) }}</p>
                 </div>
                 <div>
                     <p id="client_panel_address_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_address_label'] ?? 'Address' }}">{{ __($site_settings['client_panel_address_label'] ?? 'Address') }}</p>

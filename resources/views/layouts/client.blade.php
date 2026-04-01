@@ -133,7 +133,7 @@
     <!-- Sidebar -->
     @if(!$isMeetingPopout && !$isPublicMeeting)
     <aside class="w-[288px] bg-[#FFFFFF] border-r border-[#2E4B3D]/12 hidden lg:flex lg:flex-col h-full shrink-0 relative">
-        <div class="flex-1 overflow-y-auto pb-48 custom-sidebar-scrollbar">
+        <div class="flex-1 overflow-y-auto pb-10 custom-sidebar-scrollbar">
             <a href="{{ route('home') }}"
                 class="flex items-center pt-8 ps-8 pe-2 pb-2 text-gray-500 hover:text-gray-800 text-sm font-medium mb-4">
                 <i class="ri-arrow-left-line mr-2"></i> <span id="client_panel_back_btn" data-i18n="{{ $site_settings['client_panel_back_btn'] ?? 'Back' }}">{{ __($site_settings['client_panel_back_btn'] ?? 'Back') }}</span>
@@ -200,19 +200,13 @@
                     <i class="ri-shake-hands-line mr-3 text-lg"></i> <span id="client_panel_sidebar_my_services" data-i18n="My Services">{{ __('My Services') }}</span>
                 </a>
                 @endif
-                <a href="javascript:void(0)"
-                    onclick="openLogoutModal()"
-                    class="flex items-center px-8 py-3 text-red-400 hover:bg-red-50 hover:text-red-600 font-normal transition-colors">
-                    <i class="ri-logout-box-line mr-3 text-lg"></i> <span id="client_panel_sidebar_logout" data-i18n="Logout">{{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}</span>
-                </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                    @csrf
-                </form>
             </nav>
         </div>
+
         <img src="{{ asset('frontend/assets/client-profile-floating-img.png') }}" alt="Floating Image"
             class="w-[248px] h-auto absolute bottom-0 left-0 pointer-events-none z-0">
     </aside>
+
     @endif
 
     <!-- Main Content -->
@@ -311,6 +305,15 @@
                             </div>
                             <!-- Mobile Dropdown Anchor (teleport destination handled by script) -->
                         </div>
+
+                        <!-- Logout -->
+                        <div class="relative">
+                            <div onclick="openLogoutModal()"
+                                class="w-10 h-10 rounded-full bg-white border border-red-100 flex items-center justify-center text-red-500 relative shadow-sm cursor-pointer hover:bg-red-50 transition-colors"
+                                title="{{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}">
+                                <i class="ri-logout-box-r-line text-lg"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-y-4 justify-center lg:justify-start text-center lg:text-left items-center gap-8">
@@ -379,6 +382,15 @@
                             class="w-10 h-10 rounded-full bg-white border border-gray-200 hidden lg:flex items-center justify-center text-gray-600 relative shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
                             <i class="ri-notification-3-line text-lg"></i>
                             <div id="notif-dot-desktop" class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full {{ $user->unreadNotifications->count() > 0 ? '' : 'hidden' }}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Logout -->
+                    <div class="relative hidden lg:block">
+                        <div onclick="openLogoutModal()"
+                            class="w-10 h-10 rounded-full bg-white border border-red-100 flex items-center justify-center text-red-400 relative shadow-sm cursor-pointer hover:bg-red-50 hover:text-red-600 transition-all"
+                            title="{{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}">
+                            <i class="ri-logout-box-r-line text-lg"></i>
                         </div>
                     </div>
 
@@ -756,6 +768,9 @@
         </div>
     </div>
     @stack('scripts')
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+        @csrf
+    </form>
 </body>
 
 </html>

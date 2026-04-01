@@ -39,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
             
             // Get full language models for these locales
             $availableLanguages = \App\Models\Language::whereIn('code', $availableLocales)
+                ->where('status', 'active')
                 ->orderByRaw("CASE WHEN code = 'en' THEN 1 WHEN code = 'fr' THEN 2 ELSE 3 END ASC")
                 ->get()
                 ->unique('code'); // Ensure uniqueness if DB has multiple entries for same code

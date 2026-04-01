@@ -351,13 +351,22 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control validate-char-limit" name="zip_code" required maxlength="10" data-max="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Pincode">
+                                            <input type="text" class="form-control validate-char-limit" name="zip_code" required maxlength="10" data-max="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter Zipcode">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 10 characters allowed.</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Country <span class="text-danger">*</span></label>
                                             <select class="form-select" name="country" id="country" required>
                                                 <option value="">Select Country</option>
+                                                @foreach(config('countries') as $code => $name)
+                                                <option value="{{ $name }}" data-flag="{{ strtolower($code) }}" {{ $name == 'India' ? 'selected' : '' }}>{{ $name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Nationality</label>
+                                            <select class="form-select" name="nationality" id="nationality">
+                                                <option value="">Select Nationality</option>
                                                 @foreach(config('countries') as $code => $name)
                                                 <option value="{{ $name }}" data-flag="{{ strtolower($code) }}" {{ $name == 'India' ? 'selected' : '' }}>{{ $name }}</option>
                                                 @endforeach

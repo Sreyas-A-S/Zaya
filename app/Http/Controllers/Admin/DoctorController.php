@@ -63,6 +63,7 @@ class DoctorController extends Controller
                     'doctors.state',
                     'doctors.nationality',
                     'doctors.country',
+                    'doctors.mobile_country_code',
                     'doctors.status',
                     'doctors.gender',
                     'doctors.first_name',
@@ -102,8 +103,21 @@ class DoctorController extends Controller
                 ->orderColumn('name', 'users.name $1')
                 ->orderColumn('email', 'users.email $1')
                 ->orderColumn('phone', 'doctors.phone $1')
-                ->orderColumn('nationality', 'doctors.nationality $1')
-                ->orderColumn('status', 'doctors.status $1')
+                ->editColumn('nationality', function ($row) {
+                    return $row->nationality ?? ($row->country ?? 'N/A');
+                })
+                ->editColumn('phone', function ($row) {
+                    if (!$row->phone) return 'N/A';
+                    $phone = $row->phone;
+                    
+                    // If we have separate country code and phone doesn't already have it with hyphen
+                    if ($row->mobile_country_code && !Str::contains($phone, '-')) {
+                        // Ensure phone doesn't already start with the country code if it's a raw number
+                        $phone = $row->mobile_country_code . '-' . ltrim($phone, '+0');
+                    }
+                    
+                    return '<a href="javascript:void(0);" class="text-primary fw-bold call-phone" data-phone="' . $phone . '" data-name="' . $row->name . '"><i class="iconly-Call icli me-1"></i>' . $phone . '</a>';
+                })
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at ? \Carbon\Carbon::parse($row->created_at)->format('Y-m-d H:i') : '';
                 })
@@ -117,10 +131,6 @@ class DoctorController extends Controller
                     }
 
                     return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
-                })
-                ->editColumn('phone', function ($row) {
-                    if (!$row->phone) return 'N/A';
-                    return '<a href="javascript:void(0);" class="text-primary fw-bold call-phone" data-phone="' . $row->phone . '" data-name="' . $row->name . '"><i class="iconly-Call icli me-1"></i>' . $row->phone . '</a>';
                 })
                 ->editColumn('profile_photo', function ($row) {
                     $url = $row->profile_photo_path ? asset('storage/' . $row->profile_photo_path) : asset('admiro/assets/images/user/user.png');
@@ -202,6 +212,7 @@ class DoctorController extends Controller
             'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
+            'nationality' => 'nullable|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
 
             // D. Ayurveda Consultation Expertise
             'consultation_expertise' => 'nullable|array',
@@ -307,6 +318,7 @@ class DoctorController extends Controller
             'gender' => $validatedData['gender'],
             'dob' => $validatedData['dob'],
             'phone' => $validatedData['mobile_number'],
+            'nationality' => ($validatedData['nationality'] ?? null) ?: $validatedData['country'],
 
             'profile_photo_path' => $profilePhotoPath,
             'ayush_registration_number' => $validatedData['ayush_reg_no'],
@@ -421,6 +433,7 @@ class DoctorController extends Controller
             'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
+            'nationality' => 'nullable|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
 
             // D. Ayurveda Consultation Expertise
             'consultation_expertise' => 'nullable|array',
@@ -509,6 +522,7 @@ class DoctorController extends Controller
             'gender' => $validatedData['gender'],
             'dob' => $validatedData['dob'],
             'phone' => $validatedData['mobile_number'],
+            'nationality' => ($validatedData['nationality'] ?? null) ?: $validatedData['country'],
             'profile_photo_path' => $profilePhotoPath,
             'ayush_registration_number' => $validatedData['ayush_reg_no'],
             'state_ayurveda_council_name' => $validatedData['state_council'],

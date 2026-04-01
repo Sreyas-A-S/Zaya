@@ -59,6 +59,10 @@ class AvailabilityController extends Controller
             'off_slots' => 'nullable|string',
         ]);
 
+        if ($request->specific_date && !$request->has('day_of_week')) {
+            $request->merge(['day_of_week' => \Carbon\Carbon::parse($request->specific_date)->dayOfWeek]);
+        }
+
         $offSlots = $request->off_slots ? explode(',', $request->off_slots) : [];
 
         // 1. Clear existing slots for this pattern/date
@@ -101,7 +105,7 @@ class AvailabilityController extends Controller
             $current->addMinutes($duration);
         }
 
-        if ($request->ajax()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json(['status' => 'success', 'message' => 'Availability updated.']);
         }
 
@@ -130,6 +134,7 @@ class AvailabilityController extends Controller
             ->get();
 
         return response()->json([
+            'status' => true,
             'date' => $date,
             'formatted_date' => $dateObj->format('M d, Y'),
             'is_custom' => $isCustom,
@@ -141,7 +146,7 @@ class AvailabilityController extends Controller
                     'end' => $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('h:i A') : null,
                     'end_24' => $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('H:i') : null,
                     'duration' => $s->slot_duration,
-                    'is_available' => $s->is_available
+                    'is_available' => (bool)$s->is_available
                 ];
             })
         ]);
@@ -440,7 +445,7 @@ class AvailabilityController extends Controller
 
         $availability->delete();
 
-        if (request()->ajax()) {
+        if (request()->expectsJson() || request()->ajax()) {
             return response()->json(['status' => 'success']);
         }
 

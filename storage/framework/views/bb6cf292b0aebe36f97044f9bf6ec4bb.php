@@ -1,0 +1,1 @@
+<?php /**PATH C:\wamp64\www\zaya\resources\views\admin\admins\user-manager\index.blade.php ENDPATH**/ ?>

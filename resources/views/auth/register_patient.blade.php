@@ -3,10 +3,6 @@
 @section('title', 'Patient Registration')
 
 @section('content')
-@php
-
-return null;
-@endphp
 <div class="container-fluid p-0">
     <div class="row m-0">
         <div class="col-12 p-0">

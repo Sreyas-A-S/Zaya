@@ -490,10 +490,10 @@
             let borderClass = isMain ? 'border-primary border-3' : 'border-light';
 
             html += `
-                <div class="position-relative media-item" style="width: 100px; height: 100px; cursor: pointer;">
+                <div class="position-relative media-item" style="width: 100px; height: 100px; cursor: pointer;" onclick="setMain('existing', '${img.id}')">
                     <img src="${img.path}" class="w-100 h-100 object-fit-cover rounded ${borderClass}">
                     ${badge}
-                    <div class="media-action-overlay rounded">
+                    <div class="media-action-overlay rounded" onclick="event.stopPropagation()">
                         <button type="button" class="btn btn-primary btn-sm" onclick="setMain('existing', '${img.id}')">Set Main</button>
                         <button type="button" class="btn btn-danger btn-sm" onclick="deleteExistingImage(event, '${img.id}')"><i class="fa fa-trash"></i></button>
                     </div>
@@ -506,13 +506,17 @@
             let isMain = (mainSelection && mainSelection.type === 'new' && mainSelection.id === index);
             let badge = isMain ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1" style="z-index: 2;">Main</span>' : '';
             let borderClass = isMain ? 'border-primary border-3' : 'border-light';
-            let objectUrl = URL.createObjectURL(file);
+            
+            // Use existing preview URL or create one (once)
+            if (!file.previewUrl) {
+                file.previewUrl = URL.createObjectURL(file);
+            }
 
             html += `
-                <div class="position-relative media-item" style="width: 100px; height: 100px; cursor: pointer;">
-                    <img src="${objectUrl}" class="w-100 h-100 object-fit-cover rounded ${borderClass}">
+                <div class="position-relative media-item" style="width: 100px; height: 100px; cursor: pointer;" onclick="setMain('new', ${index})">
+                    <img src="${file.previewUrl}" class="w-100 h-100 object-fit-cover rounded ${borderClass}">
                     ${badge}
-                    <div class="media-action-overlay rounded">
+                    <div class="media-action-overlay rounded" onclick="event.stopPropagation()">
                         <button type="button" class="btn btn-primary btn-sm" onclick="setMain('new', ${index})">Set Main</button>
                         <button type="button" class="btn btn-warning btn-sm" onclick="openCropper(${index})"><i class="fa fa-crop"></i></button>
                         <button type="button" class="btn btn-danger btn-sm" onclick="removeNewFile(event, ${index})"><i class="fa fa-trash"></i></button>

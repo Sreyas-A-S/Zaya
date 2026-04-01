@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="<?php echo e(asset('frontend/assets/favicon-96x96.png')); ?>" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="<?php echo e(asset('frontend/assets/favicon.svg')); ?>" />
+    <link rel="shortcut icon" href="<?php echo e(asset('frontend/assets/favicon.ico')); ?>" />
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo e(asset('frontend/assets/apple-touch-icon.png')); ?>" />
+    <meta name="apple-mobile-web-app-title" content="Zaya Wellness" />
+    <link rel="manifest" href="<?php echo e(asset('frontend/assets/site.webmanifest')); ?>">
+    <title><?php echo e(__('Login')); ?> - Zaya Wellness</title>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        .bg-primary { background-color: #2E4B3D; }
+        .text-primary { color: #2E4B3D; }
+        .border-primary { border-color: #2E4B3D; }
+    </style>
+</head>
+
+<body class="bg-white min-h-screen flex gap-10 xl:gap-20 p-2 md:p-10 max-lg:pb-15! relative"
+    style="background-image: url('<?php echo e(asset('frontend/assets/login-bg.webp')); ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="absolute inset-0 bg-black/50 z-0"></div>
+    <!-- Back Link & Language -->
+    <div
+        class="lg:hidden absolute bottom-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-6 z-10">
+        <!-- Pill Toggle Mobile -->
+        <?php if(isset($available_languages) && $available_languages->count() >= 2): ?>
+        <?php
+        $lang1 = $available_languages->first();
+        $lang2 = $available_languages->skip(1)->first();
+        $currentLocale = App::getLocale();
+        ?>
+        <button type="button"
+            class="relative flex items-center bg-white/10 backdrop-blur-md rounded-full p-1 border border-white/20 cursor-pointer focus:outline-none"
+            onclick="switchLanguage('<?php echo e($currentLocale == $lang1->code ? $lang2->code : $lang1->code); ?>')">
+            <div id="lang-toggle-pill-mobile"
+                class="absolute top-1 bottom-1 left-1 w-9 bg-white rounded-full shadow-sm transition-transform duration-300 ease-in-out <?php echo e($currentLocale == $lang2->code ? 'translate-x-[36px]' : 'translate-x-0'); ?>">
+            </div>
+            <span class="relative z-10 w-9 text-center <?php echo e($currentLocale == $lang1->code ? 'text-black' : 'text-white'); ?> text-[10px] font-bold py-1.5 transition-colors duration-300"><?php echo e(Str::ucfirst(substr($lang1->code, 0, 2))); ?></span>
+            <span class="relative z-10 w-9 text-center <?php echo e($currentLocale == $lang2->code ? 'text-black' : 'text-white'); ?> text-[10px] font-bold py-1.5 transition-colors duration-300"><?php echo e(Str::ucfirst(substr($lang2->code, 0, 2))); ?></span>
+        </button>
+        <?php endif; ?>
+
+        <a href="<?php echo e(route('index')); ?>"
+            class="text-white flex items-center gap-2 hover:opacity-80 transition text-sm font-normal">
+            <i class="ri-arrow-left-line"></i> <?php echo e(__('Back to Website')); ?>
+
+        </a>
+    </div>
+    <!-- Left Side - Image -->
+    <div class="relative hidden lg:flex w-1/2 bg-cover bg-center items-end p-16 z-10">
+        <!-- Back Link and Language Swapper -->
+        <div class="absolute top-0 right-0 py-6 px-10 flex items-center gap-10 z-10">
+            <!-- Pill Toggle Desktop -->
+            <?php if(isset($available_languages) && $available_languages->count() >= 2): ?>
+            <?php
+            $lang1 = $available_languages->first();
+            $lang2 = $available_languages->skip(1)->first();
+            $currentLocale = App::getLocale();
+            ?>
+           
+            <?php endif; ?>
+
+            <a href="<?php echo e(route('index')); ?>"
+                class="text-white flex items-center gap-2 hover:opacity-80 transition z-10 text-sm font-normal">
+                <i class="ri-arrow-left-line"></i> <?php echo e(__('Back to Website')); ?>
+
+            </a>
+        </div>
+
+        <!-- Text Content -->
+        <div class="relative z-10 text-white max-w-xl">
+            <h1 class="text-4xl xl:text-5xl font-sans! font-bold mb-6 leading-tight"><?php echo e(__('Continue Your Journey with ZAYA')); ?>
+
+            </h1>
+            <p class="text-white/80 text-lg font-light leading-relaxed"><?php echo e(__('Access your personalized dashboard to manage consultations, review Ayurvedic diagnosis reports, and stay connected with your holistic health community.')); ?></p>
+        </div>
+    </div>
+
+    <!-- Right Side - Form -->
+    <div
+        class="w-full lg:w-1/2 flex items-center justify-center px-4 py-6 lg:p-8 bg-white overflow-y-auto z-20 rounded-3xl">
+        <div class="w-full max-w-md">
+            <h2 class="text-lg md:text-3xl font-sans! font-bold text-center text-gray-900 lg:mb-[18px]"><?php echo e(__('Login')); ?></h2>
+            <p class="text-gray-500 text-center mb-4 md:mb-7 text-md md:text-[22px]"><?php echo e(__('Welcome Back!')); ?></p>
+
+            <?php if(session('error')): ?>
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <span class="block sm:inline"><?php echo e(session('error')); ?></span>
+                </div>
+            <?php endif; ?>
+
+            <?php if(session('success')): ?>
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <span class="block sm:inline"><?php echo e(session('success')); ?></span>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" action="<?php echo e(route('login')); ?>" class="space-y-6">
+                <?php echo csrf_field(); ?>
+                <?php if(isset($redirect)): ?>
+                    <input type="hidden" name="redirect" value="<?php echo e($redirect); ?>">
+                <?php endif; ?>
+
+                <div>
+                    <input type="email" name="email" value="<?php echo e(old('email')); ?>" required autofocus
+                        placeholder="<?php echo e(__('Email or Mobile number')); ?>"
+                        class="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 text-sm lg:text-base placeholder-gray-400 bg-white shadow-sm transition-all <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500 <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                    <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <span class="text-red-500 text-sm mt-1 pl-4 block"><?php echo e($message); ?></span>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                </div>
+
+                <div class="relative">
+                    <input type="password" name="password" id="password" required placeholder="<?php echo e(__('Password')); ?>"
+                        class="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 placeholder-gray-400 bg-white shadow-sm transition-all <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500 <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                    <button type="button" onclick="togglePasswordVisibility()"
+                        class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer">
+                        <i id="password-toggle-icon" class="ri-eye-line text-xl"></i>
+                    </button>
+                    <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <span class="text-red-500 text-sm mt-1 pl-4 block"><?php echo e($message); ?></span>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                </div>
+
+                <script>
+                    function togglePasswordVisibility() {
+                        const passwordInput = document.getElementById('password');
+                        const toggleIcon = document.getElementById('password-toggle-icon');
+                        
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            toggleIcon.classList.remove('ri-eye-line');
+                            toggleIcon.classList.add('ri-eye-off-line');
+                        } else {
+                            passwordInput.type = 'password';
+                            toggleIcon.classList.remove('ri-eye-off-line');
+                            toggleIcon.classList.add('ri-eye-line');
+                        }
+                    }
+                </script>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between px-2">
+                    <label class="flex items-center gap-2 cursor-pointer group select-none">
+                        <input type="checkbox" name="remember" <?php echo e(old('remember') ? 'checked' : ''); ?>
+
+                            class="w-4 h-4 rounded border-gray-300 text-[#8B3A8A] focus:ring-[#8B3A8A] focus:ring-offset-0 cursor-pointer accent-[#8B3A8A]">
+                        <span class="text-sm text-gray-600 group-hover:text-gray-800 transition-colors"><?php echo e(__('Remember me')); ?></span>
+                    </label>
+                    <a href="<?php echo e(route('client.forgot-password')); ?>" class="text-sm font-medium text-[#8B3A8A] hover:text-[#6D2E6D] hover:underline transition-colors">
+                        <?php echo e(__('Forgot password?')); ?>
+
+                    </a>
+                </div>
+
+                <!-- Promocode Field -->
+                <div class="relative">
+                    <input type="text" name="promocode" placeholder="<?php echo e(__('Enter New Promocode')); ?>"
+                        class="w-full pl-6 pr-[110px] py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 text-sm lg:text-base placeholder-gray-400 bg-white shadow-sm transition-all">
+                    <button type="button"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#D1D1D1]/60 text-[#818181] px-7 py-2.5 rounded-full hover:bg-gray-300 transition-colors text-sm font-medium cursor-pointer">
+                        <?php echo e(__('Apply')); ?>
+
+                    </button>
+                </div>
+
+                <!-- Captcha Section -->
+                <div class="flex items-center gap-3 md:gap-4">
+                    <!-- Dynamic Captcha -->
+                    <div
+                        class="bg-white border border-gray-200 rounded-full shadow-sm flex items-center justify-center py-2 h-[58px] min-w-[140px] md:min-w-[160px] overflow-hidden relative shrink-0">
+                        <img id="captcha-img" src="<?php echo e(route('captcha')); ?>" alt="Captcha" class="h-full w-full object-contain">
+                    </div>
+
+                    <!-- Refresh Arrow -->
+                    <button type="button" onclick="refreshCaptcha()"
+                        class="text-[#1052CE] hover:text-blue-800 transition-colors focus:outline-none cursor-pointer shrink-0">
+                        <i class="ri-restart-line text-[22px] md:text-[26px] font-medium"
+                            style="display: inline-block;"></i>
+                    </button>
+
+                    <!-- Captcha Input -->
+                    <input type="text" name="captcha" placeholder="<?php echo e(__('Enter Code')); ?>" required
+                        class="w-full px-5 md:px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 placeholder-[#A3A3A3] bg-white shadow-sm transition-all h-[58px] <?php $__errorArgs = ['captcha'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500 <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                </div>
+                <?php $__errorArgs = ['captcha'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                    <span class="text-red-500 text-sm mt-1 pl-4 block"><?php echo e($message); ?></span>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+
+                <script>
+                    function refreshCaptcha() {
+                        document.getElementById('captcha-img').src = "<?php echo e(route('captcha')); ?>?" + Math.random();
+                    }
+                </script>
+
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-[#422251] to-[#AA349F] text-white py-4 rounded-full font-medium text-base lg:text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200 cursor-pointer">
+                    <?php echo e(__('Login')); ?>
+
+                </button>
+            </form>
+
+            <div class="mt-8 text-center text-gray-500 text-sm"><?php echo e(__('Login with other accounts')); ?></div>
+            <div class="flex justify-center gap-6 mt-6 mb-8 lg:mb-12">
+                <a href="<?php echo e(route('social.login', 'google')); ?>"
+                    class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition shadow-sm hover:shadow-md">
+                    <img src="<?php echo e(asset('frontend/assets/google-icon.svg')); ?>" class="w-6 h-6" alt="Google">
+                </a>
+                <a href="<?php echo e(route('social.login', 'facebook')); ?>"
+                    class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition text-[#1877F2] shadow-sm hover:shadow-md">
+                    <img src="<?php echo e(asset('frontend/assets/facebook-icon.svg')); ?>" class="w-6 h-6" alt="Facebook">
+                </a>
+                <a href="<?php echo e(route('social.login', 'apple')); ?>"
+                    class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition text-black shadow-sm hover:shadow-md">
+                    <img src="<?php echo e(asset('frontend/assets/apple-icon.svg')); ?>" class="w-6 h-6" alt="Apple">
+                </a>
+            </div>
+
+            <div class="text-center text-gray-600 text-sm lg:text-base">
+                <?php echo e(__("Don't have an account?")); ?> <a href="<?php echo e(route('client-register')); ?>"
+                    class="text-[#FF6B6B] font-medium hover:underline ml-1 text-nowrap"><?php echo e(__('Register Now')); ?></a>
+            </div>
+        </div>
+    </div>
+    <script>
+        function switchLanguage(locale) {
+            fetch(`/lang/${locale}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                    'Accept': 'application/json'
+                }
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.status) {
+                      window.location.reload();
+                  }
+              }).catch(err => {
+                  console.error('Language switch failed:', err);
+                  // Optional: fallback to regular reload or notify user
+              });
+        }
+    </script>
+</body>
+
+</html><?php /**PATH C:\wamp64\www\zaya\resources\views\zaya-login.blade.php ENDPATH**/ ?>

@@ -1,0 +1,418 @@
+<?php $__env->startSection('content'); ?>
+
+    <!-- Hero Section -->
+    <section class="pt-[144px] md:pt-[150px] px-4 md:px-6 bg-white">
+        <div class="container mx-auto">
+            <!-- Text Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-20">
+                <!-- Left Text -->
+                <div>
+                    <div class="mb-8 animate-on-scroll">
+                        <span class="bg-accent text-secondary px-8 py-2.5 rounded-full font-medium text-base inline-block">
+                            <?php echo e(__($settings['blogs_page_badge'] ?? 'Our Blogs')); ?>
+
+                        </span>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-8 leading-tight">
+                        <?php echo nl2br(__($settings['blogs_page_title'] ?? "Insights & Wellness Tips")); ?>
+
+                    </h1>
+                </div>
+
+                <!-- Right Text -->
+                <div class="col-span-2 pt-2 lg:pt-4">
+                    <h2 class="text-2xl md:text-[28px] font-serif text-secondary mb-6 leading-snug">
+                        <?php echo nl2br(__($settings['blogs_page_subtitle'] ?? 'Discover expert articles, wellness guides, and holistic living tips from our practitioners.')); ?>
+
+                    </h2>
+                    <p class="text-gray-500 leading-relaxed text-base font-light">
+                        <?php echo e(__($settings['blogs_page_description'] ?? 'Stay informed with the latest insights on Ayurveda, Yoga, mindfulness, and holistic health. Our blog features expert advice, wellness tips, and inspiring stories to guide your journey toward better health and harmony.')); ?>
+
+                    </p>
+                </div>
+            </div> 
+        </div>
+    </section>
+
+    <!-- Blogs Content with Sidebar -->
+    <section class="px-4 md:px-6 py-12 min-h-[400px]">
+        <div class="container mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+                    <!-- Search Box -->
+                    <div class="mb-12">
+                        <form id="blogs-filter-form" action="<?php echo e(route('blogs')); ?>" method="GET">
+                            <div class="flex flex-col md:flex-row gap-6 mb-6">
+                                <?php if(request()->has('category')): ?>
+                                    <input type="hidden" name="category" value="<?php echo e(request('category')); ?>">
+                                <?php endif; ?>
+                                
+                                <!-- Search Input -->
+                                <div class="relative group grow">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-6 pointer-events-none">
+                                        <i class="ri-search-line text-2xl text-[#C5896B]"></i>
+                                    </div>
+                                    <input type="text" 
+                                           name="search" 
+                                           value="<?php echo e($searchQuery ?? ''); ?>" 
+                                           placeholder="<?php echo e(__('Search articles, topics...')); ?>" 
+                                           class="w-full pl-16 pr-20 h-[72px] bg-white border border-[#D4A58E] rounded-full text-[#A67B5B] placeholder-[#C5896B] outline-none focus:ring-1 focus:ring-[#D4A58E] transition-all duration-300 text-lg shadow-sm hover:shadow-md">
+                                    
+                                    <?php if(!empty($searchQuery)): ?>
+                                        <a href="<?php echo e(route('blogs')); ?>" 
+                                           class="absolute right-20 top-1/2 -translate-y-1/2 text-[#C5896B] hover:text-[#B07459] transition-colors p-2">
+                                            <i class="ri-close-circle-line text-2xl"></i>
+                                        </a>
+                                    <?php endif; ?>
+
+                                    <button type="submit" 
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#C5896B] hover:bg-[#B07459] text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-md cursor-pointer">
+                                        <i class="ri-search-line text-xl"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Author Dropdown -->
+                                <?php if(isset($authors) && count($authors) > 0): ?>
+                                    <div class="relative w-full md:w-80" id="author-dropdown-container">
+                                        <input type="hidden" name="author" id="author-input" value="<?php echo e($selectedAuthorId ?? ''); ?>">
+                                        
+                                        <?php
+                                            $displayAuthorName = __('All Authors');
+                                            if(isset($selectedAuthorId) && $selectedAuthorId) {
+                                                foreach($authors as $a) {
+                                                    if($a['id'] == $selectedAuthorId) {
+                                                        $displayAuthorName = $a['name'];
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        ?>
+
+                                        <button type="button" onclick="toggleAuthorDropdown()" class="w-full h-[72px] pl-8 pr-6 bg-white border border-[#D4A58E] rounded-full text-[#C5896B] text-left outline-none focus:ring-1 focus:ring-[#D4A58E] transition-all duration-300 flex items-center justify-between shadow-sm hover:shadow-md cursor-pointer">
+                                            <span class="truncate block text-lg font-sans" id="selected-author-text">
+                                                <?php echo e($displayAuthorName); ?>
+
+                                            </span>
+                                            <i class="ri-arrow-down-s-line text-2xl text-[#C5896B] transition-transform duration-300" id="author-dropdown-arrow"></i>
+                                        </button>
+                                        
+                                        <!-- Dropdown List -->
+                                        <div id="author-dropdown-list" class="absolute top-full left-0 w-full mt-2 bg-white border border-[#efe6e1] rounded-[2rem] shadow-xl overflow-hidden hidden z-50">
+                                            <div class="max-h-60 overflow-y-auto py-2 flex flex-col gap-1 px-2">
+                                                <div onclick="selectAuthor('', '<?php echo e(__('All Authors')); ?>')" class="px-6 py-3 hover:bg-[#FFFBF5] rounded-xl cursor-pointer transition-colors text-[#5A3E31] font-medium text-base">
+                                                    <?php echo e(__('All Authors')); ?>
+
+                                                </div>
+                                                <?php $__currentLoopData = $authors; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $author): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <div onclick="selectAuthor('<?php echo e($author['id']); ?>', '<?php echo e(addslashes($author['name'])); ?>')" class="px-6 py-3 hover:bg-[#FFFBF5] rounded-xl cursor-pointer transition-colors text-[#5A3E31] font-medium text-base <?php echo e(isset($selectedAuthorId) && $selectedAuthorId == $author['id'] ? 'bg-[#FFFBF5]' : ''); ?>">
+                                                        <?php echo e($author['name']); ?>
+
+                                                    </div>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <?php if(!empty($searchQuery) || (isset($selectedAuthorId) && $selectedAuthorId)): ?>
+                                <div class="mt-4 ml-2">
+                                    <p class="text-gray-500">
+                                        <?php echo e(__('Showing results')); ?>
+
+                                        <?php if(!empty($searchQuery)): ?>
+                                             <?php echo e(__('for')); ?> "<span class="font-medium text-primary"><?php echo e($searchQuery); ?></span>"
+                                        <?php endif; ?>
+                                        <?php if(!empty($searchQuery) && (isset($selectedAuthorId) && $selectedAuthorId)): ?>
+                                            <?php echo e(__('and')); ?>
+
+                                        <?php endif; ?>
+                                        <?php if(isset($selectedAuthorId) && $selectedAuthorId): ?>
+                                             <?php echo e(__('posts by')); ?> "<span class="font-medium text-primary"><?php echo e($displayAuthorName); ?></span>"
+                                        <?php endif; ?>
+                                        <?php if(isset($pagination['totalPosts'])): ?>
+                                            <span class="text-gray-400">(<?php echo e($pagination['totalPosts']); ?> <?php echo e($pagination['totalPosts'] == 1 ? __('result') : __('results')); ?> <?php echo e(__('found')); ?>)</span>
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                            <?php endif; ?>
+                        </form>
+                    </div>
+
+                    <!-- Blogs Grid -->
+                    <?php if(isset($processedPosts) && count($processedPosts) > 0): ?>
+                        <div id="blogs-grid-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                            <?php $__currentLoopData = $processedPosts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $post): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <article class="group bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+                                    <a href="<?php echo e(route('blog-detail', $post['slug'])); ?>" class="block">
+                                        <div class="aspect-video overflow-hidden">
+                                            <?php if($post['featured_image']): ?>
+                                                <img src="<?php echo e($post['featured_image']); ?>" 
+                                                    <?php if(!empty($post['featured_image_srcset'])): ?> 
+                                                    srcset="<?php echo e($post['featured_image_srcset']); ?>" 
+                                                    sizes="<?php echo e($post['featured_image_sizes']); ?>" 
+                                                    <?php endif; ?>
+                                                    alt="<?php echo e($post['title']); ?>" 
+                                                    loading="lazy"
+                                                    class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                                            <?php else: ?>
+                                                <div class="w-full h-full bg-gradient-to-br from-accent/30 to-secondary/20 flex items-center justify-center">
+                                                    <i class="ri-article-line text-5xl text-secondary/40"></i>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </a>
+                                    <div class="p-6">
+                                        <div class="flex items-center gap-3 mb-4 cursor-default">
+                                            <span class="bg-accent/20 text-secondary px-4 py-1.5 rounded-full text-sm font-medium"><?php echo e($post['category']); ?></span>
+                                            <span class="text-gray-400 text-sm"><?php echo e($post['date']); ?></span>
+                                        </div>
+                                        <a href="<?php echo e(route('blog-detail', $post['slug'])); ?>">
+                                            <h3 class="text-xl font-serif font-semibold text-primary mb-3 group-hover:text-secondary transition-colors line-clamp-2">
+                                                <?php echo e($post['title']); ?>
+
+                                            </h3>
+                                        </a>
+                                        <p class="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-3 cursor-default">
+                                            <?php echo e(Str::limit($post['excerpt'], 150)); ?>
+
+                                        </p>
+                                        <a href="<?php echo e(route('blog-detail', $post['slug'])); ?>" class="inline-flex items-center text-secondary font-medium hover:text-primary transition-colors">
+                                            <?php echo e(__('Read More')); ?>
+
+                                            <i class="ri-arrow-right-line ml-2"></i>
+                                        </a>
+                                    </div>
+                                </article>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+
+                        <!-- Pagination -->
+                        <?php if(isset($pagination) && $pagination['totalPages'] > 1): ?>
+                            <nav class="mt-16 flex justify-center" aria-label="Blog pagination">
+                                <div class="flex items-center gap-2">
+                                    
+                                    <?php if($pagination['currentPage'] > 1): ?>
+                                        <a href="<?php echo e(route('blogs', array_merge(request()->query(), ['page' => $pagination['currentPage'] - 1]))); ?>" 
+                                           class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 group">
+                                            <i class="ri-arrow-left-s-line text-xl"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-100 text-gray-300 cursor-not-allowed">
+                                            <i class="ri-arrow-left-s-line text-xl"></i>
+                                        </span>
+                                    <?php endif; ?>
+
+                                    
+                                    <?php
+                                        $start = max(1, $pagination['currentPage'] - 2);
+                                        $end = min($pagination['totalPages'], $pagination['currentPage'] + 2);
+                                        
+                                        // Adjust if we're near the start or end
+                                        if ($pagination['currentPage'] <= 3) {
+                                            $end = min(5, $pagination['totalPages']);
+                                        }
+                                        if ($pagination['currentPage'] >= $pagination['totalPages'] - 2) {
+                                            $start = max(1, $pagination['totalPages'] - 4);
+                                        }
+                                    ?>
+
+                                    
+                                    <?php if($start > 1): ?>
+                                        <a href="<?php echo e(route('blogs', array_merge(request()->query(), ['page' => 1]))); ?>" 
+                                           class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300">
+                                            1
+                                        </a>
+                                        <?php if($start > 2): ?>
+                                            <span class="flex items-center justify-center w-8 text-gray-400">...</span>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+
+                                    
+                                    <?php for($i = $start; $i <= $end; $i++): ?>
+                                        <?php if($i == $pagination['currentPage']): ?>
+                                            <span class="flex items-center justify-center w-12 h-12 rounded-full bg-secondary text-white font-medium shadow-lg shadow-secondary/30">
+                                                <?php echo e($i); ?>
+
+                                            </span>
+                                        <?php else: ?>
+                                            <a href="<?php echo e(route('blogs', array_merge(request()->query(), ['page' => $i]))); ?>" 
+                                               class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300">
+                                                <?php echo e($i); ?>
+
+                                            </a>
+                                        <?php endif; ?>
+                                    <?php endfor; ?>
+
+                                    
+                                    <?php if($end < $pagination['totalPages']): ?>
+                                        <?php if($end < $pagination['totalPages'] - 1): ?>
+                                            <span class="flex items-center justify-center w-8 text-gray-400">...</span>
+                                        <?php endif; ?>
+                                        <a href="<?php echo e(route('blogs', array_merge(request()->query(), ['page' => $pagination['totalPages']]))); ?>" 
+                                           class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300">
+                                            <?php echo e($pagination['totalPages']); ?>
+
+                                        </a>
+                                    <?php endif; ?>
+
+                                    
+                                    <?php if($pagination['currentPage'] < $pagination['totalPages']): ?>
+                                        <a href="<?php echo e(route('blogs', array_merge(request()->query(), ['page' => $pagination['currentPage'] + 1]))); ?>" 
+                                           class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 group">
+                                            <i class="ri-arrow-right-s-line text-xl"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-100 text-gray-300 cursor-not-allowed">
+                                            <i class="ri-arrow-right-s-line text-xl"></i>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            </nav>
+
+                            
+                             <div class="mt-6 text-center">
+                                <p class="text-gray-400 text-sm">
+                                    <?php echo e(__('Showing')); ?> <?php echo e((($pagination['currentPage'] - 1) * $pagination['perPage']) + 1); ?> - <?php echo e(min($pagination['currentPage'] * $pagination['perPage'], $pagination['totalPosts'])); ?> <?php echo e(__('of')); ?> <?php echo e($pagination['totalPosts']); ?> <?php echo e(__('articles')); ?>
+
+                                </p>
+                            </div>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <!-- No Posts Found / Loading State -->
+                        <div class="text-center py-16">
+                            <div class="w-24 h-24 mx-auto mb-6 bg-accent/20 rounded-full flex items-center justify-center">
+                                <i class="ri-article-line text-4xl text-secondary"></i>
+                            </div>
+                            <?php if(!empty($searchQuery)): ?>
+                                <h3 class="text-2xl font-serif font-semibold text-primary mb-3"><?php echo e(__('No Results Found')); ?></h3>
+                                <p class="text-gray-500 max-w-md mx-auto mb-6">
+                                    <?php echo e(__('We couldn\'t find any articles matching')); ?> "<?php echo e($searchQuery); ?>". <?php echo e(__('Try a different search term or browse all our articles.')); ?>
+
+                                </p>
+                                <a href="<?php echo e(route('blogs')); ?>" class="inline-flex items-center bg-secondary text-white px-6 py-3 rounded-full font-medium hover:bg-secondary/90 transition-all duration-300">
+                                    <i class="ri-refresh-line mr-2"></i>
+                                    <?php echo e(__('View All Articles')); ?>
+
+                                </a>
+                            <?php else: ?>
+                                <h3 class="text-2xl font-serif font-semibold text-primary mb-3"><?php echo e(__('No Blog Posts Found')); ?></h3>
+                                <p class="text-gray-500 max-w-md mx-auto">
+                                    <?php echo e(__('We\'re working on creating valuable content for you. Please check back soon for wellness tips, insights, and more.')); ?>
+
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="sticky top-[180px] space-y-8">
+                        <!-- Categories -->
+                        <?php if(isset($categories) && count($categories) > 0): ?>
+                            <div class="bg-gray-50 rounded-[20px] p-6">
+                                <h3 class="text-xl font-serif font-bold text-primary mb-6 flex items-center gap-3">
+                                    <span class="w-10 h-10 bg-accent/30 rounded-full flex items-center justify-center">
+                                        <i class="ri-folder-line text-secondary"></i>
+                                    </span>
+                                    <?php echo e(__('Categories')); ?>
+
+                                </h3>
+                                <div class="space-y-2">
+                                    
+                                    <a href="<?php echo e(route('blogs')); ?>" 
+                                       class="flex items-center justify-between p-3 rounded-xl <?php echo e(!request('category') ? 'bg-secondary text-white' : 'bg-white hover:bg-secondary hover:text-white'); ?> transition-all duration-300 border border-gray-100 group">
+                                        <span class="font-medium <?php echo e(!request('category') ? 'text-white' : 'text-gray-700 group-hover:text-white'); ?> transition-colors">
+                                            <?php echo e(__('All Categories')); ?>
+
+                                        </span>
+                                        <span class="text-sm <?php echo e(!request('category') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500 group-hover:bg-white/20 group-hover:text-white'); ?> px-3 py-1 rounded-full transition-all">
+                                            <i class="ri-apps-line"></i>
+                                        </span>
+                                    </a>
+                                    <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php if($category->count > 0): ?>
+                                            <?php
+                                                $isActive = request('category') === $category->name;
+                                            ?>
+                                            <a href="<?php echo e(route('blogs', ['category' => $category->name])); ?>" 
+                                               class="flex items-center justify-between p-3 rounded-xl <?php echo e($isActive ? 'bg-secondary text-white' : 'bg-white hover:bg-secondary hover:text-white'); ?> transition-all duration-300 border border-gray-100 group">
+                                                <span class="font-medium <?php echo e($isActive ? 'text-white' : 'text-gray-700 group-hover:text-white'); ?> transition-colors">
+                                                    <?php echo e(__($category->name)); ?>
+
+                                                </span>
+                                                <span class="text-sm <?php echo e($isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500 group-hover:bg-white/20 group-hover:text-white'); ?> px-3 py-1 rounded-full transition-all">
+                                                    <?php echo e($category->count); ?>
+
+                                                </span>
+                                            </a>
+                                        <?php endif; ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Newsletter CTA -->
+                        <div class="bg-gradient-to-br from-secondary to-primary rounded-[20px] p-6 text-white">
+                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-4">
+                                <i class="ri-mail-line text-2xl"></i>
+                            </div>
+                             <h3 class="text-lg font-serif font-bold mb-2"><?php echo e(__('Stay Updated')); ?></h3>
+                            <p class="text-white/80 text-sm mb-4"><?php echo e(__('Get the latest wellness tips and insights delivered to your inbox.')); ?></p>
+                            <a href="#" 
+                               class="inline-flex items-center gap-2 bg-white text-secondary px-5 py-2.5 rounded-full font-medium text-sm hover:bg-accent transition-all duration-300">
+                                <?php echo e(__('Subscribe Now')); ?>
+
+                                <i class="ri-arrow-right-line"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function toggleAuthorDropdown() {
+            const list = document.getElementById('author-dropdown-list');
+            const arrow = document.getElementById('author-dropdown-arrow');
+            
+            if (list.classList.contains('hidden')) {
+                list.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            } else {
+                list.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        }
+
+        function selectAuthor(id, name) {
+            // Show preloader
+            if (window.showPreloader) {
+                window.showPreloader();
+            }
+
+            document.getElementById('author-input').value = id;
+            document.getElementById('selected-author-text').innerText = name;
+            toggleAuthorDropdown();
+            document.getElementById('blogs-filter-form').submit();
+        }
+
+        // Close on click outside
+        window.addEventListener('click', function(e) {
+            const container = document.getElementById('author-dropdown-container');
+            if (container && !container.contains(e.target)) {
+                const list = document.getElementById('author-dropdown-list');
+                const arrow = document.getElementById('author-dropdown-arrow');
+                if (!list.classList.contains('hidden')) {
+                    list.classList.add('hidden');
+                    arrow.classList.remove('rotate-180');
+                }
+            }
+        });
+    </script>
+
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\zaya\resources\views\blogs.blade.php ENDPATH**/ ?>

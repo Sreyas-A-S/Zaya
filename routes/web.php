@@ -40,6 +40,15 @@ Route::get('admin/forgot-password/otp', [\App\Http\Controllers\Auth\ForgotPasswo
 Route::post('admin/forgot-password/otp', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'verifyOtp'])->name('admin.forgot-password.otp.verify');
 Route::get('admin/forgot-password/reset', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showResetForm'])->name('admin.forgot-password.reset.show');
 Route::post('admin/forgot-password/reset', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'resetPassword'])->name('admin.forgot-password.reset.update');
+
+// Client Forgot Password Routes
+Route::get('forgot-password', [\App\Http\Controllers\Auth\ClientForgotPasswordController::class, 'showEmailForm'])->name('client.forgot-password');
+Route::post('forgot-password', [\App\Http\Controllers\Auth\ClientForgotPasswordController::class, 'sendOtp'])->name('client.forgot-password.send');
+Route::get('forgot-password/otp', [\App\Http\Controllers\Auth\ClientForgotPasswordController::class, 'showOtpForm'])->name('client.forgot-password.otp');
+Route::post('forgot-password/otp', [\App\Http\Controllers\Auth\ClientForgotPasswordController::class, 'verifyOtp'])->name('client.forgot-password.otp.verify');
+Route::get('forgot-password/reset', [\App\Http\Controllers\Auth\ClientForgotPasswordController::class, 'showResetForm'])->name('client.forgot-password.reset');
+Route::post('forgot-password/reset', [\App\Http\Controllers\Auth\ClientForgotPasswordController::class, 'resetPassword'])->name('client.forgot-password.reset.update');
+
 Route::post('login', [LoginController::class, 'login']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 

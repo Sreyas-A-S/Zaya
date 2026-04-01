@@ -51,7 +51,7 @@
             <ul class="header-right">
                 <li class="custom-dropdown">
                     <?php
-                    $allLanguages = \App\Models\Language::all();
+                    $allLanguages = \App\Models\Language::where('status', 'active')->get();
                     $user = auth()->user();
                     $role = $user ? $user->roleData() : null;
 

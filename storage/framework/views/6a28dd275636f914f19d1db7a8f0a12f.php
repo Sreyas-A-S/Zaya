@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Zaya Wellness" />
+  <meta name="keywords" content="Zaya Wellness" />
+  <meta name="author" content="Zaya Wellness" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="<?php echo e(asset('admiro/assets/images/favicon-96x96.png')); ?>" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="<?php echo e(asset('admiro/assets/images/favicon.svg')); ?>" />
+  <link rel="shortcut icon" href="<?php echo e(asset('admiro/assets/images/favicon.ico')); ?>" />
+  <link rel="apple-touch-icon" sizes="180x180" href="<?php echo e(asset('admiro/assets/images/apple-touch-icon.png')); ?>" />
+  <meta name="apple-mobile-web-app-title" content="Zaya Wellness" />
+  <link rel="manifest" href="<?php echo e(asset('admiro/assets/images/site.webmanifest')); ?>">
+
+  <title><?php echo $__env->yieldContent('title', 'Zaya Wellness'); ?> | Admin Dashboard</title>
+  <!-- Google font-->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400;6..12,500;6..12,600;6..12,700;6..12,800;6..12,900;6..12,1000&amp;display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Modak&amp;display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200;300;400;500;600;700;800&amp;display=swap"
+    rel="stylesheet" />
+  <!-- iconly-icon-->
+  <link rel="stylesheet" href="<?php echo e(asset('admiro/assets/css/iconly-icon.css')); ?>" />
+  <link rel="stylesheet" href="<?php echo e(asset('admiro/assets/css/bulk-style.css')); ?>" />
+  <!-- iconly-icon-->
+  <link rel="stylesheet" href="<?php echo e(asset('admiro/assets/css/themify.css')); ?>" />
+  <!--fontawesome-->
+  <link rel="stylesheet" href="<?php echo e(asset('admiro/assets/css/fontawesome-min.css')); ?>" />
+  <!-- Whether Icon css-->
+  <link rel="stylesheet" type="text/css"
+    href="<?php echo e(asset('admiro/assets/css/vendors/weather-icons/weather-icons.min.css')); ?>" />
+  <link rel="stylesheet" type="text/css" href="<?php echo e(asset('admiro/assets/css/vendors/flag-icon.css')); ?>" />
+  <link rel="stylesheet" type="text/css" href="<?php echo e(asset('admiro/assets/css/vendors/scrollbar.css')); ?>" />
+  <link rel="stylesheet" type="text/css" href="<?php echo e(asset('admiro/assets/css/vendors/datatables.css')); ?>">
+  <link rel="stylesheet" type="text/css" href="<?php echo e(asset('admiro/assets/css/vendors/slick.css')); ?>" />
+  <link rel="stylesheet" type="text/css" href="<?php echo e(asset('admiro/assets/css/vendors/slick-theme.css')); ?>" />
+  <!-- App css -->
+  <link rel="stylesheet" href="<?php echo e(asset('admiro/assets/css/style.css')); ?>" />
+  <link id="color" rel="stylesheet" href="<?php echo e(asset('admiro/assets/css/color-1.css')); ?>" media="screen" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <?php echo $__env->yieldPushContent('css'); ?>
+</head>
+
+<body>
+  <!-- page-wrapper Start-->
+  <!-- tap on top starts-->
+  <div class="tap-top"><i class="iconly-Arrow-Up icli"></i></div>
+  <!-- tap on tap ends-->
+  <!-- loader-->
+  <div class="loader-wrapper">
+    <img src="<?php echo e(asset('admiro/assets/images/logo/zaya wellness logo icon.svg')); ?>" alt="loader"
+      style="width: 80px; animation: pulse 1.5s infinite ease-in-out;">
+  </div>
+  <style>
+    @keyframes pulse {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.7;
+      }
+
+      50% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(0.9);
+        opacity: 0.7;
+      }
+    }
+
+    .simplebar-content-wrapper {
+      background: none !important;
+    }
+
+    .page-sidebar {
+      height: 100vh !important;
+    }
+
+    .main-sidebar {
+      height: calc(100vh - 320px) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      position: relative !important;
+      overflow: hidden !important;
+    }
+
+    .sidebar-menu {
+      flex: 1 1 auto !important;
+      display: block !important;
+      padding-bottom: 30px !important;
+    }
+
+    /* Hide the conflicting native global scrollbar */
+    .sidebar-menu::-webkit-scrollbar {
+      width: 0 !important;
+      display: none !important;
+    }
+
+    .sidebar-footer-image {
+      position: absolute !important;
+      bottom: 77px !important;
+      left: 0 !important;
+      width: 100% !important;
+      text-align: start !important;
+      pointer-events: none !important;
+      z-index: -1 !important;
+      line-height: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .sidebar-footer-image img {
+      width: 260px !important;
+      height: auto !important;
+      /* display: inline-block !important; */
+      margin: 0 !important;
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar-footer-image {
+        bottom: 70px !important;
+      }
+    }
+
+    @media (max-width: 767.98px) {
+      .sidebar-footer-image {
+        bottom: 67px !important;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .sidebar-footer-image {
+        bottom: 65px !important;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .sidebar-footer-image {
+        bottom: 63px !important;
+      }
+
+      .sidebar-footer-image img {
+        width: 220px !important;
+      }
+    }
+
+    .simplebar-content {
+      height: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    /* Simple & Modern Scrollbar for Sidebar */
+    .simplebar-scrollbar:before {
+      background-color: rgba(151, 86, 61, 0.4) !important;
+      /* Subtle version of brand color */
+      width: 4px !important;
+      border-radius: 10px !important;
+      left: auto !important;
+      right: 2px !important;
+      transition: opacity 0.2s linear !important;
+    }
+
+    .simplebar-scrollbar.simplebar-visible:before {
+      opacity: 1 !important;
+    }
+
+    .simplebar-track.simplebar-vertical {
+      width: 8px !important;
+      background-color: transparent !important;
+    }
+
+    .simplebar-track.simplebar-vertical:hover .simplebar-scrollbar:before {
+      background-color: rgba(151, 86, 61, 0.7) !important;
+    }
+
+    .password-toggle-wrap {
+      position: relative;
+    }
+
+    .password-toggle-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #6c757d;
+      z-index: 2;
+    }
+
+    .password-toggle-btn i {
+      pointer-events: none;
+    }
+
+    .page-body .avatar-upload .avatar-preview,
+    .page-body .avatar-upload .avatar-preview>div {
+      border-radius: 100% !important;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+    }
+  </style>
+  <div class="page-wrapper compact-wrapper" id="pageWrapper">
+
+    <?php echo $__env->make('partials.navbar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+    <!-- Page Body Start-->
+    <div class="page-body-wrapper">
+
+      <?php echo $__env->make('partials.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+      <div class="page-body">
+        <?php echo $__env->yieldContent('content'); ?>
+      </div>
+      <?php if(Route::is('admin.dashboard')): ?>
+        <!-- Leaves Images -->
+        <img src="<?php echo e(asset('admiro/assets/images/admin-dash-img.webp')); ?>" alt="logo" class="img-fluid admin-dash-img">
+      <?php endif; ?>
+      <?php echo $__env->make('partials.footer', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+    </div>
+  </div>
+  <!-- Toast Container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+    <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert"
+      aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          Action successful.
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert"
+      aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          An error occurred.
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+  <!-- jquery-->
+  <script src="<?php echo e(asset('admiro/assets/js/vendors/jquery/jquery.min.js')); ?>"></script>
+  <!-- bootstrap js-->
+  <script src="<?php echo e(asset('admiro/assets/js/vendors/bootstrap/dist/js/bootstrap.bundle.min.js')); ?>" defer=""></script>
+  <script src="<?php echo e(asset('admiro/assets/js/vendors/bootstrap/dist/js/popper.min.js')); ?>" defer=""></script>
+  <!-- feather-->
+  <script src="<?php echo e(asset('admiro/assets/js/vendors/feather-icon/feather.min.js')); ?>"></script>
+  <script src="<?php echo e(asset('admiro/assets/js/vendors/feather-icon/custom-script.js')); ?>"></script>
+  <!-- sidebar -->
+  <script src="<?php echo e(asset('admiro/assets/js/sidebar.js')); ?>"></script>
+  <!-- height_equal-->
+  <script src="<?php echo e(asset('admiro/assets/js/height-equal.js')); ?>"></script>
+  <!-- config-->
+  <script src="<?php echo e(asset('admiro/assets/js/config.js')); ?>"></script>
+  <!-- apex-->
+  <script src="<?php echo e(asset('admiro/assets/js/chart/apex-chart/apex-chart.js')); ?>"></script>
+  <script src="<?php echo e(asset('admiro/assets/js/chart/apex-chart/stock-prices.js')); ?>"></script>
+  <!-- scrollbar-->
+  <script src="<?php echo e(asset('admiro/assets/js/scrollbar/simplebar.js')); ?>"></script>
+  <script src="<?php echo e(asset('admiro/assets/js/scrollbar/custom.js')); ?>"></script>
+  <!-- slick-->
+  <script src="<?php echo e(asset('admiro/assets/js/slick/slick.min.js')); ?>"></script>
+  <script src="<?php echo e(asset('admiro/assets/js/slick/slick.js')); ?>"></script>
+  <!-- data_table-->
+  <script src="<?php echo e(asset('admiro/assets/js/js-datatables/datatables/jquery.dataTables.min.js')); ?>"></script>
+  <!-- page_datatable-->
+  
+  <!-- page_datatable1-->
+  
+  <!-- page_datatable-->
+  
+  <!-- theme_customizer-->
+  <!-- <script src="<?php echo e(asset('admiro/assets/js/theme-customizer/customizer.js')); ?>"></script> -->
+  <!-- tilt-->
+  <script src="<?php echo e(asset('admiro/assets/js/animation/tilt/tilt.jquery.js')); ?>"></script>
+  <!-- page_tilt-->
+  <script src="<?php echo e(asset('admiro/assets/js/animation/tilt/tilt-custom.js')); ?>"></script>
+  <!-- dashboard_1-->
+  <script src="<?php echo e(asset('admiro/assets/js/dashboard/dashboard_1.js')); ?>"></script>
+  <script>
+    window.showToast = function (message, type = 'success') {
+      const toastId = type === 'success' ? 'liveToast' : 'errorToast';
+      const toastEl = document.getElementById(toastId);
+      if (!toastEl) return;
+
+      // Set message
+      const toastBody = toastEl.querySelector('.toast-body');
+      if (toastBody) toastBody.textContent = message;
+
+      // Show toast
+      const toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    };
+  </script>
+  <!-- custom script -->
+  <script src="<?php echo e(asset('admiro/assets/js/script.js')); ?>"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      let counter = 0;
+
+      function ensureId(input) {
+        if (!input.id) {
+          counter += 1;
+          input.id = 'pwd-input-' + counter;
+        }
+        return input.id;
+      }
+
+      function addToggleToInput(input) {
+        if (!input || input.type !== 'password') return;
+
+        const inputGroup = input.closest('.input-group');
+        // Check if toggle already exists in parent or input group
+        const container = inputGroup || input.parentElement;
+        if (container && container.querySelector('.toggle-password')) return;
+
+        if (inputGroup) {
+          const span = document.createElement('span');
+          span.className = 'input-group-text toggle-password';
+          span.setAttribute('data-target', ensureId(input));
+          span.style.cursor = 'pointer';
+          span.innerHTML = '<i class="fa fa-eye"></i>';
+          inputGroup.appendChild(span);
+        } else {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'password-toggle-wrap';
+          input.parentNode.insertBefore(wrapper, input);
+          wrapper.appendChild(input);
+
+          const btn = document.createElement('span');
+          btn.className = 'password-toggle-btn toggle-password';
+          btn.setAttribute('data-target', ensureId(input));
+          btn.innerHTML = '<i class="fa fa-eye"></i>';
+          wrapper.appendChild(btn);
+        }
+      }
+
+      // Initial scan
+      document.querySelectorAll('input[type="password"]').forEach(addToggleToInput);
+
+      // Watch for dynamic password fields
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) {
+              if (node.tagName === 'INPUT' && node.type === 'password') {
+                addToggleToInput(node);
+              } else {
+                node.querySelectorAll('input[type="password"]').forEach(addToggleToInput);
+              }
+            }
+          });
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+
+      // Unified Click Handler
+      document.addEventListener('click', function (e) {
+        const toggle = e.target.closest('.toggle-password');
+        if (!toggle) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const targetId = toggle.getAttribute('data-target');
+        let input = targetId ? document.getElementById(targetId) : null;
+        
+        if (!input) {
+          const group = toggle.closest('.input-group') || toggle.closest('.password-toggle-wrap');
+          if (group) {
+            input = group.querySelector('input');
+          }
+        }
+        
+        if (!input) return;
+
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        
+        const icon = toggle.querySelector('i');
+        if (icon) {
+          icon.classList.toggle('fa-eye', !isPassword);
+          icon.classList.toggle('fa-eye-slash', isPassword);
+        }
+      });
+
+      // --- Image Resolution Helper ---
+      function updateResInfo(img, key) {
+        if (img.naturalWidth > 0) {
+          $('.resolution-text-' + key).text(img.naturalWidth + 'x' + img.naturalHeight);
+          $('.resolution-info-' + key).removeClass('d-none');
+        }
+      }
+
+      // Initial check for all preview images
+      $('img[class*="preview-"]').each(function() {
+        const img = this;
+        const keyMatch = img.className.match(/preview-([^\s]+)/);
+        if (keyMatch) {
+          const key = keyMatch[1];
+          if (img.complete) {
+            updateResInfo(img, key);
+          } else {
+            img.onload = () => updateResInfo(img, key);
+          }
+        }
+      });
+
+      // Handle dynamic file inputs
+      let currentCropper = null;
+      let currentKey = null;
+
+      $(document).on('change', '.image-ajax-input', function() {
+        const key = $(this).attr('data-key');
+        const ratio = $(this).attr('data-aspect-ratio');
+        
+        currentKey = key;
+        const currentAspectRatio = (ratio && ratio.trim() !== '') ? parseFloat(ratio) : NaN;
+        
+        // Store on the modal for absolute certainty
+        $('#globalCropperModal').attr('data-current-ratio', currentAspectRatio);
+
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            $('#globalCropperImage').attr('src', e.target.result);
+            const modal = new bootstrap.Modal(document.getElementById('globalCropperModal'));
+            modal.show();
+          }
+          reader.readAsDataURL(file);
+        }
+      });
+
+      $('#globalCropperModal').on('shown.bs.modal', function() {
+        const image = document.getElementById('globalCropperImage');
+        const ratioAttr = $(this).attr('data-current-ratio');
+        const ratio = parseFloat(ratioAttr);
+        const finalRatio = !isNaN(ratio) ? ratio : null;
+
+        console.log('Initializing Cropper with Ratio:', finalRatio);
+
+        if (currentCropper) {
+            currentCropper.destroy();
+        }
+
+        currentCropper = new Cropper(image, {
+          aspectRatio: finalRatio,
+          viewMode: 1, 
+          dragMode: 'move',
+          autoCropArea: 1,
+          responsive: true,
+          restore: false,
+          guides: true,
+          center: true,
+          highlight: false,
+          cropBoxMovable: true,
+          cropBoxResizable: true,
+          toggleDragModeOnDblclick: false,
+          crop(event) {
+            const width = Math.round(event.detail.width);
+            const height = Math.round(event.detail.height);
+            $('#crop-live-res').text(width + ' x ' + height);
+          },
+        });
+      }).on('hidden.bs.modal', function() {
+        if (currentCropper) {
+          currentCropper.destroy();
+          currentCropper = null;
+        }
+      });
+
+      $('#globalCropBtn').on('click', function() {
+        if (!currentCropper) return;
+
+        const canvas = currentCropper.getCroppedCanvas({
+          imageSmoothingEnabled: true,
+          imageSmoothingQuality: 'high',
+        });
+
+        const base64Data = canvas.toDataURL('image/jpeg', 0.9);
+        $('#cropped-' + currentKey).val(base64Data);
+        $('.preview-' + currentKey).attr('src', base64Data).parent().removeClass('d-none');
+        
+        $('.resolution-text-' + currentKey).text(canvas.width + 'x' + canvas.height);
+        $('.resolution-info-' + currentKey).removeClass('d-none');
+
+        bootstrap.Modal.getInstance(document.getElementById('globalCropperModal')).hide();
+      });
+    });
+  </script>
+  <!-- Global Cropper Modal -->
+  <div class="modal fade" id="globalCropperModal" tabindex="-1" role="dialog" aria-labelledby="globalCropperModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="globalCropperModalLabel">Crop Image</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="img-container mb-3" style="min-height: 400px; background: #f8f9fa;">
+            <img id="globalCropperImage" src="" style="max-width: 100%;">
+          </div>
+          <div class="text-center">
+            <span class="badge badge-primary px-3 py-2" style="font-size: 14px;">
+              Selection: <span id="crop-live-res">0 x 0</span> px
+            </span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" id="globalCropBtn" type="button">Apply Crop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <?php echo $__env->yieldContent('scripts'); ?>
+</body>
+<?php echo $__env->yieldPushContent('scripts'); ?>
+
+</html><?php /**PATH C:\wamp64\www\zaya\resources\views\layouts\admin.blade.php ENDPATH**/ ?>

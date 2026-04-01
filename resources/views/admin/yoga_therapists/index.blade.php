@@ -285,6 +285,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 class="form-control validate-char-limit"
                                 name="zip_code"
                                 required
+                                placeholder="Enter Zipcode"
                                 pattern="^[0-9]{4,10}$"
                                 maxlength="10"
                                 data-max="10"

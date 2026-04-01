@@ -58,8 +58,8 @@
     $age = $profile && $profile->dob ? \Carbon\Carbon::parse($profile->dob)->age . ' Years' : 'Not set';
     $gender = $profile && $profile->gender ? ucfirst($profile->gender) : ($user->gender ? ucfirst($user->gender) : 'Not set');
     $dob = $profile && $profile->dob ? \Carbon\Carbon::parse($profile->dob)->format('M d, Y') : 'Not set';
-    $nationality = $profile->nationality ?? ($user->nationality ? $user->nationality->name : 'Not set');
-    $phone = $profile->phone ?? ($user->phone ?? 'Not set');
+    $nationality = $profile->nationality ?? ($profile->country ?? ($user->nationality ? $user->nationality->name : 'Not set'));
+    $phone = ($profile->mobile_country_code ? $profile->mobile_country_code . '-' : '') . ($profile->phone ?? ($user->phone ?? 'Not set'));
     $email = $user->email;
     $patient = $user->patient ?? null;
     
@@ -155,17 +155,11 @@
             <h2 class="text-2xl font-bold font-sans! text-secondary mb-1"><?php echo e($user->name); ?></h2>
             <p class="text-lg text-gray-400 font-normal mb-10 text-capitalize"><?php echo e(str_replace('_', ' ', $user->role)); ?></p>
 
-            <div class="w-full px-4 space-y-4">
+            <div class="w-full px-4 pt-4">
                 <a href="javascript:void(0)" onclick="openPasswordModal()"
                     class="flex items-center text-gray-400 hover:text-gray-700 transition-colors text-lg">
                     <i class="ri-lock-line mr-3 text-lg"></i>
                     <span class="font-normal"><?php echo e(__('Change Password')); ?></span>
-                </a>
-                <a href="<?php echo e(route('logout')); ?>"
-                    onclick="event.preventDefault(); openLogoutModal();"
-                    class="flex items-center text-gray-400 hover:text-gray-700 transition-colors text-lg">
-                    <i class="ri-logout-box-line mr-3 text-lg"></i>
-                    <span class="font-normal"><?php echo e(__('Logout')); ?></span>
                 </a>
             </div>
 
@@ -722,9 +716,15 @@
             <form method="POST" action="<?php echo e(route('profile.updatePersonal')); ?>">
                 <?php echo csrf_field(); ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-                    <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block"><?php echo e(__('Phone')); ?></label>
-                        <input type="text" name="phone" value="<?php echo e(old('phone', $phone !== 'Not set' ? $phone : '')); ?>" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                    <div class="col-span-1 md:col-span-2 grid grid-cols-3 gap-4">
+                        <div class="col-span-1">
+                            <label class="text-sm text-gray-500 font-semibold mb-2 block"><?php echo e(__('Code')); ?></label>
+                            <input type="text" name="mobile_country_code" value="<?php echo e(old('mobile_country_code', $profile->mobile_country_code ?? '')); ?>" placeholder="+1" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="text-sm text-gray-500 font-semibold mb-2 block"><?php echo e(__('Phone')); ?></label>
+                            <input type="text" name="phone" value="<?php echo e(old('phone', $profile->phone ?? ($user->phone ?? ''))); ?>" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                        </div>
                     </div>
                     <div>
                         <label class="text-sm text-gray-500 font-semibold mb-2 block"><?php echo e(__('Gender')); ?></label>

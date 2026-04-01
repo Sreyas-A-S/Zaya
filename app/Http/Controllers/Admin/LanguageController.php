@@ -122,10 +122,11 @@ class LanguageController extends Controller
         $baseCode = explode('-', $code)[0];
 
         // Find the language by exact code or by base code (preferring shorter code)
-        $language = Language::where('code', $code)->first();
+        $language = Language::where('code', $code)->where('status', 'active')->first();
         
         if (!$language) {
             $language = Language::where('code', 'like', $baseCode . '%')
+                ->where('status', 'active')
                 ->orderByRaw('LENGTH(code) ASC')
                 ->first();
         }

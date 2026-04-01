@@ -297,7 +297,7 @@
                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
                             <input type="text" class="form-control validate-char-limit" name="zip_code" required 
                                 maxlength="10" data-max="10" pattern="^[0-9]{5,10}$" title="Enter valid zip code (5-10 digits)"
-                                placeholder="Pincode" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                placeholder="Enter Zipcode" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 10 characters allowed.</div>
                         </div>
                         <div class="col-md-6">

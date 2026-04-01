@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 <link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/select2.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icons/7.1.0/css/flag-icons.min.css">
-<link rel="stylesheet" href="{{ asset('admiro/assets/css/vendors/intltelinput.min.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
 <style>
     /* Select2 Modern Design */
     .select2-container {
@@ -79,6 +79,12 @@
     /* Use local sprite path so dropdown flags render */
     .iti__flag {
         background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags.png") !important;
+    }
+
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        .iti__flag {
+            background-image: url("https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/img/flags@2x.png") !important;
+        }
     }
 
     #editProfileModal .iti--separate-dial-code .iti__selected-flag {
@@ -357,14 +363,6 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="text-muted small d-block mb-1">Nationality</label>
-                            <div class="d-flex align-items-center">
-                                <i class="fa fa-globe text-primary me-2"></i>
-                                <span class="f-w-500">{{ $user->nationality->name ?? 'Not specified' }}</span>
-                            </div>
-                        </div>
-
                         <div class="col-12 mt-4">
                             <h6 class="border-bottom pb-2 mb-3 fw-bold">Assigned Languages</h6>
                             <div class="d-flex flex-wrap gap-2">
@@ -433,23 +431,10 @@
                                     <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
                                     <div class="invalid-feedback">Please enter a valid email address.</div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <label class="form-label">Phone Number</label>
                                     <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone', $user->phone) }}" required data-initial-value="{{ old('phone', $user->phone) }}" inputmode="numeric">
                                     <div class="invalid-feedback">Please enter a valid phone number.</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Nationality</label>
-                                    <select name="national_id" class="form-select select2" {{ $user->role === 'super-admin' ? 'disabled' : '' }}>
-                                        <option value="">Select Nationality</option>
-                                        @foreach($countries as $country)
-                                        <option value="{{ $country->id }}" {{ (is_array($user->national_id) ? in_array($country->id, $user->national_id) : $user->national_id == $country->id) ? 'selected' : '' }}>{{ $country->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @if($user->role === 'super-admin')
-                                        <input type="hidden" name="national_id" value="{{ is_array($user->national_id) ? ($user->national_id[0] ?? '') : $user->national_id }}">
-                                        <div class="small text-muted mt-1"><i class="fa fa-info-circle me-1"></i> Super Admins have global access; nationality cannot be changed here.</div>
-                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -593,10 +578,21 @@
         // Initialize intl-tel-input when modal opens (prevents layout issues)
         const phoneInput = document.querySelector("#phone");
         $('#editProfileModal').on('shown.bs.modal', function() {
-            // Initialize Select2
+            // Initialize Select2 with Country Flags
             $('.select2').select2({
-                dropdownParent: $('#editProfileModal')
+                dropdownParent: $('#editProfileModal'),
+                templateResult: formatCountry,
+                templateSelection: formatCountry,
+                escapeMarkup: function(m) { return m; }
             });
+
+            function formatCountry(country) {
+                if (!country.id) return country.text;
+                var element = $(country.element);
+                var code = element.data('code');
+                if (!code) return country.text;
+                return '<span><i class="fi fi-' + code + ' me-2 rounded-sm" style="width: 1.2em; height: 0.9em; display: inline-block;"></i>' + country.text + '</span>';
+            }
 
             if (phoneInput && !window.itiProfile) {
                 window.itiProfile = window.intlTelInput(phoneInput, {

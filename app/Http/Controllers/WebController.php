@@ -50,7 +50,7 @@ class WebController extends Controller
     public function index()
     {
         $language = App::getLocale();
-        $languages = Language::all();
+        $languages = Language::where('status', 'active')->get();
         $practitioners = Practitioner::with(['user', 'reviews'])
             ->where('status', 'active')
             ->latest()

@@ -17,15 +17,22 @@
             <div class="grid grid-cols-2 gap-y-6 gap-x-4 mb-6">
                 <div>
                     <p id="client_panel_age_label" class="text-base text-gray-400 mb-1" data-i18n="<?php echo e($site_settings['client_panel_age_label'] ?? 'Age'); ?>"><?php echo e(__($site_settings['client_panel_age_label'] ?? 'Age')); ?></p>
-                    <p class="text-base font-normal text-gray-800"><?php echo e($profile->age ?? __($site_settings['client_panel_not_set'] ?? 'Not set')); ?> <?php echo e(isset($profile->age) ? __($site_settings['client_panel_years'] ?? 'Years') : ''); ?></p>
+                    <?php
+                        $calculatedAge = (isset($profile->dob) && $profile->dob) ? (int) \Carbon\Carbon::parse($profile->dob)->diffInYears(now()) : null;
+                    ?>
+                    <p class="text-base font-normal text-gray-800"><?php echo e($calculatedAge ?? __($site_settings['client_panel_not_set'] ?? 'Not set')); ?> <?php echo e($calculatedAge ? __($site_settings['client_panel_years'] ?? 'Years') : ''); ?></p>
                 </div>
                 <div>
                     <p id="client_panel_gender_label" class="text-base text-gray-400 mb-1" data-i18n="<?php echo e($site_settings['client_panel_gender_label'] ?? 'Gender'); ?>"><?php echo e(__($site_settings['client_panel_gender_label'] ?? 'Gender')); ?></p>
                     <p class="text-base font-normal text-gray-800"><?php echo e(ucfirst(__($profile->gender ?? ($user->gender ?? ($site_settings['client_panel_not_set'] ?? 'Not set'))))); ?></p>
                 </div>
-                <div class="col-span-2">
+                <div>
                     <p id="client_panel_dob_label" class="text-base text-gray-400 mb-1" data-i18n="<?php echo e($site_settings['client_panel_dob_label'] ?? 'DOB'); ?>"><?php echo e(__($site_settings['client_panel_dob_label'] ?? 'DOB')); ?></p>
                     <p class="text-base font-normal text-gray-800"><?php echo e((isset($profile->dob) && $profile->dob) ? (\Carbon\Carbon::parse($profile->dob)->translatedFormat('M d, Y')) : __($site_settings['client_panel_not_set'] ?? 'Not set')); ?></p>
+                </div>
+                <div>
+                    <p class="text-base text-gray-400 mb-1"><?php echo e(__('Nationality')); ?></p>
+                    <p class="text-base font-normal text-gray-800"><?php echo e($profile->nationality ?? ($profile->country ?? ($user->nationality ? $user->nationality->name : __($site_settings['client_panel_not_set'] ?? 'Not set')))); ?></p>
                 </div>
             </div>
 
@@ -38,7 +45,7 @@
                 </div>
                 <div>
                     <p id="client_panel_phone_label" class="text-base text-gray-400 mb-1" data-i18n="<?php echo e($site_settings['client_panel_phone_label'] ?? 'Phone'); ?>"><?php echo e(__($site_settings['client_panel_phone_label'] ?? 'Phone')); ?></p>
-                    <p class="text-base font-normal text-gray-800"><?php echo e($profile->phone ?? ($user->phone ?? __($site_settings['client_panel_not_set'] ?? 'Not set'))); ?></p>
+                    <p class="text-base font-normal text-gray-800"><?php echo e(($profile->mobile_country_code ? $profile->mobile_country_code . '-' : '') . ($profile->phone ?? ($user->phone ?? __($site_settings['client_panel_not_set'] ?? 'Not set')))); ?></p>
                 </div>
                 <div>
                     <p id="client_panel_address_label" class="text-base text-gray-400 mb-1" data-i18n="<?php echo e($site_settings['client_panel_address_label'] ?? 'Address'); ?>"><?php echo e(__($site_settings['client_panel_address_label'] ?? 'Address')); ?></p>

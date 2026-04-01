@@ -463,7 +463,7 @@
         try {
             const res = await fetch("{{ route('time-slots.store') }}", {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 body: JSON.stringify(body)
             });
             const data = await res.json();

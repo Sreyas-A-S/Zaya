@@ -739,12 +739,27 @@ class ProfileController extends Controller
 
     public function updateProfilePic(Request $request)
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Handle profile pic removal
+        if ($request->input('remove')) {
+            if ($user->profile_pic && !str_starts_with($user->profile_pic, 'http')) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_pic);
+            }
+            $user->profile_pic = null;
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile picture removed successfully!',
+                'path' => asset('frontend/assets/profile-dummy-img.png')
+            ]);
+        }
+
         $request->validate([
             'cropped_image' => 'required|string',
         ]);
-
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
 
         // Delete old profile pic if exists
         if ($user->profile_pic && !str_starts_with($user->profile_pic, 'http')) {
@@ -785,6 +800,7 @@ class ProfileController extends Controller
     {
         $validated = $request->validate([
             'phone' => 'nullable|string|max:20',
+            'mobile_country_code' => 'nullable|string|max:10',
             'gender' => 'nullable|in:male,female,transgender,other',
             'dob' => 'nullable|date|before:today',
             'nationality' => 'nullable|string|max:255|exists:countries,name',
@@ -812,7 +828,7 @@ class ProfileController extends Controller
         $user->save();
 
         $profileData = [];
-        foreach (['phone', 'gender', 'dob', 'nationality', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'country'] as $field) {
+        foreach (['phone', 'mobile_country_code', 'gender', 'dob', 'nationality', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'country'] as $field) {
             if (\Schema::hasColumn($profile->getTable(), $field)) {
                 $profileData[$field] = $validated[$field] ?? null;
             }
