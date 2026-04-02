@@ -121,6 +121,15 @@
     </style>
     @yield('styles')
     @stack('styles')
+    <style>
+        .profile-completion-banner {
+            animation: slideDown 0.5s ease-out forwards;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
 </head>
 
 <body class="flex h-screen overflow-hidden text-gray-800 bg-white {{ $isMeetingPopout ? 'meeting-popout' : '' }} {{ $isPublicMeeting ? 'public-meeting' : '' }}">
