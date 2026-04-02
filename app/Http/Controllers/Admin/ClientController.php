@@ -28,7 +28,7 @@ class ClientController extends Controller
         $this->middleware('permission:clients-create')->only(['create', 'store']);
         $this->middleware('permission:clients-edit')->only(['edit', 'update']);
         $this->middleware('permission:clients-delete')->only('destroy');
-        $this->middleware('permission:clients-status-toggle')->only('updateStatus');
+        $this->middleware('permission:clients-status-toggle|clients-edit')->only('updateStatus');
     }
 
     public function index(Request $request)

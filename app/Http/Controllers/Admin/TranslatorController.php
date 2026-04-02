@@ -32,7 +32,7 @@ class TranslatorController extends Controller
         $this->middleware('permission:translators-create')->only(['create', 'store']);
         $this->middleware('permission:translators-edit')->only(['edit', 'update']);
         $this->middleware('permission:translators-delete')->only('destroy');
-        $this->middleware('permission:translators-update-status|super-admin')->only('updateStatus');
+        $this->middleware('permission:translators-update-status|translators-edit')->only('updateStatus');
     }
 
     public function index(Request $request)

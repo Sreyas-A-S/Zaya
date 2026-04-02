@@ -32,7 +32,7 @@ class YogaTherapistController extends Controller
         $this->middleware('permission:yoga-therapists-create')->only(['create', 'store']);
         $this->middleware('permission:yoga-therapists-edit')->only(['edit', 'update']);
         $this->middleware('permission:yoga-therapists-delete')->only('destroy');
-        $this->middleware('permission:yoga-therapists-update-status')->only('updateStatus');
+        $this->middleware('permission:yoga-therapists-update-status|yoga-therapists-edit')->only('updateStatus');
     }
 
     public function index(Request $request)

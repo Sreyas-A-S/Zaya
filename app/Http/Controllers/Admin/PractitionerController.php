@@ -36,7 +36,7 @@ class PractitionerController extends Controller
         $this->middleware('permission:practitioners-create')->only(['create', 'store']);
         $this->middleware('permission:practitioners-edit')->only(['edit', 'update']);
         $this->middleware('permission:practitioners-delete')->only('destroy');
-        $this->middleware('permission:practitioners-update-status')->only('updateStatus');
+        $this->middleware('permission:practitioners-update-status|practitioners-edit')->only('updateStatus');
     }
 
     public function index(Request $request)

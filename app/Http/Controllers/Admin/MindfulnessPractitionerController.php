@@ -32,7 +32,7 @@ class MindfulnessPractitionerController extends Controller
         $this->middleware('permission:mindfulness-practitioners-create')->only(['create', 'store']);
         $this->middleware('permission:mindfulness-practitioners-edit')->only(['edit', 'update']);
         $this->middleware('permission:mindfulness-practitioners-delete')->only('destroy');
-        $this->middleware('permission:mindfulness-practitioners-update-status')->only('updateStatus');
+        $this->middleware('permission:mindfulness-practitioners-update-status|mindfulness-practitioners-edit')->only('updateStatus');
     }
 
     public function index(Request $request)

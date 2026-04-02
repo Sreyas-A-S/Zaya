@@ -36,7 +36,7 @@ class DoctorController extends Controller
         $this->middleware('permission:doctors-create')->only(['create', 'store']);
         $this->middleware('permission:doctors-edit')->only(['edit', 'update']);
         $this->middleware('permission:doctors-delete')->only('destroy');
-        $this->middleware('permission:doctors-update-status')->only('updateStatus');
+        $this->middleware('permission:doctors-update-status|doctors-edit')->only('updateStatus');
     }
 
     /**
