@@ -373,7 +373,7 @@
                                     <?php endif; ?>
                                 <?php endif; ?>
                                 <?php if(count($myLanguages) == 0 && $user->role === 'super-admin'): ?>
-                                <span class="badge border px-3 py-2" style="background-color: #E6F7F2 !important; color: #158763 !important; border-color: #B5E4D4 !important; cursor: default; pointer-events: none; opacity: 1;">All Access (Super Admin)</span>
+                                <span class="badge border px-3 py-2" style="background-color: #E6F7F2 !important; color: #158763 !important; border-color: #B5E4D4 !important; cursor: default; pointer-events: none; opacity: 1;">All Languages (Super Admin)</span>
                                 <?php endif; ?>
                             </div>
                         </div>
