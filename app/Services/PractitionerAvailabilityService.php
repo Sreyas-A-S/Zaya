@@ -18,26 +18,37 @@ class PractitionerAvailabilityService
      */
     public function getAvailableSlots($practitioner, $date)
     {
-        $dateObj = Carbon::parse($date);
-        
         // Find professional across all models
-        $p = $this->findProvider($practitioner);
-            
-        if (!$p) {
+        $provider = $this->findProvider($practitioner);
+
+        if (!$provider) {
             \Log::error("Professional not found: $practitioner");
             return [];
         }
-        
-        $providerId = $p->id;
-        $providerType = get_class($p);
+
+        return $this->getAvailableSlotsForProvider($provider, $date);
+    }
+
+    /**
+     * Get all bookable slots for a known provider model instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $provider
+     */
+    public function getAvailableSlotsForProvider($provider, $date)
+    {
+        $dateObj = Carbon::parse($date);
+
+        $providerId = $provider->id;
+        $providerType = get_class($provider);
         \Log::info("Fetching slots for provider $providerId ($providerType) on $date");
-        
-        if (isset($p->booking_window_days) && $p->booking_window_days) {
-            $maxDate = Carbon::today()->addDays((int) $p->booking_window_days);
+
+        if (isset($provider->booking_window_days) && $provider->booking_window_days) {
+            $maxDate = Carbon::today()->addDays((int) $provider->booking_window_days);
             if ($dateObj->gt($maxDate)) {
                 return [];
             }
         }
+
         $dayOfWeek = $dateObj->dayOfWeek;
 
         // 1. Fetch criteria for this day (Polymorphic)
@@ -101,7 +112,7 @@ class PractitionerAvailabilityService
         $bookingQuery = Booking::where('booking_date', $date)
             ->whereIn('status', ['pending', 'confirmed', 'paid']);
             
-        if ($p instanceof Translator) {
+        if ($provider instanceof Translator) {
             $bookingQuery->where(function($q) use ($providerId) {
                 $q->where(function($sq) use ($providerId) {
                     $sq->where('practitioner_id', $providerId)

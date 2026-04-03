@@ -16,6 +16,7 @@ class Transaction extends Model
         'referrer_id',
         'booking_id',
         'referral_id',
+        'country_id',
         'total_amount',
         'currency',
         'company_share',
@@ -60,5 +61,10 @@ class Transaction extends Model
     public function referral()
     {
         return $this->belongsTo(Referral::class);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
     }
 }

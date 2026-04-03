@@ -18,6 +18,8 @@ class Referral extends Model
         'referred_to_id',
         'service_ids',
         'amount',
+        'booking_date',
+        'booking_time',
         'status',
         'razorpay_order_id',
         'razorpay_payment_id',

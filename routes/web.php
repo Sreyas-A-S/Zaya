@@ -95,6 +95,7 @@ Route::get('/bookings/payment/callback', [BookingController::class, 'paymentCall
 Route::get('/registration-fees/callback', [\App\Http\Controllers\Admin\RegistrationFeeController::class, 'callback'])->name('registration-fees.callback');
 Route::get('/fetch-translators', [BookingController::class, 'fetchTranslators'])->name('fetch-translators');
 Route::get('/api/available-slots/{practitioner}/{date}', [\App\Http\Controllers\AvailabilityController::class, 'getGeneratedSlots'])->name('api.available-slots');
+Route::get('/api/available-slots-by-user/{user}/{date}', [\App\Http\Controllers\AvailabilityController::class, 'getGeneratedSlotsByUser'])->name('api.available-slots-by-user');
 Route::get('/api/off-days/{practitioner}', [\App\Http\Controllers\AvailabilityController::class, 'getOffDays'])->name('api.off-days');
 Route::get('/api/booked-slots/{practitioner}/{date}', [\App\Http\Controllers\AvailabilityController::class, 'getBookedSlots'])->name('api.booked-slots');
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
@@ -165,6 +166,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
 
     Route::get('other-fees', [\App\Http\Controllers\Admin\FinanceSettingController::class, 'index'])->name('other-fees.index');
     Route::post('other-fees', [\App\Http\Controllers\Admin\FinanceSettingController::class, 'update'])->name('other-fees.update');
+    Route::get('referral-commissions', [\App\Http\Controllers\Admin\ReferralCommissionController::class, 'index'])->name('referral-commissions.index');
+    Route::post('referral-commissions', [\App\Http\Controllers\Admin\ReferralCommissionController::class, 'update'])->name('referral-commissions.update');
 
     // Financial Tracking
     Route::get('financial/transactions', [\App\Http\Controllers\Admin\FinancialController::class, 'index'])->name('financial.index');

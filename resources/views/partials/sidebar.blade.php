@@ -142,6 +142,7 @@
                     @endif
                     @if(auth()->user()->hasPermission('other-fees-view'))
                     <li> <a href="{{ route('admin.other-fees.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_other_fees'] ?? 'Other Fees' }}</a></li>
+                    <li> <a href="{{ route('admin.referral-commissions.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_referral_commissions'] ?? 'Referral Commissions' }}</a></li>
                     <li> <a href="{{ route('admin.financial.index') }}">Transactions</a></li>
                     <li> <a href="{{ route('admin.financial.practitioners') }}">Practitioner Balances</a></li>
                     @endif

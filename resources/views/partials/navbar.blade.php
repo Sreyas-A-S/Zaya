@@ -274,7 +274,7 @@
                                 <svg class="svg-color">
                                     <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Login') }}"></use>
                                 </svg>
-                                <a class="ms-2" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Log Out') }}</a>
+                                <a class="ms-2" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Log Out') }}</a>
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                     @csrf
                                 </form>

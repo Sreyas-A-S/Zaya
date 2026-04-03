@@ -81,25 +81,29 @@
 
         /* Custom Sidebar Scrollbar */
         .custom-sidebar-scrollbar::-webkit-scrollbar {
-            width: 4px;
+            width: 5px;
         }
 
         .custom-sidebar-scrollbar::-webkit-scrollbar-track {
             background: transparent;
+            margin-top: 20px;
         }
 
         .custom-sidebar-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(46, 75, 61, 0.1);
+            background: #A58F76; /* Taupe beige color */
             border-radius: 10px;
         }
 
         .custom-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(46, 75, 61, 0.2);
+            background: #8e7a64;
         }
 
-        .custom-sidebar-scrollbar {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(46, 75, 61, 0.1) transparent;
+        /* Fallback for Firefox */
+        @supports not selector(::-webkit-scrollbar) {
+            .custom-sidebar-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #A58F76 transparent;
+            }
         }
 
         @keyframes pulse-smooth {
@@ -142,7 +146,7 @@
     <!-- Sidebar -->
     @if(!$isMeetingPopout && !$isPublicMeeting)
     <aside class="w-[288px] bg-[#FFFFFF] border-r border-[#2E4B3D]/12 hidden lg:flex lg:flex-col h-full shrink-0 relative">
-        <div class="flex-1 overflow-y-auto pb-10 custom-sidebar-scrollbar">
+        <div class="flex-1 overflow-y-auto custom-sidebar-scrollbar relative z-10 min-h-0 w-full">
             <a href="{{ route('home') }}"
                 class="flex items-center pt-8 ps-8 pe-2 pb-2 text-gray-500 hover:text-gray-800 text-sm font-medium mb-4">
                 <i class="ri-arrow-left-line mr-2"></i> <span id="client_panel_back_btn" data-i18n="{{ $site_settings['client_panel_back_btn'] ?? 'Back' }}">{{ __($site_settings['client_panel_back_btn'] ?? 'Back') }}</span>
@@ -216,14 +220,16 @@
                 </a>
                 @endif
                 <a href="javascript:void(0)" onclick="openLogoutModal()"
-                    class="flex items-center px-8 py-3 text-red-500 hover:bg-red-50 hover:text-red-700 font-normal transition-colors relative z-10">
+                    class="flex items-center px-8 py-3 text-500 hover:bg-red-50 hover:text-red-700 font-normal transition-colors relative z-10">
                     <i class="ri-logout-box-r-line mr-3 text-lg"></i> <span id="client_panel_sidebar_logout" data-i18n="Logout">{{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}</span>
                 </a>
             </nav>
         </div>
 
-        <img src="{{ asset('frontend/assets/client-profile-floating-img.png') }}" alt="Floating Image"
-            class="w-[248px] h-auto absolute bottom-0 left-0 pointer-events-none z-0">
+        <div class="shrink-0 w-full relative h-[250px] pointer-events-none">
+            <img src="{{ asset('frontend/assets/client-profile-floating-img.png') }}" alt="Floating Image"
+                class="w-[248px] h-auto absolute bottom-0 left-0 z-0">
+        </div>
     </aside>
 
     @endif

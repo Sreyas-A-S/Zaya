@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Models\Translator;
 use App\Models\Language;
 use App\Models\User;
+use App\Models\UserService;
 use App\Traits\FinancialTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -153,6 +154,22 @@ class BookingController extends Controller
 
             // Record Financial Transaction
             $practitioner = $booking->practitioner;
+            $countryId = null;
+            try {
+                $client = $booking->user;
+                $raw = $client ? ($client->national_id ?? null) : null;
+                if (is_array($raw)) {
+                    foreach ($raw as $v) { if (is_numeric($v)) { $countryId = (int) $v; break; } }
+                } elseif (is_numeric($raw)) {
+                    $countryId = (int) $raw;
+                } elseif (is_string($raw)) {
+                    $decoded = json_decode($raw, true);
+                    if (is_array($decoded)) {
+                        foreach ($decoded as $v) { if (is_numeric($v)) { $countryId = (int) $v; break; } }
+                    }
+                }
+            } catch (\Throwable $e) {}
+
             $this->recordTransaction([
                 'type' => 'booking',
                 'amount' => $booking->total_price,
@@ -161,6 +178,7 @@ class BookingController extends Controller
                 'booking_id' => $booking->id,
                 'payment_id' => $paymentId,
                 'currency' => $booking->currency ?? 'INR',
+                'country_id' => $countryId,
             ]);
 
             return redirect()->route('invoice.show', $booking->invoice_no)->with('success', 'Booking confirmed!');
@@ -231,9 +249,98 @@ class BookingController extends Controller
                 'role_label' => str_replace('_', ' ', ucfirst($u->role)),
                 'handles_service' => $handlesService, 'service_fee' => $serviceFee,
                 'profile_pic' => $u->profile_pic ? (str_starts_with($u->profile_pic, 'http') ? $u->profile_pic : asset('storage/' . $u->profile_pic)) : asset('frontend/assets/profile-dummy-img.png'),
+                'profile_url' => $u->profile_url,
             ];
         });
 
         return response()->json($results);
+    }
+
+    public function getProfessionalProfile(Request $request, User $user)
+    {
+        if (strtolower((string) ($user->status ?? 'active')) !== 'active') {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $allowedRoles = ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist', 'translator'];
+        if (!in_array($user->role, $allowedRoles, true)) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $profile = $user->profile;
+        if (!$profile) {
+            return response()->json(['error' => 'No professional profile found'], 404);
+        }
+
+        $specialities = $this->firstNonEmptyProfileArray($profile, [
+            'consultations',
+            'specialization',
+            'practitioner_type',
+            'yoga_therapist_type',
+            'fields_of_specialization',
+            'areas_of_expertise',
+        ]);
+
+        $conditions = $this->firstNonEmptyProfileArray($profile, [
+            'body_therapies',
+            'health_conditions_treated',
+            'client_concerns',
+            'services_offered',
+            'areas_of_expertise',
+        ]);
+
+        $services = UserService::with('service')
+            ->where('user_id', $user->id)
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', true)->orWhere('status', 'active');
+            })
+            ->get()
+            ->map(function ($us) {
+                return [
+                    'service_id' => $us->service_id,
+                    'title' => $us->service ? $us->service->title : null,
+                    'rate' => $us->rate !== null ? (float) $us->rate : null,
+                    'currency' => $us->currency,
+                    'duration' => $us->duration,
+                ];
+            })
+            ->filter(fn ($s) => !empty($s['title']))
+            ->values();
+
+        $roleLabel = str_replace('_', ' ', ucfirst($user->role));
+        $profilePic = $user->profile_pic
+            ? (str_starts_with($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic))
+            : asset('frontend/assets/profile-dummy-img.png');
+
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'role' => $user->role,
+            'role_label' => $roleLabel,
+            'profile_pic' => $profilePic,
+            // Only practitioners have a dedicated public profile page in this app.
+            'profile_url' => $user->role === 'practitioner' ? $user->profile_url : null,
+            'specialities' => $specialities,
+            'conditions' => $conditions,
+            'services' => $services,
+        ]);
+    }
+
+    private function firstNonEmptyProfileArray($profile, array $keys): array
+    {
+        foreach ($keys as $key) {
+            if (!isset($profile->{$key})) continue;
+
+            $value = $profile->{$key};
+            if ($value === null) continue;
+
+            if (is_string($value)) $value = [$value];
+            if (is_object($value) && method_exists($value, 'toArray')) $value = $value->toArray();
+
+            $arr = array_values(array_filter((array) $value, fn ($v) => trim((string) $v) !== ''));
+            if (!empty($arr)) return $arr;
+        }
+
+        return [];
     }
 }

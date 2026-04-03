@@ -10,6 +10,7 @@ use App\Models\MindfulnessPractitioner;
 use App\Models\YogaTherapist;
 use App\Models\Translator;
 use App\Models\BookingReservation;
+use App\Models\User;
 use App\Services\PractitionerAvailabilityService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -161,6 +162,36 @@ class AvailabilityController extends Controller
     {
         $service = new PractitionerAvailabilityService();
         $slots = $service->getAvailableSlots($practitioner, $date);
+
+        return response()->json([
+            'date' => $date,
+            'slots' => $slots
+        ]);
+    }
+
+    public function getGeneratedSlotsByUser(Request $request, $user, $date)
+    {
+        $service = new PractitionerAvailabilityService();
+
+        $u = User::find($user);
+        if (!$u) {
+            return response()->json([
+                'date' => $date,
+                'slots' => [],
+                'error' => 'User not found',
+            ], 404);
+        }
+
+        $profile = $u->profile;
+        if (!$profile) {
+            return response()->json([
+                'date' => $date,
+                'slots' => [],
+                'error' => 'No professional profile linked to this user',
+            ], 404);
+        }
+
+        $slots = $service->getAvailableSlotsForProvider($profile, $date);
 
         return response()->json([
             'date' => $date,

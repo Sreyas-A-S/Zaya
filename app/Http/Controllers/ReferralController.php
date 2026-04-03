@@ -10,6 +10,7 @@ use App\Mail\ReferralInvitationMail;
 use App\Mail\ReferralReceivedMail;
 use App\Mail\BookingMail;
 use App\Traits\FinancialTrait;
+use App\Services\PractitionerAvailabilityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -43,10 +44,24 @@ class ReferralController extends Controller
             'referrals' => 'required|array|min:1',
             'referrals.*.id' => 'required|exists:users,id',
             'referrals.*.amount' => 'required|numeric|min:0',
+            'referrals.*.booking_date' => 'required|date|after_or_equal:today',
+            'referrals.*.booking_time' => 'required|string',
         ]);
 
         // Check if current practitioner already has approved access
         $hasExistingAccess = DataAccessController::hasAccess($user->id, $booking->user_id);
+
+        $availabilityService = new PractitionerAvailabilityService();
+        $clientCountryId = null;
+        try {
+            $clientUser = $booking->user;
+            $raw = $clientUser ? ($clientUser->national_id ?? null) : null;
+            if (is_array($raw)) {
+                foreach ($raw as $v) { if (is_numeric($v)) { $clientCountryId = (int) $v; break; } }
+            } elseif (is_numeric($raw)) {
+                $clientCountryId = (int) $raw;
+            }
+        } catch (\Throwable $e) {}
 
         $batchNo = 'BATCH-' . strtoupper(Str::random(10));
         $referralResults = [];
@@ -54,6 +69,20 @@ class ReferralController extends Controller
         $initialStatus = $hasExistingAccess ? 'pending' : 'awaiting_consent';
 
         foreach ($request->referrals as $refData) {
+            $referredToUser = User::find($refData['id']);
+            $profile = $referredToUser ? $referredToUser->profile : null;
+            if (!$profile) {
+                return response()->json(['error' => 'Selected professional does not have an active profile.'], 422);
+            }
+
+            $availableSlots = $availabilityService->getAvailableSlotsForProvider($profile, $refData['booking_date']);
+            $availableTimes = collect($availableSlots)->pluck('time')->filter()->values()->all();
+            if (!in_array($refData['booking_time'], $availableTimes, true)) {
+                return response()->json([
+                    'error' => "No slot available for {$referredToUser->name} on {$refData['booking_date']} at {$refData['booking_time']}. Please choose another time."
+                ], 422);
+            }
+
             $referralNo = 'ZAYA-REF-' . date('Ymd') . '-' . strtoupper(Str::random(4));
             
             // If has access and amount is 0, we can skip pending and go straight to paid
@@ -68,6 +97,8 @@ class ReferralController extends Controller
                 'referred_to_id' => $refData['id'],
                 'service_ids' => $booking->service_ids,
                 'amount' => $refData['amount'],
+                'booking_date' => $refData['booking_date'],
+                'booking_time' => $refData['booking_time'],
                 'status' => $status,
             ]);
 
@@ -81,7 +112,7 @@ class ReferralController extends Controller
             }
 
             if ($status === 'paid') {
-                $this->createReferredBooking($referral);
+                $this->createReferredBooking($referral, null, $clientCountryId);
             }
 
             $referralResults[] = $referralNo;
@@ -160,10 +191,27 @@ class ReferralController extends Controller
         return response()->json(['success' => 'A new OTP has been sent to your email.']);
     }
 
-    private function createReferredBooking($referral, $paymentId = null)
+    private function createReferredBooking($referral, $paymentId = null, $countryId = null)
     {
         $oldBooking = $referral->booking;
         $referredToUser = User::with(['practitioner', 'doctor'])->find($referral->referred_to_id);
+
+        if ($countryId === null) {
+            try {
+                $client = $referral->user;
+                $raw = $client ? ($client->national_id ?? null) : null;
+                if (is_array($raw)) {
+                    foreach ($raw as $v) { if (is_numeric($v)) { $countryId = (int) $v; break; } }
+                } elseif (is_numeric($raw)) {
+                    $countryId = (int) $raw;
+                } elseif (is_string($raw)) {
+                    $decoded = json_decode($raw, true);
+                    if (is_array($decoded)) {
+                        foreach ($decoded as $v) { if (is_numeric($v)) { $countryId = (int) $v; break; } }
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
         
         $newBooking = Booking::create([
             'invoice_no' => $referral->referral_no,
@@ -178,8 +226,8 @@ class ReferralController extends Controller
             'to_language' => $oldBooking->to_language,
             'language_id' => $oldBooking->language_id,
             'translator_id' => $oldBooking->translator_id,
-            'booking_date' => now()->addDays(1),
-            'booking_time' => $oldBooking->booking_time,
+            'booking_date' => $referral->booking_date,
+            'booking_time' => $referral->booking_time,
             'total_price' => $referral->amount,
             'status' => 'confirmed',
             'razorpay_payment_id' => $paymentId,
@@ -199,6 +247,9 @@ class ReferralController extends Controller
             'referral_id' => $referral->id,
             'payment_id' => $paymentId,
             'currency' => $newBooking->currency ?? 'INR',
+            'country_id' => $countryId,
+            'referrer_role' => $referral->referredBy->role ?? null,
+            'referred_role' => $referredToUser->role ?? null,
         ]);
 
         $newBooking->load('referral.referredBy');
