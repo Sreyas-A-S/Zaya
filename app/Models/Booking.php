@@ -12,6 +12,7 @@ class Booking extends Model
     protected $fillable = [
         'user_id',
         'practitioner_id',
+        'practitioner_type',
         'invoice_no',
         'service_ids',
         'mode',
@@ -55,7 +56,7 @@ class Booking extends Model
 
     public function practitioner()
     {
-        return $this->belongsTo(Practitioner::class);
+        return $this->morphTo();
     }
 
     public function language()

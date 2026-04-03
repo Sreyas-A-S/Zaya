@@ -165,11 +165,14 @@ class ClientController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
+        $currencies = config('currencies.symbols');
+
         return view('admin.clients.index', [
             'pageTitle' => 'Clients Management',
             'consultationPreferences' => $consultationPreferences,
             'languages' => $languages,
-            'countries' => $countries
+            'countries' => $countries,
+            'currencies' => $currencies
         ]);
     }
 
@@ -190,6 +193,7 @@ class ClientController extends Controller
             'state' => 'required|string|max:100|regex:/^[\p{L}\s\-\'.]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255',
+            'payout_currency' => 'required|string|max:10',
             'mobile_country_code' => 'nullable|string',
             'phone' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'consultation_preferences' => 'nullable|array',
@@ -236,6 +240,7 @@ class ClientController extends Controller
             'state' => $validatedData['state'],
             'zip_code' => $validatedData['zip_code'],
             'country' => $validatedData['country'],
+            'payout_currency' => $validatedData['payout_currency'],
             'mobile_country_code' => $validatedData['mobile_country_code'],
             'phone' => $validatedData['phone'],
             'client_id' => $clientId,
@@ -274,6 +279,7 @@ class ClientController extends Controller
             'state' => 'required|string|max:100|regex:/^[\p{L}\s\-\'.]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255',
+            'payout_currency' => 'required|string|max:10',
             'mobile_country_code' => 'nullable|string',
             'phone' => 'nullable|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'consultation_preferences' => 'nullable|array',
@@ -312,6 +318,7 @@ class ClientController extends Controller
             'state' => $validatedData['state'],
             'zip_code' => $validatedData['zip_code'],
             'country' => $validatedData['country'],
+            'payout_currency' => $validatedData['payout_currency'],
             'mobile_country_code' => $validatedData['mobile_country_code'] ?? null,
             'phone' => $validatedData['phone'] ?? null,
             'consultation_preferences' => $validatedData['consultation_preferences'] ?? [],

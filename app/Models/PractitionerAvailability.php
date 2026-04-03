@@ -11,6 +11,7 @@ class PractitionerAvailability extends Model
 
     protected $fillable = [
         'practitioner_id',
+        'practitioner_type',
         'day_of_week',
         'specific_date',
         'start_time',
@@ -29,6 +30,6 @@ class PractitionerAvailability extends Model
 
     public function practitioner()
     {
-        return $this->belongsTo(Practitioner::class);
+        return $this->morphTo();
     }
 }

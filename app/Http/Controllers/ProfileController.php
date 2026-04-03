@@ -341,6 +341,26 @@ class ProfileController extends Controller
         return view('transactions', compact('user', 'transactions', 'totalBalance'));
     }
 
+    public function promoCodes()
+    {
+        $user = Auth::user();
+        
+        $activePromoCodes = \App\Models\PromoCode::where('status', true)
+            ->where(function($q) {
+                $q->where('expiry_date', '>=', now()->toDateString())
+                  ->orWhereNull('expiry_date');
+            })
+            ->whereIn('usage_type', ['booking', 'both'])
+            ->get();
+
+        $usedPromoCodes = \App\Models\Booking::where('user_id', $user->id)
+            ->whereNotNull('promo_code')
+            ->pluck('promo_code')
+            ->toArray();
+
+        return view('client.promo-codes', compact('activePromoCodes', 'usedPromoCodes'));
+    }
+
     public function healthJourney()
     {
         $user = Auth::user();
@@ -1371,7 +1391,9 @@ class ProfileController extends Controller
                 break;
         }
 
-        return view('client.complete-profile', compact('user', 'profile', 'countries', 'allLanguages', 'countryCodes', 'allSpecialities', 'allConditions'));
+        $currencies = config('currencies.symbols');
+
+        return view('client.complete-profile', compact('user', 'profile', 'countries', 'allLanguages', 'countryCodes', 'allSpecialities', 'allConditions', 'currencies'));
     }
 
     public function storeCompleteProfile(Request $request)
@@ -1395,6 +1417,7 @@ class ProfileController extends Controller
             'state' => 'nullable|string|max:255',
             'zip_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:255',
+            'payout_currency' => 'nullable|string|max:10',
             'pan_number' => 'nullable|string|max:20',
             'bank_name' => 'nullable|string|max:255',
             'account_number' => 'nullable|string|max:50',

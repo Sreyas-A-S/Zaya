@@ -152,7 +152,7 @@ class BookingController extends Controller
             ]);
 
             // Record Financial Transaction
-            $practitioner = Practitioner::find($booking->practitioner_id);
+            $practitioner = $booking->practitioner;
             $this->recordTransaction([
                 'type' => 'booking',
                 'amount' => $booking->total_price,

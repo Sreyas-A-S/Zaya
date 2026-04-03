@@ -95,12 +95,7 @@
         </a>
     @endif
 
-    <!-- Logout -->
-    <a href="javascript:void(0)" 
-        onclick="openLogoutModal()"
-        class="leading-none text-base text-red-500 font-bold whitespace-nowrap cursor-pointer transition-colors flex items-center shrink-0">
-        {{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}
-    </a>
+
 </div>
 
 <style>

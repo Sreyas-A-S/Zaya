@@ -55,22 +55,26 @@
             01. {{ __('Personal Details') }}
         </button>
         @if(!in_array($user->role, ['client', 'patient']))
-        <button type="button" onclick="switchTab('professional')" class="tab-btn pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-professional">
-            02. {{ __('Professional') }}
-        </button>
-        <button type="button" onclick="switchTab('financial')" class="tab-btn pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-financial">
-            03. {{ __('KYC & Bank') }}
-        </button>
-        <button type="button" onclick="switchTab('documents')" class="tab-btn pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-documents">
-            04. {{ __('Documents') }}
-        </button>
+            <button type="button" onclick="switchTab('professional')" class="tab-btn pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-professional">
+                02. {{ __('Professional') }}
+            </button>
+            <button type="button" onclick="switchTab('financial')" class="tab-btn pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-financial">
+                03. {{ __('KYC & Bank') }}
+            </button>
+            <button type="button" onclick="switchTab('documents')" class="tab-btn pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-documents">
+                04. {{ __('Documents') }}
+            </button>
+        @else
+            <button type="button" onclick="switchTab('preferences')" class="tab-btn pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-preferences">
+                02. {{ __('Preferences & Referral') }}
+            </button>
         @endif
     </div>
 
     <form action="{{ route('profile.complete.store') }}" method="POST" enctype="multipart/form-data" id="complete-profile-form">
         @csrf
 
-        <!-- 1. Personal Tab -->
+        <!-- 1. Personal Tab (All Roles) -->
         <div id="tab-personal" class="tab-content active animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-8">
                 <div class="flex items-center gap-3">
@@ -99,7 +103,7 @@
                         </p>
                     </div>
 
-                    <!-- OTP Input Group (Hidden by default) -->
+                    <!-- OTP Input Group -->
                     <div id="otp-group" class="hidden md:col-span-2 p-6 bg-amber-50 rounded-2xl border border-amber-100 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>
@@ -137,9 +141,9 @@
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Gender') }}</label>
                         <select name="gender" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none bg-white">
                             <option value="">{{ __('Select Gender') }}</option>
-                            <option value="male" {{ ($profile->gender ?? $user->gender ?? '') == 'male' ? 'selected' : '' }}>Male</option>
-                            <option value="female" {{ ($profile->gender ?? $user->gender ?? '') == 'female' ? 'selected' : '' }}>Female</option>
-                            <option value="other" {{ ($profile->gender ?? $user->gender ?? '') == 'other' ? 'selected' : '' }}>Other</option>
+                            <option value="male" {{ (strtolower($profile->gender ?? $user->gender ?? '') == 'male') ? 'selected' : '' }}>Male</option>
+                            <option value="female" {{ (strtolower($profile->gender ?? $user->gender ?? '') == 'female') ? 'selected' : '' }}>Female</option>
+                            <option value="other" {{ (strtolower($profile->gender ?? $user->gender ?? '') == 'other') ? 'selected' : '' }}>Other</option>
                         </select>
                     </div>
 
@@ -157,6 +161,13 @@
                                 <option value="{{ $c->name }}" {{ ($profile->nationality ?? '') == $c->name ? 'selected' : '' }}>{{ $c->name }}</option>
                             @endforeach
                         </select>
+                    </div>
+                    @endif
+
+                    @if(in_array($user->role, ['client', 'patient']))
+                    <div>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Occupation / Lifestyle') }}</label>
+                        <input type="text" name="occupation" value="{{ $profile->occupation ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
                     </div>
                     @endif
 
@@ -192,22 +203,73 @@
                 </div>
 
                 <div class="flex justify-end pt-4">
-                    @if(!in_array($user->role, ['client', 'patient']))
-                    <button type="button" onclick="switchTab('professional')" class="px-8 py-3 bg-secondary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all flex items-center gap-2">
+                    <button type="button" onclick="switchTab('{{ in_array($user->role, ['client', 'patient']) ? 'preferences' : 'professional' }}')" class="px-8 py-3 bg-secondary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all flex items-center gap-2">
                         {{ __('Next Step') }}
                         <i class="ri-arrow-right-line"></i>
                     </button>
-                    @else
-                    <button type="submit" class="px-12 py-4 bg-secondary text-white font-black rounded-2xl shadow-xl shadow-secondary/20 hover:bg-opacity-90 transform hover:-translate-y-1 transition-all text-lg">
-                        {{ __('Save Profile') }}
-                    </button>
-                    @endif
                 </div>
             </div>
         </div>
 
-        @if(!in_array($user->role, ['client', 'patient']))
-        <!-- 2. Professional Tab -->
+        @if(in_array($user->role, ['client', 'patient']))
+        <!-- 2. Preferences & Referral Tab (Client Only) -->
+        <div id="tab-preferences" class="tab-content animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-secondary/5 flex items-center justify-center text-secondary">
+                        <i class="ri-heart-line text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-black text-secondary">{{ __('Preferences & Referral') }}</h2>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Preferred Speciality of Consultation') }}</label>
+                        <select id="specialities-select" name="consultation_preferences[]" multiple>
+                            @foreach($allSpecialities as $item)
+                                <option value="{{ $item }}" {{ in_array($item, (array)($profile->consultation_preferences ?? [])) ? 'selected' : '' }}>{{ $item }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Languages Spoken') }}</label>
+                        <select id="languages-spoken-select" name="languages_spoken[]" multiple>
+                            @foreach($allLanguages as $lang)
+                                <option value="{{ $lang }}" {{ in_array($lang, (array)($profile->languages_spoken ?? [])) ? 'selected' : '' }}>{{ $lang }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-50">
+                        <div>
+                            <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Referral Type') }}</label>
+                            <select name="referral_type" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none bg-white">
+                                <option value="">{{ __('Select Type') }}</option>
+                                @foreach(['Direct', 'Practitioner', 'Client', 'Social Media', 'Other'] as $type)
+                                    <option value="{{ $type }}" {{ ($profile->referral_type ?? '') == $type ? 'selected' : '' }}>{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Referring Name (If any)') }}</label>
+                            <input type="text" name="referrer_name" value="{{ $profile->referrer_name ?? '' }}" placeholder="Enter name" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between pt-4">
+                    <button type="button" onclick="switchTab('personal')" class="px-8 py-3 border border-gray-200 text-gray-600 font-bold rounded-2xl hover:bg-gray-50 transition-all">
+                        {{ __('Previous') }}
+                    </button>
+                    <button type="submit" class="px-12 py-4 bg-secondary text-white font-black rounded-2xl shadow-xl shadow-secondary/20 hover:bg-opacity-90 transform hover:-translate-y-1 transition-all text-lg">
+                        {{ __('Save Profile') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        @else
+        <!-- 2. Professional Tab (Practitioners/Doctors/Translators) -->
         <div id="tab-professional" class="tab-content animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-8">
                 <div class="flex items-center gap-3">
@@ -359,10 +421,10 @@
                             </select>
                         </div>
 
-                        @if(in_array($user->role, ['mindfulness_practitioner', 'yoga_therapist', 'practitioner', 'doctor', 'client', 'patient']))
-                        <div class="{{ in_array($user->role, ['doctor', 'client', 'patient']) ? 'md:col-span-2' : '' }}">
+                        @if(in_array($user->role, ['mindfulness_practitioner', 'yoga_therapist', 'practitioner', 'doctor']))
+                        <div class="{{ $user->role == 'doctor' ? 'md:col-span-2' : '' }}">
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Languages Spoken') }}</label>
-                            <select id="languages-spoken-select" name="{{ in_array($user->role, ['client', 'patient']) ? 'languages_spoken' : 'languages_spoken' }}[]" multiple>
+                            <select id="languages-spoken-select" name="languages_spoken[]" multiple>
                                 @foreach($allLanguages as $lang)
                                     <option value="{{ $lang }}" {{ in_array($lang, (array)($profile->languages_spoken ?? [])) ? 'selected' : '' }}>{{ $lang }}</option>
                                 @endforeach
@@ -442,6 +504,16 @@
                     <div>
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('IFSC Code') }}</label>
                         <input type="text" name="ifsc_code" value="{{ $profile->ifsc_code ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Payout Currency') }}</label>
+                        <select name="payout_currency" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none bg-white">
+                            @foreach($currencies as $code => $symbol)
+                                <option value="{{ $code }}" {{ ($profile->payout_currency ?? 'INR') == $code ? 'selected' : '' }}>
+                                    {{ $code }} ({{ $symbol }})
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                     @if($user->role == 'translator')
                     <div>
@@ -558,9 +630,9 @@
 </div>
 
 <!-- Confirmation Modal -->
-<div id="confirmation-modal" class="fixed inset-0 z-[100002] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+<div id="confirmation-modal" class="fixed inset-0 z-[100002] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 px-4">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="toggleModal(false)"></div>
-    <div class="relative bg-white rounded-[2rem] p-8 md:p-10 max-w-[450px] w-[90%] text-center shadow-2xl transform transition-all duration-300 scale-90">
+    <div class="relative bg-white rounded-[2rem] p-8 md:p-10 max-w-[450px] w-full text-center shadow-2xl transform transition-all duration-300 scale-90">
         <button onclick="toggleModal(false)" class="absolute top-6 right-8 text-gray-300 hover:text-gray-500 transition-colors">
             <i class="ri-close-line text-2xl"></i>
         </button>
@@ -613,7 +685,6 @@
         const submitBtn = document.querySelector('#confirmation-modal button[onclick="submitFinalForm()"]');
         const originalText = submitBtn.innerHTML;
         
-        // Show loading state
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<i class="ri-loader-4-line animate-spin mr-2"></i> {{ __('Submitting...') }}`;
         
@@ -772,10 +843,10 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Check if email is verified
             const isVerified = !document.getElementById('email-verified-badge').classList.contains('hidden');
             if (!isVerified) {
-                alert('Please verify your email address before submitting.');
+                if (window.showZayaToast) showZayaToast('Please verify your email address before submitting.', 'error', 'Verification');
+                else alert('Please verify your email address before submitting.');
                 return;
             }
             

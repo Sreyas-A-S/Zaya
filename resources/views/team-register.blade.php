@@ -136,7 +136,7 @@
                                 class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('City') }}</label>
                             <input type="text" name="city" value="{{ old('city') }}" required pattern="^[a-zA-Z\\s\\-]+$" title="Enter a valid city name" class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none">
@@ -152,6 +152,15 @@
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Country') }}</label>
                             <input type="text" name="country" value="{{ old('country') }}" required pattern="^[a-zA-Z\\s\\-]+$" title="Enter a valid country name" class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Payout Currency') }} <span class="text-red-500">*</span></label>
+                            <select name="payout_currency" required
+                                class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
+                                @foreach($currencies as $code => $symbol)
+                                    <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
 

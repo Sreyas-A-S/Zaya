@@ -104,7 +104,7 @@
                             <textarea class="form-control" id="promo-code-description" name="description" rows="2" placeholder="Describe the purpose of this code..."></textarea>
                         </div>
 
-                        <div class="col-12">
+                        <div class="col-12 d-none">
                             <label class="form-label fw-bold mb-2 d-block">Additional Benefits</label>
                             <div class="d-flex flex-wrap gap-3">
                                 <div class="form-check checkbox-primary">

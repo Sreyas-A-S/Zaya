@@ -57,21 +57,23 @@ class RegisterController extends Controller
             abort(404);
         }
 
+        $currencies = config('currencies.symbols');
+
         if ($type === 'practitioner') {
             $languages = \App\Models\Language::all();
             $wellnessConsultations = WellnessConsultation::where('status', 1)->get();
             $bodyTherapies = BodyTherapy::where('status', 1)->get();
             $practitionerModalities = PractitionerModality::where('status', 1)->get();
 
-            return view('auth.register_practitioner', compact('languages', 'wellnessConsultations', 'bodyTherapies', 'practitionerModalities'));
+            return view('auth.register_practitioner', compact('languages', 'wellnessConsultations', 'bodyTherapies', 'practitionerModalities', 'currencies'));
         }
 
         if ($type === 'patient' || $type === 'client') {
             $languages = \App\Models\Language::all();
-            return view('auth.register_patient', compact('languages'));
+            return view('auth.register_patient', compact('languages', 'currencies'));
         }
 
-        return view('auth.register', ['type' => $type]);
+        return view('auth.register', ['type' => $type, 'currencies' => $currencies]);
     }
 
     /**
@@ -184,6 +186,7 @@ class RegisterController extends Controller
             'city' => $request->city,
             'state' => $request->state,
             'country' => $request->country,
+            'payout_currency' => $request->payout_currency,
             'zip_code' => $request->zip_code,
             'phone' => $request->mobile_number,
             'mobile_country_code' => $request->mobile_country_code,
@@ -244,6 +247,7 @@ class RegisterController extends Controller
             'state',
             'country',
             'zip_code',
+            'payout_currency',
             'phone',
             'website_url',
             'can_translate_english',
@@ -334,6 +338,7 @@ class RegisterController extends Controller
             'state' => $request->state,
             'zip_code' => $request->zip_code,
             'country' => $request->country,
+            'payout_currency' => $request->payout_currency,
 
             'consultation_expertise' => $request->input('consultation_expertise', []),
             'health_conditions_treated' => $request->input('health_conditions', []),
@@ -383,6 +388,7 @@ class RegisterController extends Controller
             'state',
             'zip_code',
             'country',
+            'payout_currency',
             'practitioner_type',
             'years_of_experience',
             'current_workplace',
@@ -449,6 +455,7 @@ class RegisterController extends Controller
             'state',
             'zip_code',
             'country',
+            'payout_currency',
             'yoga_therapist_type',
             'years_of_experience',
             'current_organization',
@@ -519,6 +526,7 @@ class RegisterController extends Controller
             'state',
             'zip_code',
             'country',
+            'payout_currency',
             'native_language',
             'source_languages',
             'target_languages',
@@ -611,6 +619,7 @@ class RegisterController extends Controller
             'address_line_2' => ['nullable', 'string', 'max:500'],
             'state' => ['nullable', 'string', 'max:255'],
             'country' => ['nullable', 'string', 'max:255'],
+            'payout_currency' => ['required', 'string', 'max:10'],
         ];
 
         if (isset($data['role']) && in_array($data['role'], ['practitioner', 'doctor', 'patient', 'client'], true)) {

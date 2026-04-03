@@ -632,6 +632,15 @@
                                         </div>
 
                                         <div class="col-md-6">
+                                            <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="payout_currency" required id="mindfulness_payout_currency">
+                                                @foreach($currencies as $code => $symbol)
+                                                <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6">
                                             <label class="form-label">Upload Cancelled Cheque</label>
                                             <input class="form-control" type="file" name="cancelled_cheque" accept=".pdf,.jpg,.jpeg,.png">
                                             <div id="current-cancelled_cheque" class="mt-1 d-none small"></div>
@@ -1371,6 +1380,7 @@
             $('input[name="account_number"]').val(p.account_number || '');
             $('input[name="ifsc_code"]').val(p.ifsc_code || '');
             $('input[name="upi_id"]').val(p.upi_id || '');
+            $('#mindfulness_payout_currency').val(p.payout_currency || 'INR');
 
             if (p.gov_id_upload_path) {
                 $('#current-gov_id_upload').removeClass('d-none').html(`<a href="/storage/${p.gov_id_upload_path}" target="_blank" class="text-primary">View Current</a>`);

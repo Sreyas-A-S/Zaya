@@ -52,19 +52,30 @@ class AppServiceProvider extends ServiceProvider
             }
             
             $userBalance = 0;
+            $activePromoCodes = collect();
             $currentUser = auth()->user();
             if ($currentUser) {
                 // Calculate balance from practitioner shares and referrer shares
                 $earned = \App\Models\Transaction::where('practitioner_id', $currentUser->id)->sum('practitioner_share');
                 $referralEarned = \App\Models\Transaction::where('referrer_id', $currentUser->id)->sum('referrer_share');
                 $userBalance = $earned + $referralEarned;
+
+                // Fetch active promo codes
+                $activePromoCodes = \App\Models\PromoCode::where('status', true)
+                    ->where(function($q) {
+                        $q->where('expiry_date', '>=', now()->toDateString())
+                          ->orWhereNull('expiry_date');
+                    })
+                    ->whereIn('usage_type', ['booking', 'both'])
+                    ->get();
             }
             
             $view->with([
                 'site_settings' => $settings,
                 'available_languages' => $availableLanguages,
                 'current_locale' => $language,
-                'user_balance' => $userBalance
+                'user_balance' => $userBalance,
+                'active_promo_codes' => $activePromoCodes
             ]);
         });
     }

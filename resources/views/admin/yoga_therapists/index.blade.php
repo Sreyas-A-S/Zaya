@@ -547,6 +547,15 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                             pattern="^[A-Z]{4}0[A-Z0-9]{6}$" title="Enter valid IFSC (Example: SBIN0123456)"
                             oninput="this.value = this.value.toUpperCase()">
                     </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
+                        <select class="form-select" name="payout_currency" required id="yoga_payout_currency">
+                            @foreach($currencies as $code => $symbol)
+                            <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label">SWIFT Code</label>
                         <input class="form-control" type="text" name="swift_code" oninput="this.value = this.value.toUpperCase()">
@@ -1449,6 +1458,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     $('input[name="bank_name"]').val(t.bank_name);
                     $('input[name="account_number"]').val(t.account_number);
                     $('input[name="ifsc_code"]').val(t.ifsc_code);
+                    $('#yoga_payout_currency').val(t.payout_currency || 'INR');
                     $('input[name="swift_code"]').val(t.swift_code || '');
                     $('input[name="upi_id"]').val(t.upi_id);
 
