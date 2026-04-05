@@ -49,41 +49,47 @@ class AppServiceProvider extends ServiceProvider
 
         view()->composer('*', function ($view) {
             $language = App::getLocale();
-            
-            // Fetch available languages that have homepage settings
-            $availableLocales = \App\Models\HomepageSetting::distinct('language')->pluck('language')->toArray();
-            
-            // Get full language models for these locales
-            $availableLanguages = \App\Models\Language::whereIn('code', $availableLocales)
-                ->where('status', 'active')
-                ->orderByRaw("CASE WHEN code = 'en' THEN 1 WHEN code = 'fr' THEN 2 ELSE 3 END ASC")
-                ->get()
-                ->unique('code'); // Ensure uniqueness if DB has multiple entries for same code
-            
-            $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
-            
-            // Fallback to English if no settings found for current language
-            if ($settings->isEmpty() && $language !== 'en') {
-                $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
-            }
-            
+            $settings = collect();
+            $availableLanguages = collect();
             $userBalance = 0;
             $activePromoCodes = collect();
-            $currentUser = auth()->user();
-            if ($currentUser) {
-                // Calculate balance from practitioner shares and referrer shares
-                $earned = \App\Models\Transaction::where('practitioner_id', $currentUser->id)->sum('practitioner_share');
-                $referralEarned = \App\Models\Transaction::where('referrer_id', $currentUser->id)->sum('referrer_share');
-                $userBalance = $earned + $referralEarned;
 
-                // Fetch active promo codes
-                $activePromoCodes = \App\Models\PromoCode::where('status', true)
-                    ->where(function($q) {
-                        $q->where('expiry_date', '>=', now()->toDateString())
-                          ->orWhereNull('expiry_date');
-                    })
-                    ->whereIn('usage_type', ['booking', 'both'])
-                    ->get();
+            try {
+                // Fetch available languages that have homepage settings
+                $availableLocales = \App\Models\HomepageSetting::distinct('language')->pluck('language')->toArray();
+                
+                // Get full language models for these locales
+                $availableLanguages = \App\Models\Language::whereIn('code', $availableLocales)
+                    ->where('status', 'active')
+                    ->orderByRaw("CASE WHEN code = 'en' THEN 1 WHEN code = 'fr' THEN 2 ELSE 3 END ASC")
+                    ->get()
+                    ->unique('code'); // Ensure uniqueness if DB has multiple entries for same code
+                
+                $settings = \App\Models\HomepageSetting::where('language', $language)->pluck('value', 'key');
+                
+                // Fallback to English if no settings found for current language
+                if ($settings->isEmpty() && $language !== 'en') {
+                    $settings = \App\Models\HomepageSetting::where('language', 'en')->pluck('value', 'key');
+                }
+                
+                $currentUser = auth()->user();
+                if ($currentUser) {
+                    // Calculate balance from practitioner shares and referrer shares
+                    $earned = \App\Models\Transaction::where('practitioner_id', $currentUser->id)->sum('practitioner_share');
+                    $referralEarned = \App\Models\Transaction::where('referrer_id', $currentUser->id)->sum('referrer_share');
+                    $userBalance = $earned + $referralEarned;
+
+                    // Fetch active promo codes
+                    $activePromoCodes = \App\Models\PromoCode::where('status', true)
+                        ->where(function($q) {
+                            $q->where('expiry_date', '>=', now()->toDateString())
+                              ->orWhereNull('expiry_date');
+                        })
+                        ->whereIn('usage_type', ['booking', 'both'])
+                        ->get();
+                }
+            } catch (\Exception $e) {
+                \Log::error("Database error in AppServiceProvider: " . $e->getMessage());
             }
             
             $view->with([
