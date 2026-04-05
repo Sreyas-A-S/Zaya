@@ -3,12 +3,11 @@
         <div class="p-6 border-b border-[#2E4B3D]/12 flex flex-col sm:flex-row justify-between items-center gap-4">
             <h2 class="text-xl font-medium text-secondary">{{ $user->role === 'translator' ? 'Assigned Conferences' : 'Conference History' }}</h2>
             <div class="flex flex-wrap gap-3">
-                <a href="{{ route('conference.join', ['channel' => 'zaya-' . strtolower(Str::random(10)), 'provider' => 'jaas']) }}" 
-                   target="_blank" 
-                   class="px-5 py-3 bg-[#F3F6F4] text-secondary rounded-full font-medium flex items-center gap-2 hover:bg-[#E8EFEA] transition-all border border-[#2E4B3D]/10">
+                <button onclick="openPlatformModal('zaya-{{ strtolower(Str::random(10)) }}')" 
+                   class="px-5 py-3 bg-[#F3F6F4] text-secondary rounded-full font-medium flex items-center gap-2 hover:bg-[#E8EFEA] transition-all border border-[#2E4B3D]/10 cursor-pointer">
                     <i class="ri-team-line text-lg"></i>
                     Start Video Meet
-                </a>
+                </button>
             </div>
         </div>
 
@@ -98,3 +97,5 @@
         @endif
     </div>
 </div>
+
+@include('partials.conference-provider-modal')

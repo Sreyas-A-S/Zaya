@@ -91,4 +91,9 @@ return [
         'domain' => env('JITSI_DOMAIN', 'meet.jit.si'),
     ],
 
+    'daily' => [
+        'api_key' => env('DAILY_API_KEY'),
+        'domain' => env('DAILY_DOMAIN', 'zaya.daily.co'), // Replace with your default or env
+    ],
+
 ];

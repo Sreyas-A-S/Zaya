@@ -1087,8 +1087,8 @@ class ProfileController extends Controller
             ];
         }
         $appId = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_id'));
-        $provider = strtolower((string) $request->query('provider', 'agora'));
-        $provider = in_array($provider, ['agora', 'jaas', 'jitsi']) ? $provider : 'agora';
+        $provider = strtolower((string) $request->query('provider', 'choose'));
+        $provider = in_array($provider, ['agora', 'jaas', 'jitsi', 'daily', 'choose']) ? $provider : 'choose';
         
         $isMeetingPopout = $request->query('popout') === '1';
         $agoraAvailable = !empty($appId);
@@ -1102,7 +1102,7 @@ class ProfileController extends Controller
             $jaasRoomSlug = 'zaya-meeting';
         }
         $jaasRoomName = $jaasAppId !== '' ? $jaasAppId . '/' . $jaasRoomSlug : $jaasRoomSlug;
-        $jaasToken = $provider === 'jaas' ? $this->buildJaasToken($user, $jaasRoomSlug) : null;
+        $jaasToken = ($provider === 'jaas' || $provider === 'choose') ? $this->buildJaasToken($user, $jaasRoomSlug) : null;
         $jaasError = null;
 
         // Free Jitsi config
@@ -1113,6 +1113,18 @@ class ProfileController extends Controller
             $jaasError = 'JaaS App ID is missing. Set JAAS_APP_ID in your .env file.';
         } elseif ($provider === 'jaas' && empty($jaasToken)) {
             $jaasError = 'JaaS token could not be generated. Check the JaaS private key and API key ID.';
+        }
+
+        // Daily.co config
+        $dailyDomain = rtrim((string) config('services.daily.domain', 'zaya.daily.co'), '/');
+        $dailyApiKey = trim((string) config('services.daily.api_key'));
+        $dailyRoomName = strtolower($jaasRoomSlug); // Daily prefers lowercase
+        $dailyUrl = "https://{$dailyDomain}/{$dailyRoomName}";
+        $dailyToken = null;
+
+        if ($provider === 'daily' && !empty($dailyApiKey)) {
+            $this->ensureDailyRoomExists($dailyRoomName);
+            $dailyToken = $this->buildDailyToken($user, $dailyRoomName);
         }
 
         // Try to find the booking for session tracking
@@ -1126,6 +1138,12 @@ class ProfileController extends Controller
             'provider' => $provider,
             'appId_length' => strlen($appId)
         ]);
+
+        if ($provider === 'daily') {
+            return view('conference.daily', compact(
+                'user', 'channel', 'dailyUrl', 'dailyToken', 'booking'
+            ));
+        }
 
         return view('conference.session', compact(
             'user',
@@ -1143,8 +1161,95 @@ class ProfileController extends Controller
             'jaasError',
             'jitsiDomain',
             'jitsiRoom',
+            'dailyUrl',
+            'dailyToken',
             'booking'
         ));
+    }
+
+    private function ensureDailyRoomExists(string $roomName): void
+    {
+        $apiKey = trim((string) config('services.daily.api_key'));
+        if ($apiKey === '') return;
+
+        try {
+            // First, try to fetch the room to see if it exists
+            $checkResponse = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                ->withOptions(['verify' => false])
+                ->get("https://api.daily.co/v1/rooms/{$roomName}");
+
+            if ($checkResponse->successful()) {
+                return; // Room already exists
+            }
+
+            // If it doesn't exist (404), create it
+            if ($checkResponse->status() === 404) {
+                $createResponse = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                    ->withOptions(['verify' => false])
+                    ->post("https://api.daily.co/v1/rooms", [
+                        'name' => $roomName,
+                        'properties' => [
+                            'enable_chat' => true,
+                            'enable_knocking' => false,
+                            'enable_screenshare' => true,
+                            'enable_recording' => 'cloud',
+                            'exp' => now()->addHours(24)->getTimestamp(),
+                        ]
+                    ]);
+                
+                if (!$createResponse->successful()) {
+                    \Log::error('Daily.co Room Creation Failed', [
+                        'status' => $createResponse->status(),
+                        'body' => $createResponse->body(),
+                        'room' => $roomName
+                    ]);
+                } else {
+                    \Log::info('Daily.co Room Created Successfully', ['room' => $roomName]);
+                }
+            } else if (!$checkResponse->successful()) {
+                \Log::error('Daily.co Room Check Failed', [
+                    'status' => $checkResponse->status(),
+                    'body' => $checkResponse->body()
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Daily.co Ensure Room Exception: ' . $e->getMessage());
+        }
+    }
+
+    private function buildDailyToken($user, string $roomName): ?string
+    {
+        $apiKey = trim((string) config('services.daily.api_key'));
+        if ($apiKey === '') return null;
+
+        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'], true);
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                ->withOptions(['verify' => false])
+                ->post("https://api.daily.co/v1/meeting-tokens", [
+                    'properties' => [
+                        'room_name' => $roomName,
+                        'is_owner' => $isModerator,
+                        'user_name' => (string) $user->name,
+                        'user_id' => (string) $user->id,
+                        'enable_recording' => 'cloud',
+                    ]
+                ]);
+
+            if ($response->successful()) {
+                return $response->json('token');
+            }
+            
+            \Log::error('Daily.co Token Error', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Daily.co Token Exception: ' . $e->getMessage());
+        }
+
+        return null;
     }
 
     public function publicJoinSession(Request $request, $channel)
@@ -1612,5 +1717,313 @@ class ProfileController extends Controller
         ]);
 
         return back()->with('status', 'Review submitted successfully!');
+    }
+
+    public function joinSession(Request $request, $channel, bool $isPublicMeeting = false)
+    {
+        $user = Auth::user();
+        $isPublicMeeting = $isPublicMeeting || !$user;
+        if (!$user) {
+            $guestName = trim((string) $request->query('name', 'Guest'));
+            $user = (object) [
+                'id' => 0,
+                'name' => $guestName !== '' ? $guestName : 'Guest',
+                'email' => null,
+                'role' => 'guest',
+                'profile_pic' => null,
+                'profile' => null,
+                'unreadNotifications' => collect(),
+            ];
+        }
+        $appId = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_id'));
+        $provider = strtolower((string) $request->query('provider', 'choose'));
+        $provider = in_array($provider, ['agora', 'jaas', 'jitsi', 'daily', 'choose']) ? $provider : 'choose';
+        
+        $isMeetingPopout = $request->query('popout') === '1';
+        $agoraAvailable = !empty($appId);
+
+        // JaaS (8x8) config
+        $jaasDomain = rtrim((string) config('services.jaas.domain', '8x8.vc'), '/');
+        $jaasAppId = trim((string) config('services.jaas.app_id'));
+        $jaasRoomSlug = preg_replace('/[^A-Za-z0-9_-]+/', '-', (string)$channel);
+        $jaasRoomSlug = trim($jaasRoomSlug, '-');
+        if ($jaasRoomSlug === '') {
+            $jaasRoomSlug = 'zaya-meeting';
+        }
+        $jaasRoomName = $jaasAppId !== '' ? $jaasAppId . '/' . $jaasRoomSlug : $jaasRoomSlug;
+        $jaasToken = ($provider === 'jaas' || $provider === 'choose') ? $this->buildJaasToken($user, $jaasRoomSlug) : null;
+        $jaasError = null;
+
+        // Free Jitsi config
+        $jitsiDomain = rtrim((string) config('services.jitsi.domain', 'meet.jit.si'), '/');
+        $jitsiRoom = $jaasRoomSlug;
+
+        if ($provider === 'jaas' && empty($jaasAppId)) {
+            $jaasError = 'JaaS App ID is missing. Set JAAS_APP_ID in your .env file.';
+        } elseif ($provider === 'jaas' && empty($jaasToken)) {
+            $jaasError = 'JaaS token could not be generated. Check the JaaS private key and API key ID.';
+        }
+
+        // Daily.co config
+        $dailyDomain = rtrim((string) config('services.daily.domain', 'zaya.daily.co'), '/');
+        $dailyApiKey = trim((string) config('services.daily.api_key'));
+        $dailyRoomName = strtolower($jaasRoomSlug); // Daily prefers lowercase
+        $dailyUrl = "https://{$dailyDomain}/{$dailyRoomName}";
+        $dailyToken = null;
+
+        if ($provider === 'daily' && !empty($dailyApiKey)) {
+            $this->ensureDailyRoomExists($dailyRoomName);
+            $dailyToken = $this->buildDailyToken($user, $dailyRoomName);
+        }
+
+        // Try to find the booking for session tracking
+        $booking = \App\Models\Booking::where('id', function($query) use ($channel) {
+            $query->select('id')->from('bookings')->whereRaw("LOWER(REPLACE(invoice_no, '-', '')) = LOWER(?)", [str_replace('zaya-', '', $channel)]);
+        })->orWhere('id', (int)str_replace('zaya-', '', $channel))->first();
+        
+        \Log::info("User joining session:", [
+            'user' => $user->id,
+            'channel' => $channel,
+            'provider' => $provider,
+            'appId_length' => strlen($appId)
+        ]);
+
+        if ($provider === 'daily') {
+            return view('conference.daily', compact(
+                'user', 'channel', 'dailyUrl', 'dailyToken', 'booking'
+            ));
+        }
+
+        return view('conference.session', compact(
+            'user',
+            'channel',
+            'appId',
+            'provider',
+            'isMeetingPopout',
+            'isPublicMeeting',
+            'agoraAvailable',
+            'jaasDomain',
+            'jaasAppId',
+            'jaasRoomSlug',
+            'jaasRoomName',
+            'jaasToken',
+            'jaasError',
+            'jitsiDomain',
+            'jitsiRoom',
+            'dailyUrl',
+            'dailyToken',
+            'booking'
+        ));
+    }
+
+    private function ensureDailyRoomExists(string $roomName): void
+    {
+        $apiKey = trim((string) config('services.daily.api_key'));
+        if ($apiKey === '') return;
+
+        try {
+            // First, try to fetch the room to see if it exists
+            $checkResponse = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                ->withOptions(['verify' => false])
+                ->get("https://api.daily.co/v1/rooms/{$roomName}");
+
+            if ($checkResponse->successful()) {
+                return; // Room already exists
+            }
+
+            // If it doesn't exist (404), create it
+            if ($checkResponse->status() === 404) {
+                $createResponse = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                    ->withOptions(['verify' => false])
+                    ->post("https://api.daily.co/v1/rooms", [
+                        'name' => $roomName,
+                        'properties' => [
+                            'enable_chat' => true,
+                            'enable_knocking' => false,
+                            'enable_screenshare' => true,
+                            'enable_recording' => 'cloud',
+                            'exp' => now()->addHours(24)->getTimestamp(),
+                        ]
+                    ]);
+                
+                if (!$createResponse->successful()) {
+                    \Log::error('Daily.co Room Creation Failed', [
+                        'status' => $createResponse->status(),
+                        'body' => $createResponse->body(),
+                        'room' => $roomName
+                    ]);
+                } else {
+                    \Log::info('Daily.co Room Created Successfully', ['room' => $roomName]);
+                }
+            } else if (!$checkResponse->successful()) {
+                \Log::error('Daily.co Room Check Failed', [
+                    'status' => $checkResponse->status(),
+                    'body' => $checkResponse->body()
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Daily.co Ensure Room Exception: ' . $e->getMessage());
+        }
+    }
+
+    private function buildDailyToken($user, string $roomName): ?string
+    {
+        $apiKey = trim((string) config('services.daily.api_key'));
+        if ($apiKey === '') return null;
+
+        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'], true);
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                ->withOptions(['verify' => false])
+                ->post("https://api.daily.co/v1/meeting-tokens", [
+                    'properties' => [
+                        'room_name' => $roomName,
+                        'is_owner' => $isModerator,
+                        'user_name' => (string) $user->name,
+                        'user_id' => (string) $user->id,
+                        'enable_recording' => 'cloud',
+                    ]
+                ]);
+
+            if ($response->successful()) {
+                return $response->json('token');
+            }
+            
+            \Log::error('Daily.co Token Error', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Daily.co Token Exception: ' . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    public function publicJoinSession(Request $request, $channel)
+    {
+        return $this->joinSession($request, $channel, true);
+    }
+
+    private function buildJaasToken($user, string $roomSlug): ?string
+    {
+        $jaasAppId = trim((string) config('services.jaas.app_id'));
+        $kid = trim((string) config('services.jaas.kid'));
+        $privateKey = trim((string) config('services.jaas.private_key'));
+        $privateKeyPath = trim((string) config('services.jaas.private_key_path'));
+
+        if ($privateKey === '' && $privateKeyPath !== '' && file_exists($privateKeyPath)) {
+            $privateKey = trim((string) file_get_contents($privateKeyPath));
+        }
+
+        if ($privateKey !== '') {
+            $privateKey = str_replace(["\\r\\n", "\\n", "\\r"], "\n", $privateKey);
+            $privateKey = str_replace("\r\n", "\n", $privateKey);
+            $privateKey = trim($privateKey);
+        }
+
+        if ($jaasAppId === '' || $kid === '' || $privateKey === '') {
+            return null;
+        }
+
+        $now = now()->getTimestamp();
+        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'], true);
+
+        $payload = [
+            'aud' => 'jitsi',
+            'iss' => 'chat',
+            'sub' => $jaasAppId,
+                    'room' => $roomSlug,
+                    'nbf' => $now - 30,
+                    'exp' => $now + 7200,
+                    'context' => [
+                'user' => [
+                    'id' => str_pad((string)$user->id, 8, '0', STR_PAD_LEFT),
+                    'name' => (string) $user->name,
+                    'email' => (string) ($user->email ?? ''),
+                    'moderator' => $isModerator ? 'true' : 'false',
+                ],
+                'features' => [
+                    'livestreaming' => 'false',
+                    'outbound-call' => 'false',
+                    'transcription' => 'false',
+                    'recording' => 'false',
+                ],
+                'room' => [
+                    'regex' => false,
+                ],
+            ],
+        ];
+
+        try {
+            $key = openssl_pkey_get_private($privateKey);
+            if ($key === false) {
+                \Log::error('Failed to parse JaaS private key', [
+                    'user_id' => $user->id ?? null,
+                    'room' => $roomSlug,
+                ]);
+                return null;
+            }
+
+            return JWT::encode($payload, $key, 'RS256', $kid);
+        } catch (\Throwable $e) {
+            \Log::error('Failed to build JaaS token', [
+                'error' => $e->getMessage(),
+                'user_id' => $user->id ?? null,
+                'room' => $roomSlug,
+            ]);
+
+            return null;
+        }
+    }
+
+    public function generateToken(Request $request)
+    {
+        $appId = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_id'));
+        $appCertificate = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_certificate'));
+        
+        $validated = $request->validate([
+            'channel' => ['required', 'string', 'max:64', 'regex:/^[A-Za-z0-9_-]+$/'],
+            'uid' => ['nullable', 'integer', 'min:1'],
+        ]);
+
+        $channelName = $validated['channel'];
+        $uid = $validated['uid'] ?? Auth::id() ?? 1;
+        
+        \Log::info("Agora Token Request DEBUG:", [
+            'channel' => $channelName,
+            'uid' => $uid,
+            'appId_length' => strlen($appId),
+            'has_cert' => !empty($appCertificate)
+        ]);
+
+        if (empty($appId) || empty($appCertificate)) {
+            return response()->json(['token' => null, 'error' => 'Agora credentials missing or invalid']);
+        }
+
+        $role = \App\Services\Agora\RtcTokenBuilder::ROLE_PUBLISHER;
+        $expireTimeInSeconds = 3600;
+        $currentTimestamp = now()->getTimestamp();
+        $privilegeExpiredTs = $currentTimestamp + $expireTimeInSeconds;
+
+        $token = \App\Services\Agora\RtcTokenBuilder::buildTokenWithUid(
+            $appId, 
+            $appCertificate, 
+            $channelName, 
+            $uid, 
+            $role, 
+            $expireTimeInSeconds,
+            $privilegeExpiredTs
+        );
+
+        \Log::info("Generated Token DEBUG: " . $token);
+
+        return response()->json([
+            'token' => $token, 
+            'expire' => $privilegeExpiredTs,
+            'uid' => $uid,
+            'channel' => $channelName,
+        ]);
     }
 }
