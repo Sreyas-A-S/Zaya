@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 use Illuminate\Support\Facades\Event;
 use SocialiteProviders\Manager\SocialiteWasCalled;
@@ -26,6 +27,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Relation::morphMap([
+            'App\Models\Practitioner' => \App\Models\Practitioner::class,
+            'AppModelsPractitioner' => \App\Models\Practitioner::class,
+            'practitioner' => \App\Models\Practitioner::class,
+            'App\Models\Doctor' => \App\Models\Doctor::class,
+            'AppModelsDoctor' => \App\Models\Doctor::class,
+            'doctor' => \App\Models\Doctor::class,
+            'App\Models\MindfulnessPractitioner' => \App\Models\MindfulnessPractitioner::class,
+            'AppModelsMindfulnessPractitioner' => \App\Models\MindfulnessPractitioner::class,
+            'mindfulness_practitioner' => \App\Models\MindfulnessPractitioner::class,
+            'App\Models\YogaTherapist' => \App\Models\YogaTherapist::class,
+            'AppModelsYogaTherapist' => \App\Models\YogaTherapist::class,
+            'yoga_therapist' => \App\Models\YogaTherapist::class,
+        ]);
+
          App::setLocale(Session::get('locale', 'en'));
         Schema::defaultStringLength(191);
 
