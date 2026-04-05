@@ -55,7 +55,9 @@ jobs:
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
 
       - name: Ensure storage/framework/views exists
-        run: mkdir -p storage/framework/views
+        run: |
+          mkdir -p storage/framework/views
+          mkdir -p storage/framework/cache/data
 
       - name: Set permissions for storage and bootstrap/cache
         run: chmod -R 777 storage bootstrap/cache
@@ -81,6 +83,7 @@ jobs:
           mkdir -p storage/app/public
           mkdir -p storage/framework/views
           mkdir -p storage/framework/cache
+          mkdir -p storage/framework/cache/data
           mkdir -p storage/framework/sessions
 
       - name: 🔐 Set Directory Permissions
