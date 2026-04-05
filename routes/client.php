@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ZegoController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'isClient'])->group(function () {
@@ -16,6 +17,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/conference-history', [ProfileController::class, 'conferences'])->name('conferences.index');
     Route::get('/recordings/{id}', [ProfileController::class, 'showRecording'])->name('recordings.show');
     Route::get('/conference/session/{channel}', [ProfileController::class, 'joinSession'])->name('conference.join');
+    Route::get('/conference/zego/{channel}', [ZegoController::class, 'join'])->name('zego.join');
     Route::get('/bookings/{id}/consultation-form', [ProfileController::class, 'showConsultationForm'])->name('bookings.consultation-form.show');
     Route::post('/bookings/{id}/consultation-form', [ProfileController::class, 'storeConsultationForm'])->name('bookings.consultation-form.store');
     Route::get('/agora/token', [ProfileController::class, 'generateToken'])->name('agora.token');
@@ -91,3 +93,9 @@ Route::middleware(['auth', 'isClient'])->group(function () {
 });
 
 Route::get('/conference/share/{channel}', [ProfileController::class, 'publicJoinSession'])->name('conference.share');
+Route::get('/conference/zego/share/{channel}', [ZegoController::class, 'publicJoin'])->name('zego.share');
+Route::post('/conference/upload-recording', [ProfileController::class, 'uploadConferenceRecording'])->name('conference.upload-recording');
+Route::post('/conference/zego/{channel}/recording/start', [ZegoController::class, 'startRecording'])->name('zego.recording.start');
+Route::post('/conference/zego/{channel}/recording/stop', [ZegoController::class, 'stopRecording'])->name('zego.recording.stop');
+Route::post('/conference/zego/{channel}/recording/status', [ZegoController::class, 'syncRecordingStatus'])->name('zego.recording.status');
+Route::post('/conference/zego/{channel}/token', [ZegoController::class, 'generateToken'])->name('zego.token');

@@ -54,6 +54,18 @@
                     </div>
                 </button>
 
+                <!-- ZEGOCLOUD -->
+                <button onclick="redirectToPlatform('zegocloud')" class="group p-6 bg-[#FDFDFD] border border-[#2E4B3D]/10 rounded-[32px] hover:border-secondary hover:bg-secondary/5 transition-all text-left relative overflow-hidden">
+                    <div class="w-12 h-12 bg-fuchsia-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-fuchsia-500/20">
+                        <i class="ri-apps-2-fill text-white text-2xl"></i>
+                    </div>
+                    <h4 class="text-lg font-bold text-secondary mb-1">ZEGOCLOUD</h4>
+                    <p class="text-gray-400 text-xs leading-relaxed">Prebuilt ZEGOCLOUD meeting UI for fast hosted video sessions.</p>
+                    <div class="absolute bottom-4 right-6 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all">
+                        <i class="ri-arrow-right-line text-secondary text-xl"></i>
+                    </div>
+                </button>
+
                 <!-- Help Info -->
                 <div class="p-6 bg-gray-50 rounded-[32px] flex items-center gap-4">
                     <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0">
@@ -93,7 +105,10 @@
     };
 
     window.redirectToPlatform = (provider) => {
-        const url = "{{ route('conference.join', ['channel' => ':channel']) }}".replace(':channel', currentChannel);
+        const url = provider === 'zegocloud'
+            ? "{{ route('zego.join', ['channel' => ':channel']) }}".replace(':channel', currentChannel)
+            : "{{ route('conference.join', ['channel' => ':channel']) }}".replace(':channel', currentChannel);
+
         window.open(url + '?provider=' + provider, '_blank');
         closePlatformModal();
     };

@@ -96,4 +96,16 @@ return [
         'domain' => env('DAILY_DOMAIN', 'zaya.daily.co'), // Replace with your default or env
     ],
 
+    'zego' => [
+        'app_id' => env('ZEGO_APP_ID'),
+        'server_secret' => env('ZEGO_SERVER_SECRET'),
+        'cloud_recording' => [
+            'api_base' => env('ZEGO_CLOUD_RECORDING_API_BASE', 'https://cloudrecord-api.zego.im/'),
+            'storage_vendor' => env('ZEGO_CLOUD_RECORDING_STORAGE_VENDOR', 1),
+            'output_folder' => env('ZEGO_CLOUD_RECORDING_OUTPUT_FOLDER', 'zego-recordings'),
+            'max_idle_time' => env('ZEGO_CLOUD_RECORDING_MAX_IDLE_TIME', 30),
+            'max_record_time' => env('ZEGO_CLOUD_RECORDING_MAX_RECORD_TIME', 7200),
+        ],
+    ],
+
 ];

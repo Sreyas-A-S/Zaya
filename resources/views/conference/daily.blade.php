@@ -72,11 +72,18 @@
         </div>
     </div>
 
+    @if(!empty($dailyError))
+        <div style="position:absolute;top:80px;left:20px;right:20px;z-index:120;padding:14px 16px;border-radius:12px;background:rgba(127,29,29,.92);color:#fff;font:600 14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+            Daily.co setup failed: {{ $dailyError }}
+        </div>
+    @endif
+
     <div id="daily-container"></div>
 
     <script>
         const dailyUrl = "{{ $dailyUrl }}";
         const dailyToken = "{{ $dailyToken }}";
+        const dailyError = @json($dailyError ?? null);
         
         const callFrame = window.DailyIframe.createFrame(document.getElementById('daily-container'), {
             showLeaveButton: true,
@@ -101,12 +108,14 @@
             },
         });
 
-        const joinOptions = { url: dailyUrl };
-        if (dailyToken) {
-            joinOptions.token = dailyToken;
-        }
+        if (!dailyError) {
+            const joinOptions = { url: dailyUrl };
+            if (dailyToken) {
+                joinOptions.token = dailyToken;
+            }
 
-        callFrame.join(joinOptions);
+            callFrame.join(joinOptions);
+        }
 
         callFrame.on('left-meeting', () => {
             console.log('User left the meeting');

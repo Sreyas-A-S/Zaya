@@ -54,6 +54,14 @@
                                 class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all {{ $provider === 'daily' ? 'bg-secondary text-white shadow-sm' : 'text-gray-400 hover:text-secondary' }}">
                                 Daily.co
                             </button>
+                            <button onclick="switchProvider('zegocloud')"
+                                class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all text-gray-400 hover:text-secondary">
+                                ZEGOCLOUD
+                            </button>
+                            <button onclick="switchProvider('livekit')"
+                                class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all {{ $provider === 'livekit' ? 'bg-secondary text-white shadow-sm' : 'text-gray-400 hover:text-secondary' }}">
+                                LiveKit
+                            </button>
                             @if($agoraAvailable)
                             <button onclick="switchProvider('agora')"
                                 class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all {{ $provider === 'agora' ? 'bg-secondary text-white shadow-sm' : 'text-gray-400 hover:text-secondary' }}">
@@ -74,6 +82,10 @@
                                 <i class="ri-settings-4-fill text-xl"></i>
                             </button>
                         @endif
+                        <div id="recording-indicator" class="hidden items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-widest">
+                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            Recording
+                        </div>
                     </div>
                 </div>
             @endif
@@ -137,6 +149,24 @@
                                 <p class="text-white/40 text-xs">Simple, fast, and reliable browser-based video.</p>
                             </button>
 
+                            <button onclick="switchProvider('zegocloud')" 
+                                class="p-6 bg-white/5 border border-white/10 rounded-[24px] hover:bg-white/10 transition-all text-left group">
+                                <div class="w-10 h-10 bg-fuchsia-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                    <i class="ri-apps-2-fill text-white text-xl"></i>
+                                </div>
+                                <h3 class="text-white font-bold text-lg mb-1">ZEGOCLOUD</h3>
+                                <p class="text-white/40 text-xs">Hosted prebuilt video conference via ZEGOCLOUD UIKit.</p>
+                            </button>
+
+                            <button onclick="switchProvider('livekit')" 
+                                class="p-6 bg-white/5 border border-white/10 rounded-[24px] hover:bg-white/10 transition-all text-left group">
+                                <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                    <i class="ri-live-fill text-white text-xl"></i>
+                                </div>
+                                <h3 class="text-white font-bold text-lg mb-1">LiveKit</h3>
+                                <p class="text-white/40 text-xs">Open source WebRTC infrastructure and Cloud.</p>
+                            </button>
+
                             @if($agoraAvailable)
                             <button onclick="switchProvider('agora')" 
                                 class="p-6 bg-white/5 border border-white/10 rounded-[24px] hover:bg-white/10 transition-all text-left group">
@@ -153,7 +183,7 @@
                             Ready to Join?
                         </h2>
                         <p class="text-white/60 mb-10 max-w-md text-lg">
-                            You are joining via <span class="text-white font-bold uppercase tracking-wider">{{ $provider === 'jaas' ? 'JaaS' : ($provider === 'daily' ? 'Daily.co' : 'Agora') }}</span>.
+                            You are joining via <span class="text-white font-bold uppercase tracking-wider">{{ $provider === 'jaas' ? 'JaaS' : ($provider === 'daily' ? 'Daily.co' : ($provider === 'livekit' ? 'LiveKit' : 'Agora')) }}</span>.
                         </p>
 
                         <div id="setup-feedback" class="mb-6 text-white/80 text-sm hidden">
@@ -223,6 +253,9 @@
                             <button id="screen-share-btn" class="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all active:scale-90 cursor-pointer">
                                 <i class="ri-screen-share-line text-xl" id="screen-icon"></i>
                             </button>
+                            <button id="record-toggle" class="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all active:scale-90 cursor-pointer" title="Start or stop recording">
+                                <i class="ri-record-circle-line text-xl" id="record-icon"></i>
+                            </button>
                             <button onclick="leave()" class="w-14 h-14 bg-red-500 rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-500/20 cursor-pointer">
                                 <i class="ri-phone-fill text-2xl rotate-[135deg]"></i>
                             </button>
@@ -241,6 +274,9 @@
                         <button id="video-toggle-mobile" class="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer">
                             <i class="ri-video-on-fill text-2xl" id="vid-icon-mobile"></i>
                         </button>
+                        <button id="record-toggle-mobile" class="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer">
+                            <i class="ri-record-circle-line text-2xl" id="record-icon-mobile"></i>
+                        </button>
                         <button onclick="leave()" class="w-14 h-14 bg-red-500 rounded-2xl flex items-center justify-center text-white active:scale-95 shadow-lg shadow-red-500/20 transition-all cursor-pointer relative z-[101]">
                             <i class="ri-phone-fill text-2xl rotate-[135deg]"></i>
                         </button>
@@ -254,7 +290,7 @@
                     <div class="flex items-center gap-3">
                         <i class="ri-shield-check-line text-secondary"></i>
                         <p class="text-xs text-gray-400 font-medium italic">
-                            Secure encrypted session via {{ $provider === 'jaas' ? 'JaaS' : ($provider === 'daily' ? 'Daily.co' : 'Agora') }}</p>
+                            Secure encrypted session via {{ $provider === 'jaas' ? 'JaaS' : ($provider === 'daily' ? 'Daily.co' : ($provider === 'livekit' ? 'LiveKit' : 'Agora')) }}</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -322,10 +358,23 @@
             const dailyUrl = "{{ $dailyUrl }}";
             const dailyToken = "{{ $dailyToken }}";
             const conferencesUrl = "{{ route('conferences.index') }}";
+            const zegoUrl = "{{ route('zego.join', ['channel' => $channel]) }}";
+            const livekitUrl = "{{ route('livekit.join', ['channel' => $channel]) ?? '#' }}";
+            const bookingId = {{ (int) ($booking->id ?? 0) }};
+            const uploadRecordingUrl = "{{ route('conference.upload-recording') }}";
+            const csrfToken = "{{ csrf_token() }}";
             
             let jitsiApi = null;
             let dailyCall = null;
             let meetingState = { audioMuted: false, videoMuted: false, screenSharing: false };
+            let meetingStartedAt = null;
+            let recordingState = {
+                mediaRecorder: null,
+                stream: null,
+                chunks: [],
+                startedAt: null,
+                uploadPromise: null,
+            };
 
             // Timer Logic
             let timerStartTime = Date.now();
@@ -340,6 +389,15 @@
             }, 1000);
 
             window.switchProvider = (nextProvider) => {
+                if (nextProvider === 'zegocloud') {
+                    window.location.href = zegoUrl;
+                    return;
+                }
+                if (nextProvider === 'livekit') {
+                    window.location.href = livekitUrl;
+                    return;
+                }
+
                 const nextUrl = new URL(window.location.href);
                 nextUrl.searchParams.set('provider', nextProvider);
                 window.location.href = nextUrl.toString();
@@ -353,6 +411,7 @@
             };
 
             window.leave = async () => {
+                await stopRecordingAndUpload();
                 if (provider === 'jaas' && jitsiApi) { jitsiApi.dispose(); }
                 if (provider === 'daily' && dailyCall) { await dailyCall.leave(); dailyCall.destroy(); }
                 if (provider === 'agora') {
@@ -368,6 +427,8 @@
                 const feedback = document.getElementById('setup-feedback');
                 if (btn) btn.disabled = true;
                 if (feedback) feedback.classList.remove('hidden');
+                meetingStartedAt = new Date().toISOString();
+                await beginRecording(true);
 
                 if (provider === 'jaas') initJitsi();
                 else if (provider === 'daily') initDaily();
@@ -440,6 +501,8 @@
             const audioBtn = document.getElementById('audio-toggle');
             const videoBtn = document.getElementById('video-toggle');
             const screenBtn = document.getElementById('screen-share-btn');
+            const recordBtn = document.getElementById('record-toggle');
+            const recordMobileBtn = document.getElementById('record-toggle-mobile');
 
             if (audioBtn) audioBtn.onclick = () => {
                 if (provider === 'jaas') jitsiApi.executeCommand('toggleAudio');
@@ -457,6 +520,8 @@
                     meetingState.screenSharing = !meetingState.screenSharing;
                 }
             };
+            if (recordBtn) recordBtn.onclick = () => toggleRecording();
+            if (recordMobileBtn) recordMobileBtn.onclick = () => toggleRecording();
 
             // --- Agora Logic (Simplified for brevity) ---
             let client, localTracks = { videoTrack: null, audioTrack: null };
@@ -465,6 +530,131 @@
                 // Note: I will wrap the existing agora logic back in if needed, 
                 // but since the user asked for Daily.co I'm focusing on that.
                 // Assuming standard Agora implementation.
+            }
+
+            function updateRecordingUi(isRecording) {
+                const indicator = document.getElementById('recording-indicator');
+                const iconClass = isRecording ? 'ri-stop-circle-line text-red-500' : 'ri-record-circle-line';
+
+                if (indicator) indicator.classList.toggle('hidden', !isRecording);
+                if (indicator) indicator.classList.toggle('flex', isRecording);
+                if (document.getElementById('record-icon')) document.getElementById('record-icon').className = `text-xl ${iconClass}`;
+                if (document.getElementById('record-icon-mobile')) document.getElementById('record-icon-mobile').className = `text-2xl ${iconClass}`;
+            }
+
+            async function toggleRecording() {
+                if (recordingState.mediaRecorder && recordingState.mediaRecorder.state === 'recording') {
+                    await stopRecordingAndUpload();
+                    return;
+                }
+
+                await beginRecording(false);
+            }
+
+            async function beginRecording(isAutoStart) {
+                if (!bookingId || recordingState.mediaRecorder) {
+                    return;
+                }
+
+                try {
+                    const stream = await navigator.mediaDevices.getDisplayMedia({
+                        video: true,
+                        audio: true,
+                    });
+                    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+                        ? 'video/webm;codecs=vp9,opus'
+                        : 'video/webm';
+
+                    recordingState.stream = stream;
+                    recordingState.chunks = [];
+                    recordingState.startedAt = new Date().toISOString();
+                    recordingState.mediaRecorder = new MediaRecorder(stream, { mimeType });
+                    recordingState.mediaRecorder.ondataavailable = (event) => {
+                        if (event.data && event.data.size > 0) {
+                            recordingState.chunks.push(event.data);
+                        }
+                    };
+                    recordingState.mediaRecorder.onstop = () => {
+                        recordingState.uploadPromise = uploadRecording();
+                    };
+                    stream.getVideoTracks().forEach((track) => {
+                        track.addEventListener('ended', () => {
+                            if (recordingState.mediaRecorder && recordingState.mediaRecorder.state === 'recording') {
+                                recordingState.mediaRecorder.stop();
+                            }
+                        });
+                    });
+                    recordingState.mediaRecorder.start(1000);
+                    updateRecordingUi(true);
+                } catch (error) {
+                    if (!isAutoStart) {
+                        alert('Recording could not start. Allow screen/tab sharing to record the session.');
+                    }
+                    console.warn('Recording start skipped:', error);
+                }
+            }
+
+            async function stopRecordingAndUpload() {
+                if (!recordingState.mediaRecorder) {
+                    return;
+                }
+
+                const recorder = recordingState.mediaRecorder;
+                if (recorder.state !== 'inactive') {
+                    recorder.stop();
+                }
+                if (recordingState.stream) {
+                    recordingState.stream.getTracks().forEach((track) => track.stop());
+                }
+                updateRecordingUi(false);
+
+                const pendingUpload = recordingState.uploadPromise || new Promise((resolve) => {
+                    const check = setInterval(() => {
+                        if (recordingState.uploadPromise) {
+                            clearInterval(check);
+                            resolve(recordingState.uploadPromise);
+                        }
+                    }, 150);
+                    setTimeout(() => {
+                        clearInterval(check);
+                        resolve(null);
+                    }, 4000);
+                });
+
+                await pendingUpload;
+                recordingState.mediaRecorder = null;
+                recordingState.stream = null;
+                recordingState.uploadPromise = null;
+            }
+
+            async function uploadRecording() {
+                if (!recordingState.chunks.length || !bookingId) {
+                    return;
+                }
+
+                const blob = new Blob(recordingState.chunks, { type: recordingState.chunks[0].type || 'video/webm' });
+                const extension = blob.type.includes('mp4') ? 'mp4' : 'webm';
+                const formData = new FormData();
+                formData.append('booking_id', String(bookingId));
+                formData.append('provider', provider);
+                formData.append('room_name', channel);
+                formData.append('start_time', meetingStartedAt || recordingState.startedAt || new Date().toISOString());
+                formData.append('end_time', new Date().toISOString());
+                formData.append('recording', blob, `session-recording-${bookingId}.${extension}`);
+
+                try {
+                    await fetch(uploadRecordingUrl, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: formData,
+                    });
+                } catch (error) {
+                    console.error('Recording upload failed:', error);
+                } finally {
+                    recordingState.chunks = [];
+                }
             }
         });
     </script>
