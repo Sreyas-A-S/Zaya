@@ -4,7 +4,7 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Yoga Therapist Type') }} <span class="text-red-500">*</span></label>
         <select name="yoga_therapist_type" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
             <option value="">{{ __('Select Type') }}</option>
             @foreach(['Certified Yoga Therapist','Yoga Instructor','Yoga Therapist (Clinical)','Other'] as $type)
                 <option value="{{ $type }}" @selected(old('yoga_therapist_type') === $type)>{{ $type }}</option>
@@ -14,7 +14,7 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Years of Experience (Optional)') }}</label>
         <input type="number" name="years_of_experience" value="{{ old('years_of_experience') }}" min="0" max="70"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
     </div>
 </div>
 
@@ -22,41 +22,41 @@
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Current Organization (Optional)') }}</label>
         <input type="text" name="current_organization" value="{{ old('current_organization') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
     </div>
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Workplace Address (Optional)') }}</label>
         <input type="text" name="workplace_address" value="{{ old('workplace_address') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Website (Optional)') }}</label>
         <input type="url" name="website_social_links[website]" value="{{ old('website_social_links.website') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700"
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
             placeholder="https://">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('LinkedIn (Optional)') }}</label>
         <input type="url" name="website_social_links[linkedin]" value="{{ old('website_social_links.linkedin') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700"
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
             placeholder="https://">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Instagram (Optional)') }}</label>
         <input type="url" name="website_social_links[instagram]" value="{{ old('website_social_links.instagram') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700"
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
             placeholder="https://">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Facebook (Optional)') }}</label>
         <input type="url" name="website_social_links[facebook]" value="{{ old('website_social_links.facebook') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700"
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
             placeholder="https://">
     </div>
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('YouTube (Optional)') }}</label>
         <input type="url" name="website_social_links[youtube]" value="{{ old('website_social_links.youtube') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700"
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
             placeholder="https://">
     </div>
 </div>
@@ -66,12 +66,12 @@
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Certification Details (Optional)') }}</label>
         <textarea name="certification_details" rows="3"
-            class="w-full py-4 px-6 bg-white rounded-3xl border border-transparent outline-none text-[0.95rem] text-gray-700">{{ old('certification_details') }}</textarea>
+            class="w-full py-4 px-6 bg-white rounded-3xl border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">{{ old('certification_details') }}</textarea>
     </div>
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Additional Certifications (Optional)') }}</label>
         <textarea name="additional_certifications" rows="3"
-            class="w-full py-4 px-6 bg-white rounded-3xl border border-transparent outline-none text-[0.95rem] text-gray-700">{{ old('additional_certifications') }}</textarea>
+            class="w-full py-4 px-6 bg-white rounded-3xl border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">{{ old('additional_certifications') }}</textarea>
     </div>
 </div>
 
@@ -92,12 +92,12 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Registration Number (Optional)') }}</label>
         <input type="text" name="registration_number" value="{{ old('registration_number') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Affiliated Body (Optional)') }}</label>
         <input type="text" name="affiliated_body" value="{{ old('affiliated_body') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
     </div>
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Registration Proof (Optional)') }}</label>
@@ -117,7 +117,7 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Areas of Expertise') }} <span class="text-red-500">*</span></label>
         <select name="areas_of_expertise[]" multiple data-tomselect required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
             @foreach(($areasOfExpertise ?? []) as $area)
                 <option value="{{ $area->name }}" @selected(in_array($area->name, (array) old('areas_of_expertise', []), true))>{{ $area->name }}</option>
             @endforeach
@@ -126,7 +126,7 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Consultation Modes (Optional)') }}</label>
         <select name="consultation_modes[]" multiple data-tomselect
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
             @foreach(($consultationModes ?? ['Video','Audio','Chat','Group Session']) as $mode)
                 <option value="{{ $mode }}" @selected(in_array($mode, (array) old('consultation_modes', []), true))>{{ $mode }}</option>
             @endforeach
@@ -135,7 +135,7 @@
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Languages Spoken (Optional)') }}</label>
         <select name="languages_spoken[]" multiple data-tomselect
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
             @foreach(($languages ?? []) as $lang)
                 <option value="{{ $lang->name }}" @selected(in_array($lang->name, (array) old('languages_spoken', []), true))>{{ $lang->name }}</option>
             @endforeach
@@ -148,12 +148,12 @@
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Short Bio (Optional)') }}</label>
         <textarea name="short_bio" rows="4"
-            class="w-full py-4 px-6 bg-white rounded-3xl border border-transparent outline-none text-[0.95rem] text-gray-700">{{ old('short_bio') }}</textarea>
+            class="w-full py-4 px-6 bg-white rounded-3xl border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">{{ old('short_bio') }}</textarea>
     </div>
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Therapy Approach (Optional)') }}</label>
         <textarea name="therapy_approach" rows="3"
-            class="w-full py-4 px-6 bg-white rounded-3xl border border-transparent outline-none text-[0.95rem] text-gray-700">{{ old('therapy_approach') }}</textarea>
+            class="w-full py-4 px-6 bg-white rounded-3xl border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">{{ old('therapy_approach') }}</textarea>
     </div>
 </div>
 
@@ -162,12 +162,12 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Government ID Type (Optional)') }}</label>
         <input type="text" name="gov_id_type" value="{{ old('gov_id_type') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('PAN Number (Optional)') }}</label>
         <input type="text" name="pan_number" value="{{ old('pan_number') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
     </div>
 </div>
 
@@ -197,10 +197,10 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('UPI ID (Optional)') }}</label>
         <input type="text" name="upi_id" value="{{ old('upi_id') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
         <label class="block text-gray-700 font-normal mb-4 text-lg mt-6">{{ __('Bank Holder Name (Optional)') }}</label>
         <input type="text" name="bank_holder_name" value="{{ old('bank_holder_name') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
     </div>
 </div>
 
@@ -208,17 +208,17 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Bank Name (Optional)') }}</label>
         <input type="text" name="bank_name" value="{{ old('bank_name') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Account Number (Optional)') }}</label>
         <input type="text" name="account_number" value="{{ old('account_number') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
     </div>
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('IFSC Code (Optional)') }}</label>
         <input type="text" name="ifsc_code" value="{{ old('ifsc_code') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
     </div>
 </div>
 

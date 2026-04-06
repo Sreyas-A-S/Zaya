@@ -1,0 +1,321 @@
+<?php $__env->startSection('title', 'Forms'); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="container-fluid">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3>Forms</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="<?php echo e(route('admin.dashboard')); ?>"><i class="fa-solid fa-house"></i></a></li>
+                    <li class="breadcrumb-item">Users</li>
+                    <li class="breadcrumb-item active">Forms</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
+                    <h3>Forms List</h3>
+                    <button type="button" class="btn btn-primary" onclick="openGenerateLinkModal()">
+                        <i class="fa-solid fa-plus me-2"></i>Create
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display" id="forms-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>URL</th>
+                                    <th>User</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Generate Registration Link Modal -->
+<div class="modal fade" id="generate-link-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Generate Registration Link</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">User Type</label>
+                        <select class="form-select" id="reg_user_type">
+                            <option value="" selected disabled>Select user type</option>
+                            <option value="doctor">Doctors</option>
+                            <option value="mindfulness-practitioner">Mindfulness Counsellors</option>
+                            <option value="translator">Translators</option>
+                            <option value="yoga-therapist">Yoga Therapists</option>
+                        </select>
+                        <div class="form-text">This creates a secure, time-limited open registration link.</div>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <button type="button" class="btn btn-success w-100" id="btn-generate-link">
+                            <i class="fa-solid fa-link me-2"></i>Generate
+                        </button>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Generated Link</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="generated_link" readonly placeholder="Click Generate to create a link">
+                            <button class="btn btn-outline-secondary" type="button" id="btn-copy-link" disabled>Copy</button>
+                        </div>
+                        <div class="small text-muted mt-1" id="generated_link_hint"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="link-delete-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Link</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this link? This action cannot be undone.</p>
+                <input type="hidden" id="delete-link-id">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-danger" type="button" id="confirm-delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Confirmation Modal -->
+<div class="modal fade" id="status-confirmation-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Status Change</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="iconly-Info-Square icli text-primary mb-3" style="font-size: 50px;"></i>
+                <h5>Update Link Status</h5>
+                <p>Select the new status for this link:</p>
+                <div class="mb-3 px-5">
+                    <select id="status-select-input-link" class="form-select">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <input type="hidden" id="status-link-id">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" type="button" id="confirm-status-btn">Confirm Change</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('scripts'); ?>
+<script>
+    function openGenerateLinkModal() {
+        $('#reg_user_type').val('');
+        $('#generated_link').val('');
+        $('#generated_link_hint').text('');
+        $('#btn-copy-link').prop('disabled', true);
+        new bootstrap.Modal(document.getElementById('generate-link-modal')).show();
+    }
+
+    $(document).ready(function() {
+        const formsTable = $('#forms-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "<?php echo e(route('admin.forms.index')); ?>",
+            },
+            columns: [{
+                    data: 'id',
+                    name: 'open_register_links.id'
+                },
+                {
+                    data: 'url',
+                    name: 'url',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data) {
+                        if (!data) return '—';
+                        return '<a href="' + data + '" target="_blank" rel="noopener">Open</a>';
+                    }
+                },
+                {
+                    data: 'user',
+                    name: 'open_register_links.role',
+                    orderable: false
+                },
+                {
+                    data: 'status',
+                    name: 'open_register_links.status',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }
+            ]
+        });
+
+        // Status modal open
+        $(document).on('click', '.status-badge', function() {
+            const id = $(this).data('id');
+            const currentStatus = String($(this).data('status') || 'active').toLowerCase();
+            $('#status-link-id').val(id);
+            $('#status-select-input-link').val(currentStatus === 'inactive' ? 'inactive' : 'active');
+            $('#status-confirmation-modal').modal('show');
+        });
+
+        // Confirm status change
+        $(document).on('click', '#confirm-status-btn', function() {
+            const btn = $(this);
+            const id = $('#status-link-id').val();
+            const status = $('#status-select-input-link').val();
+
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+            $.ajax({
+                url: "<?php echo e(url('admin/forms')); ?>/" + id + "/status",
+                type: 'POST',
+                data: {
+                    _token: '<?php echo e(csrf_token()); ?>',
+                    status: status
+                },
+                success: function(res) {
+                    $('#status-confirmation-modal').modal('hide');
+                    formsTable.ajax.reload(null, false);
+                    if (window.showToast) window.showToast(res.message || 'Status updated successfully', 'success');
+                },
+                error: function(xhr) {
+                    const msg = (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON.error)) ? (xhr.responseJSON.message || xhr.responseJSON.error) : 'Failed to update status';
+                    if (window.showToast) window.showToast(msg, 'error');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).text('Confirm Change');
+                }
+            });
+        });
+
+        // Delete modal open
+        $(document).on('click', '.deleteLink', function() {
+            $('#delete-link-id').val($(this).data('id'));
+            $('#link-delete-modal').modal('show');
+        });
+
+        // Confirm delete
+        $(document).on('click', '#confirm-delete-btn', function() {
+            const btn = $(this);
+            const id = $('#delete-link-id').val();
+
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+            $.ajax({
+                url: "<?php echo e(url('admin/forms')); ?>/" + id,
+                type: 'DELETE',
+                data: {
+                    _token: '<?php echo e(csrf_token()); ?>'
+                },
+                success: function(res) {
+                    $('#link-delete-modal').modal('hide');
+                    formsTable.ajax.reload(null, false);
+                    if (window.showToast) window.showToast(res.success || 'Deleted successfully', 'success');
+                },
+                error: function(xhr) {
+                    const msg = (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON.error)) ? (xhr.responseJSON.message || xhr.responseJSON.error) : 'Failed to delete';
+                    if (window.showToast) window.showToast(msg, 'error');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).text('Delete');
+                }
+            });
+        });
+
+        $('#btn-generate-link').on('click', function() {
+            const userType = ($('#reg_user_type').val() || '').trim();
+            if (!userType) {
+                $('#generated_link_hint').text('Please select a user type.');
+                return;
+            }
+
+            $('#generated_link_hint').text('Generating...');
+            $('#btn-generate-link').prop('disabled', true);
+            $('#btn-copy-link').prop('disabled', true);
+
+            $.ajax({
+                url: "<?php echo e(route('admin.forms.generate-link')); ?>",
+                method: 'POST',
+                data: {
+                    user_type: userType
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(resp) {
+                    const link = resp && resp.link ? resp.link : '';
+                    $('#generated_link').val(link);
+                    const msg = (resp && resp.success) ? resp.success : (link ? 'Link generated successfully.' : 'No link generated.');
+                    $('#generated_link_hint').text(msg);
+                    if (window.showToast && link) window.showToast(msg, 'success');
+                    $('#btn-copy-link').prop('disabled', !link);
+                    if (link) formsTable.ajax.reload(null, false);
+                },
+                error: function(xhr) {
+                    const msg = (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON.error)) ? (xhr.responseJSON.message || xhr.responseJSON.error) : 'Failed to generate link.';
+                    $('#generated_link_hint').text(msg);
+                    if (window.showToast) window.showToast(msg, 'error');
+                },
+                complete: function() {
+                    $('#btn-generate-link').prop('disabled', false);
+                }
+            });
+        });
+
+        $('#btn-copy-link').on('click', async function() {
+            const link = ($('#generated_link').val() || '').trim();
+            if (!link) return;
+            try {
+                await navigator.clipboard.writeText(link);
+                $('#generated_link_hint').text('Copied to clipboard.');
+            } catch (e) {
+                $('#generated_link_hint').text('Copy failed. Select the link and copy manually.');
+            }
+        });
+    });
+</script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\wamp64\www\zaya\resources\views/admin/forms/index.blade.php ENDPATH**/ ?>

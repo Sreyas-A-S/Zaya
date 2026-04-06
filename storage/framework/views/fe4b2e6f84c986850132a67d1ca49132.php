@@ -4,17 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
-    <link rel="icon" type="image/png" href="{{ asset('frontend/assets/favicon-96x96.png') }}" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="{{ asset('frontend/assets/favicon.svg') }}" />
-    <link rel="shortcut icon" href="{{ asset('frontend/assets/favicon.ico') }}" />
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('frontend/assets/apple-touch-icon.png') }}" />
+    <link rel="icon" type="image/png" href="<?php echo e(asset('frontend/assets/favicon-96x96.png')); ?>" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="<?php echo e(asset('frontend/assets/favicon.svg')); ?>" />
+    <link rel="shortcut icon" href="<?php echo e(asset('frontend/assets/favicon.ico')); ?>" />
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo e(asset('frontend/assets/apple-touch-icon.png')); ?>" />
     <meta name="apple-mobile-web-app-title" content="Zaya Wellness" />
-    <link rel="manifest" href="{{ asset('frontend/assets/site.webmanifest') }}">
+    <link rel="manifest" href="<?php echo e(asset('frontend/assets/site.webmanifest')); ?>">
 
-    <title>{{ $joinRoleLabel ?? 'Join Zaya' }} - Zaya Wellness</title>
-    @vite(['resources/css/app.css', 'resources/css/practitioner-register.css', 'resources/js/app.js'])
+    <title><?php echo e($joinRoleLabel ?? 'Join Zaya'); ?> - Zaya Wellness</title>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/css/practitioner-register.css', 'resources/js/app.js']); ?>
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.1/fonts/remixicon.css" rel="stylesheet">
@@ -146,152 +146,156 @@
     <div class="flex-1">
         <div class="container mx-auto px-4 py-10 md:py-14">
             <div class="text-center mb-10">
-                <h1 class="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-primary mb-4">{{ __('Join the ZAYA Collective') }}</h1>
-                <p class="text-gray-500 text-sm md:text-base max-w-2xl mx-auto">{{ __('Register as') }} {{ $joinRoleLabel ?? __('a team member') }}.</p>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-primary mb-4"><?php echo e(__('Join the ZAYA Collective')); ?></h1>
+                <p class="text-gray-500 text-sm md:text-base max-w-2xl mx-auto"><?php echo e(__('Register as')); ?> <?php echo e($joinRoleLabel ?? __('a team member')); ?>.</p>
             </div>
 
-            <form action="{{ route('register') }}" method="POST" enctype="multipart/form-data" class="max-w-5xl mx-auto">
-                @csrf
-                <input type="hidden" name="role" value="{{ $joinRole }}">
+            <form action="<?php echo e(route('register')); ?>" method="POST" enctype="multipart/form-data" class="max-w-5xl mx-auto">
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="role" value="<?php echo e($joinRole); ?>">
 
                 <div class="bg-white rounded-[24px] p-8 md:p-12 border border-gray-100 shadow-sm">
-                    <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Personal Details') }}</h2>
+                    <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8"><?php echo e(__('Personal Details')); ?></h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('First Name') }}</label>
-                            <input type="text" name="first_name" value="{{ old('first_name') }}" required
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('First Name')); ?></label>
+                            <input type="text" name="first_name" value="<?php echo e(old('first_name')); ?>" required
                                 pattern="^[A-Z][a-zA-Z\s]{0,39}$"
                                 maxlength="40"
-                                title="{{ __('First letter must be capital. Only letters and spaces allowed. Max 40 characters.') }}"
+                                title="<?php echo e(__('First letter must be capital. Only letters and spaces allowed. Max 40 characters.')); ?>"
                                 class="reg-input"
-                                placeholder="{{ __('Enter First Name') }}">
+                                placeholder="<?php echo e(__('Enter First Name')); ?>">
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Middle Name') }}</label>
-                            <input type="text" name="middle_name" value="{{ old('middle_name') }}"
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Middle Name')); ?></label>
+                            <input type="text" name="middle_name" value="<?php echo e(old('middle_name')); ?>"
                                 pattern="^[a-zA-Z][a-zA-Z\s]{0,39}$"
                                 maxlength="40"
-                                title="{{ __('Middle name can start with a small or capital letter and must contain only alphabets') }}"
+                                title="<?php echo e(__('Middle name can start with a small or capital letter and must contain only alphabets')); ?>"
                                 class="reg-input"
-                                placeholder="{{ __('Enter Middle Name') }}">
+                                placeholder="<?php echo e(__('Enter Middle Name')); ?>">
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Last Name') }}</label>
-                            <input type="text" name="last_name" value="{{ old('last_name') }}" required
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Last Name')); ?></label>
+                            <input type="text" name="last_name" value="<?php echo e(old('last_name')); ?>" required
                                 pattern="^[A-Z][a-zA-Z\s]{0,39}$"
                                 maxlength="40"
-                                title="{{ __('Last name must start with a capital letter and contain only alphabets') }}"
+                                title="<?php echo e(__('Last name must start with a capital letter and contain only alphabets')); ?>"
                                 class="reg-input"
-                                placeholder="{{ __('Enter Last Name') }}">
+                                placeholder="<?php echo e(__('Enter Last Name')); ?>">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Email') }}</label>
-                            <input type="email" name="email" value="{{ old('email') }}" required
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Email')); ?></label>
+                            <input type="email" name="email" value="<?php echo e(old('email')); ?>" required
                                 class="reg-input"
-                                placeholder="{{ __('Enter Email') }}">
+                                placeholder="<?php echo e(__('Enter Email')); ?>">
                         </div>
                         <div>
-                            @if(($joinRole ?? '') === 'doctor')
-                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Mobile Number') }}</label>
-                                <input type="tel" id="phone" name="mobile_number" value="{{ old('mobile_number') }}" required
+                            <?php if(($joinRole ?? '') === 'doctor'): ?>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Mobile Number')); ?></label>
+                                <input type="tel" id="phone" name="mobile_number" value="<?php echo e(old('mobile_number')); ?>" required
                                     pattern="^[0-9\s\-\+\(\)]{7,20}$"
                                     title="Enter a valid mobile number"
                                     class="reg-input"
-                                    placeholder="{{ __('Enter Mobile Number') }}">
-                            @else
-                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Phone') }} @if(($joinRole ?? '') === 'mindfulness_practitioner')<span class="text-red-500">*</span>@endif</label>
-                                <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" {{ ($joinRole ?? '') === 'mindfulness_practitioner' ? 'required' : '' }}
+                                    placeholder="<?php echo e(__('Enter Mobile Number')); ?>">
+                            <?php else: ?>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Phone')); ?> <?php if(($joinRole ?? '') === 'mindfulness_practitioner'): ?><span class="text-red-500">*</span><?php endif; ?></label>
+                                <input type="tel" id="phone" name="phone" value="<?php echo e(old('phone')); ?>" <?php echo e(($joinRole ?? '') === 'mindfulness_practitioner' ? 'required' : ''); ?>
+
                                     pattern="^[0-9\s\-\+\(\)]{7,20}$"
                                     title="Enter a valid phone number"
                                     class="reg-input"
-                                    placeholder="{{ __('Enter Phone Number') }}">
-                            @endif
+                                    placeholder="<?php echo e(__('Enter Phone Number')); ?>">
+                            <?php endif; ?>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Gender') }} @if(($joinRole ?? '') === 'doctor')<span class="text-red-500">*</span>@endif</label>
-                            <select name="gender" {{ ($joinRole ?? '') === 'doctor' ? 'required' : '' }}
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Gender')); ?> <?php if(($joinRole ?? '') === 'doctor'): ?><span class="text-red-500">*</span><?php endif; ?></label>
+                            <select name="gender" <?php echo e(($joinRole ?? '') === 'doctor' ? 'required' : ''); ?>
+
                                 class="reg-input">
-                                <option value="">{{ __('Select') }}</option>
-                                <option value="male">{{ __('Male') }}</option>
-                                <option value="female">{{ __('Female') }}</option>
-                                <option value="other">{{ __('Other') }}</option>
+                                <option value=""><?php echo e(__('Select')); ?></option>
+                                <option value="male"><?php echo e(__('Male')); ?></option>
+                                <option value="female"><?php echo e(__('Female')); ?></option>
+                                <option value="other"><?php echo e(__('Other')); ?></option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('DOB') }} @if(($joinRole ?? '') === 'doctor')<span class="text-red-500">*</span>@endif</label>
-                            <input type="date" name="dob" value="{{ old('dob') }}" max="{{ now()->format('Y-m-d') }}" {{ ($joinRole ?? '') === 'doctor' ? 'required' : '' }}
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('DOB')); ?> <?php if(($joinRole ?? '') === 'doctor'): ?><span class="text-red-500">*</span><?php endif; ?></label>
+                            <input type="date" name="dob" value="<?php echo e(old('dob')); ?>" max="<?php echo e(now()->format('Y-m-d')); ?>" <?php echo e(($joinRole ?? '') === 'doctor' ? 'required' : ''); ?>
+
                                 class="reg-input">
                         </div>
-                        @if(($joinRole ?? '') === 'doctor')
+                        <?php if(($joinRole ?? '') === 'doctor'): ?>
                             <div>
-                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Nationality') }}</label>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Nationality')); ?></label>
                                 <select id="nationality-select" name="nationality" data-nationality-select
                                     class="reg-input">
-                                    <option value="">{{ __('Select') }}</option>
-                                    @foreach(($countries ?? []) as $c)
-                                        <option value="{{ $c->name }}" data-code="{{ strtolower($c->code) }}" @selected(old('nationality') === $c->name)>
-                                            {{ $c->name }}
+                                    <option value=""><?php echo e(__('Select')); ?></option>
+                                    <?php $__currentLoopData = ($countries ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($c->name); ?>" data-code="<?php echo e(strtolower($c->code)); ?>" <?php if(old('nationality') === $c->name): echo 'selected'; endif; ?>>
+                                            <?php echo e($c->name); ?>
+
                                         </option>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
                     </div>
 
-                    <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Address') }}</h2>
+                    <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8"><?php echo e(__('Address')); ?></h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Address Line 1') }}</label>
-                            <input type="text" name="address_line_1" value="{{ old('address_line_1') }}" required
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Address Line 1')); ?></label>
+                            <input type="text" name="address_line_1" value="<?php echo e(old('address_line_1')); ?>" required
                                 class="reg-input">
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Address Line 2') }}</label>
-                            <input type="text" name="address_line_2" value="{{ old('address_line_2') }}"
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Address Line 2')); ?></label>
+                            <input type="text" name="address_line_2" value="<?php echo e(old('address_line_2')); ?>"
                                 class="reg-input">
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('City') }}</label>
-                            <input type="text" name="city" value="{{ old('city') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid city name" class="reg-input">
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('City')); ?></label>
+                            <input type="text" name="city" value="<?php echo e(old('city')); ?>" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid city name" class="reg-input">
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State') }}</label>
-                            <input type="text" name="state" value="{{ old('state') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid state name" class="reg-input">
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('State')); ?></label>
+                            <input type="text" name="state" value="<?php echo e(old('state')); ?>" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid state name" class="reg-input">
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Zip Code') }}</label>
-                            <input type="text" name="zip_code" value="{{ old('zip_code') }}" required pattern="^[a-zA-Z0-9\s\-]{3,20}$" title="Enter a valid zip code" class="reg-input">
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Zip Code')); ?></label>
+                            <input type="text" name="zip_code" value="<?php echo e(old('zip_code')); ?>" required pattern="^[a-zA-Z0-9\s\-]{3,20}$" title="Enter a valid zip code" class="reg-input">
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Country') }}</label>
-                            <input type="text" name="country" value="{{ old('country') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid country name" class="reg-input">
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Country')); ?></label>
+                            <input type="text" name="country" value="<?php echo e(old('country')); ?>" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid country name" class="reg-input">
                         </div>
                     </div>
 
-                    @if(($joinRole ?? '') === 'doctor')
-                        @include('team-register.roles.doctor')
-                    @elseif(($joinRole ?? '') === 'mindfulness_practitioner')
-                        @include('team-register.roles.mindfulness')
-                    @elseif(($joinRole ?? '') === 'yoga_therapist')
-                        @include('team-register.roles.yoga')
-                    @elseif(($joinRole ?? '') === 'translator')
-                        @include('team-register.roles.translator')
-                    @endif
+                    <?php if(($joinRole ?? '') === 'doctor'): ?>
+                        <?php echo $__env->make('team-register.roles.doctor', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                    <?php elseif(($joinRole ?? '') === 'mindfulness_practitioner'): ?>
+                        <?php echo $__env->make('team-register.roles.mindfulness', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                    <?php elseif(($joinRole ?? '') === 'yoga_therapist'): ?>
+                        <?php echo $__env->make('team-register.roles.yoga', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                    <?php elseif(($joinRole ?? '') === 'translator'): ?>
+                        <?php echo $__env->make('team-register.roles.translator', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                    <?php endif; ?>
 
-                    <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Account Security') }}</h2>
+                    <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8"><?php echo e(__('Account Security')); ?></h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Password') }}</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Password')); ?></label>
                             <div class="relative">
                                  <input type="password" name="password" id="password" required
                                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':\\\|,.<>\/?]).{8,}$"
@@ -303,7 +307,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Confirm Password') }}</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Confirm Password')); ?></label>
                             <div class="relative">
                                  <input type="password" name="password_confirmation" id="password_confirmation" required
                                     class="reg-input pr-12">
@@ -315,21 +319,21 @@
                     </div>
 
                     <div class="mb-10">
-                        <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Captcha Verification') }}</label>
+                        <label class="block text-gray-800 text-lg font-medium mb-4"><?php echo e(__('Captcha Verification')); ?></label>
                         <div class="flex items-center gap-3">
                             <div class="bg-white border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1">
-                                <img src="{{ route('captcha') }}" id="captcha-img" alt="Captcha" class="w-full h-full object-contain filter contrast-125 mix-blend-multiply">
+                                <img src="<?php echo e(route('captcha')); ?>" id="captcha-img" alt="Captcha" class="w-full h-full object-contain filter contrast-125 mix-blend-multiply">
                             </div>
                             <button type="button" onclick="refreshCaptcha()" class="w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white hover:bg-[#154a96] border-none cursor-pointer shadow-sm">
                                 <i class="ri-refresh-line text-2xl"></i>
                             </button>
-                            <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}" required class="h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 focus:border-[#1B5CB8]">
+                            <input type="text" name="captcha" placeholder="<?php echo e(__('Enter Code')); ?>" required class="h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 focus:border-[#1B5CB8]">
                         </div>
                     </div>
 
                     <div class="flex justify-end items-center gap-6 mt-8">
-                        <a href="{{ route('index') }}" class="text-gray-500 hover:text-gray-700 font-medium transition-colors">{{ __('Cancel') }}</a>
-                        <button type="submit" class="bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">{{ __('Complete Application') }}</button>
+                        <a href="<?php echo e(route('index')); ?>" class="text-gray-500 hover:text-gray-700 font-medium transition-colors"><?php echo e(__('Cancel')); ?></a>
+                        <button type="submit" class="bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20"><?php echo e(__('Complete Application')); ?></button>
                     </div>
                 </div>
             </form>
@@ -341,7 +345,7 @@
     <script>
         function refreshCaptcha() {
             const img = document.getElementById('captcha-img');
-            if (img) img.src = "{{ route('captcha') }}?" + new Date().getTime();
+            if (img) img.src = "<?php echo e(route('captcha')); ?>?" + new Date().getTime();
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -473,3 +477,4 @@
 </body>
 
 </html>
+<?php /**PATH C:\wamp64\www\zaya\resources\views/team-register.blade.php ENDPATH**/ ?>

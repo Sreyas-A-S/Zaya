@@ -24,6 +24,7 @@ class RolePermissionSeeder extends Seeder
             'Yoga Therapists' => ['view', 'create', 'edit', 'delete', 'update-status'],
             'Translators' => ['view', 'create', 'edit', 'delete', 'update-status'],
             'Clients' => ['view', 'create', 'edit', 'delete', 'status-toggle'],
+            'Forms' => ['view', 'delete', 'update-status'],
             'Roles' => ['view', 'create', 'edit', 'delete'],
             'Services' => ['view', 'create', 'edit', 'delete', 'assign-engineer'],
             'Packages' => ['view', 'create', 'edit', 'delete', 'update-status'],
@@ -100,7 +101,7 @@ class RolePermissionSeeder extends Seeder
             Permission::whereIn('group', [
                 'Dashboard', 'Users', 'Doctors', 'Practitioners', 
                 'Mindfulness Practitioners', 'Yoga Therapists', 
-                'Translators', 'Clients', 'Credentials', 'Practitioner Reviews', 'Admins', 'Contact Messages'
+                'Translators', 'Clients', 'Forms', 'Credentials', 'Practitioner Reviews', 'Admins', 'Contact Messages'
             ])->get()
         );
     }

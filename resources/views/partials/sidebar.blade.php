@@ -13,7 +13,7 @@
                     <h5 class="sidebar-title f-w-700">{{ $adminPanelSettings['admin_panel_sidebar_pinned'] ?? 'Pinned' }}</h5>
                 </div>
             </li>
-            @if(auth()->user()->hasPermission('dashboard-view') || auth()->user()->hasPermission('doctors-view') || auth()->user()->hasPermission('practitioners-view') || auth()->user()->hasPermission('mindfulness-practitioners-view') || auth()->user()->hasPermission('yoga-therapists-view') || auth()->user()->hasPermission('clients-view') || auth()->user()->hasPermission('translators-view') || auth()->user()->hasPermission('testimonials-view') || auth()->user()->hasPermission('services-view') || auth()->user()->hasPermission('practitioner-reviews-view'))
+            @if(auth()->user()->hasPermission('dashboard-view') || auth()->user()->hasPermission('doctors-view') || auth()->user()->hasPermission('practitioners-view') || auth()->user()->hasPermission('mindfulness-practitioners-view') || auth()->user()->hasPermission('yoga-therapists-view') || auth()->user()->hasPermission('clients-view') || auth()->user()->hasPermission('translators-view') || auth()->user()->hasPermission('forms-view') || auth()->user()->hasPermission('testimonials-view') || auth()->user()->hasPermission('services-view') || auth()->user()->hasPermission('practitioner-reviews-view'))
             <li class="sidebar-main-title">
                 <div>
                     <h5 class="lan-1 f-w-700 sidebar-title">{{ $adminPanelSettings['admin_panel_sidebar_general'] ?? 'General' }}</h5>
@@ -37,7 +37,7 @@
             </li>
             @endif
 
-            @if(auth()->user()->hasPermission('doctors-view') || auth()->user()->hasPermission('practitioners-view') || auth()->user()->hasPermission('mindfulness-practitioners-view') || auth()->user()->hasPermission('yoga-therapists-view') || auth()->user()->hasPermission('clients-view') || auth()->user()->hasPermission('translators-view'))
+            @if(auth()->user()->hasPermission('doctors-view') || auth()->user()->hasPermission('practitioners-view') || auth()->user()->hasPermission('mindfulness-practitioners-view') || auth()->user()->hasPermission('yoga-therapists-view') || auth()->user()->hasPermission('clients-view') || auth()->user()->hasPermission('translators-view') || auth()->user()->hasPermission('forms-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Profile') }}"></use>
@@ -67,6 +67,10 @@
 
                     @if(auth()->user()->hasPermission('translators-view'))
                     <li> <a href="{{ route('admin.translators.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_translators'] ?? 'Translators' }}</a></li>
+                    @endif
+
+                    @if(auth()->user()->hasPermission('forms-view'))
+                    <li> <a href="{{ route('admin.forms.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_forms'] ?? 'Forms' }}</a></li>
                     @endif
                 </ul>
             </li>

@@ -65,9 +65,9 @@ h6 {
 #nationality-select+.ts-wrapper .ts-control,
 #country-select+.ts-wrapper .ts-control {
     padding: 14px 24px;
-    background: #F5F5F5;
+    background: #FFFFFF;
     border-radius: 9999px;
-    border: 1px solid transparent;
+    border: 1px solid #D1D5DB;
     font-size: 0.95rem;
     color: #374151;
     transition: all 0.3s ease;
@@ -80,7 +80,7 @@ h6 {
     padding: 14px 24px;
     background: white;
     border-radius: 9999px;
-    border: 1px solid transparent;
+    border: 1px solid #D1D5DB;
     font-size: 0.95rem;
     color: #374151;
     transition: all 0.3s ease;
@@ -91,9 +91,9 @@ h6 {
 
 #lang-input+.ts-wrapper .ts-control {
     padding: 14px 56px 14px 24px;
-    background: #F5F5F5;
+    background: #FFFFFF;
     border-radius: 9999px;
-    border: 1px solid transparent;
+    border: 1px solid #D1D5DB;
     font-size: 0.95rem;
     color: #374151;
     transition: all 0.3s ease;
@@ -125,11 +125,11 @@ h6 {
 
 #nationality-select+.ts-wrapper .ts-control:hover,
 #country-select+.ts-wrapper .ts-control:hover {
-    background: #EFEFEF;
+    background: #FAFAFA;
 }
 
 #lang-input+.ts-wrapper .ts-control:hover {
-    background: #EFEFEF;
+    background: #FAFAFA;
 }
 
 .education-country-select+.ts-wrapper .ts-control:hover {

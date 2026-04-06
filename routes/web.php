@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\PractitionerController;
 use App\Http\Controllers\Admin\MasterDataController;
 use App\Http\Controllers\Admin\MindfulnessPractitionerController;
+use App\Http\Controllers\Admin\FormController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TranslatorController;
 use App\Http\Controllers\Admin\YogaTherapistController;
@@ -24,6 +25,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CaptchaController;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 
@@ -62,6 +65,33 @@ Route::post('register', [RegisterController::class, 'register'])->name('register
 Route::get('register', function () {
     return redirect()->route('register.selection');
 });
+
+Route::get('/open-register/{role}/signature={token}', function (string $role, string $token) {
+    if (!Schema::hasTable('open_register_links')) {
+        abort(503, 'Database table open_register_links is missing. Run: php artisan migrate');
+    }
+
+    $normalizedRole = str_replace('_', '-', strtolower(trim($role)));
+
+    $link = \App\Models\OpenRegisterLink::where('token', $token)->firstOrFail();
+    if (strtolower(trim((string) ($link->status ?? 'active'))) !== 'active') {
+        abort(403, 'This link is inactive.');
+    }
+    if ($link->used_at) {
+        abort(403, 'This link has already been used.');
+    }
+
+    if ($link->expires_at && now()->greaterThan($link->expires_at)) {
+        abort(403, 'This link has expired.');
+    }
+
+    $storedRole = str_replace('_', '-', strtolower(trim((string) $link->role)));
+    if ($storedRole !== $normalizedRole) {
+        abort(404);
+    }
+
+    return app(WebController::class)->joinRegister($normalizedRole);
+})->name('open.register');
 
 // Public Master Data Quick Add (for registration forms)
 Route::post('master-data/quick-add/{type}', [MasterDataController::class, 'store'])->name('master-data.quick-add');
@@ -139,6 +169,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('clients/{id}/status', [ClientController::class, 'updateStatus'])->name('clients.status');
     Route::resource('translators', TranslatorController::class);
     Route::post('translators/{id}/status', [TranslatorController::class, 'updateStatus'])->name('translators.status');
+    Route::resource('forms', FormController::class)->only(['index', 'show']);
+    Route::post('forms/generate-link', [FormController::class, 'generateLink'])->name('forms.generate-link');
+    Route::post('forms/{id}/status', [FormController::class, 'updateStatus'])->name('forms.status');
+    Route::delete('forms/{id}', [FormController::class, 'destroy'])->name('forms.destroy');
     Route::resource('roles', RoleController::class);
     Route::get('roles/{role}/permissions', [RoleController::class, 'showPermissions'])->name('roles.permissions');
     Route::post('roles/{role}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.permissions.update');

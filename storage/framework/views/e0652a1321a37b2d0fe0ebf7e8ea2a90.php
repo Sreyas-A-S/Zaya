@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/png" href="{{ asset('frontend/assets/favicon-96x96.png') }}" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="{{ asset('frontend/assets/favicon.svg') }}" />
-    <link rel="shortcut icon" href="{{ asset('frontend/assets/favicon.ico') }}" />
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('frontend/assets/apple-touch-icon.png') }}" />
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <link rel="icon" type="image/png" href="<?php echo e(asset('frontend/assets/favicon-96x96.png')); ?>" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="<?php echo e(asset('frontend/assets/favicon.svg')); ?>" />
+    <link rel="shortcut icon" href="<?php echo e(asset('frontend/assets/favicon.ico')); ?>" />
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo e(asset('frontend/assets/apple-touch-icon.png')); ?>" />
     <meta name="apple-mobile-web-app-title" content="Zaya Wellness" />
-    <link rel="manifest" href="{{ asset('frontend/assets/site.webmanifest') }}">
-    <title>{{ __('Client Registration') }} - Zaya Wellness</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/country-selector.js'])
+    <link rel="manifest" href="<?php echo e(asset('frontend/assets/site.webmanifest')); ?>">
+    <title><?php echo e(__('Client Registration')); ?> - Zaya Wellness</title>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js', 'resources/js/country-selector.js']); ?>
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <link href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css" rel="stylesheet">
@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <script>
-        window.countryNameToCode = @json($countryNameToCode ?? []);
+        window.countryNameToCode = <?php echo json_encode($countryNameToCode ?? [], 15, 512) ?>;
     </script>
     <style>
         .iti { width: 100% !important; display: block !important; }
@@ -163,9 +163,9 @@
         .reg-input {
             width: 100%;
             padding: 14px 24px;
-            background: #FFFFFF;
+            background: #F5F5F5;
             border-radius: 9999px;
-            border: 1px solid #D1D5DB;
+            border: 1px solid transparent;
             outline: none;
             font-size: 0.95rem;
             color: #374151;
@@ -195,8 +195,8 @@
     .iti { width: 100% !important; }
     .iti--allow-dropdown input[type=tel], .iti--allow-dropdown input[type=text] {
         border-radius: 9999px !important;
-        background: #FFFFFF !important;
-        border: 1px solid #D1D5DB !important;
+        background: #F5F5F5 !important;
+        border: 1px solid transparent !important;
         padding-left: 96px !important;
     }
     .iti--allow-dropdown input[type=tel]:focus, .iti--allow-dropdown input[type=text]:focus {
@@ -206,8 +206,8 @@
     }
     .iti--allow-dropdown .iti__flag-container {
         border-radius: 9999px 0 0 9999px;
-        background: #FFFFFF;
-        border: 1px solid #D1D5DB;
+        background: #F5F5F5;
+        border: 1px solid transparent;
         border-right: 0;
     }
     .iti--allow-dropdown .iti__selected-flag {
@@ -245,9 +245,9 @@
 
         .ts-control {
             padding: 10px 24px !important;
-            background: #FFFFFF !important;
+            background: #F5F5F5 !important;
             border-radius: 9999px !important;
-            border: 1px solid #D1D5DB !important;
+            border: 1px solid transparent !important;
             min-height: 52px !important;
             display: flex !important;
             align-items: center !important;
@@ -417,215 +417,338 @@
 </style>
 </head>
 
-<body class="bg-[#F5F5F5] min-h-screen flex flex-col">
-    @php
+<body class="bg-white min-h-screen flex flex-col">
+    <?php
         $currencySymbols = config('currencies.symbols', []);
         $currCode = strtoupper($defaultCurrency ?? config('app.currency', 'INR'));
         $currSymbol = $currencySymbols[$currCode] ?? $currCode;
         $registrationCurrency = strtoupper($clientRegistrationCurrency ?? 'EUR');
         $registrationCurrencySymbol = $currencySymbols[$registrationCurrency] ?? $registrationCurrency;
         $registrationCurrencyCode = $registrationCurrency;
-    @endphp
+    ?>
     <!-- Main Content -->
     <div class="flex-1 relative overflow-x-hidden">
         <!-- Floating Leaves -->
-        <img src="{{ asset('frontend/assets/reg-floating-img-01.png') }}" alt="Decorative Leaf"
+        <img src="<?php echo e(asset('frontend/assets/reg-floating-img-01.png')); ?>" alt="Decorative Leaf"
             class="floating-leaf w-14 md:w-16 lg:w-20 right-4 md:right-12 lg:right-20 top-16 md:top-20">
 
-        <img src="{{ asset('frontend/assets/reg-floating-img-02.png') }}" alt="Decorative Leaf"
+        <img src="<?php echo e(asset('frontend/assets/reg-floating-img-02.png')); ?>" alt="Decorative Leaf"
             class="floating-leaf w-16 md:w-20 lg:w-24 -left-2 md:left-0 top-40 md:top-52">
 
-        <img src="{{ asset('frontend/assets/reg-floating-img-03.png') }}" alt="Decorative Leaf"
+        <img src="<?php echo e(asset('frontend/assets/reg-floating-img-03.png')); ?>" alt="Decorative Leaf"
             class="floating-leaf w-20 md:w-28 lg:w-36 right-0 bottom-32 md:bottom-40">
 
         <div class="container mx-auto px-4 py-8 md:py-12 lg:py-16">
             <!-- Header -->
             <div class="text-center mb-8 md:mb-16">
-                <p class="text-[#424F93] font-regular text-base md:text-lg mb-2">{{ __('Create Account') }}</p>
-                <h1 class="text-2xl md:text-3xl lg:text-4xl font-sans! font-medium text-gray-900">{{ __('Client Registration Form') }}</h1>
+                <p class="text-[#424F93] font-regular text-base md:text-lg mb-2"><?php echo e(__('Create Account')); ?></p>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-sans! font-medium text-gray-900"><?php echo e(__('Client Registration Form')); ?></h1>
             </div>
-
-            <div class="bg-white rounded-[32px] p-8 md:p-14 shadow-sm border border-gray-100 relative z-20">
-
 
             <!-- Toast Container -->
             <div id="toast-container"></div>
 
-            <form action="{{ route('register') }}" method="POST" id="registration-form" class="max-w-5xl mx-auto">
-                @csrf
+            <form action="<?php echo e(route('register')); ?>" method="POST" id="registration-form" class="max-w-5xl mx-auto">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="role" value="client">
-                @if(isset($redirect))
-                    <input type="hidden" name="redirect" value="{{ $redirect }}">
-                @endif
+                <?php if(isset($redirect)): ?>
+                    <input type="hidden" name="redirect" value="<?php echo e($redirect); ?>">
+                <?php endif; ?>
 
                 <!-- Row 1: Name Fields -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('First Name') }}</label>
-                        <input type="text" name="first_name" value="{{ old('first_name') }}"
-                            class="reg-input @error('first_name') border-red-500! @enderror"
-                            placeholder="{{ __('Enter First Name') }}" required  pattern="^[A-Z][a-zA-Z\s]{0,39}$"
-                            maxlength="40" title="{{ __('First letter must be capital. Only letters and spaces allowed. Max 40 characters.') }}">
-                        @error('first_name')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('First Name')); ?></label>
+                        <input type="text" name="first_name" value="<?php echo e(old('first_name')); ?>"
+                            class="reg-input <?php $__errorArgs = ['first_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500! <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                            placeholder="<?php echo e(__('Enter First Name')); ?>" required  pattern="^[A-Z][a-zA-Z\s]{0,39}$"
+                            maxlength="40" title="<?php echo e(__('First letter must be capital. Only letters and spaces allowed. Max 40 characters.')); ?>">
+                        <?php $__errorArgs = ['first_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Middle Name') }}</label>
-                        <input type="text" name="middle_name" value="{{ old('middle_name') }}" class="reg-input"
-                            placeholder="{{ __('Enter Middle Name') }}" pattern="^[a-zA-Z][a-zA-Z\s]{0,39}$"  maxlength="40"  title="{{ __('Middle name can start with a small or capital letter and must contain only alphabets') }}">
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Middle Name')); ?></label>
+                        <input type="text" name="middle_name" value="<?php echo e(old('middle_name')); ?>" class="reg-input"
+                            placeholder="<?php echo e(__('Enter Middle Name')); ?>" pattern="^[a-zA-Z][a-zA-Z\s]{0,39}$"  maxlength="40"  title="<?php echo e(__('Middle name can start with a small or capital letter and must contain only alphabets')); ?>">
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Last Name') }}</label>
-                        <input type="text" name="last_name" value="{{ old('last_name') }}"
-                            class="reg-input @error('last_name') border-red-500! @enderror"
-                            placeholder="{{ __('Enter Last Name') }}" required pattern="^[A-Z][a-zA-Z\s]{0,39}$"  maxlength="40" title="{{ __('Last name must start with a capital letter and contain only alphabets') }}">
-                        @error('last_name')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Last Name')); ?></label>
+                        <input type="text" name="last_name" value="<?php echo e(old('last_name')); ?>"
+                            class="reg-input <?php $__errorArgs = ['last_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500! <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                            placeholder="<?php echo e(__('Enter Last Name')); ?>" required pattern="^[A-Z][a-zA-Z\s]{0,39}$"  maxlength="40" title="<?php echo e(__('Last name must start with a capital letter and contain only alphabets')); ?>">
+                        <?php $__errorArgs = ['last_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
                 <!-- Row 2: DOB, Age, Gender -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Date of Birth') }}</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Date of Birth')); ?></label>
                         <div class="date-input-wrapper">
-                            <input type="date" name="dob" value="{{ old('dob') }}" id="dob-input"
-                                class="reg-input @error('dob') border-red-500! @enderror" placeholder="{{ __('dd-mm-yyyy') }}" required>
+                            <input type="date" name="dob" value="<?php echo e(old('dob')); ?>" id="dob-input"
+                                class="reg-input <?php $__errorArgs = ['dob'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500! <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" placeholder="<?php echo e(__('dd-mm-yyyy')); ?>" required>
                         </div>
-                        @error('dob')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <?php $__errorArgs = ['dob'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Age') }}</label>
-                        <input type="number" name="age" id="age-input" value="{{ old('age') }}"
-                            class="reg-input bg-gray-100 cursor-not-allowed" placeholder="{{ __('Age') }}" readonly>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Age')); ?></label>
+                        <input type="number" name="age" id="age-input" value="<?php echo e(old('age')); ?>"
+                            class="reg-input bg-gray-100 cursor-not-allowed" placeholder="<?php echo e(__('Age')); ?>" readonly>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Gender') }}</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Gender')); ?></label>
                         <div class="custom-select-wrapper">
                             <div class="custom-select" id="gender-select">
                                 <div class="custom-select-trigger">
-                                    <span id="gender-selected">{{ __('Select Gender') }}</span>
+                                    <span id="gender-selected"><?php echo e(__('Select Gender')); ?></span>
                                     <i class="ri-arrow-down-s-line arrow text-gray-400"></i>
                                 </div>
                                 <div class="custom-options">
-                                    <div class="custom-option" data-value="male">{{ __('Male') }}</div>
-                                    <div class="custom-option" data-value="female">{{ __('Female') }}</div>
-                                    <div class="custom-option" data-value="transgender">{{ __('Transgender') }}</div>
+                                    <div class="custom-option" data-value="male"><?php echo e(__('Male')); ?></div>
+                                    <div class="custom-option" data-value="female"><?php echo e(__('Female')); ?></div>
+                                    <div class="custom-option" data-value="transgender"><?php echo e(__('Transgender')); ?></div>
                                 </div>
                             </div>
-                            <input type="hidden" name="gender" id="gender-input" value="{{ old('gender') }}" required>
+                            <input type="hidden" name="gender" id="gender-input" value="<?php echo e(old('gender')); ?>" required>
                         </div>
-                        @error('gender')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <?php $__errorArgs = ['gender'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
                 <!-- Row 3: Email, Mobile -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Email') }}</label>
-                        <input type="email" name="email" value="{{ old('email') }}"
-                            class="reg-input @error('email') border-red-500! @enderror" placeholder="{{ __('Enter Email') }}"
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Email')); ?></label>
+                        <input type="email" name="email" value="<?php echo e(old('email')); ?>"
+                            class="reg-input <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500! <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" placeholder="<?php echo e(__('Enter Email')); ?>"
                             required>
-                        @error('email')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Mobile No.') }}</label>
-                        <input type="tel" name="mobile" value="{{ old('mobile') }}"
-                            class="reg-input @error('mobile') border-red-500! @enderror" placeholder="{{ __('Enter Mobile No.') }}"
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Mobile No.')); ?></label>
+                        <input type="tel" name="mobile" value="<?php echo e(old('mobile')); ?>"
+                            class="reg-input <?php $__errorArgs = ['mobile'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500! <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" placeholder="<?php echo e(__('Enter Mobile No.')); ?>"
                             required>
-                        @error('mobile')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <?php $__errorArgs = ['mobile'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
                 <!-- Row 4: Address Lines -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Address Line 1') }}</label>
-                        <input type="text" name="address_line_1" value="{{ old('address_line_1') }}"
-                            class="reg-input @error('address_line_1') border-red-500! @enderror"
-                            placeholder="{{ __('Enter Address Line 1') }}" required>
-                        @error('address_line_1')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Address Line 1')); ?></label>
+                        <input type="text" name="address_line_1" value="<?php echo e(old('address_line_1')); ?>"
+                            class="reg-input <?php $__errorArgs = ['address_line_1'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500! <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                            placeholder="<?php echo e(__('Enter Address Line 1')); ?>" required>
+                        <?php $__errorArgs = ['address_line_1'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Address Line 2') }}</label>
-                        <input type="text" name="address_line_2" value="{{ old('address_line_2') }}" class="reg-input"
-                            placeholder="{{ __('Enter Address Line 2') }}">
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Address Line 2')); ?></label>
+                        <input type="text" name="address_line_2" value="<?php echo e(old('address_line_2')); ?>" class="reg-input"
+                            placeholder="<?php echo e(__('Enter Address Line 2')); ?>">
                     </div>
                 </div>
 
                 <!-- Row 5: City, State, Country -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('City') }}</label>
-                        <input type="text" name="city" value="{{ old('city') }}"
-                            class="reg-input @error('city') border-red-500! @enderror" placeholder="{{ __('Enter City') }}"
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('City')); ?></label>
+                        <input type="text" name="city" value="<?php echo e(old('city')); ?>"
+                            class="reg-input <?php $__errorArgs = ['city'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500! <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" placeholder="<?php echo e(__('Enter City')); ?>"
                             required>
-                        @error('city')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <?php $__errorArgs = ['city'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('State') }}</label>
-                        <input type="text" name="state" value="{{ old('state') }}"
-                            class="reg-input @error('state') border-red-500! @enderror" placeholder="{{ __('Enter State') }}"
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('State')); ?></label>
+                        <input type="text" name="state" value="<?php echo e(old('state')); ?>"
+                            class="reg-input <?php $__errorArgs = ['state'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500! <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" placeholder="<?php echo e(__('Enter State')); ?>"
                             required>
-                        @error('state')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <?php $__errorArgs = ['state'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Country') }}</label>
-                        <select id="nationality-select" name="country" data-default="{{ old('country', 'IN') }}"
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Country')); ?></label>
+                        <select id="nationality-select" name="country" data-default="<?php echo e(old('country', 'IN')); ?>"
                             required>
-                            <option value="">{{ __('Select Country') }}</option>
+                            <option value=""><?php echo e(__('Select Country')); ?></option>
                         </select>
-                        @error('country')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <?php $__errorArgs = ['country'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
                 <!-- Row 6: Zip Code -->
                 <div class="grid grid-cols-1 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Zip Code') }}</label>
-                        <input type="text" name="zip_code" value="{{ old('zip_code') }}" class="reg-input h-[52px]"
-                            placeholder="{{ __('Enter Zip Code') }}" required maxlength="8" pattern="\d*"
-                            title="{{ __('Maximum 8 numerical values allowed') }}"
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Zip Code')); ?></label>
+                        <input type="text" name="zip_code" value="<?php echo e(old('zip_code')); ?>" class="reg-input h-[52px]"
+                            placeholder="<?php echo e(__('Enter Zip Code')); ?>" required maxlength="8" pattern="\d*"
+                            title="<?php echo e(__('Maximum 8 numerical values allowed')); ?>"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
                     </div>
                 </div>
 
                 <!-- Consultation Preferences -->
                 <div class="mb-10">
-                    <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Preferred Speciality of Consultation') }}</label>
+                    <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Preferred Speciality of Consultation')); ?></label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8 bg-gray-50/50 p-6 md:p-8 rounded-3xl">
-                        @foreach($consultationPreferences as $pref)
+                        <?php $__currentLoopData = $consultationPreferences; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pref): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <label class="flex items-center gap-3 cursor-pointer group">
                                 <div class="relative w-6 h-6 flex-shrink-0">
-                                    <input type="checkbox" name="consultation_preferences[]" value="{{ $pref->name }}" class="peer absolute inset-0 opacity-0 z-10 cursor-pointer">
+                                    <input type="checkbox" name="consultation_preferences[]" value="<?php echo e($pref->name); ?>" class="peer absolute inset-0 opacity-0 z-10 cursor-pointer">
                                     <div class="w-full h-full border-2 border-gray-300 rounded-full peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center peer-checked:[&>i]:opacity-100">
                                         <i class="ri-check-line text-white text-sm opacity-0 transition-opacity font-bold"></i>
                                     </div>
                                 </div>
-                                <span class="text-gray-700 group-hover:text-primary transition-colors">{{ $pref->name }}</span>
+                                <span class="text-gray-700 group-hover:text-primary transition-colors"><?php echo e($pref->name); ?></span>
                             </label>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         <div class="col-span-1 sm:col-span-2 lg:col-span-3 mt-4 pt-4 border-t border-gray-200">
                             <div class="flex items-center gap-3">
-                                <input type="text" id="new-preference" placeholder="{{ __('Add New Preference') }}" class="reg-input flex-1 max-w-xs">
+                                <input type="text" id="new-preference" placeholder="<?php echo e(__('Add New Preference')); ?>" class="reg-input flex-1 max-w-xs">
                                 <button type="button" onclick="addNewPreference()" class="bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-90 transition-all">
                                     <i class="ri-add-line text-xl"></i>
                                 </button>
@@ -637,22 +760,22 @@
                 <!-- Row: Languages & Referral -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Languages Spoken') }}</label>
-                        <select id="languages-select" name="languages[]" multiple placeholder="{{ __('Select Languages') }}">
-                            @foreach($languages as $lang)
-                                <option value="{{ $lang->code }}">{{ $lang->name }}</option>
-                            @endforeach
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Languages Spoken')); ?></label>
+                        <select id="languages-select" name="languages[]" multiple placeholder="<?php echo e(__('Select Languages')); ?>">
+                            <?php $__currentLoopData = $languages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lang): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($lang->code); ?>"><?php echo e($lang->name); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('How did you hear about us?') }}</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('How did you hear about us?')); ?></label>
                         <select name="referral_type" class="reg-input w-full">
-                            <option value="">{{ __('Select Option') }}</option>
-                            <option value="Direct Search">{{ __('Direct Search') }}</option>
-                            <option value="Social Media">{{ __('Social Media') }}</option>
-                            <option value="Friends & Family">{{ __('Friends & Family') }}</option>
-                            <option value="Healthcare Practitioner">{{ __('Referral by Healthcare Practitioner') }}</option>
-                            <option value="Other">{{ __('Other Sources') }}</option>
+                            <option value=""><?php echo e(__('Select Option')); ?></option>
+                            <option value="Direct Search"><?php echo e(__('Direct Search')); ?></option>
+                            <option value="Social Media"><?php echo e(__('Social Media')); ?></option>
+                            <option value="Friends & Family"><?php echo e(__('Friends & Family')); ?></option>
+                            <option value="Healthcare Practitioner"><?php echo e(__('Referral by Healthcare Practitioner')); ?></option>
+                            <option value="Other"><?php echo e(__('Other Sources')); ?></option>
                         </select>
                     </div>
                 </div>
@@ -662,24 +785,38 @@
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
                         <div class="relative">
                             <input type="password" name="password" id="password"
-                                class="reg-input @error('password') border-red-500! @enderror"
+                                class="reg-input <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500! <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                 placeholder="Enter Password" required>
                             <button type="button" onclick="togglePassword('password')"
                                 class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                 <i class="ri-eye-line text-lg" id="password-icon"></i>
                             </button>
                         </div>
-                        <p class="text-xs text-primary mt-2 pl-4">{{ __('Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.') }}</p>
-                        @error('password')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <p class="text-xs text-primary mt-2 pl-4"><?php echo e(__('Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.')); ?></p>
+                        <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Confirm Password') }}</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Confirm Password')); ?></label>
                         <div class="relative">
                             <input type="password" name="password_confirmation" id="password_confirmation"
                                 class="reg-input"
-                                placeholder="{{ __('Confirm Password') }}" required>
+                                placeholder="<?php echo e(__('Confirm Password')); ?>" required>
                             <button type="button" onclick="togglePassword('password_confirmation')"
                                 class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                 <i class="ri-eye-line text-lg" id="password_confirmation-icon"></i>
@@ -689,58 +826,61 @@
                     </div>
                 </div>
 
-                @if($clientRegistrationFeeEnabled && ($clientRegistrationFee ?? 0) > 0)
+                <?php if($clientRegistrationFeeEnabled && ($clientRegistrationFee ?? 0) > 0): ?>
                 <!-- Payment & Promocode (from Admin > Other Fees) -->
                 <div class="mb-10 border-t border-gray-200 pt-10">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 items-end">
                         <div>
-                            <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Registration Fee Amount') }}</label>
+                            <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Registration Fee Amount')); ?></label>
                             <div class="relative w-full">
                                 <div class="w-full h-[52px] bg-[#F5F5F5] rounded-full flex items-center pl-6 pr-2">
                                     <span class="text-gray-900 text-[0.95rem] font-medium" id="registration-fee-display">
-                                        {{ $registrationCurrencySymbol }} {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
+                                        <?php echo e($registrationCurrencySymbol); ?> <?php echo e(number_format($clientRegistrationFee ?? 0, 2, '.', '')); ?>
+
                                     </span>
-                                    <input type="hidden" name="registration_fee" id="registration_fee" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
-                                    <input type="hidden" name="registration_fee_actual" id="registration_fee_actual" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
-                                    <input type="hidden" name="registration_fee_currency" id="registration-fee-currency" value="{{ $registrationCurrencyCode }}">
+                                    <input type="hidden" name="registration_fee" id="registration_fee" value="<?php echo e(number_format($clientRegistrationFee ?? 0, 2, '.', '')); ?>">
+                                    <input type="hidden" name="registration_fee_actual" id="registration_fee_actual" value="<?php echo e(number_format($clientRegistrationFee ?? 0, 2, '.', '')); ?>">
+                                    <input type="hidden" name="registration_fee_currency" id="registration-fee-currency" value="<?php echo e($registrationCurrencyCode); ?>">
                                     <button type="submit"
                                         class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-sm font-medium hover:bg-[#e0a932] transition-colors shadow-sm">
-                                        {{ __('Pay & Register') }}
+                                        <?php echo e(__('Pay & Register')); ?>
+
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Promocode') }}</label>
+                            <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Promocode')); ?></label>
                             <div class="relative w-full">
                                 <input type="text" name="promocode" id="promocode-input" placeholder="CODE1234"
                                     class="w-full h-[52px] pl-6 pr-28 bg-white rounded-full border border-dashed border-gray-300 outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#FABC41] focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)]">
                                 <button type="button" id="promo-apply-btn"
                                     class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full transition-colors text-sm font-medium hover:bg-[#e0a932]">
-                                    {{ __('Apply') }}
+                                    <?php echo e(__('Apply')); ?>
+
                                 </button>
                             </div>
                         </div>
 
                         <div id="promo-breakdown" class="hidden mt-6 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                             <div>
-                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Actual Registration Fee') }}</label>
+                                <label class="block text-gray-700 font-normal mb-3 text-base"><?php echo e(__('Actual Registration Fee')); ?></label>
                                 <input type="text" id="promo-actual-fee" readonly
                                     class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
                             </div>
                             <div>
-                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Discount Percentage') }}</label>
+                                <label class="block text-gray-700 font-normal mb-3 text-base"><?php echo e(__('Discount Percentage')); ?></label>
                                 <input type="text" id="promo-discount-percentage" readonly
                                     class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
                             </div>
                             <div>
-                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Total Discount Amount') }}</label>
+                                <label class="block text-gray-700 font-normal mb-3 text-base"><?php echo e(__('Total Discount Amount')); ?></label>
                                 <input type="text" id="promo-discount-amount" readonly
                                     class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
                             </div>
                             <div>
-                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Total Payable Fee') }}</label>
+                                <label class="block text-gray-700 font-normal mb-3 text-base"><?php echo e(__('Total Payable Fee')); ?></label>
                                 <input type="text" id="promo-total-fee" readonly
                                     class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
                             </div>
@@ -753,22 +893,36 @@
                     </div>
                 </div>
 
-                @endif
+                <?php endif; ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div class="md:col-span-2">
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }}</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base"><?php echo e(__('Captcha Verification')); ?></label>
                         <div class="flex items-center gap-4">
                             <div class="bg-white rounded-full flex items-center justify-center h-[52px] w-[150px] overflow-hidden relative shrink-0 border border-gray-200">
-                                <img src="{{ route('captcha') }}" id="captcha-img" alt="captcha" class="w-full h-full object-cover">
+                                <img src="<?php echo e(route('captcha')); ?>" id="captcha-img" alt="captcha" class="w-full h-full object-cover">
                             </div>
                             <button type="button" onclick="refreshCaptcha()" class="text-[#1052CE] hover:text-blue-800 transition-colors cursor-pointer shrink-0">
                                 <i class="ri-restart-line text-[28px]"></i>
                             </button>
-                            <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}" class="reg-input flex-1 @error('captcha') border-red-500! @enderror">
+                            <input type="text" name="captcha" placeholder="<?php echo e(__('Enter Code')); ?>" class="reg-input flex-1 <?php $__errorArgs = ['captcha'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500! <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
                         </div>
-                        @error('captcha')
-                            <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <?php $__errorArgs = ['captcha'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
@@ -778,16 +932,30 @@
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
                         <div class="relative">
                             <input type="password" name="password" id="password"
-                                class="reg-input @error('password') border-red-500! @enderror"
+                                class="reg-input <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500! <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                 placeholder="Enter Password" required>
                             <button type="button" onclick="togglePassword('password')"
                                 class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                 <i class="ri-eye-line" id="password-icon"></i>
                             </button>
                         </div>
-                        @error('password')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
+                        <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <span class="text-red-500 text-xs mt-1 pl-4 block"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Confirm Password</label>
@@ -797,9 +965,17 @@
                                 placeholder="Confirm Password" required>
                             <button type="button" onclick="togglePassword('password_confirmation')"
                                 class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="ri-eye-line" id="password_confirmation-icon"></i>
+                            </button>
+                        </div>
+                        <span id="password-match-error" class="text-red-500 text-xs mt-1 pl-4 block h-4"></span>
+                    </div>
+                </div> -->
             </form>
         </div>
     </div>
+
+
 
     <!-- Client Thank You Popup Modal -->
     <div id="thank-you-popup" class="fixed inset-0 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
@@ -810,19 +986,22 @@
             </div>
 
             <!-- Text Content -->
-            <h3 class="text-[#209F59] text-3xl font-medium mb-4">{{ __('Thank you!') }}</h3>
-            <h4 class="text-gray-800 text-xl font-semibold mb-3">{{ __('Registration Successful!') }}</h4>
+            <h3 class="text-[#209F59] text-3xl font-medium mb-4"><?php echo e(__('Thank you!')); ?></h3>
+            <h4 class="text-gray-800 text-xl font-semibold mb-3"><?php echo e(__('Registration Successful!')); ?></h4>
             <p class="text-gray-500 text-base leading-relaxed mb-8">
-                {{ __('Your account has been created successfully.') }}<br>
-                {{ __('Please login to access your portal.') }}
+                <?php echo e(__('Your account has been created successfully.')); ?><br>
+                <?php echo e(__('Please login to access your portal.')); ?>
+
             </p>
             
             <div class="flex flex-col gap-3">
-                <a href="{{ route('zaya-login') }}" class="bg-[#FABC41] text-[#423131] py-3.5 px-8 rounded-full font-medium transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5">
-                    {{ __('Login Now') }}
+                <a href="<?php echo e(route('zaya-login')); ?>" class="bg-[#FABC41] text-[#423131] py-3.5 px-8 rounded-full font-medium transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5">
+                    <?php echo e(__('Login Now')); ?>
+
                 </a>
                 <button onclick="closeThankYouPopup()" class="text-gray-400 hover:text-gray-600 text-sm py-2">
-                    {{ __('Close') }}
+                    <?php echo e(__('Close')); ?>
+
                 </button>
             </div>
         </div>
@@ -832,8 +1011,8 @@
     <footer class="bg-[#FFF3D4] py-6 mt-auto">
         <div class="container mx-auto px-4">
             <div class="max-w-5xl mx-auto flex items-center justify-end gap-4 md:gap-8">
-                <a href="{{ route('zaya-login') }}" class="btn-cancel">{{ __('Cancel') }}</a>
-                <button type="submit" form="registration-form" class="btn-create">{{ __('Create Account') }}</button>
+                <a href="<?php echo e(route('zaya-login')); ?>" class="btn-cancel"><?php echo e(__('Cancel')); ?></a>
+                <button type="submit" form="registration-form" class="btn-create"><?php echo e(__('Create Account')); ?></button>
             </div>
         </div>
     </footer>
@@ -913,7 +1092,7 @@
             // Refresh Captcha
             window.refreshCaptcha = function() {
                 const img = document.getElementById('captcha-img');
-                if (img) img.src = "{{ route('captcha') }}?" + new Date().getTime();
+                if (img) img.src = "<?php echo e(route('captcha')); ?>?" + new Date().getTime();
             }
 
             // Initialize Gender Select (Still uses generic Logic)
@@ -1122,7 +1301,7 @@
         });
 
         // Show Thank You Popup if success session exists
-        @if(session('success'))
+        <?php if(session('success')): ?>
         document.addEventListener('DOMContentLoaded', function() {
             const popup = document.getElementById('thank-you-popup');
             if (popup) {
@@ -1130,7 +1309,7 @@
                 popup.classList.add('flex');
             }
         });
-        @endif
+        <?php endif; ?>
 
         function closeThankYouPopup() {
             const popup = document.getElementById('thank-you-popup');
@@ -1149,8 +1328,8 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const currencySymbols = @json(config('currencies.symbols', []));
-            let currencySymbol = @json($registrationCurrencySymbol);
+            const currencySymbols = <?php echo json_encode(config('currencies.symbols', []), 512) ?>;
+            let currencySymbol = <?php echo json_encode($registrationCurrencySymbol, 15, 512) ?>;
             const promoInput = document.getElementById('promocode-input');
             const promoApplyBtn = document.getElementById('promo-apply-btn');
             const promoBreakdown = document.getElementById('promo-breakdown');
@@ -1168,7 +1347,7 @@
             const feeInput = document.getElementById('registration_fee');
             const feeActualInput = document.getElementById('registration_fee_actual');
             const feeCurrencyInput = document.getElementById('registration-fee-currency');
-            const countryToCurrency = @json(config('currencies.country_to_currency', []));  
+            const countryToCurrency = <?php echo json_encode(config('currencies.country_to_currency', []), 512) ?>;  
             const countrySelect = document.getElementById('nationality-select');
             const fallbackRates = {
                 'EUR': { 'USD': 1.1, 'INR': 89, 'GBP': 0.85, 'AED': 4.04 },
@@ -1185,7 +1364,7 @@
 
             async function convertFee(targetCountryCode) {
                 if (!feeInput || !feeActualInput) return;
-                const baseCurrency = @json($registrationCurrencyCode);
+                const baseCurrency = <?php echo json_encode($registrationCurrencyCode, 15, 512) ?>;
                 const baseAmount = parseFloat(feeActualInput.value || feeInput.value || 0);
                 if (!baseAmount) return;
 
@@ -1317,7 +1496,7 @@
                 promoApplyBtn.textContent = 'Applying...';
 
                 try {
-                    const response = await fetch("{{ route('promo.validate') }}", {
+                    const response = await fetch("<?php echo e(route('promo.validate')); ?>", {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -1382,15 +1561,18 @@
                     <i class="ri-checkbox-circle-fill text-[#4CAF50] text-5xl"></i>
                 </div>
             </div>
-            <h3 class="text-2xl md:text-3xl font-serif font-bold text-secondary mb-4">{{ __('Thank You!') }}</h3>
+            <h3 class="text-2xl md:text-3xl font-serif font-bold text-secondary mb-4"><?php echo e(__('Thank You!')); ?></h3>
             <p class="text-gray-600 text-base md:text-lg mb-8 leading-relaxed">
-                {{ __('Your registration has been submitted successfully. Our team will review your application and get back to you shortly.') }}
+                <?php echo e(__('Your registration has been submitted successfully. Our team will review your application and get back to you shortly.')); ?>
+
             </p>
             <button onclick="closeThankYouPopup()" class="bg-secondary text-white px-8 py-3 rounded-full hover:bg-opacity-90 transition-all font-medium">
-                {{ __('Got it, thanks!') }}
+                <?php echo e(__('Got it, thanks!')); ?>
+
             </button>
         </div>
     </div>
 </body>
 
 </html>
+<?php /**PATH C:\wamp64\www\zaya\resources\views/client-register.blade.php ENDPATH**/ ?>
