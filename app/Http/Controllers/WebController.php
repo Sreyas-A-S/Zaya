@@ -25,7 +25,7 @@ use App\Models\Service;
 use App\Models\ServicePackage;
 use App\Models\Testimonial;
 use App\Mail\ContactUsMail;
-use App\Models\Country;
+
 use App\Models\Doctor;
 use App\Models\MindfulnessPractitioner;
 use App\Models\YogaTherapist;
@@ -450,17 +450,21 @@ class WebController extends Controller
         $practitionerRegistrationFee = $financeSettings['practitioner_registration_fee'] ?? '0';
         $practitionerRegistrationFee = is_numeric($practitionerRegistrationFee) ? (float) $practitionerRegistrationFee : 0.0;
         $practitionerRegistrationFeeEnabled = filter_var($financeSettings['practitioner_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
+        $practitionerRegistrationCurrency = strtoupper($financeSettings['practitioner_registration_fee_currency'] ?? config('currencies.default', 'EUR'));
+        $practitionerRegistrationCurrencySymbol = config('currencies.symbols')[$practitionerRegistrationCurrency] ?? $practitionerRegistrationCurrency;
 
         return view('practitioner-register', compact(
             'wellnessConsultations',
             'bodyTherapies',
             'otherModalities',
             'practitionerRegistrationFee',
-            'practitionerRegistrationFeeEnabled'
+            'practitionerRegistrationFeeEnabled',
+            'practitionerRegistrationCurrency',
+            'practitionerRegistrationCurrencySymbol'
         ));
     }
 
-    public function joinRegister(string $role)
+    public function joinRegister(string $role, string $token = null)
     {
         $normalized = str_replace('_', '-', strtolower(trim($role)));
         $map = [
@@ -482,6 +486,7 @@ class WebController extends Controller
             'joinRoleLabel' => $map[$normalized]['label'],
             'languages' => Language::where('status', 'active')->get(),
             'countries' => Country::where('status', 'active')->orderBy('name')->get(),
+            'openRegisterToken' => $token,
         ];
 
         if ($joinRole === 'doctor') {

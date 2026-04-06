@@ -146,6 +146,7 @@
                     <?php endif; ?>
                     <?php if(auth()->user()->hasPermission('other-fees-view')): ?>
                     <li> <a href="<?php echo e(route('admin.other-fees.index')); ?>"><?php echo e($adminPanelSettings['admin_panel_sidebar_other_fees'] ?? 'Other Fees'); ?></a></li>
+                    <li> <a href="<?php echo e(route('admin.referral-commissions.index')); ?>"><?php echo e($adminPanelSettings['admin_panel_sidebar_referral_commissions'] ?? 'Referral Commissions'); ?></a></li>
                     <li> <a href="<?php echo e(route('admin.financial.index')); ?>">Transactions</a></li>
                     <li> <a href="<?php echo e(route('admin.financial.practitioners')); ?>">Practitioner Balances</a></li>
                     <?php endif; ?>

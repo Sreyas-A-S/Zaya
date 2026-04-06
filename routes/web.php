@@ -24,6 +24,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CaptchaController;
+use App\Http\Controllers\GeoIpController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -90,7 +91,7 @@ Route::get('/open-register/{role}/signature={token}', function (string $role, st
         abort(404);
     }
 
-    return app(WebController::class)->joinRegister($normalizedRole);
+    return app(WebController::class)->joinRegister($normalizedRole, $token);
 })->name('open.register');
 
 // Public Master Data Quick Add (for registration forms)
@@ -138,6 +139,7 @@ Route::post('/blog/comment', [WebController::class, 'postComment'])->name('blog.
 Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->name('blog.comments');
 
 Route::get('/captcha', [CaptchaController::class, 'generate'])->name('captcha');
+Route::get('/geoip/country', [GeoIpController::class, 'country'])->name('geoip.country');
 Route::get('/magic-login', [\App\Http\Controllers\Auth\MagicLoginController::class, 'login'])->name('magic.login');
 Route::post('/validate-promo-code', [WebController::class, 'validatePromoCode'])->name('promo.validate');
 

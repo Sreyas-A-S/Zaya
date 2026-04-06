@@ -80,17 +80,6 @@
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </select>
     </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Degree Certificates')); ?> <span class="text-red-500">*</span></label>
-        <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-            <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
-                <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                <p class="text-gray-500 text-sm leading-none"><?php echo e(__('Upload')); ?></p>
-            </div>
-            <p class="text-gray-400 text-sm file-name-display"><?php echo e(__('Multiple files allowed (Max 2MB each)')); ?></p>
-            <input type="file" name="degree_certificates[]" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" multiple required>
-        </div>
-    </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -185,80 +174,7 @@
     </div>
 </div>
 
-<h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8"><?php echo e(__('KYC & Payment Details')); ?></h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('PAN Number')); ?> <span class="text-red-500">*</span></label>
-        <input type="text" name="pan_number" value="<?php echo e(old('pan_number')); ?>" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
-            placeholder="<?php echo e(__('Enter PAN Number')); ?>">
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('UPI ID (Optional)')); ?></label>
-        <input type="text" name="upi_id" value="<?php echo e(old('upi_id')); ?>"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
-            placeholder="<?php echo e(__('Enter UPI ID')); ?>">
-    </div>
-</div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('PAN Upload')); ?> <span class="text-red-500">*</span></label>
-        <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-            <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
-                <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                <p class="text-gray-500 text-sm leading-none"><?php echo e(__('Upload')); ?></p>
-            </div>
-            <p class="text-gray-400 text-sm file-name-display"><?php echo e(__('PDF/JPG/PNG (Max 2MB)')); ?></p>
-            <input type="file" name="pan_upload" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-        </div>
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Aadhaar Upload (Optional)')); ?></label>
-        <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-            <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
-                <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                <p class="text-gray-500 text-sm leading-none"><?php echo e(__('Upload')); ?></p>
-            </div>
-            <p class="text-gray-400 text-sm file-name-display"><?php echo e(__('PDF/JPG/PNG (Max 2MB)')); ?></p>
-            <input type="file" name="aadhaar_upload" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
-        </div>
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Cancelled Cheque')); ?> <span class="text-red-500">*</span></label>
-        <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-            <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
-                <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                <p class="text-gray-500 text-sm leading-none"><?php echo e(__('Upload')); ?></p>
-            </div>
-            <p class="text-gray-400 text-sm file-name-display"><?php echo e(__('PDF/JPG/PNG (Max 2MB)')); ?></p>
-            <input type="file" name="cancelled_cheque" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-        </div>
-    </div>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Bank Account Holder Name')); ?> <span class="text-red-500">*</span></label>
-        <input type="text" name="bank_account_holder" value="<?php echo e(old('bank_account_holder')); ?>" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Bank Name')); ?> <span class="text-red-500">*</span></label>
-        <input type="text" name="bank_name" value="<?php echo e(old('bank_name')); ?>" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('Account Number')); ?> <span class="text-red-500">*</span></label>
-        <input type="text" name="account_number" value="<?php echo e(old('account_number')); ?>" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg"><?php echo e(__('IFSC Code')); ?> <span class="text-red-500">*</span></label>
-        <input type="text" name="ifsc_code" value="<?php echo e(old('ifsc_code')); ?>" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
-    </div>
-</div>
 
 <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8"><?php echo e(__('Platform Profile')); ?></h2>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

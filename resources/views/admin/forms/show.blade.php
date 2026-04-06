@@ -33,9 +33,11 @@
                         <div class="col-md-6">
                             <div class="mb-2"><strong>User Type:</strong> {{ ucfirst(str_replace('-', ' ', $link->role)) }}</div>
                             <div class="mb-2"><strong>Created By:</strong> {{ $link->creator?->name ?? $link->creator?->email ?? '—' }}</div>
+                            <div class="mb-2"><strong>Status:</strong> {{ (strtolower(trim((string) ($link->status ?? 'active'))) === 'active' || (string) $link->status === '1') ? 'Active' : 'Inactive' }}</div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-2"><strong>Expires At:</strong> {{ optional($link->expires_at)->format('Y-m-d H:i:s') ?? '—' }}</div>
+                            <div class="mb-2"><strong>Used At:</strong> {{ optional($link->used_at)->format('Y-m-d H:i:s') ?? '—' }}</div>
                             <div class="mb-2"><strong>Created:</strong> {{ optional($link->created_at)->format('Y-m-d H:i:s') }}</div>
                         </div>
                     </div>
@@ -47,6 +49,41 @@
                         <input type="text" class="form-control" value="{{ $link->url }}" readonly>
                         <a class="btn btn-primary" href="{{ $link->url }}" target="_blank" rel="noopener">Open</a>
                     </div>
+
+                    <hr>
+
+                    <h5 class="mb-2">Registered Users ({{ $link->used_at ? 1 : 0 }})</h5>
+
+                    @if($link->used_at && !$hasUsedByColumn)
+                        <div class="alert alert-info mb-0">
+                            This link was used, but your database does not have the <code>used_by</code> column yet. Run migrations to enable showing the registered user.
+                        </div>
+                    @elseif($hasUsedByColumn && $link->usedBy)
+                        <div class="table-responsive">
+                            <table class="table table-bordered mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Registered At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ $link->usedBy->id }}</td>
+                                        <td>{{ $link->usedBy->name }}</td>
+                                        <td>{{ $link->usedBy->email }}</td>
+                                        <td>{{ ucwords(str_replace('_', ' ', (string) $link->usedBy->role)) }}</td>
+                                        <td>{{ optional($link->usedBy->created_at)->format('Y-m-d H:i:s') ?? '—' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="alert alert-light mb-0">No one has registered with this link yet.</div>
+                    @endif
                 </div>
             </div>
         </div>

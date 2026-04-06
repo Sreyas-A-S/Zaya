@@ -16,6 +16,7 @@ class OpenRegisterLink extends Model
         'created_by',
         'expires_at',
         'used_at',
+        'used_by',
     ];
 
     protected $casts = [
@@ -26,6 +27,11 @@ class OpenRegisterLink extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function usedBy()
+    {
+        return $this->belongsTo(User::class, 'used_by');
     }
 
     public function getUrlAttribute(): string

@@ -628,7 +628,7 @@
                                     <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Registration Fee Amount') }}</label>
                                     <div class='relative w-full'>
                                         <div class='w-full h-[58px] bg-[#F5F5F5] rounded-full flex items-center pl-8 pr-2' data-registration-fee-container>
-                                            <span class='text-gray-900 text-[1.05rem] font-medium'>€ 10.00</span>
+                                            <span class='text-gray-900 text-[1.05rem] font-medium'>{{ $practitionerRegistrationCurrencySymbol ?? '€' }} {{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}</span>
                                             <input type='hidden' name='registration_fee' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
                                             <input type='hidden' name='registration_fee_actual' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
                                             <button type='button' class='absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer'>{{ __('Pay') }}</button>
@@ -766,13 +766,15 @@
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const registrationCurrencySymbol = @json($practitionerRegistrationCurrencySymbol ?? '€');
+
             function renderRegistrationFee() {
                 const feeContainer = document.querySelector('[data-registration-fee-container]');
                 if (!feeContainer) return;
                 const feeInput = feeContainer.querySelector('input[name="registration_fee"]');
                 const feeText = feeContainer.querySelector('span');
                 if (!feeInput || !feeText) return;
-                feeText.textContent = `\u20AC ${feeInput.value || '0.00'}`;
+                feeText.textContent = `${registrationCurrencySymbol} ${feeInput.value || '0.00'}`;
             }
 
             renderRegistrationFee();
@@ -864,10 +866,10 @@
                             return;
                         }
 
-                        if (promoActualFee) promoActualFee.value = `\u20AC ${data.base_fee}`;
+                        if (promoActualFee) promoActualFee.value = `${registrationCurrencySymbol} ${data.base_fee}`;
                         if (promoDiscountPercentage) promoDiscountPercentage.value = `${data.discount_percentage}%`;
-                        if (promoDiscountAmount) promoDiscountAmount.value = `\u20AC ${data.discount_amount}`;
-                        if (promoTotalFee) promoTotalFee.value = `\u20AC ${data.total_fee}`;
+                        if (promoDiscountAmount) promoDiscountAmount.value = `${registrationCurrencySymbol} ${data.discount_amount}`;
+                        if (promoTotalFee) promoTotalFee.value = `${registrationCurrencySymbol} ${data.total_fee}`;
 
                         if (promoCodeHidden) promoCodeHidden.value = data.code || code;
                         if (promoDiscountPercentageHidden) promoDiscountPercentageHidden.value = data.discount_percentage || '';
@@ -1146,19 +1148,25 @@
                         }
                     });
 
-                    if (response.ok) {
-                        const popup = document.getElementById('thank-you-popup');
-                        if (popup) {
-                            popup.classList.remove('hidden');
-                            popup.classList.add('flex');
-                        }
-                        // Redirect after 3 seconds
-                        setTimeout(() => {
-                            closeThankYouPopup();
-                        }, 3000);
-                    } else {
-                        const data = await response.json();
-                        let errorMessage = 'Validation failed. Please check your inputs.';
+                     if (response.ok) {
+                         const data = await response.json().catch(() => ({}));
+                         const popup = document.getElementById('thank-you-popup');
+                         if (popup) {
+                             popup.classList.remove('hidden');
+                             popup.classList.add('flex');
+                         }
+
+                         const paymentUrl = data && data.payment_url ? data.payment_url : null;
+                         setTimeout(() => {
+                             if (paymentUrl) {
+                                 window.location.href = paymentUrl;
+                                 return;
+                             }
+                             closeThankYouPopup();
+                         }, 1500);
+                     } else {
+                         const data = await response.json();
+                         let errorMessage = 'Validation failed. Please check your inputs.';
                         if (data.errors && Object.keys(data.errors).length > 0) {
                             errorMessage = data.errors[Object.keys(data.errors)[0]][0];
                         } else if (data.message) {

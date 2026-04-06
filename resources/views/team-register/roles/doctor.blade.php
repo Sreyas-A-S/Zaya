@@ -80,17 +80,6 @@
             @endforeach
         </select>
     </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Degree Certificates') }} <span class="text-red-500">*</span></label>
-        <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-            <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
-                <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
-            </div>
-            <p class="text-gray-400 text-sm file-name-display">{{ __('Multiple files allowed (Max 2MB each)') }}</p>
-            <input type="file" name="degree_certificates[]" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" multiple required>
-        </div>
-    </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -185,80 +174,7 @@
     </div>
 </div>
 
-<h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('KYC & Payment Details') }}</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('PAN Number') }} <span class="text-red-500">*</span></label>
-        <input type="text" name="pan_number" value="{{ old('pan_number') }}" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
-            placeholder="{{ __('Enter PAN Number') }}">
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('UPI ID (Optional)') }}</label>
-        <input type="text" name="upi_id" value="{{ old('upi_id') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
-            placeholder="{{ __('Enter UPI ID') }}">
-    </div>
-</div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('PAN Upload') }} <span class="text-red-500">*</span></label>
-        <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-            <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
-                <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
-            </div>
-            <p class="text-gray-400 text-sm file-name-display">{{ __('PDF/JPG/PNG (Max 2MB)') }}</p>
-            <input type="file" name="pan_upload" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-        </div>
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Aadhaar Upload (Optional)') }}</label>
-        <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-            <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
-                <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
-            </div>
-            <p class="text-gray-400 text-sm file-name-display">{{ __('PDF/JPG/PNG (Max 2MB)') }}</p>
-            <input type="file" name="aadhaar_upload" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
-        </div>
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Cancelled Cheque') }} <span class="text-red-500">*</span></label>
-        <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
-            <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
-                <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
-                <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
-            </div>
-            <p class="text-gray-400 text-sm file-name-display">{{ __('PDF/JPG/PNG (Max 2MB)') }}</p>
-            <input type="file" name="cancelled_cheque" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-        </div>
-    </div>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Bank Account Holder Name') }} <span class="text-red-500">*</span></label>
-        <input type="text" name="bank_account_holder" value="{{ old('bank_account_holder') }}" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Bank Name') }} <span class="text-red-500">*</span></label>
-        <input type="text" name="bank_name" value="{{ old('bank_name') }}" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Account Number') }} <span class="text-red-500">*</span></label>
-        <input type="text" name="account_number" value="{{ old('account_number') }}" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
-    </div>
-    <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('IFSC Code') }} <span class="text-red-500">*</span></label>
-        <input type="text" name="ifsc_code" value="{{ old('ifsc_code') }}" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
-    </div>
-</div>
 
 <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Platform Profile') }}</h2>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

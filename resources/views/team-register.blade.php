@@ -146,6 +146,11 @@
     <div class="flex-1">
         <div class="container mx-auto px-4 py-10 md:py-14">
             <div class="text-center mb-10">
+                <div class="flex justify-center mb-6">
+                    <a href="{{ route('index') }}" aria-label="Zaya Wellness">
+                        <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="h-12 md:h-14 w-auto">
+                    </a>
+                </div>
                 <h1 class="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-primary mb-4">{{ __('Join the ZAYA Collective') }}</h1>
                 <p class="text-gray-500 text-sm md:text-base max-w-2xl mx-auto">{{ __('Register as') }} {{ $joinRoleLabel ?? __('a team member') }}.</p>
             </div>
@@ -153,194 +158,239 @@
             <form action="{{ route('register') }}" method="POST" enctype="multipart/form-data" class="max-w-5xl mx-auto">
                 @csrf
                 <input type="hidden" name="role" value="{{ $joinRole }}">
+                @if(isset($openRegisterToken))
+                    <input type="hidden" name="open_register_token" value="{{ $openRegisterToken }}">
+                @endif
 
                 <div class="bg-white rounded-[24px] p-8 md:p-12 border border-gray-100 shadow-sm">
-                    <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Personal Details') }}</h2>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('First Name') }}</label>
-                            <input type="text" name="first_name" value="{{ old('first_name') }}" required
-                                pattern="^[A-Z][a-zA-Z\s]{0,39}$"
-                                maxlength="40"
-                                title="{{ __('First letter must be capital. Only letters and spaces allowed. Max 40 characters.') }}"
-                                class="reg-input"
-                                placeholder="{{ __('Enter First Name') }}">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Middle Name') }}</label>
-                            <input type="text" name="middle_name" value="{{ old('middle_name') }}"
-                                pattern="^[a-zA-Z][a-zA-Z\s]{0,39}$"
-                                maxlength="40"
-                                title="{{ __('Middle name can start with a small or capital letter and must contain only alphabets') }}"
-                                class="reg-input"
-                                placeholder="{{ __('Enter Middle Name') }}">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Last Name') }}</label>
-                            <input type="text" name="last_name" value="{{ old('last_name') }}" required
-                                pattern="^[A-Z][a-zA-Z\s]{0,39}$"
-                                maxlength="40"
-                                title="{{ __('Last name must start with a capital letter and contain only alphabets') }}"
-                                class="reg-input"
-                                placeholder="{{ __('Enter Last Name') }}">
-                        </div>
+                    <!-- Tabs Header -->
+                    <div class="flex flex-col md:flex-row mb-10 border-b border-gray-200" id="form-tabs">
+                        <button type="button" class="tab-btn active md:w-1/3 py-4 text-center font-medium text-lg text-[#97563D] border-b-2 border-[#97563D]" data-target="tab-personal">1. {{ __('Personal Details') }}</button>
+                        <button type="button" class="tab-btn md:w-1/3 py-4 text-center font-medium text-lg text-gray-400 hover:text-gray-600 border-b-2 border-transparent transition-colors" data-target="tab-professional">2. {{ __('Professional Details') }}</button>
+                        <button type="button" class="tab-btn md:w-1/3 py-4 text-center font-medium text-lg text-gray-400 hover:text-gray-600 border-b-2 border-transparent transition-colors" data-target="tab-security">3. {{ __('Account Security') }}</button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Email') }}</label>
-                            <input type="email" name="email" value="{{ old('email') }}" required
-                                class="reg-input"
-                                placeholder="{{ __('Enter Email') }}">
+                    <!-- Step 1: Personal Details -->
+                    <div id="tab-personal" class="tab-content block" style="display: block;">
+                        <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Personal Information') }}</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('First Name') }} <span class="text-red-500">*</span></label>
+                                <input type="text" name="first_name" value="{{ old('first_name') }}" required
+                                    pattern="^[A-Z][a-zA-Z\s]{0,39}$"
+                                    maxlength="40"
+                                    title="{{ __('First letter must be capital. Only letters and spaces allowed. Max 40 characters.') }}"
+                                    class="reg-input"
+                                    placeholder="{{ __('Enter First Name') }}">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Middle Name') }}</label>
+                                <input type="text" name="middle_name" value="{{ old('middle_name') }}"
+                                    pattern="^[a-zA-Z][a-zA-Z\s]{0,39}$"
+                                    maxlength="40"
+                                    title="{{ __('Middle name can start with a small or capital letter and must contain only alphabets') }}"
+                                    class="reg-input"
+                                    placeholder="{{ __('Enter Middle Name') }}">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Last Name') }} <span class="text-red-500">*</span></label>
+                                <input type="text" name="last_name" value="{{ old('last_name') }}" required
+                                    pattern="^[A-Z][a-zA-Z\s]{0,39}$"
+                                    maxlength="40"
+                                    title="{{ __('Last name must start with a capital letter and contain only alphabets') }}"
+                                    class="reg-input"
+                                    placeholder="{{ __('Enter Last Name') }}">
+                            </div>
                         </div>
-                        <div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Email') }} <span class="text-red-500">*</span></label>
+                                <input type="email" name="email" value="{{ old('email') }}" required
+                                    class="reg-input"
+                                    placeholder="{{ __('Enter Email') }}">
+                            </div>
+                            <div>
+                                @if(($joinRole ?? '') === 'doctor')
+                                    <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Mobile Number') }} <span class="text-red-500">*</span></label>
+                                    <input type="tel" id="phone" name="mobile_number" value="{{ old('mobile_number') }}" required
+                                        pattern="^[0-9\s\-\+\(\)]{7,20}$"
+                                        title="Enter a valid mobile number"
+                                        class="reg-input"
+                                        placeholder="{{ __('Enter Mobile Number') }}">
+                                @else
+                                    <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Phone') }} @if(($joinRole ?? '') === 'mindfulness_practitioner')<span class="text-red-500">*</span>@endif</label>
+                                    <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" {{ ($joinRole ?? '') === 'mindfulness_practitioner' ? 'required' : '' }}
+                                        pattern="^[0-9\s\-\+\(\)]{7,20}$"
+                                        title="Enter a valid phone number"
+                                        class="reg-input"
+                                        placeholder="{{ __('Enter Phone Number') }}">
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Gender') }} @if(($joinRole ?? '') === 'doctor')<span class="text-red-500">*</span>@endif</label>
+                                <select name="gender" {{ ($joinRole ?? '') === 'doctor' ? 'required' : '' }}
+                                    class="reg-input bg-white">
+                                    <option value="">{{ __('Select') }}</option>
+                                    <option value="male">{{ __('Male') }}</option>
+                                    <option value="female">{{ __('Female') }}</option>
+                                    <option value="other">{{ __('Other') }}</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('DOB') }} @if(($joinRole ?? '') === 'doctor')<span class="text-red-500">*</span>@endif</label>
+                                <input type="date" name="dob" value="{{ old('dob') }}" max="{{ now()->format('Y-m-d') }}" {{ ($joinRole ?? '') === 'doctor' ? 'required' : '' }}
+                                    class="reg-input">
+                            </div>
                             @if(($joinRole ?? '') === 'doctor')
-                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Mobile Number') }}</label>
-                                <input type="tel" id="phone" name="mobile_number" value="{{ old('mobile_number') }}" required
-                                    pattern="^[0-9\s\-\+\(\)]{7,20}$"
-                                    title="Enter a valid mobile number"
-                                    class="reg-input"
-                                    placeholder="{{ __('Enter Mobile Number') }}">
-                            @else
-                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Phone') }} @if(($joinRole ?? '') === 'mindfulness_practitioner')<span class="text-red-500">*</span>@endif</label>
-                                <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" {{ ($joinRole ?? '') === 'mindfulness_practitioner' ? 'required' : '' }}
-                                    pattern="^[0-9\s\-\+\(\)]{7,20}$"
-                                    title="Enter a valid phone number"
-                                    class="reg-input"
-                                    placeholder="{{ __('Enter Phone Number') }}">
+                                <div>
+                                    <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Nationality') }}</label>
+                                    <select id="nationality-select" name="nationality" data-nationality-select
+                                        class="reg-input bg-white">
+                                        <option value="">{{ __('Select') }}</option>
+                                        @foreach(($countries ?? []) as $c)
+                                            <option value="{{ $c->name }}" data-code="{{ strtolower($c->code) }}" @selected(old('nationality') === $c->name)>
+                                                {{ $c->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             @endif
                         </div>
-                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Gender') }} @if(($joinRole ?? '') === 'doctor')<span class="text-red-500">*</span>@endif</label>
-                            <select name="gender" {{ ($joinRole ?? '') === 'doctor' ? 'required' : '' }}
-                                class="reg-input">
-                                <option value="">{{ __('Select') }}</option>
-                                <option value="male">{{ __('Male') }}</option>
-                                <option value="female">{{ __('Female') }}</option>
-                                <option value="other">{{ __('Other') }}</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('DOB') }} @if(($joinRole ?? '') === 'doctor')<span class="text-red-500">*</span>@endif</label>
-                            <input type="date" name="dob" value="{{ old('dob') }}" max="{{ now()->format('Y-m-d') }}" {{ ($joinRole ?? '') === 'doctor' ? 'required' : '' }}
-                                class="reg-input">
-                        </div>
-                        @if(($joinRole ?? '') === 'doctor')
+                        <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Address') }}</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <div>
-                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Nationality') }}</label>
-                                <select id="nationality-select" name="nationality" data-nationality-select
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Address Line 1') }} <span class="text-red-500">*</span></label>
+                                <input type="text" name="address_line_1" value="{{ old('address_line_1') }}" required
                                     class="reg-input">
-                                    <option value="">{{ __('Select') }}</option>
-                                    @foreach(($countries ?? []) as $c)
-                                        <option value="{{ $c->name }}" data-code="{{ strtolower($c->code) }}" @selected(old('nationality') === $c->name)>
-                                            {{ $c->name }}
-                                        </option>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Address Line 2') }}</label>
+                                <input type="text" name="address_line_2" value="{{ old('address_line_2') }}"
+                                    class="reg-input">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('City') }} <span class="text-red-500">*</span></label>
+                                <input type="text" name="city" value="{{ old('city') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid city name" class="reg-input">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State') }} <span class="text-red-500">*</span></label>
+                                <input type="text" name="state" value="{{ old('state') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid state name" class="reg-input">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Zip Code') }} <span class="text-red-500">*</span></label>
+                                <input type="text" name="zip_code" value="{{ old('zip_code') }}" required pattern="^[a-zA-Z0-9\s\-]{3,20}$" title="Enter a valid zip code" class="reg-input">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Country') }} <span class="text-red-500">*</span></label>
+                                <input type="text" name="country" value="{{ old('country') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid country name" class="reg-input">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Payout Currency') }} <span class="text-red-500">*</span></label>
+                                @php
+                                    $currencies = config('currencies.list', [
+                                        'USD' => 'US$', 'EUR' => '€', 'GBP' => '£', 'INR' => '₹', 'AUD' => 'A$',
+                                        'CAD' => 'C$', 'SGD' => 'S$', 'AED' => 'AED', 'SAR' => 'SAR'
+                                    ]);
+                                @endphp
+                                <select name="payout_currency" required
+                                    class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
+                                    @foreach($currencies as $code => $symbol)
+                                        <option value="{{ $code }}" @selected(old('payout_currency', 'USD') === $code)>{{ $code }} ({{ $symbol }})</option>
                                     @endforeach
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="flex justify-end mt-8 border-t border-gray-100 pt-8">
+                            <button type="button" class="next-tab-btn bg-[#FABC41] text-[#423131] py-3.5 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] shadow-md shadow-[#FABC41]/20">{{ __('Next Step') }} <i class="ri-arrow-right-line ml-2 align-middle"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Professional Details -->
+                    <div id="tab-professional" class="tab-content hidden" style="display: none;">
+                        @if(($joinRole ?? '') === 'doctor')
+                            @include('team-register.roles.doctor')
+                        @elseif(($joinRole ?? '') === 'mindfulness_practitioner')
+                            @include('team-register.roles.mindfulness')
+                        @elseif(($joinRole ?? '') === 'yoga_therapist')
+                            @include('team-register.roles.yoga')
+                        @elseif(($joinRole ?? '') === 'translator')
+                            @include('team-register.roles.translator')
                         @endif
 
-                    </div>
-
-                    <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Address') }}</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Address Line 1') }}</label>
-                            <input type="text" name="address_line_1" value="{{ old('address_line_1') }}" required
-                                class="reg-input">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Address Line 2') }}</label>
-                            <input type="text" name="address_line_2" value="{{ old('address_line_2') }}"
-                                class="reg-input">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('City') }}</label>
-                            <input type="text" name="city" value="{{ old('city') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid city name" class="reg-input">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State') }}</label>
-                            <input type="text" name="state" value="{{ old('state') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid state name" class="reg-input">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Zip Code') }}</label>
-                            <input type="text" name="zip_code" value="{{ old('zip_code') }}" required pattern="^[a-zA-Z0-9\s\-]{3,20}$" title="Enter a valid zip code" class="reg-input">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Country') }}</label>
-                            <input type="text" name="country" value="{{ old('country') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid country name" class="reg-input">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Payout Currency') }} <span class="text-red-500">*</span></label>
-                            <select name="payout_currency" required
-                                class="w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
-                                @foreach($currencies as $code => $symbol)
-                                    <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
-                                @endforeach
-                            </select>
+                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 border-t border-gray-100 pt-8">
+                            <button type="button" class="prev-tab-btn w-full sm:w-auto border border-[#D1D5DB] text-gray-700 py-3.5 px-8 rounded-full font-semibold text-lg transition-all hover:bg-gray-50"><i class="ri-arrow-left-line mr-2 align-middle"></i> {{ __('Previous') }}</button>
+                            <button type="button" class="next-tab-btn w-full sm:w-auto bg-[#FABC41] text-[#423131] py-3.5 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] shadow-md shadow-[#FABC41]/20">{{ __('Next Step') }} <i class="ri-arrow-right-line ml-2 align-middle"></i></button>
                         </div>
                     </div>
 
-                    @if(($joinRole ?? '') === 'doctor')
-                        @include('team-register.roles.doctor')
-                    @elseif(($joinRole ?? '') === 'mindfulness_practitioner')
-                        @include('team-register.roles.mindfulness')
-                    @elseif(($joinRole ?? '') === 'yoga_therapist')
-                        @include('team-register.roles.yoga')
-                    @elseif(($joinRole ?? '') === 'translator')
-                        @include('team-register.roles.translator')
-                    @endif
+                    <!-- Step 3: Account Security -->
+                    <div id="tab-security" class="tab-content hidden" style="display: none;">
+                        <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Account Security') }}</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Password') }} <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <input type="password" name="password" id="password" required
+                                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$"
+                                        title="Minimum 8 chars with uppercase, lowercase, number, and special character"
+                                        class="reg-input pr-12">
+                                    <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                        <i class="ri-eye-line text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Confirm Password') }} <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <input type="password" name="password_confirmation" id="password_confirmation" required
+                                        class="reg-input pr-12">
+                                    <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                        <i class="ri-eye-line text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
-                    <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Account Security') }}</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Password') }}</label>
-                            <div class="relative">
-                                 <input type="password" name="password" id="password" required
-                                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':\\\|,.<>\/?]).{8,}$"
-                                    title="Minimum 8 chars with uppercase, lowercase, number, and special character"
-                                    class="reg-input pr-12">
-                                <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                    <i class="ri-eye-line text-xl"></i>
+                        @if(($joinRole ?? '') === 'yoga_therapist')
+                            <div class="mb-10">
+                                <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Promo Code (Optional)') }}</label>
+                                <input type="text" name="promo_code" value="{{ old('promo_code') }}"
+                                    placeholder="{{ __('Enter promo code') }}"
+                                    class="reg-input">
+                                <p class="text-gray-500 text-sm mt-2">{{ __('If applicable, this will be applied to your registration fee payment link.') }}</p>
+                            </div>
+                        @endif
+
+                        <div class="mb-10">
+                            <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Captcha Verification') }} <span class="text-red-500">*</span></label>
+                            <div class="flex items-center gap-3">
+                                <div class="bg-gray-50 border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1">
+                                    <img src="{{ route('captcha') }}" id="captcha-img" alt="Captcha" class="w-full h-full object-contain filter contrast-125 mix-blend-multiply">
+                                </div>
+                                <button type="button" onclick="refreshCaptcha()" class="w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white hover:bg-[#154a96] border-none cursor-pointer shadow-sm transition-colors">
+                                    <i class="ri-refresh-line text-2xl"></i>
                                 </button>
+                                <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}" required class="h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 focus:border-[#1B5CB8] transition-colors">
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Confirm Password') }}</label>
-                            <div class="relative">
-                                 <input type="password" name="password_confirmation" id="password_confirmation" required
-                                    class="reg-input pr-12">
-                                <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                    <i class="ri-eye-line text-xl"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="mb-10">
-                        <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Captcha Verification') }}</label>
-                        <div class="flex items-center gap-3">
-                            <div class="bg-white border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1">
-                                <img src="{{ route('captcha') }}" id="captcha-img" alt="Captcha" class="w-full h-full object-contain filter contrast-125 mix-blend-multiply">
+                        <div class="flex flex-col sm:flex-row justify-between items-center gap-6 mt-8 border-t border-gray-100 pt-8">
+                            <button type="button" class="prev-tab-btn w-full sm:w-auto border border-[#D1D5DB] text-gray-700 py-3.5 px-8 rounded-full font-semibold text-lg transition-all hover:bg-gray-50"><i class="ri-arrow-left-line mr-2 align-middle"></i> {{ __('Previous') }}</button>
+                            <div class="flex gap-4 items-center w-full sm:w-auto justify-end">
+                                <a href="{{ route('index') }}" class="text-gray-500 hover:text-gray-700 font-medium transition-colors hidden sm:block">{{ __('Cancel') }}</a>
+                                <button type="submit" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">{{ __('Complete Application') }}</button>
                             </div>
-                            <button type="button" onclick="refreshCaptcha()" class="w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white hover:bg-[#154a96] border-none cursor-pointer shadow-sm">
-                                <i class="ri-refresh-line text-2xl"></i>
-                            </button>
-                            <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}" required class="h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 focus:border-[#1B5CB8]">
                         </div>
                     </div>
-
-                    <div class="flex justify-end items-center gap-6 mt-8">
-                        <a href="{{ route('index') }}" class="text-gray-500 hover:text-gray-700 font-medium transition-colors">{{ __('Cancel') }}</a>
-                        <button type="submit" class="bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">{{ __('Complete Application') }}</button>
-                    </div>
-                </div>
             </form>
         </div>
     </div>
@@ -354,6 +404,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            try {
             // Phone input with country flags + dial codes
             const phoneInput = document.querySelector("#phone");
             if (phoneInput && window.intlTelInput) {
@@ -362,9 +413,9 @@
                     separateDialCode: true,
                     initialCountry: "auto",
                     geoIpLookup: function(callback) {
-                        fetch("https://ipapi.co/json")
+                        fetch("{{ route('geoip.country') }}", { headers: { 'Accept': 'application/json' } })
                             .then(res => res.json())
-                            .then(data => callback((data && data.country_code ? data.country_code : 'in')))
+                            .then(data => callback((data && data.country_code ? String(data.country_code).toLowerCase() : 'in')))
                             .catch(() => callback("in"));
                     },
                     preferredCountries: ["in", "ae", "us", "gb"]
@@ -397,14 +448,28 @@
                 }
             });
 
-            document.querySelectorAll('[data-tomselect]').forEach(el => {
-                if (el.tomselect) return;
-                new TomSelect(el, {
-                    plugins: ['remove_button'],
-                    create: el.dataset.tomselectCreate === 'true',
-                    persist: false,
+            if (typeof TomSelect !== 'undefined') {
+                document.querySelectorAll('[data-tomselect]').forEach(el => {
+                    if (el.tomselect) return;
+                    try {
+                        new TomSelect(el, {
+                            plugins: ['remove_button'],
+                            create: el.dataset.tomselectCreate === 'true',
+                            persist: false,
+                        });
+                    } catch (e) {
+                        // If TomSelect fails for any reason, fall back to native select.
+                        el.removeAttribute('data-tomselect');
+                        el.style.display = '';
+                    }
                 });
-            });
+            } else {
+                // Fallback: ensure required selects are usable even if the CDN fails.
+                document.querySelectorAll('select[data-tomselect]').forEach(el => {
+                    el.removeAttribute('data-tomselect');
+                    el.style.display = '';
+                });
+            }
 
             // Nationality dropdown with flags (Doctor)
             const nationalitySelect = document.querySelector('[data-nationality-select]');
@@ -477,6 +542,199 @@
                 password.onchange = validatePassword;
                 confirm_password.onkeyup = validatePassword;
             }
+            } catch (e) {
+                console.error('Registration form init error:', e);
+            }
+
+            // Multi-step Tabs Logic
+            const tabs = ['tab-personal', 'tab-professional', 'tab-security'];
+            let currentTabIndex = 0;
+
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const nextBtns = document.querySelectorAll('.next-tab-btn');
+            const prevBtns = document.querySelectorAll('.prev-tab-btn');
+
+            function showTab(index) {
+                // Update contents
+                tabs.forEach((tabId, i) => {
+                    const content = document.getElementById(tabId);
+                    if (!content) return;
+
+                    if (i === index) {
+                        content.classList.remove('hidden');
+                        content.classList.add('block');
+                        content.style.display = 'block';
+                    } else {
+                        content.classList.remove('block');
+                        content.classList.add('hidden');
+                        content.style.display = 'none';
+                    }
+                });
+
+                // Update headers
+                tabButtons.forEach((btn, i) => {
+                    if (i === index) {
+                        btn.classList.add('active', 'text-[#97563D]', 'border-[#97563D]');
+                        btn.classList.remove('text-gray-400', 'border-transparent');
+                    } else if (i < index) {
+                        btn.classList.add('text-gray-700', 'border-transparent'); // Completed tabs
+                        btn.classList.remove('active', 'text-[#97563D]', 'border-[#97563D]', 'text-gray-400');
+                    } else {
+                        btn.classList.add('text-gray-400', 'border-transparent'); // Future tabs
+                        btn.classList.remove('active', 'text-[#97563D]', 'border-[#97563D]', 'text-gray-700');
+                    }
+                });
+                
+                currentTabIndex = index;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Ensure only one step is visible on initial load.
+            showTab(currentTabIndex);
+
+            function validateTab(index) {
+                const tabId = tabs[index];
+                const content = document.getElementById(tabId);
+                if (!content) return true;
+
+                const inputs = content.querySelectorAll('input, select, textarea');
+                let isValid = true;
+
+                function showHiddenFileError(fileInput) {
+                    const box = fileInput.closest('.upload-box');
+                    if (!box) return false;
+
+                    box.classList.add('ring-2', 'ring-red-500');
+
+                    const existing = box.querySelector('.file-error');
+                    if (existing) existing.remove();
+
+                    const error = document.createElement('p');
+                    error.className = 'file-error text-red-500 text-sm mt-2';
+                    error.textContent = 'Please upload the required document.';
+                    box.appendChild(error);
+
+                    // Clear error on successful upload
+                    fileInput.addEventListener('change', function() {
+                        box.classList.remove('ring-2', 'ring-red-500');
+                        const err = box.querySelector('.file-error');
+                        if (err) err.remove();
+                    }, { once: true });
+
+                    // Bring into view + open picker (user gesture allowed inside click handler)
+                    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    try { fileInput.click(); } catch (e) {}
+                    return true;
+                }
+
+                function showTomSelectError(selectEl) {
+                    if (!selectEl || !selectEl.tomselect) return false;
+
+                    const wrapper = selectEl.tomselect.wrapper;
+                    if (wrapper) {
+                        wrapper.classList.add('ring-2', 'ring-red-500', 'rounded-full');
+                        wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+
+                    const container = wrapper ? wrapper.parentElement : null;
+                    if (container) {
+                        const existing = container.querySelector('.tomselect-error');
+                        if (existing) existing.remove();
+
+                        const error = document.createElement('p');
+                        error.className = 'tomselect-error text-red-500 text-sm mt-2';
+                        error.textContent = 'Please select at least one option.';
+                        container.appendChild(error);
+                    }
+
+                    selectEl.addEventListener('change', function() {
+                        if (wrapper) wrapper.classList.remove('ring-2', 'ring-red-500');
+                        if (container) {
+                            const err = container.querySelector('.tomselect-error');
+                            if (err) err.remove();
+                        }
+                    }, { once: true });
+
+                    try { selectEl.tomselect.focus(); } catch (e) {}
+                    return true;
+                }
+                 
+                for (let i = 0; i < inputs.length; i++) {
+                    const input = inputs[i];
+                    if (!input.checkValidity()) {
+                        if (input.tagName === 'SELECT' && input.tomselect) {
+                            if (showTomSelectError(input)) {
+                                isValid = false;
+                                break;
+                            }
+                        }
+
+                        if (input.type === 'file' && input.required && (!input.files || input.files.length === 0)) {
+                            if (showHiddenFileError(input)) {
+                                isValid = false;
+                                break;
+                            }
+                        }
+
+                        input.reportValidity();
+                        isValid = false;
+                        
+                        // Try to focus the first invalid element if it's visible or a TomSelect
+                        if (input.tomselect) {
+                            input.tomselect.focus();
+                            if (input.tomselect.wrapper) {
+                                input.tomselect.wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                        } else {
+                            input.focus();
+                        }
+                        break;
+                    }
+                }
+                return isValid;
+            }
+
+            nextBtns.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    try {
+                        if (validateTab(currentTabIndex) && currentTabIndex < tabs.length - 1) {
+                            showTab(currentTabIndex + 1);
+                        }
+                    } catch (e) {
+                        console.error('Next step error:', e);
+                    }
+                });
+            });
+
+            prevBtns.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    if (currentTabIndex > 0) {
+                        showTab(currentTabIndex - 1);
+                    }
+                });
+            });
+            
+            // Allow clicking previous tabs (but not future ones if current is invalid)
+            tabButtons.forEach((btn, index) => {
+                btn.addEventListener('click', () => {
+                    if (index < currentTabIndex) {
+                        showTab(index); // Always allow going back
+                    } else if (index > currentTabIndex) {
+                        // Going forward: validate all steps in between
+                        let canProceed = true;
+                        for (let i = currentTabIndex; i < index; i++) {
+                            if (!validateTab(i)) {
+                                canProceed = false;
+                                break;
+                            }
+                        }
+                        if (canProceed) {
+                            showTab(index);
+                        }
+                    }
+                });
+            });
+
         });
     </script>
 </body>

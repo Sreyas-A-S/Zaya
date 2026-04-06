@@ -155,8 +155,15 @@ class FormController extends Controller
             abort(503, 'Database table open_register_links is missing. Run: php artisan migrate');
         }
 
-        $link = OpenRegisterLink::with('creator')->findOrFail($id);
+        $hasUsedByColumn = Schema::hasColumn('open_register_links', 'used_by');
 
-        return view('admin.forms.show', compact('link'));
+        $query = OpenRegisterLink::query()->with('creator');
+        if ($hasUsedByColumn) {
+            $query->with('usedBy');
+        }
+
+        $link = $query->findOrFail($id);
+
+        return view('admin.forms.show', compact('link', 'hasUsedByColumn'));
     }
 }

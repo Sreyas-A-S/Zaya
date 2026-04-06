@@ -22,11 +22,16 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Traits\ImageUploadTrait;
 use Illuminate\Validation\Rule;
+use App\Models\OpenRegisterLink;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeUserMail;
 use App\Mail\PractitionerApplicationSubmittedMail;
 use App\Mail\RegistrationFeePaymentLinkMail;
+use App\Models\HomepageSetting;
+use App\Models\PromoCode;
 use App\Services\RegistrationFeeService;
 
 class RegisterController extends Controller
@@ -89,6 +94,50 @@ class RegisterController extends Controller
         try {
             DB::beginTransaction();
 
+            $openRegisterLink = null;
+            $openRegisterToken = trim((string) $request->input('open_register_token', ''));
+            if ($openRegisterToken !== '') {
+                if (!Schema::hasTable('open_register_links')) {
+                    throw ValidationException::withMessages([
+                        'open_register_token' => 'Registration link system is not available. Please contact support.',
+                    ]);
+                }
+
+                $openRegisterLink = OpenRegisterLink::where('token', $openRegisterToken)->lockForUpdate()->first();
+                if (!$openRegisterLink) {
+                    throw ValidationException::withMessages([
+                        'open_register_token' => 'Invalid registration link.',
+                    ]);
+                }
+
+                $status = strtolower(trim((string) ($openRegisterLink->status ?? 'active')));
+                if ($status !== 'active' && $status !== '1') {
+                    throw ValidationException::withMessages([
+                        'open_register_token' => 'This registration link is inactive.',
+                    ]);
+                }
+
+                if ($openRegisterLink->used_at) {
+                    throw ValidationException::withMessages([
+                        'open_register_token' => 'This registration link has already been used.',
+                    ]);
+                }
+
+                if ($openRegisterLink->expires_at && now()->greaterThan($openRegisterLink->expires_at)) {
+                    throw ValidationException::withMessages([
+                        'open_register_token' => 'This registration link has expired.',
+                    ]);
+                }
+
+                $expectedRole = $this->mapRoleToOpenRegisterRole((string) $request->input('role', ''));
+                $linkRole = str_replace('_', '-', strtolower(trim((string) $openRegisterLink->role)));
+                if (!$expectedRole || $linkRole !== $expectedRole) {
+                    throw ValidationException::withMessages([
+                        'open_register_token' => 'This registration link does not match the selected role.',
+                    ]);
+                }
+            }
+
             event(new Registered($user = $this->create($request->all())));
 
             $teamRoles = [
@@ -113,28 +162,54 @@ class RegisterController extends Controller
                 $this->createPatientProfile($user, $request);
             }
 
+            if ($openRegisterLink) {
+                $update = ['used_at' => now()];
+                if (Schema::hasColumn('open_register_links', 'used_by')) {
+                    $update['used_by'] = $user->id;
+                }
+                $openRegisterLink->fill($update)->save();
+            }
+
             DB::commit();
 
+            $paymentLink = null;
             try {
                 $feeService = app(RegistrationFeeService::class);
                 $isTeamRole = in_array($user->role, $teamRoles, true);
+                $promoNotes = [];
+                $feeOverride = null;
+
+                if ($isTeamRole) {
+                    [$feeOverride, $promoNotes] = $this->resolveRegistrationPromo($request, $user->role);
+                    if (!empty($promoNotes['promo_code'] ?? null)) {
+                        $user->promo_code = $promoNotes['promo_code'];
+                        $user->save();
+                    }
+                }
 
                 if ($isTeamRole) {
                     Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail(ucwords(str_replace('_', ' ', $user->role))));
-                    if ($link = $feeService->createPaymentLink($user, $user->role)) {
+
+                    if ($feeOverride !== null && $feeOverride <= 0) {
+                        $paymentLink = null;
+                    } else {
+                        $paymentLink = $feeService->createPaymentLink($user, $user->role, $feeOverride, $promoNotes);
+                    }
+
+                    if ($paymentLink) {
                         Mail::to($user->email)->send(
-                            new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+                            new RegistrationFeePaymentLinkMail($paymentLink['role_label'], $paymentLink['amount'], $paymentLink['currency'], $paymentLink['payment_url'])
                         );
                     }
                 } else {
                     Mail::to($user->email)->send(new WelcomeUserMail($user->email, $request->password, url('/zaya-login'), $user->role));
-                    if ($link = $feeService->createPaymentLink($user, 'client')) {
+                    if ($paymentLink = $feeService->createPaymentLink($user, 'client')) {
                         Mail::to($user->email)->send(
-                            new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+                            new RegistrationFeePaymentLinkMail($paymentLink['role_label'], $paymentLink['amount'], $paymentLink['currency'], $paymentLink['payment_url'])
                         );
                         // Prefer directing the user to pay immediately if possible
                         $this->guard()->login($user);
-                        return redirect()->away($link['payment_url']);
+                        return redirect()->away($paymentLink['payment_url']);
                     }
                 }
             } catch (\Exception $e) {
@@ -143,6 +218,17 @@ class RegisterController extends Controller
 
             // For "Join our team" roles, do not auto-login; send user to login page.
             if (in_array($request->role, $teamRoles, true)) {
+                if ($paymentLink && ($paymentLink['payment_url'] ?? null)) {
+                    if ($request->wantsJson()) {
+                        return response()->json([
+                            'success' => 'Registration successful! Your application is under review.',
+                            'payment_url' => $paymentLink['payment_url'],
+                        ], 201);
+                    }
+
+                    return redirect()->away($paymentLink['payment_url']);
+                }
+
                 if ($request->wantsJson()) {
                     return response()->json(['success' => 'Registration successful! Your application is under review.'], 201);
                 }
@@ -162,6 +248,9 @@ class RegisterController extends Controller
                 return response()->json(['success' => 'Registration successful! Your application is under review.'], 201);
             }
             return redirect($this->redirectPath());
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
             if ($request->wantsJson()) {
@@ -169,6 +258,99 @@ class RegisterController extends Controller
             }
             return back()->withInput()->withErrors(['error' => 'Registration failed: ' . $e->getMessage()]);
         }
+    }
+
+    protected function mapRoleToOpenRegisterRole(string $role): ?string
+    {
+        $role = strtolower(trim($role));
+
+        return match ($role) {
+            'doctor' => 'doctor',
+            'mindfulness_practitioner' => 'mindfulness-practitioner',
+            'yoga_therapist' => 'yoga-therapist',
+            'translator' => 'translator',
+            default => null,
+        };
+    }
+
+    private function resolveRegistrationPromo(Request $request, string $role): array
+    {
+        $code = trim((string) ($request->input('promo_code') ?: $request->input('promocode')));
+        if ($code === '') {
+            return [null, []];
+        }
+
+        $promo = PromoCode::whereRaw('LOWER(code) = ?', [mb_strtolower($code)])->first();
+        if (!$promo || !$promo->status) {
+            return [null, []];
+        }
+
+        if ($promo->usage_type !== 'both' && $promo->usage_type !== 'registration') {
+            return [null, []];
+        }
+
+        if ($promo->expiry_date && $promo->expiry_date->isPast()) {
+            return [null, []];
+        }
+
+        if (!is_null($promo->usage_limit) && (int) $promo->used_count >= (int) $promo->usage_limit) {
+            return [null, []];
+        }
+
+        $feeKeyMap = [
+            'practitioner' => 'practitioner_registration_fee',
+            'doctor' => 'doctor_registration_fee',
+            'mindfulness_practitioner' => 'mindfulness_registration_fee',
+            'yoga_therapist' => 'yoga_registration_fee',
+            'translator' => 'translator_registration_fee',
+            'client' => 'client_registration_fee',
+        ];
+
+        if (!isset($feeKeyMap[$role])) {
+            return [null, []];
+        }
+
+        $language = session('locale', 'en');
+        $financeSettings = HomepageSetting::getSectionValues('finance', $language);
+        $feeKey = $feeKeyMap[$role];
+
+        $baseFee = $financeSettings[$feeKey] ?? '0';
+        $baseFee = is_numeric($baseFee) ? (float) $baseFee : 0.0;
+
+        $feeEnabledKey = $feeKey . '_enabled';
+        $feeEnabled = filter_var($financeSettings[$feeEnabledKey] ?? '1', FILTER_VALIDATE_BOOLEAN);
+        if (!$feeEnabled || $baseFee <= 0) {
+            return [null, []];
+        }
+
+        $reward = is_numeric($promo->reward) ? (float) $promo->reward : 0.0;
+
+        $discountAmount = 0.0;
+        $discountPercentage = 0.0;
+        if ($promo->type === 'percentage') {
+            $discountPercentage = max(0.0, min(100.0, $reward));
+            $discountAmount = $baseFee * ($discountPercentage / 100.0);
+        } else {
+            $discountAmount = max(0.0, $reward);
+            $discountAmount = min($discountAmount, $baseFee);
+            $discountPercentage = $baseFee > 0 ? ($discountAmount / $baseFee) * 100.0 : 0.0;
+        }
+
+        $discountAmount = min($discountAmount, $baseFee);
+        $totalFee = max(0.0, $baseFee - $discountAmount);
+
+        return [
+            $totalFee,
+            [
+                'promo_code' => $promo->code,
+                'promo_type' => (string) $promo->type,
+                'promo_reward' => number_format($reward, 2, '.', ''),
+                'promo_base_fee' => number_format($baseFee, 2, '.', ''),
+                'promo_discount_percentage' => number_format($discountPercentage, 2, '.', ''),
+                'promo_discount_amount' => number_format($discountAmount, 2, '.', ''),
+                'promo_total_fee' => number_format($totalFee, 2, '.', ''),
+            ],
+        ];
     }
 
     protected function createPatientProfile($user, $request)
