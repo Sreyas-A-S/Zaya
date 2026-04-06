@@ -36,7 +36,7 @@ class PractitionerController extends Controller
         $this->middleware('permission:practitioners-create')->only(['create', 'store']);
         $this->middleware('permission:practitioners-edit')->only(['edit', 'update']);
         $this->middleware('permission:practitioners-delete')->only('destroy');
-        $this->middleware('permission:practitioners-update-status')->only('updateStatus');
+        $this->middleware('permission:practitioners-update-status|practitioners-edit')->only('updateStatus');
     }
 
     public function index(Request $request)
@@ -151,8 +151,9 @@ class PractitionerController extends Controller
         }
 
         $countryMap = $allCountries->pluck('name', 'code')->toArray();
+        $currencies = config('currencies.symbols');
 
-        return view('admin.practitioners.index', compact('wellnessConsultations', 'bodyTherapies', 'practitionerModalities', 'languages', 'countries', 'countryMap'));
+        return view('admin.practitioners.index', compact('wellnessConsultations', 'bodyTherapies', 'practitionerModalities', 'languages', 'countries', 'countryMap', 'currencies'));
     }
 
     public function store(Request $request)
@@ -173,6 +174,7 @@ class PractitionerController extends Controller
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
             'phone' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
+            'payout_currency' => 'required|string|max:10',
             'website_url' => 'nullable|url|max:255',
             'social_links' => 'nullable|array',
             'consultations' => 'nullable|array',
@@ -228,6 +230,7 @@ class PractitionerController extends Controller
                 'state' => $validatedData['state'],
                 'zip_code' => $validatedData['zip_code'],
                 'country' => $validatedData['country'],
+                'payout_currency' => $validatedData['payout_currency'],
                 'phone' => $validatedData['phone'] ?? null,
                 'website_url' => $validatedData['website_url'] ?? null,
                 'social_links' => $validatedData['social_links'] ?? null,
@@ -333,6 +336,7 @@ class PractitionerController extends Controller
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
             'phone' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
+            'payout_currency' => 'required|string|max:10',
             'website_url' => 'nullable|url|max:255',
             'social_links' => 'nullable|array',
             'consultations' => 'nullable|array',
@@ -380,6 +384,7 @@ class PractitionerController extends Controller
                 'state' => $validatedData['state'],
                 'zip_code' => $validatedData['zip_code'],
                 'country' => $validatedData['country'],
+                'payout_currency' => $validatedData['payout_currency'],
                 'phone' => $validatedData['phone'] ?? null,
                 'website_url' => $validatedData['website_url'] ?? null,
                 'social_links' => $validatedData['social_links'] ?? null,

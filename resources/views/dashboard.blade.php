@@ -4,6 +4,29 @@
 
 @section('content')
 
+@if($user->isProfileIncomplete())
+<div class="profile-completion-banner mb-8 bg-white border border-amber-100 rounded-3xl p-3 md:p-4 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-4">
+        <div class="relative w-12 h-12 flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 36 36" class="w-full h-full transform -rotate-90">
+                <path class="text-amber-50" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="text-amber-500" stroke-width="3" stroke-dasharray="{{ $user->profile_status['percentage'] }}, 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <div class="absolute flex items-center justify-center text-[10px] font-black text-amber-600">
+                {{ $user->profile_status['percentage'] }}%
+            </div>
+        </div>
+        <div>
+            <h4 class="text-base font-bold text-secondary leading-tight">{{ __('Profile Incomplete') }}</h4>
+            <p class="text-sm text-gray-400 font-medium">{{ __('Complete your details to build trust and unlock full access.') }}</p>
+        </div>
+    </div>
+    <a href="{{ route('profile.complete') }}" class="shrink-0 text-xs font-black bg-secondary text-white px-5 py-2.5 rounded-2xl hover:bg-opacity-90 transition-all shadow-sm">
+        {{ __('Complete Now') }}
+    </a>
+</div>
+@endif
+
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 md:gap-8 md:mb-8 mb-5">
     <!-- Left Column -->
     <div id="col-left" class="lg:col-span-5 xl:col-span-4 space-y-5 md:space-y-8">

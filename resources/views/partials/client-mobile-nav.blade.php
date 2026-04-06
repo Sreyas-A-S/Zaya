@@ -21,7 +21,6 @@
     <!-- Profile -->
     <a href="{{ route('profile') }}" 
         class="leading-none text-base {{ request()->routeIs('profile') ? 'text-secondary border-b-2 border-secondary pb-1 font-bold' : 'text-[#8F8F8F] font-medium' }} whitespace-nowrap cursor-pointer transition-colors flex items-center shrink-0">
-        <img src="{{ $user->profile_pic ? (str_starts_with($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" class="w-5 h-5 rounded-full mr-2 object-cover">
         {{ __('Profile') }}
     </a>
 
@@ -95,12 +94,7 @@
         </a>
     @endif
 
-    <!-- Logout -->
-    <a href="javascript:void(0)" 
-        onclick="openLogoutModal()"
-        class="leading-none text-base text-red-500 font-bold whitespace-nowrap cursor-pointer transition-colors flex items-center shrink-0">
-        {{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}
-    </a>
+
 </div>
 
 <style>

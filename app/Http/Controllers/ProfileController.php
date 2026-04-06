@@ -17,6 +17,9 @@ use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -82,7 +85,7 @@ class ProfileController extends Controller
             ->take(10)
             ->get();
 
-        $reviews = \App\Models\PractitionerReview::with('practitioner.user')
+        $reviews = PractitionerReview::with('practitioner.user')
             ->where('user_id', $user->id)
             ->latest()
             ->get();
@@ -215,6 +218,69 @@ class ProfileController extends Controller
         return response()->json(['success' => true, 'conference' => $conference]);
     }
 
+    public function uploadConferenceRecording(Request $request)
+    {
+        $validated = $request->validate([
+            'booking_id' => 'required|exists:bookings,id',
+            'provider' => 'required|string|max:50',
+            'room_name' => 'nullable|string|max:255',
+            'start_time' => 'nullable|date',
+            'end_time' => 'nullable|date',
+            'recording' => 'required|file|mimetypes:video/webm,video/mp4,video/x-matroska|max:512000',
+        ]);
+
+        $booking = Booking::findOrFail($validated['booking_id']);
+        $start = !empty($validated['start_time']) ? Carbon::parse($validated['start_time']) : now();
+        $end = !empty($validated['end_time']) ? Carbon::parse($validated['end_time']) : now();
+        $duration = max($start->diffInMinutes($end), 0);
+
+        $recordingPath = $request->file('recording')->store('conference-recordings/' . now()->format('Y/m'), 'public');
+        $recordingUrl = Storage::disk('public')->url($recordingPath);
+
+        $conference = Conference::where('booking_id', $booking->id)
+            ->where('provider', $validated['provider'])
+            ->when(!empty($validated['room_name']), function ($query) use ($validated) {
+                $query->where('room_name', $validated['room_name']);
+            })
+            ->latest('id')
+            ->first();
+
+        if ($conference) {
+            $conference->update([
+                'start_time' => $conference->start_time ?? $start,
+                'end_time' => $end,
+                'duration_minutes' => $duration,
+                'recording_url' => $recordingUrl,
+                'metadata' => array_merge($conference->metadata ?? [], [
+                    'recording_disk_path' => $recordingPath,
+                    'recording_uploaded_at' => now()->toIso8601String(),
+                ]),
+            ]);
+        } else {
+            $conference = Conference::create([
+                'booking_id' => $booking->id,
+                'start_time' => $start,
+                'end_time' => $end,
+                'duration_minutes' => $duration,
+                'provider' => $validated['provider'],
+                'room_name' => $validated['room_name'] ?? null,
+                'recording_url' => $recordingUrl,
+                'metadata' => [
+                    'recording_disk_path' => $recordingPath,
+                    'recording_uploaded_at' => now()->toIso8601String(),
+                ],
+            ]);
+        }
+
+        $booking->update(['recording_url' => $recordingUrl]);
+
+        return response()->json([
+            'success' => true,
+            'recording_url' => $recordingUrl,
+            'conference_id' => $conference->id,
+        ]);
+    }
+
     public function showConsultationForm(Request $request, $id)
     {
         $user = Auth::user();
@@ -337,6 +403,26 @@ class ProfileController extends Controller
         }
 
         return view('transactions', compact('user', 'transactions', 'totalBalance'));
+    }
+
+    public function promoCodes()
+    {
+        $user = Auth::user();
+        
+        $activePromoCodes = \App\Models\PromoCode::where('status', true)
+            ->where(function($q) {
+                $q->where('expiry_date', '>=', now()->toDateString())
+                  ->orWhereNull('expiry_date');
+            })
+            ->whereIn('usage_type', ['booking', 'both'])
+            ->get();
+
+        $usedPromoCodes = \App\Models\Booking::where('user_id', $user->id)
+            ->whereNotNull('promo_code')
+            ->pluck('promo_code')
+            ->toArray();
+
+        return view('client.promo-codes', compact('activePromoCodes', 'usedPromoCodes'));
     }
 
     public function healthJourney()
@@ -1065,8 +1151,12 @@ class ProfileController extends Controller
             ];
         }
         $appId = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_id'));
-        $provider = strtolower((string) $request->query('provider', 'agora'));
-        $provider = in_array($provider, ['agora', 'jaas', 'jitsi']) ? $provider : 'agora';
+        $provider = strtolower((string) $request->query('provider', 'choose'));
+        $provider = in_array($provider, ['agora', 'jaas', 'jitsi', 'daily', 'zegocloud', 'choose']) ? $provider : 'choose';
+
+        if ($provider === 'zegocloud') {
+            return redirect()->route('zego.join', ['channel' => $channel]);
+        }
         
         $isMeetingPopout = $request->query('popout') === '1';
         $agoraAvailable = !empty($appId);
@@ -1080,7 +1170,7 @@ class ProfileController extends Controller
             $jaasRoomSlug = 'zaya-meeting';
         }
         $jaasRoomName = $jaasAppId !== '' ? $jaasAppId . '/' . $jaasRoomSlug : $jaasRoomSlug;
-        $jaasToken = $provider === 'jaas' ? $this->buildJaasToken($user, $jaasRoomSlug) : null;
+        $jaasToken = ($provider === 'jaas' || $provider === 'choose') ? $this->buildJaasToken($user, $jaasRoomSlug) : null;
         $jaasError = null;
 
         // Free Jitsi config
@@ -1091,6 +1181,25 @@ class ProfileController extends Controller
             $jaasError = 'JaaS App ID is missing. Set JAAS_APP_ID in your .env file.';
         } elseif ($provider === 'jaas' && empty($jaasToken)) {
             $jaasError = 'JaaS token could not be generated. Check the JaaS private key and API key ID.';
+        }
+
+        // Daily.co config
+        $dailyDomain = rtrim((string) config('services.daily.domain', 'zaya.daily.co'), '/');
+        $dailyApiKey = trim((string) config('services.daily.api_key'));
+        $dailyRoomName = strtolower($jaasRoomSlug); // Daily prefers lowercase
+        $dailyUrl = "https://{$dailyDomain}/{$dailyRoomName}";
+        $dailyToken = null;
+        $dailyError = null;
+
+        if ($provider === 'daily') {
+            if (empty($dailyApiKey)) {
+                $dailyError = 'Daily.co API key is missing. Set DAILY_API_KEY in your .env file.';
+            } else {
+                $dailyError = $this->ensureDailyRoomExists($dailyRoomName);
+                if ($dailyError === null) {
+                    $dailyToken = $this->buildDailyToken($user, $dailyRoomName);
+                }
+            }
         }
 
         // Try to find the booking for session tracking
@@ -1104,6 +1213,12 @@ class ProfileController extends Controller
             'provider' => $provider,
             'appId_length' => strlen($appId)
         ]);
+
+        if ($provider === 'daily') {
+            return view('conference.daily', compact(
+                'user', 'channel', 'dailyUrl', 'dailyToken', 'dailyError', 'booking'
+            ));
+        }
 
         return view('conference.session', compact(
             'user',
@@ -1121,8 +1236,102 @@ class ProfileController extends Controller
             'jaasError',
             'jitsiDomain',
             'jitsiRoom',
+            'dailyUrl',
+            'dailyToken',
+            'dailyError',
             'booking'
         ));
+    }
+
+    private function ensureDailyRoomExists(string $roomName): ?string
+    {
+        $apiKey = trim((string) config('services.daily.api_key'));
+        if ($apiKey === '') {
+            return 'Daily.co API key is missing.';
+        }
+
+        try {
+            // First, try to fetch the room to see if it exists
+            $checkResponse = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                ->withOptions(['verify' => false])
+                ->get("https://api.daily.co/v1/rooms/{$roomName}");
+
+            if ($checkResponse->successful()) {
+                return null; // Room already exists
+            }
+
+            // If it doesn't exist (404), create it
+            if ($checkResponse->status() === 404) {
+                $createResponse = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                    ->withOptions(['verify' => false])
+                    ->post("https://api.daily.co/v1/rooms", [
+                        'name' => $roomName,
+                        'properties' => [
+                            'enable_chat' => true,
+                            'enable_knocking' => false,
+                            'enable_screenshare' => true,
+                            'exp' => now()->addHours(24)->getTimestamp(),
+                        ]
+                    ]);
+                
+                if (!$createResponse->successful()) {
+                    \Log::error('Daily.co Room Creation Failed', [
+                        'status' => $createResponse->status(),
+                        'body' => $createResponse->body(),
+                        'room' => $roomName
+                    ]);
+                    return 'Daily.co could not create the meeting room. Check DAILY_DOMAIN and Daily API plan settings.';
+                } else {
+                    \Log::info('Daily.co Room Created Successfully', ['room' => $roomName]);
+                    return null;
+                }
+            } else if (!$checkResponse->successful()) {
+                \Log::error('Daily.co Room Check Failed', [
+                    'status' => $checkResponse->status(),
+                    'body' => $checkResponse->body()
+                ]);
+                return 'Daily.co room lookup failed before joining.';
+            }
+        } catch (\Exception $e) {
+            \Log::error('Daily.co Ensure Room Exception: ' . $e->getMessage());
+            return 'Daily.co room setup failed: ' . $e->getMessage();
+        }
+
+        return null;
+    }
+
+    private function buildDailyToken($user, string $roomName): ?string
+    {
+        $apiKey = trim((string) config('services.daily.api_key'));
+        if ($apiKey === '') return null;
+
+        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'], true);
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                ->withOptions(['verify' => false])
+                ->post("https://api.daily.co/v1/meeting-tokens", [
+                    'properties' => [
+                        'room_name' => $roomName,
+                        'is_owner' => $isModerator,
+                        'user_name' => (string) $user->name,
+                        'user_id' => (string) $user->id,
+                    ]
+                ]);
+
+            if ($response->successful()) {
+                return $response->json('token');
+            }
+            
+            \Log::error('Daily.co Token Error', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Daily.co Token Exception: ' . $e->getMessage());
+        }
+
+        return null;
     }
 
     public function publicJoinSession(Request $request, $channel)
@@ -1251,6 +1460,284 @@ class ProfileController extends Controller
         ]);
     }
 
+    public function completeProfile()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $profile = $user->profile;
+
+        if (!$profile) {
+            return redirect()->route('dashboard')->with('error', 'Profile not found.');
+        }
+
+        $countries = Country::query()
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
+
+        $allLanguages = \App\Models\Language::orderBy('name')->pluck('name');
+
+        // Functional Country Codes
+        $countryCodes = [
+            ['code' => '+93', 'name' => 'Afghanistan'], ['code' => '+355', 'name' => 'Albania'], ['code' => '+213', 'name' => 'Algeria'],
+            ['code' => '+1', 'name' => 'USA/Canada'], ['code' => '+376', 'name' => 'Andorra'], ['code' => '+244', 'name' => 'Angola'],
+            ['code' => '+1264', 'name' => 'Anguilla'], ['code' => '+1268', 'name' => 'Antigua & Barbuda'], ['code' => '+54', 'name' => 'Argentina'],
+            ['code' => '+374', 'name' => 'Armenia'], ['code' => '+297', 'name' => 'Aruba'], ['code' => '+61', 'name' => 'Australia'],
+            ['code' => '+43', 'name' => 'Austria'], ['code' => '+994', 'name' => 'Azerbaijan'], ['code' => '+1242', 'name' => 'Bahamas'],
+            ['code' => '+973', 'name' => 'Bahrain'], ['code' => '+880', 'name' => 'Bangladesh'], ['code' => '+1246', 'name' => 'Barbados'],
+            ['code' => '+375', 'name' => 'Belarus'], ['code' => '+32', 'name' => 'Belgium'], ['code' => '+501', 'name' => 'Belize'],
+            ['code' => '+229', 'name' => 'Benin'], ['code' => '+1441', 'name' => 'Bermuda'], ['code' => '+975', 'name' => 'Bhutan'],
+            ['code' => '+591', 'name' => 'Bolivia'], ['code' => '+387', 'name' => 'Bosnia Herzegovina'], ['code' => '+267', 'name' => 'Botswana'],
+            ['code' => '+55', 'name' => 'Brazil'], ['code' => '+673', 'name' => 'Brunei'], ['code' => '+359', 'name' => 'Bulgaria'],
+            ['code' => '+226', 'name' => 'Burkina Faso'], ['code' => '+257', 'name' => 'Burundi'], ['code' => '+855', 'name' => 'Cambodia'],
+            ['code' => '+237', 'name' => 'Cameroon'], ['code' => '+238', 'name' => 'Cape Verde Islands'], ['code' => '+1345', 'name' => 'Cayman Islands'],
+            ['code' => '+236', 'name' => 'Central African Republic'], ['code' => '+56', 'name' => 'Chile'], ['code' => '+86', 'name' => 'China'],
+            ['code' => '+57', 'name' => 'Colombia'], ['code' => '+269', 'name' => 'Comoros'], ['code' => '+242', 'name' => 'Congo'],
+            ['code' => '+682', 'name' => 'Cook Islands'], ['code' => '+506', 'name' => 'Costa Rica'], ['code' => '+385', 'name' => 'Croatia'],
+            ['code' => '+53', 'name' => 'Cuba'], ['code' => '+357', 'name' => 'Cyprus North'], ['code' => '+357', 'name' => 'Cyprus South'],
+            ['code' => '+420', 'name' => 'Czech Republic'], ['code' => '+45', 'name' => 'Denmark'], ['code' => '+253', 'name' => 'Djibouti'],
+            ['code' => '+1809', 'name' => 'Dominica'], ['code' => '+1809', 'name' => 'Dominican Republic'], ['code' => '+593', 'name' => 'Ecuador'],
+            ['code' => '+20', 'name' => 'Egypt'], ['code' => '+503', 'name' => 'El Salvador'], ['code' => '+240', 'name' => 'Equatorial Guinea'],
+            ['code' => '+291', 'name' => 'Eritrea'], ['code' => '+372', 'name' => 'Estonia'], ['code' => '+251', 'name' => 'Ethiopia'],
+            ['code' => '+500', 'name' => 'Falkland Islands'], ['code' => '+298', 'name' => 'Faroe Islands'], ['code' => '+679', 'name' => 'Fiji'],
+            ['code' => '+358', 'name' => 'Finland'], ['code' => '+33', 'name' => 'France'], ['code' => '+594', 'name' => 'French Guiana'],
+            ['code' => '+689', 'name' => 'French Polynesia'], ['code' => '+241', 'name' => 'Gabon'], ['code' => '+220', 'name' => 'Gambia'],
+            ['code' => '+995', 'name' => 'Georgia'], ['code' => '+49', 'name' => 'Germany'], ['code' => '+233', 'name' => 'Ghana'],
+            ['code' => '+350', 'name' => 'Gibraltar'], ['code' => '+30', 'name' => 'Greece'], ['code' => '+299', 'name' => 'Greenland'],
+            ['code' => '+1473', 'name' => 'Grenada'], ['code' => '+590', 'name' => 'Guadeloupe'], ['code' => '+671', 'name' => 'Guam'],
+            ['code' => '+502', 'name' => 'Guatemala'], ['code' => '+224', 'name' => 'Guinea'], ['code' => '+245', 'name' => 'Guinea - Bissau'],
+            ['code' => '+592', 'name' => 'Guyana'], ['code' => '+509', 'name' => 'Haiti'], ['code' => '+504', 'name' => 'Honduras'],
+            ['code' => '+852', 'name' => 'Hong Kong'], ['code' => '+36', 'name' => 'Hungary'], ['code' => '+354', 'name' => 'Iceland'],
+            ['code' => '+91', 'name' => 'India'], ['code' => '+62', 'name' => 'Indonesia'], ['code' => '+98', 'name' => 'Iran'],
+            ['code' => '+964', 'name' => 'Iraq'], ['code' => '+353', 'name' => 'Ireland'], ['code' => '+972', 'name' => 'Israel'],
+            ['code' => '+39', 'name' => 'Italy'], ['code' => '+1876', 'name' => 'Jamaica'], ['code' => '+81', 'name' => 'Japan'],
+            ['code' => '+962', 'name' => 'Jordan'], ['code' => '+7', 'name' => 'Kazakhstan'], ['code' => '+254', 'name' => 'Kenya'],
+            ['code' => '+686', 'name' => 'Kiribati'], ['code' => '+82', 'name' => 'Korea South'], ['code' => '+965', 'name' => 'Kuwait'],
+            ['code' => '+996', 'name' => 'Kyrgyzstan'], ['code' => '+856', 'name' => 'Laos'], ['code' => '+371', 'name' => 'Latvia'],
+            ['code' => '+961', 'name' => 'Lebanon'], ['code' => '+266', 'name' => 'Lesotho'], ['code' => '+231', 'name' => 'Liberia'],
+            ['code' => '+218', 'name' => 'Libya'], ['code' => '+417', 'name' => 'Liechtenstein'], ['code' => '+370', 'name' => 'Lithuania'],
+            ['code' => '+352', 'name' => 'Luxembourg'], ['code' => '+853', 'name' => 'Macao'], ['code' => '+389', 'name' => 'Macedonia'],
+            ['code' => '+261', 'name' => 'Madagascar'], ['code' => '+265', 'name' => 'Malawi'], ['code' => '+60', 'name' => 'Malaysia'],
+            ['code' => '+960', 'name' => 'Maldives'], ['code' => '+223', 'name' => 'Mali'], ['code' => '+356', 'name' => 'Malta'],
+            ['code' => '+692', 'name' => 'Marshall Islands'], ['code' => '+596', 'name' => 'Martinique'], ['code' => '+222', 'name' => 'Mauritania'],
+            ['code' => '+230', 'name' => 'Mauritius'], ['code' => '+269', 'name' => 'Mayotte'], ['code' => '+52', 'name' => 'Mexico'],
+            ['code' => '+691', 'name' => 'Micronesia'], ['code' => '+373', 'name' => 'Moldova'], ['code' => '+377', 'name' => 'Monaco'],
+            ['code' => '+976', 'name' => 'Mongolia'], ['code' => '+1664', 'name' => 'Montserrat'], ['code' => '+212', 'name' => 'Morocco'],
+            ['code' => '+258', 'name' => 'Mozambique'], ['code' => '+95', 'name' => 'Myanmar'], ['code' => '+264', 'name' => 'Namibia'],
+            ['code' => '+674', 'name' => 'Nauru'], ['code' => '+977', 'name' => 'Nepal'], ['code' => '+31', 'name' => 'Netherlands'],
+            ['code' => '+687', 'name' => 'New Caledonia'], ['code' => '+64', 'name' => 'New Zealand'], ['code' => '+505', 'name' => 'Nicaragua'],
+            ['code' => '+227', 'name' => 'Niger'], ['code' => '+234', 'name' => 'Nigeria'], ['code' => '+683', 'name' => 'Niue'],
+            ['code' => '+672', 'name' => 'Norfolk Islands'], ['code' => '+670', 'name' => 'Northern Marianas'], ['code' => '+47', 'name' => 'Norway'],
+            ['code' => '+968', 'name' => 'Oman'], ['code' => '+92', 'name' => 'Pakistan'], ['code' => '+680', 'name' => 'Palau'],
+            ['code' => '+507', 'name' => 'Panama'], ['code' => '+675', 'name' => 'Papua New Guinea'], ['code' => '+595', 'name' => 'Paraguay'],
+            ['code' => '+51', 'name' => 'Peru'], ['code' => '+63', 'name' => 'Philippines'], ['code' => '+48', 'name' => 'Poland'],
+            ['code' => '+351', 'name' => 'Portugal'], ['code' => '+1787', 'name' => 'Puerto Rico'], ['code' => '+974', 'name' => 'Qatar'],
+            ['code' => '+262', 'name' => 'Reunion'], ['code' => '+40', 'name' => 'Romania'], ['code' => '+7', 'name' => 'Russia'],
+            ['code' => '+250', 'name' => 'Rwanda'], ['code' => '+378', 'name' => 'San Marino'], ['code' => '+239', 'name' => 'Sao Tome & Principe'],
+            ['code' => '+966', 'name' => 'Saudi Arabia'], ['code' => '+221', 'name' => 'Senegal'], ['code' => '+381', 'name' => 'Serbia'],
+            ['code' => '+248', 'name' => 'Seychelles'], ['code' => '+232', 'name' => 'Sierra Leone'], ['code' => '+65', 'name' => 'Singapore'],
+            ['code' => '+421', 'name' => 'Slovak Republic'], ['code' => '+386', 'name' => 'Slovenia'], ['code' => '+677', 'name' => 'Solomon Islands'],
+            ['code' => '+252', 'name' => 'Somalia'], ['code' => '+27', 'name' => 'South Africa'], ['code' => '+34', 'name' => 'Spain'],
+            ['code' => '+94', 'name' => 'Sri Lanka'], ['code' => '+290', 'name' => 'St. Helena'], ['code' => '+1869', 'name' => 'St. Kitts'],
+            ['code' => '+1758', 'name' => 'St. Lucia'], ['code' => '+249', 'name' => 'Sudan'], ['code' => '+597', 'name' => 'Suriname'],
+            ['code' => '+268', 'name' => 'Swaziland'], ['code' => '+46', 'name' => 'Sweden'], ['code' => '+41', 'name' => 'Switzerland'],
+            ['code' => '+963', 'name' => 'Syria'], ['code' => '+886', 'name' => 'Taiwan'], ['code' => '+7', 'name' => 'Tajikstan'],
+            ['code' => '+66', 'name' => 'Thailand'], ['code' => '+228', 'name' => 'Togo'], ['code' => '+676', 'name' => 'Tonga'],
+            ['code' => '+1868', 'name' => 'Trinidad & Tobago'], ['code' => '+216', 'name' => 'Tunisia'], ['code' => '+90', 'name' => 'Turkey'],
+            ['code' => '+993', 'name' => 'Turkmenistan'], ['code' => '+1649', 'name' => 'Turks & Caicos Islands'], ['code' => '+688', 'name' => 'Tuvalu'],
+            ['code' => '+256', 'name' => 'Uganda'], ['code' => '+44', 'name' => 'UK'], ['code' => '+380', 'name' => 'Ukraine'],
+            ['code' => '+971', 'name' => 'United Arab Emirates'], ['code' => '+598', 'name' => 'Uruguay'], ['code' => '+998', 'name' => 'Uzbekistan'],
+            ['code' => '+678', 'name' => 'Vanuatu'], ['code' => '+379', 'name' => 'Vatican City'], ['code' => '+58', 'name' => 'Venezuela'],
+            ['code' => '+84', 'name' => 'Vietnam'], ['code' => '+1284', 'name' => 'Virgin Islands - British'], ['code' => '+1340', 'name' => 'Virgin Islands - US'],
+            ['code' => '+681', 'name' => 'Wallis & Futuna'], ['code' => '+969', 'name' => 'Yemen'], ['code' => '+967', 'name' => 'Yemen'],
+            ['code' => '+260', 'name' => 'Zambia'], ['code' => '+263', 'name' => 'Zimbabwe'],
+        ];
+
+        // Load specific lists based on role
+        $allSpecialities = [];
+        $allConditions = [];
+        switch ($user->role) {
+            case 'practitioner':
+                $allSpecialities = \App\Models\WellnessConsultation::where('status', true)->pluck('name');
+                $allConditions = \App\Models\BodyTherapy::where('status', true)->pluck('name');
+                break;
+            case 'doctor':
+                $allSpecialities = \App\Models\Specialization::where('status', true)->pluck('name');
+                $allConditions = \App\Models\HealthCondition::where('status', true)->pluck('name');
+                break;
+            case 'mindfulness_practitioner':
+                $allSpecialities = \App\Models\MindfulnessService::where('status', true)->pluck('name');
+                $allConditions = \App\Models\ClientConcern::where('status', true)->pluck('name');
+                break;
+            case 'yoga_therapist':
+                $allConditions = \App\Models\YogaExpertise::pluck('name');
+                break;
+            case 'translator':
+                $allSpecialities = \App\Models\TranslatorSpecialization::where('status', true)->pluck('name');
+                $allConditions = \App\Models\TranslatorService::where('status', true)->pluck('name');
+                break;
+        }
+
+        $currencies = config('currencies.symbols');
+
+        return view('client.complete-profile', compact('user', 'profile', 'countries', 'allLanguages', 'countryCodes', 'allSpecialities', 'allConditions', 'currencies'));
+    }
+
+    public function storeCompleteProfile(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $profile = $user->profile;
+
+        if (!$profile) {
+            return response()->json(['success' => false, 'message' => 'Profile not found.'], 404);
+        }
+
+        // Generic validation for fields that exist across multiple roles
+        $validated = $request->validate([
+            'phone' => 'nullable|string|max:20',
+            'mobile_country_code' => 'nullable|string|max:10',
+            'gender' => 'nullable|in:male,female,transgender,other',
+            'dob' => 'nullable|date|before:today',
+            'address_line_1' => 'nullable|string|max:500',
+            'city' => 'nullable|string|max:255',
+            'state' => 'nullable|string|max:255',
+            'zip_code' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:255',
+            'payout_currency' => 'nullable|string|max:10',
+            'pan_number' => 'nullable|string|max:20',
+            'bank_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:50',
+            'ifsc_code' => 'nullable|string|max:20',
+            'bank_holder_name' => 'nullable|string|max:255',
+        ]);
+
+        // Update User Model (Global fields)
+        if ($request->filled('email')) {
+            // Check if email was verified (either in session or already in DB)
+            $isAlreadyVerified = $user->email === $request->email && $user->email_verified_at;
+            $isSessionVerified = session('verified_email') === $request->email;
+
+            if (!$isAlreadyVerified && !$isSessionVerified) {
+                return response()->json(['success' => false, 'message' => 'Please verify your email before saving.'], 422);
+            }
+
+            $user->email = $request->email;
+        }
+        
+        if ($request->filled('phone')) $user->phone = $request->phone;
+        if ($request->filled('gender')) $user->gender = $request->gender;
+        $user->save();
+
+        // Prepare data for the specific profile table - EXCLUDE email here
+        $data = $request->except(['_token', 'profile_pic', 'cropped_image', 'email']);
+        
+        // Handle file uploads based on role requirements
+        $fileFields = [
+            'registration_certificate_path', 'digital_signature_path', 'pan_upload_path', 'cancelled_cheque_path',
+            'doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 
+            'doc_contract', 'doc_id_proof', 'gov_id_upload_path', 'registration_proof_path', 'certificates_path'
+        ];
+
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $data[$field] = $request->file($field)->store('profile_docs/' . $user->id, 'public');
+            }
+        }
+
+        // Handle Array fields
+        $arrayFields = [
+            'specialization', 'health_conditions_treated', 'consultations', 'body_therapies',
+            'practitioner_type', 'client_concerns', 'consultation_modes', 'languages_spoken',
+            'source_languages', 'target_languages', 'fields_of_specialization', 'services_offered',
+            'areas_of_expertise', 'consultation_preferences'
+        ];
+
+        foreach ($arrayFields as $field) {
+            if ($request->has($field)) {
+                $data[$field] = (array)$request->input($field);
+            }
+        }
+
+        // Handle Boolean fields (Consents for Doctors)
+        if ($user->role === 'doctor') {
+            $booleanFields = [
+                'ayush_registration_confirmed', 'ayush_guidelines_agreed', 'document_verification_consented', 
+                'policies_agreed', 'prescription_understanding_atgreed', 'confidentiality_consented'
+            ];
+
+            foreach ($booleanFields as $field) {
+                $data[$field] = $request->has($field);
+            }
+        }
+
+        // Update the profile model
+        $profile->update($data);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully!',
+                'redirect' => route('dashboard')
+            ]);
+        }
+
+        return redirect()->route('dashboard')->with('status', 'Profile completed successfully!');
+    }
+
+    public function sendEmailOTP(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        $email = $request->email;
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Generate 6-digit OTP
+        $otp = sprintf("%06d", mt_rand(1, 999999));
+
+        // Store OTP in Cache (expire in 10 mins)
+        Cache::put('email_otp_' . $email, $otp, now()->addMinutes(10));
+
+        // Send Email
+        try {
+            Mail::to($email)->send(new \App\Mail\EmailVerificationOTPMail($user->name, $otp));
+            return response()->json(['success' => true, 'message' => 'OTP has been sent to your email.']);
+        } catch (\Exception $e) {
+            \Log::error('OTP Send Error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to send email. Please try again.'], 500);
+        }
+    }
+
+    public function verifyEmailOTP(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|string|size:6'
+        ]);
+
+        $cachedOtp = Cache::get('email_otp_' . $request->email);
+
+        if (!$cachedOtp || $cachedOtp !== $request->otp) {
+            return response()->json(['success' => false, 'message' => 'Invalid or expired OTP.'], 422);
+        }
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        
+        // Mark verified
+        if ($user->email === $request->email) {
+            $user->email_verified_at = now();
+            $user->save();
+        } else {
+            session(['verified_email' => $request->email]);
+        }
+
+        // Clean up
+        Cache::forget('email_otp_' . $request->email);
+
+        return response()->json(['success' => true, 'message' => 'Email verified successfully!']);
+    }
+
     public function reviews()
     {
         $user = Auth::user();
@@ -1283,6 +1770,7 @@ class ProfileController extends Controller
 
         return view('reviews', compact('user', 'myReviews', 'receivedReviews', 'reviewablePractitioners'));
     }
+
     public function storeReview(Request $request)
     {
         $request->validate([
@@ -1313,4 +1801,5 @@ class ProfileController extends Controller
 
         return back()->with('status', 'Review submitted successfully!');
     }
+
 }

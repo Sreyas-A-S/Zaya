@@ -36,7 +36,7 @@ class DoctorController extends Controller
         $this->middleware('permission:doctors-create')->only(['create', 'store']);
         $this->middleware('permission:doctors-edit')->only(['edit', 'update']);
         $this->middleware('permission:doctors-delete')->only('destroy');
-        $this->middleware('permission:doctors-update-status')->only('updateStatus');
+        $this->middleware('permission:doctors-update-status|doctors-edit')->only('updateStatus');
     }
 
     /**
@@ -153,6 +153,7 @@ class DoctorController extends Controller
         $healthConditions = HealthCondition::where('status', true)->get();
         $externalTherapies = ExternalTherapy::where('status', true)->get();
         $languages = \App\Models\Language::all();
+        $currencies = config('currencies.symbols');
 
         $allCountries = \App\Models\Country::all();
         if ($isSuperAdmin || empty($user->national_id)) {
@@ -162,7 +163,7 @@ class DoctorController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
-        return view('admin.doctors.index', compact('specializations', 'expertises', 'healthConditions', 'externalTherapies', 'languages', 'countries'));
+        return view('admin.doctors.index', compact('specializations', 'expertises', 'healthConditions', 'externalTherapies', 'languages', 'countries', 'currencies'));
     }
 
     /**
@@ -245,6 +246,7 @@ class DoctorController extends Controller
             'ifsc_code' => 'required|string|max:20',
             'cancelled_cheque' => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
             'upi_id' => 'nullable|string|max:255',
+            'payout_currency' => 'required|string|max:10',
 
             // I. Platform Profile
             'short_bio' => 'required|string|min:50|max:1500',
@@ -355,6 +357,7 @@ class DoctorController extends Controller
             'ifsc_code' => $validatedData['ifsc_code'],
             'cancelled_cheque_path' => $cancelledChequePath,
             'upi_id' => $validatedData['upi_id'],
+            'payout_currency' => $validatedData['payout_currency'],
             'short_doctor_bio' => $validatedData['short_bio'],
             'key_expertise' => $validatedData['key_expertise'],
             'services_offered' => $validatedData['services_offered'],
@@ -466,6 +469,7 @@ class DoctorController extends Controller
             'ifsc_code' => 'required|string|max:20',
             'cancelled_cheque' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
             'upi_id' => 'nullable|string|max:255',
+            'payout_currency' => 'required|string|max:10',
 
             // I. Platform Profile
             'short_bio' => 'required|string|min:50|max:1500',
@@ -558,6 +562,7 @@ class DoctorController extends Controller
             'ifsc_code' => $validatedData['ifsc_code'],
             'cancelled_cheque_path' => $cancelledChequePath,
             'upi_id' => $validatedData['upi_id'],
+            'payout_currency' => $validatedData['payout_currency'],
             'short_doctor_bio' => $validatedData['short_bio'],
             'key_expertise' => $validatedData['key_expertise'],
             'services_offered' => $validatedData['services_offered'],

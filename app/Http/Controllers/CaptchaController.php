@@ -13,74 +13,56 @@ class CaptchaController extends Controller
         Session::put('captcha_code', $code);
 
         $width = 160;
-        $height = 58; 
-        $image = imagecreatetruecolor($width, $height);
+        $height = 58;
 
-        // Colors
-        $white = imagecolorallocate($image, 255, 255, 255);
-        $black = imagecolorallocate($image, 0, 0, 0);
-        $gray = imagecolorallocate($image, 240, 240, 240); // Very light gray noise
+        // Start SVG content
+        $svg = '<svg width="' . $width . '" height="' . $height . '" viewBox="0 0 ' . $width . ' ' . $height . '" xmlns="http://www.w3.org/2000/svg">';
         
-        imagefilledrectangle($image, 0, 0, $width, $height, $white);
+        // Background
+        $svg .= '<rect width="100%" height="100%" fill="white" />';
 
-        // Subtle background noise
-        for ($i = 0; $i < 5; $i++) {
-            imageline($image, rand(0, $width), rand(0, $height), rand(0, $width), rand(0, $height), $gray);
+        // Add some noise (lines)
+        for ($i = 0; $i < 10; $i++) {
+            $x1 = rand(0, $width);
+            $y1 = rand(0, $height);
+            $x2 = rand(0, $width);
+            $y2 = rand(0, $height);
+            $svg .= '<line x1="' . $x1 . '" y1="' . $y1 . '" x2="' . $x2 . '" y2="' . $y2 . '" stroke="gray" stroke-width="1" opacity="0.3" />';
         }
 
+        // Add some noise (circles)
+        for ($i = 0; $i < 5; $i++) {
+            $cx = rand(0, $width);
+            $cy = rand(0, $height);
+            $r = rand(5, 20);
+            $svg .= '<circle cx="' . $cx . '" cy="' . $cy . '" r="' . $r . '" fill="none" stroke="gray" stroke-width="1" opacity="0.2" />';
+        }
+
+        // Add text characters
         $codeLength = strlen($code);
-        $fontSize = 5; // Built-in base font
-        $charWidth = imagefontwidth($fontSize);
-        $charHeight = imagefontheight($fontSize);
+        $charSpacing = $width / ($codeLength + 1);
         
-        // Scale factor
-        $scale = 2.2;
-        $scaledW = (int)($charWidth * $scale);
-        $scaledH = (int)($charHeight * $scale);
-
-        // Calculate total width with upscaled chars
-        $spacing = $scaledW + 4; 
-        $totalWidth = $spacing * $codeLength - 4;
-        $x = ($width - $totalWidth) / 2;
-        $y = ($height - $scaledH) / 2;
-
         for ($i = 0; $i < $codeLength; $i++) {
             $char = $code[$i];
+            $x = ($i + 0.5) * $charSpacing + rand(-5, 5);
+            $y = ($height / 2) + 10 + rand(-5, 5);
+            $rotate = rand(-25, 25);
             
-            // Create a small temp canvas for one character
-            $charImg = imagecreatetruecolor($charWidth, $charHeight);
-            $cWhite = imagecolorallocate($charImg, 255, 255, 255);
-            $cBlack = imagecolorallocate($charImg, 0, 0, 0);
-            imagefilledrectangle($charImg, 0, 0, $charWidth, $charHeight, $cWhite);
-            imagechar($charImg, $fontSize, 0, 0, $char, $cBlack);
-
-            // Resample into main image
-            $charX = $x + ($i * $spacing);
-            $charY = $y + rand(-3, 3);
+            // Randomly choose between black and a dark gray
+            $color = rand(0, 1) ? '#000000' : '#333333';
             
-            imagecopyresampled(
-                $image, $charImg, 
-                (int)$charX, (int)$charY, 0, 0, 
-                $scaledW, $scaledH, $charWidth, $charHeight
-            );
-            
-            imagedestroy($charImg);
+            $svg .= '<text x="' . $x . '" y="' . $y . '" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="' . $color . '" text-anchor="middle" transform="rotate(' . $rotate . ', ' . $x . ', ' . $y . ')">' . $char . '</text>';
         }
 
-        // Add overlapping noise (lines and circles)
-        $noiseColor = imagecolorallocate($image, 100, 100, 100);
-        for ($i = 0; $i < 6; $i++) {
-            imageline($image, 0, rand(0, $height), $width, rand(0, $height), $noiseColor);
-        }
-        for ($i = 0; $i < 3; $i++) {
-            imageellipse($image, rand(0, $width), rand(0, $height), rand(20, 60), rand(20, 40), $noiseColor);
+        // Add more noise (dots)
+        for ($i = 0; $i < 50; $i++) {
+            $cx = rand(0, $width);
+            $cy = rand(0, $height);
+            $svg .= '<circle cx="' . $cx . '" cy="' . $cy . '" r="0.8" fill="gray" opacity="0.5" />';
         }
 
-        ob_start();
-        imagepng($image);
-        $content = ob_get_clean();
-        imagedestroy($image);
+        $svg .= '</svg>';
 
-        return response($content)->header('Content-Type', 'image/png');
+        return response($svg)->header('Content-Type', 'image/svg+xml');
     }
 }

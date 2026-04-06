@@ -179,6 +179,32 @@
     </div>
 </div>
 
+<!-- Professional Profile Modal -->
+<div id="professional-profile-modal" class="fixed inset-0 z-[1000] hidden" aria-labelledby="professional-profile-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeProfessionalProfileModal()"></div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-[#2E4B3D]/12">
+                <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <div>
+                        <h3 id="professional-profile-title" class="text-xl font-black text-secondary tracking-tight">Professional Profile</h3>
+                        <p id="professional-profile-subtitle" class="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1"></p>
+                    </div>
+                    <button onclick="closeProfessionalProfileModal()" class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-all shadow-sm">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                <div id="professional-profile-body" class="px-8 py-8">
+                    <div class="flex justify-center items-center py-10">
+                        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-secondary"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="h-10"></div>
 @endsection
 
@@ -187,6 +213,15 @@
     // Referral Modal Logic
     let fetchTimeout = null;
     let selectedProfessionals = {}; // { 'practitioner': {id, name, fee, pic}, ... }
+    let professionalsFetchSeq = 0;
+    let professionalsFetchController = null;
+    let professionalsLoaderShowTimer = null;
+    let professionalsLoaderShownAt = 0;
+    let professionalsLoaderVisible = false;
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     function switchReferTab(role) {
         document.getElementById('selected-role').value = role;
@@ -205,15 +240,36 @@
         fetchTimeout = setTimeout(fetchProfessionals, 400);
     }
 
-    async function fetchProfessionals() {
+    async function fetchProfessionals(showLoader = true) {
         const bookingId = document.getElementById('refer-booking-id').value;
         const query = document.getElementById('refer-search').value;
         const role = document.getElementById('selected-role').value;
         const list = document.getElementById('professionals-list');
         const loader = document.getElementById('professionals-loader');
 
-        loader.classList.remove('hidden');
-        list.classList.add('hidden');
+        const seq = ++professionalsFetchSeq;
+
+        // Abort previous request to avoid racing UI updates
+        if (professionalsFetchController) {
+            try { professionalsFetchController.abort(); } catch (e) {}
+        }
+        professionalsFetchController = new AbortController();
+
+        // Prevent loader flicker: only show it if the request takes longer than a moment,
+        // and once shown keep it visible for a minimum duration.
+        professionalsLoaderVisible = false;
+        professionalsLoaderShownAt = 0;
+        if (professionalsLoaderShowTimer) clearTimeout(professionalsLoaderShowTimer);
+        
+        if (showLoader) {
+            professionalsLoaderShowTimer = setTimeout(() => {
+                if (seq !== professionalsFetchSeq) return; // stale
+                professionalsLoaderVisible = true;
+                professionalsLoaderShownAt = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+                loader.classList.remove('hidden');
+                list.classList.add('hidden');
+            }, 150);
+        }
 
         try {
             const url = new URL("{{ route('referrable-practitioners-api') }}", window.location.origin);
@@ -221,11 +277,24 @@
             if (query) url.searchParams.append('query', query);
             url.searchParams.append('roles[]', role);
 
-            const response = await fetch(url);
+            const response = await fetch(url, { signal: professionalsFetchController.signal });
             const professionals = await response.json();
 
-            loader.classList.add('hidden');
-            list.classList.remove('hidden');
+            if (seq !== professionalsFetchSeq) return; // stale response
+            if (professionalsLoaderShowTimer) clearTimeout(professionalsLoaderShowTimer);
+
+            if (professionalsLoaderVisible) {
+                const nowTs = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+                const elapsed = nowTs - professionalsLoaderShownAt;
+                const minVisibleMs = 300;
+                if (elapsed < minVisibleMs) await (window.sleep || (ms => new Promise(r => setTimeout(r, ms))))(minVisibleMs - elapsed);
+                loader.classList.add('hidden');
+                list.classList.remove('hidden');
+            } else {
+                // Loader never shown (fast response or showLoader false) -> no UI toggle needed
+                loader.classList.add('hidden');
+                list.classList.remove('hidden');
+            }
 
             if (professionals.length === 0) {
                 list.innerHTML = '<p class="text-center text-gray-400 text-xs py-10">No professionals found in this category.</p>';
@@ -238,6 +307,8 @@
                 const item = document.createElement('div');
                 item.className = `p-4 rounded-2xl border ${isSelected ? 'border-secondary bg-secondary/5' : 'border-gray-100'} flex items-center justify-between group hover:border-secondary/20 hover:bg-gray-50/50 transition-all cursor-pointer professional-item`;
                 item.onclick = () => selectProfessional(p.id, p.name, p.service_fee, p.profile_pic, role);
+
+                const canViewProfile = (p.role === 'practitioner');
                 
                 item.innerHTML = `
                     <div class="flex items-center gap-4">
@@ -256,17 +327,110 @@
                             </div>
                         </div>
                     </div>
-                    <div class="w-7 h-7 rounded-full border-2 ${isSelected ? 'bg-secondary border-secondary' : 'border-gray-100 bg-white'} flex items-center justify-center transition-all group-hover:border-secondary check-indicator">
-                        <i class="ri-check-line text-white ${isSelected ? 'opacity-100' : 'opacity-0'} transition-all text-lg"></i>
+                    <div class="flex items-center gap-2">
+                        ${canViewProfile ? `
+                            <button type="button"
+                                onclick="event.stopPropagation(); openProfessionalProfile(${p.id});"
+                                class="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-secondary transition-all shadow-sm"
+                                title="View Profile">
+                                <i class="ri-eye-line text-lg"></i>
+                            </button>
+                        ` : ``}
+                        <div class="w-7 h-7 rounded-full border-2 ${isSelected ? 'bg-secondary border-secondary' : 'border-gray-100 bg-white'} flex items-center justify-center transition-all group-hover:border-secondary check-indicator">
+                            <i class="ri-check-line text-white ${isSelected ? 'opacity-100' : 'opacity-0'} transition-all text-lg"></i>
+                        </div>
                     </div>
                 `;
                 list.appendChild(item);
             });
         } catch (error) {
+            if (error && error.name === 'AbortError') return;
             console.error('Fetch professionals error:', error);
+            if (seq !== professionalsFetchSeq) return;
+            if (professionalsLoaderShowTimer) clearTimeout(professionalsLoaderShowTimer);
             loader.classList.add('hidden');
             list.classList.remove('hidden');
             list.innerHTML = '<p class="text-center text-red-400 text-xs py-10">Error loading professionals.</p>';
+        }
+    }
+
+    function closeProfessionalProfileModal() {
+        document.getElementById('professional-profile-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    async function openProfessionalProfile(userId) {
+        const modal = document.getElementById('professional-profile-modal');
+        const body = document.getElementById('professional-profile-body');
+        const subtitle = document.getElementById('professional-profile-subtitle');
+
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        subtitle.innerText = '';
+        body.innerHTML = '<div class="flex justify-center items-center py-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-secondary"></div></div>';
+
+        try {
+            const res = await fetch(`/api/professional-profile/${userId}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data && data.error ? data.error : 'Failed to load profile');
+
+            subtitle.innerText = (data.role_label || '').toString().toUpperCase();
+
+            const services = Array.isArray(data.services) ? data.services : [];
+            const specialities = Array.isArray(data.specialities) ? data.specialities : [];
+            const conditions = Array.isArray(data.conditions) ? data.conditions : [];
+
+            const pill = (t) => `<span class="text-[10px] px-2.5 py-1 rounded-full bg-gray-50 text-gray-600 font-black uppercase tracking-widest border border-gray-100">${t}</span>`;
+            const section = (title, contentHtml) => `
+                <div class="p-5 rounded-2xl border border-[#2E4B3D]/12 bg-white shadow-sm">
+                    <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest mb-3">${title}</p>
+                    ${contentHtml}
+                </div>
+            `;
+
+            const servicesHtml = services.length
+                ? `<div class="space-y-2">${services.map(s => `
+                    <div class="flex items-center justify-between gap-4 p-3 rounded-xl bg-gray-50/50 border border-gray-100">
+                        <div class="text-sm font-bold text-secondary">${s.title}</div>
+                        <div class="text-xs font-black text-secondary whitespace-nowrap">
+                            ${s.rate !== null ? `${(s.currency || '').toString()} ${parseFloat(s.rate).toFixed(2)}` : '—'}
+                        </div>
+                    </div>
+                `).join('')}</div>`
+                : `<p class="text-sm text-gray-400">No services listed.</p>`;
+
+            const specialitiesHtml = specialities.length
+                ? `<div class="flex flex-wrap gap-2">${specialities.map(pill).join('')}</div>`
+                : `<p class="text-sm text-gray-400">No specialities listed.</p>`;
+
+            const conditionsHtml = conditions.length
+                ? `<div class="flex flex-wrap gap-2">${conditions.map(pill).join('')}</div>`
+                : `<p class="text-sm text-gray-400">No conditions listed.</p>`;
+
+            const fullProfileLink = data.profile_url
+                ? `<div class="mt-2 flex items-center gap-2">
+                        <a href="${data.profile_url}" target="_blank" class="text-xs font-black uppercase tracking-widest text-secondary hover:text-primary underline">Open Full Profile</a>
+                   </div>`
+                : ``;
+
+            body.innerHTML = `
+                <div class="flex items-start gap-4 mb-6">
+                    <img src="${data.profile_pic}" class="w-16 h-16 rounded-2xl object-cover border border-gray-100 shadow-sm">
+                    <div class="flex-1">
+                        <p class="text-lg font-black text-secondary leading-tight">${data.name}</p>
+                        ${fullProfileLink}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${section('Services', servicesHtml)}
+                    ${section('Specialities', specialitiesHtml)}
+                    ${section('Conditions Handled', conditionsHtml)}
+                </div>
+            `;
+        } catch (e) {
+            console.error('Profile fetch error:', e);
+            body.innerHTML = `<p class="text-center text-red-400 text-sm py-10">${(e && e.message) ? e.message : 'Failed to load profile.'}</p>`;
         }
     }
 
@@ -279,7 +443,7 @@
         }
         
         renderSelectedSummary();
-        fetchProfessionals(); // Refresh list to show correct checkmarks
+        fetchProfessionals(false); // Refresh list without loader to prevent flickering
     }
 
     function renderSelectedSummary() {
@@ -298,22 +462,113 @@
         roles.forEach(roleKey => {
             const p = selectedProfessionals[roleKey];
             const roleLabel = roleKey.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const canViewProfile = (p.role === 'practitioner');
             const card = document.createElement('div');
-            card.className = 'flex items-center justify-between p-3 bg-white border border-[#2E4B3D]/12 rounded-xl shadow-sm';
+            card.className = 'p-4 bg-white border border-[#2E4B3D]/12 rounded-2xl shadow-sm space-y-4 mb-3';
             card.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <img src="${p.pic}" class="w-8 h-8 rounded-lg object-cover">
-                    <div>
-                        <p class="text-xs font-bold text-secondary">${p.name}</p>
-                        <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">${roleLabel}</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img src="${p.pic}" class="w-10 h-10 rounded-xl object-cover border border-gray-100">
+                        <div>
+                            <p class="text-xs font-black text-secondary uppercase tracking-tight">${p.name}</p>
+                            <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">${roleLabel}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        ${canViewProfile ? `
+                            <button type="button"
+                                onclick="openProfessionalProfile(${p.id})"
+                                class="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-secondary transition-all shadow-sm"
+                                title="View Profile">
+                                <i class="ri-eye-line"></i>
+                            </button>
+                        ` : ``}
+                        <button type="button" onclick="removeSelectedProfessional('${roleKey}')" class="w-8 h-8 rounded-full bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all" title="Remove">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
                     </div>
                 </div>
-                <button type="button" onclick="removeSelectedProfessional('${roleKey}')" class="text-red-400 hover:text-red-600 p-1">
-                    <i class="ri-delete-bin-line text-lg"></i>
-                </button>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Consultation Date</label>
+                        <input type="date" 
+                            onchange="fetchSlotsForReferral('${roleKey}', this.value)"
+                            min="{{ now()->format('Y-m-d') }}"
+                            class="w-full px-3 py-2 text-xs rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 transition-all bg-gray-50/50"
+                            id="date-${roleKey}">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Select Slot</label>
+                        <select id="slots-${roleKey}" 
+                            onchange="updateSelectedSlot('${roleKey}', this.value)"
+                            class="w-full px-3 py-2 text-xs rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 transition-all bg-gray-50/50 disabled:opacity-50"
+                            disabled>
+                            <option value="">Select Date First</option>
+                        </select>
+                    </div>
+                </div>
             `;
             summary.appendChild(card);
         });
+    }
+
+    async function fetchSlotsForReferral(role, date) {
+        const p = selectedProfessionals[role];
+        const slotSelect = document.getElementById(`slots-${role}`);
+        
+        if (!date) {
+            slotSelect.innerHTML = '<option value="">Select Date First</option>';
+            slotSelect.disabled = true;
+            return;
+        }
+
+        slotSelect.disabled = true;
+        slotSelect.innerHTML = '<option value="">Loading Slots...</option>';
+
+        try {
+            const response = await fetch(`/api/available-slots-by-user/${p.id}/${date}`);
+            const data = await response.json();
+            const slots = (data && Array.isArray(data.slots)) ? data.slots : [];
+
+            slotSelect.innerHTML = '<option value="">Select Time</option>';
+            if (slots.length > 0) {
+                slots.forEach(slot => {
+                    slotSelect.innerHTML += `<option value="${slot.time}">${slot.time}</option>`;
+                });
+                slotSelect.disabled = false;
+            } else {
+                slotSelect.innerHTML = '<option value="">No Slots Available</option>';
+            }
+        } catch (error) {
+            console.error('Fetch slots error:', error);
+            slotSelect.innerHTML = '<option value="">Error loading slots</option>';
+        }
+    }
+
+    function updateSelectedSlot(role, slot) {
+        if (selectedProfessionals[role]) {
+            selectedProfessionals[role].slot = slot;
+            selectedProfessionals[role].date = document.getElementById(`date-${role}`).value;
+        }
+        validateReferralForm();
+    }
+
+    function validateReferralForm() {
+        const submitBtn = document.getElementById('refer-submit-btn');
+        const roles = Object.keys(selectedProfessionals);
+        
+        if (roles.length === 0) {
+            submitBtn.disabled = true;
+            return;
+        }
+
+        const allValid = roles.every(role => {
+            const p = selectedProfessionals[role];
+            return p.date && p.slot;
+        });
+
+        submitBtn.disabled = !allValid;
     }
 
     function removeSelectedProfessional(role) {
@@ -494,7 +749,9 @@
 
         const referrals = Object.values(selectedProfessionals).map(p => ({
             id: p.id,
-            amount: p.fee
+            amount: p.fee,
+            booking_date: p.date,
+            booking_time: p.slot
         }));
 
         try {

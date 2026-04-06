@@ -935,6 +935,14 @@
     document.addEventListener('DOMContentLoaded', function() {
         handleProfessionalFormSubmit('specialitiesForm', 'specialitiesModal', 'specialities-display-container');
         handleProfessionalFormSubmit('conditionsForm', 'conditionsModal', 'conditions-display-container');
+
+        // Auto-open based on redirect from banner
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('edit') === 'professional') {
+            openSpecialitiesModal();
+        } else if (urlParams.get('edit') === 'personal') {
+            openPersonalEditModal();
+        }
     });
 
     function openGalleryModal() {

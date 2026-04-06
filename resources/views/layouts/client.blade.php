@@ -81,25 +81,29 @@
 
         /* Custom Sidebar Scrollbar */
         .custom-sidebar-scrollbar::-webkit-scrollbar {
-            width: 4px;
+            width: 5px;
         }
 
         .custom-sidebar-scrollbar::-webkit-scrollbar-track {
             background: transparent;
+            margin-top: 20px;
         }
 
         .custom-sidebar-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(46, 75, 61, 0.1);
+            background: #A58F76; /* Taupe beige color */
             border-radius: 10px;
         }
 
         .custom-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(46, 75, 61, 0.2);
+            background: #8e7a64;
         }
 
-        .custom-sidebar-scrollbar {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(46, 75, 61, 0.1) transparent;
+        /* Fallback for Firefox */
+        @supports not selector(::-webkit-scrollbar) {
+            .custom-sidebar-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #A58F76 transparent;
+            }
         }
 
         @keyframes pulse-smooth {
@@ -121,6 +125,15 @@
     </style>
     @yield('styles')
     @stack('styles')
+    <style>
+        .profile-completion-banner {
+            animation: slideDown 0.5s ease-out forwards;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
 </head>
 
 <body class="flex h-screen overflow-hidden text-gray-800 bg-white {{ $isMeetingPopout ? 'meeting-popout' : '' }} {{ $isPublicMeeting ? 'public-meeting' : '' }}">
@@ -133,7 +146,7 @@
     <!-- Sidebar -->
     @if(!$isMeetingPopout && !$isPublicMeeting)
     <aside class="w-[288px] bg-[#FFFFFF] border-r border-[#2E4B3D]/12 hidden lg:flex lg:flex-col h-full shrink-0 relative">
-        <div class="flex-1 overflow-y-auto pb-10 custom-sidebar-scrollbar">
+        <div class="flex-1 overflow-y-auto custom-sidebar-scrollbar relative z-10 min-h-0 w-full">
             <a href="{{ route('home') }}"
                 class="flex items-center pt-8 ps-8 pe-2 pb-2 text-gray-500 hover:text-gray-800 text-sm font-medium mb-4">
                 <i class="ri-arrow-left-line mr-2"></i> <span id="client_panel_back_btn" data-i18n="{{ $site_settings['client_panel_back_btn'] ?? 'Back' }}">{{ __($site_settings['client_panel_back_btn'] ?? 'Back') }}</span>
@@ -176,7 +189,7 @@
                     class="flex items-center px-8 py-3 {{ request()->routeIs('conferences.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-vidicon-line mr-3 text-lg"></i> <span id="client_panel_sidebar_my_conference_history" data-i18n="My Conference History">{{ __('My Conference History') }}</span>
                 </a>
-                @elseif(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
+                @elseif(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist', 'translator']))
                 <a href="{{ route('conferences.index') }}"
                     class="flex items-center px-8 py-3 {{ request()->routeIs('conferences.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-vidicon-line mr-3 text-lg"></i> <span id="client_panel_sidebar_conference_history" data-i18n="Conference History">{{ __($site_settings['client_panel_sidebar_conference_history'] ?? 'Conference History') }}</span>
@@ -186,11 +199,17 @@
                     class="flex items-center px-8 py-3 {{ request()->routeIs('transactions.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-wallet-3-line mr-3 text-lg"></i> <span id="client_panel_sidebar_transaction_vault" data-i18n="Transaction Vault">{{ __($site_settings['client_panel_sidebar_transaction_vault'] ?? 'Transaction Vault') }}</span>
                 </a>
+                @if(in_array($user->role, ['client', 'patient']))
+                <a href="{{ route('promo-codes.index') }}"
+                    class="flex items-center px-8 py-3 {{ request()->routeIs('promo-codes.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
+                    <i class="ri-ticket-2-line mr-3 text-lg"></i> <span>{{ __('Promo Codes') }}</span>
+                </a>
+                @endif
                 <a href="{{ route('reviews.index') }}"
                     class="flex items-center px-8 py-3 {{ request()->routeIs('reviews.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-star-line mr-3 text-lg"></i> <span id="client_panel_sidebar_reviews" data-i18n="Reviews">{{ __('Reviews') }}</span>
                 </a>
-                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
+                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist', 'translator']))
                 <a href="{{ route('time-slots.index') }}"
                     class="flex items-center px-8 py-3 {{ request()->routeIs('time-slots.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
                     <i class="ri-time-line mr-3 text-lg"></i> <span id="client_panel_sidebar_time_slots" data-i18n="Time Slots">{{ __($site_settings['client_panel_sidebar_time_slots'] ?? 'Time Slots') }}</span>
@@ -200,11 +219,17 @@
                     <i class="ri-shake-hands-line mr-3 text-lg"></i> <span id="client_panel_sidebar_my_services" data-i18n="My Services">{{ __('My Services') }}</span>
                 </a>
                 @endif
+                <a href="javascript:void(0)" onclick="openLogoutModal()"
+                    class="flex items-center px-8 py-3 text-500 hover:bg-red-50 hover:text-red-700 font-normal transition-colors relative z-10">
+                    <i class="ri-logout-box-r-line mr-3 text-lg"></i> <span id="client_panel_sidebar_logout" data-i18n="Logout">{{ __($site_settings['client_panel_sidebar_logout'] ?? 'Logout') }}</span>
+                </a>
             </nav>
         </div>
 
-        <img src="{{ asset('frontend/assets/client-profile-floating-img.png') }}" alt="Floating Image"
-            class="w-[248px] h-auto absolute bottom-0 left-0 pointer-events-none z-0">
+        <div class="shrink-0 w-full relative h-[250px] pointer-events-none">
+            <img src="{{ asset('frontend/assets/client-profile-floating-img.png') }}" alt="Floating Image"
+                class="w-[248px] h-auto absolute bottom-0 left-0 z-0">
+        </div>
     </aside>
 
     @endif
@@ -254,6 +279,36 @@
                             <span id="lang-text-{{ $lang2->code }}-mobile"
                                 class="relative z-10 w-9 text-center {{ $currentLocale == $lang2->code ? 'text-white' : 'text-gray-500' }} text-[11px] font-bold transition-colors duration-300">{{ Str::ucfirst(substr($lang2->code, 0, 2)) }}</span>
                         </button>
+                        @endif
+
+                        @if(isset($active_promo_codes) && $active_promo_codes->count() > 0)
+                        <!-- Promo Codes -->
+                        <div class="relative">
+                            <div onclick="togglePromoDropdown('mobile')"
+                                class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white relative shadow-sm cursor-pointer hover:bg-primary transition-colors">
+                                <i class="ri-ticket-line text-lg"></i>
+                            </div>
+                            
+                            <div id="promo-dropdown-mobile" class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 hidden overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                <div class="p-4 border-b border-gray-50 bg-[#F9FBF9]">
+                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Available Promo Codes</p>
+                                </div>
+                                <div class="max-h-[250px] overflow-y-auto p-2">
+                                    @foreach($active_promo_codes as $promo)
+                                    <div class="p-3 mb-2 bg-gray-50 rounded-xl last:mb-0" onclick="copyToClipboard('{{ $promo->code }}')">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-[11px] font-black text-secondary">{{ $promo->code }}</span>
+                                            <span class="text-[9px] font-bold text-emerald-600">{{ $promo->type == 'percentage' ? $promo->reward . '%' : '$' . $promo->reward }} OFF</span>
+                                        </div>
+                                        <p class="text-[10px] text-gray-500 line-clamp-1">{{ $promo->description }}</p>
+                                    </div>
+                                    @endforeach
+                                </div>
+                                <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
+                                    <a href="{{ route('promo-codes.index') }}" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View All Promo Codes</a>
+                                </div>
+                            </div>
+                        </div>
                         @endif
 
                         <!-- Coin -->
@@ -375,6 +430,55 @@
                             </div>
                         </div>
                     </div>
+
+                    @if(isset($active_promo_codes) && $active_promo_codes->count() > 0)
+                    <!-- Promo Codes -->
+                    <div class="relative hidden lg:block">
+                        <div onclick="togglePromoDropdown('desktop')"
+                            class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white relative shadow-sm cursor-pointer hover:bg-primary transition-all duration-300 ring-4 ring-secondary/10">
+                            <i class="ri-ticket-2-line text-lg"></i>
+                            <div class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-white rounded-full flex items-center justify-center shadow-sm">
+                                <span class="text-[10px] font-black text-white">{{ $active_promo_codes->count() }}</span>
+                            </div>
+                        </div>
+                        
+                        <div id="promo-dropdown-desktop" class="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 hidden overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                            <div class="p-5 border-b border-gray-50 bg-[#F9FBF9]">
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Exclusive Offers</p>
+                                <h4 class="text-base font-black text-secondary tracking-tight">Your Promo Codes</h4>
+                            </div>
+                            <div class="max-h-[350px] overflow-y-auto py-2">
+                                @foreach($active_promo_codes as $promo)
+                                <div class="px-5 py-4 hover:bg-gray-50 transition-colors cursor-pointer group" onclick="copyToClipboard('{{ $promo->code }}')">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-3 py-1 bg-secondary text-white text-[11px] font-black rounded-lg uppercase tracking-wider shadow-sm group-hover:scale-105 transition-transform">
+                                                {{ $promo->code }}
+                                            </span>
+                                            <i class="ri-file-copy-line text-gray-300 group-hover:text-secondary transition-colors"></i>
+                                        </div>
+                                        <span class="text-[11px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                                            {{ $promo->type == 'percentage' ? $promo->reward . '%' : '$' . $promo->reward }} OFF
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-gray-600 font-bold leading-relaxed mb-2">{{ $promo->description }}</p>
+                                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+                                        @if($promo->expiry_date)
+                                        <span class="text-[10px] text-gray-400 flex items-center font-bold uppercase tracking-wider"><i class="ri-time-line mr-1 text-xs"></i> Exp: {{ $promo->expiry_date->format('M d, Y') }}</span>
+                                        @else
+                                        <span class="text-[10px] text-gray-400 flex items-center font-bold uppercase tracking-wider"><i class="ri-infinity-line mr-1 text-xs"></i> No Expiry</span>
+                                        @endif
+                                        <span class="text-[10px] text-secondary font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Click to copy</span>
+                                    </div>
+                                </div>
+                                    @endforeach
+                            </div>
+                            <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
+                                <a href="{{ route('promo-codes.index') }}" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View All Promo Codes</a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
 
                     <!-- Notification -->
                     <div class="relative">
@@ -704,8 +808,10 @@
             const otherType = type === 'mobile' ? 'desktop' : 'mobile';
             const otherDropdown = document.getElementById('balance-dropdown-' + otherType);
             
-            // Close other dropdown
+            // Close other dropdowns
             otherDropdown?.classList.add('hidden');
+            document.getElementById('promo-dropdown-desktop')?.classList.add('hidden');
+            document.getElementById('promo-dropdown-mobile')?.classList.add('hidden');
             
             // Toggle current
             dropdown.classList.toggle('hidden');
@@ -719,6 +825,41 @@
                 };
                 setTimeout(() => document.addEventListener('click', closeHandler), 10);
             }
+        }
+
+        function togglePromoDropdown(type) {
+            const dropdown = document.getElementById('promo-dropdown-' + type);
+            const otherType = type === 'mobile' ? 'desktop' : 'mobile';
+            const otherDropdown = document.getElementById('promo-dropdown-' + otherType);
+            
+            // Close other dropdowns
+            otherDropdown?.classList.add('hidden');
+            document.getElementById('balance-dropdown-desktop')?.classList.add('hidden');
+            document.getElementById('balance-dropdown-mobile')?.classList.add('hidden');
+            
+            // Toggle current
+            dropdown.classList.toggle('hidden');
+
+            if (!dropdown.classList.contains('hidden')) {
+                const closeHandler = (e) => {
+                    if (!dropdown.contains(e.target) && !e.target.closest('[onclick^="togglePromoDropdown"]')) {
+                        dropdown.classList.add('hidden');
+                        document.removeEventListener('click', closeHandler);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', closeHandler), 10);
+            }
+        }
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                if (typeof showZayaToast === 'function') {
+                    showZayaToast('Promo code ' + text + ' copied to clipboard!', 'success', 'Success');
+                } else if (typeof showToast === 'function') {
+                    showToast('Promo code ' + text + ' copied to clipboard!');
+                } else {
+                    alert('Promo code ' + text + ' copied to clipboard!');
+                }
+            });
         }
 
         function openLogoutModal() {

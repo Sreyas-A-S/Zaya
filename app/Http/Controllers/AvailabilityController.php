@@ -5,7 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\PractitionerAvailability;
 use App\Models\Practitioner;
+use App\Models\Doctor;
+use App\Models\MindfulnessPractitioner;
+use App\Models\YogaTherapist;
+use App\Models\Translator;
 use App\Models\BookingReservation;
+use App\Models\User;
 use App\Services\PractitionerAvailabilityService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,20 +18,15 @@ use Illuminate\Support\Facades\Auth;
 
 class AvailabilityController extends Controller
 {
-    private function getTestPractitioner($user)
+    private function getProfessionalProfile($user)
     {
-        if ($user->practitioner) return $user->practitioner;
-        if ($user->patient) return $user->patient;
-        if (in_array($user->role, ['admin', 'super-admin'])) {
-            return Practitioner::first();
-        }
-        return null;
+        return $user->profile;
     }
 
     public function index()
     {
         $user = Auth::user();
-        $profile = $this->getTestPractitioner($user);
+        $profile = $this->getProfessionalProfile($user);
 
         if (!$profile) {
             $availabilities = collect();
@@ -34,6 +34,7 @@ class AvailabilityController extends Controller
         }
 
         $availabilities = PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->where('practitioner_type', get_class($profile))
             ->orderBy('day_of_week')
             ->orderBy('start_time')
             ->get();
@@ -44,7 +45,7 @@ class AvailabilityController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $profile = $this->getTestPractitioner($user);
+        $profile = $this->getProfessionalProfile($user);
 
         if (!$profile) {
             return back()->with('error', 'You need a professional profile to create slots.');
@@ -66,7 +67,9 @@ class AvailabilityController extends Controller
         $offSlots = $request->off_slots ? explode(',', $request->off_slots) : [];
 
         // 1. Clear existing slots for this pattern/date
-        $query = PractitionerAvailability::where('practitioner_id', $profile->id);
+        $query = PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->where('practitioner_type', get_class($profile));
+            
         if ($request->specific_date) {
             $query->where('specific_date', $request->specific_date);
         } else {
@@ -94,6 +97,7 @@ class AvailabilityController extends Controller
 
             PractitionerAvailability::create([
                 'practitioner_id' => $profile->id,
+                'practitioner_type' => get_class($profile),
                 'day_of_week' => $request->day_of_week,
                 'specific_date' => $request->specific_date,
                 'start_time' => $current->format('H:i:s'),
@@ -115,19 +119,21 @@ class AvailabilityController extends Controller
     public function getDateSlots($date)
     {
         $user = Auth::user();
-        $profile = $this->getTestPractitioner($user);
+        $profile = $this->getProfessionalProfile($user);
         if (!$profile) return response()->json(['error' => 'No profile'], 403);
 
         $dateObj = \Carbon\Carbon::parse($date);
         $dayOfWeek = $dateObj->dayOfWeek;
 
         $customSlots = PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->where('practitioner_type', get_class($profile))
             ->where('specific_date', $date)
             ->orderBy('start_time')
             ->get();
 
         $isCustom = $customSlots->isNotEmpty();
         $slots = $isCustom ? $customSlots : PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->where('practitioner_type', get_class($profile))
             ->where('day_of_week', $dayOfWeek)
             ->whereNull('specific_date')
             ->orderBy('start_time')
@@ -163,34 +169,64 @@ class AvailabilityController extends Controller
         ]);
     }
 
+    public function getGeneratedSlotsByUser(Request $request, $user, $date)
+    {
+        $service = new PractitionerAvailabilityService();
+
+        $u = User::find($user);
+        if (!$u) {
+            return response()->json([
+                'date' => $date,
+                'slots' => [],
+                'error' => 'User not found',
+            ], 404);
+        }
+
+        $profile = $u->profile;
+        if (!$profile) {
+            return response()->json([
+                'date' => $date,
+                'slots' => [],
+                'error' => 'No professional profile linked to this user',
+            ], 404);
+        }
+
+        $slots = $service->getAvailableSlotsForProvider($profile, $date);
+
+        return response()->json([
+            'date' => $date,
+            'slots' => $slots
+        ]);
+    }
+
     public function getOffDays($practitioner)
     {
-        // Find practitioner by ID or slug
-        $p = is_numeric($practitioner) 
-            ? Practitioner::find($practitioner)
-            : Practitioner::where('slug', $practitioner)->first();
+        // Find practitioner by ID or slug across all models
+        $p = $this->findProvider($practitioner);
             
         if (!$p) {
             return response()->json(['off_days' => [], 'off_day_indexes' => []], 404);
         }
 
-        // Get weekly off days (by day_of_week)
+        // Get weekly off days
         $offDayIndexes = PractitionerAvailability::where('practitioner_id', $p->id)
+            ->where('practitioner_type', get_class($p))
             ->whereNull('specific_date')
             ->whereNull('start_time')
             ->where('is_available', false)
             ->pluck('day_of_week')
             ->toArray();
 
-        // Get specific date off days (future dates only, within next 30 days)
+        // Get specific date off days
         $offDateDays = PractitionerAvailability::where('practitioner_id', $p->id)
+            ->where('practitioner_type', get_class($p))
             ->whereNotNull('specific_date')
             ->whereNull('start_time')
             ->where('is_available', false)
             ->where('specific_date', '>=', Carbon::today()->toDateString())
             ->where('specific_date', '<=', Carbon::today()->addDays(30)->toDateString())
             ->pluck('specific_date')
-            ->map(fn($date) => $date) // Convert to string format YYYY-MM-DD
+            ->map(fn($date) => $date instanceof Carbon ? $date->toDateString() : $date)
             ->toArray();
 
         return response()->json([
@@ -199,24 +235,44 @@ class AvailabilityController extends Controller
         ]);
     }
 
+    private function findProvider($identifier)
+    {
+        $models = [Practitioner::class, Doctor::class, MindfulnessPractitioner::class, YogaTherapist::class, Translator::class];
+        foreach ($models as $model) {
+            $p = is_numeric($identifier) ? $model::find($identifier) : $model::where('slug', $identifier)->first();
+            if ($p) return $p;
+        }
+        return null;
+    }
+
     public function getBookedSlots($practitioner, $date)
     {
-        // Find practitioner by ID or slug
-        $p = is_numeric($practitioner) 
-            ? Practitioner::find($practitioner)
-            : Practitioner::where('slug', $practitioner)->first();
+        $p = $this->findProvider($practitioner);
             
         if (!$p) {
             return response()->json(['booked_slots' => []], 404);
         }
 
         try {
-            // Get only truly booked slots (confirmed, paid) for this date
-            $bookedSlots = Booking::where('practitioner_id', $p->id)
-                ->where('booking_date', $date)
-                ->whereIn('status', ['confirmed', 'paid', 'completed'])
-                ->pluck('booking_time')
-                ->toArray();
+            // Get only truly booked slots
+            $query = Booking::where('booking_date', $date)
+                ->whereIn('status', ['confirmed', 'paid', 'completed']);
+
+            if ($p instanceof Translator) {
+                // For translators, we check both if they are the main professional 
+                // OR if they are assigned as a translator to another professional's session
+                $query->where(function($q) use ($p) {
+                    $q->where(function($sq) use ($p) {
+                        $sq->where('practitioner_id', $p->id)
+                           ->where('practitioner_type', Translator::class);
+                    })->orWhere('translator_id', $p->id);
+                });
+            } else {
+                $query->where('practitioner_id', $p->id)
+                      ->where('practitioner_type', get_class($p));
+            }
+
+            $bookedSlots = $query->pluck('booking_time')->toArray();
 
             return response()->json([
                 'date' => $date,
@@ -231,12 +287,13 @@ class AvailabilityController extends Controller
     public function resetToWeekly(Request $request)
     {
         $user = Auth::user();
-        $profile = $this->getTestPractitioner($user);
+        $profile = $this->getProfessionalProfile($user);
         if (!$profile) return response()->json(['error' => 'No profile'], 403);
 
         $request->validate(['date' => 'required|date']);
 
         PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->where('practitioner_type', get_class($profile))
             ->where('specific_date', $request->date)
             ->delete();
 
@@ -246,9 +303,9 @@ class AvailabilityController extends Controller
     public function updateBookingSettings(Request $request)
     {
         $user = Auth::user();
-        $profile = $this->getTestPractitioner($user);
+        $profile = $this->getProfessionalProfile($user);
 
-        if (!$profile || !($profile instanceof Practitioner)) {
+        if (!$profile) {
             return back()->with('error', 'Booking settings can only be managed for professional profiles.');
         }
 
@@ -266,7 +323,7 @@ class AvailabilityController extends Controller
     public function updateWeeklyOffDays(Request $request)
     {
         $user = Auth::user();
-        $profile = $this->getTestPractitioner($user);
+        $profile = $this->getProfessionalProfile($user);
         if (!$profile) return back()->with('error', 'No profile linked.');
 
         $request->validate([
@@ -276,14 +333,16 @@ class AvailabilityController extends Controller
 
         $offDays = $request->input('off_days', []);
 
-        // Clear all future custom overrides to ensure new weekly settings take effect as requested
+        // Clear all future custom overrides
         PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->where('practitioner_type', get_class($profile))
             ->whereNotNull('specific_date')
             ->where('specific_date', '>=', now()->toDateString())
             ->delete();
 
         // 1. Remove all current weekly off records
         PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->where('practitioner_type', get_class($profile))
             ->whereNull('specific_date')
             ->whereNull('start_time')
             ->where('is_available', false)
@@ -291,14 +350,16 @@ class AvailabilityController extends Controller
 
         // 2. Add new weekly off records
         foreach ($offDays as $day) {
-            // Delete any existing active weekly slots for this day if we're making it an off day
+            // Delete any existing active weekly slots for this day
             PractitionerAvailability::where('practitioner_id', $profile->id)
+                ->where('practitioner_type', get_class($profile))
                 ->whereNull('specific_date')
                 ->where('day_of_week', $day)
                 ->delete();
 
             PractitionerAvailability::create([
                 'practitioner_id' => $profile->id,
+                'practitioner_type' => get_class($profile),
                 'day_of_week' => (int)$day,
                 'is_available' => false
             ]);
@@ -310,26 +371,28 @@ class AvailabilityController extends Controller
     public function updateWeeklySlots(Request $request)
     {
         $user = Auth::user();
-        $profile = $this->getTestPractitioner($user);
+        $profile = $this->getProfessionalProfile($user);
         if (!$profile) return back()->with('error', 'No profile linked.');
 
         $request->validate([
             'start_time' => 'required',
             'end_time' => 'required|after:start_time',
             'slot_duration' => 'required|integer|min:1|max:480',
-            'off_slots' => 'nullable|string', // Comma separated start times like "09:00,10:00"
+            'off_slots' => 'nullable|string',
         ]);
 
         $offSlots = $request->off_slots ? explode(',', $request->off_slots) : [];
 
-        // Clear all future custom overrides to ensure new weekly settings take effect as requested
+        // Clear all future custom overrides
         PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->where('practitioner_type', get_class($profile))
             ->whereNotNull('specific_date')
             ->where('specific_date', '>=', now()->toDateString())
             ->delete();
 
         // Get days that are NOT off days
         $offDayIndexes = PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->where('practitioner_type', get_class($profile))
             ->whereNull('specific_date')
             ->whereNull('start_time')
             ->where('is_available', false)
@@ -342,12 +405,12 @@ class AvailabilityController extends Controller
         foreach ($workingDayIndexes as $dayIndex) {
             // Remove existing weekly active slots for this day
             PractitionerAvailability::where('practitioner_id', $profile->id)
+                ->where('practitioner_type', get_class($profile))
                 ->whereNull('specific_date')
                 ->where('day_of_week', $dayIndex)
                 ->where('is_available', true)
                 ->delete();
 
-            // Generate and create slots, marking the "off" ones
             $start = \Carbon\Carbon::parse($request->start_time);
             $end = \Carbon\Carbon::parse($request->end_time);
             $duration = (int) $request->slot_duration;
@@ -355,8 +418,6 @@ class AvailabilityController extends Controller
             $current = $start->copy();
             while ($current->copy()->addMinutes($duration)->lte($end)) {
                 $currentTimeStr = $current->format('H:i:s');
-                
-                // Check if this slot start time is in our "off" list
                 $isOff = false;
                 foreach($offSlots as $os) {
                     if (\Carbon\Carbon::parse($os)->format('H:i:s') === $currentTimeStr) {
@@ -367,6 +428,7 @@ class AvailabilityController extends Controller
 
                 PractitionerAvailability::create([
                     'practitioner_id' => $profile->id,
+                    'practitioner_type' => get_class($profile),
                     'day_of_week' => $dayIndex,
                     'start_time' => $current->format('H:i:s'),
                     'end_time' => $current->copy()->addMinutes($duration)->format('H:i:s'),
@@ -384,12 +446,13 @@ class AvailabilityController extends Controller
     public function toggleOffDay(Request $request)
     {
         $user = Auth::user();
-        $profile = $this->getTestPractitioner($user);
+        $profile = $this->getProfessionalProfile($user);
         if (!$profile) return response()->json(['error' => 'No profile'], 403);
 
         $request->validate(['date' => 'required|date']);
 
         $existing = PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->where('practitioner_type', get_class($profile))
             ->where('specific_date', $request->date)
             ->whereNull('start_time')
             ->first();
@@ -399,11 +462,13 @@ class AvailabilityController extends Controller
             return response()->json(['status' => 'available', 'message' => 'Date marked as available']);
         } else {
             PractitionerAvailability::where('practitioner_id', $profile->id)
+                ->where('practitioner_type', get_class($profile))
                 ->where('specific_date', $request->date)
                 ->delete();
 
             PractitionerAvailability::create([
                 'practitioner_id' => $profile->id,
+                'practitioner_type' => get_class($profile),
                 'specific_date' => $request->date,
                 'is_available' => false
             ]);
@@ -414,7 +479,7 @@ class AvailabilityController extends Controller
     public function toggleOffTime(Request $request)
     {
         $user = Auth::user();
-        $profile = $this->getTestPractitioner($user);
+        $profile = $this->getProfessionalProfile($user);
         if (!$profile) return response()->json(['error' => 'No profile'], 403);
 
         $request->validate([
@@ -425,6 +490,7 @@ class AvailabilityController extends Controller
 
         PractitionerAvailability::create([
             'practitioner_id' => $profile->id,
+            'practitioner_type' => get_class($profile),
             'specific_date' => $request->date,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
@@ -437,9 +503,10 @@ class AvailabilityController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
-        $profile = $this->getTestPractitioner($user);
+        $profile = $this->getProfessionalProfile($user);
 
         $availability = PractitionerAvailability::where('practitioner_id', $profile->id)
+            ->where('practitioner_type', get_class($profile))
             ->where('id', $id)
             ->firstOrFail();
 

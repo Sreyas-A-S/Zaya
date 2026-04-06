@@ -396,6 +396,15 @@
                                         </div>
 
                                         <div class="col-md-3">
+                                            <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="payout_currency" required id="practitioner_payout_currency">
+                                                @foreach($currencies as $code => $symbol)
+                                                <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-3">
                                             <label class="form-label">Facebook</label>
                                             <input type="url" class="form-control" name="social_links[facebook]" placeholder="https://" pattern="https://.*" title="Please enter a valid Facebook URL starting with https://">
                                         </div>
@@ -1374,6 +1383,7 @@
             $('[name="state"]').val(p.state || '');
             $('[name="zip_code"]').val(p.zip_code || '');
             $('[name="country"]').val(p.country || 'India');
+            $('#practitioner_payout_currency').val(p.payout_currency || 'INR');
             $('[name="social_links[website]"]').val(p.social_links?.website || '');
             $('[name="social_links[facebook]"]').val(p.social_links?.facebook || '');
             $('[name="social_links[instagram]"]').val(p.social_links?.instagram || '');

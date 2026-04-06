@@ -32,7 +32,7 @@ class MindfulnessPractitionerController extends Controller
         $this->middleware('permission:mindfulness-practitioners-create')->only(['create', 'store']);
         $this->middleware('permission:mindfulness-practitioners-edit')->only(['edit', 'update']);
         $this->middleware('permission:mindfulness-practitioners-delete')->only('destroy');
-        $this->middleware('permission:mindfulness-practitioners-update-status')->only('updateStatus');
+        $this->middleware('permission:mindfulness-practitioners-update-status|mindfulness-practitioners-edit')->only('updateStatus');
     }
 
     public function index(Request $request)
@@ -138,7 +138,9 @@ class MindfulnessPractitionerController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
-        return view('admin.mindfulness_practitioners.index', compact('servicesOffered', 'clientConcerns', 'consultationModes', 'languages', 'countries'));
+        $currencies = config('currencies.symbols');
+
+        return view('admin.mindfulness_practitioners.index', compact('servicesOffered', 'clientConcerns', 'consultationModes', 'languages', 'countries', 'currencies'));
     }
 
     public function store(Request $request)
@@ -159,6 +161,7 @@ class MindfulnessPractitionerController extends Controller
             'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
+            'payout_currency' => 'required|string|max:10',
 
             'practitioner_type' => 'nullable|array',
             'practitioner_type.*' => 'string',
@@ -291,6 +294,7 @@ class MindfulnessPractitionerController extends Controller
             'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
+            'payout_currency' => 'required|string|max:10',
 
             'practitioner_type' => 'nullable|array',
             'practitioner_type.*' => 'string',

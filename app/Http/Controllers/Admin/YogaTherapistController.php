@@ -32,7 +32,7 @@ class YogaTherapistController extends Controller
         $this->middleware('permission:yoga-therapists-create')->only(['create', 'store']);
         $this->middleware('permission:yoga-therapists-edit')->only(['edit', 'update']);
         $this->middleware('permission:yoga-therapists-delete')->only('destroy');
-        $this->middleware('permission:yoga-therapists-update-status')->only('updateStatus');
+        $this->middleware('permission:yoga-therapists-update-status|yoga-therapists-edit')->only('updateStatus');
     }
 
     public function index(Request $request)
@@ -140,7 +140,9 @@ class YogaTherapistController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
-        return view('admin.yoga_therapists.index', compact('areasOfExpertise', 'consultationModes', 'languages', 'countries'));
+        $currencies = config('currencies.symbols');
+
+        return view('admin.yoga_therapists.index', compact('areasOfExpertise', 'consultationModes', 'languages', 'countries', 'currencies'));
     }
 
     public function store(Request $request)
@@ -161,6 +163,7 @@ class YogaTherapistController extends Controller
             'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
+            'payout_currency' => 'required|string|max:10',
 
             'yoga_therapist_type' => 'nullable|string|max:255',
             'years_of_experience' => 'nullable|integer',
@@ -305,6 +308,7 @@ class YogaTherapistController extends Controller
             'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
+            'payout_currency' => 'required|string|max:10',
 
             'yoga_therapist_type' => 'nullable|string|max:255',
             'years_of_experience' => 'nullable|integer',

@@ -86,6 +86,14 @@
                                                     <label class="form-label">Email Address</label>
                                                     <input type="email" class="form-control" name="email" required placeholder="name@example.com">
                                                 </div>
+                                                <div class="col-md-12">
+                                                    <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
+                                                    <select class="form-select" name="payout_currency" required>
+                                                        @foreach($currencies as $code => $symbol)
+                                                            <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label">Password</label>
                                                     <input type="password" class="form-control" name="password" required placeholder="********">

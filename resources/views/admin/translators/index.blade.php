@@ -497,6 +497,14 @@
                                                 title="Enter valid UPI ID (Example: user@upi)" required>
                                         </div>
                                         <div class="col-md-6">
+                                            <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="payout_currency" required id="translator_payout_currency">
+                                                @foreach($currencies as $code => $symbol)
+                                                <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
                                             <label class="form-label">Cancelled Cheque / Passbook Upload <span class="text-danger">*</span></label>
                                             <input class="form-control" type="file" name="cancelled_cheque" accept=".pdf,.jpg,.jpeg,.png">
                                             <div id="current-cancelled_cheque" class="mt-1 d-none small"></div>
@@ -1402,6 +1410,7 @@
                             $('input[name="ifsc_code"]').val(t.ifsc_code);
                             $('input[name="swift_code"]').val(t.swift_code);
                             $('input[name="upi_id"]').val(t.upi_id);
+                            $('#translator_payout_currency').val(t.payout_currency || 'INR');
 
                             if (t.cancelled_cheque_path) {
                                 $('#current-cancelled_cheque').removeClass('d-none').html(`<a href="${storageBase}${t.cancelled_cheque_path}" target="_blank" class="text-primary">View Current Cheque</a>`);

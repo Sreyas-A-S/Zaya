@@ -35,6 +35,7 @@ class Practitioner extends Model
     protected $table = 'practitioners';
     protected $fillable = [
         'user_id',
+        'payout_currency',
         'status',
         'booking_window_days',
         'reminder_lead_time',

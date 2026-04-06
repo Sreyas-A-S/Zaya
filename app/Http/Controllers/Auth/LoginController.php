@@ -108,6 +108,13 @@ class LoginController extends Controller
     protected function authenticated(Request $request, $user)
     {
         // This method is called by the standard 'login' route (Client/User Login)
+        
+        // Store promo code if present in the request
+        if ($request->filled('promocode')) {
+            $user->promo_code = $request->input('promocode');
+            $user->save();
+        }
+
         // If an admin tries to login via the client login page, log them out and redirect.
         $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
         
@@ -124,10 +131,6 @@ class LoginController extends Controller
 
         if ($request->has('redirect')) {
             return redirect($request->redirect);
-        }
-
-        if (in_array($user->role, ['client', 'patient'])) {
-            return redirect()->route('find-practitioner');
         }
 
         return redirect()->route('dashboard');

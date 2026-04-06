@@ -33,6 +33,7 @@ class MindfulnessPractitioner extends Model
 
     protected $fillable = [
         'user_id',
+        'payout_currency',
         'slug',
         'first_name',
         'last_name',

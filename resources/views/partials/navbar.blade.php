@@ -55,17 +55,17 @@
                     $user = auth()->user();
                     $role = $user ? $user->roleData() : null;
 
-                    if ($role && $role->name === 'Super Admin') {
-                    $languages = $allLanguages;
-                    } else {
                     $assignedIds = $user?->languages;
-                    if (is_array($assignedIds)) {
-                    $languages = $allLanguages->whereIn('id', $assignedIds);
+                    if (is_array($assignedIds) && count($assignedIds) > 0) {
+                        $languages = $allLanguages->whereIn('id', $assignedIds);
                     } elseif ($assignedIds) {
-                    $languages = $allLanguages->where('id', $assignedIds);
+                        $languages = $allLanguages->where('id', $assignedIds);
                     } else {
-                    $languages = collect();
-                    }
+                        if ($role && $role->name === 'Super Admin') {
+                            $languages = $allLanguages;
+                        } else {
+                            $languages = collect();
+                        }
                     }
 
                     // Filter unique base languages by Name (e.g., only one "English" even if regional variants exist)
@@ -179,22 +179,7 @@
                                 <span class="f-w-700 text-dark small">{{ __('SELECT LANGUAGE') }}</span>
                             </div>
                             <ul class="profile-body language-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
-                                @if(in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
-                                <li class="d-flex align-items-center last-0" style="cursor: pointer;">
-                                    <a href="javascript:void(0)"
-                                        class="lang d-flex align-items-center w-100 {{ $currentLocale == 'all' ? 'active text-primary' : '' }}"
-                                        data-value="all"
-                                        data-flag="{{ asset('admiro/assets/images/dashboard/all-countries.png') }}"
-                                        onclick="changeLanguage(this)"
-                                        style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
-                                        <i class="fa fa-globe ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
-                                        <span class="f-w-600 small">{{ __('ALL LANGUAGES') }}</span>
-                                        @if($currentLocale == 'all')
-                                        <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
-                                        @endif
-                                    </a>
-                                </li>
-                                @endif
+
                                 @if($languages->isEmpty() && !in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
                                 <li class="p-3 text-center text-muted small">{{ __('No assigned languages') }}</li>
                                 @endif
@@ -289,7 +274,7 @@
                                 <svg class="svg-color">
                                     <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Login') }}"></use>
                                 </svg>
-                                <a class="ms-2" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Log Out') }}</a>
+                                <a class="ms-2" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Log Out') }}</a>
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                     @csrf
                                 </form>

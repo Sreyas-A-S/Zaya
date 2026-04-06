@@ -599,6 +599,14 @@
                                             <label class="form-label">UPI ID (Optional)</label>
                                             <input type="text" class="form-control" name="upi_id" placeholder="Enter UPI id">
                                         </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="payout_currency" required id="doctor_payout_currency">
+                                                @foreach($currencies as $code => $symbol)
+                                                <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-4 pt-3 border-top">
                                             <button type="button" class="btn btn-outline-dark prev-step" data-prev="3"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
                                             <button type="button" class="btn btn-primary next-step" data-next="5">Next Step <i class="iconly-Arrow-Right icli ms-2"></i></button>
@@ -1662,6 +1670,7 @@
             $('[name="account_number"]').val(profile.account_number);
             $('[name="ifsc_code"]').val(profile.ifsc_code);
             $('[name="upi_id"]').val(profile.upi_id);
+            $('#doctor_payout_currency').val(profile.payout_currency || 'INR');
             $('[name="short_bio"]').val(profile.short_doctor_bio);
             $('[name="key_expertise"]').val(profile.key_expertise);
             $('[name="services_offered"]').val(profile.services_offered);

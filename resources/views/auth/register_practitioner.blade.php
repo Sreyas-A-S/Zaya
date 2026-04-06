@@ -109,6 +109,14 @@
                                                     <input type="text" class="form-control" name="zip_code" placeholder="ZIP Code">
                                                 </div>
                                                 <div class="col-md-6">
+                                                    <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
+                                                    <select class="form-select" name="payout_currency" required>
+                                                        @foreach($currencies as $code => $symbol)
+                                                            <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
                                                     <label class="form-label">Website (Optional)</label>
                                                     <input type="url" class="form-control" name="website_url" placeholder="https://example.com">
                                                 </div>

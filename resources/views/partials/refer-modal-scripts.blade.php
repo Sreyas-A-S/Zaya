@@ -148,6 +148,7 @@
                                     ${p.handles_service ? 'Handles Service' : 'Consultation Only'}
                                 </span>
                                 ${p.handles_service && p.service_fee > 0 ? `<span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">Fee: €${parseFloat(p.service_fee).toFixed(2)}</span>` : ''}
+                                ${p.profile_url ? `<a href="${p.profile_url}" target="_blank" onclick="event.stopPropagation()" class="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-black uppercase tracking-widest border border-gray-200 hover:bg-primary hover:text-white hover:border-primary transition-all">Check Slots</a>` : ''}
                             </div>
                         </div>
                     </div>

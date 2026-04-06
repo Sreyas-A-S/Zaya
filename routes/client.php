@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ZegoController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'isClient'])->group(function () {
@@ -12,9 +13,11 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/consultations', [ProfileController::class, 'bookings'])->name('consultations.index');
     Route::get('/bookings', [ProfileController::class, 'bookings'])->name('bookings.index');
     Route::get('/transactions', [ProfileController::class, 'transactions'])->name('transactions.index');
+    Route::get('/promo-codes', [ProfileController::class, 'promoCodes'])->name('promo-codes.index');
     Route::get('/conference-history', [ProfileController::class, 'conferences'])->name('conferences.index');
     Route::get('/recordings/{id}', [ProfileController::class, 'showRecording'])->name('recordings.show');
     Route::get('/conference/session/{channel}', [ProfileController::class, 'joinSession'])->name('conference.join');
+    Route::get('/conference/zego/{channel}', [ZegoController::class, 'join'])->name('zego.join');
     Route::get('/bookings/{id}/consultation-form', [ProfileController::class, 'showConsultationForm'])->name('bookings.consultation-form.show');
     Route::post('/bookings/{id}/consultation-form', [ProfileController::class, 'storeConsultationForm'])->name('bookings.consultation-form.store');
     Route::get('/agora/token', [ProfileController::class, 'generateToken'])->name('agora.token');
@@ -39,6 +42,10 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::post('/data-access/toggle', [\App\Http\Controllers\DataAccessController::class, 'toggleAccess'])->name('data-access.toggle');
     Route::get('/client-profile/{id}', [ProfileController::class, 'viewClientProfile'])->name('client.profile.view');
     Route::get('/profile', [ProfileController::class, 'profile'])->name('profile');
+    Route::get('/complete-profile', [ProfileController::class, 'completeProfile'])->name('profile.complete');
+    Route::post('/complete-profile', [ProfileController::class, 'storeCompleteProfile'])->name('profile.complete.store');
+    Route::post('/profile/send-otp', [ProfileController::class, 'sendEmailOTP'])->name('profile.sendOtp');
+    Route::post('/profile/verify-otp', [ProfileController::class, 'verifyEmailOTP'])->name('profile.verifyOtp');
     Route::post('/profile/update-personal', [ProfileController::class, 'updatePersonalDetails'])->name('profile.updatePersonal');
     Route::post('/profile/update-pic', [ProfileController::class, 'updateProfilePic'])->name('profile.updatePic');
     Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
@@ -55,6 +62,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::delete('/my-services/group/{service_id}', [ProfileController::class, 'deleteServiceGroup'])->name('my-services.delete-group');
 
     Route::get('/api/referrable-practitioners', [BookingController::class, 'fetchReferrablePractitioners'])->name('referrable-practitioners-api');
+    Route::get('/api/professional-profile/{user}', [BookingController::class, 'getProfessionalProfile'])->name('professional-profile-api');
     Route::get('/api/available-translators', [ProfileController::class, 'fetchAvailableTranslators'])->name('available-translators-api');
     Route::post('/bookings/{id}/assign-translator', [ProfileController::class, 'assignTranslator'])->name('bookings.assign-translator');
 
@@ -85,3 +93,9 @@ Route::middleware(['auth', 'isClient'])->group(function () {
 });
 
 Route::get('/conference/share/{channel}', [ProfileController::class, 'publicJoinSession'])->name('conference.share');
+Route::get('/conference/zego/share/{channel}', [ZegoController::class, 'publicJoin'])->name('zego.share');
+Route::post('/conference/upload-recording', [ProfileController::class, 'uploadConferenceRecording'])->name('conference.upload-recording');
+Route::post('/conference/zego/{channel}/recording/start', [ZegoController::class, 'startRecording'])->name('zego.recording.start');
+Route::post('/conference/zego/{channel}/recording/stop', [ZegoController::class, 'stopRecording'])->name('zego.recording.stop');
+Route::post('/conference/zego/{channel}/recording/status', [ZegoController::class, 'syncRecordingStatus'])->name('zego.recording.status');
+Route::post('/conference/zego/{channel}/token', [ZegoController::class, 'generateToken'])->name('zego.token');
