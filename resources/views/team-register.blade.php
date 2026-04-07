@@ -332,7 +332,6 @@
                         </div>
 
                         <div class="flex justify-end mt-8 border-t border-gray-100 pt-8">
-                            <button type="button" class="next-tab-btn bg-[#FABC41] text-[#423131] py-3.5 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] shadow-md shadow-[#FABC41]/20">{{ __('Next Step') }} <i class="ri-arrow-right-line ml-2 align-middle"></i></button>
                         </div>
                     </div>
 

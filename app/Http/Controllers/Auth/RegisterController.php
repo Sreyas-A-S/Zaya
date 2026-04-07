@@ -822,7 +822,7 @@ class RegisterController extends Controller
             $rules['last_name'] = ['required', 'string', 'max:255'];
             $rules['gender'] = ['required', Rule::in(['male', 'female', 'other'])];
             $rules['mobile_number'] = ['required', 'string', 'max:20'];
-            $rules['profile_photo'] = ['required', 'image', 'max:2048'];
+            $rules['profile_photo'] = ['nullable', 'image', 'max:2048'];
             $rules['nationality'] = ['nullable', 'string', 'max:255'];
 
             $rules['ayush_reg_no'] = ['required', 'string', 'max:255'];
@@ -831,20 +831,20 @@ class RegisterController extends Controller
             $rules['digital_signature'] = ['nullable', 'file', 'max:2048'];
 
             $rules['primary_qualification'] = ['required', 'string', 'max:255'];
-            $rules['degree_certificates'] = ['required', 'array'];
+            $rules['degree_certificates'] = ['nullable', 'array'];
             $rules['degree_certificates.*'] = ['file', 'max:2048'];
             $rules['years_of_experience'] = ['required', 'integer', 'min:0'];
             $rules['current_workplace'] = ['required', 'string', 'max:255'];
 
-            $rules['pan_number'] = ['required', 'string', 'max:20'];
-            $rules['pan_upload'] = ['required', 'file', 'max:2048'];
+            $rules['pan_number'] = ['nullable', 'string', 'max:20'];
+            $rules['pan_upload'] = ['nullable', 'file', 'max:2048'];
             $rules['aadhaar_upload'] = ['nullable', 'file', 'max:2048'];
-            $rules['cancelled_cheque'] = ['required', 'file', 'max:2048'];
+            $rules['cancelled_cheque'] = ['nullable', 'file', 'max:2048'];
 
-            $rules['bank_account_holder'] = ['required', 'string', 'max:255'];
-            $rules['bank_name'] = ['required', 'string', 'max:255'];
-            $rules['account_number'] = ['required', 'string', 'max:255'];
-            $rules['ifsc_code'] = ['required', 'string', 'max:50'];
+            $rules['bank_account_holder'] = ['nullable', 'string', 'max:255'];
+            $rules['bank_name'] = ['nullable', 'string', 'max:255'];
+            $rules['account_number'] = ['nullable', 'string', 'max:255'];
+            $rules['ifsc_code'] = ['nullable', 'string', 'max:50'];
 
             $rules['short_bio'] = ['required', 'string'];
             $rules['key_expertise'] = ['required', 'string'];

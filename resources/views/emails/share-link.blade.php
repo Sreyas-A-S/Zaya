@@ -9,7 +9,6 @@ You have been invited to join the ZAYA Wellness Collective. Please use the secur
 Complete Registration
 @endcomponent
 
-**Secure Link:** {{ $link }}
 
 This link will expire in 7 days.
 
