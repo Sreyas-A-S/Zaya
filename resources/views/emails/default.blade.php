@@ -194,6 +194,14 @@
                 </tr>
                 @endif
             </table>
+
+            @if(!empty($credentials['login_url']))
+                <div style="margin-top: 28px;">
+                    <a href="{{ $credentials['login_url'] }}" style="display:inline-block;background:#97563D;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:9999px;font-weight:600;">
+                        {{ $credentials['button_text'] ?? 'Set Password' }}
+                    </a>
+                </div>
+            @endif
         @endif
 
             @if(!empty($outro))

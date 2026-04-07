@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\GeoIpController;
@@ -55,6 +56,9 @@ Route::post('forgot-password/reset', [\App\Http\Controllers\Auth\ClientForgotPas
 
 Route::post('login', [LoginController::class, 'login']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('set-password', [SetPasswordController::class, 'show'])->name('set-password.show');
+Route::post('set-password', [SetPasswordController::class, 'update'])->name('set-password.update');
 
 Route::get('register/selection', function () {
     return view('auth.register_selection');

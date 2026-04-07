@@ -782,13 +782,20 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
+        $requiresPassword = empty($data['open_register_token']);
+
         $rules = [
             'name' => ['nullable', 'string', 'max:255'],
             'first_name' => ['nullable', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+            'password' => array_values(array_filter([
+                $requiresPassword ? 'required' : 'nullable',
+                'string',
+                'confirmed',
+                Password::min(8)->mixedCase()->numbers()->symbols(),
+            ])),
             'role' => ['required', 'string', 'in:practitioner,patient,client,doctor,mindfulness_practitioner,yoga_therapist,translator'],
             'profile_photo' => ['nullable', 'image', 'max:2048'],
             'gender' => ['nullable', 'string', 'in:male,female,transgender,other'],
@@ -956,13 +963,18 @@ class RegisterController extends Controller
             $name = implode(' ', $parts);
         }
 
+        $rawPassword = $data['password'] ?? null;
+        if (!$rawPassword) {
+            $rawPassword = \Illuminate\Support\Str::random(32);
+        }
+
         return User::create([
             'name' => $name,
             'first_name' => $data['first_name'] ?? null,
             'middle_name' => $data['middle_name'] ?? null,
             'last_name' => $data['last_name'] ?? null,
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'password' => Hash::make($rawPassword),
             'role' => $data['role'],
         ]);
     }

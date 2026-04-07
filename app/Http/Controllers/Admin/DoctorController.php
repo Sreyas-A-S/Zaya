@@ -10,7 +10,7 @@ use App\Models\Specialization;
 use App\Models\AyurvedaExpertise;
 use App\Models\HealthCondition;
 use App\Models\ExternalTherapy;
-use App\Mail\WelcomeUserMail;
+use App\Mail\SetPasswordMail;
 use App\Mail\PractitionerApplicationSubmittedMail;
 use App\Mail\RegistrationFeePaymentLinkMail;
 use App\Services\RegistrationFeeService;
@@ -18,8 +18,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rules\Password as RulesPassword;
 
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
@@ -187,7 +188,7 @@ class DoctorController extends Controller
             'dob' => 'required|date',
             'mobile_number' => 'required|string|max:15|regex:/^[0-9\s\-\+\(\)]+$/',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+            'password' => ['required', 'string', 'confirmed', RulesPassword::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // B. Medical Registration
@@ -410,7 +411,7 @@ class DoctorController extends Controller
             'dob' => 'required|date',
             'mobile_number' => 'required|string|max:15|regex:/^[0-9\s\-\+\(\)]+$/',
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+            'password' => ['nullable', 'string', 'confirmed', RulesPassword::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // B. Medical Registration
@@ -606,7 +607,9 @@ class DoctorController extends Controller
         if ($previousStatus !== 'active' && $status === 'active') {
             $user = $doctor->user;
             if ($user) {
-                Mail::to($user->email)->send(new WelcomeUserMail($user->email, null, url('/zaya-login'), $user->role));
+                $token = Password::broker()->createToken($user);
+                $setPasswordUrl = route('set-password.show', ['token' => $token, 'email' => $user->email]);
+                Mail::to($user->email)->send(new SetPasswordMail($user->email, $setPasswordUrl));
             }
         }
 

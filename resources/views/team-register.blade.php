@@ -356,30 +356,36 @@
                     <!-- Step 3: Account Security -->
                     <div id="tab-security" class="tab-content hidden" style="display: none;">
                         <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Account Security') }}</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            <div>
-                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Password') }} <span class="text-red-500">*</span></label>
-                                <div class="relative">
-                                    <input type="password" name="password" id="password" required
-                                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$"
-                                        title="Minimum 8 chars with uppercase, lowercase, number, and special character"
-                                        class="reg-input pr-12">
-                                    <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                        <i class="ri-eye-line text-xl"></i>
-                                    </button>
+                        @if(empty($openRegisterToken))
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <div>
+                                    <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Password') }} <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <input type="password" name="password" id="password" required
+                                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$"
+                                            title="Minimum 8 chars with uppercase, lowercase, number, and special character"
+                                            class="reg-input pr-12">
+                                        <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                            <i class="ri-eye-line text-xl"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Confirm Password') }} <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <input type="password" name="password_confirmation" id="password_confirmation" required
+                                            class="reg-input pr-12">
+                                        <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                            <i class="ri-eye-line text-xl"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Confirm Password') }} <span class="text-red-500">*</span></label>
-                                <div class="relative">
-                                    <input type="password" name="password_confirmation" id="password_confirmation" required
-                                        class="reg-input pr-12">
-                                    <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                        <i class="ri-eye-line text-xl"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        @else
+                            <p class="text-gray-500 text-sm md:text-base mb-8">
+                                {{ __('After approval, we will email you a secure link to create your password and activate your account.') }}
+                            </p>
+                        @endif
 
                         @if(($joinRole ?? '') === 'yoga_therapist')
                             <div class="mb-10">
