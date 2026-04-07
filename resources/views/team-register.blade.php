@@ -86,8 +86,15 @@
         }
 
         /* TomSelect Premium Overrides */
+        .ts-wrapper {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+        }
+
         .ts-control {
-            padding: 12px 24px !important;
+            padding: 10px 24px !important;
             background: #FFFFFF !important;
             border-radius: 9999px !important;
             border: 1px solid #D1D5DB !important;
@@ -122,6 +129,7 @@
             margin-top: 8px !important;
             padding: 8px !important;
             overflow: hidden !important;
+            z-index: 1000 !important;
         }
 
         .ts-dropdown .option {
@@ -133,6 +141,12 @@
         .ts-dropdown .active {
             background-color: #FFF3D4 !important;
             color: #97563D !important;
+        }
+
+        .ts-control > .item {
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
         }
 
         /* Hide the native select that TomSelect replaces */
@@ -248,8 +262,8 @@
                             </div>
                             @if(($joinRole ?? '') === 'doctor')
                                 <div>
-                                    <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Nationality') }}</label>
-                                    <select id="nationality-select" name="nationality" data-nationality-select
+                                    <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Nationality') }} <span class="text-red-500">*</span></label>
+                                    <select id="nationality-select" name="nationality" required data-nationality-select
                                         class="reg-input bg-white">
                                         <option value="">{{ __('Select') }}</option>
                                         @foreach(($countries ?? []) as $c)
@@ -290,7 +304,15 @@
                             </div>
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Country') }} <span class="text-red-500">*</span></label>
-                                <input type="text" name="country" value="{{ old('country') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid country name" class="reg-input">
+                                <select name="country" required data-country-select
+                                    class="reg-input bg-white">
+                                    <option value="">{{ __('Select') }}</option>
+                                    @foreach(($countries ?? []) as $c)
+                                        <option value="{{ $c->name }}" data-code="{{ strtolower($c->code) }}" @selected(old('country') === $c->name)>
+                                            {{ $c->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Payout Currency') }} <span class="text-red-500">*</span></label>
@@ -413,7 +435,7 @@
                     separateDialCode: true,
                     initialCountry: "auto",
                     geoIpLookup: function(callback) {
-                        fetch("{{ route('geoip.country') }}", { headers: { 'Accept': 'application/json' } })
+                        fetch("/geoip/country", { headers: { 'Accept': 'application/json' } })
                             .then(res => res.json())
                             .then(data => callback((data && data.country_code ? String(data.country_code).toLowerCase() : 'in')))
                             .catch(() => callback("in"));
@@ -471,38 +493,40 @@
                 });
             }
 
-            // Nationality dropdown with flags (Doctor)
-            const nationalitySelect = document.querySelector('[data-nationality-select]');
-            if (nationalitySelect && !nationalitySelect.tomselect && typeof TomSelect !== 'undefined') {
-                new TomSelect(nationalitySelect, {
-                    create: false,
-                    persist: false,
-                    render: {
-                        option: function(data, escape) {
-                            const code = (data.code || '').toLowerCase();
-                            const name = escape(data.text || data.value || '');
-                            if (!code) return `<div>${name}</div>`;
-                            return `
-                                <div class="flex items-center gap-3">
-                                    <img class="w-5 h-4 rounded-sm" src="https://flagcdn.com/w20/${escape(code)}.png" alt="${name}">
-                                    <span>${name}</span>
-                                </div>
-                            `;
-                        },
-                        item: function(data, escape) {
-                            const code = (data.code || '').toLowerCase();
-                            const name = escape(data.text || data.value || '');
-                            if (!code) return `<div>${name}</div>`;
-                            return `
-                                <div class="flex items-center gap-2">
-                                    <img class="w-5 h-4 rounded-sm" src="https://flagcdn.com/w20/${escape(code)}.png" alt="${name}">
-                                    <span>${name}</span>
-                                </div>
-                            `;
+            // Nationality and Country dropdowns with flags
+            const countrySelectors = document.querySelectorAll('[data-nationality-select], [data-country-select]');
+            countrySelectors.forEach(select => {
+                if (select && !select.tomselect && typeof TomSelect !== 'undefined') {
+                    new TomSelect(select, {
+                        create: false,
+                        persist: false,
+                        render: {
+                            option: function(data, escape) {
+                                const code = (data.code || '').toLowerCase();
+                                const name = escape(data.text || data.value || '');
+                                if (!code) return `<div class="py-2 px-1 text-gray-500">${name}</div>`;
+                                return `
+                                    <div class="flex items-center gap-3 py-1">
+                                        <img class="w-6 h-4 rounded-sm object-cover border border-gray-100" src="https://flagcdn.com/w40/${escape(code)}.png" alt="${name}">
+                                        <span class="text-gray-700 font-medium">${name}</span>
+                                    </div>
+                                `;
+                            },
+                            item: function(data, escape) {
+                                const code = (data.code || '').toLowerCase();
+                                const name = escape(data.text || data.value || '');
+                                if (!code) return `<div class="text-gray-400">${name}</div>`;
+                                return `
+                                    <div class="flex items-center gap-2">
+                                        <img class="w-5 h-3.5 rounded-sm object-cover border border-gray-100" src="https://flagcdn.com/w40/${escape(code)}.png" alt="${name}">
+                                        <span class="text-gray-700 font-medium">${name}</span>
+                                    </div>
+                                `;
+                            }
                         }
-                    }
-                });
-            }
+                    });
+                }
+            });
 
             // Toggle password visibility (eye icon)
             document.querySelectorAll('.password-toggle').forEach(btn => {

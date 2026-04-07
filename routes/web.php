@@ -146,6 +146,7 @@ Route::post('/validate-promo-code', [WebController::class, 'validatePromoCode'])
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource('/admins', AdminsController::class);
     Route::post('/admins/{id}/status', [AdminsController::class, 'updateStatus'])->name('admins.status');
+    Route::post('/admins/{id}/assign-countries', [AdminsController::class, 'assignCountries'])->name('admins.assign-countries');
     Route::get('admin/admins/{id}/edit', [AdminController::class, 'edit']);
     Route::put('admin/admins/{id}', [AdminController::class, 'update']);
     Route::delete('/admin/admins/{id}', [AdminsController::class, 'destroy']);
@@ -174,6 +175,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('translators/{id}/status', [TranslatorController::class, 'updateStatus'])->name('translators.status');
     Route::resource('forms', FormController::class)->only(['index', 'show']);
     Route::post('forms/generate-link', [FormController::class, 'generateLink'])->name('forms.generate-link');
+    Route::post('forms/share-email', [FormController::class, 'shareEmail'])->name('forms.share-email');
     Route::post('forms/{id}/status', [FormController::class, 'updateStatus'])->name('forms.status');
     Route::delete('forms/{id}', [FormController::class, 'destroy'])->name('forms.destroy');
     Route::resource('roles', RoleController::class);

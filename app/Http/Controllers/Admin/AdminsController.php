@@ -40,16 +40,17 @@ class AdminsController extends Controller
 
         if ($request->ajax()) {
             $query = User::whereIn('role', ['admin', 'super-admin'])
-                ->select([
-                    'users.id',
-                    'users.name',
-                    'users.email',
-                    'users.phone',
-                    'users.languages',
-                    'users.status',
-                    'users.national_id',
-                    'users.profile_pic'
-                ]);
+            ->select([
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.phone',
+                'users.languages',
+                'users.status',
+                'users.national_id',
+                'users.created_at',
+                'users.profile_pic'
+            ]);
 
             // Apply Admin Filters (Country & Language)
             $query = $this->applyAdminFilters($query, 'user');
@@ -78,18 +79,9 @@ class AdminsController extends Controller
                     }
                 })
                 ->addColumn('nationality', function ($row) {
-                    $nationalIds = $row->national_id;
-                    if (is_string($nationalIds)) {
-                        $decoded = json_decode($nationalIds, true);
-                        if (json_last_error() === JSON_ERROR_NONE) {
-                            $nationalIds = $decoded;
-                        }
-                    }
-                    
-                    if (is_array($nationalIds) && !empty($nationalIds)) {
-                        return \App\Models\Country::whereIn('id', $nationalIds)->pluck('name')->implode(', ');
-                    } elseif (!is_array($nationalIds) && $nationalIds && is_numeric($nationalIds)) {
-                        return optional(\App\Models\Country::find($nationalIds))->name;
+                    $countryIds = $this->normalizeCountryIds($row->national_id);
+                    if (!empty($countryIds)) {
+                        return \App\Models\Country::whereIn('id', $countryIds)->pluck('name')->implode(', ');
                     }
                     return 'N/A';
                 })
@@ -123,6 +115,9 @@ class AdminsController extends Controller
                         <div class="d-flex align-items-center gap-2">
                             <a href="javascript:void(0)" data-id="' . $row->id . '" class="text-info viewUser" title="View">
                                 <i class="iconly-Show icli" style="font-size: 20px;"></i>
+                            </a>
+                            <a href="javascript:void(0)" data-id="' . $row->id . '" class="text-secondary viewCountries" title="View Assigned Countries">
+                                <i class="fa-solid fa-earth-americas" style="font-size: 20px;"></i>
                             </a>
                             <a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editUser" title="Edit">
                                 <i class="iconly-Edit-Square icli" style="font-size: 20px;"></i>
@@ -190,7 +185,7 @@ class AdminsController extends Controller
             'last_name'   => $request->lastname,
             'email'       => $request->email,
             'phone'       => $request->phone,
-            'national_id' => $request->country,
+            'national_id' => array_map('intval', $request->country),
             'languages'   => $request->language, 
             'password'    => Hash::make($request->password),
             'role'        => 'admin',
@@ -214,6 +209,8 @@ class AdminsController extends Controller
     public function edit($id)
     {
         $admin = User::findOrFail($id);
+        $countryIds = $this->normalizeCountryIds($admin->national_id);
+        $admin->country_names = Country::whereIn('id', $countryIds)->pluck('name')->toArray();
         return response()->json($admin);
     }
 
@@ -250,7 +247,7 @@ class AdminsController extends Controller
             'last_name' => $request->lastname,
             'email' => $request->email,
             'phone' => $request->phone,
-            'national_id' => $request->country,
+            'national_id' => array_map('intval', $request->country),
             'languages' => $request->language,
             'status' => $request->status,
         ];
@@ -303,17 +300,58 @@ class AdminsController extends Controller
         return response()->json(['success' => 'Status updated successfully!']);
     }
 
-    public function destroy($id)
-        {
-            $admin = User::whereIn('role', ['admin', 'super-admin'])->findOrFail($id);
-
-            $admin->delete();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Deleted successfully'
-            ]);
+    public function assignCountries(Request $request, $id)
+    {
+        if (!\Illuminate\Support\Facades\Auth::user() || !in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
-            
 
+        $admin = User::whereIn('role', ['admin', 'super-admin'])->findOrFail($id);
+
+        $countries = $request->input('countries', []);
+        
+        $admin->update([
+            'national_id' => !empty($countries) ? array_map('intval', $countries) : null
+        ]);
+
+        return response()->json(['success' => 'Assigned countries updated successfully!']);
+    }
+
+    public function destroy($id)
+    {
+        $admin = User::whereIn('role', ['admin', 'super-admin'])->findOrFail($id);
+
+        $admin->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Deleted successfully'
+        ]);
+    }
+
+    private function normalizeCountryIds($value): array
+    {
+        if (is_null($value)) {
+            return [];
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return is_array($decoded) ? array_values($decoded) : [$decoded];
+            }
+            return [$value];
+        }
+
+        if (is_numeric($value)) {
+            return [$value];
+        }
+
+        if (is_array($value)) {
+            return array_values($value);
+        }
+
+        return [];
+    }
+    
 }

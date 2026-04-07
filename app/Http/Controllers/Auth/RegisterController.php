@@ -184,6 +184,11 @@ class RegisterController extends Controller
                     if (!empty($promoNotes['promo_code'] ?? null)) {
                         $user->promo_code = $promoNotes['promo_code'];
                         $user->save();
+
+                        $promo = PromoCode::where('code', $promoNotes['promo_code'])->first();
+                        if ($promo) {
+                            $promo->increment('used_count');
+                        }
                     }
                 }
 

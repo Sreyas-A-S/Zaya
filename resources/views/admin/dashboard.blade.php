@@ -47,16 +47,14 @@
                             <h1>Hello, {{ $user->first_name ?: $user->name }} <img
                                     src="{{ asset('admiro/assets/images/dashboard-1/hand.png') }}" alt="" /></h1>
                         </div>
-                        <p class="mb-4">Welcome back! Let’s start from where you left.</p>
+                        <p class="mb-4">Let’s get back to where you paused.</p>
 
                         @if($user->role !== 'super-admin')
                             <div class="d-flex flex-wrap gap-4 mb-4">
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="flex-shrink-0 bg-light-primary p-2 rounded-circle d-flex align-items-center justify-content-center"
                                         style="width: 40px; height: 40px;">
-                                        <svg class="stroke-icon stroke-primary" style="width: 20px; height: 20px;">
-                                            <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Location') }}"></use>
-                                        </svg>
+                                        <i class="fa-solid fa-earth-americas text-primary" style="font-size: 20px;"></i>
                                     </div>
                                     <div>
                                         <h6 class="mb-0 text-muted f-w-600" style="font-size: 12px;">Nationality</h6>
@@ -145,7 +143,7 @@
                     </div>
                     <!-- Total Services -->
                     <div class="col-sm-6 col-xl-4">
-                        <div class="card small-widget">
+                        <div class="card small-widget mb-sm-4 mb-xl-4">
                             <div class="card-body">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div class="flex-grow-1">
@@ -161,7 +159,7 @@
                     </div>
                     <!-- Total Packages -->
                     <div class="col-sm-6 col-xl-4">
-                        <div class="card small-widget">
+                        <div class="card small-widget mb-sm-4 mb-xl-4">
                             <div class="card-body">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div class="flex-grow-1">
@@ -170,6 +168,72 @@
                                     </div>
                                     <div class="flex-shrink-0 bg-light-success p-3 rounded-pill">
                                         <i class="fa fa-archive text-success fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Total Doctors -->
+                    <div class="col-sm-6 col-xl-4">
+                        <div class="card small-widget mb-sm-4 mb-xl-4">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="flex-grow-1">
+                                        <h2 class="mb-1">{{ $stats['total_doctors'] }}</h2>
+                                        <p class="mb-0 font-roboto">Doctors</p>
+                                    </div>
+                                    <div class="flex-shrink-0 bg-light-primary p-3 rounded-pill">
+                                        <i class="fa fa-user-md text-primary fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Mindfulness Counsellors -->
+                    <div class="col-sm-6 col-xl-4">
+                        <div class="card small-widget mb-sm-4 mb-xl-4">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="flex-grow-1">
+                                        <h2 class="mb-1">{{ $stats['total_mindfulness'] }}</h2>
+                                        <p class="mb-0 font-roboto">Mindfulness Counsellors</p>
+                                    </div>
+                                    <div class="flex-shrink-0 bg-light-secondary p-3 rounded-pill">
+                                        <i class="fa fa-leaf text-secondary fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Yoga Therapists -->
+                    <div class="col-sm-6 col-xl-4">
+                        <div class="card small-widget mb-sm-4 mb-xl-4">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="flex-grow-1">
+                                        <h2 class="mb-1">{{ $stats['total_yoga'] }}</h2>
+                                        <p class="mb-0 font-roboto">Yoga Therapists</p>
+                                    </div>
+                                    <div class="flex-shrink-0 bg-light-warning p-3 rounded-pill">
+                                        <svg class="stroke-icon stroke-warning" style="width: 32px; height: 32px;">
+                                            <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Activity') }}"></use>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Translators -->
+                    <div class="col-sm-6 col-xl-4">
+                        <div class="card small-widget">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="flex-grow-1">
+                                        <h2 class="mb-1">{{ $stats['total_translators'] }}</h2>
+                                        <p class="mb-0 font-roboto">Translators</p>
+                                    </div>
+                                    <div class="flex-shrink-0 bg-light-info p-3 rounded-pill">
+                                        <i class="fa fa-language text-info fa-2x"></i>
                                     </div>
                                 </div>
                             </div>

@@ -138,6 +138,13 @@
                         } else {
                         $currentLocale = session('locale', config('app.locale', 'en'));
                         }
+
+                        // Language Fallback logic
+                        if ($currentLocale !== 'all' && !$languages->where('code', $currentLocale)->first()) {
+                            $firstAssignedLang = $languages->first();
+                            $currentLocale = $firstAssignedLang ? $firstAssignedLang->code : 'en';
+                            session(['locale' => $currentLocale]);
+                        }
                         
                         $currentLanguage=$allLanguages->where('code', $currentLocale)->first();
 
@@ -179,6 +186,22 @@
                                 <span class="f-w-700 text-dark small">{{ __('SELECT LANGUAGE') }}</span>
                             </div>
                             <ul class="profile-body language-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
+                                @if(in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
+                                <li class="d-flex align-items-center last-0" style="cursor: pointer;">
+                                    <a href="javascript:void(0)"
+                                        class="lang d-flex align-items-center w-100 {{ $currentLocale == 'all' ? 'active text-primary' : '' }}"
+                                        data-value="all"
+                                        data-flag=""
+                                        onclick="changeLanguage(this)"
+                                        style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
+                                        <i class="fa fa-language ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
+                                        <span class="f-w-600 small">{{ __('ALL LANGUAGES') }}</span>
+                                        @if($currentLocale == 'all')
+                                        <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                                        @endif
+                                    </a>
+                                </li>
+                                @endif
 
                                 @if($languages->isEmpty() && !in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
                                 <li class="p-3 text-center text-muted small">{{ __('No assigned languages') }}</li>

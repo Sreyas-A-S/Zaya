@@ -152,6 +152,13 @@ class BookingController extends Controller
                 'razorpay_payment_id' => $paymentId,
             ]);
 
+            if (!empty($notes['promo_code'])) {
+                $promo = \App\Models\PromoCode::where('code', $notes['promo_code'])->first();
+                if ($promo) {
+                    $promo->increment('used_count');
+                }
+            }
+
             // Record Financial Transaction
             $practitioner = $booking->practitioner;
             $countryId = null;

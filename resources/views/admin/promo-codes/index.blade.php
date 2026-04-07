@@ -31,6 +31,16 @@
                     </button>
                 </div>
                 <div class="card-body">
+                    <div class="d-flex justify-content-start align-items-center mb-3 gap-3 d-none" id="custom-filters-container">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 small fw-bold text-muted">Created Date:</label>
+                            <input type="date" id="created-date-filter" class="form-control form-control-sm" style="width: 130px;">
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 small fw-bold text-muted">Expiry Date:</label>
+                            <input type="date" id="expiry-date-filter" class="form-control form-control-sm" style="width: 130px;">
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="display" id="promo-codes-table">
                             <thead>
@@ -40,8 +50,9 @@
                                     <th>Context</th>
                                     <th>Type</th>
                                     <th>Reward</th>
-                                    <th>Limit/Used</th>
+                                    <th>Used/Limit</th>
                                     <th>Expiry Date</th>
+                                    <th>Created Date</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -174,6 +185,36 @@
     </div>
 </div>
 
+<!-- View Modal -->
+<div class="modal fade" id="view-promo-code-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h5 class="modal-title text-white"><i class="iconly-Show icli me-2"></i>Promo Code Details</h5>
+                <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <table class="table table-bordered mb-0">
+                    <tbody>
+                        <tr><th class="bg-light" style="width: 40%;">Code</th><td id="view-code" class="fw-bold"></td></tr>
+                        <tr><th class="bg-light">Description</th><td><div id="view-description" style="max-height: 120px; overflow-y: auto; word-break: break-word; white-space: pre-wrap;"></div></td></tr>
+                        <tr><th class="bg-light">Usage Context</th><td id="view-usage-type"></td></tr>
+                        <tr><th class="bg-light">Discount Type</th><td id="view-type"></td></tr>
+                        <tr><th class="bg-light">Reward Value</th><td id="view-reward"></td></tr>
+                        <tr><th class="bg-light">Usage Limit</th><td id="view-usage-limit"></td></tr>
+                        <tr><th class="bg-light">Used Count</th><td id="view-used-count"></td></tr>
+                        <tr><th class="bg-light">Expiry Date</th><td id="view-expiry-date"></td></tr>
+                        <tr><th class="bg-light">Status</th><td id="view-status"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button class="btn btn-outline-dark" type="button" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -186,7 +227,17 @@
         var table = $('#promo-codes-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('admin.promo-codes.index') }}",
+            ajax: {
+                url: "{{ route('admin.promo-codes.index') }}",
+                data: function (d) {
+                    d.created_date_filter = $('#created-date-filter').val();
+                    d.expiry_date_filter = $('#expiry-date-filter').val();
+                }
+            },
+            initComplete: function() {
+                const filterHtml = $('#custom-filters-container').removeClass('d-none').detach();
+                $('#promo-codes-table_wrapper .dataTables_filter').prepend(filterHtml);
+            },
             columns: [
                 {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                 {data: 'code', name: 'code'},
@@ -196,13 +247,18 @@
                 {
                     data: null, 
                     render: function(data) {
-                        return (data.usage_limit || '∞') + ' / ' + data.used_count;
+                        return (data.used_count || 0) + ' / ' + (data.usage_limit || '∞');
                     }
                 },
                 {data: 'expiry_date', name: 'expiry_date'},
+                {data: 'created_at', name: 'created_at'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
+        });
+
+        $('#created-date-filter, #expiry-date-filter').on('change', function() {
+            table.ajax.reload();
         });
 
         $('#promo-code-form').on('submit', function(e) {
@@ -249,6 +305,25 @@
                 }
 
                 $('#promo-code-modal').modal('show');
+            });
+        });
+
+        $(document).on('click', '.viewPromoCode', function() {
+            var id = $(this).data('id');
+            $.get("{{ url('admin/promo-codes') }}/" + id, function(data) {
+                $('#view-code').text(data.code);
+                $('#view-description').text(data.description || 'N/A');
+                let uType = data.usage_type.charAt(0).toUpperCase() + data.usage_type.slice(1);
+                $('#view-usage-type').text(uType);
+                $('#view-type').text(data.type === 'fixed' ? 'Fixed Amount' : 'Percentage (%)');
+                $('#view-reward').text(data.type === 'percentage' ? data.reward + '%' : '$' + data.reward);
+                
+                $('#view-usage-limit').text(data.usage_limit || 'Unlimited');
+                $('#view-used-count').text(data.used_count || 0);
+                $('#view-expiry-date').text(data.expiry_date ? data.expiry_date.split('T')[0] : 'N/A');
+                $('#view-status').html(data.status ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>');
+
+                $('#view-promo-code-modal').modal('show');
             });
         });
 

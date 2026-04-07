@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use App\Mail\ShareRegistrationLinkMail;
+use Illuminate\Support\Facades\Mail;
 use Yajra\DataTables\DataTables;
 
 class FormController extends Controller
@@ -70,8 +72,13 @@ class FormController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $viewUrl = route('admin.forms.show', $row->id);
+                    $role = str_replace('_', '-', strtolower(trim((string) $row->role)));
+                    $url = url('/open-register/' . $role . '/signature=' . $row->token);
                     return '
                         <a href="' . e($viewUrl) . '" class="btn btn-primary btn-sm me-1">View</a>
+                        <button type="button" class="btn btn-info btn-sm shareLink me-1 text-white" data-url="' . e($url) . '" title="Share via Email">
+                            <i class="fa-solid fa-share-nodes"></i>
+                        </button>
                         <button type="button" class="btn btn-danger btn-sm deleteLink" data-id="' . e($row->id) . '" title="Delete">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -165,5 +172,19 @@ class FormController extends Controller
         $link = $query->findOrFail($id);
 
         return view('admin.forms.show', compact('link', 'hasUsedByColumn'));
+    }
+    public function shareEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'link' => 'required|url',
+        ]);
+
+        try {
+            Mail::to($request->email)->send(new ShareRegistrationLinkMail($request->link));
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to send email: ' . $e->getMessage()], 500);
+        }
     }
 }

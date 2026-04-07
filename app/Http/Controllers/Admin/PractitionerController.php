@@ -52,6 +52,7 @@ class PractitionerController extends Controller
                     'users.id',
                     'users.name',
                     'users.first_name',
+                    'users.middle_name',
                     'users.last_name',
                     'users.email',
                     'users.created_at',
@@ -120,10 +121,16 @@ class PractitionerController extends Controller
                     return '<a href="javascript:void(0);" class="text-primary fw-bold call-phone" data-phone="' . $row->phone . '" data-name="' . $row->name . '"><i class="iconly-Call icli me-1"></i>' . $row->phone . '</a>';
                 })
                 ->editColumn('nationality', function ($row) {
-                    $code = $row->nationality ?: ($row->country ?: null);
-                    if (!$code) return 'N/A';
+                    $value = $row->nationality ?: ($row->country ?: null);
+                    if (!$value) {
+                        return 'N/A';
+                    }
+
                     $countries = config('countries', []);
-                    return $countries[strtoupper($code)] ?? $code;
+                    $code = $this->resolveCountryCode($value, $countries);
+                    $name = $code ? ($countries[$code] ?? $value) : $value;
+                    $flag = $code ? $this->flagEmoji($code) . ' ' : '';
+                    return $flag . $name;
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-3">';
@@ -134,6 +141,10 @@ class PractitionerController extends Controller
                     return $btn;
                 })
                 ->rawColumns(['status', 'phone', 'profile_photo', 'action', 'nationality'])
+                ->editColumn('name', function ($row) {
+                    $parts = array_filter([$row->first_name, $row->middle_name, $row->last_name]);
+                    return implode(' ', $parts);
+                })
                 ->make(true);
         }
 
@@ -160,6 +171,7 @@ class PractitionerController extends Controller
     {
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'middle_name' => 'nullable|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
             'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
@@ -198,8 +210,9 @@ class PractitionerController extends Controller
         DB::beginTransaction();
         try {
             $user = User::create([
-                'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+                'name' => trim($validatedData['first_name'] . ' ' . ($validatedData['middle_name'] ? ($validatedData['middle_name'] . ' ') : '') . $validatedData['last_name']),
                 'first_name' => $validatedData['first_name'],
+                'middle_name' => $validatedData['middle_name'] ?? null,
                 'last_name' => $validatedData['last_name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
@@ -220,6 +233,7 @@ class PractitionerController extends Controller
 
             $practitionerData = [
                 'first_name' => $validatedData['first_name'],
+                'middle_name' => $validatedData['middle_name'] ?? null,
                 'last_name' => $validatedData['last_name'],
                 'gender' => $validatedData['gender'] ?? null,
                 'dob' => $validatedData['dob'] ?? null,
@@ -323,6 +337,7 @@ class PractitionerController extends Controller
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
             'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'middle_name' => 'nullable|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
@@ -361,8 +376,9 @@ class PractitionerController extends Controller
         DB::beginTransaction();
         try {
             $user->update([
-                'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+                'name' => trim($validatedData['first_name'] . ' ' . ($validatedData['middle_name'] ? ($validatedData['middle_name'] . ' ') : '') . $validatedData['last_name']),
                 'first_name' => $validatedData['first_name'],
+                'middle_name' => $validatedData['middle_name'] ?? null,
                 'last_name' => $validatedData['last_name'],
                 'email' => $validatedData['email'],
             ]);
@@ -471,5 +487,51 @@ class PractitionerController extends Controller
         }
 
         return response()->json(['success' => 'Status updated successfully!']);
+    }
+
+    private function resolveCountryCode(?string $value, array $countries): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+
+        $trimmed = trim($value);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        $upperValue = strtoupper($trimmed);
+        if (isset($countries[$upperValue])) {
+            return $upperValue;
+        }
+
+        foreach ($countries as $code => $name) {
+            if (strcasecmp($name, $trimmed) === 0) {
+                return $code;
+            }
+        }
+
+        return null;
+    }
+
+    private function flagEmoji(?string $code): string
+    {
+        if (!$code) {
+            return '';
+        }
+
+        $code = strtoupper($code);
+        if (strlen($code) !== 2) {
+            return '';
+        }
+
+        $offset = 127397;
+        $first = ord($code[0]);
+        $second = ord($code[1]);
+        if ($first < 65 || $first > 90 || $second < 65 || $second > 90) {
+            return '';
+        }
+
+        return mb_convert_encoding('&#' . ($offset + $first) . ';&#' . ($offset + $second) . ';', 'UTF-8', 'HTML-ENTITIES');
     }
 }

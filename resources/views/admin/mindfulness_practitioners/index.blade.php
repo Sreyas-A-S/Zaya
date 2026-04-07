@@ -46,7 +46,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
-                    <h3>Practitioners List</h3>
+                    <h3>Counsellors List</h3>
                     <button type="button" class="btn btn-primary" onclick="openCreateModal()">
                         <i class="fa-solid fa-plus me-2"></i>Register New
                     </button>
@@ -1286,7 +1286,7 @@
         $('#practitioner_id').val(id);
         $('#croppedImage').val('');
         $('#form-method').val('PUT');
-        $('#form-modal-title').text('Edit Practitioner');
+        $('#form-modal-title').text('Edit Counsellor');
 
         // Password fields specific logic
         $('.password-field').hide();
@@ -2008,7 +2008,7 @@
         $('#practitioner_id').val('');
         $('#croppedImage').val('');
         $('#form-method').val('POST');
-        $('#form-modal-title').text('Register Mindfulness Practitioner');
+        $('#form-modal-title').text('Register Mindfulness Counsellor');
 
         // Show password fields
         $('.password-field').show();

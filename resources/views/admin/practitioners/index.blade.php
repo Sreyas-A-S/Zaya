@@ -3,6 +3,31 @@
 @section('title', 'Practitioners Management')
 
 @section('content')
+@php
+    $flagEmoji = function (?string $code): string {
+        if (!$code) {
+            return '';
+        }
+        $code = strtoupper($code);
+        if (strlen($code) !== 2) {
+            return '';
+        }
+        $offset = 127397; // Unicode OFFSET for Regional Indicator Symbol
+        $first = ord($code[0]);
+        $second = ord($code[1]);
+        if ($first < 65 || $first > 90 || $second < 65 || $second > 90) {
+            return '';
+        }
+        return mb_convert_encoding("&#" . ($offset + $first) . ";&#" . ($offset + $second) . ";", 'UTF-8', 'HTML-ENTITIES');
+    };
+
+    $countryFlagMap = [];
+    if (isset($countryMap) && is_array($countryMap)) {
+        foreach ($countryMap as $code => $name) {
+            $countryFlagMap[$code] = $flagEmoji($code);
+        }
+    }
+@endphp
 <style>
     #practitioners-table_wrapper .dataTables_filter {
         display: flex;
@@ -50,7 +75,9 @@
                             <select id="country-filter" class="form-select form-select-sm" style="width: 180px;">
                                 <option value="">All Countries</option>
                                 @foreach($countries as $country)
-                                    <option value="{{ $country->name }}">{{ $country->name }}</option>
+                                    <option value="{{ $country->name }}">
+                                        {{ $flagEmoji($country->code) }} {{ $country->name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -142,17 +169,22 @@
                                             <div id="photo-error-message" class="text-danger small mt-1"></div>
                                             <div id="current-profile_photo" class="d-none"></div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">First Name <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control validate-char-limit" name="first_name" required maxlength="50" data-max="50" pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="First Name">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Middle Name</label>
+                                            <input type="text" class="form-control validate-char-limit" name="middle_name" maxlength="50" data-max="50" placeholder="Middle Name (optional)">
+                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                        </div>
+                                        <div class="col-md-3">
                                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control validate-char-limit" name="last_name" required maxlength="50" data-max="50" pattern="^[A-Z][a-z]*$" title="First letter must be capital and only letters allowed" placeholder="Last Name">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
                                             <input type="email" class="form-control validate-char-limit" name="email" required maxlength="255" data-max="255" placeholder="Email Address">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 255 characters allowed.</div>
@@ -207,8 +239,12 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Nationality <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control validate-char-limit" name="nationality" required maxlength="50" data-max="50" pattern="^[a-zA-Z\s]+$" title="Only letters and spaces allowed" placeholder="Nationality">
-                                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                            <select class="form-select" name="nationality" required>
+                                                <option value="">Select Nationality</option>
+                                                @foreach($countries as $country)
+                                                    <option value="{{ $country->name }}">{{ $flagEmoji($country->code) }} {{ $country->name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Phone Number <span class="text-danger">*</span></label>
@@ -247,7 +283,7 @@
                                             <select class="form-select" name="country" id="country" required>
                                                 <option value="">Select Country</option>
                                                 @foreach($countries as $country)
-                                                <option value="{{ $country->name }}">{{ $country->name }}</option>
+                                                    <option value="{{ $country->name }}">{{ $flagEmoji($country->code) }} {{ $country->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -833,6 +869,7 @@
 <script>
     const storageBase = "{{ asset('storage') }}/";
     const countryMap = @json($countryMap);
+    const countryFlagMap = @json($countryFlagMap);
     let table;
     let toastInstance;
     let languageChoices;
@@ -851,6 +888,32 @@
             msgDiv.addClass('d-none');
         }
     });
+
+    const findCountryCode = (value) => {
+        if (!value) return null;
+        const candidate = String(value).trim();
+        if (!candidate) return null;
+
+        const upper = candidate.toUpperCase();
+        if (countryFlagMap[upper]) {
+            return upper;
+        }
+
+        for (const [code, name] of Object.entries(countryMap)) {
+            if (typeof name === 'string' && name.toLowerCase() === candidate.toLowerCase()) {
+                return code;
+            }
+        }
+
+        return null;
+    };
+
+    const formatCountryWithFlag = (value) => {
+        const code = findCountryCode(value);
+        const label = code ? (countryMap[code] ?? value) : (value || 'N/A');
+        const flag = code ? (countryFlagMap[code] ?? '') : '';
+        return (flag + ' ' + label).trim() || 'N/A';
+    };
 
     $(document).ready(function() {
         const phoneInput = document.querySelector("#phone");
@@ -980,7 +1043,10 @@
                 },
                 {
                     data: 'nationality',
-                    name: 'practitioners.nationality'
+                    name: 'practitioners.nationality',
+                    render: function(data, type, row) {
+                        return formatCountryWithFlag(data || row.country);
+                    }
                 },
                 {
                     data: 'status',

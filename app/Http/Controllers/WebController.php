@@ -64,7 +64,9 @@ class WebController extends Controller
         $testimonials = Testimonial::withCount(['likes', 'replies'])->where('status', 'approved')->latest()->get();
         $ip = request()->ip();
         $testimonials->each(function ($testimonial) use ($ip) {
-            $testimonial->is_liked = $testimonial->likes()->where('ip_address', $ip)->exists();
+            if (is_object($testimonial) && method_exists($testimonial, 'likes')) {
+                $testimonial->is_liked = $testimonial->likes()->where('ip_address', $ip)->exists();
+            }
         });
         $services = Service::where('status', true)->orderBy('order_column')->get();
         $settings = HomepageSetting::getAllSettings($language);
@@ -484,8 +486,8 @@ class WebController extends Controller
         $viewData = [
             'joinRole' => $joinRole,
             'joinRoleLabel' => $map[$normalized]['label'],
-            'languages' => Language::where('status', 'active')->get(),
-            'countries' => Country::where('status', 'active')->orderBy('name')->get(),
+            'languages' => Language::orderBy('name')->get(), // Fetch all languages sorted A-Z
+            'countries' => Country::orderBy('name')->get(), // Fetch all countries sorted A-Z
             'openRegisterToken' => $token,
         ];
 
