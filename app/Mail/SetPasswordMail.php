@@ -40,7 +40,7 @@ class SetPasswordMail extends Mailable
                 'intro' => 'Your application has been approved. Please create a password to activate your account.',
                 'credentials' => [
                     'email' => $this->email,
-                   
+                    'login_url' => $this->setPasswordUrl,
                     'password' => null,
                 ],
                 'outro' => 'This link is secure and expires after use. If you did not request this, please contact support.',
