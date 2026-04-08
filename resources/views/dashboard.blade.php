@@ -4,8 +4,8 @@
 
 @section('content')
 
-@if($user->isProfileIncomplete())
-<div class="profile-completion-banner mb-8 bg-white border border-amber-100 rounded-3xl p-3 md:p-4 flex items-center justify-between shadow-sm">
+@if($user->isProfileIncomplete() && ($site_settings['client_panel_show_profile_incomplete'] ?? 'show') === 'show')
+<div id="profile-completion-banner" class="profile-completion-banner mb-8 bg-white border border-amber-100 rounded-3xl p-3 md:p-4 flex items-center justify-between shadow-sm transition-all duration-300">
     <div class="flex items-center gap-4">
         <div class="relative w-12 h-12 flex items-center justify-center shrink-0">
             <svg viewBox="0 0 36 36" class="w-full h-full transform -rotate-90">
@@ -21,10 +21,36 @@
             <p class="text-sm text-gray-400 font-medium">{{ __('Complete your details to build trust and unlock full access.') }}</p>
         </div>
     </div>
-    <a href="{{ route('profile.complete') }}" class="shrink-0 text-xs font-black bg-secondary text-white px-5 py-2.5 rounded-2xl hover:bg-opacity-90 transition-all shadow-sm">
-        {{ __('Complete Now') }}
-    </a>
+    <div class="flex items-center gap-3">
+        <a href="{{ route('profile.complete') }}" class="shrink-0 text-xs font-black bg-secondary text-white px-5 py-2.5 rounded-2xl hover:bg-opacity-90 transition-all shadow-sm">
+            {{ __('Complete Now') }}
+        </a>
+        <button onclick="closeProfileBanner()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors">
+            <i class="ri-close-line text-xl"></i>
+        </button>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (sessionStorage.getItem('hideProfileBanner') === 'true') {
+            const banner = document.getElementById('profile-completion-banner');
+            if (banner) banner.style.display = 'none';
+        }
+    });
+
+    function closeProfileBanner() {
+        const banner = document.getElementById('profile-completion-banner');
+        if (banner) {
+            banner.style.opacity = '0';
+            banner.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                banner.style.display = 'none';
+                sessionStorage.setItem('hideProfileBanner', 'true');
+            }, 300);
+        }
+    }
+</script>
 @endif
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 md:gap-8 md:mb-8 mb-5">
@@ -34,6 +60,11 @@
         <div id="section-identity" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
             <div class="flex justify-between items-center mb-6">
                 <h2 id="client_panel_identity_hub_title" class="text-xl font-medium font-sans! text-secondary" data-i18n="{{ $site_settings['client_panel_identity_hub_title'] ?? 'Identity Hub' }}">{{ __($site_settings['client_panel_identity_hub_title'] ?? 'Identity Hub') }}</h2>
+                @if($user->isProfileIncomplete())
+                <a href="{{ route('profile.complete') }}" class="text-xs font-black text-secondary hover:text-primary transition-colors flex items-center gap-1">
+                    <i class="ri-edit-line"></i> {{ __('Complete Profile') }}
+                </a>
+                @endif
             </div>
 
             @php

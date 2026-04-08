@@ -12,6 +12,12 @@
             </div>
             <h1 class="text-3xl font-black text-secondary tracking-tight mb-2">Referral & Data Sharing</h1>
             <p class="text-gray-500 font-medium">Please review the specialists recommended by <strong>{{ $referral->referredBy->name }}</strong></p>
+            @if($referral->note)
+            <div class="mt-6 p-5 bg-gray-50 rounded-3xl border border-gray-100 max-w-lg mx-auto">
+                <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-2">Practitioner's Note</p>
+                <p class="text-sm text-secondary font-medium italic leading-relaxed">"{{ $referral->note }}"</p>
+            </div>
+            @endif
         </div>
 
         <div class="px-8 py-10">
@@ -38,7 +44,7 @@
                     <div class="text-right">
                         @if($ref->amount > 0)
                             <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Session Fee</p>
-                            <p class="font-black text-secondary text-lg">€{{ number_format($ref->amount, 2) }}</p>
+                            <p class="font-black text-secondary text-lg">{{ get_currency_symbol($ref->currency ?? 'INR') }}{{ number_format($ref->amount, 2) }}</p>
                         @else
                             <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-full">No Fee</span>
                         @endif

@@ -108,4 +108,16 @@ return [
         ],
     ],
 
+    'google_drive' => [
+        'service_account_email' => env('GOOGLE_DRIVE_SERVICE_ACCOUNT_EMAIL'),
+        'service_account_private_key' => env('GOOGLE_DRIVE_SERVICE_ACCOUNT_PRIVATE_KEY'),
+        'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID'),
+        'make_public' => env('GOOGLE_DRIVE_MAKE_PUBLIC', true),
+    ],
+
+    'google_meet' => [
+        'master_account' => env('GOOGLE_MEET_MASTER_ACCOUNT_EMAIL'),
+        'service_account_json' => env('GOOGLE_MEET_SERVICE_ACCOUNT_JSON_PATH'),
+    ],
+
 ];

@@ -46,6 +46,14 @@ class LanguageController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('admin.languages.index', ['showCreateModal' => true]);
+    }
+
+    /**
      * Store new language
      */
     public function store(Request $request)
@@ -78,6 +86,14 @@ class LanguageController extends Controller
         return response()->json([
             'language' => $language
         ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id)
+    {
+        return view('admin.languages.index', ['edit_id' => $id]);
     }
 
     /**

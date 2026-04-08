@@ -89,6 +89,27 @@ class WebController extends Controller
         return view('about', compact('settings', 'testimonials'));
     }
 
+    public function privacyPolicy()
+    {
+        $language = App::getLocale();
+        $settings = HomepageSetting::getAllSettings($language);
+        return view('privacy-policy', compact('settings'));
+    }
+
+    public function cookiePolicy()
+    {
+        $language = App::getLocale();
+        $settings = HomepageSetting::getAllSettings($language);
+        return view('cookie-policy', compact('settings'));
+    }
+
+    public function termsAndConditions()
+    {
+        $language = App::getLocale();
+        $settings = HomepageSetting::getAllSettings($language);
+        return view('terms-and-conditions', compact('settings'));
+    }
+
     public function services(Request $request)
     {
         $language = App::getLocale();
@@ -334,6 +355,61 @@ class WebController extends Controller
             });
 
         return response()->json($cities->concat($zips)->take(8));
+    }
+
+    public function searchServices(Request $request)
+    {
+        $query = $request->get('query');
+        $practitionerId = $request->get('practitioner_id');
+        
+        $servicesQuery = Service::where('status', true);
+        
+        if ($practitionerId) {
+            $practitioner = Practitioner::find($practitionerId);
+            if ($practitioner && $practitioner->user_id) {
+                $servicesQuery->whereHas('userServices', function($q) use ($practitioner) {
+                    $q->where('user_id', $practitioner->user_id);
+                });
+            }
+        }
+        
+        if (!empty($query)) {
+            $servicesQuery->where('title', 'LIKE', "%{$query}%");
+        }
+        
+        $services = $servicesQuery->limit(10)->get();
+        
+        return response()->json($services);
+    }
+
+    public function fetchServiceScheduleForm(Request $request)
+    {
+        $serviceId = $request->get('service_id');
+        $practitionerId = $request->get('practitioner_id');
+        $iteration = $request->get('iteration', 1);
+
+        $service = Service::find($serviceId);
+        $activePractitioner = Practitioner::find($practitionerId);
+
+        if (!$service || !$activePractitioner) {
+            return response()->json(['error' => 'Service or Practitioner not found'], 404);
+        }
+
+        $practitionerServices = $activePractitioner->user
+            ? $activePractitioner->user->userServices()->with('service')->where('status', 'active')->get()->groupBy('service_id')
+            : collect();
+
+        $practitionerCountry = $activePractitioner->country ?? $activePractitioner->user->country ?? null;
+        $countryCurrencyMap = [
+            'IN' => 'INR','IND' => 'INR','INDIA' => 'INR',
+            'US' => 'USD','USA' => 'USD','UNITED STATES' => 'USD',
+            'GB' => 'GBP','UK' => 'GBP','UNITED KINGDOM' => 'GBP',
+            'AE' => 'AED','UAE' => 'AED',
+            'EU' => 'EUR','FR' => 'EUR','DE' => 'EUR','ES' => 'EUR','IT' => 'EUR',
+        ];
+        $derivedCurrency = $practitionerCountry ? ($countryCurrencyMap[strtoupper($practitionerCountry)] ?? config('app.currency', 'INR')) : config('app.currency', 'INR');
+
+        return view('partials.frontend.service-schedule-item', compact('service', 'practitionerServices', 'derivedCurrency', 'iteration'))->render();
     }
 
     public function practitionerDetail(Request $request, $slug)
@@ -698,9 +774,10 @@ class WebController extends Controller
                 ->whereHas('userServices', function($q) use ($selectedPractitioner) {
                     $q->where('user_id', $selectedPractitioner->user_id);
                 })
+                ->limit(15)
                 ->get();
         } else {
-            $services = Service::where('status', true)->get();
+            $services = Service::where('status', true)->limit(15)->get();
         }
 
         $languages = \App\Models\Language::where('status', 'active')

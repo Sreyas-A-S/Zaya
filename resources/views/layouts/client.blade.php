@@ -157,8 +157,11 @@
                     <i class="ri-user-line mr-3 text-lg"></i> <span id="client_panel_sidebar_dashboard" data-i18n="Dashboard">{{ __($site_settings['client_panel_sidebar_dashboard'] ?? 'Dashboard') }}</span>
                 </a>
                 <a href="{{ route('profile') }}"
-                    class="flex items-center px-8 py-3 {{ request()->routeIs('profile') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
+                    class="flex items-center px-8 py-3 {{ request()->routeIs('profile') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors relative">
                     <i class="ri-user-settings-line mr-3 text-lg"></i> <span id="client_panel_sidebar_profile" data-i18n="Profile">{{ __('Profile') }}</span>
+                    @if($user->isProfileIncomplete())
+                        <span class="absolute right-8 top-1/2 -translate-y-1/2 w-2 h-2 bg-amber-500 rounded-full shadow-sm"></span>
+                    @endif
                 </a>
                 @if(in_array($user->role, ['client', 'patient']))
                 <a href="{{ route('health-journey.index') }}"

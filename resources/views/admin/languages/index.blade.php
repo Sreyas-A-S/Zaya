@@ -9,9 +9,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">Language List</h4>
 
-        <a href="{{ route('admin.languages.create') }}" class="btn btn-success">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createLanguageModal">
             <i class="fa fa-plus"></i> Register New Language
-        </a>
+        </button>
     </div>
 
     <div class="card">
@@ -43,6 +43,37 @@
         </div>
     </div>
 
+</div>
+
+<!-- Create Language Modal -->
+<div class="modal fade" id="createLanguageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Register New Language</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="createLanguageForm">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Language Code</label>
+                        <input type="text" name="code" class="form-control" placeholder="e.g. en, fr, de">
+                        <small class="text-danger error-text code_error"></small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Language Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. English, French, German">
+                        <small class="text-danger error-text name_error"></small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Language</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <!-- Status Confirm Modal -->
@@ -148,6 +179,40 @@ $(document).ready(function() {
         ]
     });
 
+    @if(isset($showCreateModal) && $showCreateModal)
+        $('#createLanguageModal').modal('show');
+    @endif
+
+    @if(isset($edit_id))
+        setTimeout(function() {
+            $('.editLanguage[data-id="{{ $edit_id }}"]').trigger('click');
+        }, 500);
+    @endif
+
+});
+
+// Create Language
+$(document).on('submit', '#createLanguageForm', function (e) {
+    e.preventDefault();
+    $.ajax({
+        url: "{{ route('admin.languages.store') }}",
+        type: "POST",
+        data: $(this).serialize(),
+        success: function (response) {
+            $('#createLanguageModal').modal('hide');
+            $('#createLanguageForm')[0].reset();
+            $('#languages-table').DataTable().ajax.reload(null, false);
+        },
+        error: function (xhr) {
+            let errors = xhr.responseJSON.errors;
+            $('#createLanguageForm .error-text').text('');
+            if (errors) {
+                $.each(errors, function (key, value) {
+                    $('#createLanguageForm [name="' + key + '"]').siblings('.error-text').text(value[0]);
+                });
+            }
+        }
+    });
 });
 
 $(document).on('click', '.editLanguageBtn', function () {

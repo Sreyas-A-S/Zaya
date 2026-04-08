@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-CxsYkohz.css",
+    "file": "assets/app-lEgzRNgQ.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -9,7 +9,7 @@
     ]
   },
   "resources/css/book-session.css": {
-    "file": "assets/book-session-BxTk7v0e.css",
+    "file": "assets/book-session-DWVJKKdH.css",
     "src": "resources/css/book-session.css",
     "isEntry": true,
     "name": "book-session",

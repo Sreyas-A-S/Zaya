@@ -350,6 +350,16 @@
                 let recordingEnabled = false;
                 let leaveHandled = false;
 
+                // Prevent accidental navigation
+                window.addEventListener('beforeunload', (event) => {
+                    if (!leaveHandled) {
+                        // Standard way to trigger the browser's confirmation dialog
+                        event.preventDefault();
+                        event.returnValue = 'Are you sure you want to leave the meeting? Your session will end.';
+                        return event.returnValue;
+                    }
+                });
+
                 const showSdkLoadError = (message) => {
                     document.body.insertAdjacentHTML(
                         'beforeend',

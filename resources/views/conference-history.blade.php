@@ -73,5 +73,64 @@
     window.addEventListener('popstate', function() {
         fetchConferences(window.location.href);
     });
+
+    async function startInstantMeeting(provider = 'choose') {
+        if (provider === 'choose') {
+            // If provider not selected yet, just show modal
+            // (The modal buttons will now need to call this function with a provider)
+            openPlatformModal();
+            return;
+        }
+
+        const btn = document.getElementById('instant-meet-text').parentElement;
+        const icon = document.getElementById('instant-meet-icon');
+        const text = document.getElementById('instant-meet-text');
+        
+        // Disable and show loader
+        btn.disabled = true;
+        const originalText = text.textContent;
+        text.textContent = 'Initializing...';
+        icon.className = 'ri-loader-4-line text-lg animate-spin';
+
+        try {
+            const response = await fetch("{{ route('zego.instant.init') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ provider: provider })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                if (provider === 'google_meet' && data.redirect_url) {
+                    window.open(data.redirect_url, '_blank');
+                    closePlatformModal();
+                } else if (data.channel) {
+                    // Open the platform selection modal logic or redirect directly
+                    // Since we already HAVE the provider now, we can redirect directly
+                    const url = provider === 'zegocloud'
+                        ? "{{ route('zego.join', ['channel' => ':channel']) }}".replace(':channel', data.channel)
+                        : "{{ route('conference.join', ['channel' => ':channel']) }}".replace(':channel', data.channel);
+
+                    window.open(url + '?provider=' + provider, '_blank');
+                    closePlatformModal();
+                }
+            } else {
+                alert(data.message || 'Failed to initialize meeting. Please try again.');
+            }
+        } catch (error) {
+            console.error('Instant meeting error:', error);
+            alert('A connection error occurred.');
+        } finally {
+            // Reset button
+            btn.disabled = false;
+            text.textContent = originalText;
+            icon.className = 'ri-team-line text-lg';
+        }
+    }
 </script>
 @endsection

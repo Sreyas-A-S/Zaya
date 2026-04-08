@@ -4,44 +4,115 @@ namespace App\Http\Controllers;
 
 use App\Models\Conference;
 use App\Models\Booking;
+use App\Jobs\UploadZegoRecordingToGoogleDrive;
 use App\Support\ZEGO\ZegoErrorCodes;
 use App\Support\ZEGO\ZegoServerAssistant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class ZegoController extends Controller
 {
+    /**
+     * Pre-authorizes an instant meeting ID or generates a Google Meet link.
+     */
+    public function initInstantMeeting(Request $request)
+    {
+        $user = Auth::user();
+        $professionalRoles = ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist', 'translator', 'admin'];
+        
+        if (!$user || !in_array($user->role, $professionalRoles)) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $provider = $request->input('provider', 'zegocloud');
+
+        if ($provider === 'google_meet') {
+            $googleService = new \App\Support\Google\GoogleCalendarService();
+            if (!$googleService->isConfigured()) {
+                return response()->json(['success' => false, 'message' => 'Google Meet is not configured on the server.'], 500);
+            }
+
+            try {
+                $meeting = $googleService->createMeeting(
+                    "Instant Session by " . $user->name,
+                    now()->toIso8601String(),
+                    60,
+                    [$user->email] // Add practitioner as attendee so they can record
+                );
+
+                return response()->json([
+                    'success' => true,
+                    'channel' => $meeting['id'], // We store the Google event ID
+                    'redirect_url' => $meeting['hangout_link']
+                ]);
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => 'Google Meet Error: ' . $e->getMessage()], 500);
+            }
+        }
+
+        $channel = 'zaya-' . strtolower(Str::random(10));
+        
+        // Temporarily authorize this channel ID for this specific user in cache (10 min expiry)
+        Cache::put('instant_meeting_' . $channel, $user->id, now()->addMinutes(10));
+
+        return response()->json([
+            'success' => true,
+            'channel' => $channel
+        ]);
+    }
+
     public function join(Request $request, string $channel, bool $isPublicMeeting = false)
     {
         $user = Auth::user();
-        $isPublicMeeting = $isPublicMeeting || !$user;
+        
+        // 1. Resolve the booking from the channel (Invoice No or ID)
+        $booking = $this->resolveBooking($channel);
 
-        if (!$user) {
-            $guestName = trim((string) $request->query('name', 'Guest'));
-            $user = (object) [
-                'id' => 0,
-                'name' => $guestName !== '' ? $guestName : 'Guest',
-                'email' => null,
-                'role' => 'guest',
-                'profile_pic' => null,
-            ];
+        // 2. Authorization & Instant Meeting Logic
+        if (!$booking) {
+            // Check if this is an authorized instant meeting initiated via the backend
+            $authorizedUserId = Cache::get('instant_meeting_' . $channel);
+            
+            // Only allow if the ID was pre-authorized for the current professional
+            if ($authorizedUserId && $user && (int) $user->id === (int) $authorizedUserId) {
+                $booking = null; // Proceed as instant meeting
+            } else {
+                // Not a booking and not an authorized instant ID
+                return redirect()->route('dashboard')->with('error', 'The meeting link is invalid or has expired.');
+            }
+        } else {
+            // If a booking DOES exist, enforce strict participant check
+            if ($user) {
+                $isAuthorized = ($user->id === $booking->user_id || $user->id === $booking->practitioner_id);
+                
+                if (!$isAuthorized && $user->role !== 'admin') {
+                    return redirect()->route('dashboard')->with('error', 'You are not authorized to join this private meeting.');
+                }
+            } else {
+                if (!$isPublicMeeting) {
+                    return redirect()->route('login')->with('error', 'Please login to join your scheduled session.');
+                }
+            }
         }
 
         $roomId = $this->sanitizeRoomId($channel);
         $zegoAppId = (int) config('services.zego.app_id');
         $zegoError = null;
-        $booking = Booking::where('id', function ($query) use ($channel) {
-            $query->select('id')->from('bookings')->whereRaw("LOWER(REPLACE(invoice_no, '-', '')) = LOWER(?)", [str_replace('zaya-', '', $channel)]);
-        })->orWhere('id', (int) str_replace('zaya-', '', $channel))->first();
 
         if ($zegoAppId <= 0 || trim((string) config('services.zego.server_secret')) === '') {
             $zegoError = 'ZEGOCLOUD configuration is incomplete. Set ZEGO_APP_ID and ZEGO_SERVER_SECRET in your .env file.';
         }
 
         return view('conference.zego', [
-            'user' => $user,
+            'user' => $user ?? (object) [
+                'id' => 0,
+                'name' => trim((string) $request->query('name', 'Guest')) ?: 'Guest',
+                'role' => 'guest',
+            ],
             'channel' => $channel,
             'roomId' => $roomId,
             'zegoAppId' => $zegoAppId,
@@ -311,6 +382,7 @@ class ZegoController extends Controller
     {
         $recordingUrl = null;
         $recordingStatus = 'stopped_pending_upload';
+        $existingMetadata = $conference->metadata ?? [];
 
         for ($attempt = 0; $attempt < 5; $attempt++) {
             $response = $this->zegoCloudRecordingRequest('DescribeRecordStatus', [
@@ -342,17 +414,28 @@ class ZegoController extends Controller
             'end_time' => now(),
             'duration_minutes' => max(Carbon::parse($conference->start_time ?? now())->diffInMinutes(now()), 0),
             'recording_url' => $recordingUrl ?: $conference->recording_url,
-            'metadata' => array_merge($conference->metadata ?? [], [
+            'metadata' => array_merge($existingMetadata, [
                 'zego_recording_task_id' => $taskId,
                 'zego_recording_status' => $recordingUrl ? $recordingStatus : $recordingStatus,
                 'zego_recording_synced_at' => now()->toIso8601String(),
+                'zego_recording_file_url' => $recordingUrl ?: ($existingMetadata['zego_recording_file_url'] ?? null),
             ]),
         ]);
 
         if ($recordingUrl) {
             $conference->booking?->update(['recording_url' => $recordingUrl]);
+
+            if ($this->hasGoogleDriveConfig() && empty(($existingMetadata['google_drive_file_id'] ?? null))) {
+                UploadZegoRecordingToGoogleDrive::dispatch($conference->id);
+            }
         }
 
         return ['recording_url' => $recordingUrl];
+    }
+
+    private function hasGoogleDriveConfig(): bool
+    {
+        return (string) config('services.google_drive.service_account_email') !== ''
+            && (string) config('services.google_drive.service_account_private_key') !== '';
     }
 }

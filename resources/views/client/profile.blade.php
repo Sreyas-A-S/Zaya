@@ -155,6 +155,16 @@
             <h2 class="text-2xl font-bold font-sans! text-secondary mb-1">{{ $user->name }}</h2>
             <p class="text-lg text-gray-400 font-normal mb-10 text-capitalize">{{ str_replace('_', ' ', $user->role) }}</p>
 
+            @if($user->isProfileIncomplete())
+            <div class="w-full px-4 mb-6">
+                <a href="{{ route('profile.complete') }}"
+                    class="flex items-center justify-center w-full py-3 bg-amber-50 text-amber-700 rounded-xl border border-amber-100 hover:bg-amber-100 transition-colors text-sm font-bold gap-2">
+                    <i class="ri-information-line text-lg"></i>
+                    <span>{{ __('Complete Your Profile') }}</span>
+                </a>
+            </div>
+            @endif
+
             <div class="w-full px-4 pt-4">
                 <a href="javascript:void(0)" onclick="openPasswordModal()"
                     class="flex items-center text-gray-400 hover:text-gray-700 transition-colors text-lg">

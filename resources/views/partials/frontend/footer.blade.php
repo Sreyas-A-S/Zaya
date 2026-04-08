@@ -133,11 +133,11 @@
                     </div>
 
                     <div class="flex lg:flex-col justify-center lg:justify-start text-xs md:text-sm text-[#252525] gap-6 md:gap-8 lg:gap-6 mt-6">
-                        <a id="footer-privacy" href="#"
+                        <a id="footer-privacy" href="{{ route('privacy-policy') }}"
                             class="hover:text-[#79584B] transition-colors" data-i18n="Privacy Policy">{{ __('Privacy Policy') }}</a>
-                        <a id="footer-cookie" href="#"
+                        <a id="footer-cookie" href="{{ route('cookie-policy') }}"
                             class="hover:text-[#79584B] transition-colors" data-i18n="Cookie Policy">{{ __('Cookie Policy') }}</a>
-                        <a id="footer-terms" href="#"
+                        <a id="footer-terms" href="{{ route('terms-and-conditions') }}"
                             class="hover:text-[#79584B] transition-colors" data-i18n="Terms & Conditions">{{ __('Terms & Conditions') }}</a>
                     </div>
                 </div>

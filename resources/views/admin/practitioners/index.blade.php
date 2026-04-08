@@ -1705,14 +1705,14 @@
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="p-practice" role="tabpanel">
-                                <h6>Consultations</h6><div class="d-flex flex-wrap gap-2">${badges(p.consultations)}</div>
-                                <h6 class="mt-3">Body Therapies</h6><div class="d-flex flex-wrap gap-2">${badges(p.body_therapies)}</div>
-                                <h6 class="mt-3">Other Modalities</h6><div class="d-flex flex-wrap gap-2">${badges(p.other_modalities)}</div>
+                                <h6 class="fw-bold">Consultations</h6><div class="d-flex flex-wrap gap-2">${badges(p.consultations)}</div>
+                                <h6 class="mt-3 fw-bold">Body Therapies</h6><div class="d-flex flex-wrap gap-2">${badges(p.body_therapies)}</div>
+                                <h6 class="mt-3 fw-bold">Other Modalities</h6><div class="d-flex flex-wrap gap-2">${badges(p.other_modalities)}</div>
                             </div>
                             <div class="tab-pane fade" id="p-qual" role="tabpanel">
                                 <div class="row">${qualsHtml || 'No qualifications listed.'}</div>
                                 <hr class="my-3">
-                                <h6>Documents</h6>
+                                <h6 class="fw-bold">Documents</h6>
                                 <div class="row g-2">
                                     ${renderDocLinks(p.doc_cover_letter, 'Cover Letter')}
                                     ${renderDocLinks(p.doc_certificates, 'Educational Certificate', { multiple: true })}
@@ -1725,7 +1725,7 @@
                             </div>
                             <div class="tab-pane fade" id="p-bio" role="tabpanel">
                                 <p class="small text-muted">${p.profile_bio || 'No bio provided.'}</p>
-                                <h6 class="mt-3">Additional Courses</h6>
+                                <h6 class="mt-3 fw-bold">Additional Courses</h6>
                                 <p class="small text-muted">${p.additional_courses || 'None'}</p>
                             </div>
                         </div>

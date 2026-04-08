@@ -306,19 +306,29 @@
                     </div>
 
                     <!-- Service Tags -->
-                    <div class="flex flex-wrap gap-3" id="available-services-container">
-                        @forelse($services as $service)
-                        <label class="service-tag-label inline-block cursor-pointer select-none" data-service-name="{{ strtolower($service->title) }}" data-service-id="{{ $service->id }}">
-                            <input type="checkbox" class="peer hidden" value="{{ $service->title }}" 
-                                {{ (isset($prefilledService) && $prefilledService->id == $service->id) || (!isset($prefilledService) && $loop->first) ? 'checked' : '' }}>
-                            <div
-                                class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D]">
-                                {{ $service->title }}
-                            </div>
-                        </label>
-                        @empty
-                        <div class="text-sm text-gray-400">No services available.</div>
-                        @endforelse
+                    <div class="services-slider-container">
+                        <button type="button" class="service-nav-btn service-prev disabled" onclick="scrollServices(-1)">
+                            <i class="ri-arrow-left-s-line"></i>
+                        </button>
+                        
+                        <div class="services-scroll-wrapper no-scrollbar" id="available-services-container">
+                            @forelse($services as $service)
+                            <label class="service-tag-label inline-block cursor-pointer select-none shrink-0" data-service-name="{{ strtolower($service->title) }}" data-service-id="{{ $service->id }}">
+                                <input type="checkbox" class="peer hidden" value="{{ $service->title }}" 
+                                    {{ (isset($prefilledService) && $prefilledService->id == $service->id) || (!isset($prefilledService) && $loop->first) ? 'checked' : '' }}>
+                                <div
+                                    class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D] whitespace-nowrap">
+                                    {{ $service->title }}
+                                </div>
+                            </label>
+                            @empty
+                            <div class="text-sm text-gray-400">No services available.</div>
+                            @endforelse
+                        </div>
+
+                        <button type="button" class="service-nav-btn service-next" onclick="scrollServices(1)">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </button>
                     </div>
                     <div id="service-search-empty" class="text-sm text-gray-400 mt-3 hidden">No services found.</div>
                 </div>
@@ -326,147 +336,9 @@
                 <!-- Scheduling Section -->
                 <div class="grid grid-cols-1 gap-6 mb-8 hidden" id="service-schedule-container">
                     @forelse($services as $service)
-                    <div class="service-schedule-item" data-service-name="{{ strtolower($service->title) }}" data-service-id="{{ $service->id }}">
-                        <h4 class="font-normal text-gray-400 mb-4">Service <span class="service-index">{{ $loop->iteration }}</span></h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <div class="relative flex-1">
-                                <input type="text" value="{{ $service->title }}" disabled
-                                    class="w-full h-full py-2 px-4 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-[#252525] font-medium cursor-not-allowed">
-                                <input type="hidden" name="services[{{ $service->id }}][id]" value="{{ $service->id }}">
-                                <input type="hidden" name="services[{{ $service->id }}][title]" value="{{ $service->title }}">
-                            </div>
-                            <div class="relative flex-1">
-                                @php
-                                    $rates = $practitionerServices->get($service->id) ?? collect();
-                                    $defaultRate = $rates->first();
-                                    $defaultDurationLabel = $defaultRate ? ($defaultRate->duration . ' Min') : 'Duration';
-                                    $defaultCurrency = $defaultRate->currency ?? $derivedCurrency;
-                                    $symbols = ['INR' => '₹', 'USD' => '$', 'EUR' => '€', 'GBP' => '£', 'AED' => 'د.إ'];
-                                    $defaultSymbol = $symbols[$defaultCurrency] ?? $defaultCurrency;
-                                @endphp
-                                <div class="duration-picker-trigger h-full py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
-                                    onclick="
-                                                const dd = this.nextElementSibling.nextElementSibling; 
-                                                dd.classList.toggle('hidden'); 
-                                                const icon = this.querySelector('i'); 
-                                                // Close all other duration dropdowns
-                                                document.querySelectorAll('.duration-dropdown').forEach(d => {
-                                                    if(d !== dd) { d.classList.add('hidden'); }
-                                                });
-                                                if(dd.classList.contains('hidden')) { 
-                                                    icon.className='ri-arrow-down-s-line text-gray-700 text-lg';
-                                                    dd.classList.remove('cal-open-top', 'cal-open-bottom');
-                                                } else { 
-                                                    icon.className='ri-arrow-up-s-line text-gray-700 text-lg'; 
-                                                    if(typeof smartPosition !== 'undefined') { smartPosition(this, dd); } 
-                                                }">
-                                    <span class="text-sm text-[#252525] font-medium duration-label">
-                                       {{ $defaultDurationLabel }}
-                                    </span>
-                                    <i class="ri-arrow-down-s-line text-gray-700 text-lg"></i>
-                                    </div>
-                                    <input type="hidden" name="services[{{ $service->id }}][duration]" class="duration-value" 
-                                    value="{{ $defaultRate ? ($defaultRate->duration . ' Min') : '' }}">
-                                <!-- Dropdown Menu -->
-                                <div
-                                    class="duration-dropdown hidden absolute left-0 w-72 bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-gray-100 z-50">
-                                    <div class="p-2">
-                                        @forelse($rates as $idx => $rate)
-                                        @php
-                                            $label = ($rate->duration ?? '') . ' Min';
-                                            $price = $rate->rate ?? 0;
-                                        @endphp
-                                        <label
-                                            class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
-                                            <div class="flex items-center gap-3">
-                                                <input type="radio" name="temp_duration_{{ $service->id }}" value="{{ $label }}"
-                                                    class="peer hidden" {{ $idx === 0 ? 'checked' : '' }}>
-                                                <div
-                                                    class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
-                                                    <div
-                                                        class="w-2.5 h-2.5 rounded-full bg-[#F5A623] scale-0 peer-checked:scale-100 transition-transform">
-                                                    </div>
-                                                </div>
-                                                <span class="text-[15px] text-[#404040]">{{ $label }}</span>
-                                            </div>
-                                            @php $symbol = $symbols[$rate->currency ?? $defaultCurrency] ?? ($rate->currency ?? $defaultCurrency); @endphp
-                                            <span class="text-[15px] font-medium text-[#29724C]" data-currency="{{ $rate->currency ?? $defaultCurrency }}" data-symbol="{{ $symbol }}">{{ $symbol }} {{ number_format($price, 2) }}</span>
-                                        </label>
-                                        @empty
-                                        <div class="px-4 py-3 text-sm text-gray-500">
-                                            {{ __('No durations set by this practitioner for this service.') }}
-                                        </div>
-                                        @endforelse
-                                    </div>
-
-                                    <hr class="border-gray-100 m-0">
-
-                                    <!-- Footer -->
-                                    <div class="p-3.5 flex items-center justify-end gap-3 rounded-b-2xl bg-white">
-                                        <button type="button"
-                                            class="text-[15px] text-[#594B4B] font-medium px-4 py-2 hover:bg-gray-50 rounded-full cursor-pointer transition-colors border-none bg-transparent"
-                                            onclick="
-                                                    let dd = this.closest('.duration-dropdown');
-                                                    let active = dd.querySelector('input[type=radio]:checked');
-                                                    if (active) active.checked = false;
-                                                    dd.previousElementSibling.value = '';
-                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = 'Duration';
-                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-gray-600');
-                                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-[#252525]');
-                                                    dd.classList.add('hidden');
-                                                    dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
-                                                    if(typeof clearPromoCode === 'function') clearPromoCode();
-                                                ">
-                                            Clear
-                                        </button>
-                                        <button type="button"
-                                            class="bg-[#41B882] text-white px-6 py-2 rounded-full text-[15px] font-medium hover:bg-[#38A172] cursor-pointer transition-colors shadow-sm border-none"
-                                            onclick="
-                                                    let dd = this.closest('.duration-dropdown');
-                                                    let checked = dd.querySelector('input[type=radio]:checked');
-                                                    if(checked) {
-                                                        let val = checked.value;
-                                                        dd.previousElementSibling.value = val;
-                                                        dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = val;
-                                                        dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-gray-600');
-                                                        dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-[#252525]', 'font-medium');
-                                                    }
-                                                    dd.classList.add('hidden');
-                                                    dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
-                                                    if(typeof updateStep3Services === 'function') updateStep3Services();
-                                                    if(typeof clearPromoCode === 'function') clearPromoCode();
-                                                ">
-                                            Set
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="relative flex-1">
-                                <div class="day-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
-                                    onclick="toggleCalendar(this)">
-                                    <span class="text-sm text-gray-700 day-label">Day</span>
-                                    <i class="ri-calendar-line text-gray-700 text-lg"></i>
-                                </div>
-                                <input type="hidden" name="services[{{ $service->id }}][day]" class="day-value">
-                                <div class="calendar-dropdown hidden">
-                                    <div class="calendar-wrapper"></div>
-                                </div>
-                            </div>
-                            <div class="relative flex-1">
-                                <div class="time-picker-trigger py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
-                                    onclick="toggleTimePicker(this)">
-                                    <span class="text-sm text-gray-700 time-label">Time</span>
-                                    <i class="ri-time-line text-gray-700 text-lg"></i>
-                                </div>
-                                <input type="hidden" name="services[{{ $service->id }}][time]" class="time-value">
-                                <div class="time-picker-dropdown hidden">
-                                    <div class="time-picker-content"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        @include('partials.frontend.service-schedule-item', ['service' => $service, 'iteration' => $loop->iteration])
                     @empty
-                    <div class="text-sm text-gray-400">No services selected.</div>
+                        <div class="text-sm text-gray-400">No services selected.</div>
                     @endforelse
                 </div>
             </div>
@@ -689,6 +561,32 @@
     </div>
 
     <script>
+        function scrollServices(direction) {
+            const wrapper = document.getElementById('available-services-container');
+            if (!wrapper) return;
+            const scrollAmount = 200;
+            wrapper.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        function updateServiceNavButtons() {
+            const wrapper = document.getElementById('available-services-container');
+            const prevBtn = document.querySelector('.service-prev');
+            const nextBtn = document.querySelector('.service-next');
+            if (!wrapper || !prevBtn || !nextBtn) return;
+
+            prevBtn.classList.toggle('disabled', wrapper.scrollLeft <= 0);
+            nextBtn.classList.toggle('disabled', wrapper.scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth - 1);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const wrapper = document.getElementById('available-services-container');
+            if (wrapper) {
+                wrapper.addEventListener('scroll', updateServiceNavButtons);
+                // Initial check
+                setTimeout(updateServiceNavButtons, 100);
+            }
+        });
+
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -1042,8 +940,6 @@
             const searchDivider = document.getElementById('service-search-divider');
             const serviceSearchInputWrapper = document.getElementById('service-search-input-wrapper');
             const serviceSearchInput = document.getElementById('service-search-input');
-            const serviceTags = Array.from(document.querySelectorAll('.service-tag-label'));
-            const scheduleItems = Array.from(document.querySelectorAll('.service-schedule-item'));
             const serviceSearchEmpty = document.getElementById('service-search-empty');
 
             function updateStep3Services() {
@@ -1183,13 +1079,13 @@
                 });
             }
 
-            function renderSelectedServices() {
+            async function renderSelectedServices() {
                 // Clear promo code when services change to avoid incorrect discount amounts
                 if (appliedPromoCode) {
                     clearPromoCode();
                 }
 
-                const checkedBoxes = document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked');
+                const checkedBoxes = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
                 if (selectedServicesContainer) {
                     selectedServicesContainer.innerHTML = '';
 
@@ -1223,10 +1119,31 @@
                     }
                 }
 
+                // Ensure all selected services have a schedule form
+                const practitionerId = @json($activePractitioner ? $activePractitioner->id : null);
+                const scheduleContainer = document.getElementById('service-schedule-container');
+                
+                for (const checkbox of checkedBoxes) {
+                    const label = checkbox.closest('.service-tag-label');
+                    const serviceId = label.dataset.serviceId;
+                    let scheduleItem = document.querySelector(`.service-schedule-item[data-service-id="${serviceId}"]`);
+                    
+                    if (!scheduleItem && practitionerId) {
+                        try {
+                            const response = await fetch(`{{ route('fetch-service-schedule-form') }}?service_id=${serviceId}&practitioner_id=${practitionerId}`);
+                            const html = await response.text();
+                            if (scheduleContainer) {
+                                scheduleContainer.insertAdjacentHTML('beforeend', html);
+                            }
+                        } catch (error) {
+                            console.error('Error fetching schedule form:', error);
+                        }
+                    }
+                }
+
                 syncScheduleWithSelection(checkedBoxes);
                 
                 // Toggle scheduling section visibility
-                const scheduleContainer = document.getElementById('service-schedule-container');
                 if (scheduleContainer) {
                     if (checkedBoxes.length > 0) {
                         scheduleContainer.classList.remove('hidden');
@@ -1268,7 +1185,8 @@
 
             function updateScheduleIndices() {
                 let idx = 1;
-                scheduleItems.forEach(item => {
+                const allItems = document.querySelectorAll('.service-schedule-item');
+                allItems.forEach(item => {
                     const label = item.querySelector('.service-index');
                     if (!label) return;
                     if (item.classList.contains('hidden')) return;
@@ -1278,13 +1196,14 @@
             }
 
             function syncScheduleWithSelection(checkedBoxes) {
-                const selectedSet = new Set(
-                    Array.from(checkedBoxes).map(box => box.value.trim().toLowerCase())
+                const selectedIds = new Set(
+                    Array.from(checkedBoxes).map(box => box.closest('.service-tag-label').dataset.serviceId)
                 );
 
-                scheduleItems.forEach(item => {
-                    const name = item.dataset.serviceName || '';
-                    if (selectedSet.has(name)) {
+                const allItems = document.querySelectorAll('.service-schedule-item');
+                allItems.forEach(item => {
+                    const id = item.dataset.serviceId || '';
+                    if (selectedIds.has(id)) {
                         item.classList.remove('hidden');
                     } else {
                         item.classList.add('hidden');
@@ -1303,28 +1222,66 @@
             renderSelectedServices();
             updateConditionsInput();
 
-            // Service search filter
+            // Service search with AJAX
+            let searchTimeout = null;
             if (serviceSearchInput) {
                 serviceSearchInput.addEventListener('input', function() {
-                    const query = this.value.trim().toLowerCase();
-                    let visibleCount = 0;
-
-                    serviceTags.forEach(tag => {
-                        const name = tag.dataset.serviceName || '';
-                        const checkbox = tag.querySelector('input[type="checkbox"]');
-                        const isChecked = checkbox ? checkbox.checked : false;
-
-                        if (isChecked || !query || name.includes(query)) {
-                            tag.classList.remove('hidden');
-                            visibleCount += 1;
-                        } else {
-                            tag.classList.add('hidden');
+                    const query = this.value.trim();
+                    const practitionerId = @json($activePractitioner ? $activePractitioner->id : null);
+                    
+                    if (searchTimeout) clearTimeout(searchTimeout);
+                    
+                    searchTimeout = setTimeout(async () => {
+                        try {
+                            const response = await fetch(`{{ route('search-services') }}?query=${encodeURIComponent(query)}&practitioner_id=${practitionerId || ''}`);
+                            const services = await response.json();
+                            
+                            const container = document.getElementById('available-services-container');
+                            const currentCheckedIds = Array.from(container.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'))
+                                .map(cb => cb.closest('.service-tag-label').dataset.serviceId);
+                            
+                            // Remove unselected ones
+                            const labels = container.querySelectorAll('.service-tag-label');
+                            labels.forEach(label => {
+                                const checkbox = label.querySelector('input[type="checkbox"]');
+                                if (!checkbox.checked) {
+                                    label.remove();
+                                }
+                            });
+                            
+                            if (services.length === 0 && currentCheckedIds.length === 0) {
+                                serviceSearchEmpty.classList.remove('hidden');
+                            } else {
+                                serviceSearchEmpty.classList.add('hidden');
+                                
+                                services.forEach(service => {
+                                    // If not already in container
+                                    if (!currentCheckedIds.includes(service.id.toString())) {
+                                        const label = document.createElement('label');
+                                        label.className = 'service-tag-label inline-block cursor-pointer select-none shrink-0';
+                                        label.dataset.serviceName = service.title.toLowerCase();
+                                        label.dataset.serviceId = service.id;
+                                        
+                                        label.innerHTML = `
+                                            <input type="checkbox" class="peer hidden" value="${service.title}">
+                                            <div class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D] whitespace-nowrap">
+                                                ${service.title}
+                                            </div>
+                                        `;
+                                        
+                                        const checkbox = label.querySelector('input');
+                                        checkbox.addEventListener('change', renderSelectedServices);
+                                        
+                                        container.appendChild(label);
+                                    }
+                                });
+                            }
+                            
+                            if (typeof updateServiceNavButtons === 'function') updateServiceNavButtons();
+                        } catch (error) {
+                            console.error('Service search error:', error);
                         }
-                    });
-
-                    if (serviceSearchEmpty) {
-                        serviceSearchEmpty.classList.toggle('hidden', !query || visibleCount > 0);
-                    }
+                    }, 300);
                 });
             }
 

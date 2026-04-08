@@ -147,35 +147,16 @@
         </div>
         @endif
 
-        <button onclick="showReferralForm()" id="refer-btn" class="w-full py-3 border-2 border-secondary text-secondary font-bold rounded-xl hover:bg-secondary hover:text-white transition-all flex items-center justify-center gap-2">
+        <button onclick="openReferModal({{ $booking->id }}, {{ $booking->user_id }})" class="w-full py-3 border-2 border-secondary text-secondary font-bold rounded-xl hover:bg-secondary hover:text-white transition-all flex items-center justify-center gap-2">
             <i class="ri-user-shared-line"></i>
-            Refer to another Practitioner
+            Refer to Peer
         </button>
-
-        <div id="referral-form" class="hidden mt-4 bg-gray-50 p-5 rounded-2xl border border-gray-100">
-            <h4 class="text-sm font-bold text-secondary mb-4">Refer this Session</h4>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Select Professional</label>
-                    <select id="refer-to-id" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-secondary outline-none">
-                        <option value="">-- Choose Practitioner/Doctor --</option>
-                        {{-- This will be populated or handled via JS --}}
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Session Fee (€)</label>
-                    <input type="number" id="refer-amount" value="{{ $booking->total_price }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-secondary outline-none">
-                </div>
-                <button onclick="submitReferral({{ $booking->id }})" id="submit-referral-btn" class="w-full py-3 bg-secondary text-white font-bold rounded-xl shadow-lg shadow-secondary/10">
-                    Send Referral Invitation
-                </button>
-            </div>
-        </div>
     </div>
 
     <script>
         async function requestDataAccess(clientId) {
             const btn = document.getElementById('request-otp-btn');
+            if (!btn) return;
             btn.disabled = true;
             btn.innerText = 'Sending OTP...';
 
@@ -207,9 +188,11 @@
         }
 
         async function verifyDataAccess(clientId) {
-            const otp = document.getElementById('access-otp').value;
+            const otpEl = document.getElementById('access-otp');
             const btn = document.getElementById('verify-otp-btn');
+            if (!otpEl || !btn) return;
 
+            const otp = otpEl.value;
             if (!otp) return alert('Please enter the OTP.');
 
             btn.disabled = true;
@@ -229,7 +212,11 @@
                 if (result.success) {
                     alert(result.success);
                     // Refresh modal content to show "Access Granted"
-                    viewBookingDetails({{ $booking->id }});
+                    if (typeof viewBookingDetails === 'function') {
+                        viewBookingDetails({{ $booking->id }});
+                    } else {
+                        location.reload();
+                    }
                 } else {
                     alert(result.error || 'Verification failed.');
                 }
@@ -239,72 +226,6 @@
             } finally {
                 btn.disabled = false;
                 btn.innerText = 'Verify';
-            }
-        }
-
-        function showReferralForm() {
-            const form = document.getElementById('referral-form');
-            form.classList.toggle('hidden');
-            
-            // Load practitioners if not already loaded
-            const select = document.getElementById('refer-to-id');
-            if (select.options.length <= 1) {
-                fetchPractitionersForReferral();
-            }
-        }
-
-        async function fetchPractitionersForReferral() {
-            try {
-                const response = await fetch('/api/referrable-practitioners');
-                const data = await response.json();
-                const select = document.getElementById('refer-to-id');
-                
-                data.forEach(p => {
-                    if (p.id !== {{ $user->id }}) {
-                        const opt = document.createElement('option');
-                        opt.value = p.id;
-                        opt.textContent = `${p.name} (${p.role})`;
-                        select.appendChild(opt);
-                    }
-                });
-            } catch (err) {
-                console.error('Error fetching practitioners:', err);
-            }
-        }
-
-        async function submitReferral(bookingId) {
-            const referredToId = document.getElementById('refer-to-id').value;
-            const amount = document.getElementById('refer-amount').value;
-            const btn = document.getElementById('submit-referral-btn');
-
-            if (!referredToId) return alert('Please select a professional.');
-
-            btn.disabled = true;
-            btn.innerText = 'Sending...';
-
-            try {
-                const response = await fetch(`/bookings/${bookingId}/refer`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ referred_to_id: referredToId, amount: amount })
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    alert(result.success);
-                    document.getElementById('referral-form').classList.add('hidden');
-                } else {
-                    alert(result.error || 'Something went wrong.');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Failed to send referral.');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'Send Referral Invitation';
             }
         }
     </script>

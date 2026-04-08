@@ -42,7 +42,6 @@ class AppServiceProvider extends ServiceProvider
             'yoga_therapist' => \App\Models\YogaTherapist::class,
         ]);
 
-         App::setLocale(Session::get('locale', 'en'));
         Schema::defaultStringLength(191);
 
         Event::listen(SocialiteWasCalled::class, [AppleExtendSocialite::class, 'handle']);

@@ -541,12 +541,25 @@
             // AJAX Pagination Handling
             $(document).on('click', '.custom-pagination a', function (e) {
                 e.preventDefault();
-                e.stopPropagation(); // Prevent app.blade.php global listener from interfering
                 const url = $(this).attr('href');
-                fetchResults(url);
+                if (url && url !== '#') {
+                    fetchResults(url);
+                }
             });
 
-            function fetchResults(url) {
+            // Handle browser back/forward buttons
+            window.history.replaceState({url: window.location.href}, '', window.location.href);
+
+            window.addEventListener('popstate', function (event) {
+                if (event.state && event.state.url) {
+                    fetchResults(event.state.url, false);
+                } else {
+                    // Fallback to current URL if no state (e.g., first load)
+                    fetchResults(window.location.href, false);
+                }
+            });
+
+            function fetchResults(url, pushState = true) {
                 if (window.showPreloader) window.showPreloader();
                 
                 $.ajax({
@@ -557,7 +570,7 @@
                     },
                     success: function (data) {
                         // Check if we accidentally got the full page
-                        if (data.indexOf('<!DOCTYPE html>') !== -1) {
+                        if (typeof data === 'string' && data.indexOf('<!DOCTYPE html>') !== -1) {
                             console.warn('Received full page instead of partial. Reloading as fallback.');
                             window.location.href = url;
                             return;
@@ -565,8 +578,10 @@
 
                         $('#practitioner-results-container').html(data);
                         
-                        // Push to history (original URL without ajax param)
-                        window.history.pushState({path: url}, '', url);
+                        // Push to history
+                        if (pushState) {
+                            window.history.pushState({url: url}, '', url);
+                        }
                         
                         // Re-initialize scroll animations
                         setupScrollAnimations();
@@ -583,7 +598,7 @@
                     error: function (xhr) {
                         console.error('Error fetching search results:', xhr.status);
                         // Fallback to traditional load on error
-                        window.location.href = url;
+                        if (pushState) window.location.href = url;
                     },
                     complete: function() {
                         if (window.hidePreloader) window.hidePreloader();

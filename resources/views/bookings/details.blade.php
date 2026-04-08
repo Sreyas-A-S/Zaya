@@ -3,11 +3,11 @@
 @section('title', 'Booking Details')
 
 @section('content')
-<div class="max-w-5xl mx-auto py-8 px-4">
+<div class="max-w-5xl mx-auto py-6 px-2 md:py-8 md:px-4">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
-            <nav class="flex mb-4" aria-label="Breadcrumb">
+            <nav class="flex mb-4 overflow-x-auto scrollbar-hide whitespace-nowrap" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
                         <a href="{{ route('bookings.index') }}" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-secondary transition-colors">Consultations</a>
@@ -38,7 +38,7 @@
         <div class="lg:col-span-2 space-y-8">
             <!-- Summary Card -->
             <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm">
-                <div class="p-8">
+                <div class="p-5 md:p-8">
                     <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Booking Information</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="flex items-start gap-4">
@@ -83,7 +83,7 @@
             </div>
 
             <!-- Referral History -->
-            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm p-8">
+            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm p-5 md:p-8">
                 <div class="flex items-center justify-between mb-8">
                     <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Referral History</h3>
                     <i class="ri-history-line text-gray-300 text-xl"></i>
@@ -103,7 +103,7 @@
                             @endif
                         </div>
                         <!-- Content -->
-                        <div class="w-[calc(100%-4rem)] md:w-[45%] p-5 rounded-3xl border {{ $node['type'] === 'current' ? 'border-secondary/20 bg-secondary/5' : 'border-gray-50 bg-[#F9FBF9]' }} shadow-sm">
+                        <div class="w-[calc(100%-3.5rem)] md:w-[45%] p-4 md:p-5 rounded-3xl border {{ $node['type'] === 'current' ? 'border-secondary/20 bg-secondary/5' : 'border-gray-50 bg-[#F9FBF9]' }} shadow-sm">
                             <div class="flex items-center justify-between gap-2 mb-1">
                                 <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">
                                     {{ $node['type'] === 'parent' ? 'Referred From' : ($node['type'] === 'current' ? 'Current Session' : 'Referred To') }}
@@ -129,7 +129,7 @@
 
             <!-- Consultation Forms Section -->
             @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner_id === $user->profile_id)
-            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm p-8">
+            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm p-5 md:p-8">
                 <div class="flex items-center justify-between mb-8">
                     <div>
                         <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Consultation Records</h3>
@@ -169,7 +169,7 @@
         <!-- Sidebar Info -->
         <div class="space-y-8">
             <!-- Client Card -->
-            <div class="bg-[#F9FBF9] rounded-[2.5rem] border border-[#2E4B3D]/12 p-8 shadow-sm">
+            <div class="bg-[#F9FBF9] rounded-[2.5rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm">
                 <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Client Profile</h3>
                 <div class="flex items-center gap-4 mb-6">
                     <img src="{{ $booking->user->profile_pic ? (str_starts_with($booking->user->profile_pic, 'http') ? $booking->user->profile_pic : asset('storage/' . $booking->user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" 
@@ -198,7 +198,7 @@
             </div>
 
             <!-- Consent Status -->
-            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 p-8 shadow-sm">
+            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Consent & Security</h3>
                     @if($hasConsent)
@@ -235,8 +235,8 @@
                         Join Session
                     </a>
                 @endif
-                
-                @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner_id === $user->profile_id)
+
+                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner_id === $user->profile_id)
                     <button onclick="openReferModal({{ $booking->id }}, {{ $booking->user_id }})" class="w-full py-5 bg-white text-secondary border border-[#2E4B3D]/12 rounded-[1.5rem] font-black text-sm hover:bg-[#F9FBF9] transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-sm">
                         <i class="ri-user-shared-line text-lg text-orange-500"></i>
                         Refer to Peer
@@ -247,7 +247,6 @@
     </div>
 </div>
 
-{{-- Re-include the refer modal as it's needed here too --}}
 @include('partials.refer-modal-scripts')
 
 @endsection

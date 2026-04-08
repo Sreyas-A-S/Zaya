@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Mail\ReferralInvitationMail;
 use App\Mail\ReferralReceivedMail;
 use App\Mail\BookingMail;
+use App\Services\CurrencyConversionService;
 use App\Traits\FinancialTrait;
 use App\Services\PractitionerAvailabilityService;
 use Illuminate\Http\Request;
@@ -46,6 +47,7 @@ class ReferralController extends Controller
             'referrals.*.amount' => 'required|numeric|min:0',
             'referrals.*.booking_date' => 'required|date|after_or_equal:today',
             'referrals.*.booking_time' => 'required|string',
+            'note' => 'nullable|string',
         ]);
 
         // Check if current practitioner already has approved access
@@ -97,8 +99,10 @@ class ReferralController extends Controller
                 'referred_to_id' => $refData['id'],
                 'service_ids' => $booking->service_ids,
                 'amount' => $refData['amount'],
+                'currency' => $this->resolveProfessionalCurrency($referredToUser),
                 'booking_date' => $refData['booking_date'],
                 'booking_time' => $refData['booking_time'],
+                'note' => $request->note,
                 'status' => $status,
             ]);
 
@@ -195,6 +199,7 @@ class ReferralController extends Controller
     {
         $oldBooking = $referral->booking;
         $referredToUser = User::with(['practitioner', 'doctor'])->find($referral->referred_to_id);
+        $currency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referredToUser) ?? config('currencies.default', 'INR')));
 
         if ($countryId === null) {
             try {
@@ -229,6 +234,7 @@ class ReferralController extends Controller
             'booking_date' => $referral->booking_date,
             'booking_time' => $referral->booking_time,
             'total_price' => $referral->amount,
+            'currency' => $currency,
             'status' => 'confirmed',
             'razorpay_payment_id' => $paymentId,
         ]);
@@ -246,7 +252,7 @@ class ReferralController extends Controller
             'booking_id' => $newBooking->id,
             'referral_id' => $referral->id,
             'payment_id' => $paymentId,
-            'currency' => $newBooking->currency ?? 'INR',
+            'currency' => $currency,
             'country_id' => $countryId,
             'referrer_role' => $referral->referredBy->role ?? null,
             'referred_role' => $referredToUser->role ?? null,
@@ -271,8 +277,46 @@ class ReferralController extends Controller
         $referral = Referral::with(['user', 'referredBy', 'referredTo', 'booking'])->where('referral_no', $referral_no)->firstOrFail();
         $batch = Referral::with(['referredTo'])->where('batch_no', $referral->batch_no)->get();
 
+        $serviceTitles = [];
+        try {
+            $serviceIds = (array) ($referral->service_ids ?? []);
+            $serviceIds = array_values(array_filter($serviceIds, fn ($v) => is_numeric($v)));
+            if (!empty($serviceIds)) {
+                $serviceTitles = Service::whereIn('id', $serviceIds)->pluck('title')->filter()->values()->all();
+            }
+        } catch (\Throwable $e) {
+            $serviceTitles = [];
+        }
+
+        $expertCurrency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referral->referredTo) ?? config('currencies.default', 'INR')));
+        $clientCurrency = derive_currency_from_user(Auth::user());
+
+        $converted = null;
+        if ($expertCurrency && $clientCurrency && $expertCurrency !== $clientCurrency) {
+            $converted = app(CurrencyConversionService::class)->convert((float) $referral->amount, $expertCurrency, $clientCurrency);
+        }
+
         if ($referral->status === 'awaiting_consent') {
             return view('referrals.consent', compact('referral', 'batch'));
+        }
+
+        if ($referral->status === 'paid') {
+            return redirect()->route('dashboard')->with('info', 'This referral session is already confirmed.');
+        }
+
+        if ($referral->status === 'pending' && $referral->amount > 0) {
+            return view('referrals.pay', compact('referral', 'serviceTitles', 'expertCurrency', 'clientCurrency', 'converted'));
+        }
+
+        return redirect()->route('dashboard');
+    }
+
+    public function initiatePayment($referral_no)
+    {
+        $referral = Referral::with(['user', 'referredTo'])->where('referral_no', $referral_no)->firstOrFail();
+
+        if ($referral->status === 'awaiting_consent') {
+            return redirect()->route('referrals.pay', $referral_no);
         }
 
         if ($referral->status === 'paid') {
@@ -323,7 +367,9 @@ class ReferralController extends Controller
         }
 
         if ($referral->amount > 0) {
-            return $this->initiateRazorpay($referral);
+            return redirect()
+                ->route('referrals.pay', $referral->referral_no)
+                ->with('success', 'Consent verified. Please proceed to payment to confirm the referral.');
         }
 
         return redirect()->route('dashboard')->with('success', 'Consent granted and referral confirmed!');
@@ -334,10 +380,18 @@ class ReferralController extends Controller
         $razorpayKey = config('services.razorpay.key');
         $razorpaySecret = config('services.razorpay.secret');
 
-        $response = Http::withBasicAuth($razorpayKey, $razorpaySecret)
+        $verifySsl = config('services.razorpay.verify_ssl');
+        if ($verifySsl === null) {
+            $verifySsl = !app()->environment('local');
+        }
+
+        $currency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referral->referredTo) ?? config('currencies.default', 'INR')));
+
+        $response = Http::withOptions(['verify' => (bool) $verifySsl])
+            ->withBasicAuth($razorpayKey, $razorpaySecret)
             ->post('https://api.razorpay.com/v1/payment_links', [
-                'amount' => $referral->amount * 100,
-                'currency' => 'INR',
+                'amount' => (int) round(((float) $referral->amount) * 100),
+                'currency' => $currency,
                 'accept_partial' => false,
                 'description' => "Referral Session: " . $referral->referredTo->name,
                 'customer' => [
@@ -348,7 +402,10 @@ class ReferralController extends Controller
                 'notify' => ['sms' => true, 'email' => true],
                 'callback_url' => route('referrals.payment.callback'),
                 'callback_method' => 'get',
-                'notes' => ['referral_no' => $referral->referral_no]
+                'notes' => [
+                    'referral_no' => $referral->referral_no,
+                    'referral_currency' => $currency,
+                ]
             ]);
 
         if ($response->successful()) {
@@ -380,5 +437,19 @@ class ReferralController extends Controller
         }
 
         return redirect()->route('dashboard')->with('error', 'Payment failed.');
+    }
+
+    private function resolveProfessionalCurrency(?User $user): string
+    {
+        if (!$user) return strtoupper(config('currencies.default', 'INR'));
+
+        try {
+            $profile = $user->profile;
+            if ($profile && isset($profile->payout_currency) && $profile->payout_currency) {
+                return strtoupper(trim((string) $profile->payout_currency));
+            }
+        } catch (\Throwable $e) {}
+
+        return derive_currency_from_user($user);
     }
 }

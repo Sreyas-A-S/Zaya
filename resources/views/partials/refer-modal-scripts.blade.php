@@ -1,4 +1,4 @@
-<!-- Referral Modal HTML -->
+<!-- Referral Modal -->
 <div id="refer-modal" class="fixed inset-0 z-[999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeReferModal()"></div>
 
@@ -19,6 +19,7 @@
                         <input type="hidden" id="refer-booking-id">
                         <input type="hidden" id="refer-client-id">
                         
+                        <!-- Step 1: Select Recipient & Fee -->
                         <div id="refer-step-1">
                             <!-- Role Selection (Tabs) -->
                             <div class="mb-6">
@@ -62,15 +63,24 @@
                                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary mx-auto"></div>
                                     <p class="text-[10px] text-gray-400 uppercase font-bold mt-3 tracking-widest">Searching Professionals...</p>
                                 </div>
-                                <div id="professionals-list" class="space-y-3 max-h-[280px] overflow-y-auto pr-2 custom-sidebar-scrollbar"></div>
+                                <div id="professionals-list" class="space-y-3 max-h-[280px] overflow-y-auto pr-2 custom-sidebar-scrollbar">
+                                    <!-- Dynamic list items -->
+                                </div>
                             </div>
 
                             <!-- Selected Professionals Summary -->
-                            <div class="mb-8">
+                            <div class="mb-6">
                                 <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Selected Professionals (1 from each category)</label>
                                 <div id="selected-professionals-summary" class="space-y-2">
                                     <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center py-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">No professionals selected yet</p>
                                 </div>
+                            </div>
+
+                            <!-- Referral Note -->
+                            <div class="mb-8">
+                                <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">3. Referral Note (Optional)</label>
+                                <textarea id="refer-note" rows="3" placeholder="Add a detailed note about this referral (e.g. client's condition, goals, special requests)..." 
+                                    class="w-full px-4 py-4 rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-sm transition-all shadow-sm bg-gray-50/30"></textarea>
                             </div>
 
                             <button type="button" id="refer-submit-btn" onclick="submitReferral()" disabled class="w-full py-5 bg-secondary text-white rounded-[1.5rem] font-black text-sm hover:bg-primary transition-all shadow-2xl shadow-secondary/30 uppercase tracking-[0.2em] disabled:opacity-40 disabled:cursor-not-allowed">
@@ -84,15 +94,109 @@
     </div>
 </div>
 
+<!-- Translator Modal -->
+<div id="translator-modal" class="fixed inset-0 z-[999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeTranslatorModal()"></div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-[#2E4B3D]/12">
+                <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <div>
+                        <h3 class="text-xl font-black text-secondary tracking-tight">Assign Translator</h3>
+                        <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1" id="translator-lang-pair">Find a professional translator</p>
+                    </div>
+                    <button onclick="closeTranslatorModal()" class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-all shadow-sm">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                <div class="px-8 py-8">
+                    <form id="translator-form">
+                        <input type="hidden" id="translator-booking-id">
+                        
+                        <!-- Search & Filter -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Find Professional Translator</label>
+                            <div class="relative">
+                                <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="translator-search" placeholder="Search by name..." 
+                                    oninput="debouncedFetchTranslators()"
+                                    class="w-full pl-11 pr-4 py-4 rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-sm transition-all shadow-sm">
+                            </div>
+                        </div>
+
+                        <!-- Translators List -->
+                        <div class="mb-6">
+                            <div id="translators-loader" class="hidden py-10 text-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary mx-auto"></div>
+                                <p class="text-[10px] text-gray-400 uppercase font-bold mt-3 tracking-widest">Searching Translators...</p>
+                            </div>
+                            <div id="translators-list" class="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-sidebar-scrollbar">
+                                <!-- Dynamic list items -->
+                            </div>
+                        </div>
+
+                        <button type="button" id="translator-submit-btn" onclick="submitTranslatorAssignment()" disabled class="w-full py-5 bg-secondary text-white rounded-[1.5rem] font-black text-sm hover:bg-primary transition-all shadow-2xl shadow-secondary/30 uppercase tracking-[0.2em] disabled:opacity-40 disabled:cursor-not-allowed">
+                            Assign Selected Translator
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Professional Profile Modal -->
+<div id="professional-profile-modal" class="fixed inset-0 z-[1000] hidden" aria-labelledby="professional-profile-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeProfessionalProfileModal()"></div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-[#2E4B3D]/12">
+                <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <div>
+                        <h3 id="professional-profile-title" class="text-xl font-black text-secondary tracking-tight">Professional Profile</h3>
+                        <p id="professional-profile-subtitle" class="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1"></p>
+                    </div>
+                    <button onclick="closeProfessionalProfileModal()" class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-all shadow-sm">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                <div id="professional-profile-body" class="px-8 py-8">
+                    <div class="flex justify-center items-center py-10">
+                        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-secondary"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
 <script>
     // Referral Modal Logic
     let fetchTimeout = null;
-    let selectedProfessionals = {};
+    let selectedProfessionals = {}; // { 'practitioner': {id, name, fee, pic}, ... }
+    let professionalsFetchSeq = 0;
+    let professionalsFetchController = null;
+    let professionalsLoaderShowTimer = null;
+    let professionalsLoaderShownAt = 0;
+    let professionalsLoaderVisible = false;
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     function switchReferTab(role) {
-        document.getElementById('selected-role').value = role;
+        const selectedRoleInput = document.getElementById('selected-role');
+        if (!selectedRoleInput) return;
+        selectedRoleInput.value = role;
         document.querySelectorAll('[data-role-tab]').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.roleTab === role);
+            if (btn.dataset.roleTab === role) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
         });
         fetchProfessionals();
     }
@@ -102,17 +206,42 @@
         fetchTimeout = setTimeout(fetchProfessionals, 400);
     }
 
-    async function fetchProfessionals() {
-        const bookingId = document.getElementById('refer-booking-id').value;
-        const query = document.getElementById('refer-search').value;
-        const role = document.getElementById('selected-role').value;
+    async function fetchProfessionals(showLoader = true) {
+        const bookingIdEl = document.getElementById('refer-booking-id');
+        const searchEl = document.getElementById('refer-search');
+        const roleEl = document.getElementById('selected-role');
         const list = document.getElementById('professionals-list');
         const loader = document.getElementById('professionals-loader');
 
-        if (!list || !loader) return;
+        if (!bookingIdEl || !roleEl || !list || !loader) return;
 
-        loader.classList.remove('hidden');
-        list.classList.add('hidden');
+        const bookingId = bookingIdEl.value;
+        const query = searchEl ? searchEl.value : '';
+        const role = roleEl.value;
+
+        const seq = ++professionalsFetchSeq;
+
+        // Abort previous request to avoid racing UI updates
+        if (professionalsFetchController) {
+            try { professionalsFetchController.abort(); } catch (e) {}
+        }
+        professionalsFetchController = new AbortController();
+
+        // Prevent loader flicker: only show it if the request takes longer than a moment,
+        // and once shown keep it visible for a minimum duration.
+        professionalsLoaderVisible = false;
+        professionalsLoaderShownAt = 0;
+        if (professionalsLoaderShowTimer) clearTimeout(professionalsLoaderShowTimer);
+        
+        if (showLoader) {
+            professionalsLoaderShowTimer = setTimeout(() => {
+                if (seq !== professionalsFetchSeq) return; // stale
+                professionalsLoaderVisible = true;
+                professionalsLoaderShownAt = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+                loader.classList.remove('hidden');
+                list.classList.add('hidden');
+            }, 150);
+        }
 
         try {
             const url = new URL("{{ route('referrable-practitioners-api') }}", window.location.origin);
@@ -120,11 +249,24 @@
             if (query) url.searchParams.append('query', query);
             url.searchParams.append('roles[]', role);
 
-            const response = await fetch(url);
+            const response = await fetch(url, { signal: professionalsFetchController.signal });
             const professionals = await response.json();
 
-            loader.classList.add('hidden');
-            list.classList.remove('hidden');
+            if (seq !== professionalsFetchSeq) return; // stale response
+            if (professionalsLoaderShowTimer) clearTimeout(professionalsLoaderShowTimer);
+
+            if (professionalsLoaderVisible) {
+                const nowTs = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+                const elapsed = nowTs - professionalsLoaderShownAt;
+                const minVisibleMs = 300;
+                if (elapsed < minVisibleMs) await (window.sleep || (ms => new Promise(r => setTimeout(r, ms))))(minVisibleMs - elapsed);
+                loader.classList.add('hidden');
+                list.classList.remove('hidden');
+            } else {
+                // Loader never shown (fast response or showLoader false) -> no UI toggle needed
+                loader.classList.add('hidden');
+                list.classList.remove('hidden');
+            }
 
             if (professionals.length === 0) {
                 list.innerHTML = '<p class="text-center text-gray-400 text-xs py-10">No professionals found in this category.</p>';
@@ -137,6 +279,8 @@
                 const item = document.createElement('div');
                 item.className = `p-4 rounded-2xl border ${isSelected ? 'border-secondary bg-secondary/5' : 'border-gray-100'} flex items-center justify-between group hover:border-secondary/20 hover:bg-gray-50/50 transition-all cursor-pointer professional-item`;
                 item.onclick = () => selectProfessional(p.id, p.name, p.service_fee, p.profile_pic, role);
+
+                const canViewProfile = (p.role === 'practitioner');
                 
                 item.innerHTML = `
                     <div class="flex items-center gap-4">
@@ -147,33 +291,133 @@
                                 <span class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${p.handles_service ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-50 text-gray-400'}">
                                     ${p.handles_service ? 'Handles Service' : 'Consultation Only'}
                                 </span>
-                                ${p.handles_service && p.service_fee > 0 ? `<span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">Fee: €${parseFloat(p.service_fee).toFixed(2)}</span>` : ''}
-                                ${p.profile_url ? `<a href="${p.profile_url}" target="_blank" onclick="event.stopPropagation()" class="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-black uppercase tracking-widest border border-gray-200 hover:bg-primary hover:text-white hover:border-primary transition-all">Check Slots</a>` : ''}
+                                ${p.handles_service && p.service_fee > 0 ? `
+                                    <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">
+                                        Fee: €${parseFloat(p.service_fee).toFixed(2)}
+                                    </span>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
-                    <div class="w-7 h-7 rounded-full border-2 ${isSelected ? 'bg-secondary border-secondary' : 'border-gray-100 bg-white'} flex items-center justify-center transition-all group-hover:border-secondary check-indicator">
-                        <i class="ri-check-line text-white ${isSelected ? 'opacity-100' : 'opacity-0'} transition-all text-lg"></i>
+                    <div class="flex items-center gap-2">
+                        ${canViewProfile ? `
+                            <button type="button"
+                                onclick="event.stopPropagation(); openProfessionalProfile(${p.id});"
+                                class="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-secondary transition-all shadow-sm"
+                                title="View Profile">
+                                <i class="ri-eye-line text-lg"></i>
+                            </button>
+                        ` : ``}
+                        <div class="w-7 h-7 rounded-full border-2 ${isSelected ? 'bg-secondary border-secondary' : 'border-gray-100 bg-white'} flex items-center justify-center transition-all group-hover:border-secondary check-indicator">
+                            <i class="ri-check-line text-white ${isSelected ? 'opacity-100' : 'opacity-0'} transition-all text-lg"></i>
+                        </div>
                     </div>
                 `;
                 list.appendChild(item);
             });
         } catch (error) {
+            if (error && error.name === 'AbortError') return;
             console.error('Fetch professionals error:', error);
+            if (seq !== professionalsFetchSeq) return;
+            if (professionalsLoaderShowTimer) clearTimeout(professionalsLoaderShowTimer);
             loader.classList.add('hidden');
             list.classList.remove('hidden');
             list.innerHTML = '<p class="text-center text-red-400 text-xs py-10">Error loading professionals.</p>';
         }
     }
 
+    function closeProfessionalProfileModal() {
+        document.getElementById('professional-profile-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    async function openProfessionalProfile(userId) {
+        const modal = document.getElementById('professional-profile-modal');
+        const body = document.getElementById('professional-profile-body');
+        const subtitle = document.getElementById('professional-profile-subtitle');
+
+        if (!modal || !body || !subtitle) return;
+
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        subtitle.innerText = '';
+        body.innerHTML = '<div class="flex justify-center items-center py-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-secondary"></div></div>';
+
+        try {
+            const res = await fetch(`/api/professional-profile/${userId}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data && data.error ? data.error : 'Failed to load profile');
+
+            subtitle.innerText = (data.role_label || '').toString().toUpperCase();
+
+            const services = Array.isArray(data.services) ? data.services : [];
+            const specialities = Array.isArray(data.specialities) ? data.specialities : [];
+            const conditions = Array.isArray(data.conditions) ? data.conditions : [];
+
+            const pill = (t) => `<span class="text-[10px] px-2.5 py-1 rounded-full bg-gray-50 text-gray-600 font-black uppercase tracking-widest border border-gray-100">${t}</span>`;
+            const section = (title, contentHtml) => `
+                <div class="p-5 rounded-2xl border border-[#2E4B3D]/12 bg-white shadow-sm">
+                    <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest mb-3">${title}</p>
+                    ${contentHtml}
+                </div>
+            `;
+
+            const servicesHtml = services.length
+                ? `<div class="space-y-2">${services.map(s => `
+                    <div class="flex items-center justify-between gap-4 p-3 rounded-xl bg-gray-50/50 border border-gray-100">
+                        <div class="text-sm font-bold text-secondary">${s.title}</div>
+                        <div class="text-xs font-black text-secondary whitespace-nowrap">
+                            ${s.rate !== null ? `${(s.currency || '').toString()} ${parseFloat(s.rate).toFixed(2)}` : '—'}
+                        </div>
+                    </div>
+                `).join('')}</div>`
+                : `<p class="text-sm text-gray-400">No services listed.</p>`;
+
+            const specialitiesHtml = specialities.length
+                ? `<div class="flex flex-wrap gap-2">${specialities.map(pill).join('')}</div>`
+                : `<p class="text-sm text-gray-400">No specialities listed.</p>`;
+
+            const conditionsHtml = conditions.length
+                ? `<div class="flex flex-wrap gap-2">${conditions.map(pill).join('')}</div>`
+                : `<p class="text-sm text-gray-400">No conditions listed.</p>`;
+
+            const fullProfileLink = data.profile_url
+                ? `<div class="mt-2 flex items-center gap-2">
+                        <a href="${data.profile_url}" target="_blank" class="text-xs font-black uppercase tracking-widest text-secondary hover:text-primary underline">Open Full Profile</a>
+                   </div>`
+                : ``;
+
+            body.innerHTML = `
+                <div class="flex items-start gap-4 mb-6">
+                    <img src="${data.profile_pic}" class="w-16 h-16 rounded-2xl object-cover border border-gray-100 shadow-sm">
+                    <div class="flex-1">
+                        <p class="text-lg font-black text-secondary leading-tight">${data.name}</p>
+                        ${fullProfileLink}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${section('Services', servicesHtml)}
+                    ${section('Specialities', specialitiesHtml)}
+                    ${section('Conditions Handled', conditionsHtml)}
+                </div>
+            `;
+        } catch (e) {
+            console.error('Profile fetch error:', e);
+            body.innerHTML = `<p class="text-center text-red-400 text-sm py-10">${(e && e.message) ? e.message : 'Failed to load profile.'}</p>`;
+        }
+    }
+
     function selectProfessional(id, name, fee, pic, role) {
+        // Toggle selection: if clicking the same one, unselect
         if (selectedProfessionals[role] && selectedProfessionals[role].id === id) {
             delete selectedProfessionals[role];
         } else {
             selectedProfessionals[role] = { id, name, fee, pic, role };
         }
+        
         renderSelectedSummary();
-        fetchProfessionals();
+        fetchProfessionals(false); // Refresh list without loader to prevent flickering
     }
 
     function renderSelectedSummary() {
@@ -182,6 +426,7 @@
         if (!summary || !submitBtn) return;
 
         const roles = Object.keys(selectedProfessionals);
+
         if (roles.length === 0) {
             summary.innerHTML = '<p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center py-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">No professionals selected yet</p>';
             submitBtn.disabled = true;
@@ -192,20 +437,119 @@
         summary.innerHTML = '';
         roles.forEach(roleKey => {
             const p = selectedProfessionals[roleKey];
+            const roleLabel = roleKey.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const canViewProfile = (p.role === 'practitioner');
             const card = document.createElement('div');
-            card.className = 'flex items-center justify-between p-3 bg-white border border-[#2E4B3D]/12 rounded-xl shadow-sm';
+            card.className = 'p-4 bg-white border border-[#2E4B3D]/12 rounded-2xl shadow-sm space-y-4 mb-3';
             card.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <img src="${p.pic}" class="w-8 h-8 rounded-lg object-cover">
-                    <div>
-                        <p class="text-xs font-bold text-secondary">${p.name}</p>
-                        <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">${roleKey.replace('_', ' ').toUpperCase()}</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img src="${p.pic}" class="w-10 h-10 rounded-xl object-cover border border-gray-100">
+                        <div>
+                            <p class="text-xs font-black text-secondary uppercase tracking-tight">${p.name}</p>
+                            <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">${roleLabel}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        ${canViewProfile ? `
+                            <button type="button"
+                                onclick="openProfessionalProfile(${p.id})"
+                                class="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-secondary transition-all shadow-sm"
+                                title="View Profile">
+                                <i class="ri-eye-line"></i>
+                            </button>
+                        ` : ``}
+                        <button type="button" onclick="removeSelectedProfessional('${roleKey}')" class="w-8 h-8 rounded-full bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all" title="Remove">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
                     </div>
                 </div>
-                <button type="button" onclick="removeSelectedProfessional('${roleKey}')" class="text-red-400 hover:text-red-600 p-1"><i class="ri-delete-bin-line text-lg"></i></button>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Consultation Date</label>
+                        <input type="date" 
+                            onchange="fetchSlotsForReferral('${roleKey}', this.value)"
+                            min="{{ now()->format('Y-m-d') }}"
+                            class="w-full px-3 py-2 text-xs rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 transition-all bg-gray-50/50"
+                            id="date-${roleKey}">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Select Slot</label>
+                        <select id="slots-${roleKey}" 
+                            onchange="updateSelectedSlot('${roleKey}', this.value)"
+                            class="w-full px-3 py-2 text-xs rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 transition-all bg-gray-50/50 disabled:opacity-50"
+                            disabled>
+                            <option value="">Select Date First</option>
+                        </select>
+                    </div>
+                </div>
             `;
             summary.appendChild(card);
         });
+    }
+
+    async function fetchSlotsForReferral(role, date) {
+        const p = selectedProfessionals[role];
+        const slotSelect = document.getElementById(`slots-${role}`);
+        
+        if (!date || !slotSelect) {
+            if (slotSelect) {
+                slotSelect.innerHTML = '<option value="">Select Date First</option>';
+                slotSelect.disabled = true;
+            }
+            return;
+        }
+
+        slotSelect.disabled = true;
+        slotSelect.innerHTML = '<option value="">Loading Slots...</option>';
+
+        try {
+            const response = await fetch(`/api/available-slots-by-user/${p.id}/${date}`);
+            const data = await response.json();
+            const slots = (data && Array.isArray(data.slots)) ? data.slots : [];
+
+            slotSelect.innerHTML = '<option value="">Select Time</option>';
+            if (slots.length > 0) {
+                slots.forEach(slot => {
+                    slotSelect.innerHTML += `<option value="${slot.time}">${slot.time}</option>`;
+                });
+                slotSelect.disabled = false;
+            } else {
+                slotSelect.innerHTML = '<option value="">No Slots Available</option>';
+            }
+        } catch (error) {
+            console.error('Fetch slots error:', error);
+            slotSelect.innerHTML = '<option value="">Error loading slots</option>';
+        }
+    }
+
+    function updateSelectedSlot(role, slot) {
+        if (selectedProfessionals[role]) {
+            selectedProfessionals[role].slot = slot;
+            const dateInput = document.getElementById(`date-${role}`);
+            selectedProfessionals[role].date = dateInput ? dateInput.value : '';
+        }
+        validateReferralForm();
+    }
+
+    function validateReferralForm() {
+        const submitBtn = document.getElementById('refer-submit-btn');
+        if (!submitBtn) return;
+
+        const roles = Object.keys(selectedProfessionals);
+        
+        if (roles.length === 0) {
+            submitBtn.disabled = true;
+            return;
+        }
+
+        const allValid = roles.every(role => {
+            const p = selectedProfessionals[role];
+            return p.date && p.slot;
+        });
+
+        submitBtn.disabled = !allValid;
     }
 
     function removeSelectedProfessional(role) {
@@ -214,35 +558,222 @@
         fetchProfessionals();
     }
 
-    function openReferModal(bookingId, clientId) {
-        document.getElementById('refer-booking-id').value = bookingId;
-        document.getElementById('refer-client-id').value = clientId;
-        document.getElementById('refer-modal').classList.remove('hidden');
+    async function openReferModal(bookingId, clientId) {
+        const modal = document.getElementById('refer-modal');
+        const bookingIdInput = document.getElementById('refer-booking-id');
+        const clientIdInput = document.getElementById('refer-client-id');
+        if (!modal || !bookingIdInput || !clientIdInput) return;
+
+        bookingIdInput.value = bookingId;
+        clientIdInput.value = clientId;
+        modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
-        document.getElementById('refer-search').value = '';
+        
+        // Reset form & state
+        const searchInput = document.getElementById('refer-search');
+        const noteInput = document.getElementById('refer-note');
+        if (searchInput) searchInput.value = '';
+        if (noteInput) noteInput.value = '';
+        
         selectedProfessionals = {};
         renderSelectedSummary();
+        
+        // Default to practitioner tab
         switchReferTab('practitioner');
     }
 
     function closeReferModal() {
-        document.getElementById('refer-modal').classList.add('hidden');
+        const modal = document.getElementById('refer-modal');
+        if (modal) modal.classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
 
-    async function submitReferral() {
-        const bookingId = document.getElementById('refer-booking-id').value;
-        const submitBtn = document.getElementById('refer-submit-btn');
-        if (Object.keys(selectedProfessionals).length === 0) return alert('Please select a professional.');
+    // Translator Modal Logic
+    let translatorFetchTimeout = null;
+    let selectedTranslatorId = null;
+    let currentFromLang = '';
+    let currentToLang = '';
+
+    function debouncedFetchTranslators() {
+        clearTimeout(translatorFetchTimeout);
+        translatorFetchTimeout = setTimeout(fetchTranslators, 400);
+    }
+
+    async function fetchTranslators() {
+        const searchInput = document.getElementById('translator-search');
+        const list = document.getElementById('translators-list');
+        const loader = document.getElementById('translators-loader');
+        if (!list || !loader) return;
+
+        const query = searchInput ? searchInput.value : '';
+
+        loader.classList.remove('hidden');
+        list.classList.add('hidden');
+
+        try {
+            const url = new URL("{{ route('available-translators-api') }}", window.location.origin);
+            if (query) url.searchParams.append('query', query);
+            url.searchParams.append('from_lang', currentFromLang);
+            url.searchParams.append('to_lang', currentToLang);
+
+            const response = await fetch(url);
+            const translators = await response.json();
+
+            loader.classList.add('hidden');
+            list.classList.remove('hidden');
+
+            if (translators.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400 text-xs py-10">No translators found matching the language pair.</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            translators.forEach(t => {
+                const isSelected = selectedTranslatorId === t.id;
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-2xl border ${isSelected ? 'border-secondary bg-secondary/5' : 'border-gray-100'} flex items-center justify-between group hover:border-secondary/20 hover:bg-gray-50/50 transition-all cursor-pointer professional-item`;
+                item.onclick = () => selectTranslator(t.id);
+                
+                item.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <img src="${t.profile_photo_path}" class="w-12 h-12 rounded-xl object-cover border border-gray-100 shadow-sm">
+                        <div>
+                            <p class="text-sm font-bold text-secondary leading-tight">${t.full_name}</p>
+                            <div class="flex flex-wrap items-center gap-2 mt-1">
+                                <span class="text-[9px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-black uppercase tracking-widest">
+                                    Native: ${t.native_language}
+                                </span>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">
+                                    Exp: ${t.years_of_experience} Yrs
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-7 h-7 rounded-full border-2 ${isSelected ? 'bg-secondary border-secondary' : 'border-gray-100 bg-white'} flex items-center justify-center transition-all group-hover:border-secondary check-indicator">
+                        <i class="ri-check-line text-white ${isSelected ? 'opacity-100' : 'opacity-0'} transition-all text-lg"></i>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        } catch (error) {
+            console.error('Fetch translators error:', error);
+            loader.classList.add('hidden');
+            list.classList.remove('hidden');
+            list.innerHTML = '<p class="text-center text-red-400 text-xs py-10">Error loading translators.</p>';
+        }
+    }
+
+    function selectTranslator(id) {
+        selectedTranslatorId = (selectedTranslatorId === id) ? null : id;
+        const submitBtn = document.getElementById('translator-submit-btn');
+        if (submitBtn) submitBtn.disabled = !selectedTranslatorId;
+        fetchTranslators();
+    }
+
+    function openTranslatorModal(bookingId, fromLang, toLang) {
+        const modal = document.getElementById('translator-modal');
+        const bookingIdInput = document.getElementById('translator-booking-id');
+        const langPairText = document.getElementById('translator-lang-pair');
+        if (!modal || !bookingIdInput) return;
+
+        bookingIdInput.value = bookingId;
+        currentFromLang = fromLang;
+        currentToLang = toLang;
+        if (langPairText) langPairText.innerText = `Language Pair: ${fromLang} → ${toLang}`;
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        
+        // Reset
+        const searchInput = document.getElementById('translator-search');
+        if (searchInput) searchInput.value = '';
+        selectedTranslatorId = null;
+        const submitBtn = document.getElementById('translator-submit-btn');
+        if (submitBtn) submitBtn.disabled = true;
+        
+        fetchTranslators();
+    }
+
+    function closeTranslatorModal() {
+        const modal = document.getElementById('translator-modal');
+        if (modal) modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    async function submitTranslatorAssignment() {
+        const bookingIdInput = document.getElementById('translator-booking-id');
+        const submitBtn = document.getElementById('translator-submit-btn');
+        if (!bookingIdInput || !submitBtn || !selectedTranslatorId) return;
+
+        const bookingId = bookingIdInput.value;
 
         submitBtn.disabled = true;
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = 'Assigning...';
+
+        try {
+            const response = await fetch(`/bookings/${bookingId}/assign-translator`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    translator_id: selectedTranslatorId
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                if (window.showZayaToast) showZayaToast(data.success, 'Translator');
+                closeTranslatorModal();
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                alert(data.error || 'Assignment failed.');
+            }
+        } catch (error) {
+            console.error('Translator Assignment Error:', error);
+            alert('An error occurred.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
+    }
+
+    async function submitReferral() {
+        const bookingIdInput = document.getElementById('refer-booking-id');
+        const submitBtn = document.getElementById('refer-submit-btn');
+        const noteInput = document.getElementById('refer-note');
+        if (!bookingIdInput || !submitBtn) return;
+
+        const bookingId = bookingIdInput.value;
+        const note = noteInput ? noteInput.value : '';
+
+        if (Object.keys(selectedProfessionals).length === 0) {
+            alert('Please select at least one professional to refer to.');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        const originalText = submitBtn.innerText;
         submitBtn.innerText = 'Sending Requests...';
+
+        const referrals = Object.values(selectedProfessionals).map(p => ({
+            id: p.id,
+            amount: p.fee,
+            booking_date: p.date,
+            booking_time: p.slot
+        }));
 
         try {
             const response = await fetch(`/bookings/${bookingId}/refer`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: JSON.stringify({ referrals: Object.values(selectedProfessionals).map(p => ({ id: p.id, amount: p.fee })) })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    referrals: referrals,
+                    note: note
+                })
             });
             const data = await response.json();
             if (data.success) {
@@ -257,7 +788,8 @@
             alert('An error occurred.');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerText = 'Send Referral Requests';
+            submitBtn.innerText = originalText;
         }
     }
 </script>
+@endpush

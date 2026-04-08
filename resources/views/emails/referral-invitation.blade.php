@@ -44,15 +44,42 @@
                         <a href="{{ $referral->referredTo->profile_url }}" style="color: #97563D; font-size: 12px; font-weight: 700; text-decoration: underline; margin-top: 5px; display: inline-block;">View Profile</a>
                     </div>
                 </div>
+
+                <div style="margin-top: 15px; border-top: 1px solid #edf2f7; padding-top: 15px;">
+                    <span class="label">Referred By:</span>
+                    <span class="value">{{ $referral->referredBy->name }}</span>
+                </div>
+
+                @if(!empty($serviceTitles))
+                <div style="margin-top: 15px; border-top: 1px solid #edf2f7; padding-top: 15px;">
+                    <span class="label">Consultation:</span>
+                    <span class="value">{{ implode(', ', $serviceTitles) }}</span>
+                </div>
+                @endif
+
                 <div style="margin-top: 15px; border-top: 1px solid #edf2f7; padding-top: 15px;">
                     <span class="label">Session Amount:</span>
-                    <span class="value">€ {{ number_format($referral->amount, 2) }}</span>
+                    <span class="value">{{ get_currency_symbol($expertCurrency ?? 'INR') }} {{ number_format($referral->amount, 2) }} ({{ $expertCurrency ?? 'INR' }})</span>
+                    @if(!empty($converted) && !empty($converted['converted']))
+                        <div style="font-size: 12px; color: #64748b; font-weight: 600; margin-top: 6px;">
+                            Approx: {{ get_currency_symbol($clientCurrency ?? '') }} {{ number_format((float) $converted['converted'], 2) }} ({{ $clientCurrency ?? '' }})
+                        </div>
+                    @endif
                 </div>
+
+                @if($referral->note)
+                <div style="margin-top: 15px; border-top: 1px solid #edf2f7; padding-top: 15px;">
+                    <span class="label">Practitioner's Note:</span>
+                    <p style="font-size: 14px; color: #4B5563; margin-top: 5px; font-style: italic; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #edf2f7;">
+                        "{{ $referral->note }}"
+                    </p>
+                </div>
+                @endif
             </div>
 
             <p>To confirm this referral and schedule your session, please complete the payment using the secure link below:</p>
 
-            <a href="{{ $payUrl }}" class="button">Accept Referral & Pay</a>
+            <a href="{{ $payUrl }}" class="button">Pay Now</a>
             
             <p style="font-size: 13px; color: #94a3b8; margin-top: 30px;">
                 Reference ID: {{ $referral->referral_no }}

@@ -48,7 +48,7 @@ class PromoCodeController extends Controller
                 ->editColumn('reward', function($row) {
                     $html = $row->type == 'percentage' ? $row->reward . '%' : '$' . $row->reward;
                     if ($row->benefits && count($row->benefits) > 0) {
-                        $html .= ' <span class="badge bg-info text-white" title="'.implode(', ', $row->benefits).'">+Benefits</span>';
+                        $html .= ' <span class="badge bg-info text-white" >+Benefits</span>';
                     }
                     return $html;
                 })

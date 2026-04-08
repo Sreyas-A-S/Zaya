@@ -47,12 +47,27 @@
                         </div>
                     </div>
 
-                    <video id="main-player" class="w-full h-full cursor-pointer" playsinline>
-                        <source src="{{ $booking->recording_url }}" type="video/mp4">
-                    </video>
+                    @php
+                        $isGoogleDrivePreview = str_contains((string) $booking->recording_url, 'drive.google.com/file/d/')
+                            && str_contains((string) $booking->recording_url, '/preview');
+                    @endphp
+
+                    @if($isGoogleDrivePreview)
+                        <iframe
+                            class="w-full h-full"
+                            src="{{ $booking->recording_url }}"
+                            allow="autoplay; encrypted-media"
+                            allowfullscreen
+                            title="Session recording preview"
+                        ></iframe>
+                    @else
+                        <video id="main-player" class="w-full h-full cursor-pointer" playsinline>
+                            <source src="{{ $booking->recording_url }}" type="video/mp4">
+                        </video>
+                    @endif
 
                     <!-- Custom UI Overlay -->
-                    <div id="video-controls" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 md:p-6 pt-12 md:pt-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-focus-within:opacity-100">
+                    <div id="video-controls" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 md:p-6 pt-12 md:pt-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-focus-within:opacity-100 {{ $isGoogleDrivePreview ? 'hidden' : '' }}">
                         <div class="pointer-events-auto">
                             <!-- Progress Bar -->
                             <div class="relative w-full h-1 md:h-1.5 bg-white/20 rounded-full mb-4 md:mb-6 cursor-pointer group/progress" id="progress-bar-container">
@@ -146,7 +161,10 @@
 
 @section('scripts')
 <script>
+(() => {
     const player = document.getElementById('main-player');
+    if (!player) return;
+
     const playPauseBtn = document.getElementById('play-pause');
     const playIcon = document.getElementById('play-icon');
     const progressBar = id => document.getElementById(id);
@@ -302,5 +320,6 @@
             if (!player.paused) document.getElementById('video-controls').style.opacity = '0';
         }, 3000);
     });
+})();
 </script>
 @endsection

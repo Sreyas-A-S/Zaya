@@ -45,3 +45,42 @@ if (! function_exists('get_currency_symbol')) {
         return $symbols[strtoupper($code)] ?? $code;
     }
 }
+
+if (! function_exists('derive_currency_from_user')) {
+    /**
+     * Derive a best-guess currency (ISO 4217) from user/profile country codes.
+     */
+    function derive_currency_from_user($user): string
+    {
+        $country = null;
+
+        try {
+            if (isset($user->country)) {
+                $country = $user->country;
+            } elseif (isset($user->patient) && $user->patient) {
+                $country = $user->patient->country ?? null;
+            } elseif (isset($user->practitioner) && $user->practitioner) {
+                $country = $user->practitioner->country ?? null;
+            } elseif (isset($user->doctor) && $user->doctor) {
+                $country = $user->doctor->country ?? null;
+            } elseif (isset($user->profile) && $user->profile) {
+                $country = $user->profile->country ?? null;
+            }
+        } catch (\Throwable $e) {
+            $country = null;
+        }
+
+        $map = config('currencies.country_to_currency', []);
+        $fallback = config('currencies.default', config('app.currency', 'INR'));
+
+        if (!$country) return strtoupper($fallback);
+
+        $code = strtoupper(trim((string) $country));
+        if (isset($map[$code])) return strtoupper($map[$code]);
+
+        $alpha2 = strtoupper(substr($code, 0, 2));
+        if (isset($map[$alpha2])) return strtoupper($map[$alpha2]);
+
+        return strtoupper($fallback);
+    }
+}

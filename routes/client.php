@@ -15,6 +15,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/transactions', [ProfileController::class, 'transactions'])->name('transactions.index');
     Route::get('/promo-codes', [ProfileController::class, 'promoCodes'])->name('promo-codes.index');
     Route::get('/conference-history', [ProfileController::class, 'conferences'])->name('conferences.index');
+    Route::post('/conference/instant-init', [ZegoController::class, 'initInstantMeeting'])->name('zego.instant.init');
     Route::get('/recordings/{id}', [ProfileController::class, 'showRecording'])->name('recordings.show');
     Route::get('/conference/session/{channel}', [ProfileController::class, 'joinSession'])->name('conference.join');
     Route::get('/conference/zego/{channel}', [ZegoController::class, 'join'])->name('zego.join');
@@ -32,6 +33,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     // Referral Routes
     Route::post('/bookings/{id}/refer', [\App\Http\Controllers\ReferralController::class, 'store'])->name('bookings.refer');
     Route::get('/referrals/{referral_no}/pay', [\App\Http\Controllers\ReferralController::class, 'pay'])->name('referrals.pay');
+    Route::post('/referrals/{referral_no}/pay', [\App\Http\Controllers\ReferralController::class, 'initiatePayment'])->name('referrals.pay.initiate');
     Route::post('/referrals/{referral_no}/resend-otp', [\App\Http\Controllers\ReferralController::class, 'resendOTP'])->name('referrals.resend-otp');
     Route::post('/referrals/{referral_no}/verify-consent', [\App\Http\Controllers\ReferralController::class, 'verifyConsent'])->name('referrals.verify-consent');
     Route::get('/referrals/payment/callback', [\App\Http\Controllers\ReferralController::class, 'paymentCallback'])->name('referrals.payment.callback');

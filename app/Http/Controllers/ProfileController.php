@@ -1152,7 +1152,7 @@ class ProfileController extends Controller
         }
         $appId = preg_replace('/[^a-f0-9]/i', '', (string)config('services.agora.app_id'));
         $provider = strtolower((string) $request->query('provider', 'choose'));
-        $provider = in_array($provider, ['agora', 'jaas', 'jitsi', 'daily', 'zegocloud', 'choose']) ? $provider : 'choose';
+        $provider = in_array($provider, ['agora', 'jaas', 'jitsi', 'daily', 'zegocloud', 'google_meet', 'choose']) ? $provider : 'choose';
 
         if ($provider === 'zegocloud') {
             return redirect()->route('zego.join', ['channel' => $channel]);
@@ -1218,6 +1218,16 @@ class ProfileController extends Controller
             return view('conference.daily', compact(
                 'user', 'channel', 'dailyUrl', 'dailyToken', 'dailyError', 'booking'
             ));
+        }
+
+        if ($provider === 'google_meet') {
+            // For Instant meetings, we redirect to a new meeting
+            // For scheduled bookings, we could later integrate with Google Calendar API 
+            // to fetch a specific hangoutLink if stored.
+            $googleMeetUrl = "https://meet.google.com/new";
+            
+            // Redirect externally
+            return redirect()->away($googleMeetUrl);
         }
 
         return view('conference.session', compact(

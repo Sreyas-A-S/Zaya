@@ -37,6 +37,14 @@
                     <span class="label">Client Name:</span>
                     <span class="value">{{ $referral->user->name }}</span>
                 </div>
+                @if($referral->note)
+                <div style="margin-top: 15px; border-top: 1px solid #edf2f7; padding-top: 15px;">
+                    <span class="label">Practitioner's Note:</span>
+                    <p style="font-size: 14px; color: #4B5563; margin-top: 5px; font-style: italic; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #edf2f7;">
+                        "{{ $referral->note }}"
+                    </p>
+                </div>
+                @endif
                 <div style="margin-top: 15px; border-top: 1px solid #edf2f7; padding-top: 15px;">
                     <span class="label">Reference ID:</span>
                     <span class="value">{{ $referral->referral_no }}</span>

@@ -8,6 +8,7 @@ class ReferralCommissionRate extends Model
 {
     protected $fillable = [
         'country_id',
+        'type',
         'referrer_role',
         'referred_role',
         'company_commission_percent',

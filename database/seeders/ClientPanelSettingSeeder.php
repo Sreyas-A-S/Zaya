@@ -13,6 +13,7 @@ class ClientPanelSettingSeeder extends Seeder
             // General
             ['key' => 'client_panel_book_session_btn', 'value' => 'Book a New Consultation', 'type' => 'text', 'section' => 'client_panel_general'],
             ['key' => 'client_panel_back_btn', 'value' => 'Back', 'type' => 'text', 'section' => 'client_panel_general'],
+            ['key' => 'client_panel_show_profile_incomplete', 'value' => 'show', 'type' => 'boolean', 'section' => 'client_panel_general'],
 
             // Identity Hub
             ['key' => 'client_panel_identity_hub_title', 'value' => 'Identity Hub', 'type' => 'text', 'section' => 'client_panel_identity'],

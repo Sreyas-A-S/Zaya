@@ -121,7 +121,14 @@
                                                         <small class="text-muted">Current: {{ $setting->value }}</small>
                                                     </div>
                                                 </div>
+
+                                                @elseif($setting->type === 'boolean')
+                                                <select id="{{ $setting->key }}" name="{{ $setting->key }}" class="form-select">
+                                                    <option value="show" {{ ($setting->value === 'show' || $setting->value === '1' || $setting->value === 'true') ? 'selected' : '' }}>Show</option>
+                                                    <option value="hide" {{ ($setting->value === 'hide' || $setting->value === '0' || $setting->value === 'false') ? 'selected' : '' }}>Hide</option>
+                                                </select>
                                                 @endif
+
                                             </div>
                                             @endforeach
                                         </div>

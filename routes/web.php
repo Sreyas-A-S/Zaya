@@ -79,6 +79,8 @@ Route::post('/find-practitioner', [WebController::class, 'findPractitionerPost']
 Route::get('/search', [WebController::class, 'search'])->name('search');
 Route::get('/filter-practitioners', [WebController::class, 'filterPractitioners'])->name('filter-practitioners');
 Route::get('/search-locations', [WebController::class, 'searchLocations'])->name('search-locations');
+Route::get('/search-services', [WebController::class, 'searchServices'])->name('search-services');
+Route::get('/fetch-service-schedule-form', [WebController::class, 'fetchServiceScheduleForm'])->name('fetch-service-schedule-form');
 Route::get('/practitioner/{slug}', [WebController::class, 'practitionerDetail'])->name('practitioner-detail');
 Route::get('/zaya-login', [WebController::class, 'zayaLogin'])->name('zaya-login');
 Route::get('/client-register', [WebController::class, 'clientRegister'])->name('client-register');
@@ -101,6 +103,10 @@ Route::get('/api/booked-slots/{practitioner}/{date}', [\App\Http\Controllers\Ava
 Route::get('/contact-us', [WebController::class, 'contactUs'])->name('contact-us');
 Route::post('/contact-us', [WebController::class, 'storeContact'])->name('contact-us.store');
 Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+
+Route::get('/privacy', [WebController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/cookie-policy', [WebController::class, 'cookiePolicy'])->name('cookie-policy');
+Route::get('/terms-and-conditions', [WebController::class, 'termsAndConditions'])->name('terms-and-conditions');
 
 Route::post('/blog/like', [WebController::class, 'toggleLike'])->name('blog.like');
 Route::post('/testimonial/{id}/like', [\App\Http\Controllers\Admin\TestimonialController::class, 'toggleLike'])->name('testimonial.like');
@@ -168,6 +174,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('other-fees', [\App\Http\Controllers\Admin\FinanceSettingController::class, 'update'])->name('other-fees.update');
     Route::get('referral-commissions', [\App\Http\Controllers\Admin\ReferralCommissionController::class, 'index'])->name('referral-commissions.index');
     Route::post('referral-commissions', [\App\Http\Controllers\Admin\ReferralCommissionController::class, 'update'])->name('referral-commissions.update');
+    Route::post('referral-commissions/set-country', [\App\Http\Controllers\Admin\ReferralCommissionController::class, 'setCountry'])->name('referral-commissions.set-country');
 
     // Financial Tracking
     Route::get('financial/transactions', [\App\Http\Controllers\Admin\FinancialController::class, 'index'])->name('financial.index');
