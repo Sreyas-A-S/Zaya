@@ -111,6 +111,7 @@ Route::get('/services', [WebController::class, 'services'])->name('services');
 Route::get('/gallery', [WebController::class, 'gallery'])->name('gallery');
 Route::get('/find-practitioner', [WebController::class, 'findPractitioner'])->name('find-practitioner');
 Route::post('/find-practitioner', [WebController::class, 'findPractitionerPost'])->name('find-practitioner.post');
+Route::get('/zipcode/conditions', [WebController::class, 'zipcodeConditions'])->name('zipcode.conditions');
 Route::get('/search', [WebController::class, 'search'])->name('search');
 Route::get('/filter-practitioners', [WebController::class, 'filterPractitioners'])->name('filter-practitioners');
 Route::get('/search-locations', [WebController::class, 'searchLocations'])->name('search-locations');
@@ -319,6 +320,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('/pincode/store', [\App\Http\Controllers\Admin\PincodeController::class, 'store'])->name('admin.pincode.store');
     Route::get('/pincode/get', [\App\Http\Controllers\Admin\PincodeController::class, 'getPincode'])->name('admin.pincode.get');
     Route::delete('/pincode/delete', [\App\Http\Controllers\Admin\PincodeController::class, 'destroy'])->name('admin.pincode.delete');
+
+    // Zipcode (Public) - aliases (prefer these in UI)
+    Route::post('/zipcode/store', [\App\Http\Controllers\Admin\PincodeController::class, 'store'])->name('admin.zipcode.store');
+    Route::get('/zipcode/get', [\App\Http\Controllers\Admin\PincodeController::class, 'getPincode'])->name('admin.zipcode.get');
+    Route::delete('/zipcode/delete', [\App\Http\Controllers\Admin\PincodeController::class, 'destroy'])->name('admin.zipcode.delete');
 
 
 

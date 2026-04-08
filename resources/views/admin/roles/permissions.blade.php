@@ -45,10 +45,14 @@
                             <thead class="bg-light">
                                 <tr>
                                     <th style="width: 20%;" class="align-middle">Module</th>
-                                    <th class="text-center align-middle" style="width: 15%;">View</th>
-                                    <th class="text-center align-middle" style="width: 15%;">Create</th>
-                                    <th class="text-center align-middle" style="width: 15%;">Edit</th>
-                                    <th class="text-center align-middle" style="width: 15%;">Delete</th>
+                                    <th class="text-center align-middle">View</th>
+                                    <th class="text-center align-middle">Create</th>
+                                    <th class="text-center align-middle">Edit</th>
+                                    <th class="text-center align-middle">Delete</th>
+                                    <th class="text-center align-middle">Update Status</th>
+                                    <th class="text-center align-middle">Status Toggle</th>
+                                    <th class="text-center align-middle">Status</th>
+                                    <th class="text-center align-middle">Assign</th>
                                     <th class="text-center align-middle" style="width: 80px;">
                                         <i class="fa fa-check-double" title="Toggle Row"></i>
                                     </th>
@@ -57,19 +61,23 @@
                             <tbody>
                                 @php
                                 $standardActions = ['view', 'create', 'edit', 'delete'];
+                                $extraActions = ['update-status', 'status-toggle', 'status', 'assign-engineer'];
+                                $actions = array_merge($standardActions, $extraActions);
                                 @endphp
                                 @foreach($permissions as $group => $groupPermissions)
                                 <tr>
                                     <td class="fw-bold text-dark bg-light-primary">{{ ucwords(str_replace(['_', '-'], ' ', $group)) }}</td>
 
-                                    @foreach($standardActions as $action)
+                                    @foreach($actions as $action)
                                     <td class="text-center">
                                         @php
-                                        // Simple matching: check if slug contains the action keyword
-                                        $perm = $groupPermissions->first(function($p) use ($action) {
-                                        $s = strtolower($p->slug);
-                                        $a = strtolower($action);
-                                        return str_contains($s, $a);
+                                        // Match by suffix tokens to avoid collisions like "status" vs "update-status"
+                                        $actionTokens = array_values(array_filter(explode('-', strtolower($action))));
+                                        $perm = $groupPermissions->first(function($p) use ($actionTokens) {
+                                            $tokens = array_values(array_filter(explode('-', strtolower((string) $p->slug))));
+                                            $n = count($actionTokens);
+                                            if ($n === 0 || count($tokens) < $n) return false;
+                                            return array_slice($tokens, -$n) == $actionTokens;
                                         });
                                         @endphp
                                         @if($perm)

@@ -1,8 +1,8 @@
 <!-- Results Heading -->
 <div class="text-center mb-10 md:mb-16">
     <h2 class="text-lg md:text-3xl font-semibold text-primary font-sans! mb-2">
-        @if(isset($pincode) && $pincode)
-            Search Results Based on <span class="font-bold text-gray-900">'{{ $pincode }}'</span>
+        @if(isset($zipcode) && $zipcode)
+            Search Results Based on <span class="font-bold text-gray-900">'{{ $zipcode }}'</span>
         @else
             All Practitioners
         @endif
@@ -39,6 +39,23 @@
                 <i class="ri-map-pin-line text-gray-800"></i>
                 <span>{{ $p->city_state }}</span>
             </div>
+
+            @php
+                $conditions = $p->body_therapies ?? $p->health_conditions_treated ?? $p->services_offered ?? [];
+                if (!is_array($conditions)) $conditions = [$conditions];
+                $conditions = array_values(array_unique(array_filter($conditions, fn ($v) => trim((string) $v) !== '')));
+                $conditions = array_slice($conditions, 0, 3);
+            @endphp
+
+            @if(!empty($conditions))
+                <div class="mt-3 flex flex-wrap justify-center gap-1.5 max-w-[220px]">
+                    @foreach($conditions as $cond)
+                        <span class="px-2.5 py-1 rounded-full text-[10px] md:text-[11px] font-semibold bg-[#F3F6F4] text-primary border border-[#2E4B3D]/10">
+                            {{ $cond }}
+                        </span>
+                    @endforeach
+                </div>
+            @endif
         </a>
     @empty
         <div class="col-span-full py-20 text-center">

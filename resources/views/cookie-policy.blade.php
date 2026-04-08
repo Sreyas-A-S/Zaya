@@ -42,7 +42,7 @@
                     </p>
                     <ul class="list-disc pl-6 mb-6 space-y-2">
                         <li><strong>{{ __('Essential Cookies:') }}</strong> {{ __("Required for technical reasons for our platform to operate.") }}</li>
-                        <li><strong>{{ __('Performance & Functionality Cookies:') }}</strong> {{ __("Used to enhance performance and remember your preferences (e.g., your saved pincode).") }}</li>
+                        <li><strong>{{ __('Performance & Functionality Cookies:') }}</strong> {{ __("Used to enhance performance and remember your preferences (e.g., your saved zipcode).") }}</li>
                         <li><strong>{{ __('Analytics & Customization Cookies:') }}</strong> {{ __("Help us understand how users interact with our platform so we can improve the experience.") }}</li>
                     </ul>
 

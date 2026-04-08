@@ -2324,8 +2324,10 @@
                 table.draw();
                 showToast(data.success);
             },
-            error: function() {
-                showToast('Error deleting doctor', 'error');
+            error: function(error) {
+                console.log(error.responseJSON.error);
+                let errorMessage = error.responseJSON.error;
+                showToast(errorMessage, 'error');
             },
             complete: function() {
                 btn.prop('disabled', false).text('Delete Now');

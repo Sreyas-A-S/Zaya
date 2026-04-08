@@ -55,9 +55,11 @@
     <div class="card">
         <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
             <h3>User Managers List</h3>
+            @if(auth()->user()->hasPermission('users-create'))
             <button class="btn btn-primary" onclick="openCreateModal()">
                 <i class="fa-solid fa-plus me-2"></i>Register New
             </button>
+            @endif
         </div>
 
         <div class="card-body">
@@ -91,108 +93,124 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
+            @if(auth()->user()->hasPermission('users-create') || auth()->user()->hasPermission('users-edit'))
             <form id="userManagerForm" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div id="methodPlaceholder"></div>
                 <input type="hidden" name="user_id" id="userId">
                 <!-- Hidden field for cropped image -->
                 <input type="hidden" name="cropped_image" id="croppedImage">
-
                 <div class="modal-body p-4">
-                    <div class="row g-3">
-                        <!-- Profile Photo -->
-                        <div class="col-md-12 text-center mb-4">
-                            <div class="avatar-upload">
-                                <div class="avatar-edit">
-                                    <input type='file' id="imageUpload" accept=".png, .jpg, .jpeg" />
-                                    <label for="imageUpload"><i class="fa-solid fa-pencil"></i></label>
-                                </div>
-                                <div class="avatar-preview">
-                                    <div id="imagePreview" style="background-image: url('{{ asset('admiro/assets/images/user/user.png') }}');">
+                    <div id="permission-error" class="alert alert-danger d-none">
+                        You do not have permission to perform this action.
+                    </div>
+                    <div id="modal-form-content">
+                        <div class="row g-3">
+                            <!-- Profile Photo -->
+                            <div class="col-md-12 text-center mb-4">
+                                <div class="avatar-upload">
+                                    <div class="avatar-edit">
+                                        <input type='file' id="imageUpload" accept=".png, .jpg, .jpeg" />
+                                        <label for="imageUpload"><i class="fa-solid fa-pencil"></i></label>
+                                    </div>
+                                    <div class="avatar-preview">
+                                        <div id="imagePreview" style="background-image: url('{{ asset('admiro/assets/images/user/user.png') }}');">
+                                        </div>
                                     </div>
                                 </div>
+                                <label class="form-label mt-2 d-block" required>Profile Photo</label>
                             </div>
-                            <label class="form-label mt-2 d-block" required>Profile Photo</label>
-                        </div>
 
-                        <!-- Fields -->
-                        <div class="col-md-6">
-                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input class="form-control validate-char-limit validate-format" type="text" name="firstname" id="firstname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="First Name">
-                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
-                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input class="form-control validate-char-limit validate-format" type="text" name="lastname" id="lastname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="Last Name">
-                            <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
-                            <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                            <input class="form-control" type="email" name="email" id="email" required placeholder="Email">
-                        </div>
+                            <!-- Fields -->
+                            <div class="col-md-6">
+                                <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input class="form-control validate-char-limit validate-format" type="text" name="firstname" id="firstname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="First Name">
+                                <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input class="form-control validate-char-limit validate-format" type="text" name="lastname" id="lastname" required maxlength="50" data-max="40" pattern="^[A-Z][a-zA-Z]*$" title="Only letters, spaces, and hyphens allowed (No numbers)" placeholder="Last Name">
+                                <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
+                                <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <input class="form-control" type="email" name="email" id="email" required placeholder="Email">
+                            </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                            <input class="form-control" type="text" name="phone" id="phone" required placeholder="Phone Number">
-                        </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input class="form-control" type="text" name="phone" id="phone" required placeholder="Phone Number">
+                            </div>
 
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">Country <span class="text-danger">*</span></label>
-                            <select name="country[]" id="country" class="form-control select2" multiple required>
-                                @foreach($countries as $country)
-                                <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Country <span class="text-danger">*</span></label>
+                                <select name="country[]" id="country" class="form-control select2" multiple required>
+                                    @foreach($countries as $country)
+                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">Language <span class="text-danger">*</span></label>
-                            <select name="language[]" id="language" class="form-control select2" multiple required>
-                                @foreach($languages as $language)
-                                <option value="{{ $language->id }}">{{ $language->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Language <span class="text-danger">*</span></label>
+                                <select name="language[]" id="language" class="form-control select2" multiple required>
+                                    @foreach($languages as $language)
+                                    <option value="{{ $language->id }}">{{ $language->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Status <span class="text-danger">*</span></label>
-                            <select name="status" id="status" class="form-control" required>
-                                <option value="pending">Pending</option>
-                                <option value="active">Active</option>
-                                <option value="rejected">Rejected</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status <span class="text-danger">*</span></label>
+                                <select name="status" id="status" class="form-control" required>
+                                    <option value="pending">Pending</option>
+                                    <option value="active">Active</option>
+                                    <option value="rejected">Rejected</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
 
-                        <div class="col-md-6 mb-3 password-field">
-                            <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password" id="password-input"
-                                minlength="8"
-                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
-                                title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
-                                required placeholder="Password" oninput="validatePasswordMatch()">
-                            <div id="password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
-                        </div>
+                            <div class="col-md-6 mb-3 password-field">
+                                <label class="form-label">Password <span class="text-danger">*</span></label>
+                                <input class="form-control" type="password" name="password" id="password-input"
+                                    minlength="8"
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                    title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                    required placeholder="Password" oninput="validatePasswordMatch()">
+                                <div id="password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
+                            </div>
 
-                        <div class="col-md-6 mb-3 password-field">
-                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                            <input class="form-control" type="password" name="password_confirmation" id="password-confirm-input"
-                                minlength="8"
-                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
-                                title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
-                                required placeholder="Confirm Password" oninput="validatePasswordMatch()">
-                            <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
+                            <div class="col-md-6 mb-3 password-field">
+                                <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                <input class="form-control" type="password" name="password_confirmation" id="password-confirm-input"
+                                    minlength="8"
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                    title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                    required placeholder="Confirm Password" oninput="validatePasswordMatch()">
+                                <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal-footer">
+                <div class="modal-footer" id="modal-footer-content">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="saveBtn">Create User Manager</button>
                 </div>
             </form>
+            @else
+            <div class="modal-body text-center">
+                <p class="text-danger">Unauthorized. You do not have permission to create or edit User Managers.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+            @endif
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>
@@ -893,6 +911,21 @@
         // Edit User
         $(document).on('click', '.editUser', function() {
             let id = $(this).data('id');
+            
+            // Check permission
+            @if(!auth()->user()->hasPermission('users-edit'))
+                $('#um-modal-title').text('Edit User Manager');
+                $('#permission-error').removeClass('d-none').text('You do not have permission to edit User Managers.');
+                $('#modal-form-content').addClass('d-none');
+                $('#modal-footer-content').addClass('d-none');
+                $('#userManagerModal').modal('show');
+                return;
+            @else
+                $('#permission-error').addClass('d-none');
+                $('#modal-form-content').removeClass('d-none');
+                $('#modal-footer-content').removeClass('d-none');
+            @endif
+
             $.get("{{ url('admin/user-managers') }}/" + id + "/edit", function(user) {
                 $('#um-modal-title').text('Edit User Manager');
                 $('#userId').val(user.id);
@@ -1186,6 +1219,17 @@
     });
 
     function openCreateModal() {
+        // Check permission
+        @if(!auth()->user()->hasPermission('users-create'))
+            $('#permission-error').removeClass('d-none');
+            $('#modal-form-content').addClass('d-none');
+            $('#modal-footer-content').addClass('d-none');
+        @else
+            $('#permission-error').addClass('d-none');
+            $('#modal-form-content').removeClass('d-none');
+            $('#modal-footer-content').removeClass('d-none');
+        @endif
+
         $('#um-modal-title').text('Register User Manager');
         $('#userManagerForm')[0].reset();
         if (typeof window.iti !== 'undefined') {

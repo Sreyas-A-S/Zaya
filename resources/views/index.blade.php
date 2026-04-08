@@ -49,8 +49,8 @@
                     <div class="w-full md:flex-1 flex items-center md:pl-3 pb-2 md:pb-0 md:pr-2">
                         <i class="ri-map-pin-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg"></i>
                         <input id="hero_search_placeholder_2" type="text"
-                            name="pincode"
-                            value="{{ session('global_pincode') }}"
+                            name="zipcode"
+                            value="{{ session('global_zipcode', session('global_pincode')) }}"
                             placeholder="{{ $settings['hero_search_placeholder_2'] ?? 'City, Postal code...' }}"
                             maxlength="6"
                             pattern="[0-9]{6}"

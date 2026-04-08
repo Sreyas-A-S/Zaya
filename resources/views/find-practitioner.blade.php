@@ -36,20 +36,20 @@
                     </div>
                 </div>
 
-                <!-- Pincode Input -->
+                <!-- Zipcode Input -->
                 <div class="relative w-full md:w-1/4">
-                    <input id="find-practitioner-pincode-input" type="text" 
+                    <input id="find-practitioner-zipcode-input" type="text" 
                         maxlength="6"
                         oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
-                        placeholder="{{ $settings['find_practitioner_pincode_placeholder'] ?? 'Enter Pincode' }}"
-                        value="{{ session('global_pincode') }}"
-                        {{ session('global_pincode') ? 'readonly' : '' }}
+                        placeholder="{{ $settings['find_practitioner_pincode_placeholder'] ?? 'Enter Zipcode' }}"
+                        value="{{ session('global_zipcode', session('global_pincode')) }}"
+                        {{ session('global_zipcode', session('global_pincode')) ? 'readonly' : '' }}
                         class="w-full border border-[#db8871] rounded-full px-6 py-3.5 pr-12 text-base md:text-lg text-[#db8871] placeholder-[#db8871] focus:outline-none bg-white transition-colors">
-                    <button id="find-practitioner-pincode-btn" style="{{ session('global_pincode') ? 'display:none;' : '' }}"
+                    <button id="find-practitioner-zipcode-btn" style="{{ session('global_zipcode', session('global_pincode')) ? 'display:none;' : '' }}"
                         class="absolute right-[10px] top-1/2 -translate-y-1/2 w-10 h-10 bg-[#F39551] rounded-full flex items-center justify-center hover:opacity-90 transition-all cursor-pointer border-none outline-none">
                         <i class="ri-search-line text-white text-lg"></i>
                     </button>
-                    <button id="find-practitioner-pincode-delete" style="{{ session('global_pincode') ? '' : 'display:none;' }}"
+                    <button id="find-practitioner-zipcode-delete" style="{{ session('global_zipcode', session('global_pincode')) ? '' : 'display:none;' }}"
                         class="absolute right-[10px] top-1/2 -translate-y-1/2 w-10 h-10 bg-[#F39551] rounded-full flex items-center justify-center hover:opacity-90 transition-all cursor-pointer border-none outline-none">
                         <i class="ri-delete-bin-line text-white text-lg"></i>
                     </button>
@@ -111,7 +111,7 @@
         <div class="container mx-auto max-w-6xl">
             <!-- Practitioner Results Wrapper -->
             <div id="practitioner-results-container">
-                @include('partials.frontend.practitioner-grid', ['practitioners' => $practitioners, 'pincode' => $pincode, 'selectedService' => $selectedService])
+                @include('partials.frontend.practitioner-grid', ['practitioners' => $practitioners, 'zipcode' => $zipcode, 'selectedService' => $selectedService])
             </div>
 
             <style>
@@ -444,39 +444,39 @@
 
             setupSearch('find_practitioner_search_input', 'find-practitioner-search-results');
 
-            // Pincode Search Logic
-            const pincodeInput = document.getElementById('find-practitioner-pincode-input');
-            const pincodeBtn = document.getElementById('find-practitioner-pincode-btn');
-            const pincodeDelete = document.getElementById('find-practitioner-pincode-delete');
+            // Zipcode Search Logic
+            const zipcodeInput = document.getElementById('find-practitioner-zipcode-input');
+            const zipcodeBtn = document.getElementById('find-practitioner-zipcode-btn');
+            const zipcodeDelete = document.getElementById('find-practitioner-zipcode-delete');
 
-            function savePincode(pincode) {
-                if (pincode.length === 6) {
+            function saveZipcode(zipcode) {
+                if (zipcode.length === 6) {
                     $.ajax({
-                        url: "{{ route('admin.pincode.store') }}",
+                        url: "{{ route('admin.zipcode.store') }}",
                         type: "POST",
                         data: {
-                            pincode: pincode,
+                            zipcode: zipcode,
                             _token: "{{ csrf_token() }}"
                         },
                         success: function(response) {
                             if (response.status) {
                                 // Sync search input itself
-                                $(pincodeInput).prop('readonly', true);
-                                $(pincodeBtn).hide();
-                                $(pincodeDelete).show();
+                                $(zipcodeInput).prop('readonly', true);
+                                $(zipcodeBtn).hide();
+                                $(zipcodeDelete).show();
 
                                 // Sync with footer
-                                const footerInput = $('#footer-pincode-input');
-                                footerInput.val("{{ __('Your Pincode') }}: " + pincode)
+                                const footerInput = $('#footer-zipcode-input');
+                                footerInput.val("{{ __('Your Zipcode') }}: " + zipcode)
                                     .prop('readonly', true)
                                     .attr('maxlength', '')
                                     .removeClass('bg-[#F9F9F9] border-gray-200')
                                     .addClass('bg-green-50 border-green-200');
                                 
-                                $('#footer-pincode-save').hide();
-                                $('#footer-pincode-delete').show();
+                                $('#footer-zipcode-save').hide();
+                                $('#footer-zipcode-delete').show();
 
-                                // Reload search results to apply pincode filter
+                                // Reload search results to apply zipcode filter
                                 updateSearchResults(); 
                             }
                         }
@@ -484,9 +484,9 @@
                 }
             }
 
-            function deletePincode() {
+            function deleteZipcode() {
                 $.ajax({
-                    url: "{{ route('admin.pincode.delete') }}",
+                    url: "{{ route('admin.zipcode.delete') }}",
                     type: "DELETE",
                     data: {
                         _token: "{{ csrf_token() }}"
@@ -494,12 +494,12 @@
                     success: function(response) {
                         if (response.status) {
                             // Sync search input itself
-                            $(pincodeInput).val('').prop('readonly', false);
-                            $(pincodeBtn).show();
-                            $(pincodeDelete).hide();
+                            $(zipcodeInput).val('').prop('readonly', false);
+                            $(zipcodeBtn).show();
+                            $(zipcodeDelete).hide();
 
                             // Sync with footer
-                            const footerInput = $('#footer-pincode-input');
+                            const footerInput = $('#footer-zipcode-input');
                             if (footerInput.length) {
                                 footerInput.val('')
                                     .prop('readonly', false)
@@ -507,8 +507,8 @@
                                     .removeClass('bg-green-50 border-green-200')
                                     .addClass('bg-[#F9F9F9] border-gray-200');
                                 
-                                $('#footer-pincode-delete').hide();
-                                $('#footer-pincode-save').show();
+                                $('#footer-zipcode-delete').hide();
+                                $('#footer-zipcode-save').show();
                             }
 
                             // Reload to show all practitioners again
@@ -518,22 +518,22 @@
                 });
             }
 
-            if (pincodeBtn) {
-                pincodeBtn.addEventListener('click', () => {
-                    savePincode(pincodeInput.value);
+            if (zipcodeBtn) {
+                zipcodeBtn.addEventListener('click', () => {
+                    saveZipcode(zipcodeInput.value);
                 });
             }
 
-            if (pincodeDelete) {
-                pincodeDelete.addEventListener('click', () => {
-                    deletePincode();
+            if (zipcodeDelete) {
+                zipcodeDelete.addEventListener('click', () => {
+                    deleteZipcode();
                 });
             }
 
-            if (pincodeInput) {
-                pincodeInput.addEventListener('keypress', (e) => {
+            if (zipcodeInput) {
+                zipcodeInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
-                        savePincode(pincodeInput.value);
+                        saveZipcode(zipcodeInput.value);
                     }
                 });
             }

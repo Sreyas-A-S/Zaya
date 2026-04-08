@@ -76,10 +76,10 @@
 
         <!-- Right Actions (Desktop) -->
         <div class="flex items-center gap-6 xl:gap-8 justify-end flex-1">
-            @guest
+            @if(!Auth::user() || in_array(Auth::user()->role, ['admin','super_admin', 'user-manager', 'financial-manager', 'content-manager']))
             <a id="nav-login" href="{{ route('zaya-login') }}"
                 class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors" data-i18n="Login">{{ __($site_settings['nav_login'] ?? 'Login') }}</a>
-            @endguest
+            @endif
 
             <a id="nav-find-practitioner" href="{{ route('find-practitioner') }}"
                 class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap" data-i18n="Find Practitioner">{{ __($site_settings['nav_find_practitioner'] ?? 'Find Practitioner') }}</a>

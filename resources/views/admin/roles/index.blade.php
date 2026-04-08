@@ -26,9 +26,11 @@
             <div class="card">
                 <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
                     <h3>Roles List</h3>
+                    @if(auth()->user()->hasPermission('roles-create'))
                     <button type="button" class="btn btn-primary" onclick="openCreateModal()">
                         <i class="fa-solid fa-plus me-2"></i>Create New Role
                     </button>
+                    @endif
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -58,21 +60,35 @@
                 <h5 class="modal-title" id="form-modal-title">Create New Role</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            @if(auth()->user()->hasPermission('roles-create') || auth()->user()->hasPermission('roles-edit'))
             <form id="role-form" method="POST" class="theme-form">
                 @csrf
                 <input type="hidden" name="_method" id="form-method" value="POST">
                 <input type="hidden" name="role_id" id="role_id">
                 <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label">Role Name</label>
-                        <input type="text" class="form-control" name="name" id="role_name" required placeholder="e.g. Manager">
+                    <div id="permission-error" class="alert alert-danger d-none">
+                        You do not have permission to perform this action.
+                    </div>
+                    <div id="modal-form-content">
+                        <div class="mb-3">
+                            <label class="form-label">Role Name</label>
+                            <input type="text" class="form-control" name="name" id="role_name" required placeholder="e.g. Manager">
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer border-top pt-3">
+                <div class="modal-footer border-top pt-3" id="modal-footer-content">
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="submit-btn"><i class="fa-solid fa-check-circle me-2"></i> Save Role</button>
                 </div>
             </form>
+            @else
+            <div class="modal-body text-center">
+                <p class="text-danger">Unauthorized. You do not have permission to create or edit roles.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+            @endif
         </div>
     </div>
 </div>
@@ -163,6 +179,20 @@
     });
 
     function openCreateModal() {
+        // Check permission
+        @if(!auth()->user()->hasPermission('roles-create'))
+            $('#permission-error').removeClass('d-none');
+            $('#modal-form-content').addClass('d-none');
+            $('#modal-footer-content').addClass('d-none');
+            $('#form-modal-title').text('Create New Role');
+            $('#role-form-modal').modal('show');
+            return;
+        @else
+            $('#permission-error').addClass('d-none');
+            $('#modal-form-content').removeClass('d-none');
+            $('#modal-footer-content').removeClass('d-none');
+        @endif
+
         $('#role-form')[0].reset();
         $('#role_id').val('');
         $('#form-method').val('POST');
@@ -174,6 +204,21 @@
 
     $('body').on('click', '.editRole', function() {
         const id = $(this).data('id');
+
+        // Check permission
+        @if(!auth()->user()->hasPermission('roles-edit'))
+            $('#permission-error').removeClass('d-none').text('You do not have permission to edit roles.');
+            $('#modal-form-content').addClass('d-none');
+            $('#modal-footer-content').addClass('d-none');
+            $('#form-modal-title').text('Edit Role');
+            $('#role-form-modal').modal('show');
+            return;
+        @else
+            $('#permission-error').addClass('d-none');
+            $('#modal-form-content').removeClass('d-none');
+            $('#modal-footer-content').removeClass('d-none');
+        @endif
+
         $.get("{{ url('admin/roles') }}/" + id + "/edit", function(data) {
             $('#role_id').val(data.id);
             $('#role_name').val(data.name);

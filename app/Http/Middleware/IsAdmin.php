@@ -15,7 +15,8 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
+        
+        $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Finance Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'finance-manager', 'content-manager', 'user-manager'];
         
         if (auth()->check() && in_array(auth()->user()->role, $adminRoles)) {
             return $next($request);

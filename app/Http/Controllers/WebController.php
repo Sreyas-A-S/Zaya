@@ -213,13 +213,13 @@ class WebController extends Controller
         $language = App::getLocale();
         $settings = HomepageSetting::getAllSettings($language);
 
-        $pincode = trim((string) $request->query('pincode', ''));
+        $zipcode = trim((string) $request->query('zipcode', $request->query('pincode', session('global_zipcode', session('global_pincode', '')))));
         $query = Practitioner::with(['user', 'reviews'])
             ->where('status', 'active');
 
         $selectedService = null;
-        if ($pincode !== '') {
-            $query->where('zip_code', 'LIKE', "%{$pincode}%");
+        if ($zipcode !== '') {
+            $query->where('zip_code', 'LIKE', "%{$zipcode}%");
         }
 
         if ($request->filled('service')) {
@@ -262,20 +262,60 @@ class WebController extends Controller
         $services = Service::where('status', true)->orderBy('title')->get();
 
         if ($request->ajax()) {
-            return view('partials.frontend.practitioner-grid', compact('practitioners', 'pincode', 'selectedService'))->render();
+            return view('partials.frontend.practitioner-grid', compact('practitioners', 'zipcode', 'selectedService'))->render();
         }
 
-        return view('find-practitioner', compact('settings', 'practitioners', 'pincode', 'services', 'selectedService'));
+        return view('find-practitioner', compact('settings', 'practitioners', 'zipcode', 'services', 'selectedService'));
     }
 
     public function findPractitionerPost(Request $request)
     {
-        $pincode = trim((string) $request->input('pincode', ''));
+        $zipcode = trim((string) $request->input('zipcode', $request->input('pincode', '')));
         $params = [];
-        if ($pincode !== '') {
-            $params['pincode'] = $pincode;
+        if ($zipcode !== '') {
+            $params['zipcode'] = $zipcode;
         }
         return redirect()->route('find-practitioner', $params);
+    }
+
+    public function zipcodeConditions(Request $request)
+    {
+        $raw = trim((string) $request->query('zipcode', $request->query('pincode', session('global_zipcode', session('global_pincode', '')))));
+        $zipcode = substr(preg_replace('/[^0-9]/', '', $raw), 0, 6);
+
+        if (strlen($zipcode) !== 6) {
+            return response()->json([
+                'success' => true,
+                'zipcode' => null,
+                'conditions' => [],
+            ]);
+        }
+
+        $conditions = [];
+
+        $rows = Practitioner::query()
+            ->where('status', 'active')
+            ->where('zip_code', 'LIKE', "%{$zipcode}%")
+            ->limit(80)
+            ->get(['body_therapies']);
+
+        foreach ($rows as $p) {
+            $arr = $p->body_therapies ?? [];
+            if (!is_array($arr)) $arr = [$arr];
+
+            foreach ($arr as $v) {
+                $v = trim((string) $v);
+                if ($v === '') continue;
+                $conditions[$v] = true;
+                if (count($conditions) >= 6) break 2;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'zipcode' => $zipcode,
+            'conditions' => array_keys($conditions),
+        ]);
     }
 
     public function search(Request $request)

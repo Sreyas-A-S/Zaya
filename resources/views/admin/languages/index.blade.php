@@ -9,9 +9,11 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">Language List</h4>
 
+        @if(auth()->user()->hasPermission('master-data-create'))
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createLanguageModal">
             <i class="fa fa-plus"></i> Register New Language
         </button>
+        @endif
     </div>
 
     <div class="card">
@@ -53,6 +55,7 @@
                 <h5 class="modal-title">Register New Language</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+            @if(auth()->user()->hasPermission('master-data-create'))
             <form id="createLanguageForm">
                 @csrf
                 <div class="modal-body">
@@ -72,6 +75,14 @@
                     <button type="submit" class="btn btn-primary">Save Language</button>
                 </div>
             </form>
+            @else
+            <div class="modal-body text-center">
+                <p class="text-danger">Unauthorized. You do not have permission to register a new language.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+            @endif
         </div>
     </div>
 </div>
@@ -108,6 +119,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
+            @if(auth()->user()->hasPermission('master-data-edit'))
             <form id="editLanguageForm">
                 @csrf
                 @method('PUT')
@@ -153,6 +165,14 @@
                 </div>
 
             </form>
+            @else
+            <div class="modal-body text-center">
+                <p class="text-danger">Unauthorized. You do not have permission to edit this language.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+            @endif
 
         </div>
     </div>

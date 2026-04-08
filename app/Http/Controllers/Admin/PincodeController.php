@@ -11,39 +11,55 @@ class PincodeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'pincode' => 'required|digits:6'
+            'pincode' => 'nullable|digits:6',
+            'zipcode' => 'nullable|digits:6',
         ]);
 
-        session(['global_pincode' => $request->pincode]);
+        $zipcode = $request->input('zipcode', $request->input('pincode'));
+        if (!$zipcode) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Zipcode is required',
+            ], 422);
+        }
+
+        // Store new preferred session key, and keep legacy key for compatibility.
+        session([
+            'global_zipcode' => $zipcode,
+            'global_pincode' => $zipcode,
+        ]);
 
         if ($request->ajax()) {
             return response()->json([
                 'status' => true,
-                'message' => 'Pincode ' . $request->pincode . ' saved successfully'
+                'message' => 'Zipcode ' . $zipcode . ' saved successfully',
+                'zipcode' => $zipcode,
             ]);
         }
 
-        return redirect()->back()->with('success', 'Pincode saved successfully');
+        return redirect()->back()->with('success', 'Zipcode saved successfully');
     }
 
     // AJAX method
     public function getPincode()
     {
-        $pincode = session('global_pincode');
+        $zipcode = session('global_zipcode', session('global_pincode'));
 
         return response()->json([
             'status' => true,
-            'pincode' => $pincode
+            'zipcode' => $zipcode,
+            'pincode' => $zipcode, // legacy alias
         ]);
     }
 
     public function destroy()
     {
+        session()->forget('global_zipcode');
         session()->forget('global_pincode');
 
         return response()->json([
             'status' => true,
-            'message' => 'Pincode cleared successfully'
+            'message' => 'Zipcode cleared successfully'
         ]);
     }
 }

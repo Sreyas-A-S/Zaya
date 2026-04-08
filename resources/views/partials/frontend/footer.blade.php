@@ -83,35 +83,36 @@
                     </ul>
                 </div>
 
-                <!-- Column 4: Pincode & Socials -->
+                <!-- Column 4: Zipcode & Socials -->
                 <div class="order-3 z-1 md:col-span-2 lg:col-span-1">
-                    <h4 id="footer-pincode-title" class="font-sans! text-base font-medium text-[#252525] mb-4 text-center lg:text-start" data-i18n="{{ $site_settings['pincode_heading'] ?? 'Save your pincode & find nearby care.' }}">
-                        {{ __($site_settings['pincode_heading'] ?? 'Save your pincode & find nearby care.') }}</h4>                  
+                    <h4 id="footer-zipcode-title" class="font-sans! text-base font-medium text-[#252525] mb-4 text-center lg:text-start" data-i18n="{{ $site_settings['pincode_heading'] ?? 'Save your zipcode & find nearby care.' }}">
+                        {{ __($site_settings['pincode_heading'] ?? 'Save your zipcode & find nearby care.') }}</h4>                  
                     
                     <form class="flex gap-2 mb-2 items-center">
                         <div class="relative flex-1">
                             @php
-                                $savedPincode = session('global_pincode');
-                                $displayValue = $savedPincode ? __('Your Pincode') . ': ' . $savedPincode : '';
+                                $savedZipcode = session('global_zipcode', session('global_pincode'));
+                                $displayValue = $savedZipcode ? __('Your Zipcode') . ': ' . $savedZipcode : '';
                             @endphp
-                            <input id="footer-pincode-input" type="text" placeholder="{{ __('Enter Pincode') }}" data-i18n="Enter Pincode"
-                                maxlength="{{ $savedPincode ? '20' : '6' }}" 
-                                {{ $savedPincode ? 'readonly' : '' }}
+                            <input id="footer-zipcode-input" type="text" placeholder="{{ __('Enter Zipcode') }}" data-i18n="Enter Zipcode"
+                                data-zipcode="{{ $savedZipcode ?? '' }}"
+                                maxlength="{{ $savedZipcode ? '20' : '6' }}" 
+                                {{ $savedZipcode ? 'readonly' : '' }}
                                 oninput="if(!this.readOnly) this.value = this.value.replace(/[^a-zA-Z0-9]/g, '');"
                                 value="{{ $displayValue }}"
-                                class="{{ $savedPincode ? 'bg-[#4DB286] border-green-200' : 'bg-[#F9F9F9] border-gray-200' }} placeholder-gray-400 text-gray-800 rounded px-4 h-11 w-full text-sm focus:outline-none focus:border-[#79584B] transition-all border">
+                                class="{{ $savedZipcode ? 'bg-[#4DB286] border-green-200' : 'bg-[#F9F9F9] border-gray-200' }} placeholder-gray-400 text-gray-800 rounded px-4 h-11 w-full text-sm focus:outline-none focus:border-[#79584B] transition-all border">
                         </div>
-                        <button id="footer-pincode-save" type="button" style="{{ session('global_pincode') ? 'display:none;' : '' }}"
+                        <button id="footer-zipcode-save" type="button" style="{{ session('global_zipcode', session('global_pincode')) ? 'display:none;' : '' }}"
                             class="bg-primary h-11 text-white font-medium rounded px-6 text-sm hover:bg-[#5e4339] transition-all shadow-sm flex items-center justify-center gap-2 whitespace-nowrap min-w-[90px]" data-i18n="Save">
                             <span>{{ __('Save') }}</span>
                         </button>
-                        <button id="footer-pincode-delete" type="button" style="{{ session('global_pincode') ? '' : 'display:none;' }}"
+                        <button id="footer-zipcode-delete" type="button" style="{{ session('global_zipcode', session('global_pincode')) ? '' : 'display:none;' }}"
                             class="bg-primary h-11 text-white font-medium rounded px-4 text-lg hover:bg-[#5e4339] transition-all shadow-sm flex items-center justify-center whitespace-nowrap" title="{{ __('Delete') }}">
                             <i class="ri-delete-bin-line"></i>
                         </button>
                     </form>
 
-                    <div id="pincode-message" class="min-h-[24px] mb-2 text-xs font-bold"></div>
+                    <div id="zipcode-message" class="min-h-[24px] mb-2 text-xs font-bold"></div>
 
                     <div class="flex flex-wrap gap-3 xl:gap-8 justify-center lg:justify-start">
                         <a href="{{ $site_settings['social_facebook'] ?? '#' }}" target="_blank"
@@ -154,31 +155,73 @@
     </div>
 
     <script>
-$('#footer-pincode-input').on('input', function() {
-    $('#pincode-message').empty();
+    const conditionsMenu = document.getElementById('conditions-menu');
+    const defaultConditionsHtml = conditionsMenu ? conditionsMenu.innerHTML : '';
+
+    function renderSupportedConditions(conditions) {
+        if (!conditionsMenu) return;
+        if (!conditions || !conditions.length) {
+            conditionsMenu.innerHTML = defaultConditionsHtml;
+            return;
+        }
+
+        conditionsMenu.innerHTML = conditions.slice(0, 6).map(function (label) {
+            const safe = String(label).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return '<li><a href="#" class="hover:text-[#79584B] transition-colors">' + safe + '</a></li>';
+        }).join('');
+    }
+
+    function refreshSupportedConditions(zipcode) {
+        const url = @json(route('zipcode.conditions'));
+        const params = zipcode ? ('?zipcode=' + encodeURIComponent(zipcode)) : '';
+
+        // Prefer jQuery if present to match existing stack
+        if (window.$ && $.ajax) {
+            $.ajax({
+                url: url + params,
+                type: 'GET',
+                success: function (res) {
+                    if (res && res.success) renderSupportedConditions(res.conditions || []);
+                },
+                error: function () {
+                    // fallback to default static list
+                    renderSupportedConditions([]);
+                }
+            });
+            return;
+        }
+
+        fetch(url + params, { headers: { 'Accept': 'application/json' } })
+            .then(r => r.ok ? r.json() : null)
+            .then(res => { if (res && res.success) renderSupportedConditions(res.conditions || []); })
+            .catch(() => renderSupportedConditions([]));
+    }
+
+$('#footer-zipcode-input').on('input', function() {
+    $('#zipcode-message').empty();
 });
 
-$('#footer-pincode-save').click(function(){
+$('#footer-zipcode-save').click(function(){
 
-    var pincodeInput = $('#footer-pincode-input');
-    var pincode = pincodeInput.val();
+    var zipcodeInput = $('#footer-zipcode-input');
+    var zipcode = zipcodeInput.val();
     
-    if(pincode.length < 6) {
-        $('#pincode-message').html('<span class="text-red-600 font-bold">{{ __("Please enter 6 digits") }}</span>');
+    if(zipcode.length < 6) {
+        $('#zipcode-message').html('<span class="text-red-600 font-bold">{{ __("Please enter 6 digits") }}</span>');
         return;
     }
 
     $.ajax({
-        url: "{{ route('admin.pincode.store') }}",
+        url: "{{ route('admin.zipcode.store') }}",
         type: "POST",
         data: {
-            pincode: pincode,
+            zipcode: zipcode,
             _token: "{{ csrf_token() }}"
         },
         success: function(response){
 
             if(response.status){
-                var btn = $('#footer-pincode-save');
+                var btn = $('#footer-zipcode-save');
                 var originalHtml = btn.html();
                 
                 btn.html('<span>' + "{{ __('Saved') }}" + '</span>')
@@ -187,46 +230,48 @@ $('#footer-pincode-save').click(function(){
                    .addClass('bg-green-600 text-white');
                 
                 // Show formatted text inside input and make readonly
-                pincodeInput.val("{{ __('Your Pincode') }}: " + pincode)
+                zipcodeInput.val("{{ __('Your Zipcode') }}: " + zipcode)
                             .prop('readonly', true)
                             .attr('maxlength', '')
                             .removeClass('bg-[#F9F9F9] border-gray-200')
                             .addClass('bg-green-50 border-green-200');
 
-                // Sync with find-practitioner-pincode-input if it exists on the page
-                $('#find-practitioner-pincode-input').val(pincode).prop('readonly', true);
-                $('#find-practitioner-pincode-btn').hide();
-                $('#find-practitioner-pincode-delete').show();
+                // Sync with find-practitioner-zipcode-input if it exists on the page
+                $('#find-practitioner-zipcode-input').val(zipcode).prop('readonly', true);
+                $('#find-practitioner-zipcode-btn').hide();
+                $('#find-practitioner-zipcode-delete').show();
 
                 // Sync with hero search bar postal code input if empty
                 var heroPincodeInput = $('#hero_search_placeholder_2');
                 if (heroPincodeInput.length && !heroPincodeInput.val()) {
-                    heroPincodeInput.val(pincode);
+                    heroPincodeInput.val(zipcode);
                 }
 
-                $('#pincode-message').html(
+                $('#zipcode-message').html(
                     '<span class="text-green-600 font-bold">'+response.message+'</span>'
                 );
 
+                refreshSupportedConditions(zipcode);
+
                 setTimeout(function(){
-                    $('#pincode-message').empty();
+                    $('#zipcode-message').empty();
                     btn.html(originalHtml)
                        .prop('disabled', false)
                        .removeClass('bg-green-600')
                        .addClass('bg-[#79584B] hover:bg-[#5e4339]')
                        .hide(); 
                     
-                    $('#footer-pincode-delete').removeClass('bg-green-600').addClass('bg-primary hover:bg-[#5e4339]').show(); 
+                    $('#footer-zipcode-delete').removeClass('bg-green-600').addClass('bg-primary hover:bg-[#5e4339]').show(); 
                 }, 2000);
             }
 
         },
         error: function(xhr){
              var errorMessage = 'Validation error';
-             if(xhr.responseJSON && xhr.responseJSON.errors && xhr.responseJSON.errors.pincode) {
-                 errorMessage = xhr.responseJSON.errors.pincode[0];
+             if(xhr.responseJSON && xhr.responseJSON.errors && xhr.responseJSON.errors.zipcode) {
+                 errorMessage = xhr.responseJSON.errors.zipcode[0];
              }
-            $('#pincode-message').html(
+            $('#zipcode-message').html(
                 '<span class="text-red-600 font-bold">'+errorMessage+'</span>'
             );
         }
@@ -234,38 +279,47 @@ $('#footer-pincode-save').click(function(){
 
 });
 
-$('#footer-pincode-delete').click(function(){
+$('#footer-zipcode-delete').click(function(){
     $.ajax({
-        url: "{{ route('admin.pincode.delete') }}",
+        url: "{{ route('admin.zipcode.delete') }}",
         type: "DELETE",
         data: {
             _token: "{{ csrf_token() }}"
         },
         success: function(response){
             if(response.status){
-                $('#footer-pincode-input').val('')
+                $('#footer-zipcode-input').val('')
                                          .prop('readonly', false)
                                          .attr('maxlength', '6')
                                          .removeClass('bg-green-50 border-green-200')
                                          .addClass('bg-[#F9F9F9] border-gray-200');
                 
-                // Sync with find-practitioner-pincode-input if it exists on the page
-                $('#find-practitioner-pincode-input').val('').prop('readonly', false);
-                $('#find-practitioner-pincode-btn').show();
-                $('#find-practitioner-pincode-delete').hide();
+                // Sync with find-practitioner-zipcode-input if it exists on the page
+                $('#find-practitioner-zipcode-input').val('').prop('readonly', false);
+                $('#find-practitioner-zipcode-btn').show();
+                $('#find-practitioner-zipcode-delete').hide();
 
-                $('#footer-pincode-delete').removeClass('bg-green-600').addClass('bg-primary').hide();
-                $('#footer-pincode-save').removeClass('bg-green-600 hover:bg-green-700').addClass('bg-[#79584B] hover:bg-[#5e4339]').show();
+                $('#footer-zipcode-delete').removeClass('bg-green-600').addClass('bg-primary').hide();
+                $('#footer-zipcode-save').removeClass('bg-green-600 hover:bg-green-700').addClass('bg-[#79584B] hover:bg-[#5e4339]').show();
                 
-                $('#pincode-message').html(
+                $('#zipcode-message').html(
                     '<span class="text-blue-600 font-bold">'+response.message+'</span>'
                 );
+
+                refreshSupportedConditions(null);
                 setTimeout(function(){
-                    $('#pincode-message').empty();
+                    $('#zipcode-message').empty();
                 }, 2000);
             }
         }
     });
+});
+
+// If a zipcode is already saved, refresh the supported conditions on load.
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('footer-zipcode-input');
+    const saved = input ? (input.getAttribute('data-zipcode') || '') : '';
+    if (saved && saved.length === 6) refreshSupportedConditions(saved);
 });
 
 function toggleFooterMenu(menuId) {

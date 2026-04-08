@@ -26,9 +26,16 @@
             <div class="card">
                 <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
                     <h3>{{ $title }} List</h3>
+                    @php
+                        $user = auth()->user();
+                        $canCreate = $user->hasPermission('master-data-create') || $user->roleData()->name === 'Super Admin';
+                        // Contextual check can be complex here, but we can at least check global.
+                    @endphp
+                    @if($canCreate)
                     <button type="button" class="btn btn-primary" onclick="openCreateModal()">
                         <i class="fa-solid fa-plus me-2"></i>Add New Item
                     </button>
+                    @endif
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -59,29 +66,48 @@
                 <h5 class="modal-title f-w-600" id="modal-title">Add New Item</h5>
                 <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            @php
+                $canEdit = $user->hasPermission('master-data-edit') || $user->roleData()->name === 'Super Admin';
+                // Note: creating and editing might have different permissions, 
+                // but usually users who can see master data can at least edit if they have the global permission.
+            @endphp
+            @if($canCreate || $canEdit)
             <form id="item-form">
                 @csrf
                 <input type="hidden" name="id" id="item_id">
                 <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label fw-bold" for="name">Name <span class="text-danger">*</span></label>
-                            <input class="form-control" id="name" name="name" type="text" required placeholder="Enter item name..." style="border-radius: 8px;">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold" for="status">Status</label>
-                            <select class="form-select" id="status" name="status" required style="border-radius: 8px;">
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
+                    <div id="permission-error" class="alert alert-danger d-none">
+                        You do not have permission to perform this action.
+                    </div>
+                    <div id="modal-form-content">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-bold" for="name">Name <span class="text-danger">*</span></label>
+                                <input class="form-control" id="name" name="name" type="text" required placeholder="Enter item name..." style="border-radius: 8px;">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold" for="status">Status</label>
+                                <select class="form-select" id="status" name="status" required style="border-radius: 8px;">
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0">
+                <div class="modal-footer border-0" id="modal-footer-content">
                     <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Cancel</button>
                     <button class="btn btn-primary" type="submit" id="save-btn"><i class="fa fa-save me-1"></i> Save Changes</button>
                 </div>
             </form>
+            @else
+            <div class="modal-body text-center">
+                <p class="text-danger">Unauthorized. You do not have permission to manage master data.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+            @endif
         </div>
     </div>
 </div>

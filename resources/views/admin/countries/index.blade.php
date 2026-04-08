@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Doctors Management')
+@section('title', 'Countries Management')
 
 @section('content')
 <div class="container-fluid">
@@ -26,9 +26,11 @@
             <div class="card">
                 <div class="card-header pb-0 card-no-border d-flex justify-content-between align-items-center">
                     <h3>Country List</h3>
+                    @if(auth()->user()->hasPermission('master-data-create'))
                     <button type="button" class="btn btn-primary" onclick="openCreateModal()">
                         <i class="iconly-Add-User icli me-2"></i>Register New Country
                     </button>
+                    @endif
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -86,6 +88,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
+      @if(auth()->user()->hasPermission('master-data-edit'))
       <div class="modal-body">
         <form id="editCountryForm">
           <input type="hidden" id="countryId">
@@ -105,6 +108,14 @@
           </button>
         </form>
       </div>
+      @else
+      <div class="modal-body text-center">
+        <p class="text-danger">Unauthorized. You do not have permission to edit countries.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+      @endif
     </div>
   </div>
 </div>
