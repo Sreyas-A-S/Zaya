@@ -111,7 +111,7 @@ class UserManagerController extends Controller
         $role = $user->roleData();
         $isSuperAdmin = ($role && $role->name === 'Super Admin');
 
-        $allCountries = Country::all();
+        $allCountries = Country::where('status', 'active')->get();
         $languages = Language::all();
 
         if ($isSuperAdmin) {

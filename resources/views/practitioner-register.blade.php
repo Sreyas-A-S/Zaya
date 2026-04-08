@@ -24,6 +24,17 @@
             width: 100% !important;
             display: block !important;
         }
+
+        /* Hide native select arrow */
+        select.appearance-none {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+        }
+        
+        select.appearance-none::-ms-expand {
+            display: none;
+        }
     </style>
 </head>
 
@@ -632,6 +643,22 @@
                                             <input type='hidden' name='registration_fee' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
                                             <input type='hidden' name='registration_fee_actual' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
                                             <button type='button' class='absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer'>{{ __('Pay') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Payout Currency') }}</label>
+                                    <div class='relative w-full'>
+                                        <select name="payout_currency" class="w-full h-[58px] pl-6 pr-12 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#FABC41] focus:bg-white focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)] appearance-none">
+                                            @foreach(config('currencies.symbols') as $code => $symbol)
+                                                <option value="{{ $code }}" {{ $code === ($practitionerRegistrationCurrency ?? 'EUR') ? 'selected' : '' }}>
+                                                    {{ $code }} ({{ $symbol }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none">
+                                             <i class="ri-arrow-down-s-line text-gray-400 text-xl"></i>
                                         </div>
                                     </div>
                                 </div>

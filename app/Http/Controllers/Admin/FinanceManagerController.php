@@ -131,7 +131,7 @@ class FinanceManagerController extends Controller
                 ->make(true);
         }
 
-        $allCountries = Country::all();
+        $allCountries = Country::where('status', 'active')->get();
         $languages = Language::all();
 
         $isAdminRole = ($role && in_array($role->name, ['Super Admin', 'Admin']));

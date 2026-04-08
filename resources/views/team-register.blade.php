@@ -316,15 +316,9 @@
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Payout Currency') }} <span class="text-red-500">*</span></label>
-                                @php
-                                    $currencies = config('currencies.list', [
-                                        'USD' => 'US$', 'EUR' => '€', 'GBP' => '£', 'INR' => '₹', 'AUD' => 'A$',
-                                        'CAD' => 'C$', 'SGD' => 'S$', 'AED' => 'AED', 'SAR' => 'SAR'
-                                    ]);
-                                @endphp
                                 <select name="payout_currency" required
                                     class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
-                                    @foreach($currencies as $code => $symbol)
+                                    @foreach(config('currencies.symbols') as $code => $symbol)
                                         <option value="{{ $code }}" @selected(old('payout_currency', 'USD') === $code)>{{ $code }} ({{ $symbol }})</option>
                                     @endforeach
                                 </select>
