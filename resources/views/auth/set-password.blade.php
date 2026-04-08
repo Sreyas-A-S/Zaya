@@ -23,7 +23,7 @@
                 <label class="col-form-label">New Password</label>
                 <div class="form-input position-relative">
                   <input class="form-control @error('password') is-invalid @enderror" type="password" name="password" required placeholder="*********">
-                  <div class="show-hide"><span class="show"> </span></div>
+                  <div class="show-hide-independent"><span class="show"> </span></div>
                   @error('password')
                   <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -36,7 +36,7 @@
                 <label class="col-form-label">Confirm New Password</label>
                 <div class="form-input position-relative">
                   <input class="form-control" type="password" name="password_confirmation" required placeholder="*********">
-                  <div class="show-hide"><span class="show"> </span></div>
+                  <div class="show-hide-independent"><span class="show"> </span></div>
                 </div>
               </div>
 
@@ -70,15 +70,39 @@
     opacity: 1;
     margin-right: 5px;
   }
+
+  /* Custom positioning for independent show-hide to replace template broken script */
+  .show-hide-independent {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    display: block;
+    cursor: pointer;
+    z-index: 10;
+  }
+  
+  .show-hide-independent span {
+    font-size: 13px;
+    font-weight: 500;
+    color: #8B3A8A; /* Matches Zaya theme color */
+    text-transform: lowercase;
+  }
+  
+  .show-hide-independent span.show:before {
+    content: "show";
+  }
+  
+  .show-hide-independent span:not(.show):before {
+    content: "hide";
+  }
 </style>
 
 @section('scripts')
 <script>
   $(document).ready(function() {
-    // Standard show/hide logic for multiple fields
-    $('.show-hide').css('display', 'block'); // Ensure they are visible
-    
-    $('.show-hide span').on('click', function() {
+    // Independent show/hide logic for multiple fields
+    $('.show-hide-independent span').on('click', function() {
       var input = $(this).closest('.form-input').find('input');
       if (input.attr('type') === 'password') {
         input.attr('type', 'text');
@@ -99,7 +123,7 @@
       
       // Reset password types to password before submission for security
       $('.form-input input').attr('type', 'password');
-      $('.show-hide span').addClass('show');
+      $('.show-hide-independent span').addClass('show');
     });
   });
 </script>
