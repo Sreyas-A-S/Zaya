@@ -163,9 +163,9 @@
         .reg-input {
             width: 100%;
             padding: 14px 24px;
-            background: #F5F5F5;
+            background: #FFFFFF;
             border-radius: 9999px;
-            border: 1px solid transparent;
+            border: 1px solid #D1D5DB;
             outline: none;
             font-size: 0.95rem;
             color: #374151;
@@ -195,8 +195,8 @@
     .iti { width: 100% !important; }
     .iti--allow-dropdown input[type=tel], .iti--allow-dropdown input[type=text] {
         border-radius: 9999px !important;
-        background: #F5F5F5 !important;
-        border: 1px solid transparent !important;
+        background: #FFFFFF !important;
+        border: 1px solid #D1D5DB !important;
         padding-left: 96px !important;
     }
     .iti--allow-dropdown input[type=tel]:focus, .iti--allow-dropdown input[type=text]:focus {
@@ -206,8 +206,8 @@
     }
     .iti--allow-dropdown .iti__flag-container {
         border-radius: 9999px 0 0 9999px;
-        background: #F5F5F5;
-        border: 1px solid transparent;
+        background: #FFFFFF;
+        border: 1px solid #D1D5DB;
         border-right: 0;
     }
     .iti--allow-dropdown .iti__selected-flag {
@@ -245,9 +245,9 @@
 
         .ts-control {
             padding: 10px 24px !important;
-            background: #F5F5F5 !important;
+            background: #FFFFFF !important;
             border-radius: 9999px !important;
-            border: 1px solid transparent !important;
+            border: 1px solid #D1D5DB !important;
             min-height: 52px !important;
             display: flex !important;
             align-items: center !important;
@@ -417,7 +417,7 @@
 </style>
 </head>
 
-<body class="bg-white min-h-screen flex flex-col">
+<body class="bg-[#F5F5F5] min-h-screen flex flex-col">
     @php
         $currencySymbols = config('currencies.symbols', []);
         $currCode = strtoupper($defaultCurrency ?? config('app.currency', 'INR'));
@@ -444,6 +444,9 @@
                 <p class="text-[#424F93] font-regular text-base md:text-lg mb-2">{{ __('Create Account') }}</p>
                 <h1 class="text-2xl md:text-3xl lg:text-4xl font-sans! font-medium text-gray-900">{{ __('Client Registration Form') }}</h1>
             </div>
+
+            <div class="bg-white rounded-[32px] p-8 md:p-14 shadow-sm border border-gray-100 relative z-20">
+
 
             <!-- Toast Container -->
             <div id="toast-container"></div>
@@ -794,17 +797,9 @@
                                 placeholder="Confirm Password" required>
                             <button type="button" onclick="togglePassword('password_confirmation')"
                                 class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                <i class="ri-eye-line" id="password_confirmation-icon"></i>
-                            </button>
-                        </div>
-                        <span id="password-match-error" class="text-red-500 text-xs mt-1 pl-4 block h-4"></span>
-                    </div>
-                </div> -->
             </form>
         </div>
     </div>
-
-
 
     <!-- Client Thank You Popup Modal -->
     <div id="thank-you-popup" class="fixed inset-0 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">

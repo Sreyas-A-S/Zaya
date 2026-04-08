@@ -23,7 +23,7 @@ class PromoCode extends Model
     ];
 
     protected $casts = [
-        'expiry_date' => 'date',
+        'expiry_date' => 'datetime',
         'status' => 'boolean',
         'used_count' => 'integer',
         'usage_limit' => 'integer',

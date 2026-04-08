@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class RegistrationFeeService
 {
-    public function createPaymentLink($user, string $role): ?array
+    public function createPaymentLink($user, string $role, ?float $amountOverride = null, array $extraNotes = []): ?array
     {
         $map = [
             'practitioner' => ['fee' => 'practitioner_registration_fee', 'enabled' => 'practitioner_registration_fee_enabled', 'label' => 'Practitioner'],
@@ -25,6 +25,9 @@ class RegistrationFeeService
         $language = session('locale', 'en');
         $settings = HomepageSetting::getSectionValues('finance', $language);
         $fee = (float) ($settings[$map[$role]['fee']] ?? 0);
+        if (is_numeric($amountOverride)) {
+            $fee = max(0.0, (float) $amountOverride);
+        }
         $currencyKey = $map[$role]['fee'] . '_currency';
         $feeCurrency = strtoupper($settings[$currencyKey] ?? config('currencies.default', 'EUR'));
         $enabled = filter_var($settings[$map[$role]['enabled']] ?? '1', FILTER_VALIDATE_BOOLEAN);
@@ -50,6 +53,12 @@ class RegistrationFeeService
 
         $currency = $feeCurrency ?? $this->deriveCurrencyFromUser($user);
 
+        $notes = array_merge([
+            'user_id' => $user->id,
+            'role' => $role,
+            'source' => 'admin_registration',
+        ], $extraNotes);
+
         try {
             $response = Http::withOptions(['verify' => (bool) $verifySsl])
                 ->withBasicAuth($razorpayKey, $razorpaySecret)
@@ -64,11 +73,7 @@ class RegistrationFeeService
                     ],
                     'callback_url' => route('admin.registration-fees.callback'),
                     'callback_method' => 'get',
-                    'notes' => [
-                        'user_id' => $user->id,
-                        'role' => $role,
-                        'source' => 'admin_registration',
-                    ]
+                    'notes' => $notes,
                 ]);
 
             if ($response->successful()) {

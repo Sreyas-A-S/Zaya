@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\BlogLike;
 use App\Models\ContactUs;
+use App\Models\Country;
 use App\Models\HomepageSetting;
 use App\Models\Language;
 use App\Models\PromoCode;
@@ -24,7 +25,7 @@ use App\Models\Service;
 use App\Models\ServicePackage;
 use App\Models\Testimonial;
 use App\Mail\ContactUsMail;
-use App\Models\Country;
+
 use App\Models\Doctor;
 use App\Models\MindfulnessPractitioner;
 use App\Models\YogaTherapist;
@@ -63,7 +64,9 @@ class WebController extends Controller
         $testimonials = Testimonial::withCount(['likes', 'replies'])->where('status', 'approved')->latest()->get();
         $ip = request()->ip();
         $testimonials->each(function ($testimonial) use ($ip) {
-            $testimonial->is_liked = $testimonial->likes()->where('ip_address', $ip)->exists();
+            if (is_object($testimonial) && method_exists($testimonial, 'likes')) {
+                $testimonial->is_liked = $testimonial->likes()->where('ip_address', $ip)->exists();
+            }
         });
         $services = Service::where('status', true)->orderBy('order_column')->get();
         $settings = HomepageSetting::getAllSettings($language);
@@ -525,17 +528,21 @@ class WebController extends Controller
         $practitionerRegistrationFee = $financeSettings['practitioner_registration_fee'] ?? '0';
         $practitionerRegistrationFee = is_numeric($practitionerRegistrationFee) ? (float) $practitionerRegistrationFee : 0.0;
         $practitionerRegistrationFeeEnabled = filter_var($financeSettings['practitioner_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
+        $practitionerRegistrationCurrency = strtoupper($financeSettings['practitioner_registration_fee_currency'] ?? config('currencies.default', 'EUR'));
+        $practitionerRegistrationCurrencySymbol = config('currencies.symbols')[$practitionerRegistrationCurrency] ?? $practitionerRegistrationCurrency;
 
         return view('practitioner-register', compact(
             'wellnessConsultations',
             'bodyTherapies',
             'otherModalities',
             'practitionerRegistrationFee',
-            'practitionerRegistrationFeeEnabled'
+            'practitionerRegistrationFeeEnabled',
+            'practitionerRegistrationCurrency',
+            'practitionerRegistrationCurrencySymbol'
         ));
     }
 
-    public function joinRegister(string $role)
+    public function joinRegister(string $role, string $token = null)
     {
         $normalized = str_replace('_', '-', strtolower(trim($role)));
         $map = [
@@ -555,8 +562,9 @@ class WebController extends Controller
         $viewData = [
             'joinRole' => $joinRole,
             'joinRoleLabel' => $map[$normalized]['label'],
-            'languages' => Language::where('status', 'active')->get(),
-            'countries' => Country::where('status', 'active')->orderBy('name')->get(),
+            'languages' => Language::orderBy('name')->get(), // Fetch all languages sorted A-Z
+            'countries' => Country::orderBy('name')->get(), // Fetch all countries sorted A-Z
+            'openRegisterToken' => $token,
         ];
 
         if ($joinRole === 'doctor') {

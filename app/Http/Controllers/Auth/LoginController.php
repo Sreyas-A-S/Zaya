@@ -109,18 +109,30 @@ class LoginController extends Controller
     {
         // This method is called by the standard 'login' route (Client/User Login)
         
+        // Define allowed roles for this login page
+        $allowedRoles = [
+            'client', 
+            'patient', 
+            'practitioner', 
+            'doctor', 
+            'mindfulness-practitioner', 
+            'mindfulness_practitioner',
+            'yoga-therapist', 
+            'yoga_therapist',
+            'translator'
+        ];
+        
+        // If it's a backend user (not in allowed list), log them out and redirect back with error
+        if (!in_array(strtolower($user->role), $allowedRoles)) {
+            auth()->logout();
+            return redirect()->route('login')
+                ->with('error', 'Backend users are not allowed to login through this portal. Please use the Admin Portal.');
+        }
+
         // Store promo code if present in the request
         if ($request->filled('promocode')) {
             $user->promo_code = $request->input('promocode');
             $user->save();
-        }
-
-        // If an admin tries to login via the client login page, log them out and redirect.
-        $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
-        
-        if (in_array($user->role, $adminRoles)) {
-            auth()->logout();
-            return redirect()->route('admin.login')->with('error', 'Admins must login via the Admin Portal.');
         }
 
         $blockReason = $user->getLoginBlockReason();

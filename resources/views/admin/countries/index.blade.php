@@ -166,7 +166,7 @@
             </div>
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
+                <button type="button" class="btn btn-primary" id="confirm-country-status-btn">Confirm Change</button>
             </div>
         </div>
     </div>
@@ -481,7 +481,7 @@
         });
 
         // Confirm status change
-        $(document).on('click', '#confirm-status-btn', function() {
+        $(document).on('click', '#confirm-country-status-btn', function() {
             let btn = $(this);
             let id = $('#status-country-id').val();
             let status = $('#status-new-value').val();

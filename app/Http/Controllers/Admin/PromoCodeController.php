@@ -24,11 +24,23 @@ class PromoCodeController extends Controller
     {
         if ($request->ajax()) {
             $data = PromoCode::query();
+
+            if ($request->filled('created_date_filter')) {
+                $data->whereDate('created_at', $request->created_date_filter);
+            }
+
+            if ($request->filled('expiry_date_filter')) {
+                $data->whereDate('expiry_date', $request->expiry_date_filter);
+            }
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     return '
                         <div class="d-flex align-items-center gap-2">
+                            <a href="javascript:void(0)" class="text-info viewPromoCode" data-id="'.$row->id.'" title="View">
+                                <i class="iconly-Show icli" style="font-size: 20px;"></i>
+                            </a>
                             <a href="javascript:void(0)" class="text-primary editPromoCode" data-id="'.$row->id.'" title="Edit">
                                 <i class="iconly-Edit-Square icli" style="font-size: 20px;"></i>
                             </a>
@@ -47,13 +59,14 @@ class PromoCodeController extends Controller
                 })
                 ->editColumn('reward', function($row) {
                     $html = $row->type == 'percentage' ? $row->reward . '%' : '$' . $row->reward;
-                    if ($row->benefits && count($row->benefits) > 0) {
-                        $html .= ' <span class="badge bg-info text-white" >+Benefits</span>';
-                    }
+                   
                     return $html;
                 })
                 ->editColumn('expiry_date', function($row) {
                     return $row->expiry_date ? $row->expiry_date->format('Y-m-d') : 'N/A';
+                })
+                ->editColumn('created_at', function($row) {
+                    return $row->created_at ? $row->created_at->format('Y-m-d') : 'N/A';
                 })
                 ->editColumn('status', function ($row) {
                     $badgeClass = $row->status ? 'bg-success' : 'bg-danger';

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\YogaTherapist;
-use App\Mail\WelcomeUserMail;
+use App\Mail\SetPasswordMail;
 use App\Mail\PractitionerApplicationSubmittedMail;
 use App\Mail\RegistrationFeePaymentLinkMail;
 use App\Services\RegistrationFeeService;
@@ -16,8 +16,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rules\Password as RulesPassword;
 
 use App\Traits\AdminFilterTrait;
 use App\Traits\ImageUploadTrait;
@@ -151,7 +152,7 @@ class YogaTherapistController extends Controller
             'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
             'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
             'email' => 'required|email|max:255|unique:users,email',
-            'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+            'password' => ['required', 'string', 'confirmed', RulesPassword::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
             'cropped_image' => 'nullable|string',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
@@ -296,7 +297,7 @@ class YogaTherapistController extends Controller
             'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
             'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => ['nullable', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+            'password' => ['nullable', 'string', 'confirmed', RulesPassword::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|image|max:2048',
             'cropped_image' => 'nullable|string',
             'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
@@ -453,7 +454,9 @@ class YogaTherapistController extends Controller
         if ($previousStatus !== 'active' && $status === 'active') {
             $user = $therapist->user;
             if ($user) {
-                Mail::to($user->email)->send(new WelcomeUserMail($user->email, null, url('/zaya-login'), $user->role));
+                $token = Password::broker()->createToken($user);
+                $setPasswordUrl = route('set-password.show', ['token' => $token, 'email' => $user->email]);
+                Mail::to($user->email)->send(new SetPasswordMail($user->email, $setPasswordUrl));
             }
         }
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\PractitionerController;
 use App\Http\Controllers\Admin\MasterDataController;
 use App\Http\Controllers\Admin\MindfulnessPractitionerController;
+use App\Http\Controllers\Admin\FormController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TranslatorController;
 use App\Http\Controllers\Admin\YogaTherapistController;
@@ -21,9 +22,13 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CaptchaController;
+use App\Http\Controllers\GeoIpController;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 
@@ -52,6 +57,9 @@ Route::post('forgot-password/reset', [\App\Http\Controllers\Auth\ClientForgotPas
 Route::post('login', [LoginController::class, 'login']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
+Route::get('set-password', [SetPasswordController::class, 'show'])->name('set-password.show');
+Route::post('set-password', [SetPasswordController::class, 'update'])->name('set-password.update');
+
 Route::get('register/selection', function () {
     return view('auth.register_selection');
 })->name('register.selection');
@@ -62,6 +70,33 @@ Route::post('register', [RegisterController::class, 'register'])->name('register
 Route::get('register', function () {
     return redirect()->route('register.selection');
 });
+
+Route::get('/open-register/{role}/signature={token}', function (string $role, string $token) {
+    if (!Schema::hasTable('open_register_links')) {
+        abort(503, 'Database table open_register_links is missing. Run: php artisan migrate');
+    }
+
+    $normalizedRole = str_replace('_', '-', strtolower(trim($role)));
+
+    $link = \App\Models\OpenRegisterLink::where('token', $token)->firstOrFail();
+    if (strtolower(trim((string) ($link->status ?? 'active'))) !== 'active') {
+        abort(403, 'This link is inactive.');
+    }
+    if ($link->used_at) {
+        abort(403, 'This link has already been used.');
+    }
+
+    if ($link->expires_at && now()->greaterThan($link->expires_at)) {
+        abort(403, 'This link has expired.');
+    }
+
+    $storedRole = str_replace('_', '-', strtolower(trim((string) $link->role)));
+    if ($storedRole !== $normalizedRole) {
+        abort(404);
+    }
+
+    return app(WebController::class)->joinRegister($normalizedRole, $token);
+})->name('open.register');
 
 // Public Master Data Quick Add (for registration forms)
 Route::post('master-data/quick-add/{type}', [MasterDataController::class, 'store'])->name('master-data.quick-add');
@@ -114,12 +149,14 @@ Route::post('/blog/comment', [WebController::class, 'postComment'])->name('blog.
 Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->name('blog.comments');
 
 Route::get('/captcha', [CaptchaController::class, 'generate'])->name('captcha');
+Route::get('/geoip/country', [GeoIpController::class, 'country'])->name('geoip.country');
 Route::get('/magic-login', [\App\Http\Controllers\Auth\MagicLoginController::class, 'login'])->name('magic.login');
 Route::post('/validate-promo-code', [WebController::class, 'validatePromoCode'])->name('promo.validate');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource('/admins', AdminsController::class);
     Route::post('/admins/{id}/status', [AdminsController::class, 'updateStatus'])->name('admins.status');
+    Route::post('/admins/{id}/assign-countries', [AdminsController::class, 'assignCountries'])->name('admins.assign-countries');
     Route::get('admin/admins/{id}/edit', [AdminController::class, 'edit']);
     Route::put('admin/admins/{id}', [AdminController::class, 'update']);
     Route::delete('/admin/admins/{id}', [AdminsController::class, 'destroy']);
@@ -146,6 +183,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('clients/{id}/status', [ClientController::class, 'updateStatus'])->name('clients.status');
     Route::resource('translators', TranslatorController::class);
     Route::post('translators/{id}/status', [TranslatorController::class, 'updateStatus'])->name('translators.status');
+    Route::resource('forms', FormController::class)->only(['index', 'show']);
+    Route::post('forms/generate-link', [FormController::class, 'generateLink'])->name('forms.generate-link');
+    Route::post('forms/share-email', [FormController::class, 'shareEmail'])->name('forms.share-email');
+    Route::post('forms/{id}/status', [FormController::class, 'updateStatus'])->name('forms.status');
+    Route::delete('forms/{id}', [FormController::class, 'destroy'])->name('forms.destroy');
     Route::resource('roles', RoleController::class);
     Route::get('roles/{role}/permissions', [RoleController::class, 'showPermissions'])->name('roles.permissions');
     Route::post('roles/{role}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.permissions.update');

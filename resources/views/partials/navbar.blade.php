@@ -138,31 +138,37 @@
                         } else {
                         $currentLocale = session('locale', config('app.locale', 'en'));
                         }
+
+                        // Language Fallback logic
+                        if ($currentLocale !== 'all' && !$languages->where('code', $currentLocale)->first()) {
+                            $firstAssignedLang = $languages->first();
+                            $currentLocale = $firstAssignedLang ? $firstAssignedLang->code : 'en';
+                            session(['locale' => $currentLocale]);
+                        }
                         
                         $currentLanguage=$allLanguages->where('code', $currentLocale)->first();
 
-                        $allCountries = \App\Models\Country::all();
-                        if ($role && $role->name === 'Super Admin') {
-                        $userCountries = $allCountries;
-                        $currentCountryCode = session('admin_country', 'all');
-                        } else {
+                        $allCountries = \App\Models\Country::where('status', 'active')->get();
                         $assignedCountryIds = $user?->national_id;
-                        if (is_array($assignedCountryIds)) {
-                        $userCountries = $allCountries->whereIn('id', $assignedCountryIds);
-                        } elseif ($assignedCountryIds) {
-                        $userCountries = $allCountries->where('id', $assignedCountryIds);
+                        $hasUnrestrictedAccess = ($role && $role->name === 'Super Admin') || empty($assignedCountryIds);
+
+                        if ($hasUnrestrictedAccess) {
+                            $userCountries = $allCountries;
+                            $currentCountryCode = session('admin_country', 'all');
                         } else {
-                        $userCountries = collect();
-                        }
-                        $currentCountryCode = session('admin_country', 'us');
+                            if (is_array($assignedCountryIds)) {
+                                $userCountries = $allCountries->whereIn('id', $assignedCountryIds);
+                            } else {
+                                $userCountries = $allCountries->where('id', $assignedCountryIds);
+                            }
+                            $currentCountryCode = session('admin_country');
+                            if ($currentCountryCode === 'all' || !$userCountries->where('code', strtoupper($currentCountryCode))->first()) {
+                                $firstCountry = $userCountries->first();
+                                $currentCountryCode = $firstCountry ? strtolower($firstCountry->code) : 'us';
+                                session(['admin_country' => $currentCountryCode]);
+                            }
                         }
 
-                        // Fallback logic
-                        if ($currentCountryCode !== 'all' && !$userCountries->where('code', strtoupper($currentCountryCode))->first()) {
-                        $firstAssigned = $userCountries->first();
-                        $currentCountryCode = $firstAssigned ? strtolower($firstAssigned->code) : 'us';
-                        session(['admin_country' => $currentCountryCode]);
-                        }
                         $currentCountry = $userCountries->where('code', strtoupper($currentCountryCode))->first();
                         @endphp
 
@@ -171,7 +177,7 @@
                             @if($currentLocale !== 'all')
                             <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentLanguage ? getCountryCode($currentLanguage) : 'us') . '.svg') }}" style="width: 20px; height: 14px; border: 1px solid #eee; border-radius: 2px;" alt="flag">
                             @endif
-                            <h6 class="lang-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentLocale === 'all' ? 'ALL' : ($currentLanguage ? strtoupper($currentLanguage->code) : 'EN') }}</h6>
+                            <h6 class="lang-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentLocale === 'all' ? 'EN' : ($currentLanguage ? strtoupper($currentLanguage->code) : 'EN') }}</h6>
                         </a>
 
                         <div class="custom-menu overflow-hidden">
@@ -179,6 +185,22 @@
                                 <span class="f-w-700 text-dark small">{{ __('SELECT LANGUAGE') }}</span>
                             </div>
                             <ul class="profile-body language-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
+                                @if(in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
+                                <li class="d-flex align-items-center last-0" style="cursor: pointer;">
+                                    <a href="javascript:void(0)"
+                                        class="lang d-flex align-items-center w-100 {{ $currentLocale == 'all' ? 'active text-primary' : '' }}"
+                                        data-value="all"
+                                        data-flag=""
+                                        onclick="changeLanguage(this)"
+                                        style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
+                                        <i class="fa fa-language ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
+                                        <span class="f-w-600 small">{{ __('Default Language (En)') }}</span>
+                                        @if($currentLocale == 'all')
+                                        <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                                        @endif
+                                    </a>
+                                </li>
+                                @endif
 
                                 @if($languages->isEmpty() && !in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
                                 <li class="p-3 text-center text-muted small">{{ __('No assigned languages') }}</li>

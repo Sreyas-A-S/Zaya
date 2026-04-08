@@ -44,7 +44,7 @@ class AdminController extends Controller
             $langIds = [];
             if (is_array($user->languages)) {
                 $langIds = $user->languages;
-            } else {
+            } elseif (is_string($user->languages)) {
                 $decoded = json_decode($user->languages, true);
                 if (is_array($decoded)) {
                     $langIds = $decoded;
@@ -61,6 +61,10 @@ class AdminController extends Controller
             'total_patients' => $this->applyAdminFilters(Patient::query(), 'user')->count(),
             'total_services' => Service::count(),
             'total_packages' => Package::count(),
+            'total_doctors' => $this->applyAdminFilters(User::where('role', 'doctor'), 'user')->count(),
+            'total_mindfulness' => $this->applyAdminFilters(User::whereIn('role', ['mindfulness_practitioner', 'mindfulness-practitioner']), 'user')->count(),
+            'total_yoga' => $this->applyAdminFilters(User::whereIn('role', ['yoga_therapist', 'yoga-therapist']), 'user')->count(),
+            'total_translators' => $this->applyAdminFilters(User::where('role', 'translator'), 'user')->count(),
         ];
 
         return view('admin.dashboard', compact('user', 'myLanguages', 'stats'));
@@ -82,7 +86,7 @@ class AdminController extends Controller
             $langIds = [];
             if (is_array($user->languages)) {
                 $langIds = $user->languages;
-            } else {
+            } elseif (is_string($user->languages)) {
                 $decoded = json_decode($user->languages, true);
                 if (is_array($decoded)) {
                     $langIds = $decoded;

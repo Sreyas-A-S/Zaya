@@ -118,8 +118,9 @@ class FinanceManagerController extends Controller
                 })
 
                 ->addColumn('action', function ($row) {
-                    $btn = '<div class="d-flex align-items-center gap-3">';
+                    $btn = '<div class="d-flex align-items-center gap-2">';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-info viewUser" title="View"><i class="iconly-Show icli" style="font-size: 20px;"></i></a>';
+                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-secondary viewCountries" title="View Assigned Countries"><i class="fa-solid fa-earth-americas" style="font-size: 20px;"></i></a>';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editUser" title="Edit"><i class="iconly-Edit-Square icli" style="font-size: 20px;"></i></a>';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-danger deleteUser" title="Delete"><i class="iconly-Delete icli" style="font-size: 20px;"></i></a>';
                     $btn .= '</div>';
@@ -130,7 +131,7 @@ class FinanceManagerController extends Controller
                 ->make(true);
         }
 
-        $allCountries = Country::all();
+        $allCountries = Country::where('status', 'active')->get();
         $languages = Language::all();
 
         $isAdminRole = ($role && in_array($role->name, ['Super Admin', 'Admin']));
@@ -305,5 +306,22 @@ class FinanceManagerController extends Controller
         $user->save();
 
         return response()->json(['success' => true, 'message' => 'Status updated successfully']);
+    }
+
+    public function assignCountries(Request $request, $id)
+    {
+        if (!\Illuminate\Support\Facades\Auth::user() || !in_array(\Illuminate\Support\Facades\Auth::user()->role, ['admin', 'super-admin'])) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $user = User::where('role', 'financial-manager')->findOrFail($id);
+
+        $countries = $request->input('countries', []);
+        
+        $user->update([
+            'national_id' => !empty($countries) ? array_map('intval', $countries) : null
+        ]);
+
+        return response()->json(['success' => 'Assigned countries updated successfully!']);
     }
 }
