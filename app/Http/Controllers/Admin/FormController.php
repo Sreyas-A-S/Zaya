@@ -101,6 +101,7 @@ class FormController extends Controller
 
         $validated = $request->validate([
             'user_type' => ['required', 'string', 'max:100'],
+            'expires_at' => ['nullable', 'date', 'after_or_equal:today'],
         ]);
 
         $normalized = str_replace('_', '-', strtolower(trim($validated['user_type'])));
@@ -115,7 +116,7 @@ class FormController extends Controller
             'token' => $token,
             'status' => 'active',
             'created_by' => Auth::id(),
-            'expires_at' => now()->addDays(7),
+            'expires_at' => $validated['expires_at'] ? \Carbon\Carbon::parse($validated['expires_at'])->endOfDay() : now()->addDays(7),
         ]);
 
         $link = $record->url;

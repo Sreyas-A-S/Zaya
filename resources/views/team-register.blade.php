@@ -332,6 +332,7 @@
                         </div>
 
                         <div class="flex justify-end mt-8 border-t border-gray-100 pt-8">
+                            <button type="button" class="next-tab-btn w-full sm:w-auto bg-[#FABC41] text-[#423131] py-3.5 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] shadow-md shadow-[#FABC41]/20">{{ __('Next Step') }} <i class="ri-arrow-right-line ml-2 align-middle"></i></button>
                         </div>
                     </div>
 
@@ -383,7 +384,7 @@
                             </div>
                         @else
                             <p class="text-gray-500 text-sm md:text-base mb-8">
-                                {{ __('After approval, we will email you a secure link to create your password and activate your account.') }}
+                                {{ __('After approval, check your email for a secure to set your password and activate your account.') }}
                             </p>
                         @endif
 

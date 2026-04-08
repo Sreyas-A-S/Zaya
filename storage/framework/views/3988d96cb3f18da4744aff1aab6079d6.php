@@ -36,6 +36,7 @@
                                     <th>ID</th>
                                     <th>URL</th>
                                     <th>User</th>
+                                    <th>Expiry Date</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -59,7 +60,7 @@
             </div>
             <div class="modal-body">
                 <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">User Type</label>
                         <select class="form-select" id="reg_user_type">
                             <option value="" selected disabled>Select user type</option>
@@ -68,10 +69,15 @@
                             <option value="translator">Translators</option>
                             <option value="yoga-therapist">Yoga Therapists</option>
                         </select>
-                        <div class="form-text">This creates a secure, time-limited open registration link.</div>
+                        <div class="form-text">Secure, time-limited open registration link.</div>
                     </div>
-                    <div class="col-md-6 d-flex align-items-end">
-                        <button type="button" class="btn btn-success w-100" id="btn-generate-link">
+                    <div class="col-md-4">
+                        <label class="form-label">Expiry Date</label>
+                        <input type="date" class="form-control" id="reg_expires_at" min="<?php echo e(date('Y-m-d')); ?>" value="<?php echo e(date('Y-m-d', strtotime('+7 days'))); ?>">
+                        <div class="form-text">When will this link expire?</div>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="button" class="btn btn-success w-100 mb-4" id="btn-generate-link">
                             <i class="fa-solid fa-link me-2"></i>Generate
                         </button>
                     </div>
@@ -181,6 +187,7 @@
 <script>
     function openGenerateLinkModal() {
         $('#reg_user_type').val('');
+        $('#reg_expires_at').val("<?php echo e(date('Y-m-d', strtotime('+7 days'))); ?>");
         $('#generated_link').val('');
         $('#generated_link_hint').text('');
         $('#btn-copy-link').prop('disabled', true);
@@ -212,6 +219,18 @@
                     data: 'user',
                     name: 'open_register_links.role',
                     orderable: false
+                },
+                {
+                    data: 'expires_at',
+                    name: 'open_register_links.expires_at',
+                    render: function(data) {
+                        if (!data) return 'Never';
+                        return new Date(data).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        });
+                    }
                 },
                 {
                     data: 'status',
@@ -314,7 +333,8 @@
                 url: "<?php echo e(route('admin.forms.generate-link')); ?>",
                 method: 'POST',
                 data: {
-                    user_type: userType
+                    user_type: userType,
+                    expires_at: $('#reg_expires_at').val()
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
