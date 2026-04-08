@@ -1083,9 +1083,11 @@
         });
 
         // View User Details
-        $(document).on('click', '.viewUser', function() {
+        $(document).on('click', '.viewUser, .viewCountries', function () {
+            let isCountryView = $(this).hasClass('viewCountries');
+            $('#viewContentManagerModal .modal-title').text(isCountryView ? 'Assigned Countries' : 'Content Manager Details');
             let id = $(this).data('id');
-            $.get("{{ url('admin/content-managers') }}/" + id + "/edit", function(user) {
+            $.get("{{ url('admin/content-managers') }}/" + id + "/edit", function (user) {
                 $('#view-name').text(user.first_name + ' ' + user.last_name);
                 $('#view-fname').text(user.first_name);
                 $('#view-lname').text(user.last_name);
@@ -1094,7 +1096,7 @@
                 $('#view-created-at').text(new Date(user.created_at).toLocaleString());
 
                 // Country and Language Lookups (Multiple)
-                let countryNames = [];
+                let cIds = [];
                 if (user.national_id) {
                     let countries = user.national_id;
                     if (typeof countries === 'string') {
@@ -1108,13 +1110,53 @@
                             countries = [countries];
                         }
                     }
-                    let cIds = Array.isArray(countries) ? countries : [countries];
+                    cIds = Array.isArray(countries) ? countries : [countries];
+                }
+                cIds = cIds.map(String);
+
+                if (isCountryView) {
+                    $('#viewContentManagerModal .col-md-4').hide();
+                    $('#viewContentManagerModal .col-md-8').removeClass('col-md-8').addClass('col-md-12');
+                    $('#viewContentManagerModal #info-pane, #viewContentManagerModal #location-tab').hide();
+                    $('#location-pane').addClass('show active');
+
+                    let html = '<div class="row g-3 mt-1">';
+                    $('#country option').each(function () {
+                        let cid = $(this).val();
+                        let cname = $(this).text().trim();
+                        if (cid) {
+                            let checked = cIds.includes(String(cid)) ? 'checked' : '';
+                            html += `
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-check custom-checkbox">
+                                        <input type="checkbox" class="form-check-input assign-country-checkbox" id="country_check_${cid}" value="${cid}" data-user-id="${user.id}" ${checked}>
+                                        <label class="form-check-label" style="margin-left:8px;" for="country_check_${cid}">${cname}</label>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                    html += '</div>';
+                    $('#view-country-full').html(html);
+                    $('#view-country-full').prev('label').text('Assigned Countries');
+
+                } else {
+                    $('#viewContentManagerModal .col-md-4').show();
+                    $('#viewContentManagerModal .col-md-12').removeClass('col-md-12').addClass('col-md-8');
+                    $('#viewContentManagerModal #info-pane, #viewContentManagerModal #location-tab').show();
+                    $('#location-pane').removeClass('show active');
+                    $('#info-pane').addClass('show active');
+                    $('#info-tab').addClass('active');
+                    $('#location-tab').removeClass('active');
+
+                    let countryNames = [];
                     cIds.forEach(cid => {
                         let name = $('#country option[value="' + cid + '"]').text();
                         if (name) countryNames.push(name);
                     });
+                    $('#view-country-full').text(countryNames.length ? countryNames.join(', ') : 'N/A');
+                    $('#view-country-full').prev('label').text('Country');
                 }
-                $('#view-country-full').text(countryNames.length ? countryNames.join(', ') : 'N/A');
 
                 let languageNames = [];
                 if (user.languages) {
@@ -1158,7 +1200,7 @@
                     badgeClass = 'bg-danger';
                     label = 'Rejected';
                 } else if (status === 'inactive' || status === '0') {
-                    badgeClass = 'bg-danger'; // Updated to danger color
+                    badgeClass = 'bg-danger';
                     label = 'Inactive';
                 }
 
@@ -1168,6 +1210,33 @@
                 $('#view-profile-pic').attr('src', avatar);
 
                 $('#viewContentManagerModal').modal('show');
+            });
+        });
+
+        // Update assigned countries on checkbox click
+        $(document).on('change', '.assign-country-checkbox', function () {
+            let userId = $(this).data('user-id');
+            let selectedCountries = [];
+            $('.assign-country-checkbox:checked').each(function () {
+                selectedCountries.push($(this).val());
+            });
+
+            $.ajax({
+                url: "{{ url('admin/content-managers') }}/" + userId + "/assign-countries",
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    countries: selectedCountries
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $('#content-managers-table').DataTable().ajax.reload(null, false);
+                        window.showToast(response.success);
+                    }
+                },
+                error: function () {
+                    window.showToast('Failed to update assigned countries.', 'error');
+                }
             });
         });
     });

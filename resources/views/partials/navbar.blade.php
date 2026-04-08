@@ -148,7 +148,7 @@
                         
                         $currentLanguage=$allLanguages->where('code', $currentLocale)->first();
 
-                        $allCountries = \App\Models\Country::all();
+                        $allCountries = \App\Models\Country::where('status', 'active')->get();
                         if ($role && $role->name === 'Super Admin') {
                         $userCountries = $allCountries;
                         $currentCountryCode = session('admin_country', 'all');

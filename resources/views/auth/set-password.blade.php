@@ -75,12 +75,31 @@
 @section('scripts')
 <script>
   $(document).ready(function() {
+    // Standard show/hide logic for multiple fields
+    $('.show-hide').css('display', 'block'); // Ensure they are visible
+    
+    $('.show-hide span').on('click', function() {
+      var input = $(this).closest('.form-input').find('input');
+      if (input.attr('type') === 'password') {
+        input.attr('type', 'text');
+        $(this).removeClass('show');
+      } else {
+        input.attr('type', 'password');
+        $(this).addClass('show');
+      }
+    });
+
+    // Form submission loader
     $('.theme-form').on('submit', function() {
       var btn = $('#set-password-btn');
       if (!btn.hasClass('loading')) {
         btn.addClass('loading');
         btn.css('pointer-events', 'none');
       }
+      
+      // Reset password types to password before submission for security
+      $('.form-input input').attr('type', 'password');
+      $('.show-hide span').addClass('show');
     });
   });
 </script>
