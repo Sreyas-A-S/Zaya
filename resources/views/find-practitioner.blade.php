@@ -22,6 +22,7 @@
                 <!-- Search Input -->
                 <div class="relative w-full md:w-1/4 search-container">
                     <input id="find_practitioner_search_input" type="text" 
+                        value="{{ $searchQuery ?? request('query') }}"
                         placeholder="{{ $settings['find_practitioner_search_placeholder'] ?? 'Practitioners, Treatments...' }}"
                         autocomplete="off"
                         class="w-full border border-[#db8871] rounded-full px-6 py-3.5 pr-12 text-base md:text-lg text-[#db8871] placeholder-[#db8871] focus:outline-none bg-white transition-colors">
@@ -339,6 +340,7 @@
             function updateSearchResults() {
                 const service = $('input[name="service"]').val();
                 const mode = $('input[name="mode"]').val();
+                const q = ($('#find_practitioner_search_input').val() || '').trim();
                 let url = new URL(window.location.href);
                 
                 if (service) url.searchParams.set('service', service);
@@ -346,6 +348,9 @@
                 
                 if (mode) url.searchParams.set('mode', mode);
                 else url.searchParams.delete('mode');
+
+                if (q) url.searchParams.set('query', q);
+                else url.searchParams.delete('query');
                 
                 url.searchParams.delete('page'); // Reset to page 1 on filter change
                 
@@ -439,6 +444,14 @@
                             }
                         }
                     });
+                });
+
+                // Apply query as a filter (conditions / keywords) when pressing Enter
+                searchInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        updateSearchResults();
+                    }
                 });
             }
 

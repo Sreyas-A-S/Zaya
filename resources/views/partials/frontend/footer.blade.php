@@ -68,18 +68,7 @@
                         <i class="ri-add-line text-2xl md:hidden text-[#2E2E2E]" id="conditions-icon"></i>
                     </div>
                     <ul id="conditions-menu" class="hidden md:block! space-y-4 text-base font-regular text-[#2E2E2E]/80 pt-6 md:pt-0">
-                        <li><a id="footer-life-transitions" href="#"
-                                class="hover:text-[#79584B] transition-colors" data-i18n="Life Transitions">{{ __('Life Transitions') }}</a></li>
-                        <li><a id="footer-mental-imbalance" href="#"
-                                class="hover:text-[#79584B] transition-colors" data-i18n="Mental Imbalance">{{ __('Mental Imbalance') }}</a></li>
-                        <li><a id="footer-stress-reduction" href="#"
-                                class="hover:text-[#79584B] transition-colors" data-i18n="Stress Reduction">{{ __('Stress Reduction') }}</a></li>
-                        <li><a id="footer-toxin-removal" href="#"
-                                class="hover:text-[#79584B] transition-colors" data-i18n="Toxin Removal">{{ __('Toxin Removal') }}</a></li>
-                        <li><a id="footer-chronic-pain" href="#"
-                                class="hover:text-[#79584B] transition-colors" data-i18n="Chronic Pain">{{ __('Chronic Pain') }}</a></li>
-                        <li><a id="footer-immune-support" href="#"
-                                class="hover:text-[#79584B] transition-colors" data-i18n="Immune Support">{{ __('Immune Support') }}</a></li>
+                        <!-- Populated dynamically based on zipcode (or global defaults) -->
                     </ul>
                 </div>
 
@@ -165,9 +154,14 @@
             return;
         }
 
+        const baseUrl = @json(route('find-practitioner'));
+        const rawZip = document.getElementById('footer-zipcode-input') ? (document.getElementById('footer-zipcode-input').getAttribute('data-zipcode') || '') : '';
+        const zipParam = (rawZip && rawZip.length === 6) ? ('&zipcode=' + encodeURIComponent(rawZip)) : '';
+
         conditionsMenu.innerHTML = conditions.slice(0, 6).map(function (label) {
             const safe = String(label).replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            return '<li><a href="#" class="hover:text-[#79584B] transition-colors">' + safe + '</a></li>';
+            const href = baseUrl + '?query=' + encodeURIComponent(label) + zipParam;
+            return '<li><a href="' + href + '" class="hover:text-[#79584B] transition-colors">' + safe + '</a></li>';
         }).join('');
     }
 
@@ -319,7 +313,7 @@ $('#footer-zipcode-delete').click(function(){
 document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('footer-zipcode-input');
     const saved = input ? (input.getAttribute('data-zipcode') || '') : '';
-    if (saved && saved.length === 6) refreshSupportedConditions(saved);
+    refreshSupportedConditions(saved && saved.length === 6 ? saved : null);
 });
 
 function toggleFooterMenu(menuId) {

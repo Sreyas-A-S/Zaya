@@ -214,6 +214,7 @@ class WebController extends Controller
         $settings = HomepageSetting::getAllSettings($language);
 
         $zipcode = trim((string) $request->query('zipcode', $request->query('pincode', session('global_zipcode', session('global_pincode', '')))));
+        $searchQuery = trim((string) $request->query('query', ''));
         $query = Practitioner::with(['user', 'reviews'])
             ->where('status', 'active');
 
@@ -258,6 +259,15 @@ class WebController extends Controller
             // Mode filtering can be added here if practitioners have a mode field
         }
 
+        if ($searchQuery !== '') {
+            $like = '%' . $searchQuery . '%';
+            $query->where(function ($q) use ($like) {
+                $q->where('body_therapies', 'LIKE', $like)
+                  ->orWhere('other_modalities', 'LIKE', $like)
+                  ->orWhere('consultations', 'LIKE', $like);
+            });
+        }
+
         $practitioners = $query->paginate(12)->onEachSide(1)->withQueryString();
         $services = Service::where('status', true)->orderBy('title')->get();
 
@@ -265,7 +275,7 @@ class WebController extends Controller
             return view('partials.frontend.practitioner-grid', compact('practitioners', 'zipcode', 'selectedService'))->render();
         }
 
-        return view('find-practitioner', compact('settings', 'practitioners', 'zipcode', 'services', 'selectedService'));
+        return view('find-practitioner', compact('settings', 'practitioners', 'zipcode', 'services', 'selectedService', 'searchQuery'));
     }
 
     public function findPractitionerPost(Request $request)
@@ -283,21 +293,16 @@ class WebController extends Controller
         $raw = trim((string) $request->query('zipcode', $request->query('pincode', session('global_zipcode', session('global_pincode', '')))));
         $zipcode = substr(preg_replace('/[^0-9]/', '', $raw), 0, 6);
 
-        if (strlen($zipcode) !== 6) {
-            return response()->json([
-                'success' => true,
-                'zipcode' => null,
-                'conditions' => [],
-            ]);
-        }
-
         $conditions = [];
 
-        $rows = Practitioner::query()
-            ->where('status', 'active')
-            ->where('zip_code', 'LIKE', "%{$zipcode}%")
-            ->limit(80)
-            ->get(['body_therapies']);
+        $rowsQuery = Practitioner::query()->where('status', 'active');
+        if (strlen($zipcode) === 6) {
+            $rowsQuery->where('zip_code', 'LIKE', "%{$zipcode}%");
+        } else {
+            $zipcode = null;
+        }
+
+        $rows = $rowsQuery->limit(200)->get(['body_therapies']);
 
         foreach ($rows as $p) {
             $arr = $p->body_therapies ?? [];
