@@ -1702,6 +1702,15 @@ class ProfileController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
+        // Check if email is already taken by another user
+        $exists = \App\Models\User::where('email', $email)
+            ->where('id', '!=', $user->id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json(['success' => false, 'message' => 'This email is already in use by another account.'], 422);
+        }
+
         // Generate 6-digit OTP
         $otp = sprintf("%06d", mt_rand(1, 999999));
 
@@ -1810,6 +1819,19 @@ class ProfileController extends Controller
         ]);
 
         return back()->with('status', 'Review submitted successfully!');
+    }
+
+    public function checkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        $email = $request->email;
+        $currentUser = Auth::user();
+
+        $exists = \App\Models\User::where('email', $email)
+            ->where('id', '!=', $currentUser->id)
+            ->exists();
+
+        return response()->json(['exists' => $exists]);
     }
 
 }
