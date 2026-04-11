@@ -1,4 +1,4 @@
-<div id="zaya-toast" class="fixed top-20 md:top-28 right-4 md:right-8 left-4 md:left-auto z-[100001] opacity-0 pointer-events-none transition-all duration-500 transform -translate-y-10 md:translate-y-0 md:translate-x-[100px]">
+<div id="zaya-toast" class="fixed top-20 md:top-28 right-4 md:right-8 left-4 md:left-auto z-[1000003] opacity-0 pointer-events-none transition-all duration-500 transform -translate-y-10 md:translate-y-0 md:translate-x-[100px]">
     <div id="toast-container" class="bg-[#A8D7C2]/95 backdrop-blur-sm border border-[#95C3AE] rounded-[15px] px-6 py-3 flex items-center gap-4 shadow-[0_12px_40px_rgba(0,0,0,0.12)] min-w-0 md:min-w-[450px] max-w-full md:max-w-[95vw]">
         <!-- Icon Wrapper -->
         <div id="toast-icon-bg" class="shrink-0 w-10 h-10 rounded-full border-[3px] border-white bg-[#4ADE80]/80 flex items-center justify-center">

@@ -48,6 +48,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::post('/complete-profile', [ProfileController::class, 'storeCompleteProfile'])->name('profile.complete.store');
     Route::post('/profile/send-otp', [ProfileController::class, 'sendEmailOTP'])->name('profile.sendOtp');
     Route::post('/profile/verify-otp', [ProfileController::class, 'verifyEmailOTP'])->name('profile.verifyOtp');
+    Route::post('/profile/check-email', [ProfileController::class, 'checkEmail'])->name('profile.checkEmail');
     Route::post('/profile/update-personal', [ProfileController::class, 'updatePersonalDetails'])->name('profile.updatePersonal');
     Route::post('/profile/update-pic', [ProfileController::class, 'updateProfilePic'])->name('profile.updatePic');
     Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');

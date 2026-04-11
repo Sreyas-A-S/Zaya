@@ -827,16 +827,53 @@
         const emailInput = document.getElementById('email-input');
         const originalEmail = emailInput.value;
         const isVerifiedAtStart = !document.getElementById('email-verified-badge').classList.contains('hidden');
+        let checkEmailTimeout;
 
         emailInput.addEventListener('input', function() {
-            if (this.value !== originalEmail) {
+            clearTimeout(checkEmailTimeout);
+            const currentEmail = this.value;
+
+            if (currentEmail !== originalEmail) {
                 document.getElementById('email-verified-badge').classList.add('hidden');
                 document.getElementById('send-otp-btn').classList.remove('hidden');
                 document.getElementById('email-change-warning').classList.remove('hidden');
+
+                if (currentEmail.includes('@') && currentEmail.includes('.')) {
+                    checkEmailTimeout = setTimeout(() => {
+                        fetch('{{ route("profile.checkEmail") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                            },
+                            body: JSON.stringify({ email: currentEmail })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.exists) {
+                                emailInput.classList.add('border-red-500', 'text-red-600');
+                                emailInput.classList.remove('border-gray-200');
+                                if (window.showZayaToast) showZayaToast('This email is already in use.', 'error', 'Duplicate Email');
+                                document.getElementById('send-otp-btn').disabled = true;
+                                document.getElementById('send-otp-btn').classList.add('opacity-50', 'cursor-not-allowed');
+                            } else {
+                                emailInput.classList.remove('border-red-500', 'text-red-600');
+                                emailInput.classList.add('border-gray-200');
+                                document.getElementById('send-otp-btn').disabled = false;
+                                document.getElementById('send-otp-btn').classList.remove('opacity-50', 'cursor-not-allowed');
+                            }
+                        })
+                        .catch(err => console.error('Error checking email:', err));
+                    }, 500);
+                }
             } else if (isVerifiedAtStart) {
                 document.getElementById('email-verified-badge').classList.remove('hidden');
                 document.getElementById('send-otp-btn').classList.add('hidden');
                 document.getElementById('email-change-warning').classList.add('hidden');
+                emailInput.classList.remove('border-red-500', 'text-red-600');
+                emailInput.classList.add('border-gray-200');
+                document.getElementById('send-otp-btn').disabled = false;
+                document.getElementById('send-otp-btn').classList.remove('opacity-50', 'cursor-not-allowed');
             }
         });
 
