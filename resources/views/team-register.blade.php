@@ -162,7 +162,7 @@
             <div class="text-center mb-10">
                 <div class="flex justify-center mb-6">
                     <a href="{{ route('index') }}" aria-label="Zaya Wellness">
-                        <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="h-12 md:h-14 w-auto">
+                        <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="h-16 md:h-20 w-auto">
                     </a>
                 </div>
                 <h1 class="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-primary mb-4">{{ __('Join the ZAYA Collective') }}</h1>
@@ -378,7 +378,7 @@
                             </div>
                         @else
                             <p class="text-gray-500 text-sm md:text-base mb-8">
-                                {{ __('After approval, check your email for a secure to set your password and activate your account.') }}
+                                {{ __('Once your account is approved, you will receive a secure email link to set your password and activate your account.') }}
                             </p>
                         @endif
 
@@ -412,6 +412,7 @@
                                 <button type="submit" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">{{ __('Complete Application') }}</button>
                             </div>
                         </div>
+                    </div>
                     </div>
             </form>
         </div>
@@ -610,6 +611,18 @@
                 });
                 
                 currentTabIndex = index;
+
+                // Hide "Previous" button on the first tab
+                prevBtns.forEach(btn => {
+                    if (index === 0) {
+                        btn.style.visibility = 'hidden';
+                        btn.setAttribute('disabled', 'disabled');
+                    } else {
+                        btn.style.visibility = 'visible';
+                        btn.removeAttribute('disabled');
+                    }
+                });
+
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 

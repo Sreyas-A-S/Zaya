@@ -3,8 +3,13 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Native Language (Optional)') }}</label>
-        <input type="text" name="native_language" value="{{ old('native_language') }}"
+        <select name="native_language" data-tomselect
             class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            <option value="">{{ __('Select') }}</option>
+            @foreach(($languages ?? []) as $lang)
+                <option value="{{ $lang->name }}" @selected(old('native_language') === $lang->name)>{{ $lang->name }}</option>
+            @endforeach
+        </select>
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Translator Type') }} <span class="text-red-500">*</span></label>
@@ -81,6 +86,16 @@
         <input type="url" name="portfolio_link" value="{{ old('portfolio_link') }}"
             class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
             placeholder="https://">
+    </div>
+    <div>
+        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Upload Certificates (Optional)') }}</label>
+        <input type="file" name="certificates[]" multiple
+            class="w-full py-3 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+    </div>
+    <div>
+        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Upload Portfolio/Samples (Optional)') }}</label>
+        <input type="file" name="sample_work[]" multiple
+            class="w-full py-3 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
     </div>
 </div>
 

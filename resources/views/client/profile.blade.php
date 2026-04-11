@@ -135,9 +135,7 @@
         <div class="bg-white rounded-xl px-5 pt-12 pb-5 flex flex-col items-center border border-[#2E4B3D]/12">
             <div class="relative mb-6">
                 @php
-                    $avatar = $user->profile_pic
-                        ? (str_starts_with($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic))
-                        : asset('frontend/assets/profile-dummy-img.png');
+                    $avatar = $user->profile_pic_url;
                 @endphp
                 <img id="user-profile-img" src="{{ $avatar }}"
                     alt="{{ $user->name }}" class="w-38 h-38 rounded-full object-cover"
@@ -336,7 +334,7 @@
             @forelse($servicesHistory as $booking)
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-4 w-[198px]">
-                    <img src="{{ $booking->user->profile_pic ? asset('storage/' . $booking->user->profile_pic) : asset('frontend/assets/profile-dummy-img.png') }}" class="w-13 h-13 rounded-full object-cover">
+                    <img src="{{ $booking->user->profile_pic_url }}" class="w-13 h-13 rounded-full object-cover">
                     <div>
                         <p class="text-base font-medium text-gray-800">{{ $booking->user->name }}</p>
                         <p class="text-sm text-gray-400 mt-0.5">{{ \Carbon\Carbon::parse($booking->booking_date)->isToday() ? 'Today' : (\Carbon\Carbon::parse($booking->booking_date)->isYesterday() ? 'Yesterday' : \Carbon\Carbon::parse($booking->booking_date)->format('M d, Y')) }}</p>
@@ -374,7 +372,7 @@
             @forelse($upcomingServices as $booking)
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-4 w-[198px]">
-                    <img src="{{ $booking->user->profile_pic ? asset('storage/' . $booking->user->profile_pic) : asset('frontend/assets/profile-dummy-img.png') }}" class="w-13 h-13 rounded-full object-cover">
+                    <img src="{{ $booking->user->profile_pic_url }}" class="w-13 h-13 rounded-full object-cover">
                     <div>
                         <p class="text-base font-medium text-gray-800">{{ $booking->user->name }}</p>
                         <p class="text-sm text-gray-400 mt-0.5">{{ \Carbon\Carbon::parse($booking->booking_date)->isToday() ? 'Today' : \Carbon\Carbon::parse($booking->booking_date)->format('M d, Y') }}</p>

@@ -309,14 +309,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
-                            <select class="form-select" name="payout_currency" required id="client_payout_currency">
-                                @foreach($currencies as $code => $symbol)
-                                <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
-                                @endforeach
-                            </select>
-                        </div>
+                       
                         <div class="col-md-3">
                             <label class="form-label">Password <span class="text-danger">*</span> <span class="text-muted small" id="password-hint">(New clients only)</span></label>
                             <input type="password" class="form-control" name="password" id="password-input"

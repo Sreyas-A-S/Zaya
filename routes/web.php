@@ -82,9 +82,9 @@ Route::get('/open-register/{role}/signature={token}', function (string $role, st
     if (strtolower(trim((string) ($link->status ?? 'active'))) !== 'active') {
         abort(403, 'This link is inactive.');
     }
-    if ($link->used_at) {
-        abort(403, 'This link has already been used.');
-    }
+    // if ($link->used_at) {
+    //     abort(403, 'This link has already been used.');
+    // }
 
     if ($link->expires_at && now()->greaterThan($link->expires_at)) {
         abort(403, 'This link has expired.');

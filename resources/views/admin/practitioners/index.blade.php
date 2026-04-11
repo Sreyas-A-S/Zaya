@@ -1043,10 +1043,7 @@
                 },
                 {
                     data: 'nationality',
-                    name: 'practitioners.nationality',
-                    render: function(data, type, row) {
-                        return formatCountryWithFlag(data || row.country);
-                    }
+                    name: 'practitioners.nationality'
                 },
                 {
                     data: 'status',
@@ -1749,6 +1746,7 @@
                             <p class="mb-1"><strong>Phone:</strong> ${p.phone || 'N/A'}</p>
                             <p class="mb-1"><strong>Nationality:</strong> ${getCountryName(p.nationality) || getCountryName(p.country) || 'N/A'}</p>
                             <p class="mb-1"><strong>Location:</strong> ${[p.city, p.state, getCountryName(p.country)].filter(Boolean).join(', ') || 'N/A'}</p>
+                            <p class="mb-1"><strong>Payout Currency:</strong> ${p.payout_currency || 'N/A'}</p>
                             <p class="mb-1"><strong>Gender:</strong> ${p.gender ? p.gender.charAt(0).toUpperCase() + p.gender.slice(1) : 'N/A'}</p>
                             <p class="mb-1"><strong>DOB:</strong> ${p.dob ? new Date(p.dob).toLocaleDateString() : 'N/A'}</p>
                             <div class="d-flex justify-content-center gap-2 mt-3">

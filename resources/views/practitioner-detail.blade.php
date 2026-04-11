@@ -4,7 +4,7 @@
     @php
         $firstName = $practitioner->first_name ?? $practitioner->user->first_name ?? 'Professional';
         $lastName = $practitioner->last_name ?? $practitioner->user->last_name ?? '';
-        $bio = $practitioner->profile_bio ?? $practitioner->short_doctor_bio ?? $practitioner->short_bio ?? '';
+        $bio = $practitioner->profile_bio ?? '';
         $photo = $practitioner->profile_photo_path ?? $practitioner->profile_pic ?? '';
 
         $serviceTitle = isset($selectedService) ? ($selectedService->title ?? '') : '';
@@ -44,7 +44,7 @@
 
                 <!-- Left Image (Practitioner) -->
                 <div class="w-full md:w-5/12 relative pt-10 flex items-end justify-center">
-                    <img src="{{ $photo ? asset('storage/' . $photo) : asset('frontend/assets/lilly-profile-pic.png') }}" alt="{{ $firstName }}" class="h-full">
+                    <img src="{{ optional($practitioner->user)->profile_pic_url ?? asset('frontend/assets/lilly-profile-pic.png') }}" alt="{{ $firstName }}" class="h-full">
                 </div>
 
                 <!-- Right Content -->
@@ -53,9 +53,14 @@
                     <h2 class="text-3xl md:text-4xl font-sans! font-medium text-primary mb-7 leading-tight">
                         {{ $subtitle }}
                     </h2>
-                    <p class="text-[#404040] mb-10 max-w-xl leading-relaxed text-base opacity-80">
-                        {{ $serviceDescription !== '' ? $serviceDescription : $bio }}
-                    </p>
+                    <div class="text-[#404040] mb-10 max-w-xl leading-relaxed text-base opacity-80 space-y-4">
+                        @if($serviceDescription !== '')
+                            <p>{{ $serviceDescription }}</p>
+                        @endif
+                        @if($bio !== '')
+                            <p>{{ $bio }}</p>
+                        @endif
+                    </div>
 
                     <div class="flex flex-col items-start gap-10">
                         @php

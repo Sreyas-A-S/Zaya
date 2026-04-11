@@ -232,6 +232,46 @@ class User extends Authenticatable implements JWTSubject
         return url('/dashboard');
     }
 
+    public function getProfilePicUrlAttribute()
+    {
+        // 1. Check direct profile_pic on User
+        $pic = $this->profile_pic;
+        
+        // 2. Check for role-specific photo path attributes that might be on the model (e.g. from joins)
+        if (!$pic) {
+            if (isset($this->profile_photo_path) && $this->profile_photo_path) {
+                $pic = $this->profile_photo_path;
+            } elseif (isset($this->dr_profile_pic) && $this->dr_profile_pic) {
+                $pic = $this->dr_profile_pic;
+            }
+        }
+
+        // 3. Fallback to relationship if still not found
+        if (!$pic) {
+            $profile = $this->profile;
+            if ($profile) {
+                if (isset($profile->profile_photo_path) && $profile->profile_photo_path) {
+                    $pic = $profile->profile_photo_path;
+                } elseif (isset($profile->profile_pic) && $profile->profile_pic) {
+                    $pic = $profile->profile_pic;
+                }
+            }
+        }
+
+        if ($pic) {
+            if (str_starts_with($pic, 'http')) {
+                return $pic;
+            }
+            return asset('storage/' . $pic);
+        }
+
+        // Return a consistent placeholder based on role or a safe default
+        if ($this->role && in_array($this->role, ['client', 'patient'])) {
+            return asset('frontend/assets/profile-dummy-img.png');
+        }
+        return asset('admiro/assets/images/user/user.png');
+    }
+
     public function practitionerTransactions()
     {
         return $this->hasMany(Transaction::class, 'practitioner_id');

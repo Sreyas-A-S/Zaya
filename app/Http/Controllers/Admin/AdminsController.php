@@ -42,6 +42,7 @@ class AdminsController extends Controller
             $query = User::whereIn('role', ['admin', 'super-admin'])
             ->select([
                 'users.id',
+                'users.role',
                 'users.name',
                 'users.email',
                 'users.phone',

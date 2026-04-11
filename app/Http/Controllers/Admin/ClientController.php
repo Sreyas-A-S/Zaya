@@ -42,6 +42,7 @@ class ClientController extends Controller
                 ->leftJoin('patients', 'users.id', '=', 'patients.user_id')
                 ->select([
                     'users.id',
+                    'users.role',
                     'users.first_name',
                     'users.middle_name',
                     'users.last_name',
@@ -95,8 +96,7 @@ class ClientController extends Controller
                     return $row->created_at ? $row->created_at->format('Y-m-d H:i') : '';
                 })
                 ->editColumn('profile_photo', function ($row) {
-                    $url = $row->profile_photo_path ? asset('storage/' . $row->profile_photo_path) : asset('admiro/assets/images/user/user.png');
-                    return '<img src="' . $url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
+                    return '<img src="' . $row->profile_pic_url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
                 })
                 ->editColumn('phone', function ($row) {
                     if (!$row->phone) return 'N/A';

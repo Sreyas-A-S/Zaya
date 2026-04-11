@@ -117,11 +117,16 @@ class RegisterController extends Controller
                     ]);
                 }
 
-                if ($openRegisterLink->used_at) {
-                    throw ValidationException::withMessages([
-                        'open_register_token' => 'This registration link has already been used.',
+                // Check if this email already registered with this link
+                $existingRegistration = \App\Models\User::where('email', $request->email)->first();
+                if ($existingRegistration) {
+                     throw ValidationException::withMessages([
+                        'email' => 'This email address has already been used to register.',
                     ]);
                 }
+                
+                // Track usage per link if needed, but not as a single-use lock
+                $openRegisterLink->increment('usage_count');
 
                 if ($openRegisterLink->expires_at && now()->greaterThan($openRegisterLink->expires_at)) {
                     throw ValidationException::withMessages([
@@ -162,13 +167,14 @@ class RegisterController extends Controller
                 $this->createPatientProfile($user, $request);
             }
 
-            if ($openRegisterLink) {
-                $update = ['used_at' => now()];
-                if (Schema::hasColumn('open_register_links', 'used_by')) {
-                    $update['used_by'] = $user->id;
-                }
-                $openRegisterLink->fill($update)->save();
-            }
+            // Removed link usage update as links are now multi-use.
+            // if ($openRegisterLink) {
+            //     $update = ['used_at' => now()];
+            //     if (Schema::hasColumn('open_register_links', 'used_by')) {
+            //         $update['used_by'] = $user->id;
+            //     }
+            //     $openRegisterLink->fill($update)->save();
+            // }
 
             DB::commit();
 
@@ -239,8 +245,8 @@ class RegisterController extends Controller
                 }
 
                 return redirect()
-                    ->route('login')
-                    ->with('status', 'Registration successful! Please log in.');
+                    ->route('zaya-login')
+                    ->with('success', 'Registration successful! Your application is under review.');
             }
 
             $this->guard()->login($user);

@@ -118,7 +118,11 @@ class ProfileCompletionService
                 if ($field === 'user' || $field === 'consents') continue;
 
                 $totalFields++;
-                $value = $profile->$field;
+                try {
+                    $value = $profile->$field;
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    $value = null;
+                }
                 
                 if (is_array($value)) {
                     if (count($value) > 0) {

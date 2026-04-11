@@ -323,7 +323,7 @@
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body text-center p-4">
                     <div class="mb-3 text-center d-flex justify-content-center">
-                        <img class="rounded-circle border p-1" src="{{ $user->profile_pic ? '/storage/' . $user->profile_pic : asset('admiro/assets/images/user/user.png') }}" alt="profile" style="width: 120px; height: 120px; object-fit: cover;">
+                        <img class="rounded-circle border p-1" src="{{ $user->profile_pic_url }}" alt="profile" style="width: 120px; height: 120px; object-fit: cover;">
                     </div>
                     <h4 class="mb-1 f-w-600">{{ $user->first_name }} {{ $user->last_name }}</h4>
                     <p class="text-muted text-capitalize mb-4">{{ $user->role }}</p>
@@ -406,7 +406,7 @@
                                     <label for="imageUpload"><i class="fa-solid fa-pencil"></i></label>
                                 </div>
                                 <div class="avatar-preview">
-                                    <div id="imagePreview" style="background-image: url('{{ $user->profile_pic ? '/storage/' . $user->profile_pic : asset('admiro/assets/images/user/user.png') }}');">
+                                    <div id="imagePreview" style="background-image: url('{{ $user->profile_pic_url }}');">
                                     </div>
                                 </div>
                             </div>

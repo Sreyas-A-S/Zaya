@@ -18,7 +18,7 @@
             <!-- Avatar -->
             <div
                 class="w-32 h-32 md:w-[150px] md:h-[150px] mb-4 overflow-hidden rounded-full border border-gray-100">
-                <img src="{{ $p->profile_photo_path ? asset('storage/' . $p->profile_photo_path) : asset('frontend/assets/lilly-profile-pic.png') }}"
+                <img src="{{ optional($p->user)->profile_pic_url ?? asset('frontend/assets/lilly-profile-pic.png') }}"
                     alt="{{ $p->first_name }}"
                     class="w-full h-full object-cover rounded-full transition-transform duration-500 group-hover:scale-110">
             </div>
@@ -31,7 +31,7 @@
 
             <!-- Role -->
             <p class="font-serif text-sm md:text-base lg:text-lg italic text-secondary mt-0.5">
-                {{ optional($selectedService)->title ?: ($p->other_modalities[0] ?? ($p->consultations[0] ?? 'Holistic Practitioner')) }}
+                {{ optional($selectedService)->title ?: $p->subtitle_display }}
             </p>
 
             <!-- Location -->
@@ -40,11 +40,15 @@
                 <span>{{ $p->city_state }}</span>
             </div>
 
+            <!-- Bio -->
+            @if($p->profile_bio)
+                <p class="mt-2 text-xs text-gray-400 line-clamp-2 px-4 italic">
+                    {{ Str::limit(strip_tags($p->profile_bio), 100) }}
+                </p>
+            @endif
+
             @php
-                $conditions = $p->body_therapies ?? $p->health_conditions_treated ?? $p->services_offered ?? [];
-                if (!is_array($conditions)) $conditions = [$conditions];
-                $conditions = array_values(array_unique(array_filter($conditions, fn ($v) => trim((string) $v) !== '')));
-                $conditions = array_slice($conditions, 0, 3);
+                $conditions = array_slice($p->expertises_list, 0, 3);
             @endphp
 
             @if(!empty($conditions))

@@ -46,6 +46,11 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(SocialiteWasCalled::class, [AppleExtendSocialite::class, 'handle']);
 
+        // Set locale from session
+        if (Session::has('locale')) {
+            App::setLocale(Session::get('locale'));
+        }
+
         view()->composer('*', function ($view) {
             $language = App::getLocale();
             $settings = collect();

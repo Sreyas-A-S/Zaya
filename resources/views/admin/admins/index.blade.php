@@ -999,7 +999,9 @@
                 $('#viewAdminModal .section-title').show();
                 $('#view-nationality').closest('.col-md-12').removeClass('col-md-12').addClass('col-md-6');
 
-                if (cIds.length > 0 && !countryNames.length) {
+                // Reset list to ensure we collect all currently assigned IDs
+                countryNames = [];
+                if (cIds.length > 0) {
                     cIds.forEach(cid => {
                         let option = $('#edit_country option').filter(function() {
                             return String($(this).val()) === String(cid);
