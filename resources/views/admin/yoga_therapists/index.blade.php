@@ -1279,7 +1279,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 if (id) formData.append('_method', 'PUT');
 
                 let btn = $('#submit-btn');
-                btn.prop('disabled', true).html('Saving...');
+                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
 
                 $.ajax({
                     url: url,

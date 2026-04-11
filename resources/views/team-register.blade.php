@@ -153,6 +153,27 @@
         select[data-tomselect] {
             display: none !important;
         }
+
+        /* Button Loader Styles */
+        .btn-loader {
+            display: inline-block;
+            width: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            vertical-align: middle;
+        }
+
+        button[type="submit"].loading .btn-loader {
+            width: 18px;
+            opacity: 1;
+            margin-right: 8px;
+        }
+        
+        button[type="submit"].loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
     </style>
 </head>
 
@@ -398,7 +419,9 @@
                             <button type="button" class="prev-tab-btn w-full sm:w-auto border border-[#D1D5DB] text-gray-700 py-3.5 px-8 rounded-full font-semibold text-lg transition-all hover:bg-gray-50"><i class="ri-arrow-left-line mr-2 align-middle"></i> {{ __('Previous') }}</button>
                             <div class="flex gap-4 items-center w-full sm:w-auto justify-end">
                                 <a href="{{ route('index') }}" class="text-gray-500 hover:text-gray-700 font-medium transition-colors hidden sm:block">{{ __('Cancel') }}</a>
-                                <button type="submit" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">{{ __('Complete Application') }}</button>
+                                <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">
+                                    <i class="ri-loader-4-line ri-spin btn-loader"></i>{{ __('Complete Application') }}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -747,6 +770,18 @@
                     }
                 });
             });
+            
+            // Handle form submission with loading state
+            const registerForm = document.querySelector('form[action*="register"]');
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    const submitBtn = document.getElementById('submit-btn');
+                    if (submitBtn) {
+                        submitBtn.classList.add('loading');
+                        submitBtn.style.pointerEvents = 'none';
+                    }
+                });
+            }
 
         });
     </script>

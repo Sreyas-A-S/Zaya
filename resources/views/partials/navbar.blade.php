@@ -133,10 +133,13 @@
                         return strtolower($iso) ?: 'us' ;
                         }
                         }
-                        if ($role && $role->name === 'Super Admin') {
-                        $currentLocale = session('locale', 'all');
+                        $adminRoleSlugs = ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
+                        $userRoleSlug = strtolower(str_replace(' ', '-', $user?->role));
+
+                        if (in_array($userRoleSlug, $adminRoleSlugs)) {
+                            $currentLocale = session('locale', 'all');
                         } else {
-                        $currentLocale = session('locale', config('app.locale', 'en'));
+                            $currentLocale = session('locale', config('app.locale', 'en'));
                         }
 
                         // Language Fallback logic
@@ -161,10 +164,10 @@
                             } else {
                                 $userCountries = $allCountries->where('id', $assignedCountryIds);
                             }
-                            $currentCountryCode = session('admin_country');
-                            if ($currentCountryCode === 'all' || !$userCountries->where('code', strtoupper($currentCountryCode))->first()) {
+                            $currentCountryCode = session('admin_country', 'all');
+                            if ($currentCountryCode !== 'all' && !$userCountries->where('code', strtoupper($currentCountryCode))->first()) {
                                 $firstCountry = $userCountries->first();
-                                $currentCountryCode = $firstCountry ? strtolower($firstCountry->code) : 'us';
+                                $currentCountryCode = $firstCountry ? strtolower($firstCountry->code) : 'all';
                                 session(['admin_country' => $currentCountryCode]);
                             }
                         }
@@ -185,7 +188,7 @@
                                 <span class="f-w-700 text-dark small">{{ __('SELECT LANGUAGE') }}</span>
                             </div>
                             <ul class="profile-body language-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
-                                @if(in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
+                                @if(in_array($userRoleSlug, $adminRoleSlugs))
                                 <li class="d-flex align-items-center last-0" style="cursor: pointer;">
                                     <a href="javascript:void(0)"
                                         class="lang d-flex align-items-center w-100 {{ $currentLocale == 'all' ? 'active text-primary' : '' }}"
@@ -231,7 +234,7 @@
                         @if($currentCountryCode !== 'all')
                         <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentCountry ? strtolower($currentCountry->code) : 'us') . '.svg') }}" style="width: 20px; height: 14px; border: 1px solid #eee; border-radius: 2px;" alt="flag">
                         @endif
-                        <h6 class="country-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentCountryCode === 'all' ? 'ALL' : ($currentCountry ? strtoupper($currentCountry->code) : 'US') }}</h6>
+                        <h6 class="country-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentCountryCode === 'all' ? 'ALL REGIONS' : ($currentCountry ? strtoupper($currentCountry->code) : 'US') }}</h6>
                     </a>
 
                     <div class="custom-menu overflow-hidden">
@@ -341,7 +344,7 @@
                             currentLangImg.style.display = 'block';
                         }
                     }
-                    if (currentLangText) currentLangText.textContent = langName;
+                    if (currentLangText) currentLangText.textContent = id === 'all' ? 'EN' : langName;
 
                     // 2. Update localStorage
                     localStorage.setItem('selectedLanguage', id);
@@ -391,7 +394,7 @@
                             currentImg.style.display = 'block';
                         }
                     }
-                    if (currentTxt) currentTxt.textContent = code.toUpperCase();
+                    if (currentTxt) currentTxt.textContent = code === 'all' ? 'ALL REGIONS' : code.toUpperCase();
 
                     // Update active state
                     document.querySelectorAll('.country-menu-list .lang').forEach(el => {

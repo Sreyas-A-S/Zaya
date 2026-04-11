@@ -414,6 +414,27 @@
         .animate-pop-in {
             animation: popIn 0.3s ease-out forwards;
         }
+
+        /* Button Loader Styles */
+        .btn-loader {
+            display: inline-block;
+            width: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            vertical-align: middle;
+        }
+
+        button.loading .btn-loader {
+            width: 18px;
+            opacity: 1;
+            margin-right: 8px;
+        }
+        
+        button.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
 </style>
 </head>
 
@@ -833,7 +854,9 @@
         <div class="container mx-auto px-4">
             <div class="max-w-5xl mx-auto flex items-center justify-end gap-4 md:gap-8">
                 <a href="{{ route('zaya-login') }}" class="btn-cancel">{{ __('Cancel') }}</a>
-                <button type="submit" form="registration-form" class="btn-create">{{ __('Create Account') }}</button>
+                <button type="submit" id="submit-btn" form="registration-form" class="btn-create">
+                    <i class="ri-loader-4-line ri-spin btn-loader"></i>{{ __('Create Account') }}
+                </button>
             </div>
         </div>
     </footer>
@@ -841,6 +864,16 @@
     <script>
         // Custom Select Logic (Generic)
         document.addEventListener('DOMContentLoaded', function () {
+            // Handle form submission with loading state
+            const registrationForm = document.getElementById('registration-form');
+            if (registrationForm) {
+                registrationForm.addEventListener('submit', function() {
+                    const submitBtn = document.getElementById('submit-btn');
+                    if (submitBtn) {
+                        submitBtn.classList.add('loading');
+                    }
+                });
+            }
             function setupCustomSelect(selectId, inputId, selectedId, flagId = null) {
                 const select = document.getElementById(selectId);
                 const input = document.getElementById(inputId);

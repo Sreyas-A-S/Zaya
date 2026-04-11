@@ -91,7 +91,28 @@
   <script src="{{ asset('admiro/assets/js/vendors/bootstrap/dist/js/popper.min.js') }}" defer=""></script>
 
   <!-- password_show-->
-  <script src="{{ asset('admiro/assets/js/password.js') }}"></script>
+  {{-- <script src="{{ asset('admiro/assets/js/password.js') }}"></script> --}}
+  <script>
+    function togglePasswordVisibility(inputId, toggleEl) {
+      const input = typeof inputId === 'string' ? document.getElementById(inputId) : inputId;
+      if (!input) return;
+      
+      const span = toggleEl.querySelector('span');
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (span) {
+          span.classList.remove('show');
+          // Update text based on common template patterns or just let CSS handle it
+          // In this template, .show class likely hides the word 'show' or shows 'hide'
+        }
+      } else {
+        input.type = 'password';
+        if (span) {
+          span.classList.add('show');
+        }
+      }
+    }
+  </script>
   <!-- custom script -->
   <script src="{{ asset('admiro/assets/js/script.js') }}"></script>
   @yield('scripts')

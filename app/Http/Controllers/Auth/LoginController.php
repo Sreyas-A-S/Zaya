@@ -78,7 +78,7 @@ class LoginController extends Controller
                 return redirect()->route('admin.login')->with('error', $blockReason);
             }
 
-            $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
+            $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Finance Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'financial-manager', 'finance-manager', 'content-manager', 'user-manager'];
 
             if (in_array(auth()->user()->role, $adminRoles)) {
                 return redirect()->intended('/admin');

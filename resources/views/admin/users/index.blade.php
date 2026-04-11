@@ -254,7 +254,7 @@
         });
 
         function submitForm(form, btn, modalId, url, type) {
-            btn.html('Sending..');
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
             $.ajax({
                 data: form.serialize(),
                 url: url,
@@ -265,11 +265,11 @@
                     $('#user_id').val(''); // Clear ID after success
                     if (modalId) $(modalId).modal('hide');
                     table.draw();
-                    btn.html('Save');
+                    btn.prop('disabled', false).html('Save');
                 },
                 error: function(data) {
                     console.log('Error:', data);
-                    btn.html('Save');
+                    btn.prop('disabled', false).html('Save');
                     // Add error handling alert here if needed
                     alert('Something went wrong!');
                 }
