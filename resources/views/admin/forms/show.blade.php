@@ -52,13 +52,17 @@
 
                     <hr>
 
-                    <h5 class="mb-2">Registered Users ({{ $link->used_at ? 1 : 0 }})</h5>
+                    @php
+                        $users = collect($link->registeredUsers ?? []);
+                        if ($hasUsedByColumn && $link->usedBy) {
+                            $users->push($link->usedBy);
+                        }
+                        $uniqueUsers = $users->unique('id')->values();
+                    @endphp
 
-                    @if($link->used_at && !$hasUsedByColumn)
-                        <div class="alert alert-info mb-0">
-                            This link was used, but your database does not have the <code>used_by</code> column yet. Run migrations to enable showing the registered user.
-                        </div>
-                    @elseif($hasUsedByColumn && $link->usedBy)
+                    <h5 class="mb-2">Registered Users ({{ $uniqueUsers->count() }})</h5>
+
+                    @if($uniqueUsers->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-bordered mb-0">
                                 <thead>
@@ -71,13 +75,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @foreach($uniqueUsers as $user)
                                     <tr>
-                                        <td>{{ $link->usedBy->id }}</td>
-                                        <td>{{ $link->usedBy->name }}</td>
-                                        <td>{{ $link->usedBy->email }}</td>
-                                        <td>{{ ucwords(str_replace('_', ' ', (string) $link->usedBy->role)) }}</td>
-                                        <td>{{ optional($link->usedBy->created_at)->format('Y-m-d H:i:s') ?? '—' }}</td>
+                                        <td>{{ $user->id }}</td>
+                                        <td>{{ $user->name ?? trim($user->first_name . ' ' . $user->last_name) }}</td>
+                                        <td>{{ $user->email }}</td>
+                                        <td>{{ ucwords(str_replace('_', ' ', (string) $user->role)) }}</td>
+                                        <td>{{ optional($user->created_at)->format('Y-m-d H:i:s') ?? '—' }}</td>
                                     </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

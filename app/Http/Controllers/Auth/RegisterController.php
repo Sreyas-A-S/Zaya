@@ -126,8 +126,9 @@ class RegisterController extends Controller
                 }
                 
                 // Track usage per link if needed, but not as a single-use lock
-                $openRegisterLink->increment('usage_count');
-
+                if (Schema::hasColumn('open_register_links', 'usage_count')) {
+                    $openRegisterLink->increment('usage_count');
+                }
                 if ($openRegisterLink->expires_at && now()->greaterThan($openRegisterLink->expires_at)) {
                     throw ValidationException::withMessages([
                         'open_register_token' => 'This registration link has expired.',
@@ -611,16 +612,6 @@ class RegisterController extends Controller
             $practitionerData['profile_photo_path'] = $request->file('profile_photo')->store('mindfulness_photos', 'public');
         }
 
-        if ($request->hasFile('certificates')) {
-            $paths = [];
-            foreach ((array) $request->file('certificates') as $file) {
-                if ($file) {
-                    $paths[] = $file->store('mindfulness_docs', 'public');
-                }
-            }
-            $practitionerData['certificates_path'] = $paths;
-        }
-
         if ($request->hasFile('gov_id_upload')) {
             $practitionerData['gov_id_upload_path'] = $request->file('gov_id_upload')->store('mindfulness_docs', 'public');
         }
@@ -770,6 +761,16 @@ class RegisterController extends Controller
         }
 
         if ($request->hasFile('gov_id_upload')) {
+            $paths = [];
+            foreach ((array) $request->file('sample_work') as $file) {
+                if ($file) {
+                    $paths[] = $file->store('translator_docs', 'public');
+                }
+            }
+            $translatorData['sample_work_path'] = $paths;
+        }
+
+        if ($request->hasFile('gov_id_upload')) {
             $translatorData['gov_id_upload_path'] = $request->file('gov_id_upload')->store('translator_docs', 'public');
         }
 
@@ -788,7 +789,15 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        $requiresPassword = empty($data['open_register_token']);
+        $teamRoles = [
+            'practitioner',
+            'doctor',
+            'mindfulness_practitioner',
+            'yoga_therapist',
+            'translator',
+        ];
+        $isTeamRole = isset($data['role']) && in_array($data['role'], $teamRoles, true);
+        $requiresPassword = empty($data['open_register_token']) && !$isTeamRole;
 
         $rules = [
             'name' => ['nullable', 'string', 'max:255'],
@@ -982,6 +991,7 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($rawPassword),
             'role' => $data['role'],
+            'open_register_link_id' => !empty($data['open_register_token']) ? \App\Models\OpenRegisterLink::where('token', $data['open_register_token'])->value('id') : null,
         ]);
     }
     /**
@@ -995,7 +1005,9 @@ class RegisterController extends Controller
     {
         if (in_array($request->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist', 'translator'], true)) {
             $this->guard()->logout();
-            return redirect()->route('zaya-login')->with('success', 'Thank you! Your application has been submitted and is under review.');
+            // Assuming you have a route named 'registration.success' or similar. 
+            // If not, redirecting to a generic 'home' or specific info page is safer.
+            return redirect()->route('index')->with('success', 'Thank you! Your application has been submitted and is under review.');
         }
 
         if ($request->has('redirect')) {
