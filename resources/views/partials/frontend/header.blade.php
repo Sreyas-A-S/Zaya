@@ -1,4 +1,8 @@
 <!-- Header -->
+@php
+    $adminRoles = ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
+    $isFrontendUser = Auth::check() && !in_array(Auth::user()->role, $adminRoles);
+@endphp
 <header class="fixed w-full top-0 z-50 transition-all duration-300 py-8 px-4 bg-white">
     <div class="container mx-auto flex justify-between items-center relative">
 
@@ -76,10 +80,10 @@
 
         <!-- Right Actions (Desktop) -->
         <div class="flex items-center gap-6 xl:gap-8 justify-end flex-1">
-            @guest
+            @if(!$isFrontendUser)
             <a id="nav-login" href="{{ route('zaya-login') }}"
                 class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors" data-i18n="Login">{{ __($site_settings['nav_login'] ?? 'Login') }}</a>
-            @endguest
+            @endif
 
             <a id="nav-find-practitioner" href="{{ route('find-practitioner') }}"
                 class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap" data-i18n="Find Practitioner">{{ __($site_settings['nav_find_practitioner'] ?? 'Find Practitioner') }}</a>
@@ -107,7 +111,7 @@
             @endif
 
             <!-- User Profile (Desktop) -->
-            @auth
+            @if($isFrontendUser)
             <div class="relative group ml-1 hidden lg:inline-block">
                 <button class="relative shrink-0 focus:outline-none py-4">
                     @php
@@ -124,7 +128,7 @@
                 <!-- Profile Dropdown -->
                 <div class="absolute top-full right-0 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden z-[60]">
                     <div class="py-2">
-                        <a href="{{ in_array($user->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']) ? route('admin.dashboard') : route('dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
+                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
                             <i class="ri-dashboard-line text-lg"></i> {{ __('Dashboard') }}
                         </a>
                         <a href="{{ route('profile') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
@@ -139,7 +143,7 @@
                     </div>
                 </div>
             </div>
-            @endauth
+            @endif
         </div>
     </div>
 
@@ -187,13 +191,14 @@
 
         <a id="nav-contact-us-mobile" href="{{ route('contact-us') }}"
             class="text-lg font-medium text-secondary border-b border-gray-50 pb-2" data-i18n="Contact Us">{{ __($site_settings['footer_link_contact_us'] ?? 'Contact Us') }}</a>
-        @auth
-        <a id="nav-dashboard-mobile" href="{{ in_array(Auth::user()->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']) ? route('admin.dashboard') : route('dashboard') }}" class="text-lg font-medium text-secondary pb-2 flex items-center gap-3">
+        
+        @if($isFrontendUser)
+        <a id="nav-dashboard-mobile" href="{{ route('dashboard') }}" class="text-lg font-medium text-secondary pb-2 flex items-center gap-3">
             <i class="ri-user-3-line"></i> {{ __('Profile') }}
         </a>
         @else
         <a id="nav-login-mobile" href="{{ route('zaya-login') }}" class="text-lg font-medium text-secondary pb-2" data-i18n="Login">{{ __($site_settings['nav_login'] ?? 'Login') }}</a>
-        @endauth
+        @endif
 
         <div class="pt-2">
             <a id="nav-find-practitioner-mobile" href="{{ route('find-practitioner') }}"
@@ -352,21 +357,22 @@
         });
     </script>
 
-    <!-- Logout Confirmation Modal -->
-    <div id="logoutConfirmModalHeader" class="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
-        <div class="bg-white rounded-[40px] w-full max-w-[340px] overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-200" id="logoutModalContentHeader">
-            <div class="p-10 text-center">
-                <div class="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-red-100">
-                    <i class="ri-logout-box-r-line text-4xl"></i>
-                </div>
-                <h3 class="text-2xl font-black text-secondary mb-3 tracking-tight">{{ __('Confirm Logout?') }}</h3>
-                <p class="text-gray-500 mb-8 leading-relaxed font-medium text-base">{{ __('Are you sure you want to end your session and logout?') }}</p>
-                
-                <div class="flex flex-col gap-3">
-                    <button type="button" onclick="document.getElementById('logout-form-desktop').submit();" class="w-full py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 transition-all text-lg shadow-xl shadow-red-200">{{ __('Yes, Logout') }}</button>
-                    <button type="button" onclick="closeLogoutModalHeader()" class="w-full py-4 bg-gray-50 text-gray-500 font-black rounded-2xl hover:bg-gray-100 transition-all text-lg">{{ __('Cancel') }}</button>
-                </div>
+</header>
+
+<!-- Logout Confirmation Modal -->
+<div id="logoutConfirmModalHeader" class="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[40px] w-full max-w-[340px] overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-200" id="logoutModalContentHeader">
+        <div class="p-10 text-center">
+            <div class="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-red-100">
+                <i class="ri-logout-box-r-line text-4xl"></i>
+            </div>
+            <h3 class="text-2xl font-black text-secondary mb-3 tracking-tight">{{ __('Confirm Logout?') }}</h3>
+            <p class="text-gray-500 mb-8 leading-relaxed font-medium text-base">{{ __('Are you sure you want to end your session and logout?') }}</p>
+            
+            <div class="flex flex-col gap-3">
+                <button type="button" onclick="document.getElementById('logout-form-desktop').submit();" class="w-full py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 transition-all text-lg shadow-xl shadow-red-200">{{ __('Yes, Logout') }}</button>
+                <button type="button" onclick="closeLogoutModalHeader()" class="w-full py-4 bg-gray-50 text-gray-500 font-black rounded-2xl hover:bg-gray-100 transition-all text-lg">{{ __('Cancel') }}</button>
             </div>
         </div>
     </div>
-</header>
+</div>

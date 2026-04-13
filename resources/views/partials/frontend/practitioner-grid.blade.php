@@ -40,13 +40,6 @@
                 <span>{{ $p->city_state }}</span>
             </div>
 
-            <!-- Bio -->
-            @if($p->profile_bio)
-                <p class="mt-2 text-xs text-gray-400 line-clamp-2 px-4 italic">
-                    {{ Str::limit(strip_tags($p->profile_bio), 100) }}
-                </p>
-            @endif
-
             @php
                 $conditions = array_slice($p->expertises_list, 0, 3);
             @endphp

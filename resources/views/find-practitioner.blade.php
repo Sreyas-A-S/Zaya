@@ -310,7 +310,32 @@
                         }
                     });
                     dropdown.classList.toggle('dropdown-open');
+
+                    // Focus search input and reset items if exists
+                    const searchInput = dropdown.querySelector('.dropdown-search-input');
+                    if (dropdown.classList.contains('dropdown-open') && searchInput) {
+                        searchInput.value = '';
+                        items.forEach(item => item.style.display = '');
+                        setTimeout(() => searchInput.focus(), 100);
+                    }
                 });
+
+                // Handle Search Input
+                const searchInput = dropdown.querySelector('.dropdown-search-input');
+                if (searchInput) {
+                    searchInput.addEventListener('click', (e) => e.stopPropagation());
+                    searchInput.addEventListener('input', function() {
+                        const searchTerm = this.value.toLowerCase();
+                        items.forEach(item => {
+                            const text = item.textContent.toLowerCase();
+                            if (text.includes(searchTerm)) {
+                                item.style.display = '';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                    });
+                }
 
                 // Handle Item Click
                 items.forEach(item => {

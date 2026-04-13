@@ -245,53 +245,74 @@ class WebController extends Controller
                     }
                 }
             }
+        }
 
-            $serviceTitle = $selectedService ? $selectedService->title : null;
+        $serviceTitle = $selectedService ? $selectedService->title : null;
 
-            $serviceFilter = function ($sq) use ($serviceForFilter, $serviceTitle) {
-                $sq->whereHas('userServices', function ($q) use ($serviceForFilter) {
-                    if (is_numeric($serviceForFilter)) {
-                        $q->where('service_id', $serviceForFilter);
-                    } else {
-                        $q->whereHas('service', function ($tsq) use ($serviceForFilter) {
-                            $tsq->where('slug', $serviceForFilter)
-                               ->orWhereHas('categories', function ($cq) use ($serviceForFilter) {
-                                   $cq->where('slug', $serviceForFilter);
+        if ($selectedService || $searchQuery !== '') {
+            $applyFilters = function($query, $modelType, $searchQuery, $serviceForFilter, $serviceTitle) {
+                $query->where(function($q) use ($modelType, $searchQuery, $serviceForFilter, $serviceTitle) {
+                    // 1. Service Filter
+                    if ($serviceForFilter) {
+                        $q->where(function($sq) use ($modelType, $serviceForFilter, $serviceTitle) {
+                            $sq->whereHas('userServices', function ($usq) use ($serviceForFilter) {
+                                if (is_numeric($serviceForFilter)) {
+                                    $usq->where('service_id', $serviceForFilter);
+                                } else {
+                                    $usq->whereHas('service', function ($tsq) use ($serviceForFilter) {
+                                        $tsq->where('slug', $serviceForFilter)
+                                           ->orWhereHas('categories', function ($cq) use ($serviceForFilter) {
+                                               $cq->where('slug', $serviceForFilter);
+                                           });
+                                    });
+                                }
+                            });
+
+                            if ($serviceTitle) {
+                                $sq->orWhere(function($ssq) use ($modelType, $serviceTitle) {
+                                    $like = "%{$serviceTitle}%";
+                                    if ($modelType === 'practitioner') {
+                                        $ssq->where('body_therapies', 'LIKE', $like)->orWhere('other_modalities', 'LIKE', $like)->orWhere('consultations', 'LIKE', $like);
+                                    } elseif ($modelType === 'doctor') {
+                                        $ssq->where('specialization', 'LIKE', $like)->orWhere('consultation_expertise', 'LIKE', $like)->orWhere('health_conditions_treated', 'LIKE', $like)->orWhere('panchakarma_procedures', 'LIKE', $like)->orWhere('external_therapies', 'LIKE', $like);
+                                    } elseif ($modelType === 'mindfulness') {
+                                        $ssq->where('practitioner_type', 'LIKE', $like)->orWhere('services_offered', 'LIKE', $like)->orWhere('client_concerns', 'LIKE', $like);
+                                    } elseif ($modelType === 'yoga') {
+                                        $ssq->where('yoga_therapist_type', 'LIKE', $like)->orWhere('areas_of_expertise', 'LIKE', $like);
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    // 2. Query Filter
+                    if ($searchQuery !== '') {
+                        $q->where(function($qq) use ($modelType, $searchQuery) {
+                            $like = "%{$searchQuery}%";
+                            $qq->where('first_name', 'LIKE', $like)
+                               ->orWhere('last_name', 'LIKE', $like)
+                               ->orWhereHas('userServices.service', function($usq) use ($like) {
+                                   $usq->where('title', 'LIKE', $like);
                                });
+
+                            if ($modelType === 'practitioner') {
+                                $qq->orWhere('body_therapies', 'LIKE', $like)->orWhere('other_modalities', 'LIKE', $like)->orWhere('consultations', 'LIKE', $like);
+                            } elseif ($modelType === 'doctor') {
+                                $qq->orWhere('specialization', 'LIKE', $like)->orWhere('consultation_expertise', 'LIKE', $like)->orWhere('health_conditions_treated', 'LIKE', $like)->orWhere('panchakarma_procedures', 'LIKE', $like)->orWhere('external_therapies', 'LIKE', $like);
+                            } elseif ($modelType === 'mindfulness') {
+                                $qq->orWhere('practitioner_type', 'LIKE', $like)->orWhere('services_offered', 'LIKE', $like)->orWhere('client_concerns', 'LIKE', $like);
+                            } elseif ($modelType === 'yoga') {
+                                $qq->orWhere('yoga_therapist_type', 'LIKE', $like)->orWhere('areas_of_expertise', 'LIKE', $like);
+                            }
                         });
                     }
                 });
-
-                if ($serviceTitle) {
-                    $sq->orWhere('body_therapies', 'LIKE', "%{$serviceTitle}%")
-                      ->orWhere('other_modalities', 'LIKE', "%{$serviceTitle}%")
-                      ->orWhere('consultations', 'LIKE', "%{$serviceTitle}%");
-                }
             };
 
-            $practitionerQuery->where($serviceFilter);
-            $doctorQuery->where($serviceFilter);
-            $mindfulnessQuery->where($serviceFilter);
-            $yogaQuery->where($serviceFilter);
-        }
-
-        if ($searchQuery !== '') {
-            $like = '%' . $searchQuery . '%';
-            $searchFilter = function ($q) use ($like) {
-                $q->where('first_name', 'LIKE', $like)
-                  ->orWhere('last_name', 'LIKE', $like)
-                  ->orWhere('body_therapies', 'LIKE', $like)
-                  ->orWhere('other_modalities', 'LIKE', $like)
-                  ->orWhere('consultations', 'LIKE', $like)
-                  ->orWhereHas('userServices.service', function($sq) use ($like) {
-                      $sq->where('title', 'LIKE', $like);
-                  });
-            };
-
-            $practitionerQuery->where($searchFilter);
-            $doctorQuery->where($searchFilter);
-            $mindfulnessQuery->where($searchFilter);
-            $yogaQuery->where($searchFilter);
+            $applyFilters($practitionerQuery, 'practitioner', $searchQuery, $serviceForFilter, $serviceTitle);
+            $applyFilters($doctorQuery, 'doctor', $searchQuery, $serviceForFilter, $serviceTitle);
+            $applyFilters($mindfulnessQuery, 'mindfulness', $searchQuery, $serviceForFilter, $serviceTitle);
+            $applyFilters($yogaQuery, 'yoga', $searchQuery, $serviceForFilter, $serviceTitle);
         }
 
         // Combine all results using a manual union-like approach for pagination or just merge for small datasets.
@@ -375,24 +396,32 @@ class WebController extends Controller
         }
 
         // Search Practitioners, Doctors, etc.
-        $searchFilter = function ($q) use ($query) {
+        $applySearchFilter = function ($q, $modelType, $query) {
             $q->where('status', 'active')
-              ->where(function ($sq) use ($query) {
-                  $sq->where('first_name', 'LIKE', "%{$query}%")
-                    ->orWhere('last_name', 'LIKE', "%{$query}%")
-                    ->orWhere('body_therapies', 'LIKE', "%{$query}%")
-                    ->orWhere('consultations', 'LIKE', "%{$query}%")
-                    ->orWhere('other_modalities', 'LIKE', "%{$query}%")
-                    ->orWhereHas('userServices.service', function($usq) use ($query) {
-                        $usq->where('title', 'LIKE', "%{$query}%");
+              ->where(function ($sq) use ($modelType, $query) {
+                  $like = "%{$query}%";
+                  $sq->where('first_name', 'LIKE', $like)
+                    ->orWhere('last_name', 'LIKE', $like)
+                    ->orWhereHas('userServices.service', function($usq) use ($like) {
+                        $usq->where('title', 'LIKE', $like);
                     });
+
+                  if ($modelType === 'practitioner') {
+                      $sq->orWhere('body_therapies', 'LIKE', $like)->orWhere('other_modalities', 'LIKE', $like)->orWhere('consultations', 'LIKE', $like);
+                  } elseif ($modelType === 'doctor') {
+                      $sq->orWhere('specialization', 'LIKE', $like)->orWhere('consultation_expertise', 'LIKE', $like)->orWhere('health_conditions_treated', 'LIKE', $like)->orWhere('panchakarma_procedures', 'LIKE', $like)->orWhere('external_therapies', 'LIKE', $like);
+                  } elseif ($modelType === 'mindfulness') {
+                      $sq->orWhere('practitioner_type', 'LIKE', $like)->orWhere('services_offered', 'LIKE', $like)->orWhere('client_concerns', 'LIKE', $like);
+                  } elseif ($modelType === 'yoga') {
+                      $sq->orWhere('yoga_therapist_type', 'LIKE', $like)->orWhere('areas_of_expertise', 'LIKE', $like);
+                  }
               });
         };
 
-        $practitioners = Practitioner::where($searchFilter)->with('user')->take(5)->get();
-        $doctors = Doctor::where($searchFilter)->with('user')->take(5)->get();
-        $mindfulness = MindfulnessPractitioner::where($searchFilter)->with('user')->take(5)->get();
-        $yoga = YogaTherapist::where($searchFilter)->with('user')->take(5)->get();
+        $practitioners = Practitioner::where(function($q) use ($applySearchFilter, $query) { $applySearchFilter($q, 'practitioner', $query); })->with('user')->take(5)->get();
+        $doctors = Doctor::where(function($q) use ($applySearchFilter, $query) { $applySearchFilter($q, 'doctor', $query); })->with('user')->take(5)->get();
+        $mindfulness = MindfulnessPractitioner::where(function($q) use ($applySearchFilter, $query) { $applySearchFilter($q, 'mindfulness', $query); })->with('user')->take(5)->get();
+        $yoga = YogaTherapist::where(function($q) use ($applySearchFilter, $query) { $applySearchFilter($q, 'yoga', $query); })->with('user')->take(5)->get();
 
         $allPractitioners = $practitioners->merge($doctors)->merge($mindfulness)->merge($yoga)->take(10);
 
