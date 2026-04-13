@@ -152,7 +152,7 @@ Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->na
 Route::get('/captcha', [CaptchaController::class, 'generate'])->name('captcha');
 Route::get('/geoip/country', [GeoIpController::class, 'country'])->name('geoip.country');
 Route::get('/magic-login', [\App\Http\Controllers\Auth\MagicLoginController::class, 'login'])->name('magic.login');
-Route::post('/validate-promo-code', [WebController::class, 'validatePromoCode'])->name('promo.validate');
+Route::post('/validate-promo-code', [WebController::class, 'validatePromoCode'])->name('promo.validate')->middleware('throttle:5,1');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource('/admins', AdminsController::class);

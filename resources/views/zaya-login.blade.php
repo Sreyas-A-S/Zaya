@@ -153,14 +153,75 @@
                 </div>
 
                 <!-- Promocode Field -->
-                <div class="relative">
-                    <input type="text" name="promocode" placeholder="{{ __('Enter New Promocode') }}"
-                        class="w-full pl-6 pr-[110px] py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 text-sm lg:text-base placeholder-gray-400 bg-white shadow-sm transition-all">
-                    <button type="button"
-                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#D1D1D1]/60 text-[#818181] px-7 py-2.5 rounded-full hover:bg-gray-300 transition-colors text-sm font-medium cursor-pointer">
-                        {{ __('Apply') }}
-                    </button>
+                <div>
+                    <div class="relative">
+                        <input type="text" name="promocode" id="promocode-input" placeholder="{{ __('Enter New Promocode') }}"
+                            class="w-full pl-6 pr-[110px] py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 text-sm lg:text-base placeholder-gray-400 bg-white shadow-sm transition-all">
+                        <button type="button" id="apply-promo-btn" onclick="applyPromoCodeLogin()"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#8B3A8A] text-white px-7 py-2.5 rounded-full hover:bg-[#6D2E6D] transition-colors text-sm font-medium cursor-pointer">
+                            {{ __('Apply') }}
+                        </button>
+                    </div>
+                    <div id="promo-status" class="mt-2 ml-4 text-xs font-medium hidden"></div>
                 </div>
+
+                <script>
+                    async function applyPromoCodeLogin() {
+                        const input = document.getElementById('promocode-input');
+                        const btn = document.getElementById('apply-promo-btn');
+                        const status = document.getElementById('promo-status');
+                        const code = input.value.trim();
+
+                        if (!code) {
+                            if (window.showZayaToast) showZayaToast('Please enter a promo code.', 'warning');
+                            return;
+                        }
+
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i>';
+
+                        try {
+                            const response = await fetch('{{ route("promo.validate") }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({ code: code, usage_type: 'registration' })
+                            });
+
+                            if (response.status === 429) {
+                                status.textContent = 'Too many attempts. Please try again in a minute.';
+                                status.className = 'mt-2 ml-4 text-xs font-medium text-red-600';
+                                status.classList.remove('hidden');
+                                if (window.showZayaToast) showZayaToast('Too many attempts. Please wait before trying again.', 'error');
+                                return;
+                            }
+
+                            const data = await response.json();
+
+                            status.classList.remove('hidden');
+                            if (response.ok) {
+                                status.textContent = 'Promo code applied!';
+                                status.className = 'mt-2 ml-4 text-xs font-medium text-green-600';
+                                if (window.showZayaToast) showZayaToast('Promo code applied successfully!', 'success');
+                                input.readOnly = true;
+                                btn.classList.add('hidden');
+                            } else {
+                                status.textContent = data.message || 'Invalid promo code.';
+                                status.className = 'mt-2 ml-4 text-xs font-medium text-red-600';
+                                if (window.showZayaToast) showZayaToast(data.message || 'Invalid promo code.', 'error');
+                            }
+                        } catch (error) {
+                            console.error('Promo error:', error);
+                            if (window.showZayaToast) showZayaToast('Error validating promo code.', 'error');
+                        } finally {
+                            btn.disabled = false;
+                            btn.innerHTML = '{{ __("Apply") }}';
+                        }
+                    }
+                </script>
 
                 <!-- Captcha Section -->
                 <div class="flex items-center gap-3 md:gap-4">

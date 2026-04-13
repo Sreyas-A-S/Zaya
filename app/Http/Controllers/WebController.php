@@ -240,16 +240,26 @@ class WebController extends Controller
                 }
             }
 
-            $query->whereHas('userServices', function ($q) use ($serviceForFilter) {
-                if (is_numeric($serviceForFilter)) {
-                    $q->where('service_id', $serviceForFilter);
-                } else {
-                    $q->whereHas('service', function ($sq) use ($serviceForFilter) {
-                        $sq->where('slug', $serviceForFilter)
-                           ->orWhereHas('categories', function ($cq) use ($serviceForFilter) {
-                               $cq->where('slug', $serviceForFilter);
-                           });
-                    });
+            $serviceTitle = $selectedService ? $selectedService->title : null;
+
+            $query->where(function ($sq) use ($serviceForFilter, $serviceTitle) {
+                $sq->whereHas('userServices', function ($q) use ($serviceForFilter) {
+                    if (is_numeric($serviceForFilter)) {
+                        $q->where('service_id', $serviceForFilter);
+                    } else {
+                        $q->whereHas('service', function ($tsq) use ($serviceForFilter) {
+                            $tsq->where('slug', $serviceForFilter)
+                               ->orWhereHas('categories', function ($cq) use ($serviceForFilter) {
+                                   $cq->where('slug', $serviceForFilter);
+                               });
+                        });
+                    }
+                });
+
+                if ($serviceTitle) {
+                    $sq->orWhere('body_therapies', 'LIKE', "%{$serviceTitle}%")
+                      ->orWhere('other_modalities', 'LIKE', "%{$serviceTitle}%")
+                      ->orWhere('consultations', 'LIKE', "%{$serviceTitle}%");
                 }
             });
         }
@@ -262,9 +272,14 @@ class WebController extends Controller
         if ($searchQuery !== '') {
             $like = '%' . $searchQuery . '%';
             $query->where(function ($q) use ($like) {
-                $q->where('body_therapies', 'LIKE', $like)
+                $q->where('first_name', 'LIKE', $like)
+                  ->orWhere('last_name', 'LIKE', $like)
+                  ->orWhere('body_therapies', 'LIKE', $like)
                   ->orWhere('other_modalities', 'LIKE', $like)
-                  ->orWhere('consultations', 'LIKE', $like);
+                  ->orWhere('consultations', 'LIKE', $like)
+                  ->orWhereHas('userServices.service', function($sq) use ($like) {
+                      $sq->where('title', 'LIKE', $like);
+                  });
             });
         }
 
@@ -332,11 +347,14 @@ class WebController extends Controller
             ->where(function ($q) use ($query) {
                 $q->where('first_name', 'LIKE', "%{$query}%")
                     ->orWhere('last_name', 'LIKE', "%{$query}%")
+                    ->orWhere('body_therapies', 'LIKE', "%{$query}%")
+                    ->orWhere('consultations', 'LIKE', "%{$query}%")
+                    ->orWhere('other_modalities', 'LIKE', "%{$query}%")
                     ->orWhereHas('userServices.service', function($sq) use ($query) {
                         $sq->where('title', 'LIKE', "%{$query}%");
                     });
             })
-            ->take(5)
+            ->take(10)
             ->get();
 
         // Search Services (Treatments)
@@ -359,6 +377,11 @@ class WebController extends Controller
             $specialty = 'Practitioner';
             if ($p->user && $p->user->userServices->first()) {
                 $specialty = $p->user->userServices->first()->service->title;
+            } else {
+                $specialties = array_merge((array)($p->body_therapies ?? []), (array)($p->consultations ?? []), (array)($p->other_modalities ?? []));
+                if (!empty($specialties)) {
+                    $specialty = $specialties[0];
+                }
             }
             $results['practitioners'][] = [
                 'name' => ($p->first_name ?? '') . ' ' . ($p->last_name ?? ''),
@@ -838,7 +861,9 @@ class WebController extends Controller
             ->get();
         $consultationPreferences = \App\Models\ClientConsultationPreference::all();
 
-        return view('book-session', compact('practitioners', 'selectedPractitioner', 'services', 'languages', 'consultationPreferences', 'prefilledService'));
+        $userPromoCodes = auth()->check() ? auth()->user()->userPromoCodes()->latest()->get() : collect();
+
+        return view('book-session', compact('practitioners', 'selectedPractitioner', 'services', 'languages', 'consultationPreferences', 'prefilledService', 'userPromoCodes'));
     }
 
     public function contactUs()

@@ -493,10 +493,15 @@
 
             <!-- Promo Code Section -->
             <div class="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                <h4 class="text-gray-800 font-medium mb-4 flex items-center gap-2">
-                    <i class="ri-ticket-line text-secondary text-lg"></i>
-                    Apply Promo Code
-                </h4>
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="text-gray-800 font-medium flex items-center gap-2">
+                        <i class="ri-ticket-line text-secondary text-lg"></i>
+                        Apply Promo Code
+                    </h4>
+                    <button type="button" onclick="openPromoModal()" class="text-secondary text-sm font-medium hover:underline cursor-pointer">
+                        Choose from saved
+                    </button>
+                </div>
                 <div class="flex gap-3">
                     <div class="relative flex-1">
                         <input type="text" id="promo-code-input" placeholder="Enter code here..." 
@@ -2066,6 +2071,104 @@
                 if (priceContainer) priceContainer.innerHTML = '₹ 0.00 <span class="text-xl text-gray-400 font-normal">/ INR</span>';
             }
         });
+    </script>
+    <!-- Promo Code Modal -->
+    <div id="promoModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity opacity-0 popup-backdrop"
+            onclick="closePromoModal()"></div>
+
+        <!-- Modal Content -->
+        <div class="bg-white rounded-[24px] w-full max-w-[500px] relative z-10 scale-95 opacity-0 transition-all duration-300 popup-content max-h-[90vh] flex flex-col"
+            style="box-shadow: 0px 4px 44px 0px rgba(0, 0, 0, 0.08);">
+            <!-- Header -->
+            <div class="p-8 border-b border-gray-100 shrink-0">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-medium text-gray-900">Saved Promo Codes</h2>
+                    <button type="button" onclick="closePromoModal()"
+                        class="w-8 h-8 flex items-center justify-center rounded-full bg-[#F5F5F5] hover:bg-[#EAEAEA] text-gray-500 transition-colors cursor-pointer">
+                        <i class="ri-close-line text-[20px]"></i>
+                    </button>
+                </div>
+                <p class="text-gray-500 text-sm mt-2">Select a code from your previously entered promo codes.</p>
+            </div>
+
+            <!-- List -->
+            <div class="overflow-y-auto p-6 space-y-3">
+                @if(isset($userPromoCodes) && $userPromoCodes->count() > 0)
+                    @foreach($userPromoCodes as $savedCode)
+                    <div class="group flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-secondary hover:bg-secondary/5 transition-all cursor-pointer" 
+                         onclick="selectSavedPromo('{{ $savedCode->promo_code }}')">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-secondary/10 transition-colors">
+                                <i class="ri-ticket-2-line text-lg text-gray-400 group-hover:text-secondary"></i>
+                            </div>
+                            <span class="text-gray-900 font-medium uppercase tracking-wider">{{ $savedCode->promo_code }}</span>
+                        </div>
+                        <i class="ri-arrow-right-s-line text-xl text-gray-300 group-hover:text-secondary transition-colors"></i>
+                    </div>
+                    @endforeach
+                @else
+                    <div class="text-center py-10">
+                        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-ticket-line text-2xl text-gray-300"></i>
+                        </div>
+                        <p class="text-gray-500">No saved promo codes found.</p>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Footer -->
+            <div class="p-6 border-t border-gray-100 shrink-0 text-center">
+                <button type="button" onclick="closePromoModal()"
+                    class="text-gray-500 text-sm font-medium hover:text-gray-800 transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openPromoModal() {
+            const modal = document.getElementById('promoModal');
+            if (!modal) return;
+            const backdrop = modal.querySelector('.popup-backdrop');
+            const content = modal.querySelector('.popup-content');
+
+            modal.classList.remove('hidden');
+            // Trigger reflow
+            modal.offsetHeight;
+
+            backdrop.classList.replace('opacity-0', 'opacity-100');
+            content.classList.replace('scale-95', 'scale-100');
+            content.classList.replace('opacity-0', 'opacity-100');
+        }
+
+        function closePromoModal() {
+            const modal = document.getElementById('promoModal');
+            if (!modal) return;
+            const backdrop = modal.querySelector('.popup-backdrop');
+            const content = modal.querySelector('.popup-content');
+
+            backdrop.classList.replace('opacity-100', 'opacity-0');
+            content.classList.replace('scale-100', 'scale-95');
+            content.classList.replace('opacity-100', 'opacity-0');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function selectSavedPromo(code) {
+            const input = document.getElementById('promo-code-input');
+            if (input) {
+                input.value = code;
+                closePromoModal();
+                if (typeof applyPromoCode === 'function') {
+                    applyPromoCode();
+                }
+            }
+        }
     </script>
     <script src="{{ asset('frontend/script.js') }}"></script>
 </body>
