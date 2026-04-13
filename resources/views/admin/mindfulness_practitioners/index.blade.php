@@ -1221,7 +1221,7 @@
         }
 
         let btn = $('#submit-btn');
-        btn.prop('disabled', true).html('Saving...');
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
 
         $.ajax({
             url: url,

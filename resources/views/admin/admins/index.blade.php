@@ -209,6 +209,22 @@
         max-height: 500px;
         width: 100%;
     }
+
+    /* Button Loader */
+    .btn-loader {
+        display: inline-block;
+        width: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        vertical-align: middle;
+    }
+
+    .btn.loading .btn-loader {
+        width: 16px;
+        opacity: 1;
+        margin-right: 5px;
+    }
 </style>
 
 <div class="container-fluid">
@@ -337,7 +353,7 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Nationality <span class="text-danger">*</span></label>
                             <select name="country[]" id="edit_country" class="form-control select2 w-100" multiple required>
-                                @foreach($countries as $country)
+                                @foreach($allCountries as $country)
                                 <option value="{{ $country->id }}" data-flag="{{ strtolower($country->code) }}">
                                     {{ $country->name }}
                                 </option>
@@ -364,23 +380,50 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Password (Leave blank to keep current)</label>
-                            <input type="password" id="edit_password" name="password" class="form-control"
-                                minlength="8"
-                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
-                                title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
-                                oninput="validatePasswordMatchAdmin()">
-                            <div id="edit-password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
+                            <div class="form-input position-relative">
+                                <input type="password" id="edit_password" name="password" class="form-control"
+                                    minlength="8"
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
+                                    title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
+                                    oninput="validatePasswordMatchAdmin()">
+                                <div class="show-hide" onclick="togglePasswordVisibility('edit_password', this)"><span class="show"></span></div>
+                            </div>
+                            <div id="edit-password-requirements-text" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
+                            
+                            <!-- Password Requirements UI -->
+                            <div id="password-requirements-ui" class="password-requirements mt-2 px-1 d-none">
+                                <p class="text-muted mb-1 small" style="font-size: 11px;">Password must contain:</p>
+                                <ul class="list-unstyled mb-0" style="font-size: 11px;">
+                                    <li id="req-length" class="text-muted d-flex align-items-center gap-1">
+                                        <i class="fa fa-circle-o"></i> At least 8 characters
+                                    </li>
+                                    <li id="req-upper" class="text-muted d-flex align-items-center gap-1">
+                                        <i class="fa fa-circle-o"></i> One uppercase letter
+                                    </li>
+                                    <li id="req-lower" class="text-muted d-flex align-items-center gap-1">
+                                        <i class="fa fa-circle-o"></i> One lowercase letter
+                                    </li>
+                                    <li id="req-number" class="text-muted d-flex align-items-center gap-1">
+                                        <i class="fa fa-circle-o"></i> One number
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="col-md-6 password-field">
                             <label class="form-label">Confirm Password</label>
-                            <input type="password" id="edit_password_confirmation" name="password_confirmation" class="form-control" minlength="8" oninput="validatePasswordMatchAdmin()">
+                            <div class="form-input position-relative">
+                                <input type="password" id="edit_password_confirmation" name="password_confirmation" class="form-control" minlength="8" oninput="validatePasswordMatchAdmin()">
+                                <div class="show-hide" onclick="togglePasswordVisibility('edit_password_confirmation', this)"><span class="show"></span></div>
+                            </div>
                             <div id="edit-password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="saveBtn">Save Admin</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <i class="fa fa-spinner fa-spin btn-loader"></i> <span class="btn-text">Save Admin</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -530,63 +573,68 @@
 
 <script>
     function validatePasswordMatchAdmin() {
-        const password = $('#password-input');
-        const confirm = $('#password-confirm-input');
-        const requirements = $('#password-requirements');
-        const matchError = $('#password-match-error');
-
-        const editPassword = $('#edit_password');
-        const editConfirm = $('#edit_password_confirmation');
-        const editRequirements = $('#edit-password-requirements');
-        const editMatchError = $('#edit-password-match-error');
-
+        // Handle Create Form (these IDs might exist in the modal for creating)
+        const $createPass = $('#password-input');
+        const $createConfirm = $('#password-confirm-input');
+        
+        // Handle Edit Form
+        const $editPass = $('#edit_password');
+        const $editConfirm = $('#edit_password_confirmation');
+        
         const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
-
-        if (password.length) {
-            if (password.val() === '') {
-                requirements.addClass('d-none');
-            } else if (pattern.test(password.val())) {
-                requirements.addClass('d-none');
-            } else {
-                requirements.removeClass('d-none');
-            }
-
-            if (password.val() !== '') {
-                if (confirm.val() !== password.val()) {
-                    matchError.removeClass('d-none');
-                    confirm.addClass('is-invalid');
+        
+        // Helper to update UI for a specific password input
+        const updateUI = (passInput, requirementsId, requirementsTextId, matchErrorId, confirmInput) => {
+            if (!passInput.length) return;
+            
+            const val = passInput.val();
+            const $reqUi = $('#password-requirements-ui');
+            const $reqText = $(`#${requirementsTextId}`);
+            
+            if (val) {
+                $reqUi.removeClass('d-none');
+                
+                const updateReq = (id, met) => {
+                    const $el = $(`#${id}`);
+                    if (met) {
+                        $el.addClass('requirement-met').removeClass('text-muted');
+                    } else {
+                        $el.removeClass('requirement-met').addClass('text-muted');
+                    }
+                };
+                
+                updateReq('req-length', val.length >= 8);
+                updateReq('req-upper', /[A-Z]/.test(val));
+                updateReq('req-lower', /[a-z]/.test(val));
+                updateReq('req-number', /[0-9]/.test(val));
+                
+                if (pattern.test(val)) {
+                    $reqText.addClass('d-none');
                 } else {
-                    matchError.addClass('d-none');
-                    confirm.removeClass('is-invalid');
+                    $reqText.removeClass('d-none');
                 }
             } else {
-                matchError.addClass('d-none');
-                confirm.removeClass('is-invalid');
+                $reqUi.addClass('d-none');
+                $reqText.addClass('d-none');
             }
-        }
-
-        if (editPassword.length) {
-            if (editPassword.val() === '') {
-                editRequirements.addClass('d-none');
-            } else if (pattern.test(editPassword.val())) {
-                editRequirements.addClass('d-none');
-            } else {
-                editRequirements.removeClass('d-none');
-            }
-
-            if (editPassword.val() !== '') {
-                if (editConfirm.val() !== editPassword.val()) {
-                    editMatchError.removeClass('d-none');
-                    editConfirm.addClass('is-invalid');
+            
+            if (confirmInput.length && confirmInput.val() !== '') {
+                if (val !== confirmInput.val()) {
+                    $(`#${matchErrorId}`).removeClass('d-none');
+                    confirmInput.addClass('is-invalid');
                 } else {
-                    editMatchError.addClass('d-none');
-                    editConfirm.removeClass('is-invalid');
+                    $(`#${matchErrorId}`).addClass('d-none');
+                    confirmInput.removeClass('is-invalid');
                 }
-            } else {
-                editMatchError.addClass('d-none');
-                editConfirm.removeClass('is-invalid');
+            } else if (confirmInput.length) {
+                $(`#${matchErrorId}`).addClass('d-none');
+                confirmInput.removeClass('is-invalid');
             }
-        }
+        };
+        
+        // Run for either form that is present/active
+        updateUI($createPass, 'password-requirements-ui', 'password-requirements', 'password-match-error', $createConfirm);
+        updateUI($editPass, 'password-requirements-ui', 'edit-password-requirements-text', 'edit-password-match-error', $editConfirm);
     }
 
     const formatDateToDdMmYyyy = (value) => {
@@ -707,7 +755,7 @@
             $('#edit_password_confirmation').removeClass('is-invalid');
             $('#methodPlaceholder').html('');
             $('#adminForm').attr('action', "{{ route('admin.admins.store') }}");
-            $('#saveBtn').text('Create Admin');
+            $('#saveBtn').find('.btn-text').text('Create Admin');
             $('#admin-modal-title').text('Register Admin');
             $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
             $('.password-field').show();
@@ -837,7 +885,7 @@
 
             $('#methodPlaceholder').html('@method("PUT")');
             $('#adminForm').attr('action', "{{ url('admin/admins') }}/" + id);
-            $('#saveBtn').text('Update Admin');
+            $('#saveBtn').find('.btn-text').text('Update Admin');
             $('#adminModal').modal('show');
         });
     });
@@ -849,6 +897,10 @@
         if (typeof window.iti !== 'undefined') {
             formData.set('phone', window.iti.getNumber());
         }
+
+        const btn = $('#saveBtn');
+        const originalHtml = btn.html();
+        btn.addClass('loading').prop('disabled', true);
 
         $.ajax({
             url: $(this).attr('action'),
@@ -871,6 +923,9 @@
                 } else {
                     window.showToast('Something went wrong', 'error');
                 }
+            },
+            complete: function() {
+                btn.removeClass('loading').prop('disabled', false);
             }
         });
     });
@@ -999,7 +1054,9 @@
                 $('#viewAdminModal .section-title').show();
                 $('#view-nationality').closest('.col-md-12').removeClass('col-md-12').addClass('col-md-6');
 
-                if (cIds.length > 0 && !countryNames.length) {
+                // Reset list to ensure we collect all currently assigned IDs
+                countryNames = [];
+                if (cIds.length > 0) {
                     cIds.forEach(cid => {
                         let option = $('#edit_country option').filter(function() {
                             return String($(this).val()) === String(cid);

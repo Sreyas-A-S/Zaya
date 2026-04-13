@@ -56,4 +56,57 @@ class Doctor extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function userServices()
+    {
+        return $this->hasMany(UserService::class, 'user_id', 'user_id');
+    }
+
+    public function reviews()
+    {
+        // Doctors use practitioner_id in practitioner_reviews table for simplicity in generic review system
+        return $this->hasMany(PractitionerReview::class, 'practitioner_id', 'id');
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->where('status', true)->avg('rating') ?? 0;
+    }
+
+    public function getProfileBioAttribute()
+    {
+        return $this->short_doctor_bio ?? ($this->short_bio ?? '');
+    }
+
+    public function getCityStateAttribute()
+    {
+        if ($this->city && $this->state) {
+            return $this->city . ', ' . $this->state;
+        }
+        return $this->city ?: ($this->state ?: ($this->country ?? 'Location not set'));
+    }
+
+    public function getSubtitleDisplayAttribute()
+    {
+        $specialization = $this->specialization ?? [];
+        if (!is_array($specialization)) $specialization = [$specialization];
+        
+        $expertise = $this->consultation_expertise ?? [];
+        if (!is_array($expertise)) $expertise = [$expertise];
+
+        $subtitle = $specialization[0] ?? ($expertise[0] ?? 'Ayurvedic Doctor');
+        return str_replace('_', ' ', ucfirst($subtitle));
+    }
+
+    public function getExpertisesListAttribute()
+    {
+        $list = array_merge(
+            (array) ($this->specialization ?? []),
+            (array) ($this->consultation_expertise ?? []),
+            (array) ($this->health_conditions_treated ?? []),
+            (array) ($this->panchakarma_procedures ?? []),
+            (array) ($this->external_therapies ?? [])
+        );
+        return array_values(array_unique(array_filter($list, fn ($v) => trim((string) $v) !== '')));
+    }
 }

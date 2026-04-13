@@ -153,6 +153,27 @@
         select[data-tomselect] {
             display: none !important;
         }
+
+        /* Button Loader Styles */
+        .btn-loader {
+            display: inline-block;
+            width: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            vertical-align: middle;
+        }
+
+        button[type="submit"].loading .btn-loader {
+            width: 18px;
+            opacity: 1;
+            margin-right: 8px;
+        }
+        
+        button[type="submit"].loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
     </style>
 </head>
 
@@ -162,7 +183,7 @@
             <div class="text-center mb-10">
                 <div class="flex justify-center mb-6">
                     <a href="{{ route('index') }}" aria-label="Zaya Wellness">
-                        <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="h-12 md:h-14 w-auto">
+                        <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" alt="Zaya Wellness" class="h-16 md:h-20 w-auto">
                     </a>
                 </div>
                 <h1 class="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-primary mb-4">{{ __('Join the ZAYA Collective') }}</h1>
@@ -177,6 +198,25 @@
                 @endif
 
                 <div class="bg-white rounded-[24px] p-8 md:p-12 border border-gray-100 shadow-sm">
+                    @if ($errors->any())
+                        <div class="mb-8 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="ri-error-warning-fill text-red-500 text-xl"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">There were some problems with your submission:</h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        <ul class="list-disc pl-5 space-y-1">
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                     <!-- Tabs Header -->
                     <div class="flex flex-col md:flex-row mb-10 border-b border-gray-200" id="form-tabs">
                         <button type="button" class="tab-btn active md:w-1/3 py-4 text-center font-medium text-lg text-[#97563D] border-b-2 border-[#97563D]" data-target="tab-personal">1. {{ __('Personal Details') }}</button>
@@ -351,45 +391,15 @@
                     <!-- Step 3: Account Security -->
                     <div id="tab-security" class="tab-content hidden" style="display: none;">
                         <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Account Security') }}</h2>
-                        @if(empty($openRegisterToken))
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                                <div>
-                                    <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Password') }} <span class="text-red-500">*</span></label>
-                                    <div class="relative">
-                                        <input type="password" name="password" id="password" required
-                                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$"
-                                            title="Minimum 8 chars with uppercase, lowercase, number, and special character"
-                                            class="reg-input pr-12">
-                                        <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                            <i class="ri-eye-line text-xl"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Confirm Password') }} <span class="text-red-500">*</span></label>
-                                    <div class="relative">
-                                        <input type="password" name="password_confirmation" id="password_confirmation" required
-                                            class="reg-input pr-12">
-                                        <button type="button" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                            <i class="ri-eye-line text-xl"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        @else
-                            <p class="text-gray-500 text-sm md:text-base mb-8">
-                                {{ __('After approval, check your email for a secure to set your password and activate your account.') }}
-                            </p>
-                        @endif
+                        
+                        <p class="text-gray-500 text-sm md:text-base mb-8">
+                            {{ __('Once your account is approved, you will receive a secure email link to set your password and activate your account.') }}
+                        </p>
 
                         @if(($joinRole ?? '') === 'yoga_therapist')
-                            <div class="mb-10">
-                                <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Promo Code (Optional)') }}</label>
-                                <input type="text" name="promo_code" value="{{ old('promo_code') }}"
-                                    placeholder="{{ __('Enter promo code') }}"
-                                    class="reg-input">
-                                <p class="text-gray-500 text-sm mt-2">{{ __('If applicable, this will be applied to your registration fee payment link.') }}</p>
-                            </div>
+
+                        
+                        
                         @endif
 
                         <div class="mb-10">
@@ -409,9 +419,12 @@
                             <button type="button" class="prev-tab-btn w-full sm:w-auto border border-[#D1D5DB] text-gray-700 py-3.5 px-8 rounded-full font-semibold text-lg transition-all hover:bg-gray-50"><i class="ri-arrow-left-line mr-2 align-middle"></i> {{ __('Previous') }}</button>
                             <div class="flex gap-4 items-center w-full sm:w-auto justify-end">
                                 <a href="{{ route('index') }}" class="text-gray-500 hover:text-gray-700 font-medium transition-colors hidden sm:block">{{ __('Cancel') }}</a>
-                                <button type="submit" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">{{ __('Complete Application') }}</button>
+                                <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">
+                                    <i class="ri-loader-4-line ri-spin btn-loader"></i>{{ __('Complete Application') }}
+                                </button>
                             </div>
                         </div>
+                    </div>
                     </div>
             </form>
         </div>
@@ -436,7 +449,10 @@
                     initialCountry: "auto",
                     geoIpLookup: function(callback) {
                         fetch("/geoip/country", { headers: { 'Accept': 'application/json' } })
-                            .then(res => res.json())
+                            .then(res => {
+                                if (!res.ok) throw new Error('Failed');
+                                return res.json();
+                            })
                             .then(data => callback((data && data.country_code ? String(data.country_code).toLowerCase() : 'in')))
                             .catch(() => callback("in"));
                     },
@@ -550,22 +566,6 @@
                 });
             });
 
-            // Password confirmation check
-            const password = document.getElementById("password");
-            const confirm_password = document.getElementById("password_confirmation");
-
-            function validatePassword() {
-                if (password.value != confirm_password.value) {
-                    confirm_password.setCustomValidity("Passwords Don't Match");
-                } else {
-                    confirm_password.setCustomValidity('');
-                }
-            }
-
-            if (password && confirm_password) {
-                password.onchange = validatePassword;
-                confirm_password.onkeyup = validatePassword;
-            }
             } catch (e) {
                 console.error('Registration form init error:', e);
             }
@@ -610,6 +610,18 @@
                 });
                 
                 currentTabIndex = index;
+
+                // Hide "Previous" button on the first tab
+                prevBtns.forEach(btn => {
+                    if (index === 0) {
+                        btn.style.visibility = 'hidden';
+                        btn.setAttribute('disabled', 'disabled');
+                    } else {
+                        btn.style.visibility = 'visible';
+                        btn.removeAttribute('disabled');
+                    }
+                });
+
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
@@ -758,6 +770,18 @@
                     }
                 });
             });
+            
+            // Handle form submission with loading state
+            const registerForm = document.querySelector('form[action*="register"]');
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    const submitBtn = document.getElementById('submit-btn');
+                    if (submitBtn) {
+                        submitBtn.classList.add('loading');
+                        submitBtn.style.pointerEvents = 'none';
+                    }
+                });
+            }
 
         });
     </script>

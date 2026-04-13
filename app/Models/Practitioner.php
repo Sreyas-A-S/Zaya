@@ -97,9 +97,15 @@ class Practitioner extends Model
     {
         return $this->hasMany(PractitionerQualification::class, 'practitioner_id');
     }
+
     public function reviews()
     {
         return $this->hasMany(PractitionerReview::class);
+    }
+
+    public function getProfileBioAttribute($value)
+    {
+        return $value ?: ($this->short_bio ?? '');
     }
 
     public function getAverageRatingAttribute()
@@ -112,6 +118,28 @@ class Practitioner extends Model
         if ($this->city && $this->state) {
             return $this->city . ', ' . $this->state;
         }
-        return $this->city ?: ($this->state ?: 'Location not set');
+        return $this->city ?: ($this->state ?: ($this->country ?? 'Location not set'));
+    }
+
+    public function getSubtitleDisplayAttribute()
+    {
+        $consultations = $this->consultations ?? [];
+        if (!is_array($consultations)) $consultations = [$consultations];
+        
+        $modalities = $this->other_modalities ?? [];
+        if (!is_array($modalities)) $modalities = [$modalities];
+
+        $subtitle = $modalities[0] ?? ($consultations[0] ?? ($this->user->role ?? 'Professional'));
+        return str_replace('_', ' ', ucfirst($subtitle));
+    }
+
+    public function getExpertisesListAttribute()
+    {
+        $list = array_merge(
+            (array) ($this->body_therapies ?? []),
+            (array) ($this->consultations ?? []),
+            (array) ($this->other_modalities ?? [])
+        );
+        return array_values(array_unique(array_filter($list, fn ($v) => trim((string) $v) !== '')));
     }
 }

@@ -215,14 +215,20 @@ class WebController extends Controller
 
         $zipcode = trim((string) $request->query('zipcode', $request->query('pincode', session('global_zipcode', session('global_pincode', '')))));
         $searchQuery = trim((string) $request->query('query', ''));
-        $query = Practitioner::with(['user', 'reviews'])
-            ->where('status', 'active');
 
-        $selectedService = null;
+        $practitionerQuery = Practitioner::with(['user', 'reviews', 'userServices.service'])->where('status', 'active');
+        $doctorQuery = Doctor::with(['user', 'reviews', 'userServices.service'])->where('status', 'active');
+        $mindfulnessQuery = MindfulnessPractitioner::with(['user', 'reviews', 'userServices.service'])->where('status', 'active');
+        $yogaQuery = YogaTherapist::with(['user', 'reviews', 'userServices.service'])->where('status', 'active');
+
         if ($zipcode !== '') {
-            $query->where('zip_code', 'LIKE', "%{$zipcode}%");
+            $practitionerQuery->where('zip_code', 'LIKE', "%{$zipcode}%");
+            $doctorQuery->where('zip_code', 'LIKE', "%{$zipcode}%");
+            $mindfulnessQuery->where('zip_code', 'LIKE', "%{$zipcode}%");
+            $yogaQuery->where('zip_code', 'LIKE', "%{$zipcode}%");
         }
 
+        $selectedService = null;
         if ($request->filled('service')) {
             $service = $request->query('service');
             $serviceForFilter = $service;
@@ -242,7 +248,7 @@ class WebController extends Controller
 
             $serviceTitle = $selectedService ? $selectedService->title : null;
 
-            $query->where(function ($sq) use ($serviceForFilter, $serviceTitle) {
+            $serviceFilter = function ($sq) use ($serviceForFilter, $serviceTitle) {
                 $sq->whereHas('userServices', function ($q) use ($serviceForFilter) {
                     if (is_numeric($serviceForFilter)) {
                         $q->where('service_id', $serviceForFilter);
@@ -261,17 +267,17 @@ class WebController extends Controller
                       ->orWhere('other_modalities', 'LIKE', "%{$serviceTitle}%")
                       ->orWhere('consultations', 'LIKE', "%{$serviceTitle}%");
                 }
-            });
-        }
+            };
 
-        if ($request->filled('mode')) {
-            $mode = $request->mode;
-            // Mode filtering can be added here if practitioners have a mode field
+            $practitionerQuery->where($serviceFilter);
+            $doctorQuery->where($serviceFilter);
+            $mindfulnessQuery->where($serviceFilter);
+            $yogaQuery->where($serviceFilter);
         }
 
         if ($searchQuery !== '') {
             $like = '%' . $searchQuery . '%';
-            $query->where(function ($q) use ($like) {
+            $searchFilter = function ($q) use ($like) {
                 $q->where('first_name', 'LIKE', $like)
                   ->orWhere('last_name', 'LIKE', $like)
                   ->orWhere('body_therapies', 'LIKE', $like)
@@ -280,10 +286,32 @@ class WebController extends Controller
                   ->orWhereHas('userServices.service', function($sq) use ($like) {
                       $sq->where('title', 'LIKE', $like);
                   });
-            });
+            };
+
+            $practitionerQuery->where($searchFilter);
+            $doctorQuery->where($searchFilter);
+            $mindfulnessQuery->where($searchFilter);
+            $yogaQuery->where($searchFilter);
         }
 
-        $practitioners = $query->paginate(12)->onEachSide(1)->withQueryString();
+        // Combine all results using a manual union-like approach for pagination or just merge for small datasets.
+        // For proper pagination across models, we might need a more complex approach or just merge if results are reasonable.
+        // Let's use a simple merge and paginate the collection for now, or pick one as primary.
+        
+        $results = $practitionerQuery->get()
+            ->merge($doctorQuery->get())
+            ->merge($mindfulnessQuery->get())
+            ->merge($yogaQuery->get());
+
+        $perPage = 12;
+        $page = $request->get('page', 1);
+        $practitioners = new \Illuminate\Pagination\LengthAwarePaginator(
+            $results->forPage($page, $perPage),
+            $results->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
         $services = Service::where('status', true)->orderBy('title')->get();
 
         if ($request->ajax()) {
@@ -342,20 +370,31 @@ class WebController extends Controller
     {
         $query = $request->get('query');
 
-        // Search Practitioners
-        $practitioners = Practitioner::where('status', 'active')
-            ->where(function ($q) use ($query) {
-                $q->where('first_name', 'LIKE', "%{$query}%")
+        if (empty($query)) {
+            return response()->json(['practitioners' => [], 'treatments' => []]);
+        }
+
+        // Search Practitioners, Doctors, etc.
+        $searchFilter = function ($q) use ($query) {
+            $q->where('status', 'active')
+              ->where(function ($sq) use ($query) {
+                  $sq->where('first_name', 'LIKE', "%{$query}%")
                     ->orWhere('last_name', 'LIKE', "%{$query}%")
                     ->orWhere('body_therapies', 'LIKE', "%{$query}%")
                     ->orWhere('consultations', 'LIKE', "%{$query}%")
                     ->orWhere('other_modalities', 'LIKE', "%{$query}%")
-                    ->orWhereHas('userServices.service', function($sq) use ($query) {
-                        $sq->where('title', 'LIKE', "%{$query}%");
+                    ->orWhereHas('userServices.service', function($usq) use ($query) {
+                        $usq->where('title', 'LIKE', "%{$query}%");
                     });
-            })
-            ->take(10)
-            ->get();
+              });
+        };
+
+        $practitioners = Practitioner::where($searchFilter)->with('user')->take(5)->get();
+        $doctors = Doctor::where($searchFilter)->with('user')->take(5)->get();
+        $mindfulness = MindfulnessPractitioner::where($searchFilter)->with('user')->take(5)->get();
+        $yoga = YogaTherapist::where($searchFilter)->with('user')->take(5)->get();
+
+        $allPractitioners = $practitioners->merge($doctors)->merge($mindfulness)->merge($yoga)->take(10);
 
         // Search Services (Treatments)
         $services = Service::with('categories')->where('status', true)
@@ -373,8 +412,8 @@ class WebController extends Controller
             'treatments' => []
         ];
 
-        foreach ($practitioners as $p) {
-            $specialty = 'Practitioner';
+        foreach ($allPractitioners as $p) {
+            $specialty = 'Professional';
             if ($p->user && $p->user->userServices->first()) {
                 $specialty = $p->user->userServices->first()->service->title;
             } else {
@@ -489,26 +528,25 @@ class WebController extends Controller
         $settings = HomepageSetting::getAllSettings($language);
 
         // Try lookup by slug across all professional profile models
-        $practitioner = Practitioner::with(['user', 'reviews'])->where('slug', $slug)->first();
-        
+        $practitioner = Practitioner::with(['user', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
+
         if (!$practitioner) {
-            $practitioner = Doctor::with(['user', 'reviews'])->where('slug', $slug)->first();
+            $practitioner = Doctor::with(['user', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
         }
         if (!$practitioner) {
-            $practitioner = MindfulnessPractitioner::with(['user', 'reviews'])->where('slug', $slug)->first();
+            $practitioner = MindfulnessPractitioner::with(['user', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
         }
         if (!$practitioner) {
-            $practitioner = YogaTherapist::with(['user', 'reviews'])->where('slug', $slug)->first();
+            $practitioner = YogaTherapist::with(['user', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
         }
 
         // Fallback to ID-based lookup if slug didn't match and it's numeric
         if (!$practitioner && is_numeric($slug)) {
-            $practitioner = Practitioner::with(['user', 'reviews'])->find($slug)
-                ?? Doctor::with(['user', 'reviews'])->find($slug)
-                ?? MindfulnessPractitioner::with(['user', 'reviews'])->find($slug)
-                ?? YogaTherapist::with(['user', 'reviews'])->find($slug);
+            $practitioner = Practitioner::with(['user', 'reviews', 'userServices.service'])->find($slug)
+                ?? Doctor::with(['user', 'reviews', 'userServices.service'])->find($slug)
+                ?? MindfulnessPractitioner::with(['user', 'reviews', 'userServices.service'])->find($slug)
+                ?? YogaTherapist::with(['user', 'reviews', 'userServices.service'])->find($slug);
         }
-
         if (!$practitioner) {
             abort(404);
         }
@@ -539,22 +577,53 @@ class WebController extends Controller
         $language = App::getLocale();
         $settings = HomepageSetting::getAllSettings($language);
 
-        $practitioners = Practitioner::with(['user', 'reviews'])
-            ->where('status', 'active')
-            ->whereHas('userServices', function ($q) {
-                $q->where('status', 'active');
+        $pQuery = Practitioner::with(['user', 'reviews'])->where('status', 'active');
+        $dQuery = Doctor::with(['user', 'reviews'])->where('status', 'active');
+        $mQuery = MindfulnessPractitioner::with(['user', 'reviews'])->where('status', 'active');
+        $yQuery = YogaTherapist::with(['user', 'reviews'])->where('status', 'active');
+
+        // Only show practitioners who offer some service
+        $serviceCheck = function ($q) {
+            $q->whereHas('userServices', function ($sq) {
+                $sq->where('status', 'active');
             });
+        };
+        $pQuery->where($serviceCheck);
+        $dQuery->where($serviceCheck);
+        $mQuery->where($serviceCheck);
+        $yQuery->where($serviceCheck);
 
         if (!empty($query)) {
-            $practitioners->where(function ($q) use ($query) {
+            $pQuery->where(function ($q) use ($query) {
                 $q->where('first_name', 'LIKE', "%{$query}%")
                     ->orWhere('last_name', 'LIKE', "%{$query}%")
                     ->orWhere('consultations', 'LIKE', "%{$query}%")
                     ->orWhere('other_modalities', 'LIKE', "%{$query}%");
             });
+            $dQuery->where(function ($q) use ($query) {
+                $q->where('first_name', 'LIKE', "%{$query}%")
+                    ->orWhere('last_name', 'LIKE', "%{$query}%")
+                    ->orWhere('specialization', 'LIKE', "%{$query}%")
+                    ->orWhere('consultation_expertise', 'LIKE', "%{$query}%");
+            });
+            $mQuery->where(function ($q) use ($query) {
+                $q->where('first_name', 'LIKE', "%{$query}%")
+                    ->orWhere('last_name', 'LIKE', "%{$query}%")
+                    ->orWhere('practitioner_type', 'LIKE', "%{$query}%")
+                    ->orWhere('client_concerns', 'LIKE', "%{$query}%");
+            });
+            $yQuery->where(function ($q) use ($query) {
+                $q->where('first_name', 'LIKE', "%{$query}%")
+                    ->orWhere('last_name', 'LIKE', "%{$query}%")
+                    ->orWhere('yoga_therapist_type', 'LIKE', "%{$query}%")
+                    ->orWhere('areas_of_expertise', 'LIKE', "%{$query}%");
+            });
         }
 
-        $practitioners = $practitioners->get();
+        $practitioners = $pQuery->get()
+            ->merge($dQuery->get())
+            ->merge($mQuery->get())
+            ->merge($yQuery->get());
 
         return view('partials.frontend.practitioner-slides', compact('practitioners', 'settings'))->render();
     }
@@ -615,7 +684,7 @@ class WebController extends Controller
         $normalized = str_replace('_', '-', strtolower(trim($role)));
         $map = [
             'doctor' => ['role' => 'doctor', 'label' => 'Ayurvedic Doctor'],
-            'mindfulness-practitioner' => ['role' => 'mindfulness_practitioner', 'label' => 'Mindfulness Practitioner'],
+            'mindfulness-practitioner' => ['role' => 'mindfulness_practitioner', 'label' => 'Mindfulness Counsellor'],
             'yoga-therapist' => ['role' => 'yoga_therapist', 'label' => 'Yoga Therapist'],
             'translator' => ['role' => 'translator', 'label' => 'Translator'],
         ];
@@ -816,29 +885,50 @@ class WebController extends Controller
             $prefilledService = Service::find($request->query('service_id'));
         }
 
-        $practitionersQuery = Practitioner::with(['user', 'reviews'])
-            ->where('status', 'active')
-            ->whereHas('userServices', function ($q) {
-                $q->where('status', 'active');
-            });
+        $pQuery = Practitioner::with(['user', 'reviews'])->where('status', 'active');
+        $dQuery = Doctor::with(['user', 'reviews'])->where('status', 'active');
+        $mQuery = MindfulnessPractitioner::with(['user', 'reviews'])->where('status', 'active');
+        $yQuery = YogaTherapist::with(['user', 'reviews'])->where('status', 'active');
 
-        // If service is provided, only show practitioners who offer that service.
-        if ($prefilledService) {
-            $practitionersQuery->whereHas('userServices', function ($q) use ($prefilledService) {
-                $q->where('status', 'active')->where('service_id', $prefilledService->id);
+        // Only show practitioners who offer some service
+        $serviceCheck = function ($q) {
+            $q->whereHas('userServices', function ($sq) {
+                $sq->where('status', 'active');
             });
+        };
+        $pQuery->where($serviceCheck);
+        $dQuery->where($serviceCheck);
+        $mQuery->where($serviceCheck);
+        $yQuery->where($serviceCheck);
+
+        // If service is provided, only show practitioners who offer that specific service.
+        if ($prefilledService) {
+            $specificServiceCheck = function ($q) use ($prefilledService) {
+                $q->whereHas('userServices', function ($sq) use ($prefilledService) {
+                    $sq->where('status', 'active')->where('service_id', $prefilledService->id);
+                });
+            };
+            $pQuery->where($specificServiceCheck);
+            $dQuery->where($specificServiceCheck);
+            $mQuery->where($specificServiceCheck);
+            $yQuery->where($specificServiceCheck);
         }
+
+        $results = $pQuery->get()
+            ->merge($dQuery->get())
+            ->merge($mQuery->get())
+            ->merge($yQuery->get());
 
         $selectedPractitioner = null;
         if ($practitioner) {
-            $selectedPractitioner = (clone $practitionersQuery)->where('slug', $practitioner)->first();
+            $selectedPractitioner = $results->where('slug', $practitioner)->first();
         }
 
         if (!$selectedPractitioner && $request->filled('practitioner_id')) {
-            $selectedPractitioner = (clone $practitionersQuery)->where('id', $request->query('practitioner_id'))->first();
+            $selectedPractitioner = $results->where('id', $request->query('practitioner_id'))->first();
         }
 
-        $practitioners = $practitionersQuery->get();
+        $practitioners = $results;
 
         if (!$selectedPractitioner && $practitioners->isNotEmpty()) {
             $selectedPractitioner = $practitioners->first();

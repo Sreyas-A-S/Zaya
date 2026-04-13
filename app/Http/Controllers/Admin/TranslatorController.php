@@ -47,6 +47,7 @@ class TranslatorController extends Controller
                 ->leftJoin('translators', 'users.id', '=', 'translators.user_id')
                 ->select([
                     'users.id as user_id',
+                    'users.role',
                     'users.name',
                     'users.first_name',
                     'users.last_name',
@@ -146,8 +147,7 @@ class TranslatorController extends Controller
                     return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
                 })
                 ->editColumn('profile_photo', function ($row) {
-                    $url = $row->profile_photo_path ? asset('storage/' . $row->profile_photo_path) : asset('admiro/assets/images/user/user.png');
-                    return '<img src="' . $url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
+                    return '<img src="' . $row->profile_pic_url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
                 })
                 ->editColumn('phone', function ($row) {
                     if (!$row->phone) return 'N/A';

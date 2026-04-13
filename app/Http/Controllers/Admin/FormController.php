@@ -165,7 +165,7 @@ class FormController extends Controller
 
         $hasUsedByColumn = Schema::hasColumn('open_register_links', 'used_by');
 
-        $query = OpenRegisterLink::query()->with('creator');
+        $query = OpenRegisterLink::query()->with(['creator', 'registeredUsers']);
         if ($hasUsedByColumn) {
             $query->with('usedBy');
         }

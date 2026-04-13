@@ -11,6 +11,10 @@ use App\Models\Service;
 use App\Models\Package;
 use App\Models\Language;
 use App\Models\Country;
+use App\Models\Doctor;
+use App\Models\MindfulnessPractitioner;
+use App\Models\YogaTherapist;
+use App\Models\Translator;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Hash;
@@ -61,10 +65,10 @@ class AdminController extends Controller
             'total_patients' => $this->applyAdminFilters(Patient::query(), 'user')->count(),
             'total_services' => Service::count(),
             'total_packages' => Package::count(),
-            'total_doctors' => $this->applyAdminFilters(User::where('role', 'doctor'), 'user')->count(),
-            'total_mindfulness' => $this->applyAdminFilters(User::whereIn('role', ['mindfulness_practitioner', 'mindfulness-practitioner']), 'user')->count(),
-            'total_yoga' => $this->applyAdminFilters(User::whereIn('role', ['yoga_therapist', 'yoga-therapist']), 'user')->count(),
-            'total_translators' => $this->applyAdminFilters(User::where('role', 'translator'), 'user')->count(),
+            'total_doctors' => $this->applyAdminFilters(Doctor::query(), 'user')->count(),
+            'total_mindfulness' => $this->applyAdminFilters(MindfulnessPractitioner::query(), 'user')->count(),
+            'total_yoga' => $this->applyAdminFilters(YogaTherapist::query(), 'user')->count(),
+            'total_translators' => $this->applyAdminFilters(Translator::query(), 'user')->count(),
         ];
 
         return view('admin.dashboard', compact('user', 'myLanguages', 'stats'));

@@ -59,8 +59,8 @@
                   <label class="col-form-label">Password</label>
                   <div class="form-input position-relative">
                     <input class="form-control @error('password') is-invalid @enderror" type="password" name="password"
-                      required autocomplete="current-password" placeholder="*********">
-                    <div class="show-hide"><span class="show"> </span></div>
+                      id="login-password" required autocomplete="current-password" placeholder="*********">
+                    <div class="show-hide" onclick="togglePasswordVisibility('login-password', this)"><span class="show"> </span></div>
                     @error('password')
                       <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>

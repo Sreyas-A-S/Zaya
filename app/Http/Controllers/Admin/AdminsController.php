@@ -42,6 +42,7 @@ class AdminsController extends Controller
             $query = User::whereIn('role', ['admin', 'super-admin'])
             ->select([
                 'users.id',
+                'users.role',
                 'users.name',
                 'users.email',
                 'users.phone',
@@ -142,7 +143,7 @@ class AdminsController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
-        return view('admin.admins.index', compact('countries', 'languages'));
+        return view('admin.admins.index', compact('countries', 'languages', 'allCountries'));
     }
 
     public function store(Request $request)

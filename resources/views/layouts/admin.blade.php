@@ -316,6 +316,25 @@
   <!-- custom script -->
   <script src="{{ asset('admiro/assets/js/script.js') }}"></script>
   <script>
+    function togglePasswordVisibility(inputId, toggleEl) {
+      const input = typeof inputId === 'string' ? document.getElementById(inputId) : inputId;
+      if (!input) return;
+      
+      const span = toggleEl.querySelector('span');
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (span) {
+          span.classList.remove('show');
+        }
+      } else {
+        input.type = 'password';
+        if (span) {
+          span.classList.add('show');
+        }
+      }
+    }
+  </script>
+  <script>
     document.addEventListener('DOMContentLoaded', function () {
       let counter = 0;
 

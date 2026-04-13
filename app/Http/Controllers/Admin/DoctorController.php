@@ -54,6 +54,7 @@ class DoctorController extends Controller
                 ->leftJoin('doctors', 'users.id', '=', 'doctors.user_id')
                 ->select([
                     'users.id',
+                    'users.role',
                     'users.name',
                     'users.email',
                     'users.created_at',
@@ -134,8 +135,7 @@ class DoctorController extends Controller
                     return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
                 })
                 ->editColumn('profile_photo', function ($row) {
-                    $url = $row->profile_photo_path ? asset('storage/' . $row->profile_photo_path) : asset('admiro/assets/images/user/user.png');
-                    return '<img src="' . $url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
+                    return '<img src="' . $row->profile_pic_url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-3">';

@@ -57,12 +57,18 @@
                                         <i class="fa-solid fa-earth-americas text-primary" style="font-size: 20px;"></i>
                                     </div>
                                     <div>
-                                        <h6 class="mb-0 text-muted f-w-600" style="font-size: 12px;">Nationality</h6>
-                                        @if($user->nationality)
-                                            <span class="f-w-700 text-dark">{{ $user->nationality->name }}</span>
-                                        @else
-                                            <span class="text-muted f-w-500" style="font-size: 13px;">Not specified</span>
-                                        @endif
+                                        <h6 class="mb-0 text-muted f-w-600" style="font-size: 12px;">Country</h6>
+                                        @php
+                                            $adminCountryCode = session('admin_country', 'all');
+                                            $displayCountry = 'Not specified';
+                                            if ($adminCountryCode === 'all') {
+                                                $displayCountry = 'All Regions';
+                                            } else {
+                                                $country = \App\Models\Country::where('code', strtoupper($adminCountryCode))->first();
+                                                $displayCountry = $country ? $country->name : strtoupper($adminCountryCode);
+                                            }
+                                        @endphp
+                                        <span class="f-w-700 text-dark">{{ $displayCountry }}</span>
                                     </div>
                                 </div>
 

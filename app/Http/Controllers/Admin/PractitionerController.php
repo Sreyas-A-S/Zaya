@@ -50,6 +50,7 @@ class PractitionerController extends Controller
                 ->leftJoin('practitioners', 'users.id', '=', 'practitioners.user_id')
                 ->select([
                     'users.id',
+                    'users.role',
                     'users.name',
                     'users.first_name',
                     'users.middle_name',
@@ -113,8 +114,7 @@ class PractitionerController extends Controller
                     return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
                 })
                 ->addColumn('profile_photo', function ($row) {
-                    $url = $row->profile_photo_path ? asset('storage/' . $row->profile_photo_path) : asset('admiro/assets/images/user/user.png');
-                    return '<img src="' . $url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
+                    return '<img src="' . $row->profile_pic_url . '" class="img-fluid rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="Profile">';
                 })
                 ->editColumn('phone', function ($row) {
                     if (!$row->phone) return 'N/A';
@@ -129,8 +129,7 @@ class PractitionerController extends Controller
                     $countries = config('countries', []);
                     $code = $this->resolveCountryCode($value, $countries);
                     $name = $code ? ($countries[$code] ?? $value) : $value;
-                    $flag = $code ? $this->flagEmoji($code) . ' ' : '';
-                    return $flag . $name;
+                    return $name;
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-3">';

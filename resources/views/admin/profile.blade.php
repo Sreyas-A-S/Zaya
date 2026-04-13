@@ -234,6 +234,25 @@
         background-color: #237a75 !important;
         transform: translateY(-1px);
     }
+
+    .password-requirements i {
+        font-size: 8px;
+        width: 12px;
+    }
+    
+    .requirement-met {
+        color: #2e4b3d !important;
+        font-weight: 500;
+    }
+    
+    .requirement-met i {
+        color: #2e4b3d;
+    }
+
+    .requirement-met i:before {
+        content: "\f058"; /* fa-check-circle */
+        font-size: 11px;
+    }
 </style>
 @endpush
 
@@ -323,7 +342,7 @@
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body text-center p-4">
                     <div class="mb-3 text-center d-flex justify-content-center">
-                        <img class="rounded-circle border p-1" src="{{ $user->profile_pic ? '/storage/' . $user->profile_pic : asset('admiro/assets/images/user/user.png') }}" alt="profile" style="width: 120px; height: 120px; object-fit: cover;">
+                        <img class="rounded-circle border p-1" src="{{ $user->profile_pic_url }}" alt="profile" style="width: 120px; height: 120px; object-fit: cover;">
                     </div>
                     <h4 class="mb-1 f-w-600">{{ $user->first_name }} {{ $user->last_name }}</h4>
                     <p class="text-muted text-capitalize mb-4">{{ $user->role }}</p>
@@ -406,7 +425,7 @@
                                     <label for="imageUpload"><i class="fa-solid fa-pencil"></i></label>
                                 </div>
                                 <div class="avatar-preview">
-                                    <div id="imagePreview" style="background-image: url('{{ $user->profile_pic ? '/storage/' . $user->profile_pic : asset('admiro/assets/images/user/user.png') }}');">
+                                    <div id="imagePreview" style="background-image: url('{{ $user->profile_pic_url }}');">
                                     </div>
                                 </div>
                             </div>
@@ -483,8 +502,26 @@
                                 minlength="8"
                                 oninput="validatePassword();">
                         </div>
-                        <div id="password-requirements" class="text-danger small mt-2">
+                        <div id="password-requirements-text" class="text-danger small mt-2 d-none">
                             Include: Uppercase, lowercase, number, and symbol.
+                        </div>
+                        <!-- Password Requirements UI -->
+                        <div id="password-requirements-ui" class="password-requirements mt-2 px-1">
+                            <p class="text-muted mb-1 small" style="font-size: 11px;">Password must contain:</p>
+                            <ul class="list-unstyled mb-0" style="font-size: 11px;">
+                                <li id="req-length" class="text-muted d-flex align-items-center gap-1">
+                                    <i class="fa fa-circle-o"></i> At least 8 characters
+                                </li>
+                                <li id="req-upper" class="text-muted d-flex align-items-center gap-1">
+                                    <i class="fa fa-circle-o"></i> One uppercase letter
+                                </li>
+                                <li id="req-lower" class="text-muted d-flex align-items-center gap-1">
+                                    <i class="fa fa-circle-o"></i> One lowercase letter
+                                </li>
+                                <li id="req-number" class="text-muted d-flex align-items-center gap-1">
+                                    <i class="fa fa-circle-o"></i> One number
+                                </li>
+                            </ul>
                         </div>
                     </div>
 
@@ -540,24 +577,42 @@
     function validatePassword() {
         const password = document.getElementById('new_password');
         const confirm = document.getElementById('confirm_password');
-        const requirements = document.getElementById('password-requirements');
+        const requirementsText = document.getElementById('password-requirements-text');
         const matchError = document.getElementById('password-match-error');
 
         if (!password || !confirm) return;
+        const val = password.value;
         const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}$/;
 
-        if (password.value === '') {
-            requirements.classList.remove('d-none');
+        // Update individual requirements
+        const updateReq = (id, met) => {
+            const el = document.getElementById(id);
+            if (met) {
+                el.classList.add('requirement-met');
+                el.classList.remove('text-muted');
+            } else {
+                el.classList.remove('requirement-met');
+                el.classList.add('text-muted');
+            }
+        };
+        
+        updateReq('req-length', val.length >= 8);
+        updateReq('req-upper', /[A-Z]/.test(val));
+        updateReq('req-lower', /[a-z]/.test(val));
+        updateReq('req-number', /[0-9]/.test(val));
+
+        if (val === '') {
+            requirementsText.classList.add('d-none');
             password.setCustomValidity('Required');
-        } else if (pattern.test(password.value)) {
-            requirements.classList.add('d-none');
+        } else if (pattern.test(val)) {
+            requirementsText.classList.add('d-none');
             password.setCustomValidity('');
         } else {
-            requirements.classList.remove('d-none');
+            requirementsText.classList.remove('d-none');
             password.setCustomValidity('Invalid');
         }
 
-        if (confirm.value !== '' && confirm.value !== password.value) {
+        if (confirm.value !== '' && confirm.value !== val) {
             matchError.classList.remove('d-none');
             confirm.setCustomValidity('Mismatch');
         } else {

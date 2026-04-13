@@ -120,5 +120,3 @@
             class="w-full py-4 px-6 bg-white rounded-3xl border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">{{ old('target_audience') }}</textarea>
     </div>
 </div>
-
-</div>

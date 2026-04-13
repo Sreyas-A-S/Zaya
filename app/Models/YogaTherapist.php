@@ -86,4 +86,46 @@ class YogaTherapist extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function userServices()
+    {
+        return $this->hasMany(UserService::class, 'user_id', 'user_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(PractitionerReview::class, 'practitioner_id', 'id');
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->where('status', true)->avg('rating') ?? 0;
+    }
+
+    public function getProfileBioAttribute()
+    {
+        return $this->short_bio ?? '';
+    }
+
+    public function getCityStateAttribute()
+    {
+        if ($this->city && $this->state) {
+            return $this->city . ', ' . $this->state;
+        }
+        return $this->city ?: ($this->state ?: ($this->country ?? 'Location not set'));
+    }
+
+    public function getSubtitleDisplayAttribute()
+    {
+        $subtitle = $this->yoga_therapist_type ?? 'Yoga Therapist';
+        return str_replace('_', ' ', ucfirst($subtitle));
+    }
+
+    public function getExpertisesListAttribute()
+    {
+        $list = array_merge(
+            (array) ($this->areas_of_expertise ?? [])
+        );
+        return array_values(array_unique(array_filter($list, fn ($v) => trim((string) $v) !== '')));
+    }
 }

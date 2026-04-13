@@ -34,6 +34,11 @@ class OpenRegisterLink extends Model
         return $this->belongsTo(User::class, 'used_by');
     }
 
+    public function registeredUsers()
+    {
+        return $this->hasMany(User::class, 'open_register_link_id');
+    }
+
     public function getUrlAttribute(): string
     {
         $role = str_replace('_', '-', strtolower((string) $this->role));

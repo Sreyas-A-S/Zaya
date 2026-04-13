@@ -78,10 +78,23 @@ class LoginController extends Controller
                 return redirect()->route('admin.login')->with('error', $blockReason);
             }
 
-            $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
+            $adminRoles = [
+                'admin', 'super-admin', 'country-admin', 
+                'financial-manager', 'finance-manager', 
+                'financial_manager', 'finance_manager',
+                'financialmanager', 'financemanager',
+                'content-manager', 'user-manager',
+                'content_manager', 'user_manager'
+            ];
 
-            if (in_array(auth()->user()->role, $adminRoles)) {
-                return redirect()->intended('/admin');
+            $userRole = strtolower(trim(auth()->user()->role ?? ''));
+
+            if (in_array($userRole, $adminRoles) || str_contains($userRole, 'admin') || str_contains($userRole, 'manager')) {
+                // Ensure they aren't in the specific non-admin list just in case
+                $nonAdminRoles = ['doctor', 'practitioner', 'mindfulness-practitioner', 'yoga-therapist', 'client', 'patient', 'translator'];
+                if (!in_array($userRole, $nonAdminRoles)) {
+                    return redirect()->intended('/admin');
+                }
             }
 
             // Explicitly block non-admin roles from the Admin Portal

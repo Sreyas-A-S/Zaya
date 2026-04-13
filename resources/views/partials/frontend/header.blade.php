@@ -76,10 +76,10 @@
 
         <!-- Right Actions (Desktop) -->
         <div class="flex items-center gap-6 xl:gap-8 justify-end flex-1">
-            @if(!Auth::user() || in_array(Auth::user()->role, ['admin','super_admin', 'user-manager', 'financial-manager', 'content-manager']))
+            @guest
             <a id="nav-login" href="{{ route('zaya-login') }}"
                 class="hidden lg:inline-block text-base lg:text-lg text-gray-700 hover:text-primary font-medium transition-colors" data-i18n="Login">{{ __($site_settings['nav_login'] ?? 'Login') }}</a>
-            @endif
+            @endguest
 
             <a id="nav-find-practitioner" href="{{ route('find-practitioner') }}"
                 class="hidden lg:inline-block bg-secondary text-white px-6 py-2.5 rounded-full text-base font-medium hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg whitespace-nowrap" data-i18n="Find Practitioner">{{ __($site_settings['nav_find_practitioner'] ?? 'Find Practitioner') }}</a>
@@ -112,24 +112,19 @@
                 <button class="relative shrink-0 focus:outline-none py-4">
                     @php
                     $user = Auth::user();
-                    $hasProfilePicture = !empty($user->profile_picture);
-                    $profilePictureUrl = $hasProfilePicture ? asset('storage/' . $user->profile_picture) : null;
+                    $profilePictureUrl = $user->profile_pic_url;
                     @endphp
 
                     <div
                         class="w-11 h-11 md:w-12 md:h-12 rounded-full border-2 border-gray-200 overflow-hidden flex items-center justify-center bg-secondary/10 transition-all duration-300 group-hover:border-primary">
-                        @if($hasProfilePicture)
                         <img src="{{ $profilePictureUrl }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
-                        @else
-                        <i class="ri-user-3-line text-xl text-secondary"></i>
-                        @endif
                     </div>
                 </button>
 
                 <!-- Profile Dropdown -->
                 <div class="absolute top-full right-0 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden z-[60]">
                     <div class="py-2">
-                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
+                        <a href="{{ in_array($user->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']) ? route('admin.dashboard') : route('dashboard') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
                             <i class="ri-dashboard-line text-lg"></i> {{ __('Dashboard') }}
                         </a>
                         <a href="{{ route('profile') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
@@ -193,7 +188,7 @@
         <a id="nav-contact-us-mobile" href="{{ route('contact-us') }}"
             class="text-lg font-medium text-secondary border-b border-gray-50 pb-2" data-i18n="Contact Us">{{ __($site_settings['footer_link_contact_us'] ?? 'Contact Us') }}</a>
         @auth
-        <a id="nav-dashboard-mobile" href="{{ route('dashboard') }}" class="text-lg font-medium text-secondary pb-2 flex items-center gap-3">
+        <a id="nav-dashboard-mobile" href="{{ in_array(Auth::user()->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']) ? route('admin.dashboard') : route('dashboard') }}" class="text-lg font-medium text-secondary pb-2 flex items-center gap-3">
             <i class="ri-user-3-line"></i> {{ __('Profile') }}
         </a>
         @else

@@ -375,7 +375,7 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-y-4 justify-center lg:justify-start text-center lg:text-left items-center gap-8">
-                    <img src="{{ $user->profile_pic ? (str_starts_with($user->profile_pic, 'http') ? $user->profile_pic : asset('storage/' . $user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" alt="Profile"
+                    <img src="{{ $user->profile_pic_url }}" alt="Profile"
                         class="w-25 lg:w-20 h-25 lg:h-20 rounded-full object-cover p-1 bg-white">
                     <div>
                         <h1 class="text-3xl lg:text-4xl font-bold font-sans! text-secondary mb-2">{{ $user->name }}</h1>

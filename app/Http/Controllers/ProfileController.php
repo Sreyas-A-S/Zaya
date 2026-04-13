@@ -805,7 +805,13 @@ class ProfileController extends Controller
 
     private function deriveCurrency($user)
     {
-        $country = $user->country ?? $user->practitioner->country ?? $user->doctor->country ?? null;
+        $profile = $user->practitioner ?? $user->doctor ?? $user->mindfulnessPractitioner ?? $user->yogaTherapist ?? $user->translator ?? null;
+        
+        if ($profile && !empty($profile->payout_currency)) {
+            return strtoupper(trim($profile->payout_currency));
+        }
+
+        $country = $user->country ?? ($profile ? $profile->country : null);
         $map = config('currencies.country_to_currency', []);
         $fallback = config('currencies.default', config('app.currency', 'INR'));
 
