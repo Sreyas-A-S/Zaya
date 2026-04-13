@@ -152,7 +152,7 @@ class FinanceManagerController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
-        return view('admin.finance-manager.index', compact('countries', 'languages'));
+        return view('admin.finance-manager.index', compact('countries', 'languages', 'allCountries'));
     }
 
     /**

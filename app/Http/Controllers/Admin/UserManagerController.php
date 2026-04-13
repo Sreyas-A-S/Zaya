@@ -121,7 +121,7 @@ class UserManagerController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
-        return view('admin.user-manager.index', compact('countries', 'languages'));
+        return view('admin.user-manager.index', compact('countries', 'languages', 'allCountries'));
     }
 
     /**

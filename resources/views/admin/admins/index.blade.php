@@ -353,7 +353,7 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Nationality <span class="text-danger">*</span></label>
                             <select name="country[]" id="edit_country" class="form-control select2 w-100" multiple required>
-                                @foreach($countries as $country)
+                                @foreach($allCountries as $country)
                                 <option value="{{ $country->id }}" data-flag="{{ strtolower($country->code) }}">
                                     {{ $country->name }}
                                 </option>

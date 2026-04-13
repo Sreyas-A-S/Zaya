@@ -143,7 +143,7 @@ class AdminsController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
-        return view('admin.admins.index', compact('countries', 'languages'));
+        return view('admin.admins.index', compact('countries', 'languages', 'allCountries'));
     }
 
     public function store(Request $request)

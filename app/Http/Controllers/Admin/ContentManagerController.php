@@ -150,7 +150,7 @@ class ContentManagerController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
-        return view('admin.content-manager.index', compact('countries', 'languages'));
+        return view('admin.content-manager.index', compact('countries', 'languages', 'allCountries'));
     }
 
     /**

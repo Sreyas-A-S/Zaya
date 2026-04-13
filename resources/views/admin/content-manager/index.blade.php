@@ -167,7 +167,7 @@
                         <div class="col-md-12 mb-3">
                             <label class="form-label">Country <span class="text-danger">*</span></label>
                             <select name="country[]" id="country" class="form-control select2" multiple required>
-                                @foreach($countries as $country)
+                                @foreach($allCountries as $country)
                                 <option value="{{ $country->id }}">{{ $country->name }}</option>
                                 @endforeach
                             </select>
@@ -240,7 +240,9 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="saveBtn">Create Content Manager</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <i class="fa fa-spinner fa-spin btn-loader"></i> <span class="btn-text">Create Content Manager</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -1047,13 +1049,14 @@
             }
         });
 
-        // Form Submit
         $('#contentManagerForm').on('submit', function(e) {
             e.preventDefault();
             let formData = new FormData(this);
             if (typeof window.iti !== 'undefined') {
                 formData.set('phone', window.iti.getNumber());
             }
+            const btn = $('#saveBtn');
+            btn.addClass('loading').prop('disabled', true);
 
             $.ajax({
                 url: $(this).attr('action'),
@@ -1078,6 +1081,9 @@
                     } else {
                         window.showToast('Something went wrong', 'error');
                     }
+                },
+                complete: function() {
+                    btn.removeClass('loading').prop('disabled', false);
                 }
             });
         });

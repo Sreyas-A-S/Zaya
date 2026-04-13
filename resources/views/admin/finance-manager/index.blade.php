@@ -171,7 +171,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Country <span class="text-danger">*</span></label>
                                     <select name="country[]" id="fm-countries" class="form-control select2" multiple required>
-                                        @foreach($countries as $country)
+                                        @foreach($allCountries as $country)
                                         <option value="{{ $country->id }}" data-flag="{{ strtolower($country->code) }}">{{ $country->name }}</option>
                                         @endforeach
                                     </select>
@@ -244,7 +244,9 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="saveBtn">Create Finance Manager</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <i class="fa fa-spinner fa-spin btn-loader"></i> <span class="btn-text">Create Finance Manager</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -1094,10 +1096,13 @@
             let formData = new FormData(this);
             formData.set('phone', window.iti.getNumber());
 
-            $.ajax({
-                url: $(this).attr('action'),
-                type: 'POST',
-                data: formData,
+                const btn = $('#saveBtn');
+                btn.addClass('loading').prop('disabled', true);
+                
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
                 processData: false,
                 contentType: false,
                 success: function(resp) {
@@ -1117,6 +1122,9 @@
                     } else {
                         window.showToast('Something went wrong', 'error');
                     }
+                },
+                complete: function() {
+                    btn.removeClass('loading').prop('disabled', false);
                 }
             });
         });
