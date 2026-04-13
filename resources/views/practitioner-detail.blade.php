@@ -54,9 +54,6 @@
                         {{ $subtitle }}
                     </h2>
                     <div class="text-[#404040] mb-10 max-w-xl leading-relaxed text-base opacity-80 space-y-4">
-                        @if($serviceDescription !== '')
-                            <p>{{ $serviceDescription }}</p>
-                        @endif
                         @if($bio !== '')
                             <p>{{ $bio }}</p>
                         @endif

@@ -133,7 +133,7 @@ class AdminsController extends Controller
                 ->make(true);
         }
 
-        $allCountries = Country::where('status', 'active')->get();
+        $allCountries = Country::all();
         $languages = Language::all();
 
         if ($isSuperAdmin || empty($user->national_id)) {

@@ -357,7 +357,7 @@
         @endforeach
 
         <div class="col-12 mt-2">
-            <div class="input-group input-group-sm" style="max-width: 300px;">
+            <div class="input-group input-group-sm" style="max-width: 300px; z-index: 1;">
                 <input type="text"
                        class="form-control new-master-data-input"
                        data-type="client_consultation_preferences"

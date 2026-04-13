@@ -386,7 +386,7 @@
                                     pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
                                     title="Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character."
                                     oninput="validatePasswordMatchAdmin()">
-                                <div class="show-hide" onclick="togglePasswordVisibility('edit_password', this)"><span class="show"></span></div>
+                                <div class="show-hide" onclick="togglePasswordVisibility('edit_password', this)"></div>
                             </div>
                             <div id="edit-password-requirements-text" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
                             
@@ -413,7 +413,7 @@
                             <label class="form-label">Confirm Password</label>
                             <div class="form-input position-relative">
                                 <input type="password" id="edit_password_confirmation" name="password_confirmation" class="form-control" minlength="8" oninput="validatePasswordMatchAdmin()">
-                                <div class="show-hide" onclick="togglePasswordVisibility('edit_password_confirmation', this)"><span class="show"></span></div>
+                                <div class="show-hide" onclick="togglePasswordVisibility('edit_password_confirmation', this)"></div>
                             </div>
                             <div id="edit-password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
                         </div>

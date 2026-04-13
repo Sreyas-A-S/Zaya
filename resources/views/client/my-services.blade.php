@@ -280,7 +280,7 @@
 
 <!-- Add Service Modal -->
 <div id="addServiceModal" class="fixed inset-0 bg-[#1A1A1A]/60 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4">
-    <div class="bg-white rounded-3xl sm:rounded-[40px] w-full max-w-3xl overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-300" id="addModalContent">
+    <div class="bg-white rounded-3xl sm:rounded-[40px] w-full max-w-4xl overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-300" id="addModalContent">
         <div class="px-6 py-6 sm:px-10 sm:py-8 border-b border-gray-100 flex justify-between items-center bg-[#F8FAF9]">
             <div>
                 <h3 class="text-xl sm:text-2xl font-black text-secondary tracking-tight" id="modal-title">Configure Services</h3>
@@ -316,7 +316,7 @@
                                 Pricing Tiers
                             </label>
                             <div class="rates-container space-y-3 sm:space-y-4">
-                                <div class="rate-row grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 shadow-sm">
+                                <div class="rate-row grid grid-cols-1 sm:grid-cols-[1fr_1.5fr] gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 shadow-sm">
                                     <div>
                                         <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Duration</label>
                                         <div class="relative">
@@ -328,7 +328,7 @@
                                         <div>
                                             <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
                                             <div class="flex gap-2 sm:gap-3">
-                                                <div class="relative w-24 sm:w-28">
+                                                <div class="relative w-20 sm:w-24">
                                                     <select name="services[0][currency]" class="currency-select h-[54px] sm:h-[58px] w-full bg-white border border-gray-200 rounded-lg pl-3 pr-8 text-sm font-bold text-secondary focus:border-secondary focus:ring-2 focus:ring-secondary/10 appearance-none">
                                                         @foreach(config('currencies.symbols') as $code => $symbol)
                                                             <option value="{{ $code }}" {{ ($defaultCurrency ?? 'INR') === $code ? 'selected' : '' }}>
@@ -342,7 +342,7 @@
                                                 </div>
                                                 <div class="relative flex-1">
                                                     <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">{{ config('currencies.symbols')[$defaultCurrency ?? 'INR'] ?? '₹' }}</span>
-                                                    <input type="number" name="services[0][rates][0][rate]" step="0.01" required placeholder="0.00" class="w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
+                                                    <input type="number" name="services[0][rates][0][rate]" step="0.01" required placeholder="0.00" class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
                                                 </div>
                                                 <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
                                                     <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
@@ -564,7 +564,7 @@ async function fetchAvailableServices() {
                             <div>
                                 <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
                                 <div class="flex gap-2 sm:gap-3">
-                                    <div class="relative w-24 sm:w-28">
+                                    <div class="relative w-20 sm:w-24">
                                         <select name="services[${currentIdx}][currency]" class="currency-select h-[54px] sm:h-[58px] w-full bg-white border border-gray-200 rounded-lg pl-3 pr-8 text-sm font-bold text-secondary focus:border-secondary focus:ring-2 focus:ring-secondary/10 appearance-none">
                                             @foreach(config('currencies.symbols') as $code => $symbol)
                                                 <option value="{{ $code }}">{{ $code }}</option>
@@ -576,7 +576,7 @@ async function fetchAvailableServices() {
                                     </div>
                                     <div class="relative flex-1">
                                         <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">₹</span>
-                                        <input type="number" name="services[${currentIdx}][rates][0][rate]" step="0.01" required placeholder="0.00" class="w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
+                                        <input type="number" name="services[${currentIdx}][rates][0][rate]" step="0.01" required placeholder="0.00" class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
                                     </div>
                                     <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
                                         <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
@@ -608,7 +608,7 @@ async function fetchAvailableServices() {
         const currentSymbol = CURRENCY_SYMBOLS[currentCurrency] || '₹';
         
         const row = document.createElement('div');
-        row.className = 'rate-row grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 animate-in fade-in slide-in-from-top-4 duration-300 shadow-sm';
+        row.className = 'rate-row grid grid-cols-1 sm:grid-cols-[1fr_1.5fr] gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 animate-in fade-in slide-in-from-top-4 duration-300 shadow-sm';
         row.innerHTML = `
             <div>
                 <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Duration</label>
@@ -623,7 +623,7 @@ async function fetchAvailableServices() {
                 <div class="flex gap-2 sm:gap-3">
                     <div class="relative flex-1">
                         <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">${currentSymbol}</span>
-                        <input type="number" name="services[${serviceIdx}][rates][${rateIdx}][rate]" step="0.01" required placeholder="0.00" class="w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
+                        <input type="number" name="services[${serviceIdx}][rates][${rateIdx}][rate]" step="0.01" required placeholder="0.00" class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
                     </div>
                     <button type="button" onclick="confirmRemoveRateRow(this)" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100">
                         <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
@@ -753,7 +753,7 @@ async function fetchAvailableServices() {
                 
                 rates.forEach((rate, index) => {
                     const row = document.createElement('div');
-                    row.className = 'rate-row grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 shadow-sm mb-4';
+                    row.className = 'rate-row grid grid-cols-1 sm:grid-cols-[1fr_1.5fr] gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 shadow-sm mb-4';
                     row.innerHTML = `
                         <div>
                             <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Duration</label>
@@ -767,7 +767,7 @@ async function fetchAvailableServices() {
                             <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
                             <div class="flex gap-2 sm:gap-3">
                                 ${index === 0 ? `
-                                <div class="relative w-24 sm:w-28">
+                                <div class="relative w-20 sm:w-24">
                                     <select name="services[0][currency]" class="currency-select h-[54px] sm:h-[58px] w-full bg-white border border-gray-200 rounded-lg pl-3 pr-8 text-sm font-bold text-secondary focus:border-secondary focus:ring-2 focus:ring-secondary/10 appearance-none">
                                         @foreach(config('currencies.symbols') as $code => $symbol)
                                             <option value="{{ $code }}" ${rate.currency === '{{ $code }}' ? 'selected' : '' }>{{ $code }}</option>
@@ -780,7 +780,7 @@ async function fetchAvailableServices() {
                                 ` : ''}
                                 <div class="relative flex-1">
                                     <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">${CURRENCY_SYMBOLS[rate.currency] || CURRENCY_SYMBOLS[DEFAULT_CURRENCY] || '₹'}</span>
-                                    <input type="number" name="services[0][rates][${index}][rate]" value="${parseFloat(rate.rate).toFixed(2)}" step="0.01" required placeholder="0.00" class="w-full pl-8 sm:pl-10 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
+                                    <input type="number" name="services[0][rates][${index}][rate]" value="${parseFloat(rate.rate).toFixed(2)}" step="0.01" required placeholder="0.00" class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-base sm:text-lg">
                                 </div>
                                 ${index > 0 ? `
                                 <button type="button" onclick="confirmRemoveRateRow(this)" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100">
