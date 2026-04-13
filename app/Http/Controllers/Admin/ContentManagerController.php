@@ -131,7 +131,7 @@ class ContentManagerController extends Controller
                 ->make(true);
         }
 
-        $allCountries = Country::where('status', 'active')->get();
+        $allCountries = Country::all();
         $languages = Language::all();
 
         if ($isSuperAdmin) {

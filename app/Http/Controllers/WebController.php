@@ -54,6 +54,13 @@ class WebController extends Controller
     //
     public function index()
     {
+        if (auth()->check()) {
+            $user = auth()->user();
+            $adminRoles = ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
+            if (in_array($user->role, $adminRoles)) {
+                return redirect()->route('admin.dashboard');
+            }
+        }
         $language = App::getLocale();
         $languages = Language::where('status', 'active')->get();
         $practitioners = Practitioner::with(['user', 'reviews'])
@@ -605,6 +612,14 @@ class WebController extends Controller
 
     public function zayaLogin(Request $request)
     {
+        if (auth()->check()) {
+            $user = auth()->user();
+            $adminRoles = ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
+            if (in_array($user->role, $adminRoles)) {
+                return redirect()->route('admin.dashboard');
+            }
+            return redirect()->route('dashboard');
+        }
         $redirect = $request->query('redirect');
         $available_languages = \App\Models\Language::where('status', 'active')->get();
         return view('zaya-login', compact('available_languages', 'redirect'));
