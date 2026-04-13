@@ -26,7 +26,7 @@
                         placeholder="{{ $settings['find_practitioner_search_placeholder'] ?? 'Practitioners, Treatments...' }}"
                         autocomplete="off"
                         class="w-full border border-[#db8871] rounded-full px-6 py-3.5 pr-12 text-base md:text-lg text-[#db8871] placeholder-[#db8871] focus:outline-none bg-white transition-colors">
-                    <button class="absolute right-[10px] top-1/2 -translate-y-1/2 w-10 h-10 bg-[#db8871] rounded-full flex items-center justify-center hover:opacity-90 transition-all cursor-pointer border-none outline-none">
+                    <button id="find_practitioner_search_btn" class="absolute right-[10px] top-1/2 -translate-y-1/2 w-10 h-10 bg-[#db8871] rounded-full flex items-center justify-center hover:opacity-90 transition-all cursor-pointer border-none outline-none">
                         <i class="ri-search-line text-white text-lg"></i>
                     </button>
                     <!-- Search Results Dropdown -->
@@ -337,6 +337,21 @@
                 });
             });
 
+            window.selectServiceFromSearch = function(slug, title) {
+                const serviceInput = $('input[name="service"]');
+                const serviceSelectedText = $('.custom-dropdown input[name="service"]').siblings('.dropdown-button').find('.dropdown-selected');
+                
+                serviceInput.val(slug);
+                serviceSelectedText.text(title);
+                
+                // Close search results
+                document.querySelectorAll('.search-container').forEach(container => {
+                    container.classList.remove('dropdown-open');
+                });
+                
+                updateSearchResults();
+            }
+
             function updateSearchResults() {
                 const service = $('input[name="service"]').val();
                 const mode = $('input[name="mode"]').val();
@@ -424,7 +439,7 @@
                                     resultsContainer.insertAdjacentHTML('beforeend', '<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Treatments</div>');
                                     data.treatments.forEach(function(item) {
                                         const resultItem = `
-                                            <a href="/service/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                            <a href="javascript:void(0)" onclick="selectServiceFromSearch('${item.slug}', '${item.name}')" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
                                                 <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
                                                     <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                                 </div>
@@ -456,6 +471,18 @@
             }
 
             setupSearch('find_practitioner_search_input', 'find-practitioner-search-results');
+
+            // Handle Search Button Click
+            const searchBtn = document.getElementById('find_practitioner_search_btn');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', function() {
+                    // Close search results dropdown
+                    document.querySelectorAll('.search-container').forEach(container => {
+                        container.classList.remove('dropdown-open');
+                    });
+                    updateSearchResults();
+                });
+            }
 
             // Zipcode Search Logic
             const zipcodeInput = document.getElementById('find-practitioner-zipcode-input');

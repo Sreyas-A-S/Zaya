@@ -143,9 +143,15 @@ class LoginController extends Controller
         }
 
         // Store promo code if present in the request
-        if ($request->filled('promocode')) {
-            $user->promo_code = $request->input('promocode');
+        $promoCode = trim((string) ($request->input('promo_code') ?: $request->input('promocode', '')));
+        if ($promoCode !== '') {
+            $user->promo_code = $promoCode;
             $user->save();
+
+            // Track promo code in user_promo_codes table (unique per user per code)
+            $user->userPromoCodes()->firstOrCreate([
+                'promo_code' => $promoCode
+            ]);
         }
 
         $blockReason = $user->getLoginBlockReason();

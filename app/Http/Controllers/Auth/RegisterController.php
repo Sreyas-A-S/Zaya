@@ -146,6 +146,17 @@ class RegisterController extends Controller
 
             event(new Registered($user = $this->create($request->all())));
 
+            // General promo code tracking for all users
+            $promoCode = trim((string) ($request->input('promo_code') ?: $request->input('promocode', '')));
+            if ($promoCode !== '') {
+                $user->promo_code = $promoCode;
+                $user->save();
+
+                $user->userPromoCodes()->firstOrCreate([
+                    'promo_code' => $promoCode
+                ]);
+            }
+
             $teamRoles = [
                 'practitioner',
                 'doctor',
@@ -189,9 +200,6 @@ class RegisterController extends Controller
                 if ($isTeamRole) {
                     [$feeOverride, $promoNotes] = $this->resolveRegistrationPromo($request, $user->role);
                     if (!empty($promoNotes['promo_code'] ?? null)) {
-                        $user->promo_code = $promoNotes['promo_code'];
-                        $user->save();
-
                         $promo = PromoCode::where('code', $promoNotes['promo_code'])->first();
                         if ($promo) {
                             $promo->increment('used_count');

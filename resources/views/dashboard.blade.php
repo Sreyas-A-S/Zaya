@@ -60,11 +60,9 @@
         <div id="section-identity" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
             <div class="flex justify-between items-center mb-6">
                 <h2 id="client_panel_identity_hub_title" class="text-xl font-medium font-sans! text-secondary" data-i18n="{{ $site_settings['client_panel_identity_hub_title'] ?? 'Identity Hub' }}">{{ __($site_settings['client_panel_identity_hub_title'] ?? 'Identity Hub') }}</h2>
-                @if($user->isProfileIncomplete())
                 <a href="{{ route('profile.complete') }}" class="text-xs font-black text-secondary hover:text-primary transition-colors flex items-center gap-1">
-                    <i class="ri-edit-line"></i> {{ __('Complete Profile') }}
+                    <i class="ri-edit-line"></i> {{ __('Edit Profile') }}
                 </a>
-                @endif
             </div>
 
             @php

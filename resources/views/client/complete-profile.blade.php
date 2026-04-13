@@ -1,6 +1,6 @@
 @extends('layouts.client')
 
-@section('title', 'Complete Your Profile')
+@section('title', 'Edit Profile')
 
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
@@ -38,8 +38,8 @@
 <div class="w-full">
     <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-xl font-black text-secondary">{{ __('Complete Your Profile') }}</h1>
-            <p class="text-xs text-gray-400 font-medium">{{ __('Verification for ' . ucfirst(str_replace('_', ' ', $user->role))) }}</p>
+            <h1 class="text-xl font-black text-secondary">{{ __('Edit Profile') }}</h1>
+            <p class="text-xs text-gray-400 font-medium">{{ __('Profile settings for ' . ucfirst(str_replace('_', ' ', $user->role))) }}</p>
         </div>
         <div class="bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100 flex items-center gap-3">
             <div class="w-24 bg-amber-200/30 rounded-full h-1 overflow-hidden">

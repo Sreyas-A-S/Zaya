@@ -282,4 +282,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Transaction::class, 'referrer_id');
     }
+
+    public function userPromoCodes()
+    {
+        return $this->hasMany(UserPromoCode::class);
+    }
 }
