@@ -234,7 +234,7 @@
                         @if($currentCountryCode !== 'all')
                         <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentCountry ? strtolower($currentCountry->code) : 'us') . '.svg') }}" style="width: 20px; height: 14px; border: 1px solid #eee; border-radius: 2px;" alt="flag">
                         @endif
-                        <h6 class="country-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentCountryCode === 'all' ? 'ALL REGIONS' : ($currentCountry ? strtoupper($currentCountry->code) : 'US') }}</h6>
+                        <h6 class="country-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentCountryCode === 'all' ? 'ALL' : ($currentCountry ? strtoupper($currentCountry->code) : 'US') }}</h6>
                     </a>
 
                     <div class="custom-menu overflow-hidden">
@@ -251,7 +251,7 @@
                                     onclick="changeCountry(this)"
                                     style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
                                     <i class="fa fa-earth-americas ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
-                                    <span class="f-w-600 small">{{ __('ALL REGIONS') }}</span>
+                                    <span class="f-w-600 small">{{ __('ALL') }}</span>
                                     @if($currentCountryCode == 'all')
                                     <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
                                     @endif
@@ -394,7 +394,7 @@
                             currentImg.style.display = 'block';
                         }
                     }
-                    if (currentTxt) currentTxt.textContent = code === 'all' ? 'ALL REGIONS' : code.toUpperCase();
+                    if (currentTxt) currentTxt.textContent = code === 'all' ? 'ALL' : code.toUpperCase();
 
                     // Update active state
                     document.querySelectorAll('.country-menu-list .lang').forEach(el => {
