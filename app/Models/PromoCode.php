@@ -30,4 +30,30 @@ class PromoCode extends Model
         'reward' => 'decimal:2',
         'benefits' => 'array',
     ];
+
+    /**
+     * Increment used_count only when code is active, not expired, and within usage limit.
+     */
+    public function incrementUsageIfAvailable(): bool
+    {
+        $updated = static::query()
+            ->whereKey($this->id)
+            ->where('status', true)
+            ->where(function ($q) {
+                $q->whereNull('expiry_date')
+                    ->orWhereDate('expiry_date', '>=', now()->toDateString());
+            })
+            ->where(function ($q) {
+                $q->whereNull('usage_limit')
+                    ->orWhereColumn('used_count', '<', 'usage_limit');
+            })
+            ->increment('used_count');
+
+        if ($updated > 0) {
+            $this->refresh();
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -35,6 +35,11 @@ class PromoCodeController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->addColumn('used_limit', function ($row) {
+                    $used = (int) ($row->used_count ?? 0);
+                    $limit = $row->usage_limit;
+                    return is_null($limit) ? ($used . ' / Unlimited') : ($used . ' / ' . (int) $limit);
+                })
                 ->addColumn('action', function ($row) {
                     return '
                         <div class="d-flex align-items-center gap-2">
@@ -69,6 +74,12 @@ class PromoCodeController extends Controller
                     return $row->created_at ? $row->created_at->format('Y-m-d') : 'N/A';
                 })
                 ->editColumn('status', function ($row) {
+                    $used = (int) ($row->used_count ?? 0);
+                    $limit = $row->usage_limit;
+                    if (!is_null($limit) && $used >= (int) $limit) {
+                        return '<span class="badge bg-warning text-dark">Limit Reached</span>';
+                    }
+
                     $badgeClass = $row->status ? 'bg-success' : 'bg-danger';
                     $statusText = $row->status ? 'Active' : 'Inactive';
                     

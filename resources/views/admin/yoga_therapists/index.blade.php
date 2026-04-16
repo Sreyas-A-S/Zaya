@@ -121,7 +121,11 @@
                                 </div>
                                 <div class="stepper-item" data-step="6">
                                     <div class="step-counter">6</div>
-                                    <div class="step-name text-nowrap">Identity & Payment</div>
+                                    <div class="step-name text-nowrap">Identity</div>
+                                </div>
+                                <div class="stepper-item" data-step="7">
+                                    <div class="step-counter">7</div>
+                                    <div class="step-name text-nowrap">Payment & Offers</div>
                                 </div>
                             </div>
 
@@ -416,7 +420,19 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     <div class="col-12">
                         <h6 class="text-primary border-bottom pb-2 mt-2">Certifications & Qualifications</h6>
                     </div>
-                    <div class="col-md-12">
+                    <div class="col-md-6">
+                        <label class="form-label">Highest Education <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="highest_education" required placeholder="e.g. Master of Yoga">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Institute/University <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="institute_university" required placeholder="Enter Institute">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Year of Passing <span class="text-danger">*</span></label>
+                        <input class="form-control" type="number" name="year_of_passing" required placeholder="YYYY">
+                    </div>
+                    <div class="col-md-12 mt-3">
                         <label class="form-label">Yoga Therapy Certification Details <span class="text-danger">*</span></label>
                         <textarea class="form-control" name="certification_details" rows="3" required placeholder="List key certifications"></textarea>
                     </div>
@@ -574,6 +590,73 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 </div>
             </div>
 
+            <!-- Step 7: Payment & Offers -->
+            <div class="step-content d-none" id="step-7">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <h6 class="text-primary border-bottom pb-2 mt-2">Registration Fee & Special Offers</h6>
+                        <div class="alert alert-light-primary border-0 mb-4 p-4">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <p class="mb-1 text-muted">Registration Fee Amount</p>
+                                    @php
+                                        $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+                                        $feeValue = $financeSettings['yoga_physiotherapist_registration_fee'] ?? 0;
+                                        $feeCurrency = $financeSettings['yoga_physiotherapist_registration_fee_currency'] ?? 'EUR';
+                                        $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+                                    @endphp
+                                    <h4 class="mb-0 fw-bold" id="admin-fee-display-yoga">
+                                        {{ $symbol }} {{ number_format((float)$feeValue, 2) }}
+                                    </h4>
+                                    <input type="hidden" name="registration_fee" id="admin_registration_fee_yoga" value="{{ $feeValue }}">
+                                    <input type="hidden" name="registration_fee_actual" id="admin_registration_fee_actual_yoga" value="{{ $feeValue }}">
+                                    <input type="hidden" name="registration_fee_currency" value="{{ $feeCurrency }}">
+                                </div>
+                                <div class="ms-3">
+                                    <button type="submit" class="btn btn-primary" id="admin-pay-btn-yoga">
+                                        <i class="iconly-Tick-Square icli me-2"></i> Pay & Register
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-primary small mt-3 mb-0"><i class="iconly-Info-Circle icli me-1"></i> After clicking, the practitioner will receive an email with the payment link.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">Promocode (Optional)</label>
+                        <div class="input-group">
+                            <input type="text" name="promocode" id="admin-promocode-input-yoga" class="form-control" placeholder="Enter code">
+                            <button class="btn btn-outline-primary" type="button" id="admin-promo-apply-btn-yoga">Apply</button>
+                        </div>
+                        <div id="admin-promo-status-yoga" class="small mt-1"></div>
+                    </div>
+
+                    <div id="admin-promo-details-yoga" class="col-12 d-none">
+                        <div class="card bg-light border-0 mt-3">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Discount Percentage:</span>
+                                    <span id="admin-promo-discount-percent-yoga" class="fw-bold text-success">0%</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Discount Amount:</span>
+                                    <span id="admin-promo-discount-amount-yoga" class="fw-bold text-success">0.00</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-bold">Final Payable Amount:</span>
+                                    <span id="admin-promo-final-amount-yoga" class="fw-bold text-primary">0.00</span>
+                                </div>
+                                <input type="hidden" name="promo_code" id="admin-promo-code-hidden-yoga">
+                                <input type="hidden" name="promo_discount_percentage" id="admin-promo-discount-percentage-hidden-yoga">
+                                <input type="hidden" name="promo_discount_amount" id="admin-promo-discount-amount-hidden-yoga">
+                                <input type="hidden" name="promo_total_fee" id="admin-promo-total-fee-hidden-yoga">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Buttons -->
             <div class="d-flex justify-content-between mt-4">
                 <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">Previous</button>
@@ -705,7 +788,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
         let table;
         let therapistIti;
         let currentStep = 1;
-        const totalSteps = 6;
+        const totalSteps = 7;
         let cropper;
         const cropperImage = document.getElementById('cropperImage');
         let cropperDidApply = false;
@@ -1023,6 +1106,100 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             }
 
             window.languageChoices = languageChoices;
+
+            // Promocode Logic for Admin Modal (Yoga)
+            const promoInputYoga = document.getElementById('admin-promocode-input-yoga');
+            const promoApplyBtnYoga = document.getElementById('admin-promo-apply-btn-yoga');
+            const promoStatusYoga = document.getElementById('admin-promo-status-yoga');
+            const promoDetailsYoga = document.getElementById('admin-promo-details-yoga');
+            const feeDisplayYoga = document.getElementById('admin-fee-display-yoga');
+            const feeInputYoga = document.getElementById('admin_registration_fee_yoga');
+            const feeActualInputYoga = document.getElementById('admin_registration_fee_actual_yoga');
+            
+            const promoCodeHiddenYoga = document.getElementById('admin-promo-code-hidden-yoga');
+            const promoDiscountPercentHiddenYoga = document.getElementById('admin-promo-discount-percentage-hidden-yoga');
+            const promoDiscountAmountHiddenYoga = document.getElementById('admin-promo-discount-amount-hidden-yoga');
+            const promoTotalFeeHiddenYoga = document.getElementById('admin-promo-total-fee-hidden-yoga');
+            
+            const promoPercentTextYoga = document.getElementById('admin-promo-discount-percent-yoga');
+            const promoAmountTextYoga = document.getElementById('admin-promo-discount-amount-yoga');
+            const promoFinalTextYoga = document.getElementById('admin-promo-final-amount-yoga');
+            
+            const currencySymbolYoga = "{{ $symbol }}";
+
+            function clearAdminPromoYoga() {
+                if (!promoDetailsYoga) return;
+                promoDetailsYoga.classList.add('d-none');
+                promoStatusYoga.innerHTML = '';
+                
+                promoCodeHiddenYoga.value = '';
+                promoDiscountPercentHiddenYoga.value = '';
+                promoDiscountAmountHiddenYoga.value = '';
+                promoTotalFeeHiddenYoga.value = '';
+                
+                if (feeActualInputYoga && feeInputYoga) {
+                    feeInputYoga.value = feeActualInputYoga.value;
+                    feeDisplayYoga.innerText = `${currencySymbolYoga} ${parseFloat(feeInputYoga.value).toFixed(2)}`;
+                }
+            }
+
+            promoInputYoga?.addEventListener('input', () => {
+                if (promoCodeHiddenYoga.value) clearAdminPromoYoga();
+            });
+
+            promoApplyBtnYoga?.addEventListener('click', async () => {
+                const code = promoInputYoga.value.trim();
+                if (!code) {
+                    promoStatusYoga.innerHTML = '<span class="text-danger">Please enter a code.</span>';
+                    return;
+                }
+
+                promoApplyBtnYoga.disabled = true;
+                promoApplyBtnYoga.innerText = 'Checking...';
+                promoStatusYoga.innerHTML = '';
+
+                try {
+                    const response = await fetch("{{ route('promo.validate') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ code, role: 'yoga_therapist' })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        promoStatusYoga.innerHTML = `<span class="text-danger">${data.message || 'Invalid code.'}</span>`;
+                        clearAdminPromoYoga();
+                        return;
+                    }
+
+                    // Success
+                    promoStatusYoga.innerHTML = '<span class="text-success">Promo applied!</span>';
+                    promoDetailsYoga.classList.remove('d-none');
+                    
+                    promoPercentTextYoga.innerText = `${data.discount_percentage}%`;
+                    promoAmountTextYoga.innerText = `${currencySymbolYoga} ${data.discount_amount}`;
+                    promoFinalTextYoga.innerText = `${currencySymbolYoga} ${data.total_fee}`;
+                    
+                    promoCodeHiddenYoga.value = data.code;
+                    promoDiscountPercentHiddenYoga.value = data.discount_percentage;
+                    promoDiscountAmountHiddenYoga.value = data.discount_amount;
+                    promoTotalFeeHiddenYoga.value = data.total_fee;
+                    
+                    feeInputYoga.value = data.total_fee;
+                    feeDisplayYoga.innerText = `${currencySymbolYoga} ${parseFloat(data.total_fee).toFixed(2)}`;
+
+                } catch (error) {
+                    promoStatusYoga.innerHTML = '<span class="text-danger">Error validating code.</span>';
+                } finally {
+                    promoApplyBtnYoga.disabled = false;
+                    promoApplyBtnYoga.innerText = 'Apply';
+                }
+            });
 
             // Stepper Logic
             $('#next-btn').click(function() {
@@ -1386,6 +1563,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         $('input[name="registration_proof"]').prop('required', true);
                     }
 
+                    $('input[name="highest_education"]').val(t.highest_education || '');
+                    $('input[name="institute_university"]').val(t.institute_university || '');
+                    $('input[name="year_of_passing"]').val(t.year_of_passing || '');
                     if (t.certification_details) $('textarea[name="certification_details"]').val(t.certification_details);
                     if (t.additional_certifications) $('textarea[name="additional_certifications"]').val(t.additional_certifications);
 
@@ -1696,7 +1876,17 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 </div>
                                 <!-- Qualifications -->
                                 <div class="tab-pane fade" id="v-qual">
-                                    <p class="text-muted small mb-1">Certification Details</p>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Highest Education</p>
+                                            <p class="fw-bold">${t.highest_education || 'N/A'}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Institute & Year</p>
+                                            <p class="fw-bold">${t.institute_university || ''} ${t.year_of_passing ? '(' + t.year_of_passing + ')' : ''}</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted small mb-1 mt-3">Certification Details</p>
                                     <p class="bg-light p-3 rounded mb-3">${t.certification_details || 'N/A'}</p>
                                     <p class="text-muted small mb-1">Additional Certs</p>
                                     <p class="bg-light p-3 rounded mb-3">${t.additional_certifications || 'N/A'}</p>

@@ -141,6 +141,10 @@
                                     <div class="step-counter">5</div>
                                     <div class="step-name text-nowrap">Documents</div>
                                 </div>
+                                <div class="stepper-item" data-step="6">
+                                    <div class="step-counter">6</div>
+                                    <div class="step-name text-nowrap">Payment & Offers</div>
+                                </div>
                             </div>
 
                             <form id="practitioner-form" method="POST" enctype="multipart/form-data" class="theme-form" novalidate>
@@ -525,7 +529,79 @@
 
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-5 pt-3 border-top">
                                             <button type="button" class="btn btn-outline-dark prev-step" data-prev="4"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
-                                            <button type="submit" class="btn btn-success" id="submit-btn"><i class="fa-solid fa-check-circle me-2"></i> Complete Registration</button>
+                                            <button type="button" class="btn btn-primary next-step" data-next="6">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 6: Payment & Offers -->
+                                <div class="step-content d-none" id="step6">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <h6 class="f-w-600 mb-3 border-bottom pb-2">Registration Fee & Special Offers</h6>
+                                            <div class="alert alert-light-primary border-0 mb-4 p-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-1 text-muted">Registration Fee Amount</p>
+                                                        @php
+                                                            $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+                                                            $feeValue = $financeSettings['practitioner_registration_fee'] ?? 0;
+                                                            $feeCurrency = $financeSettings['practitioner_registration_fee_currency'] ?? 'EUR';
+                                                            $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+                                                        @endphp
+                                                        <h4 class="mb-0 fw-bold" id="admin-fee-display-practitioner">
+                                                            {{ $symbol }} {{ number_format((float)$feeValue, 2) }}
+                                                        </h4>
+                                                        <input type="hidden" name="registration_fee" id="admin_registration_fee_practitioner" value="{{ $feeValue }}">
+                                                        <input type="hidden" name="registration_fee_actual" id="admin_registration_fee_actual_practitioner" value="{{ $feeValue }}">
+                                                        <input type="hidden" name="registration_fee_currency" value="{{ $feeCurrency }}">
+                                                    </div>
+                                                    <div class="ms-3">
+                                                        <button type="submit" class="btn btn-primary" id="admin-pay-btn-practitioner">
+                                                            <i class="fa-solid fa-check-circle me-2"></i> Pay & Register
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <p class="text-primary small mt-3 mb-0"><i class="fa-solid fa-info-circle me-1"></i> After completion, the practitioner will receive an email with the payment link.</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-bold">Promocode (Optional)</label>
+                                            <div class="input-group">
+                                                <input type="text" name="promocode" id="admin-promocode-input-practitioner" class="form-control" placeholder="Enter promo code">
+                                                <button class="btn btn-outline-primary" type="button" id="admin-promo-apply-btn-practitioner">Apply</button>
+                                            </div>
+                                            <div id="admin-promo-status-practitioner" class="small mt-1"></div>
+                                        </div>
+
+                                        <div id="admin-promo-details-practitioner" class="col-12 d-none">
+                                            <div class="card bg-light border-0 mt-3">
+                                                <div class="card-body p-3">
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span>Discount Percentage:</span>
+                                                        <span id="admin-promo-discount-percent-practitioner" class="fw-bold text-success">0%</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span>Discount Amount:</span>
+                                                        <span id="admin-promo-discount-amount-practitioner" class="fw-bold text-success">0.00</span>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span class="fw-bold">Final Payable Amount:</span>
+                                                        <span id="admin-promo-final-amount-practitioner" class="fw-bold text-primary">0.00</span>
+                                                    </div>
+                                                    <input type="hidden" name="promo_code" id="admin-promo-code-hidden-practitioner">
+                                                    <input type="hidden" name="promo_discount_percentage" id="admin-promo-discount-percentage-hidden-practitioner">
+                                                    <input type="hidden" name="promo_discount_amount" id="admin-promo-discount-amount-hidden-practitioner">
+                                                    <input type="hidden" name="promo_total_fee" id="admin-promo-total-fee-hidden-practitioner">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 wizard-footer d-flex justify-content-between mt-5 pt-3 border-top">
+                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="5"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
+                                            <button type="submit" class="btn btn-success" id="submit-btn" style="display: none;"><i class="fa-solid fa-check-circle me-2"></i> Save Practitioner</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1262,6 +1338,8 @@
         });
     }
 
+    let practitionerTotalSteps = 6;
+
     function updateStep(step) {
         $('.step-content').addClass('d-none');
         $('#step' + step).removeClass('d-none');
@@ -1272,6 +1350,23 @@
             else $(this).removeClass('active completed');
         });
         $('#practitioner-form-modal .modal-body').scrollTop(0);
+
+        // Buttons handling
+        if (step == practitionerTotalSteps) {
+            $('.next-step').hide();
+            $('#submit-btn').show();
+            $('#admin-pay-btn-practitioner').show();
+        } else {
+            $('.next-step').show();
+            $('#submit-btn').hide();
+            $('#admin-pay-btn-practitioner').hide();
+        }
+
+        if (step == 1) {
+            $('.prev-step').hide();
+        } else {
+            $('.prev-step').show();
+        }
     }
 
     // Real-time validation: Clear error when user starts typing
@@ -1396,6 +1491,9 @@
         $('#imageUpload').val('');
         croppedFile = null;
 
+        practitionerTotalSteps = 6;
+        $('.stepper-item[data-step="6"]').show();
+        clearAdminPromoPrac();
         updateStep(1);
         $('#practitioner-form-modal').modal('show');
     }
@@ -1530,6 +1628,8 @@
             $('#password-confirm-input').removeAttr('required').val('').removeClass('is-invalid');
             $('#submit-btn').prop('disabled', false);
 
+            practitionerTotalSteps = 5; // Hide payment step on edit
+            $('.stepper-item[data-step="6"]').hide();
             updateStep(1);
             $('#practitioner-form-modal').modal('show');
         });
@@ -1981,6 +2081,96 @@
      document.getElementById("password-input").addEventListener("input", function () {
     this.value = this.value.replace(/\s/g, '');
 });
+
+    // Promocode Logic for Practitioner
+    const promoInputPrac = document.getElementById('admin-promocode-input-practitioner');
+    const promoApplyBtnPrac = document.getElementById('admin-promo-apply-btn-practitioner');
+    const promoStatusPrac = document.getElementById('admin-promo-status-practitioner');
+    const promoDetailsPrac = document.getElementById('admin-promo-details-practitioner');
+    const feeDisplayPrac = document.getElementById('admin-fee-display-practitioner');
+    const feeInputPrac = document.getElementById('admin_registration_fee_practitioner');
+    const feeActualInputPrac = document.getElementById('admin_registration_fee_actual_practitioner');
+
+    const promoCodeHiddenPrac = document.getElementById('admin-promo-code-hidden-practitioner');
+    const promoPercHiddenPrac = document.getElementById('admin-promo-discount-percentage-hidden-practitioner');
+    const promoAmtHiddenPrac = document.getElementById('admin-promo-discount-amount-hidden-practitioner');
+    const promoTotalHiddenPrac = document.getElementById('admin-promo-total-fee-hidden-practitioner');
+
+    const currencySymbolPrac = "{{ $symbol }}";
+
+    function clearAdminPromoPrac() {
+        if (promoStatusPrac) promoStatusPrac.innerHTML = '';
+        if (promoDetailsPrac) promoDetailsPrac.classList.add('d-none');
+        if (promoCodeHiddenPrac) {
+            promoCodeHiddenPrac.value = '';
+            promoPercHiddenPrac.value = '';
+            promoAmtHiddenPrac.value = '';
+            promoTotalHiddenPrac.value = '';
+            if (feeActualInputPrac && feeInputPrac) {
+                feeInputPrac.value = feeActualInputPrac.value;
+                feeDisplayPrac.innerText = `${currencySymbolPrac} ${parseFloat(feeInputPrac.value).toFixed(2)}`;
+            }
+        }
+    }
+
+    promoInputPrac?.addEventListener('input', () => {
+        if (promoCodeHiddenPrac.value) clearAdminPromoPrac();
+    });
+
+    promoApplyBtnPrac?.addEventListener('click', async () => {
+        const code = promoInputPrac.value.trim();
+        if (!code) {
+            promoStatusPrac.innerHTML = '<span class="text-danger">Please enter a code.</span>';
+            return;
+        }
+
+        promoApplyBtnPrac.disabled = true;
+        promoApplyBtnPrac.innerText = 'Checking...';
+        promoStatusPrac.innerHTML = '';
+
+        try {
+            const response = await fetch("{{ route('promo.validate') }}", {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ code, role: 'practitioner' })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                promoStatusPrac.innerHTML = `<span class="text-danger">${data.message || 'Invalid code.'}</span>`;
+                clearAdminPromoPrac();
+                return;
+            }
+
+            // Success
+            promoStatusPrac.innerHTML = '<span class="text-success">Promo applied!</span>';
+            promoDetailsPrac.classList.remove('d-none');
+            
+            document.getElementById('admin-promo-discount-percent-practitioner').innerText = `${data.discount_percentage}%`;
+            document.getElementById('admin-promo-discount-amount-practitioner').innerText = `${currencySymbolPrac} ${data.discount_amount}`;
+            document.getElementById('admin-promo-final-amount-practitioner').innerText = `${currencySymbolPrac} ${data.total_fee}`;
+            
+            feeDisplayPrac.innerText = `${currencySymbolPrac} ${data.total_fee}`;
+            feeInputPrac.value = data.total_fee;
+
+            promoCodeHiddenPrac.value = data.code;
+            promoPercHiddenPrac.value = data.discount_percentage;
+            promoAmtHiddenPrac.value = data.discount_amount;
+            promoTotalHiddenPrac.value = data.total_fee;
+
+        } catch (err) {
+            promoStatusPrac.innerHTML = '<span class="text-danger">Error validating code.</span>';
+            clearAdminPromoPrac();
+        } finally {
+            promoApplyBtnPrac.disabled = false;
+            promoApplyBtnPrac.innerText = 'Apply';
+        }
+    });
 
 </script>
 

@@ -24,6 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            'validate-promo-code',
+            '/validate-promo-code',
+        ]);
+
         $middleware->alias([
             'isAdmin' => \App\Http\Middleware\IsAdmin::class,
             'isClient' => \App\Http\Middleware\IsClient::class,

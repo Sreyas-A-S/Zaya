@@ -823,8 +823,11 @@
 
             const feeInput = document.querySelector('input[name="registration_fee"]');
             const feeActualInput = document.querySelector('input[name="registration_fee_actual"]');
-            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-            const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+            function getCsrfToken() {
+                return document.querySelector('input[name="_token"]')?.value ||
+                    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                    '';
+            }
             const roleValue = document.querySelector('input[name=\"role\"]')?.value || 'practitioner';
 
             function clearPromo() {
@@ -871,13 +874,14 @@
                     try {
                         const response = await fetch("{{ route('promo.validate') }}", {
                             method: 'POST',
+                            credentials: 'same-origin',
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': csrfToken
+                                'X-CSRF-TOKEN': getCsrfToken()
                             },
-                            body: JSON.stringify({ code, role: roleValue })
+                            body: JSON.stringify({ code, role: roleValue, usage_type: 'registration' })
                         });
 
                         const data = await response.json().catch(() => ({}));

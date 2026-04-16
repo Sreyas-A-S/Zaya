@@ -152,9 +152,11 @@ class RegisterController extends Controller
                 $user->promo_code = $promoCode;
                 $user->save();
 
-                $user->userPromoCodes()->firstOrCreate([
-                    'promo_code' => $promoCode
-                ]);
+                if (Schema::hasTable('user_promo_codes')) {
+                    $user->userPromoCodes()->firstOrCreate([
+                        'promo_code' => $promoCode
+                    ]);
+                }
             }
 
             $teamRoles = [
@@ -194,15 +196,24 @@ class RegisterController extends Controller
             try {
                 $feeService = app(RegistrationFeeService::class);
                 $isTeamRole = in_array($user->role, $teamRoles, true);
+                $promoRole = $user->role === 'patient' ? 'client' : $user->role;
                 $promoNotes = [];
                 $feeOverride = null;
+                $isPromoEligibleRole = in_array($promoRole, [
+                    'client',
+                    'practitioner',
+                    'doctor',
+                    'mindfulness_practitioner',
+                    'yoga_therapist',
+                    'translator',
+                ], true);
 
-                if ($isTeamRole) {
-                    [$feeOverride, $promoNotes] = $this->resolveRegistrationPromo($request, $user->role);
+                if ($isPromoEligibleRole) {
+                    [$feeOverride, $promoNotes] = $this->resolveRegistrationPromo($request, $promoRole);
                     if (!empty($promoNotes['promo_code'] ?? null)) {
                         $promo = PromoCode::where('code', $promoNotes['promo_code'])->first();
                         if ($promo) {
-                            $promo->increment('used_count');
+                            $promo->incrementUsageIfAvailable();
                         }
                     }
                 }
@@ -223,7 +234,12 @@ class RegisterController extends Controller
                     }
                 } else {
                     Mail::to($user->email)->send(new WelcomeUserMail($user->email, $request->password, url('/zaya-login'), $user->role));
-                    if ($paymentLink = $feeService->createPaymentLink($user, 'client')) {
+                    if ($feeOverride !== null && $feeOverride <= 0) {
+                        $paymentLink = null;
+                    } else {
+                        $paymentLink = $feeService->createPaymentLink($user, 'client', $feeOverride, $promoNotes);
+                    }
+                    if ($paymentLink) {
                         Mail::to($user->email)->send(
                             new RegistrationFeePaymentLinkMail($paymentLink['role_label'], $paymentLink['amount'], $paymentLink['currency'], $paymentLink['payment_url'])
                         );
@@ -238,17 +254,6 @@ class RegisterController extends Controller
 
             // For "Join our team" roles, do not auto-login; send user to login page.
             if (in_array($request->role, $teamRoles, true)) {
-                if ($paymentLink && ($paymentLink['payment_url'] ?? null)) {
-                    if ($request->wantsJson()) {
-                        return response()->json([
-                            'success' => 'Registration successful! Your application is under review.',
-                            'payment_url' => $paymentLink['payment_url'],
-                        ], 201);
-                    }
-
-                    return redirect()->away($paymentLink['payment_url']);
-                }
-
                 if ($request->wantsJson()) {
                     return response()->json(['success' => 'Registration successful! Your application is under review.'], 201);
                 }
@@ -324,6 +329,7 @@ class RegisterController extends Controller
             'yoga_therapist' => 'yoga_registration_fee',
             'translator' => 'translator_registration_fee',
             'client' => 'client_registration_fee',
+            'patient' => 'client_registration_fee',
         ];
 
         if (!isset($feeKeyMap[$role])) {
@@ -509,7 +515,7 @@ class RegisterController extends Controller
             'linkedin' => $request->input('linkedin'),
         ];
 
-        $user->doctor()->create([
+        $doctorData = [
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'full_name' => trim($request->first_name . ' ' . $request->last_name),
@@ -527,8 +533,12 @@ class RegisterController extends Controller
 
             'primary_qualification' => $request->primary_qualification,
             'primary_qualification_other' => $request->primary_qualification === 'other' ? $request->primary_qualification_other : null,
+            'primary_institute' => $request->primary_institute,
+            'primary_year' => $request->primary_year,
             'post_graduation' => $request->post_graduation,
             'post_graduation_other' => $request->post_graduation === 'other' ? $request->post_graduation_other : null,
+            'pg_institute' => $request->pg_institute,
+            'pg_year' => $request->pg_year,
             'specialization' => $request->input('specialization', []),
             'degree_certificates_path' => $degreeCertificatesPaths,
             'years_of_experience' => $request->years_of_experience,
@@ -573,7 +583,19 @@ class RegisterController extends Controller
             'prescription_understanding_agreed' => $request->boolean('prescription_understanding'),
             'confidentiality_consented' => $request->boolean('confidentiality_consent'),
             'status' => 'inactive',
-        ]);
+        ];
+
+        // Keep registration working even when DB schema is behind code fields.
+        if (Schema::hasTable('doctors')) {
+            $columns = array_flip(Schema::getColumnListing('doctors'));
+            $doctorData = array_filter(
+                $doctorData,
+                fn ($value, $key) => isset($columns[$key]),
+                ARRAY_FILTER_USE_BOTH
+            );
+        }
+
+        $user->doctor()->create($doctorData);
     }
 
     protected function createMindfulnessPractitionerProfile($user, $request)
@@ -596,6 +618,8 @@ class RegisterController extends Controller
             'current_workplace',
             'website_social_links',
             'highest_education',
+            'institute_university',
+            'year_of_passing',
             'mindfulness_training_details',
             'additional_certifications',
             'services_offered',
@@ -653,6 +677,9 @@ class RegisterController extends Controller
             'current_organization',
             'workplace_address',
             'website_social_links',
+            'highest_education',
+            'institute_university',
+            'year_of_passing',
             'certification_details',
             'additional_certifications',
             'registration_number',
@@ -729,6 +756,8 @@ class RegisterController extends Controller
             'previous_clients_projects',
             'portfolio_link',
             'highest_education',
+            'institute_university',
+            'year_of_passing',
             'certification_details',
             'services_offered',
             'gov_id_type',

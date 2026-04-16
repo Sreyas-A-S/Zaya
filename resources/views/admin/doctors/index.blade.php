@@ -129,6 +129,10 @@
                                     <div class="step-counter">5</div>
                                     <div class="step-name">Profile & Consent</div>
                                 </div>
+                                <div class="stepper-item" data-step="6">
+                                    <div class="step-counter">6</div>
+                                    <div class="step-name">Payment & Offers</div>
+                                </div>
                             </div>
 
                             <form id="doctor-form" enctype="multipart/form-data" novalidate>
@@ -277,6 +281,14 @@
                                             </select>
                                             <input type="text" class="form-control mt-2 d-none" name="primary_qualification_other" id="primary_qualification_other" placeholder="Specify Other Qualification">
                                         </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Institute (Primary)</label>
+                                            <input type="text" class="form-control" name="primary_institute" id="primary_institute" placeholder="Enter Institute">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Year of Passing (Primary)</label>
+                                            <input type="number" class="form-control" name="primary_year" id="primary_year" placeholder="YYYY">
+                                        </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Post Graduation (If any)</label>
                                             <select class="form-select" name="post_graduation" id="post_graduation">
@@ -286,6 +298,14 @@
                                                 <option value="other">Other</option>
                                             </select>
                                             <input type="text" class="form-control mt-2 d-none" name="post_graduation_other" id="post_graduation_other" placeholder="Specify Other PG">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Institute (PG)</label>
+                                            <input type="text" class="form-control" name="pg_institute" id="pg_institute" placeholder="Enter Institute">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Year of Passing (PG)</label>
+                                            <input type="number" class="form-control" name="pg_year" id="pg_year" placeholder="YYYY">
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Specialization (Select multiple if applicable)</label>
@@ -693,7 +713,79 @@
 
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-5 pt-3 border-top">
                                             <button type="button" class="btn btn-outline-dark prev-step" data-prev="4"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
-                                            <button type="submit" class="btn btn-success" id="submit-btn"><i class="iconly-Tick-Square icli me-2"></i> Complete Registration</button>
+                                            <button type="button" class="btn btn-primary next-step" data-next="6">Next Step: Payment <i class="iconly-Arrow-Right icli ms-2"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 6: Registration Fee & Promocode -->
+                                <div class="step-content d-none" id="step6">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <h5 class="f-w-600 mb-3">Registration Fee & Special Offers</h5>
+                                            <div class="alert alert-light-primary border-0 mb-4 p-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-1 text-muted">Registration Fee Amount</p>
+                                                        <h4 class="mb-0 fw-bold" id="admin-fee-display">
+                                                            @php
+                                                                $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+                                                                $feeValue = $financeSettings['doctor_registration_fee'] ?? 0;
+                                                                $feeCurrency = $financeSettings['doctor_registration_fee_currency'] ?? 'EUR';
+                                                                $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+                                                            @endphp
+                                                            {{ $symbol }} {{ number_format((float)$feeValue, 2) }}
+                                                        </h4>
+                                                        <input type="hidden" name="registration_fee" id="admin_registration_fee" value="{{ $feeValue }}">
+                                                        <input type="hidden" name="registration_fee_actual" id="admin_registration_fee_actual" value="{{ $feeValue }}">
+                                                        <input type="hidden" name="registration_fee_currency" value="{{ $feeCurrency }}">
+                                                    </div>
+                                                    <div class="ms-3">
+                                                        <button type="submit" class="btn btn-primary btn-lg" id="admin-pay-btn">
+                                                            <i class="iconly-Tick-Square icli me-2"></i> Pay & Register
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <p class="text-primary small mt-3 mb-0"><i class="iconly-Info-Circle icli me-1"></i> After clicking, the practitioner will receive an email with the payment link.</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <label class="form-label">Promocode (Optional)</label>
+                                            <div class="input-group">
+                                                <input type="text" name="promocode" id="admin-promocode-input" class="form-control" placeholder="Enter code (e.g. WELCOME10)">
+                                                <button class="btn btn-outline-primary" type="button" id="admin-promo-apply-btn">Apply</button>
+                                            </div>
+                                            <div id="admin-promo-status" class="small mt-1"></div>
+                                        </div>
+
+                                        <div id="admin-promo-details" class="col-12 d-none">
+                                            <div class="card bg-light border-0 mt-3">
+                                                <div class="card-body p-3">
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span>Discount Percentage:</span>
+                                                        <span id="admin-promo-discount-percent" class="fw-bold text-success">0%</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span>Discount Amount:</span>
+                                                        <span id="admin-promo-discount-amount" class="fw-bold text-success">0.00</span>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span class="fw-bold">Final Payable Amount:</span>
+                                                        <span id="admin-promo-final-amount" class="fw-bold text-primary">0.00</span>
+                                                    </div>
+                                                    <input type="hidden" name="promo_code" id="admin-promo-code-hidden">
+                                                    <input type="hidden" name="promo_discount_percentage" id="admin-promo-discount-percentage-hidden">
+                                                    <input type="hidden" name="promo_discount_amount" id="admin-promo-discount-amount-hidden">
+                                                    <input type="hidden" name="promo_total_fee" id="admin-promo-total-fee-hidden">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 wizard-footer d-flex justify-content-between mt-5 pt-3 border-top">
+                                            <button type="button" class="btn btn-outline-dark prev-step" data-prev="5"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
+                                            <button type="submit" class="btn btn-success" id="admin-complete-btn"><i class="iconly-Tick-Square icli me-2"></i> Complete Registration</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1494,6 +1586,100 @@
         $('#languages_capabilities_container').append(html);
     }
 
+        // Promocode Logic for Admin Modal
+        const promoInput = document.getElementById('admin-promocode-input');
+        const promoApplyBtn = document.getElementById('admin-promo-apply-btn');
+        const promoStatus = document.getElementById('admin-promo-status');
+        const promoDetails = document.getElementById('admin-promo-details');
+        const feeDisplay = document.getElementById('admin-fee-display');
+        const feeInput = document.getElementById('admin_registration_fee');
+        const feeActualInput = document.getElementById('admin_registration_fee_actual');
+        
+        const promoCodeHidden = document.getElementById('admin-promo-code-hidden');
+        const promoDiscountPercentHidden = document.getElementById('admin-promo-discount-percentage-hidden');
+        const promoDiscountAmountHidden = document.getElementById('admin-promo-discount-amount-hidden');
+        const promoTotalFeeHidden = document.getElementById('admin-promo-total-fee-hidden');
+        
+        const promoPercentText = document.getElementById('admin-promo-discount-percent');
+        const promoAmountText = document.getElementById('admin-promo-discount-amount');
+        const promoFinalText = document.getElementById('admin-promo-final-amount');
+        
+        const currencySymbol = "{{ $symbol }}";
+
+        function clearAdminPromo() {
+            if (!promoDetails) return;
+            promoDetails.classList.add('d-none');
+            promoStatus.innerHTML = '';
+            
+            promoCodeHidden.value = '';
+            promoDiscountPercentHidden.value = '';
+            promoDiscountAmountHidden.value = '';
+            promoTotalFeeHidden.value = '';
+            
+            if (feeActualInput && feeInput) {
+                feeInput.value = feeActualInput.value;
+                feeDisplay.innerText = `${currencySymbol} ${parseFloat(feeInput.value).toFixed(2)}`;
+            }
+        }
+
+        promoInput?.addEventListener('input', () => {
+            if (promoCodeHidden.value) clearAdminPromo();
+        });
+
+        promoApplyBtn?.addEventListener('click', async () => {
+            const code = promoInput.value.trim();
+            if (!code) {
+                promoStatus.innerHTML = '<span class="text-danger">Please enter a code.</span>';
+                return;
+            }
+
+            promoApplyBtn.disabled = true;
+            promoApplyBtn.innerText = 'Checking...';
+            promoStatus.innerHTML = '';
+
+            try {
+                const response = await fetch("{{ route('promo.validate') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ code, role: 'doctor' })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    promoStatus.innerHTML = `<span class="text-danger">${data.message || 'Invalid code.'}</span>`;
+                    clearAdminPromo();
+                    return;
+                }
+
+                // Success
+                promoStatus.innerHTML = '<span class="text-success">Promo applied!</span>';
+                promoDetails.classList.remove('d-none');
+                
+                promoPercentText.innerText = `${data.discount_percentage}%`;
+                promoAmountText.innerText = `${currencySymbol} ${data.discount_amount}`;
+                promoFinalText.innerText = `${currencySymbol} ${data.total_fee}`;
+                
+                promoCodeHidden.value = data.code;
+                promoDiscountPercentHidden.value = data.discount_percentage;
+                promoDiscountAmountHidden.value = data.discount_amount;
+                promoTotalFeeHidden.value = data.total_fee;
+                
+                feeInput.value = data.total_fee;
+                feeDisplay.innerText = `${currencySymbol} ${parseFloat(data.total_fee).toFixed(2)}`;
+
+            } catch (error) {
+                promoStatus.innerHTML = '<span class="text-danger">Error validating code.</span>';
+            } finally {
+                promoApplyBtn.disabled = false;
+                promoApplyBtn.innerText = 'Apply';
+            }
+        });
+
     function initFormNavigation() {
         $('.next-step').on('click', function() {
             var stepContent = $(this).closest('.step-content');
@@ -1679,8 +1865,12 @@
             // Qualifications
             $('[name="primary_qualification"]').val(profile.primary_qualification).trigger('change');
             $('[name="primary_qualification_other"]').val(profile.primary_qualification_other);
+            $('[name="primary_institute"]').val(profile.primary_institute || '');
+            $('[name="primary_year"]').val(profile.primary_year || '');
             $('[name="post_graduation"]').val(profile.post_graduation || '').trigger('change');
             $('[name="post_graduation_other"]').val(profile.post_graduation_other);
+            $('[name="pg_institute"]').val(profile.pg_institute || '');
+            $('[name="pg_year"]').val(profile.pg_year || '');
 
             // JSON fields
             function checkBoxes(selector, values) {
@@ -1910,8 +2100,16 @@
                                     <div class="col-sm-6"><label class="small text-muted mb-0">State Council</label><p class="f-w-600">${p.state_ayurveda_council_name || 'N/A'}</p></div>
                                     
                                     <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Qualifications & Experience</h6></div>
-                                    <div class="col-sm-6"><label class="small text-muted mb-0">Primary Qualification</label><p class="f-w-600">${p.primary_qualification === 'other' ? p.primary_qualification_other : (p.primary_qualification || 'N/A')}</p></div>
-                                    <div class="col-sm-6"><label class="small text-muted mb-0">Post Graduation</label><p class="f-w-600">${p.post_graduation === 'other' ? p.post_graduation_other : (p.post_graduation || 'None')}</p></div>
+                                    <div class="col-sm-6">
+                                        <label class="small text-muted mb-0">Primary Qualification</label>
+                                        <p class="f-w-600 mb-0">${p.primary_qualification === 'other' ? p.primary_qualification_other : (p.primary_qualification || 'N/A')}</p>
+                                        <p class="small text-muted">${p.primary_institute || ''} ${p.primary_year ? '(' + p.primary_year + ')' : ''}</p>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="small text-muted mb-0">Post Graduation</label>
+                                        <p class="f-w-600 mb-0">${p.post_graduation === 'other' ? p.post_graduation_other : (p.post_graduation || 'None')}</p>
+                                        <p class="small text-muted">${p.pg_institute || ''} ${p.pg_year ? '(' + p.pg_year + ')' : ''}</p>
+                                    </div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Experience</label><p class="f-w-600">${p.years_of_experience || 0} Years</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Current Workplace</label><p class="f-w-600">${p.current_workplace_clinic_name || 'N/A'}</p></div>
                                     <div class="col-12"><label class="small text-muted mb-0">Specializations</label><div>${renderBadges(p.specialization)}</div></div>

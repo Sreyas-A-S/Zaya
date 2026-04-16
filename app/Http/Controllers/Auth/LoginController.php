@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class LoginController extends Controller
 {
@@ -149,9 +150,11 @@ class LoginController extends Controller
             $user->save();
 
             // Track promo code in user_promo_codes table (unique per user per code)
-            $user->userPromoCodes()->firstOrCreate([
-                'promo_code' => $promoCode
-            ]);
+            if (Schema::hasTable('user_promo_codes')) {
+                $user->userPromoCodes()->firstOrCreate([
+                    'promo_code' => $promoCode
+                ]);
+            }
         }
 
         $blockReason = $user->getLoginBlockReason();

@@ -1214,7 +1214,11 @@
             const roleInput = document.querySelector('input[name="role"]');
             const roleValue = roleInput ? roleInput.value : 'client';
 
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            function getCsrfToken() {
+                return document.querySelector('input[name="_token"]')?.value ||
+                    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                    '';
+            }
 
             async function convertFee(targetCountryCode) {
                 if (!feeInput || !feeActualInput) return;
@@ -1352,13 +1356,14 @@
                 try {
                     const response = await fetch("{{ route('promo.validate') }}", {
                         method: 'POST',
+                        credentials: 'same-origin',
                         headers: {
                             'Accept': 'application/json',
                             'Content-Type': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': csrfToken
+                            'X-CSRF-TOKEN': getCsrfToken()
                         },
-                        body: JSON.stringify({ code, role: roleValue })
+                        body: JSON.stringify({ code, role: roleValue, usage_type: 'registration' })
                     });
 
                     const data = await response.json().catch(() => ({}));

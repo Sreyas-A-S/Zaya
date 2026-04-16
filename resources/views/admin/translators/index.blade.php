@@ -142,7 +142,11 @@
                                 </div>
                                 <div class="stepper-item" data-step="6">
                                     <div class="step-counter">6</div>
-                                    <div class="step-name text-nowrap">Identity & Payment</div>
+                                    <div class="step-name text-nowrap">Identity</div>
+                                </div>
+                                <div class="stepper-item" data-step="7">
+                                    <div class="step-counter">7</div>
+                                    <div class="step-name text-nowrap">Payment & Offers</div>
                                 </div>
                             </div>
 
@@ -381,9 +385,17 @@
                                 <!-- Step 4: Qualifications -->
                                 <div class="step-content d-none" id="step-4">
                                     <div class="row g-3">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <label class="form-label">Highest Education Qualification <span class="text-danger">*</span></label>
                                             <input class="form-control" type="text" name="highest_education" required placeholder="e.g. Master's in Translation">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Institute/University <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="institute_university" required placeholder="Enter Institute">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Year of Passing <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="number" name="year_of_passing" required placeholder="YYYY">
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Translation Certification Details</label>
@@ -512,6 +524,73 @@
                                     </div>
                                 </div>
 
+                                <!-- Step 7: Payment & Offers -->
+                                <div class="step-content d-none" id="step-7">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <h6 class="text-primary border-bottom pb-2 mt-2">Registration Fee & Special Offers</h6>
+                                            <div class="alert alert-light-primary border-0 mb-4 p-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-1 text-muted">Registration Fee Amount</p>
+                                                        @php
+                                                            $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+                                                            $feeValue = $financeSettings['translator_registration_fee'] ?? 0;
+                                                            $feeCurrency = $financeSettings['translator_registration_fee_currency'] ?? 'EUR';
+                                                            $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+                                                        @endphp
+                                                        <h4 class="mb-0 fw-bold" id="admin-fee-display-trans">
+                                                            {{ $symbol }} {{ number_format((float)$feeValue, 2) }}
+                                                        </h4>
+                                                        <input type="hidden" name="registration_fee" id="admin_registration_fee_trans" value="{{ $feeValue }}">
+                                                        <input type="hidden" name="registration_fee_actual" id="admin_registration_fee_actual_trans" value="{{ $feeValue }}">
+                                                        <input type="hidden" name="registration_fee_currency" value="{{ $feeCurrency }}">
+                                                    </div>
+                                                    <div class="ms-3">
+                                                        <button type="submit" class="btn btn-primary" id="admin-pay-btn-trans">
+                                                            <i class="iconly-Tick-Square icli me-2"></i> Pay & Register
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <p class="text-primary small mt-3 mb-0"><i class="iconly-Info-Circle icli me-1"></i> After clicking, the practitioner will receive an email with the payment link.</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <label class="form-label">Promocode (Optional)</label>
+                                            <div class="input-group">
+                                                <input type="text" name="promocode" id="admin-promocode-input-trans" class="form-control" placeholder="Enter code">
+                                                <button class="btn btn-outline-primary" type="button" id="admin-promo-apply-btn-trans">Apply</button>
+                                            </div>
+                                            <div id="admin-promo-status-trans" class="small mt-1"></div>
+                                        </div>
+
+                                        <div id="admin-promo-details-trans" class="col-12 d-none">
+                                            <div class="card bg-light border-0 mt-3">
+                                                <div class="card-body p-3">
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span>Discount Percentage:</span>
+                                                        <span id="admin-promo-discount-percent-trans" class="fw-bold text-success">0%</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span>Discount Amount:</span>
+                                                        <span id="admin-promo-discount-amount-trans" class="fw-bold text-success">0.00</span>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span class="fw-bold">Final Payable Amount:</span>
+                                                        <span id="admin-promo-final-amount-trans" class="fw-bold text-primary">0.00</span>
+                                                    </div>
+                                                    <input type="hidden" name="promo_code" id="admin-promo-code-hidden-trans">
+                                                    <input type="hidden" name="promo_discount_percentage" id="admin-promo-discount-percentage-hidden-trans">
+                                                    <input type="hidden" name="promo_discount_amount" id="admin-promo-discount-amount-hidden-trans">
+                                                    <input type="hidden" name="promo_total_fee" id="admin-promo-total-fee-hidden-trans">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Buttons -->
                                 <div class="d-flex justify-content-between mt-4">
                                     <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">Previous</button>
@@ -626,7 +705,7 @@
         let table;
         let translatorIti;
         let currentStep = 1;
-        const totalSteps = 6;
+        const totalSteps = 7;
         let sourceLangChoices, targetLangChoices, addLangChoices;
         let cropper;
         let croppedFile = null;
@@ -835,6 +914,100 @@
                         target: targetChoices,
                         additional: additionalChoices
                     };
+
+            // Promocode Logic for Admin Modal (Translator)
+            const promoInputTrans = document.getElementById('admin-promocode-input-trans');
+            const promoApplyBtnTrans = document.getElementById('admin-promo-apply-btn-trans');
+            const promoStatusTrans = document.getElementById('admin-promo-status-trans');
+            const promoDetailsTrans = document.getElementById('admin-promo-details-trans');
+            const feeDisplayTrans = document.getElementById('admin-fee-display-trans');
+            const feeInputTrans = document.getElementById('admin_registration_fee_trans');
+            const feeActualInputTrans = document.getElementById('admin_registration_fee_actual_trans');
+            
+            const promoCodeHiddenTrans = document.getElementById('admin-promo-code-hidden-trans');
+            const promoDiscountPercentHiddenTrans = document.getElementById('admin-promo-discount-percentage-hidden-trans');
+            const promoDiscountAmountHiddenTrans = document.getElementById('admin-promo-discount-amount-hidden-trans');
+            const promoTotalFeeHiddenTrans = document.getElementById('admin-promo-total-fee-hidden-trans');
+            
+            const promoPercentTextTrans = document.getElementById('admin-promo-discount-percent-trans');
+            const promoAmountTextTrans = document.getElementById('admin-promo-discount-amount-trans');
+            const promoFinalTextTrans = document.getElementById('admin-promo-final-amount-trans');
+            
+            const currencySymbolTrans = "{{ $symbol }}";
+
+            function clearAdminPromoTrans() {
+                if (!promoDetailsTrans) return;
+                promoDetailsTrans.classList.add('d-none');
+                promoStatusTrans.innerHTML = '';
+                
+                promoCodeHiddenTrans.value = '';
+                promoDiscountPercentHiddenTrans.value = '';
+                promoDiscountAmountHiddenTrans.value = '';
+                promoTotalFeeHiddenTrans.value = '';
+                
+                if (feeActualInputTrans && feeInputTrans) {
+                    feeInputTrans.value = feeActualInputTrans.value;
+                    feeDisplayTrans.innerText = `${currencySymbolTrans} ${parseFloat(feeInputTrans.value).toFixed(2)}`;
+                }
+            }
+
+            promoInputTrans?.addEventListener('input', () => {
+                if (promoCodeHiddenTrans.value) clearAdminPromoTrans();
+            });
+
+            promoApplyBtnTrans?.addEventListener('click', async () => {
+                const code = promoInputTrans.value.trim();
+                if (!code) {
+                    promoStatusTrans.innerHTML = '<span class="text-danger">Please enter a code.</span>';
+                    return;
+                }
+
+                promoApplyBtnTrans.disabled = true;
+                promoApplyBtnTrans.innerText = 'Checking...';
+                promoStatusTrans.innerHTML = '';
+
+                try {
+                    const response = await fetch("{{ route('promo.validate') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ code, role: 'translator' })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        promoStatusTrans.innerHTML = `<span class="text-danger">${data.message || 'Invalid code.'}</span>`;
+                        clearAdminPromoTrans();
+                        return;
+                    }
+
+                    // Success
+                    promoStatusTrans.innerHTML = '<span class="text-success">Promo applied!</span>';
+                    promoDetailsTrans.classList.remove('d-none');
+                    
+                    promoPercentTextTrans.innerText = `${data.discount_percentage}%`;
+                    promoAmountTextTrans.innerText = `${currencySymbolTrans} ${data.discount_amount}`;
+                    promoFinalTextTrans.innerText = `${currencySymbolTrans} ${data.total_fee}`;
+                    
+                    promoCodeHiddenTrans.value = data.code;
+                    promoDiscountPercentHiddenTrans.value = data.discount_percentage;
+                    promoDiscountAmountHiddenTrans.value = data.discount_amount;
+                    promoTotalFeeHiddenTrans.value = data.total_fee;
+                    
+                    feeInputTrans.value = data.total_fee;
+                    feeDisplayTrans.innerText = `${currencySymbolTrans} ${parseFloat(data.total_fee).toFixed(2)}`;
+
+                } catch (error) {
+                    promoStatusTrans.innerHTML = '<span class="text-danger">Error validating code.</span>';
+                } finally {
+                    promoApplyBtnTrans.disabled = false;
+                    promoApplyBtnTrans.innerText = 'Apply';
+                }
+            });
 
                     // Stepper Logic
                     $('#next-btn').click(function() {
@@ -1371,6 +1544,8 @@
                             $('input[name="portfolio_link"]').val(t.portfolio_link);
 
                             $('input[name="highest_education"]').val(t.highest_education);
+                            $('input[name="institute_university"]').val(t.institute_university);
+                            $('input[name="year_of_passing"]').val(t.year_of_passing);
                             $('textarea[name="certification_details"]').val(t.certification_details);
 
                             if (t.certificates_path && t.certificates_path.length > 0) {
@@ -1529,7 +1704,11 @@
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <p class="text-muted small mb-1">Highest Education</p>
-                                            <p class="fw-medium">${t.highest_education || 'N/A'}</p>
+                                            <p class="fw-bold">${t.highest_education || 'N/A'}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Institute & Year</p>
+                                            <p class="fw-bold">${t.institute_university || ''} ${t.year_of_passing ? '(' + t.year_of_passing + ')' : ''}</p>
                                         </div>
                                         <div class="col-md-12">
                                             <p class="text-muted small mb-1">Certification Details</p>
