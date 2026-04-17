@@ -29,7 +29,9 @@ class ReferralCommissionController extends Controller
         }
 
         $targetCountry = $currentCountry;
+        // The UI uses `0` as "Global", but the DB stores global rows with `country_id` = NULL.
         $countryId = $targetCountry ? $targetCountry->id : 0;
+        $countryIdForQuery = ($countryId === 0) ? null : $countryId;
 
         $roles = [
             'practitioner' => 'Practitioner',
@@ -39,14 +41,18 @@ class ReferralCommissionController extends Controller
         ];
 
         // Load specific rates for the selected country
-        $rates = ReferralCommissionRate::where('country_id', $countryId)->get();
+        $rates = ReferralCommissionRate::when(
+            $countryIdForQuery === null,
+            fn ($q) => $q->whereNull('country_id'),
+            fn ($q) => $q->where('country_id', $countryIdForQuery)
+        )->get();
         $directRates = $rates->where('type', 'direct')->keyBy('referred_role');
         $referralRates = $rates->where('type', 'referral')
             ->where('referrer_role', 'practitioner')
             ->keyBy('referred_role');
 
-        // ALWAYS Load global fallback rates (country_id = 0)
-        $globalRates = ReferralCommissionRate::where('country_id', 0)->get();
+        // ALWAYS Load global fallback rates (country_id IS NULL)
+        $globalRates = ReferralCommissionRate::whereNull('country_id')->get();
         $globalDirectRates = $globalRates->where('type', 'direct')->keyBy('referred_role');
         $globalReferralRates = $globalRates->where('type', 'referral')
             ->where('referrer_role', 'practitioner')
@@ -73,7 +79,9 @@ class ReferralCommissionController extends Controller
         $countryId = (int) $validated['country_id'];
         session(['admin_commission_country_id' => $countryId]);
 
-        $rates = ReferralCommissionRate::where('country_id', $countryId)->get();
+        $rates = ($countryId === 0)
+            ? ReferralCommissionRate::whereNull('country_id')->get()
+            : ReferralCommissionRate::where('country_id', $countryId)->get();
         
         $directRates = $rates->where('type', 'direct')->mapWithKeys(function($item) {
             return [$item->referred_role => $item->company_commission_percent];
@@ -92,7 +100,7 @@ class ReferralCommissionController extends Controller
             'success' => true,
             'country_id' => $countryId,
             'direct_rates' => $directRates,
-            'referral_rates' => $referral_rates
+            'referral_rates' => $referralRates
         ]);
     }
 
@@ -114,13 +122,14 @@ class ReferralCommissionController extends Controller
         ]);
 
         $countryId = (int) $validated['country_id'];
+        $countryIdForSave = ($countryId === 0) ? null : $countryId;
         $isSuperAdmin = auth()->user()->role === 'super-admin';
 
         // 1. Save Country-Specific Rates
         foreach ($validated['direct_rates'] as $index => $rateData) {
             ReferralCommissionRate::updateOrCreate(
                 [
-                    'country_id' => $countryId,
+                    'country_id' => $countryIdForSave,
                     'type' => 'direct',
                     'referred_role' => $rateData['referred_role'],
                     'referrer_role' => null,
@@ -132,7 +141,7 @@ class ReferralCommissionController extends Controller
         foreach ($validated['referral_rates'] as $index => $rateData) {
             ReferralCommissionRate::updateOrCreate(
                 [
-                    'country_id' => $countryId,
+                    'country_id' => $countryIdForSave,
                     'type' => 'referral',
                     'referrer_role' => 'practitioner',
                     'referred_role' => $rateData['referred_role'],
@@ -148,7 +157,7 @@ class ReferralCommissionController extends Controller
         if ($isSuperAdmin && $request->has('global_direct_rates')) {
             foreach ($request->global_direct_rates as $rateData) {
                 ReferralCommissionRate::updateOrCreate(
-                    ['country_id' => 0, 'type' => 'direct', 'referred_role' => $rateData['referred_role'], 'referrer_role' => null],
+                    ['country_id' => null, 'type' => 'direct', 'referred_role' => $rateData['referred_role'], 'referrer_role' => null],
                     ['company_commission_percent' => (float) $rateData['company_commission_percent']]
                 );
             }
@@ -156,7 +165,7 @@ class ReferralCommissionController extends Controller
         if ($isSuperAdmin && $request->has('global_referral_rates')) {
             foreach ($request->global_referral_rates as $rateData) {
                 ReferralCommissionRate::updateOrCreate(
-                    ['country_id' => 0, 'type' => 'referral', 'referred_role' => $rateData['referred_role'], 'referrer_role' => 'practitioner'],
+                    ['country_id' => null, 'type' => 'referral', 'referred_role' => $rateData['referred_role'], 'referrer_role' => 'practitioner'],
                     [
                         'company_commission_percent' => (float) $rateData['company_commission_percent'],
                         'referrer_commission_percent' => (float) $rateData['referrer_commission_percent']

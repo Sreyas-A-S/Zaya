@@ -23,7 +23,7 @@ class GlobalReferralCommissionSeeder extends Seeder
             // Global Direct Booking (Scenario 1)
             ReferralCommissionRate::updateOrCreate(
                 [
-                    'country_id' => 0,
+                    'country_id' => null,
                     'type' => 'direct',
                     'referred_role' => $role,
                     'referrer_role' => null,
@@ -37,7 +37,7 @@ class GlobalReferralCommissionSeeder extends Seeder
             // Global Referral Booking (Scenario 2)
             ReferralCommissionRate::updateOrCreate(
                 [
-                    'country_id' => 0,
+                    'country_id' => null,
                     'type' => 'referral',
                     'referred_role' => $role,
                     'referrer_role' => 'practitioner',

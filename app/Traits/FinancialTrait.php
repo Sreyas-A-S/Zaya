@@ -43,9 +43,9 @@ trait FinancialTrait
                     ->first();
             }
 
-            // Fallback to Global Role-wise Settings (country_id = 0)
+            // Fallback to Global Role-wise Settings (country_id IS NULL)
             if (!$rate && $practitionerRole) {
-                $rate = ReferralCommissionRate::where('country_id', 0)
+                $rate = ReferralCommissionRate::whereNull('country_id')
                     ->where('type', 'direct')
                     ->where('referred_role', $practitionerRole)
                     ->first();
@@ -80,16 +80,16 @@ trait FinancialTrait
                 }
             }
 
-            // Fallback to Global Role-wise Settings (country_id = 0)
+            // Fallback to Global Role-wise Settings (country_id IS NULL)
             if (!$rate && $practitionerRole) {
-                $rate = ReferralCommissionRate::where('country_id', 0)
+                $rate = ReferralCommissionRate::whereNull('country_id')
                     ->where('type', 'referral')
                     ->where('referrer_role', $referrerRole ?: 'practitioner')
                     ->where('referred_role', $practitionerRole)
                     ->first();
 
                 if (!$rate && $referrerRole && $referrerRole !== 'practitioner') {
-                    $rate = ReferralCommissionRate::where('country_id', 0)
+                    $rate = ReferralCommissionRate::whereNull('country_id')
                         ->where('type', 'referral')
                         ->where('referrer_role', 'practitioner')
                         ->where('referred_role', $practitionerRole)
