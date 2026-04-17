@@ -215,11 +215,73 @@
     </div>
 </div>
 
+<!-- Share Modal -->
+<div class="modal fade" id="share-promo-code-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success">
+                <h5 class="modal-title text-white"><i class="iconly-Upload icli me-2"></i>Share Promo Code</h5>
+                <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <h5 class="text-muted">Promo Code</h5>
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                        <h2 id="share-code-display" class="fw-bold text-primary mb-0"></h2>
+                        <button class="btn btn-sm btn-outline-primary" id="copy-code-btn" title="Copy to Clipboard">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <a id="share-whatsapp" href="#" target="_blank" class="btn btn-light w-100 py-3 text-center border">
+                            <i class="fa-brands fa-whatsapp text-success fs-4 d-block mb-1"></i>
+                            <span>WhatsApp</span>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a id="share-email" href="#" class="btn btn-light w-100 py-3 text-center border">
+                            <i class="fa-solid fa-envelope text-danger fs-4 d-block mb-1"></i>
+                            <span>Email</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button class="btn btn-outline-dark" type="button" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
 <script>
     $(document).ready(function() {
+        $(document).on('click', '.sharePromoCode', function() {
+            var code = $(this).data('code');
+            $('#share-code-display').text(code);
+            
+            var shareMessage = "Promo Code: " + code + "\nApply this code on Zaya Wellness.";
+            var whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareMessage);
+            var emailUrl = "mailto:?subject=Zaya Wellness Promo Code&body=" + encodeURIComponent(shareMessage);
+
+            $('#share-whatsapp').attr('href', whatsappUrl);
+            $('#share-email').attr('href', emailUrl);
+            $('#share-promo-code-modal').modal('show');
+        });
+
+        $('#copy-code-btn').on('click', function() {
+            var code = $('#share-code-display').text();
+            var $temp = $("<input>");
+            $("body").append($temp);
+            $temp.val(code).select();
+            document.execCommand("copy");
+            $temp.remove();
+            showToast('Promo code copied to clipboard!');
+        });
         $('#promo-code-type').on('change', function() {
             $('#reward-addon').text($(this).val() === 'percentage' ? '%' : '₹');
         });

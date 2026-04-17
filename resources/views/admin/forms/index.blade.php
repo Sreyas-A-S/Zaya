@@ -62,7 +62,7 @@
             </div>
             <div class="modal-body">
                 <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">User Type</label>
                         <select class="form-select" id="reg_user_type">
                             <option value="" selected disabled>Select user type</option>
@@ -71,15 +71,25 @@
                             <option value="translator">Translators</option>
                             <option value="yoga-therapist">Yoga Therapists</option>
                         </select>
-                        <div class="form-text">Secure, time-limited open registration link.</div>
+                        <div class="form-text">Secure, time-limited link.</div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <label class="form-label">Reg Fee Currency</label>
+                        <select class="form-select" id="reg_currency">
+                            <option value="" selected disabled>Select currency</option>
+                            @foreach($currencies as $code => $symbol)
+                                <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
+                            @endforeach
+                        </select>
+                        <div class="form-text">Currency for reg fee.</div>
+                    </div>
+                    <div class="col-md-3">
                         <label class="form-label">Expiry Date</label>
                         <input type="date" class="form-control" id="reg_expires_at" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d', strtotime('+7 days')) }}">
-                        <div class="form-text">When will this link expire?</div>
+                        <div class="form-text">When will this expire?</div>
                     </div>
-                    <div class="col-md-4 d-flex align-items-end">
-                        <button type="button" class="btn btn-success w-100 mb-4" id="btn-generate-link">
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="button" class="btn btn-success w-100" id="btn-generate-link" style="margin-bottom: 21px;">
                             <i class="fa-solid fa-link me-2"></i>Generate
                         </button>
                     </div>
@@ -87,15 +97,14 @@
                         <label class="form-label">Generated Link</label>
                         <div class="input-group">
                             <input type="text" class="form-control" id="generated_link" readonly placeholder="Click Generate to create a link">
-                            <button class="btn btn-outline-secondary" type="button" id="btn-copy-link" disabled>Copy</button>
+                            <button class="btn btn-outline-secondary" id="btn-copy-link" type="button" disabled>Copy</button>
                         </div>
                         <div class="small text-muted mt-1" id="generated_link_hint"></div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Submit</button>
+                <button class="btn btn-outline-dark" type="button" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -122,23 +131,43 @@
 </div>
 
 <!-- Share Link Modal -->
-<div class="modal fade" id="share-link-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade" id="share-link-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Share Registration Link</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-success">
+                <h5 class="modal-title text-white"><i class="iconly-Upload icli me-2"></i>Share Registration Link</h5>
+                <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label">Registration Link</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="share_generated_link" readonly>
-                        <button class="btn btn-outline-secondary" type="button" id="btn-copy-share-link">Copy</button>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <h5 class="text-muted">Registration Link</h5>
+                    <div class="d-flex align-items-center justify-content-center gap-2">
+                        <h4 id="share-link-display" class="fw-bold text-primary mb-0" style="word-break: break-all;"></h4>
+                        <input type="hidden" id="share_generated_link">
+                        <button class="btn btn-sm btn-outline-primary" id="btn-copy-share-link" title="Copy to Clipboard">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
                     </div>
                 </div>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <a id="share-whatsapp" href="#" target="_blank" class="btn btn-light w-100 py-3 text-center border">
+                            <i class="fa-brands fa-whatsapp text-success fs-4 d-block mb-1"></i>
+                            <span>WhatsApp</span>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a id="share-email-mailto" href="#" class="btn btn-light w-100 py-3 text-center border">
+                            <i class="fa-solid fa-envelope text-danger fs-4 d-block mb-1"></i>
+                            <span>Email</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
                 <div class="mb-3">
-                    <label class="form-label">Recipient Email</label>
+                    <label class="form-label fw-bold">Or Send Direct Email</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
                         <input type="email" class="form-control" id="share_email_input" placeholder="Enter recipient email">
@@ -149,8 +178,8 @@
                     <div class="small text-muted mt-1" id="share_hint"></div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+            <div class="modal-footer border-top-0">
+                <button class="btn btn-outline-dark" type="button" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -320,14 +349,38 @@
             });
         });
 
+        // Clear validation on change
+        $('#reg_user_type, #reg_currency').on('change', function() {
+            if ($(this).val()) {
+                $(this).removeClass('is-invalid');
+                if (!$('#reg_user_type').val() && !$('#reg_currency').val()) {
+                    $('#generated_link_hint').removeClass('text-danger').text('');
+                }
+            }
+        });
+
         $('#btn-generate-link').on('click', function() {
             const userType = ($('#reg_user_type').val() || '').trim();
+            const currency = ($('#reg_currency').val() || '').trim();
+            
+            let hasError = false;
             if (!userType) {
-                $('#generated_link_hint').text('Please select a user type.');
+                $('#reg_user_type').addClass('is-invalid');
+                hasError = true;
+            }
+            if (!currency) {
+                $('#reg_currency').addClass('is-invalid');
+                hasError = true;
+            }
+
+            if (hasError) {
+                $('#generated_link_hint').text('Please select both User Type and Currency.').addClass('text-danger');
+                if (window.showToast) window.showToast('Please select User Type and Currency.', 'error');
                 return;
             }
 
-            $('#generated_link_hint').text('Generating...');
+            $('#reg_user_type, #reg_currency').removeClass('is-invalid');
+            $('#generated_link_hint').removeClass('text-danger').text('Generating...');
             $('#btn-generate-link').prop('disabled', true);
             $('#btn-copy-link').prop('disabled', true);
 
@@ -336,6 +389,7 @@
                 method: 'POST',
                 data: {
                     user_type: userType,
+                    currency: currency,
                     expires_at: $('#reg_expires_at').val()
                 },
                 headers: {
@@ -376,9 +430,26 @@
         $(document).on('click', '.shareLink', function() {
             const link = $(this).data('url');
             $('#share_generated_link').val(link);
+            $('#share-link-display').text(link);
             $('#share_email_input').val('');
             $('#share_hint').text('').removeClass('text-danger text-success');
+            
+            var shareMessage = "Registration Link: " + link + "\nPlease use this link to register on Zaya Wellness.";
+            var whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareMessage);
+            var emailUrl = "mailto:?subject=Zaya Wellness Registration Link&body=" + encodeURIComponent(shareMessage);
+
+            $('#share-whatsapp').attr('href', whatsappUrl);
+            $('#share-email-mailto').attr('href', emailUrl);
+            
             $('#share-link-modal').modal('show');
+        });
+
+        $(document).on('click', '#share-email-mailto', function(e) {
+            e.preventDefault();
+            const url = $(this).attr('href');
+            if (url && url !== '#') {
+                window.location.href = url;
+            }
         });
 
         $('#btn-copy-share-link').on('click', async function() {
@@ -387,7 +458,13 @@
                 await navigator.clipboard.writeText(link);
                 if (window.showToast) window.showToast('Link copied to clipboard', 'success');
             } catch (e) {
-                console.error('Copy failed');
+                // Fallback for older browsers
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val(link).select();
+                document.execCommand("copy");
+                $temp.remove();
+                if (window.showToast) window.showToast('Link copied to clipboard', 'success');
             }
         });
 

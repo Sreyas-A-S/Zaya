@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             ServiceSeederFrench::class,
             PractitionerReviewSeeder::class,
             CountriesSeeder::class,
+            GlobalReferralCommissionSeeder::class,
             GeneralSettingSeeder::class,
             SocialLinksSettingsSeeder::class,
             FinanceSettingSeeder::class,

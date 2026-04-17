@@ -24,9 +24,15 @@ class CountryController extends Controller
 
         $data = Country::latest()->select($columns);
 
+        $countryToCurrency = config('currencies.country_to_currency', []);
+
         return DataTables::of($data)
 
             ->addIndexColumn()
+
+            ->addColumn('currency', function ($row) use ($countryToCurrency) {
+                return $countryToCurrency[strtoupper($row->code)] ?? '-';
+            })
 
             ->addColumn('status', function ($row) {
                 $status = strtolower($row->status ?? 'active');

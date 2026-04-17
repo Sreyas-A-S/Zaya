@@ -38,7 +38,9 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Code</th>
                                     <th>Country Name</th>
+                                    <th>Currency</th>
                                     <th>Flag</th>
                                     <th>Status</th>
                                     <th>Actions</th>
@@ -100,7 +102,8 @@
 
           <div class="mb-3">
             <label>Code</label>
-            <input type="text" id="countryCode" name="code" class="form-control">
+            <input type="text" id="countryCode" name="code" class="form-control" readonly>
+            <small class="text-muted">Country code cannot be changed as it is linked to currency and regional settings.</small>
           </div>
 
           <button type="submit" class="btn btn-primary">
@@ -447,8 +450,18 @@
                     searchable: false
                 },
                 {
+                    data: 'code',
+                    name: 'countries.code'
+                },
+                {
                     data: 'name',
                     name: 'countries.name'
+                },
+                {
+                    data: 'currency',
+                    name: 'currency',
+                    orderable: false,
+                    searchable: false
                 },
                 {
                     data: 'flag',

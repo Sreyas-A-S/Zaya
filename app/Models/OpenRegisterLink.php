@@ -11,6 +11,7 @@ class OpenRegisterLink extends Model
 
     protected $fillable = [
         'role',
+        'currency',
         'token',
         'status',
         'created_by',

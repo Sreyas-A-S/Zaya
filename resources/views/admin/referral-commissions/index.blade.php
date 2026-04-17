@@ -3,11 +3,16 @@
 @section('title', 'Commission Rates Configuration')
 
 @section('content')
+@php 
+    $isGlobalView = ($countryCode === 'all'); 
+    $canEditGlobal = $isSuperAdmin;
+    $canEditCountry = auth()->user()->can('other-fees-edit');
+@endphp
 <div class="container-fluid">
     <div class="page-title">
         <div class="row">
             <div class="col-sm-6">
-                <h3>Commission Rates Configuration</h3>
+                <h3>Commission Rates Configuration ({{ $isGlobalView ? 'Global Fallback' : strtoupper($countryCode) }})</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb">
@@ -25,184 +30,66 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header pb-0 card-no-border">
-                    <h3>Country-wise Configuration</h3>
-                    <p>Set commission percentages for direct bookings and referral scenarios.</p>
-                </div>
-                <div class="card-body">
-                    @if($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <div class="row g-3 align-items-end mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Select Country Context</label>
-                            <select id="country-selector" class="form-select border-primary">
-                                @foreach($countries as $c)
-                                    <option value="{{ $c->id }}" {{ (int)$countryId === (int)$c->id ? 'selected' : '' }}>
-                                        {{ $c->name }} ({{ $c->code }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            <small class="text-muted">Configuration below applies to the selected country.</small>
-                        </div>
-                        <div class="col-md-6 text-md-end">
-                            <a href="{{ route('admin.other-fees.index') }}" class="btn btn-light shadow-sm border">
-                                <i class="fa-solid fa-gears me-2"></i>Global Finance Settings
-                            </a>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3>Manage Commission Ratios</h3>
+                            <p>Configure role-specific commissions for current country and global fallbacks.</p>
                         </div>
                     </div>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-pills nav-primary mb-4 gap-2" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active px-4 py-2 fw-bold" id="pills-country-tab" data-bs-toggle="pill" data-bs-target="#pills-country" type="button" role="tab" aria-controls="pills-country" aria-selected="true">
+                                <i class="fa-solid fa-flag me-2"></i> {{ $isGlobalView ? 'Global View' : strtoupper($countryCode) . ' Specific' }}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link px-4 py-2 fw-bold" id="pills-global-tab" data-bs-toggle="pill" data-bs-target="#pills-global" type="button" role="tab" aria-controls="pills-global" aria-selected="false">
+                                <i class="fa-solid fa-globe me-2"></i> Global Fallback Ratios
+                            </button>
+                        </li>
+                    </ul>
 
                     <form id="commission-rates-form" action="{{ route('admin.referral-commissions.update') }}" method="POST">
                         @csrf
                         <input type="hidden" name="country_id" value="{{ $countryId }}">
 
-                        <!-- Section 1: Direct Bookings -->
-                        <div class="mb-5">
-                            <div class="p-4 rounded-4 mb-4 border border-primary-subtle" style="background: linear-gradient(to right, #f0f7ff, #ffffff);">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-center" style="width: 40px; height: 40px;">
-                                        <i class="fa-solid fa-user fs-5"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="mb-1 text-primary fw-black">Scenario 1: Direct Bookings</h4>
-                                        <p class="text-muted small mb-0 font-medium">Commission breakdown when a client books an expert directly without any referral.</p>
-                                    </div>
-                                </div>
+                        <div class="tab-content" id="pills-tabContent">
+                            <!-- Tab 1: Country Specific -->
+                            <div class="tab-pane fade show active" id="pills-country" role="tabpanel" aria-labelledby="pills-country-tab">
+                                @include('admin.referral-commissions.partials.rates_table', [
+                                    'title' => 'Country-Specific Ratios',
+                                    'description' => 'These rates apply specifically to the selected country.',
+                                    'directRates' => $directRates,
+                                    'referralRates' => $referralRates,
+                                    'roles' => $roles,
+                                    'prefix' => '',
+                                    'isDisabled' => !$canEditCountry
+                                ])
                             </div>
-                            
-                            <div class="table-responsive">
-                                <table class="table table-bordered align-middle">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th style="width: 30%;" class="py-3 px-4">Performing Expert Role</th>
-                                            <th style="width: 35%;" class="py-3 px-4">Zaya Commission (%)</th>
-                                            <th style="width: 35%;" class="py-3 px-4">Expert's Share (%)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php $directIdx = 0; @endphp
-                                        @foreach($roles as $roleKey => $roleLabel)
-                                            @if($roleKey === 'practitioner')
-                                                @php
-                                                    $rate = $directRates[$roleKey] ?? null;
-                                                    $zayaVal = $rate ? $rate->company_commission_percent : 0;
-                                                @endphp
-                                                <tr>
-                                                    <td class="fw-bold px-4">{{ $roleLabel }}</td>
-                                                    <td class="px-4">
-                                                        <div class="input-group">
-                                                            <input type="hidden" name="direct_rates[{{ $directIdx }}][referred_role]" value="{{ $roleKey }}">
-                                                            <input type="number" step="0.01" min="0" max="100"
-                                                                class="form-control zaya-input border-primary-subtle"
-                                                                name="direct_rates[{{ $directIdx }}][company_commission_percent]"
-                                                                data-role="{{ $roleKey }}"
-                                                                data-type="direct"
-                                                                value="{{ $zayaVal }}"
-                                                                oninput="updateExpertShare(this)">
-                                                            <span class="input-group-text bg-primary-subtle border-primary-subtle text-primary fw-bold">%</span>
-                                                        </div>
-                                                    </td>
-                                                    <td class="px-4">
-                                                        <div class="input-group">
-                                                            <input type="text" class="form-control bg-light expert-share border-gray-200" value="{{ (100 - $zayaVal) }}" readonly>
-                                                            <span class="input-group-text bg-gray-100 border-gray-200 text-muted">%</span>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                @php $directIdx++; @endphp
-                                            @endif
-                                        @endforeach
-                                    </tbody>
-                                </table>
+
+                            <!-- Tab 2: Global Fallback -->
+                            <div class="tab-pane fade" id="pills-global" role="tabpanel" aria-labelledby="pills-global-tab">
+                                @include('admin.referral-commissions.partials.rates_table', [
+                                    'title' => 'Universal Global Fallbacks',
+                                    'description' => 'These rates are used as a fallback if no country-specific rates are defined.',
+                                    'directRates' => $globalDirectRates,
+                                    'referralRates' => $globalReferralRates,
+                                    'roles' => $roles,
+                                    'prefix' => 'global_',
+                                    'isDisabled' => !$canEditGlobal
+                                ])
                             </div>
                         </div>
 
-                        <!-- Section 2: Referral Bookings -->
-                        <div>
-                            <div class="p-4 rounded-4 mb-4 border border-success-subtle" style="background: linear-gradient(to right, #f6fff9, #ffffff);">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="bg-success text-white rounded-3 p-2 d-flex align-items-center justify-center" style="width: 40px; height: 40px;">
-                                        <i class="fa-solid fa-share-nodes fs-5"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="mb-1 text-success fw-black">Scenario 2: Referral Bookings</h4>
-                                        <p class="text-muted small mb-0 font-medium">Commission breakdown when a practitioner refers a client to another expert.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="table table-bordered align-middle">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th style="width: 25%;" class="py-3 px-4">Expert Referred To</th>
-                                            <th style="width: 25%;" class="py-3 px-4">Referring Practitioner Bonus (%)</th>
-                                            <th style="width: 25%;" class="py-3 px-4">Zaya Commission (%)</th>
-                                            <th style="width: 25%;" class="py-3 px-4">Referred Expert's Share (%)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php $refIdx = 0; @endphp
-                                        @foreach($roles as $roleKey => $roleLabel)
-                                            @php
-                                                $rate = $referralRates[$roleKey] ?? null;
-                                                $refVal = $rate ? $rate->referrer_commission_percent : 0;
-                                                $compVal = $rate ? $rate->company_commission_percent : 0;
-                                            @endphp
-                                            <tr>
-                                                <td class="px-4">
-                                                    <span class="badge bg-soft-primary text-primary border border-primary-subtle px-3 py-2 rounded-3 fw-bold">{{ $roleLabel }}</span>
-                                                    <input type="hidden" name="referral_rates[{{ $refIdx }}][referred_role]" value="{{ $roleKey }}">
-                                                </td>
-                                                <td class="px-4">
-                                                    <div class="input-group">
-                                                        <input type="number" step="0.01" min="0" max="100"
-                                                            class="form-control ref-bonus-input border-success-subtle"
-                                                            name="referral_rates[{{ $refIdx }}][referrer_commission_percent]"
-                                                            data-role="{{ $roleKey }}"
-                                                            data-field="referrer"
-                                                            value="{{ $refVal }}"
-                                                            oninput="updateReferralExpertShare(this)">
-                                                        <span class="input-group-text bg-success-subtle border-success-subtle text-success fw-bold">%</span>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4">
-                                                    <div class="input-group">
-                                                        <input type="number" step="0.01" min="0" max="100"
-                                                            class="form-control zaya-commission-input border-primary-subtle"
-                                                            name="referral_rates[{{ $refIdx }}][company_commission_percent]"
-                                                            data-role="{{ $roleKey }}"
-                                                            data-field="company"
-                                                            value="{{ $compVal }}"
-                                                            oninput="updateReferralExpertShare(this)">
-                                                        <span class="input-group-text bg-primary-subtle border-primary-subtle text-primary fw-bold">%</span>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4">
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control bg-light performing-expert-share border-gray-200" value="{{ (100 - $refVal - $compVal) }}" readonly>
-                                                        <span class="input-group-text bg-gray-100 border-gray-200 text-muted">%</span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            @php $refIdx++; @endphp
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
+                        @if($canEditCountry || $canEditGlobal)
                         <div class="card-footer text-end mt-4 px-0 pb-0">
-                            <button type="submit" class="btn btn-primary px-5 btn-lg shadow-sm">
-                                <i class="fa-solid fa-save me-2"></i> Update Commission Rates
+                            <button type="submit" id="saveCommissionBtn" class="btn btn-primary px-5 btn-lg shadow-sm">
+                                <i class="fa-solid fa-save me-2"></i> Save All Commission Rates
                             </button>
                         </div>
+                        @endif
                     </form>
                 </div>
             </div>
@@ -216,14 +103,9 @@
     function updateExpertShare(input) {
         const row = input.closest('tr');
         let zayaVal = parseFloat(input.value) || 0;
-        
-        if (zayaVal > 100) {
-            zayaVal = 100;
-            input.value = 100;
-        }
-        
+        if (zayaVal > 100) { zayaVal = 100; input.value = 100; }
         const expertShareInput = row.querySelector('.expert-share');
-        expertShareInput.value = Math.max(0, (100 - zayaVal)).toFixed(2);
+        if (expertShareInput) expertShareInput.value = Math.max(0, (100 - zayaVal)).toFixed(2);
     }
 
     function updateReferralExpertShare(input) {
@@ -236,170 +118,61 @@
         let zayaComm = parseFloat(zayaCommInput.value) || 0;
         
         const totalOther = refBonus + zayaComm;
-        performingExpertShareInput.value = Math.max(0, (100 - totalOther)).toFixed(2);
+        if (performingExpertShareInput) performingExpertShareInput.value = Math.max(0, (100 - totalOther)).toFixed(2);
         
         if (totalOther > 100) {
-            refBonusInput.classList.add('is-invalid', 'border-danger');
-            zayaCommInput.classList.add('is-invalid', 'border-danger');
-            performingExpertShareInput.classList.add('is-invalid', 'text-danger', 'border-danger');
+            refBonusInput.classList.add('is-invalid');
+            zayaCommInput.classList.add('is-invalid');
         } else {
-            refBonusInput.classList.remove('is-invalid', 'border-danger');
-            zayaCommInput.classList.remove('is-invalid', 'border-danger');
-            performingExpertShareInput.classList.remove('is-invalid', 'text-danger', 'border-danger');
+            refBonusInput.classList.remove('is-invalid');
+            zayaCommInput.classList.remove('is-invalid');
         }
     }
 
-    function validateCommissions() {
-        let isValid = true;
-        const referralRows = document.querySelectorAll('.performing-expert-share');
-        const directRows = document.querySelectorAll('.expert-share');
-        
-        [...referralRows, ...directRows].forEach(shareInput => {
-            if (parseFloat(shareInput.value) < 0 || shareInput.classList.contains('text-danger')) {
-                isValid = false;
-            }
-        });
-
-        if (!isValid) {
-            alert('Please ensure that the total commission does not exceed 100% for any scenario.');
-            return false;
-        }
-        return true;
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // Country Context Selector
-        const countrySelector = document.getElementById('country-selector');
-        const commissionForm = document.getElementById('commission-rates-form');
-        const countryIdInput = commissionForm ? commissionForm.querySelector('input[name="country_id"]') : null;
-
-        if (countrySelector && commissionForm && countryIdInput) {
-            countrySelector.addEventListener('change', async function() {
-                const countryId = this.value;
-                const overlay = document.createElement('div');
-                overlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.5); z-index: 10; display: flex; align-items: center; justify-content: center;';
-                overlay.innerHTML = '<div class="spinner-border text-primary"></div>';
-                commissionForm.style.position = 'relative';
-                commissionForm.appendChild(overlay);
-
-                const url = "{{ route('admin.referral-commissions.set-country') }}";
-                const token = "{{ csrf_token() }}";
-
-                const applyRatesToForm = (response) => {
-                    if (!response || !response.success) return;
-
-                    // Update hidden country ID
-                    countryIdInput.value = response.country_id;
-
-                    const directRates = response.direct_rates || {};
-                    const referralRates = response.referral_rates || {};
-
-                    // Direct inputs: clear missing roles to 0
-                    commissionForm.querySelectorAll('input[data-type="direct"][data-role]').forEach(input => {
-                        const role = input.getAttribute('data-role');
-                        input.value = (directRates[role] !== undefined) ? directRates[role] : 0;
-                        updateExpertShare(input);
-                    });
-
-                    // Referral inputs: clear missing roles to 0
-                    commissionForm.querySelectorAll('input[data-field="referrer"][data-role]').forEach(input => {
-                        const role = input.getAttribute('data-role');
-                        input.value = (referralRates[role] && referralRates[role].referrer !== undefined) ? referralRates[role].referrer : 0;
-                        updateReferralExpertShare(input);
-                    });
-                    commissionForm.querySelectorAll('input[data-field="company"][data-role]').forEach(input => {
-                        const role = input.getAttribute('data-role');
-                        input.value = (referralRates[role] && referralRates[role].company !== undefined) ? referralRates[role].company : 0;
-                        updateReferralExpertShare(input);
-                    });
-
-                    if (window.showToast) showToast('Country context switched.', 'success');
-                };
-
-                try {
-                    // Prefer jQuery if present (keeps existing stack), else fallback to fetch.
-                    if (window.$ && $.ajax) {
-                        $.ajax({
-                            url,
-                            type: 'POST',
-                            data: { _token: token, country_id: countryId },
-                            success: applyRatesToForm,
-                            error: function() { alert('Failed to switch country context.'); },
-                            complete: function() { overlay.remove(); }
-                        });
-                        return;
-                    }
-
-                    const res = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': token,
-                            'Accept': 'application/json',
-                        },
-                        body: JSON.stringify({ country_id: countryId }),
-                    });
-
-                    if (!res.ok) throw new Error('Request failed');
-                    const json = await res.json();
-                    applyRatesToForm(json);
-                } catch (e) {
-                    alert('Failed to switch country context.');
-                } finally {
-                    overlay.remove();
-                }
-            });
-        }
-
-        // AJAX Form Submission
-        if (commissionForm) {
-            commissionForm.addEventListener('submit', function(e) {
+    $(document).ready(function() {
+        const commissionForm = $('#commission-rates-form');
+        if (commissionForm.length) {
+            commissionForm.on('submit', function(e) {
                 e.preventDefault();
-                
-                if (!validateCommissions()) return;
-
-                const btn = this.querySelector('button[type="submit"]');
-                const originalHtml = btn.innerHTML;
-                
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i> Saving...';
-
-                const formData = new FormData(this);
+                const btn = $('#saveCommissionBtn');
+                const originalHtml = btn.html();
+                btn.prop('disabled', true).html('<i class="fa-solid fa-circle-notch fa-spin me-2"></i> Saving...');
 
                 $.ajax({
-                    url: this.action,
+                    url: $(this).attr('action'),
                     type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
+                    data: $(this).serialize(),
                     success: function(response) {
-                        if (window.showToast) {
-                            showToast(response.message || 'Settings saved successfully.', 'success');
-                        } else {
-                            alert(response.message || 'Settings saved successfully.');
-                        }
+                        if (window.showToast) showToast(response.message || 'Settings saved successfully.', 'success');
+                        else alert(response.message || 'Settings saved successfully.');
                     },
                     error: function(xhr) {
-                        const errorMsg = xhr.responseJSON && xhr.responseJSON.message 
-                            ? xhr.responseJSON.message 
-                            : 'An error occurred while saving.';
-                        
-                        if (window.showToast) {
-                            showToast(errorMsg, 'error');
-                        } else {
-                            alert(errorMsg);
-                        }
+                        const errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred while saving.';
+                        if (window.showToast) showToast(errorMsg, 'error');
+                        else alert(errorMsg);
                     },
-                    complete: function() {
-                        btn.disabled = false;
-                        btn.innerHTML = originalHtml;
-                    }
+                    complete: function() { btn.prop('disabled', false).html(originalHtml); }
                 });
             });
         }
     });
 </script>
 <style>
+    .nav-pills .nav-link {
+        background-color: #f1f1f1;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    .nav-pills .nav-link.active { 
+        background-color: var(--bs-primary) !important; 
+        color: #ffffff !important;
+        border-color: var(--bs-primary) !important;
+        box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.2); 
+    }
+    .nav-pills .nav-link.active i {
+        color: #ffffff !important;
+    }
     .bg-soft-primary { background-color: rgba(var(--bs-primary-rgb), 0.1); }
     .fw-black { font-weight: 900; }
     .font-medium { font-weight: 500; }

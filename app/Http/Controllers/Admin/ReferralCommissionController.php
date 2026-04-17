@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Country;
 use App\Models\ReferralCommissionRate;
+use App\Models\HomepageSetting;
 use Illuminate\Http\Request;
 
 class ReferralCommissionController extends Controller
@@ -19,13 +20,16 @@ class ReferralCommissionController extends Controller
     {
         $countries = Country::where('status', 'active')->orderBy('name')->get();
         
-        // Get country from session, fallback to first country
-        $countryId = session('admin_commission_country_id');
+        $adminCountryCode = session('admin_country', 'all');
+        $countryCode = ($adminCountryCode === 'all') ? 'all' : strtoupper($adminCountryCode);
         
-        if (!$countryId || !$countries->contains('id', $countryId)) {
-            $countryId = $countries->first()->id ?? 0;
-            session(['admin_commission_country_id' => $countryId]);
+        $currentCountry = null;
+        if ($countryCode !== 'all') {
+            $currentCountry = Country::where('code', $countryCode)->first();
         }
+
+        $targetCountry = $currentCountry;
+        $countryId = $targetCountry ? $targetCountry->id : 0;
 
         $roles = [
             'practitioner' => 'Practitioner',
@@ -34,14 +38,27 @@ class ReferralCommissionController extends Controller
             'mindfulness_practitioner' => 'Mindfulness Counsellor',
         ];
 
+        // Load specific rates for the selected country
         $rates = ReferralCommissionRate::where('country_id', $countryId)->get();
-        
         $directRates = $rates->where('type', 'direct')->keyBy('referred_role');
         $referralRates = $rates->where('type', 'referral')
             ->where('referrer_role', 'practitioner')
             ->keyBy('referred_role');
 
-        return view('admin.referral-commissions.index', compact('countries', 'countryId', 'roles', 'directRates', 'referralRates'));
+        // ALWAYS Load global fallback rates (country_id = 0)
+        $globalRates = ReferralCommissionRate::where('country_id', 0)->get();
+        $globalDirectRates = $globalRates->where('type', 'direct')->keyBy('referred_role');
+        $globalReferralRates = $globalRates->where('type', 'referral')
+            ->where('referrer_role', 'practitioner')
+            ->keyBy('referred_role');
+
+        $isSuperAdmin = auth()->user()->role === 'super-admin';
+
+        return view('admin.referral-commissions.index', compact(
+            'countries', 'countryId', 'roles', 'directRates', 'referralRates', 
+            'globalDirectRates', 'globalReferralRates',
+            'countryCode', 'targetCountry', 'isSuperAdmin'
+        ));
     }
 
     /**
@@ -50,10 +67,10 @@ class ReferralCommissionController extends Controller
     public function setCountry(Request $request)
     {
         $validated = $request->validate([
-            'country_id' => 'required|exists:countries,id'
+            'country_id' => 'required' // Can be 0 for Global
         ]);
 
-        $countryId = $validated['country_id'];
+        $countryId = (int) $validated['country_id'];
         session(['admin_commission_country_id' => $countryId]);
 
         $rates = ReferralCommissionRate::where('country_id', $countryId)->get();
@@ -75,14 +92,14 @@ class ReferralCommissionController extends Controller
             'success' => true,
             'country_id' => $countryId,
             'direct_rates' => $directRates,
-            'referral_rates' => $referralRates
+            'referral_rates' => $referral_rates
         ]);
     }
 
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'country_id' => 'required|exists:countries,id',
+            'country_id' => 'required',
             'direct_rates' => 'required|array',
             'direct_rates.*.referred_role' => 'required|string|max:50',
             'direct_rates.*.company_commission_percent' => 'required|numeric|min:0|max:100',
@@ -90,14 +107,17 @@ class ReferralCommissionController extends Controller
             'referral_rates.*.referred_role' => 'required|string|max:50',
             'referral_rates.*.company_commission_percent' => 'required|numeric|min:0|max:100',
             'referral_rates.*.referrer_commission_percent' => 'required|numeric|min:0|max:100',
+            
+            // Optional global rates
+            'global_direct_rates' => 'nullable|array',
+            'global_referral_rates' => 'nullable|array',
         ]);
 
-        $countryId = $validated['country_id'];
+        $countryId = (int) $validated['country_id'];
+        $isSuperAdmin = auth()->user()->role === 'super-admin';
 
-        // Save Direct Booking Rates
+        // 1. Save Country-Specific Rates
         foreach ($validated['direct_rates'] as $index => $rateData) {
-            $company = (float) $rateData['company_commission_percent'];
-            
             ReferralCommissionRate::updateOrCreate(
                 [
                     'country_id' => $countryId,
@@ -105,25 +125,11 @@ class ReferralCommissionController extends Controller
                     'referred_role' => $rateData['referred_role'],
                     'referrer_role' => null,
                 ],
-                [
-                    'company_commission_percent' => $company,
-                    'referrer_commission_percent' => 0,
-                ]
+                ['company_commission_percent' => (float) $rateData['company_commission_percent']]
             );
         }
 
-        // Save Referral Booking Rates
         foreach ($validated['referral_rates'] as $index => $rateData) {
-            $company = (float) $rateData['company_commission_percent'];
-            $referrer = (float) $rateData['referrer_commission_percent'];
-            
-            if (($company + $referrer) > 100.0) {
-                $roleLabel = str_replace('_', ' ', $rateData['referred_role']);
-                return back()->withErrors([
-                    "referral_rates.$index" => "Total commission (Zaya + Referrer) for referral to $roleLabel cannot exceed 100%.",
-                ])->withInput();
-            }
-
             ReferralCommissionRate::updateOrCreate(
                 [
                     'country_id' => $countryId,
@@ -132,15 +138,36 @@ class ReferralCommissionController extends Controller
                     'referred_role' => $rateData['referred_role'],
                 ],
                 [
-                    'company_commission_percent' => $company,
-                    'referrer_commission_percent' => $referrer,
+                    'company_commission_percent' => (float) $rateData['company_commission_percent'],
+                    'referrer_commission_percent' => (float) $rateData['referrer_commission_percent'],
                 ]
             );
         }
 
+        // 2. Save Global Fallback Rates (ONLY if Super Admin)
+        if ($isSuperAdmin && $request->has('global_direct_rates')) {
+            foreach ($request->global_direct_rates as $rateData) {
+                ReferralCommissionRate::updateOrCreate(
+                    ['country_id' => 0, 'type' => 'direct', 'referred_role' => $rateData['referred_role'], 'referrer_role' => null],
+                    ['company_commission_percent' => (float) $rateData['company_commission_percent']]
+                );
+            }
+        }
+        if ($isSuperAdmin && $request->has('global_referral_rates')) {
+            foreach ($request->global_referral_rates as $rateData) {
+                ReferralCommissionRate::updateOrCreate(
+                    ['country_id' => 0, 'type' => 'referral', 'referred_role' => $rateData['referred_role'], 'referrer_role' => 'practitioner'],
+                    [
+                        'company_commission_percent' => (float) $rateData['company_commission_percent'],
+                        'referrer_commission_percent' => (float) $rateData['referrer_commission_percent']
+                    ]
+                );
+            }
+        }
+
         return $request->ajax()
-            ? response()->json(['success' => true, 'message' => 'Commission rates updated successfully.'])
+            ? response()->json(['success' => true, 'message' => 'Commission settings updated successfully.'])
             : redirect()->route('admin.referral-commissions.index')
-                ->with('success', 'Commission rates updated successfully.');
+                ->with('success', 'Commission settings updated successfully.');
     }
 }

@@ -23,7 +23,8 @@ class RegistrationFeeService
         }
 
         $language = session('locale', 'en');
-        $settings = HomepageSetting::getSectionValues('finance', $language);
+        $countryCode = $this->deriveCountryCodeFromUser($user);
+        $settings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
         $fee = (float) ($settings[$map[$role]['fee']] ?? 0);
         if (is_numeric($amountOverride)) {
             $fee = max(0.0, (float) $amountOverride);
@@ -97,6 +98,32 @@ class RegistrationFeeService
             'currency' => $currency,
             'role_label' => $map[$role]['label'],
         ];
+    }
+
+    private function deriveCountryCodeFromUser($user): string
+    {
+        $country = null;
+        if (isset($user->country)) {
+            $country = $user->country;
+        } elseif (isset($user->patient) && $user->patient) {
+            $country = $user->patient->country;
+        } elseif (isset($user->practitioner) && $user->practitioner) {
+            $country = $user->practitioner->country;
+        }
+
+        if ($country) {
+            // If it's a name, we might need to map it back to a code
+            // For now, let's assume it's a code if length is 2, or try to find it
+            if (strlen($country) === 2) {
+                return strtoupper($country);
+            }
+            
+            $dbCountry = \App\Models\Country::where('name', $country)->first();
+            if ($dbCountry) {
+                return strtoupper($dbCountry->code);
+            }
+        }
+        return 'all';
     }
 
     private function deriveCurrencyFromUser($user): string

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\OpenRegisterLink;
 use App\Models\BlogLike;
 use App\Models\ContactUs;
 use App\Models\Country;
@@ -748,6 +749,32 @@ class WebController extends Controller
             'openRegisterToken' => $token,
         ];
 
+        // Fetch registration fee data
+        $roleMap = [
+            'doctor' => 'doctor_registration_fee',
+            'mindfulness_practitioner' => 'mindfulness_registration_fee',
+            'yoga_therapist' => 'yoga_registration_fee',
+            'translator' => 'translator_registration_fee',
+        ];
+
+        $feeKey = $roleMap[$joinRole];
+        $countryCode = 'all';
+        $openLink = null;
+        if ($token) {
+            $openLink = OpenRegisterLink::where('token', $token)->first();
+            if ($openLink && $openLink->currency) {
+                $countryToCurrency = config('currencies.country_to_currency', []);
+                $revMap = array_flip($countryToCurrency);
+                $countryCode = $revMap[$openLink->currency] ?? 'all';
+            }
+        }
+
+        $financeSettings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
+        $viewData['registrationFeeEnabled'] = filter_var($financeSettings[$feeKey . '_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
+        $viewData['registrationFee'] = (float) ($financeSettings[$feeKey] ?? 0);
+        $viewData['registrationCurrency'] = $openLink && $openLink->currency ? $openLink->currency : ($financeSettings[$feeKey . '_currency'] ?? 'EUR');
+        $viewData['registrationCurrencySymbol'] = get_currency_symbol($viewData['registrationCurrency']);
+
         if ($joinRole === 'doctor') {
             $viewData['specializations'] = Specialization::where('status', 1)->get();
             $viewData['consultationExpertise'] = AyurvedaExpertise::where('status', 1)->get();
@@ -769,12 +796,79 @@ class WebController extends Controller
         return view('team-register', $viewData);
     }
 
+    public function getRegistrationFee(Request $request)
+    {
+        $role = $request->input('role', 'client');
+        $countryName = $request->input('country');
+        $token = $request->input('token');
+        
+        $countryCode = 'all';
+        if ($countryName) {
+            $dbCountry = \App\Models\Country::where('name', $countryName)->first();
+            if ($dbCountry) {
+                $countryCode = strtoupper($dbCountry->code);
+            }
+        }
+        $language = session('locale', 'en');
+
+        $map = [
+            'practitioner' => 'practitioner_registration_fee',
+            'doctor' => 'doctor_registration_fee',
+            'mindfulness_practitioner' => 'mindfulness_registration_fee',
+            'yoga_therapist' => 'yoga_registration_fee',
+            'translator' => 'translator_registration_fee',
+            'client' => 'client_registration_fee',
+        ];
+
+        if (!isset($map[$role])) {
+            return response()->json(['error' => 'Invalid role'], 400);
+        }
+
+        $settings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
+        $feeKey = $map[$role];
+        $currencyKey = $feeKey . '_currency';
+
+        $fee = (float) ($settings[$feeKey] ?? 0);
+        $currency = $settings[$currencyKey] ?? 'EUR';
+
+        // Override with token currency if available
+        if ($token) {
+            $link = OpenRegisterLink::where('token', $token)->first();
+            if ($link && $link->currency) {
+                $currency = $link->currency;
+                // If the currency is different from the mapped one, we might need to fetch the fee for that specific currency
+                // But according to the requirement, the fee is fetched based on the user type and currency.
+                // In our system, fees are set PER COUNTRY (which maps to a currency).
+                // If a link is generated with a specific currency, we should probably find a country that uses that currency to get the fee.
+                // Or if the fee is already set for that currency globally.
+                
+                // Let's check if there's a country setting for this currency
+                $countryToCurrency = config('currencies.country_to_currency', []);
+                $revMap = array_flip($countryToCurrency);
+                if (isset($revMap[$currency])) {
+                    $targetCountryCode = $revMap[$currency];
+                    $regionalSettings = HomepageSetting::getSectionValues('finance', $language, $targetCountryCode);
+                    if (isset($regionalSettings[$feeKey])) {
+                        $fee = (float) $regionalSettings[$feeKey];
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'fee' => $fee,
+            'currency' => $currency,
+            'enabled' => filter_var($settings[$feeKey . '_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN)
+        ]);
+    }
+
     public function validatePromoCode(Request $request)
     {
         $request->validate([
             'code' => ['required', 'string', 'max:255'],
             'amount' => ['nullable', 'numeric', 'min:0'],
             'usage_type' => ['nullable', 'string', 'in:registration,booking'],
+            'country' => ['nullable', 'string'],
         ]);
 
         $usageType = $request->input('usage_type', 'registration');
@@ -782,24 +876,35 @@ class WebController extends Controller
 
         if ($usageType === 'registration') {
             $role = $request->input('role', 'practitioner');
+            $countryName = $request->input('country');
+            $countryCode = 'all';
+            if ($countryName) {
+                $dbCountry = \App\Models\Country::where('name', $countryName)->first();
+                if ($dbCountry) {
+                    $countryCode = strtoupper($dbCountry->code);
+                }
+            }
+
             $feeKey = match ($role) {
                 'client' => 'client_registration_fee',
                 'doctor' => 'doctor_registration_fee',
+                'mindfulness_practitioner' => 'mindfulness_registration_fee',
+                'yoga_therapist' => 'yoga_registration_fee',
+                'translator' => 'translator_registration_fee',
                 default => 'practitioner_registration_fee',
             };
 
             $language = session('locale', 'en');
-            $financeSettings = HomepageSetting::getSectionValues('finance', $language);
+            $financeSettings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
             $baseFee = $financeSettings[$feeKey] ?? '0';
             $baseFee = is_numeric($baseFee) ? (float) $baseFee : 0.0;
-            
+
             $feeEnabledKey = $feeKey . '_enabled';
             $feeEnabled = filter_var($financeSettings[$feeEnabledKey] ?? '1', FILTER_VALIDATE_BOOLEAN);
             if (!$feeEnabled) {
                 return response()->json(['message' => 'Fee is currently disabled.'], 422);
             }
-        } else {
-            // For bookings, we use the amount passed from frontend
+        } else {            // For bookings, we use the amount passed from frontend
             $baseFee = (float) $request->input('amount', 0);
         }
 
