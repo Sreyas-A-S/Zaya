@@ -430,7 +430,12 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Year of Passing <span class="text-danger">*</span></label>
-                        <input class="form-control" type="number" name="year_of_passing" required placeholder="YYYY">
+                        <select class="form-select" name="year_of_passing" id="year_of_passing" required>
+                            <option value="">Select Year</option>
+                            @for($year = date('Y'); $year >= 1950; $year--)
+                            <option value="{{ $year }}">{{ $year }}</option>
+                            @endfor
+                        </select>
                     </div>
                     <div class="col-md-12 mt-3">
                         <label class="form-label">Yoga Therapy Certification Details <span class="text-danger">*</span></label>
@@ -799,7 +804,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             $('#therapist-form')[0].reset();
             $('#therapist_id').val('');
             $('#form-method').val('POST');
-            $('#form-modal-title').text('Register Yoga Therapist');
+            $('#form-modal-title').text('Register New Yoga Therapist');
+            $('#yoga_payout_currency').css({'pointer-events': 'auto', 'background-color': '#fff'}).attr('tabindex', '0');
             $('.password-field').show();
             $('input[name="password"]').attr('required', 'required');
             $('input[name="password_confirmation"]').attr('required', 'required');
@@ -1565,7 +1571,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
                     $('input[name="highest_education"]').val(t.highest_education || '');
                     $('input[name="institute_university"]').val(t.institute_university || '');
-                    $('input[name="year_of_passing"]').val(t.year_of_passing || '');
+                    $('[name="year_of_passing"]').val(t.year_of_passing || '');
                     if (t.certification_details) $('textarea[name="certification_details"]').val(t.certification_details);
                     if (t.additional_certifications) $('textarea[name="additional_certifications"]').val(t.additional_certifications);
 
@@ -1638,7 +1644,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     $('input[name="bank_name"]').val(t.bank_name);
                     $('input[name="account_number"]').val(t.account_number);
                     $('input[name="ifsc_code"]').val(t.ifsc_code);
-                    $('#yoga_payout_currency').val(t.payout_currency || 'INR');
+                    $('#yoga_payout_currency').val(t.payout_currency || 'INR').css({'pointer-events': 'none', 'background-color': '#e9ecef'}).attr('tabindex', '-1');
                     $('input[name="swift_code"]').val(t.swift_code || '');
                     $('input[name="upi_id"]').val(t.upi_id);
 

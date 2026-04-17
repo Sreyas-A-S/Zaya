@@ -123,7 +123,7 @@ class ClientController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex align-items-center gap-3">';
-                    $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-secondary viewClient" title="View"><i class="iconly-Show icli" style="font-size: 20px;"></i></a>';
+                    $btn .= '<a href="' . route('admin.clients.show', $row->id) . '" class="text-secondary" title="View"><i class="iconly-Show icli" style="font-size: 20px;"></i></a>';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-primary editClient" title="Edit"><i class="iconly-Edit-Square icli" style="font-size: 20px;"></i></a>';
                     $btn .= '<a href="javascript:void(0)" data-id="' . $row->id . '" class="text-danger deleteClient" title="Delete"><i class="iconly-Delete icli" style="font-size: 20px;"></i></a>';
                     $btn .= '</div>';
@@ -165,7 +165,13 @@ class ClientController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
-        $currencies = config('currencies.symbols');
+        $symbols = config('currencies.symbols');
+        $allCodes = array_unique(array_merge(array_keys($symbols), array_values(config('currencies.country_to_currency', []))));
+        sort($allCodes);
+        $currencies = [];
+        foreach ($allCodes as $code) {
+            $currencies[$code] = $symbols[$code] ?? $code;
+        }
 
         return view('admin.clients.index', [
             'pageTitle' => 'Clients Management',
@@ -284,6 +290,31 @@ class ClientController extends Controller
         ]);
 
         return response()->json(['success' => 'Client saved successfully.', 'client_id' => $clientId]);
+    }
+
+    public function show($id)
+    {
+        $user = User::with('patient')->findOrFail($id);
+        $consultationPreferences = \App\Models\ClientConsultationPreference::where('status', true)->get();
+        $languages = \App\Models\Language::all();
+        $countries = \App\Models\Country::all();
+        $symbols = config('currencies.symbols');
+        $allCodes = array_unique(array_merge(array_keys($symbols), array_values(config('currencies.country_to_currency', []))));
+        sort($allCodes);
+        $currencies = [];
+        foreach ($allCodes as $code) {
+            $currencies[$code] = $symbols[$code] ?? $code;
+        }
+
+        return view('admin.clients.show', [
+            'pageTitle' => 'Client Details',
+            'user' => $user,
+            'patient' => $user->patient,
+            'consultationPreferences' => $consultationPreferences,
+            'languages' => $languages,
+            'countries' => $countries,
+            'currencies' => $currencies
+        ]);
     }
 
     public function edit($id)

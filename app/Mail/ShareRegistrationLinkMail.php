@@ -39,7 +39,13 @@ class ShareRegistrationLinkMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.share-link',
+            view: 'emails.share-link',
+            with: [
+                'title' => 'Registration Link Shared',
+                'intro' => 'You have been invited to join the ZAYA Wellness Collective. Please use the secure link below to complete your registration.',
+                'link' => $this->link,
+                'outro' => 'This link will expire in 7 days.',
+            ],
         );
     }
 

@@ -77,9 +77,13 @@
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Year of Passing') }} <span class="text-red-500">*</span></label>
-        <input type="number" name="year_of_passing" value="{{ old('year_of_passing') }}" required min="1950" max="{{ date('Y') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
-            placeholder="YYYY">
+        <select name="year_of_passing" required
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            <option value="">{{ __('Select Year') }}</option>
+            @for($year = date('Y'); $year >= 1950; $year--)
+                <option value="{{ $year }}" @selected(old('year_of_passing') == $year)>{{ $year }}</option>
+            @endfor
+        </select>
     </div>
 </div>
 

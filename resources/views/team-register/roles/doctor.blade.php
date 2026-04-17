@@ -63,9 +63,13 @@
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Year of Passing (Primary)') }} <span class="text-red-500">*</span></label>
-        <input type="number" name="primary_year" value="{{ old('primary_year') }}" required min="1950" max="{{ date('Y') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-            placeholder="YYYY">
+        <select name="primary_year" required
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
+            <option value="">{{ __('Select Year') }}</option>
+            @for($year = date('Y'); $year >= 1950; $year--)
+                <option value="{{ $year }}" @selected(old('primary_year') == $year)>{{ $year }}</option>
+            @endfor
+        </select>
     </div>
 </div>
 
@@ -91,9 +95,13 @@
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Year of Passing (PG)') }}</label>
-        <input type="number" name="pg_year" value="{{ old('pg_year') }}" min="1950" max="{{ date('Y') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-            placeholder="YYYY">
+        <select name="pg_year"
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
+            <option value="">{{ __('Select Year') }}</option>
+            @for($year = date('Y'); $year >= 1950; $year--)
+                <option value="{{ $year }}" @selected(old('pg_year') == $year)>{{ $year }}</option>
+            @endfor
+        </select>
     </div>
 </div>
 
@@ -264,7 +272,7 @@
 <div class="bg-white rounded-2xl p-6 mb-12 space-y-4">
     <label class="flex items-start gap-3 text-gray-700">
         <input type="checkbox" name="ayush_confirmation" value="1" class="mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('ayush_confirmation'))>
-        <span>{{ __('I confirm I am a registered AYUSH Practitioner.') }}</span>
+        <span>{{ __('I confirm I am a registered AYUSH Doctor.') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
         <input type="checkbox" name="guidelines_agreement" value="1" class="mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('guidelines_agreement'))>

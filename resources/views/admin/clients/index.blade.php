@@ -191,6 +191,8 @@
     .stepper-horizontal .stepper-item.completed .step-name {
         color: #51bb25;
     }
+
+
 </style>
 <div class="container-fluid">
     <div class="page-title">
@@ -260,13 +262,17 @@
 <div class="modal fade" id="client-form-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="form-modal-title">Register New Client</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <!-- Stepper Progress Bar -->
-                <div class="stepper-horizontal mb-4">
+            <form id="client-form" method="POST" class="theme-form" novalidate>
+                @csrf
+                <input type="hidden" name="_method" id="form-method" value="POST">
+                <input type="hidden" name="client_id" id="client_id_hidden">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="form-modal-title">Register New Client</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
+                    <!-- Stepper Progress Bar -->
+                    <div class="stepper-horizontal mb-4">
                     <div class="stepper-item active" data-step="1">
                         <div class="step-counter">1</div>
                         <div class="step-name">Personal</div>
@@ -293,10 +299,7 @@
                     </div>
                 </div>
 
-                <form id="client-form" method="POST" class="theme-form" novalidate>
-                    @csrf
-                    <input type="hidden" name="_method" id="form-method" value="POST">
-                    <input type="hidden" name="client_id" id="client_id_hidden">
+
 
                     <!-- Step 1: Personal Information -->
                     <div class="step-content" id="step-1">
@@ -305,7 +308,7 @@
                         <div class="col-md-12 text-center mb-4">
                             <div class="avatar-upload">
                                 <div class="avatar-edit">
-                                    <input type='file' id="imageUpload" name="profile_photo" accept=".png, .jpg, .jpeg"  required />
+                                    <input type='file' id="imageUpload" name="profile_photo" accept=".png, .jpg, .jpeg" />
                                     <label for="imageUpload"><i class="iconly-Edit icli"></i></label>
                                 </div>
                                 <div class="avatar-preview">
@@ -419,6 +422,7 @@
                                 <option value="{{ $country->name }}">{{ $country->name }}</option>
                                 @endforeach
                             </select>
+                        </div>
                         <div class="col-md-6">
                             <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
                             <select class="form-select" name="payout_currency" id="client_payout_currency">
@@ -478,6 +482,8 @@
         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
                 <!-- Step 4: Experience & Referral -->
                 <div class="step-content d-none" id="step-4">
@@ -506,9 +512,6 @@
                         <div class="col-md-12 d-none" id="referrer_name_div">
                             <label class="form-label">Referring Practitioner/Client Name</label>
                             <input type="text" class="form-control" name="referrer_name" placeholder="Enter name" required>
-                        </div>
-                    </div>
-
                         </div>
                     </div>
                 </div>
@@ -599,6 +602,7 @@
                         </div>
                     </div>
                 </div>
+                </div> <!-- Closing modal-body -->
 
                 <div class="modal-footer justify-content-between mt-4">
                     <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">Previous</button>
@@ -995,6 +999,15 @@
             }
         }
 
+        // Expose a safe reset helper for openCreateModal() (defined outside ready scope)
+        window.resetClientStepper = function() {
+            currentStep = 1;
+            totalSteps = 6;
+            $('.stepper-horizontal').show();
+            $('.stepper-horizontal .stepper-item[data-step="6"]').show();
+            updateStepper();
+        };
+
         $('#next-btn').click(function() {
             if (validateStep(currentStep)) {
                 if (currentStep < totalSteps) {
@@ -1014,17 +1027,26 @@
         function validateStep(step) {
             let valid = true;
             $(`#step-${step} input, #step-${step} select, #step-${step} textarea`).each(function() {
+                const $el = $(this);
+                if ($el.is(':hidden')) return;
+                $el.removeClass('is-invalid');
+                $el.next('.invalid-feedback').remove();
+
                 if (this.hasAttribute('required') && !this.value) {
-                    $(this).addClass('is-invalid');
+                    $el.addClass('is-invalid');
+                    if ($el.next('.invalid-feedback').length === 0) {
+                        $el.after('<div class="invalid-feedback">This field is required</div>');
+                    }
                     valid = false;
-                } else {
-                    $(this).removeClass('is-invalid');
                 }
                 
                 // Password match validation on step 5
                 if (step === 5 && this.id === 'password-confirm-input') {
                     if (this.value !== $('#password-input').val()) {
-                        $(this).addClass('is-invalid');
+                        $el.addClass('is-invalid');
+                        if ($el.next('.invalid-feedback').length === 0) {
+                            $el.after('<div class="invalid-feedback">Passwords do not match</div>');
+                        }
                         valid = false;
                     }
                 }
@@ -1202,6 +1224,11 @@
                 $('#form-modal-title').text('Edit Client');
                 $('#form-method').val('PUT');
                 $('#client_id_hidden').val(data.id);
+                
+                // Clear previous validation results
+                const form = $('#client-form');
+                form.find('.is-invalid').removeClass('is-invalid');
+                form.find('.invalid-feedback').remove();
                 $('input[name="first_name"]').val(data.first_name);
                 $('input[name="middle_name"]').val(data.middle_name);
                 $('input[name="last_name"]').val(data.last_name);
@@ -1214,7 +1241,7 @@
                     $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
                 }
                 croppedFile = null;
-                $('#imageUpload').val('');
+                $('#imageUpload').val('').removeAttr('required');
 
                 // Optional Password hint
                 $('#password-hint').text('(Leave blank to keep current password)');
@@ -1250,8 +1277,10 @@
                     $('select[name="gender"]').val(data.patient.gender);
                     $('select[name="referral_type"]').val(data.patient.referral_type).trigger('change');
                     $('input[name="referrer_name"]').val(data.patient.referrer_name);
-
-                    // Handle Consultation Preferences (Multiselect)
+                    
+                    // Always allow changing payout currency and remove any disabled state
+                    $('#client_payout_currency').val(data.patient.payout_currency || 'INR').css({'pointer-events': 'auto', 'background-color': '#ffffff'}).removeAttr('tabindex');
+                    
                     if (data.patient.consultation_preferences) {
                         $('.pref-checkbox').prop('checked', false);
                         data.patient.consultation_preferences.forEach(function(val) {
@@ -1291,10 +1320,13 @@
                 }
 
                 new bootstrap.Modal(document.getElementById('client-form-modal')).show();
-                
+
+                // For Edit: Use the same stepper flow as Create, but without payment step
                 currentStep = 1;
-                totalSteps = 5; // Skip Step 6 (Payment) during Edit
+                totalSteps = 5;
+                $('.stepper-horizontal').show();
                 $('.stepper-horizontal .stepper-item[data-step="6"]').hide();
+                $('#step-6').addClass('d-none');
                 updateStepper();
             });
         });
@@ -1424,6 +1456,7 @@
         $('#form-modal-title').text('Register New Client');
         $('#form-method').val('POST');
         $('#client_id_hidden').val('');
+        $('#client_payout_currency').css({'pointer-events': 'auto', 'background-color': '#fff'}).attr('tabindex', '0');
         $('#age_display').val('');
         $('#referrer_name_div').addClass('d-none');
         $('#password-hint').text('(Required for new clients)');
@@ -1432,10 +1465,9 @@
         $('#password-confirm-input').removeClass('is-invalid');
         $('#submit-btn').prop('disabled', false);
 
-        currentStep = 1;
-        totalSteps = 6;
-        $('.stepper-horizontal .stepper-item[data-step="6"]').show();
-        updateStepper();
+        if (typeof window.resetClientStepper === 'function') {
+            window.resetClientStepper();
+        }
         if (clientIti) {
             clientIti.setNumber('');
         }
@@ -1461,84 +1493,7 @@
     // Expose to window for the button onclick
     window.openCreateModal = openCreateModal;
 
-    $(document).on('click', '.viewClient', function() {
-        let id = $(this).data('id');
-        // Reset form first
-        $('#client-form')[0].reset();
-        $('#client-form-modal input, #client-form-modal select, #client-form-modal textarea').prop('disabled', true);
-        $('#submit-btn').addClass('d-none');
-        $('#form-modal-title').text('View Client Details');
-        $('.pref-checkbox').prop('checked', false).prop('disabled', true);
-        if (languageChoices) languageChoices.disable();
-        $('#languages_capabilities_container').empty(); // Clear existing rows for view mode
 
-        $.get("{{ url('admin/clients') }}/" + id + "/edit", function(data) {
-            $('#client_id_hidden').val(data.id);
-            $('input[name="first_name"]').val(data.first_name);
-            $('input[name="middle_name"]').val(data.middle_name);
-            $('input[name="last_name"]').val(data.last_name);
-            $('input[name="email"]').val(data.email);
-
-            if (data.patient.profile_photo_path) {
-                $('#imagePreview').css('background-image', 'url(/storage/' + data.patient.profile_photo_path + ')');
-            } else {
-                $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
-            }
-
-            if (clientIti) {
-                clientIti.setNumber(data.patient.phone || '');
-            } else {
-                $('input[name="phone"]').val(data.patient.phone);
-            }
-            $('input[name="mobile_country_code"]').val(data.patient.mobile_country_code);
-            $('input[name="address_line_1"]').val(data.patient.address_line_1);
-            $('input[name="address_line_2"]').val(data.patient.address_line_2);
-            $('input[name="city"]').val(data.patient.city);
-            $('input[name="state"]').val(data.patient.state);
-            $('input[name="zip_code"]').val(data.patient.zip_code);
-            $('select[name="country"]').val(data.patient.country);
-
-            if (data.patient.dob) {
-                let dobDate = data.patient.dob.substring(0, 10);
-                $('input[name="dob"]').val(dobDate);
-                $('#age_display').val(calculateAge(dobDate));
-            } else {
-                $('input[name="dob"]').val('');
-                $('#age_display').val('');
-            }
-
-            $('input[name="occupation"]').val(data.patient.occupation);
-            $('select[name="gender"]').val(data.patient.gender);
-            $('select[name="referral_type"]').val(data.patient.referral_type);
-            $('input[name="referrer_name"]').val(data.patient.referrer_name);
-
-            if (data.patient.consultation_preferences) {
-                data.patient.consultation_preferences.forEach(function(val) {
-                    $(`input[name="consultation_preferences[]"][value="${val}"]`).prop('checked', true);
-                });
-            }
-
-            if (data.patient.languages_spoken) {
-                const langs = Array.isArray(data.patient.languages_spoken) ? data.patient.languages_spoken : [];
-                if (langs.length > 0 && typeof langs[0] === 'string') {
-                    languageChoices.setChoiceByValue(langs);
-                } else {
-                    const langValues = [];
-                    $.each(data.patient.languages_spoken, function(key, caps) {
-                        const langName = caps.language || key;
-                        langValues.push(langName);
-                        addLanguageCapabilityRow(langName, langName, caps);
-                    });
-                    languageChoices.setChoiceByValue(langValues);
-                }
-            }
-
-            $('#referrer_name_div').removeClass('d-none'); // Show by default in view mode if value exists
-            if (!data.patient.referrer_name) $('#referrer_name_div').addClass('d-none');
-
-            new bootstrap.Modal(document.getElementById('client-form-modal')).show();
-        });
-    });
 
     // Re-enable fields when modal is closed/hidden to prevent issues with other modes
     $('#client-form-modal').on('hidden.bs.modal', function() {

@@ -287,7 +287,12 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Year of Passing (Primary)</label>
-                                            <input type="number" class="form-control" name="primary_year" id="primary_year" placeholder="YYYY">
+                                            <select class="form-select" name="primary_year" id="primary_year">
+                                                <option value="">Select Year</option>
+                                                @for($year = date('Y'); $year >= 1950; $year--)
+                                                <option value="{{ $year }}">{{ $year }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Post Graduation (If any)</label>
@@ -305,7 +310,12 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Year of Passing (PG)</label>
-                                            <input type="number" class="form-control" name="pg_year" id="pg_year" placeholder="YYYY">
+                                            <select class="form-select" name="pg_year" id="pg_year">
+                                                <option value="">Select Year</option>
+                                                @for($year = date('Y'); $year >= 1950; $year--)
+                                                <option value="{{ $year }}">{{ $year }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Specialization (Select multiple if applicable)</label>
@@ -683,7 +693,7 @@
                                         <div class="col-12">
                                             <div class="form-check checkbox-primary mb-2">
                                                 <input class="form-check-input" type="checkbox" name="ayush_confirmation" value="1" required id="ayush_confirmation">
-                                                <label class="form-check-label" for="ayush_confirmation">I confirm I am a registered AYUSH Practitioner.</label>
+                                                <label class="form-check-label" for="ayush_confirmation">I confirm I am a registered AYUSH Doctor.</label>
                                             </div>
                                             <div class="form-check checkbox-primary mb-2">
                                                 <input class="form-check-input" type="checkbox" name="guidelines_agreement" value="1" required id="guidelines_agreement">
@@ -1743,6 +1753,7 @@
         $('#doctor_id').val('');
         $('#form-method').val('POST');
         $('#form-modal-title').text('Register New Doctor');
+        $('#doctor_payout_currency').css({'pointer-events': 'auto', 'background-color': '#fff'}).attr('tabindex', '0');
         $('#submit-btn').html('Complete Registration <i class="fa fa-check-circle ms-1"></i>');
         $('.file-keep-note').addClass('d-none');
         $('.is-invalid').removeClass('is-invalid');
@@ -1856,7 +1867,7 @@
             $('[name="account_number"]').val(profile.account_number);
             $('[name="ifsc_code"]').val(profile.ifsc_code);
             $('[name="upi_id"]').val(profile.upi_id);
-            $('#doctor_payout_currency').val(profile.payout_currency || 'INR');
+            $('#doctor_payout_currency').val(profile.payout_currency || 'INR').css({'pointer-events': 'none', 'background-color': '#e9ecef'}).attr('tabindex', '-1');
             $('[name="short_bio"]').val(profile.short_doctor_bio);
             $('[name="key_expertise"]').val(profile.key_expertise);
             $('[name="services_offered"]').val(profile.services_offered);
@@ -2098,6 +2109,13 @@
                                     <div class="col-12"><h6 class="text-primary border-bottom pb-2">Medical Registration</h6></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">AYUSH Number</label><p class="f-w-600">${p.ayush_registration_number || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">State Council</label><p class="f-w-600">${p.state_ayurveda_council_name || 'N/A'}</p></div>
+                                    <div class="col-12 mt-2">
+                                        <div class="d-flex flex-wrap gap-2">
+                                            ${p.reg_certificate_path ? `<a href="/storage/${p.reg_certificate_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-pdf me-1"></i> View Reg Certificate</a>` : ''}
+                                            ${p.registration_certificate_path && !p.reg_certificate_path ? `<a href="/storage/${p.registration_certificate_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-pdf me-1"></i> View Reg Certificate</a>` : ''}
+                                            ${p.digital_signature_path ? `<a href="/storage/${p.digital_signature_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-image me-1"></i> View Digital Signature</a>` : ''}
+                                        </div>
+                                    </div>
                                     
                                     <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Qualifications & Experience</h6></div>
                                     <div class="col-sm-6">
@@ -2162,10 +2180,12 @@
                                     
                                     <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Documents Status</h6>
                                         <div class="d-flex flex-wrap gap-2 pt-1">
-                                            ${p.reg_certificate_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> Reg Certificate</span>` : '<span class="badge badge-light-danger">Missing Reg Cert</span>'}
-                                            ${p.pan_upload_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> PAN Upload</span>` : '<span class="badge badge-light-danger">Missing PAN</span>'}
-                                            ${p.aadhaar_upload_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> Aadhaar Upload</span>` : '<span class="badge badge-light-danger">Missing Aadhaar</span>'}
-                                            ${p.cancelled_cheque_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> Bank Proof</span>` : '<span class="badge badge-light-danger">Missing Bank Proof</span>'}
+                                            ${p.reg_certificate_path ? `<a href="/storage/${p.reg_certificate_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-pdf me-1"></i> Reg Certificate</a>` : ''}
+                                            ${p.registration_certificate_path && !p.reg_certificate_path ? `<a href="/storage/${p.registration_certificate_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-pdf me-1"></i> Reg Certificate</a>` : ''}
+                                            ${p.digital_signature_path ? `<a href="/storage/${p.digital_signature_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-image me-1"></i> Digital Signature</a>` : ''}
+                                            ${p.pan_upload_path ? `<a href="/storage/${p.pan_upload_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-image me-1"></i> PAN Upload</a>` : '<span class="badge badge-light-danger">Missing PAN</span>'}
+                                            ${p.aadhaar_upload_path ? `<a href="/storage/${p.aadhaar_upload_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-image me-1"></i> Aadhaar Upload</a>` : ''}
+                                            ${p.cancelled_cheque_path ? `<a href="/storage/${p.cancelled_cheque_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-image me-1"></i> Bank Proof</a>` : '<span class="badge badge-light-danger">Missing Bank Proof</span>'}
                                             ${p.degree_certificates_path && p.degree_certificates_path.length > 0 ? p.degree_certificates_path.map((path, idx) => 
                                                 `<a href="/storage/${path}" target="_blank" class="badge badge-light-info text-decoration-none">
                                                     <i class="fa-solid fa-file-pdf me-1"></i> Degree ${idx + 1}

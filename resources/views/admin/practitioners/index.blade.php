@@ -391,7 +391,12 @@
                                                     <div class="row g-2">
                                                         <div class="col-md-3">
                                                             <label class="small fw-bold">Year of Passing <span class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control form-control-sm" name="qualifications[0][year_of_passing]" required pattern="^[0-9]{4}$" title="Enter 4-digit year">
+                                                            <select class="form-select form-select-sm" name="qualifications[0][year_of_passing]" required>
+                                                                <option value="">Select Year</option>
+                                                                @for($year = date('Y'); $year >= 1950; $year--)
+                                                                    <option value="{{ $year }}">{{ $year }}</option>
+                                                                @endfor
+                                                            </select>
                                                         </div>
                                                         <div class="col-md-5">
                                                             <label class="small fw-bold">Institute Name <span class="text-danger">*</span></label>
@@ -529,7 +534,10 @@
 
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-5 pt-3 border-top">
                                             <button type="button" class="btn btn-outline-dark prev-step" data-prev="4"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
-                                            <button type="button" class="btn btn-primary next-step" data-next="6">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                            <div class="footer-buttons">
+                                                <button type="button" class="btn btn-primary next-step" data-next="6">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                                <button type="submit" class="btn btn-success" id="submit-btn-edit" style="display: none;"><i class="fa-solid fa-check-circle me-2"></i> Save Practitioner</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1354,11 +1362,11 @@
         // Buttons handling
         if (step == practitionerTotalSteps) {
             $('.next-step').hide();
-            $('#submit-btn').show();
+            $('#submit-btn, #submit-btn-edit').show();
             $('#admin-pay-btn-practitioner').show();
         } else {
             $('.next-step').show();
-            $('#submit-btn').hide();
+            $('#submit-btn, #submit-btn-edit').hide();
             $('#admin-pay-btn-practitioner').hide();
         }
 
@@ -1385,7 +1393,16 @@
                 <div class="row g-2">
                     <div class="col-md-3">
                         <label class="small fw-bold">Year of Passing <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control form-control-sm" name="qualifications[${qualCount}][year_of_passing]" value="${data.year_of_passing || ''}" required pattern="^[0-9]{4}$" title="Enter 4-digit year">
+                        <select class="form-select form-select-sm" name="qualifications[${qualCount}][year_of_passing]" required>
+                            <option value="">Select Year</option>
+                            ${(() => {
+                                let options = '';
+                                for(let y = new Date().getFullYear(); y >= 1950; y--) {
+                                    options += `<option value="${y}" ${data.year_of_passing == y ? 'selected' : ''}>${y}</option>`;
+                                }
+                                return options;
+                            })()}
+                        </select>
                     </div>
                     <div class="col-md-5">
                         <label class="small fw-bold">Institute Name <span class="text-danger">*</span></label>
@@ -1469,6 +1486,8 @@
         }
         $('#languages_capabilities_container').empty(); // Clear language capability rows
 
+        $('#practitioner_payout_currency').css({'pointer-events': 'auto', 'background-color': '#fff'}).attr('tabindex', '0');
+
         $('#form-modal-title').text('Register New Practitioner');
         $('.cons-checkbox, .body-checkbox, .mod-checkbox').prop('checked', false);
         $('#qualifications-container').empty();
@@ -1544,7 +1563,7 @@
             $('[name="state"]').val(p.state || '');
             $('[name="zip_code"]').val(p.zip_code || '');
             $('[name="country"]').val(p.country || 'India');
-            $('#practitioner_payout_currency').val(p.payout_currency || 'INR');
+            $('#practitioner_payout_currency').val(p.payout_currency || 'INR').css({'pointer-events': 'none', 'background-color': '#e9ecef'}).attr('tabindex', '-1');
             $('[name="social_links[website]"]').val(p.social_links?.website || '');
             $('[name="social_links[facebook]"]').val(p.social_links?.facebook || '');
             $('[name="social_links[instagram]"]').val(p.social_links?.instagram || '');

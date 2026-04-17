@@ -445,7 +445,12 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Year of Passing <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="number" name="year_of_passing" required placeholder="YYYY">
+                                            <select class="form-select" name="year_of_passing" id="year_of_passing" required>
+                                                <option value="">Select Year</option>
+                                                @for($year = date('Y'); $year >= 1950; $year--)
+                                                <option value="{{ $year }}">{{ $year }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Mindfulness Training Details <span class="text-danger">*</span></label>
@@ -1553,7 +1558,7 @@
             $('input[name="account_number"]').val(p.account_number || '');
             $('input[name="ifsc_code"]').val(p.ifsc_code || '');
             $('input[name="upi_id"]').val(p.upi_id || '');
-            $('#mindfulness_payout_currency').val(p.payout_currency || 'INR');
+            $('#mindfulness_payout_currency').val(p.payout_currency || 'INR').css({'pointer-events': 'none', 'background-color': '#e9ecef'}).attr('tabindex', '-1');
 
             if (p.gov_id_upload_path) {
                 $('#current-gov_id_upload').removeClass('d-none').html(`<a href="/storage/${p.gov_id_upload_path}" target="_blank" class="text-primary">View Current</a>`);
@@ -1572,7 +1577,7 @@
             // Step 3: Qualifications
             $('input[name="highest_education"]').val(p.highest_education || '');
             $('input[name="institute_university"]').val(p.institute_university || '');
-            $('input[name="year_of_passing"]').val(p.year_of_passing || '');
+            $('[name="year_of_passing"]').val(p.year_of_passing || '');
             $('textarea[name="mindfulness_training_details"]').val(p.mindfulness_training_details || '');
             $('textarea[name="additional_certifications"]').val(p.additional_certifications || '');
 
@@ -2193,6 +2198,7 @@
         $('#croppedImage').val('');
         $('#form-method').val('POST');
         $('#form-modal-title').text('Register Mindfulness Counsellor');
+        $('#mindfulness_payout_currency').css({'pointer-events': 'auto', 'background-color': '#fff'}).attr('tabindex', '0');
 
         // Show password fields
         $('.password-field').show();

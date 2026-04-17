@@ -395,7 +395,12 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Year of Passing <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="number" name="year_of_passing" required placeholder="YYYY">
+                                            <select class="form-select" name="year_of_passing" id="year_of_passing" required>
+                                                <option value="">Select Year</option>
+                                                @for($year = date('Y'); $year >= 1950; $year--)
+                                                <option value="{{ $year }}">{{ $year }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Translation Certification Details</label>
@@ -1265,12 +1270,13 @@
                             $('#crop-modal').modal('hide');
                         }, 'image/png');
                     });
-
-                    function openCreateModal() {
+function openCreateModal() {
                         $('#translator-form')[0].reset();
                         $('#translator_id').val('');
                         $('#form-method').val('POST');
-                        $('#form-modal-title').text('Register Translator');
+                        $('#form-modal-title').text('Register New Translator');
+                        $('#translator_payout_currency').css({'pointer-events': 'auto', 'background-color': '#fff'}).attr('tabindex', '0');
+                        $('.password-field').show();
                         $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
                         $('#imageUpload').val('');
                         croppedFile = null;
@@ -1545,7 +1551,7 @@
 
                             $('input[name="highest_education"]').val(t.highest_education);
                             $('input[name="institute_university"]').val(t.institute_university);
-                            $('input[name="year_of_passing"]').val(t.year_of_passing);
+                            $('[name="year_of_passing"]').val(t.year_of_passing);
                             $('textarea[name="certification_details"]').val(t.certification_details);
 
                             if (t.certificates_path && t.certificates_path.length > 0) {
@@ -1585,7 +1591,7 @@
                             $('input[name="ifsc_code"]').val(t.ifsc_code);
                             $('input[name="swift_code"]').val(t.swift_code);
                             $('input[name="upi_id"]').val(t.upi_id);
-                            $('#translator_payout_currency').val(t.payout_currency || 'INR');
+                            $('#translator_payout_currency').val(t.payout_currency || 'INR').css({'pointer-events': 'none', 'background-color': '#e9ecef'}).attr('tabindex', '-1');
 
                             if (t.cancelled_cheque_path) {
                                 $('#current-cancelled_cheque').removeClass('d-none').html(`<a href="${storageBase}${t.cancelled_cheque_path}" target="_blank" class="text-primary">View Current Cheque</a>`);
