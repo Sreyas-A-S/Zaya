@@ -392,14 +392,76 @@
                     <div id="tab-security" class="tab-content hidden" style="display: none;">
                         <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Account Security') }}</h2>
                         
-                        <p class="text-gray-500 text-sm md:text-base mb-8">
-                            {{ __('Once your account is approved, you will receive a secure email link to set your password and activate your account.') }}
-                        </p>
+                        @php
+                            $roleKey = match($joinRole) {
+                                'doctor' => 'doctor_registration_fee',
+                                'mindfulness_practitioner' => 'mindfulness_registration_fee',
+                                'yoga_therapist' => 'yoga_registration_fee',
+                                'translator' => 'translator_registration_fee',
+                                default => 'practitioner_registration_fee',
+                            };
+                            $feeValue = $financeSettings[$roleKey] ?? 0;
+                            $feeEnabled = filter_var($financeSettings[$roleKey . '_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
+                            $feeCurrency = strtoupper($financeSettings[$roleKey . '_currency'] ?? 'EUR');
+                            $currencySymbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+                        @endphp
 
-                        @if(($joinRole ?? '') === 'yoga_therapist')
+                        @if($feeEnabled && $feeValue > 0)
+                            <div class="mb-10 p-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                                <h3 class="text-lg font-medium text-gray-900 mb-6">{{ __('Registration Fee & Special Offers') }}</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-3 text-base">{{ __('Registration Fee Amount') }}</label>
+                                        <div class="relative w-full">
+                                            <div class="w-full h-[52px] bg-white border border-gray-200 rounded-full flex items-center pl-6 pr-2">
+                                                <span class="text-gray-900 text-lg font-bold" id="registration-fee-display">
+                                                    {{ $currencySymbol }} {{ number_format($feeValue, 2) }}
+                                                </span>
+                                                <input type="hidden" name="registration_fee" id="registration_fee" value="{{ number_format($feeValue, 2, '.', '') }}">
+                                                <input type="hidden" name="registration_fee_actual" id="registration_fee_actual" value="{{ number_format($feeValue, 2, '.', '') }}">
+                                                <input type="hidden" name="registration_fee_currency" id="registration-fee-currency" value="{{ $feeCurrency }}">
+                                                <button type="submit"
+                                                    class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-sm font-medium hover:bg-[#e0a932] transition-colors shadow-sm">
+                                                    {{ __('Pay & Register') }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                        
-                        
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-3 text-base">{{ __('Promocode (Optional)') }}</label>
+                                        <div class="relative w-full">
+                                            <input type="text" name="promocode" id="promocode-input" placeholder="CODE1234"
+                                                class="w-full h-[52px] pl-6 pr-28 bg-white rounded-full border border-dashed border-gray-300 outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#FABC41]">
+                                            <button type="button" id="promo-apply-btn"
+                                                class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full transition-colors text-sm font-medium hover:bg-[#e0a932]">
+                                                {{ __('Apply') }}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div id="promo-breakdown" class="hidden mt-6 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="bg-white p-4 rounded-xl border border-gray-100">
+                                            <p class="text-gray-500 text-sm mb-1">{{ __('Discount Percentage') }}</p>
+                                            <input type="text" id="promo-discount-percentage" readonly class="bg-transparent border-none p-0 text-gray-900 font-bold focus:ring-0 w-full">
+                                        </div>
+                                        <div class="bg-white p-4 rounded-xl border border-gray-100">
+                                            <p class="text-gray-500 text-sm mb-1">{{ __('Total Discount') }}</p>
+                                            <input type="text" id="promo-discount-amount" readonly class="bg-transparent border-none p-0 text-gray-900 font-bold focus:ring-0 w-full">
+                                        </div>
+                                        <div class="bg-primary/5 p-4 rounded-xl border border-primary/10 md:col-span-2">
+                                            <p class="text-primary text-sm mb-1 font-medium">{{ __('Final Payable Amount') }}</p>
+                                            <input type="text" id="promo-total-fee" readonly class="bg-transparent border-none p-0 text-primary text-xl font-bold focus:ring-0 w-full">
+                                        </div>
+
+                                        <input type="hidden" name="promo_code" id="promo-code-hidden" value="">
+                                        <input type="hidden" name="promo_discount_percentage" id="promo-discount-percentage-hidden" value="">
+                                        <input type="hidden" name="promo_discount_amount" id="promo-discount-amount-hidden" value="">
+                                        <input type="hidden" name="promo_total_fee" id="promo-total-fee-hidden" value="">
+                                    </div>
+                                </div>
+                                <p class="text-gray-400 text-xs mt-4"><i class="ri-information-line mr-1"></i> {{ __('After clicking complete, you will be redirected to the payment gateway.') }}</p>
+                            </div>
                         @endif
 
                         <!-- Payment Section -->
@@ -838,6 +900,124 @@
                     }
                 });
             }
+
+            // Promocode & Fee Conversion Logic
+            const currencySymbols = @json(config('currencies.symbols', []));
+            const promoInput = document.getElementById('promocode-input');
+            const promoApplyBtn = document.getElementById('promo-apply-btn');
+            const promoBreakdown = document.getElementById('promo-breakdown');
+            const feeInput = document.getElementById('registration_fee');
+            const feeActualInput = document.getElementById('registration_fee_actual');
+            const feeCurrencyInput = document.getElementById('registration-fee-currency');
+            const countryToCurrency = @json(config('currencies.country_to_currency', []));
+            const countrySelect = document.querySelector('[name="country"]');
+            const countrySelectorTS = countrySelect && countrySelect.tomselect;
+
+            const fallbackRates = {
+                'EUR': { 'USD': 1.1, 'INR': 89, 'GBP': 0.85, 'AED': 4.04 },
+                'USD': { 'EUR': 0.91, 'INR': 81, 'GBP': 0.77, 'AED': 3.67 },
+                'INR': { 'EUR': 0.0112, 'USD': 0.0123, 'GBP': 0.0095, 'AED': 0.045 },
+                'GBP': { 'EUR': 1.18, 'USD': 1.30, 'INR': 104, 'AED': 4.77 },
+                'AED': { 'EUR': 0.25, 'USD': 0.27, 'INR': 22, 'GBP': 0.21 },
+            };
+
+            function getCsrfToken() {
+                return document.querySelector('input[name="_token"]')?.value ||
+                    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                    '';
+            }
+
+            async function convertFee(targetCountryName) {
+                if (!feeInput || !feeActualInput) return;
+                const baseCurrency = "{{ $feeCurrency ?? 'EUR' }}";
+                const baseAmount = parseFloat(feeActualInput.value || 0);
+                if (!baseAmount) return;
+
+                // Derive currency from country name
+                let derivedCurrency = baseCurrency;
+                const countries = @json($countries->pluck('code', 'name')->toArray() ?? []);
+                const countryCode = countries[targetCountryName];
+                
+                if (countryCode && countryToCurrency[countryCode.toUpperCase()]) {
+                    derivedCurrency = countryToCurrency[countryCode.toUpperCase()];
+                }
+
+                const symbol = currencySymbols[derivedCurrency] || derivedCurrency;
+                feeCurrencyInput && (feeCurrencyInput.value = derivedCurrency);
+
+                const applyValue = (val) => {
+                    feeInput.value = val.toFixed(2);
+                    const display = document.getElementById('registration-fee-display');
+                    if (display) display.textContent = `${symbol} ${val.toFixed(2)} (${derivedCurrency})`;
+                };
+
+                try {
+                    const ffUrl = `https://api.frankfurter.app/latest?from=${baseCurrency}&to=${derivedCurrency}`;
+                    const resp = await fetch(ffUrl);
+                    const data = await resp.json();
+                    if (data?.rates?.[derivedCurrency]) {
+                        applyValue(baseAmount * data.rates[derivedCurrency]);
+                        return;
+                    }
+                } catch (e) {}
+
+                const rate = fallbackRates[baseCurrency]?.[derivedCurrency];
+                applyValue(rate ? baseAmount * rate : baseAmount);
+            }
+
+            if (countrySelect) {
+                if (countrySelect.tomselect) {
+                    countrySelect.tomselect.on('change', (val) => convertFee(val));
+                } else {
+                    countrySelect.addEventListener('change', (e) => convertFee(e.target.value));
+                }
+                const initial = countrySelect.value || (countrySelect.tomselect ? countrySelect.tomselect.getValue() : '');
+                if (initial) convertFee(initial);
+            }
+
+            promoApplyBtn?.addEventListener('click', async () => {
+                const code = promoInput?.value.trim() || '';
+                if (!code) return;
+
+                promoApplyBtn.disabled = true;
+                const originalText = promoApplyBtn.textContent;
+                promoApplyBtn.textContent = '...';
+
+                try {
+                    const response = await fetch("{{ route('promo.validate') }}", {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': getCsrfToken()
+                        },
+                        body: JSON.stringify({ code, role: "{{ $joinRole }}", usage_type: 'registration' })
+                    });
+
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || 'Invalid promo code');
+
+                    const symbol = currencySymbols[feeCurrencyInput.value] || feeCurrencyInput.value;
+                    document.getElementById('promo-discount-percentage').value = `${data.discount_percentage}%`;
+                    document.getElementById('promo-discount-amount').value = `${symbol} ${data.discount_amount}`;
+                    document.getElementById('promo-total-fee').value = `${symbol} ${data.total_fee}`;
+                    
+                    document.getElementById('promo-code-hidden').value = data.code;
+                    document.getElementById('promo-discount-percentage-hidden').value = data.discount_percentage;
+                    document.getElementById('promo-discount-amount-hidden').value = data.discount_amount;
+                    document.getElementById('promo-total-fee-hidden').value = data.total_fee;
+
+                    if (feeInput) feeInput.value = data.total_fee;
+                    promoBreakdown?.classList.remove('hidden');
+                } catch (err) {
+                    alert(err.message);
+                } finally {
+                    promoApplyBtn.disabled = false;
+                    promoApplyBtn.textContent = originalText;
+                }
+            });
 
         });
     </script>

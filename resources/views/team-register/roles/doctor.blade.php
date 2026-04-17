@@ -56,6 +56,25 @@
             placeholder="{{ __('If Other, specify') }}">
     </div>
     <div>
+        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Institute/University (Primary)') }} <span class="text-red-500">*</span></label>
+        <input type="text" name="primary_institute" value="{{ old('primary_institute') }}" required
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+            placeholder="{{ __('Enter Institute Name') }}">
+    </div>
+    <div>
+        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Year of Passing (Primary)') }} <span class="text-red-500">*</span></label>
+        <select name="primary_year" required
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
+            <option value="">{{ __('Select Year') }}</option>
+            @for($year = date('Y'); $year >= 1950; $year--)
+                <option value="{{ $year }}" @selected(old('primary_year') == $year)>{{ $year }}</option>
+            @endfor
+        </select>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 mt-10">
+    <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Post Graduation (Optional)') }}</label>
         <select name="post_graduation"
             class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
@@ -67,6 +86,22 @@
         <input type="text" name="post_graduation_other" value="{{ old('post_graduation_other') }}"
             class="mt-3 w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
             placeholder="{{ __('If Other, specify') }}">
+    </div>
+    <div>
+        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Institute/University (PG)') }}</label>
+        <input type="text" name="pg_institute" value="{{ old('pg_institute') }}"
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
+            placeholder="{{ __('Enter PG Institute Name') }}">
+    </div>
+    <div>
+        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Year of Passing (PG)') }}</label>
+        <select name="pg_year"
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
+            <option value="">{{ __('Select Year') }}</option>
+            @for($year = date('Y'); $year >= 1950; $year--)
+                <option value="{{ $year }}" @selected(old('pg_year') == $year)>{{ $year }}</option>
+            @endfor
+        </select>
     </div>
 </div>
 

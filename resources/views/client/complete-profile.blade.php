@@ -507,13 +507,15 @@
                     </div>
                     <div>
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Payout Currency') }}</label>
-                        <select name="payout_currency" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none bg-white">
-                            @foreach($currencies as $code => $symbol)
-                                <option value="{{ $code }}" {{ ($profile->payout_currency ?? 'INR') == $code ? 'selected' : '' }}>
-                                    {{ $code }} ({{ $symbol }})
-                                </option>
-                            @endforeach
-                        </select>
+                        @php
+                            $selectedCurrency = $profile->payout_currency ?? 'INR';
+                            $selectedSymbol = $currencies[$selectedCurrency] ?? '';
+                        @endphp
+                        <div class="w-full px-4 py-3 bg-[#f3f4f6] rounded-xl border border-gray-200 text-gray-500 font-bold cursor-not-allowed flex items-center">
+                            {{ $selectedCurrency }} {{ $selectedSymbol ? '('.$selectedSymbol.')' : '' }}
+                            <i class="ri-lock-line ml-autoright ml-auto text-gray-400"></i>
+                        </div>
+                        <input type="hidden" name="payout_currency" value="{{ $selectedCurrency }}">
                     </div>
                     @if($user->role == 'translator')
                     <div>

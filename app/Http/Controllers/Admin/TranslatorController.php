@@ -210,9 +210,12 @@ class TranslatorController extends Controller
             'years_of_experience' => 'nullable|integer',
             'fields_of_specialization' => 'nullable|array',
             'previous_clients_projects' => 'nullable|string|max:1000',
+            'highest_education' => 'nullable|string|max:255',
+            'institute_university' => 'nullable|string|max:255',
+            'year_of_passing' => 'nullable|integer|min:1950|max:'.date('Y'),
             'portfolio_link' => 'nullable|url|max:255',
 
-            'highest_education' => 'nullable|string|max:255',
+
             'certification_details' => 'nullable|string|max:1000',
             'certificates' => 'nullable|array',
             'certificates.*' => 'file|max:2048',
@@ -231,6 +234,10 @@ class TranslatorController extends Controller
             'swift_code' => 'nullable|string|max:20',
             'upi_id' => 'nullable|string|max:255',
             'cancelled_cheque' => 'nullable|file|max:2048',
+
+            // Payment & Promocode
+            'promo_code' => 'nullable|string|max:50',
+            'promo_total_fee' => 'nullable|numeric',
         ]);
 
         DB::beginTransaction();
@@ -249,7 +256,24 @@ class TranslatorController extends Controller
             Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail('Translator'));
 
             $feeService = app(RegistrationFeeService::class);
-            if ($link = $feeService->createPaymentLink($user, $user->role)) {
+            $promoNotes = [];
+            $feeOverride = $request->input('promo_total_fee');
+
+            if ($request->filled('promo_code')) {
+                $promoNotes = [
+                    'promo_code' => $request->promo_code,
+                    'promo_discount_percentage' => $request->promo_discount_percentage,
+                    'promo_discount_amount' => $request->promo_discount_amount,
+                    'promo_total_fee' => $request->promo_total_fee,
+                ];
+
+                $promo = \App\Models\PromoCode::where('code', $request->promo_code)->first();
+                if ($promo) {
+                    $promo->incrementUsageIfAvailable();
+                }
+            }
+
+            if ($link = $feeService->createPaymentLink($user, $user->role, $feeOverride, $promoNotes)) {
                 Mail::to($user->email)->send(
                     new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
                 );
@@ -360,9 +384,12 @@ class TranslatorController extends Controller
             'years_of_experience' => 'nullable|integer',
             'fields_of_specialization' => 'nullable|array',
             'previous_clients_projects' => 'nullable|string|max:1000',
+            'highest_education' => 'nullable|string|max:255',
+            'institute_university' => 'nullable|string|max:255',
+            'year_of_passing' => 'nullable|integer|min:1950|max:'.date('Y'),
             'portfolio_link' => 'nullable|url|max:255',
 
-            'highest_education' => 'nullable|string|max:255',
+
             'certification_details' => 'nullable|string|max:1000',
             'certificates' => 'nullable|array',
             'certificates.*' => 'file|max:2048',

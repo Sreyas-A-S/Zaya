@@ -306,12 +306,7 @@
                 {data: 'usage_type', name: 'usage_type'},
                 {data: 'type', name: 'type'},
                 {data: 'reward', name: 'reward'},
-                {
-                    data: null, 
-                    render: function(data) {
-                        return (data.used_count || 0) + ' / ' + (data.usage_limit || '∞');
-                    }
-                },
+                {data: 'used_limit', name: 'used_limit', orderable: false, searchable: false},
                 {data: 'expiry_date', name: 'expiry_date'},
                 {data: 'created_at', name: 'created_at'},
                 {data: 'status', name: 'status', orderable: false, searchable: false},
@@ -431,3 +426,4 @@
     }
 </script>
 @endsection
+

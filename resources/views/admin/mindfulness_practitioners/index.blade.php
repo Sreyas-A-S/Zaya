@@ -125,6 +125,10 @@
                                     <div class="step-counter">6</div>
                                     <div class="step-name text-nowrap">Profile</div>
                                 </div>
+                                <div class="stepper-item" data-step="7">
+                                    <div class="step-counter">7</div>
+                                    <div class="step-name text-nowrap">Payment & Offers</div>
+                                </div>
                             </div>
 
                             <form id="practitioner-form" method="POST" enctype="multipart/form-data" class="theme-form" novalidate>
@@ -431,9 +435,22 @@
                                 <!-- Step 3: Qualifications -->
                                 <div class="step-content d-none" id="step-3">
                                     <div class="row g-3">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <label class="form-label">Highest Education <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="highest_education" maxlength="255" required>
+                                            <input class="form-control" type="text" name="highest_education" maxlength="255" required placeholder="e.g. PhD in Psychology">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Institute/University <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="institute_university" required placeholder="Enter Institute">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Year of Passing <span class="text-danger">*</span></label>
+                                            <select class="form-select" name="year_of_passing" id="year_of_passing" required>
+                                                <option value="">Select Year</option>
+                                                @for($year = date('Y'); $year >= 1950; $year--)
+                                                <option value="{{ $year }}">{{ $year }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Mindfulness Training Details <span class="text-danger">*</span></label>
@@ -441,7 +458,7 @@
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">Upload Certificates <span class="text-danger">*</span> <small class="text-muted fs-9">Ctrl + click to select multiple</small><span class="small text-muted">(Format: PDF/JPG/PNG, Max 2MB each)</span></label>
-                                            <input class="form-control" type="file" name="certificates[]" multiple accept=".pdf,.jpg,.jpeg,.png" required>
+                                            <input class="form-control" type="file" name="certificates[]" multiple accept=".pdf,.jpg,.jpeg,.png">
                                             <div id="current-certificates" class="mt-2 d-none"></div>
                                         </div>
                                         <div class="col-md-12">
@@ -716,6 +733,73 @@
                             </div>
                         </div>
 
+                        <!-- Step 7: Payment & Offers -->
+                        <div class="step-content d-none" id="step-7">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <h6 class="text-primary border-bottom pb-2 mt-2">Registration Fee & Special Offers</h6>
+                                    <div class="alert alert-light-primary border-0 mb-4 p-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1">
+                                                <p class="mb-1 text-muted">Registration Fee Amount</p>
+                                                @php
+                                                    $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+                                                    $feeValue = $financeSettings['mindfulness_practitioner_registration_fee'] ?? 0;
+                                                    $feeCurrency = $financeSettings['mindfulness_practitioner_registration_fee_currency'] ?? 'EUR';
+                                                    $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+                                                @endphp
+                                                <h4 class="mb-0 fw-bold" id="admin-fee-display-mind">
+                                                    {{ $symbol }} {{ number_format((float)$feeValue, 2) }}
+                                                </h4>
+                                                <input type="hidden" name="registration_fee" id="admin_registration_fee_mind" value="{{ $feeValue }}">
+                                                <input type="hidden" name="registration_fee_actual" id="admin_registration_fee_actual_mind" value="{{ $feeValue }}">
+                                                <input type="hidden" name="registration_fee_currency" value="{{ $feeCurrency }}">
+                                            </div>
+                                            <div class="ms-3">
+                                                <button type="submit" class="btn btn-primary" id="admin-pay-btn-mind">
+                                                    <i class="iconly-Tick-Square icli me-2"></i> Pay & Register
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p class="text-primary small mt-3 mb-0"><i class="iconly-Info-Circle icli me-1"></i> After clicking, the practitioner will receive an email with the payment link.</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label">Promocode (Optional)</label>
+                                    <div class="input-group">
+                                        <input type="text" name="promocode" id="admin-promocode-input-mind" class="form-control" placeholder="Enter code">
+                                        <button class="btn btn-outline-primary" type="button" id="admin-promo-apply-btn-mind">Apply</button>
+                                    </div>
+                                    <div id="admin-promo-status-mind" class="small mt-1"></div>
+                                </div>
+
+                                <div id="admin-promo-details-mind" class="col-12 d-none">
+                                    <div class="card bg-light border-0 mt-3">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Discount Percentage:</span>
+                                                <span id="admin-promo-discount-percent-mind" class="fw-bold text-success">0%</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Discount Amount:</span>
+                                                <span id="admin-promo-discount-amount-mind" class="fw-bold text-success">0.00</span>
+                                            </div>
+                                            <hr>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="fw-bold">Final Payable Amount:</span>
+                                                <span id="admin-promo-final-amount-mind" class="fw-bold text-primary">0.00</span>
+                                            </div>
+                                            <input type="hidden" name="promo_code" id="admin-promo-code-hidden-mind">
+                                            <input type="hidden" name="promo_discount_percentage" id="admin-promo-discount-percentage-hidden-mind">
+                                            <input type="hidden" name="promo_discount_amount" id="admin-promo-discount-amount-hidden-mind">
+                                            <input type="hidden" name="promo_total_fee" id="admin-promo-total-fee-hidden-mind">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Buttons -->
                         <div class="d-flex justify-content-between mt-4">
                             <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">Previous</button>
@@ -827,7 +911,7 @@
 <script>
     let table;
     let currentStep = 1;
-    const totalSteps = 6;
+    const totalSteps = 7;
     let iti;
     let phoneInput;
     let cropper;
@@ -962,6 +1046,100 @@
         });
     }
     window.practitionerTypeChoices = practitionerTypeChoices;
+
+    // Promocode Logic for Admin Modal (Mindfulness)
+    const promoInputMind = document.getElementById('admin-promocode-input-mind');
+    const promoApplyBtnMind = document.getElementById('admin-promo-apply-btn-mind');
+    const promoStatusMind = document.getElementById('admin-promo-status-mind');
+    const promoDetailsMind = document.getElementById('admin-promo-details-mind');
+    const feeDisplayMind = document.getElementById('admin-fee-display-mind');
+    const feeInputMind = document.getElementById('admin_registration_fee_mind');
+    const feeActualInputMind = document.getElementById('admin_registration_fee_actual_mind');
+    
+    const promoCodeHiddenMind = document.getElementById('admin-promo-code-hidden-mind');
+    const promoDiscountPercentHiddenMind = document.getElementById('admin-promo-discount-percentage-hidden-mind');
+    const promoDiscountAmountHiddenMind = document.getElementById('admin-promo-discount-amount-hidden-mind');
+    const promoTotalFeeHiddenMind = document.getElementById('admin-promo-total-fee-hidden-mind');
+    
+    const promoPercentTextMind = document.getElementById('admin-promo-discount-percent-mind');
+    const promoAmountTextMind = document.getElementById('admin-promo-discount-amount-mind');
+    const promoFinalTextMind = document.getElementById('admin-promo-final-amount-mind');
+    
+    const currencySymbolMind = "{{ $symbol }}";
+
+    function clearAdminPromoMind() {
+        if (!promoDetailsMind) return;
+        promoDetailsMind.classList.add('d-none');
+        promoStatusMind.innerHTML = '';
+        
+        promoCodeHiddenMind.value = '';
+        promoDiscountPercentHiddenMind.value = '';
+        promoDiscountAmountHiddenMind.value = '';
+        promoTotalFeeHiddenMind.value = '';
+        
+        if (feeActualInputMind && feeInputMind) {
+            feeInputMind.value = feeActualInputMind.value;
+            feeDisplayMind.innerText = `${currencySymbolMind} ${parseFloat(feeInputMind.value).toFixed(2)}`;
+        }
+    }
+
+    promoInputMind?.addEventListener('input', () => {
+        if (promoCodeHiddenMind.value) clearAdminPromoMind();
+    });
+
+    promoApplyBtnMind?.addEventListener('click', async () => {
+        const code = promoInputMind.value.trim();
+        if (!code) {
+            promoStatusMind.innerHTML = '<span class="text-danger">Please enter a code.</span>';
+            return;
+        }
+
+        promoApplyBtnMind.disabled = true;
+        promoApplyBtnMind.innerText = 'Checking...';
+        promoStatusMind.innerHTML = '';
+
+        try {
+            const response = await fetch("{{ route('promo.validate') }}", {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ code, role: 'mindfulness_practitioner' })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                promoStatusMind.innerHTML = `<span class="text-danger">${data.message || 'Invalid code.'}</span>`;
+                clearAdminPromoMind();
+                return;
+            }
+
+            // Success
+            promoStatusMind.innerHTML = '<span class="text-success">Promo applied!</span>';
+            promoDetailsMind.classList.remove('d-none');
+            
+            promoPercentTextMind.innerText = `${data.discount_percentage}%`;
+            promoAmountTextMind.innerText = `${currencySymbolMind} ${data.discount_amount}`;
+            promoFinalTextMind.innerText = `${currencySymbolMind} ${data.total_fee}`;
+            
+            promoCodeHiddenMind.value = data.code;
+            promoDiscountPercentHiddenMind.value = data.discount_percentage;
+            promoDiscountAmountHiddenMind.value = data.discount_amount;
+            promoTotalFeeHiddenMind.value = data.total_fee;
+            
+            feeInputMind.value = data.total_fee;
+            feeDisplayMind.innerText = `${currencySymbolMind} ${parseFloat(data.total_fee).toFixed(2)}`;
+
+        } catch (error) {
+            promoStatusMind.innerHTML = '<span class="text-danger">Error validating code.</span>';
+        } finally {
+            promoApplyBtnMind.disabled = false;
+            promoApplyBtnMind.innerText = 'Apply';
+        }
+    });
 
     // Stepper Logic
     $('#next-btn').click(function() {
@@ -1380,7 +1558,7 @@
             $('input[name="account_number"]').val(p.account_number || '');
             $('input[name="ifsc_code"]').val(p.ifsc_code || '');
             $('input[name="upi_id"]').val(p.upi_id || '');
-            $('#mindfulness_payout_currency').val(p.payout_currency || 'INR');
+            $('#mindfulness_payout_currency').val(p.payout_currency || 'INR').css({'pointer-events': 'none', 'background-color': '#e9ecef'}).attr('tabindex', '-1');
 
             if (p.gov_id_upload_path) {
                 $('#current-gov_id_upload').removeClass('d-none').html(`<a href="/storage/${p.gov_id_upload_path}" target="_blank" class="text-primary">View Current</a>`);
@@ -1395,6 +1573,13 @@
             } else {
                 $('#current-cancelled_cheque').addClass('d-none').empty();
             }
+
+            // Step 3: Qualifications
+            $('input[name="highest_education"]').val(p.highest_education || '');
+            $('input[name="institute_university"]').val(p.institute_university || '');
+            $('[name="year_of_passing"]').val(p.year_of_passing || '');
+            $('textarea[name="mindfulness_training_details"]').val(p.mindfulness_training_details || '');
+            $('textarea[name="additional_certifications"]').val(p.additional_certifications || '');
 
             // Step 6: Profile
             $('textarea[name="short_bio"]').val(p.short_bio || '');
@@ -1610,7 +1795,11 @@
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <p class="text-muted small mb-1">Highest Education</p>
-                                            <p class="fw-medium">${p.highest_education || 'N/A'}</p>
+                                            <p class="fw-bold">${p.highest_education || 'N/A'}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="text-muted small mb-1">Institute & Year</p>
+                                            <p class="fw-bold">${p.institute_university || ''} ${p.year_of_passing ? '(' + p.year_of_passing + ')' : ''}</p>
                                         </div>
                                         <div class="col-md-12">
                                              <p class="text-muted small mb-1">Training Details</p>
@@ -2009,6 +2198,7 @@
         $('#croppedImage').val('');
         $('#form-method').val('POST');
         $('#form-modal-title').text('Register Mindfulness Counsellor');
+        $('#mindfulness_payout_currency').css({'pointer-events': 'auto', 'background-color': '#fff'}).attr('tabindex', '0');
 
         // Show password fields
         $('.password-field').show();

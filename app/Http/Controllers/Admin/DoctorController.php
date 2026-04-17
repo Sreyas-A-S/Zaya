@@ -200,8 +200,12 @@ class DoctorController extends Controller
             // C. Qualifications & Experience
             'primary_qualification' => ['required', Rule::in(['bams', 'other'])],
             'primary_qualification_other' => 'nullable|string|max:255',
+            'primary_institute' => 'nullable|string|max:255',
+            'primary_year' => 'nullable|integer|min:1950|max:'.date('Y'),
             'post_graduation' => ['nullable', Rule::in(['md_ayurveda', 'ms_ayurveda', 'other'])],
             'post_graduation_other' => 'nullable|string|max:255',
+            'pg_institute' => 'nullable|string|max:255',
+            'pg_year' => 'nullable|integer|min:1950|max:'.date('Y'),
             'specialization' => 'nullable|array',
             'specialization.*' => 'string|max:255',
             'degree_certificates' => 'required|array',
@@ -267,6 +271,11 @@ class DoctorController extends Controller
             'policies_agreement' => 'accepted',
             'prescription_understanding' => 'accepted',
             'confidentiality_consent' => 'accepted',
+
+            // K. Payment & Promocode (Optional)
+            'promocode' => 'nullable|string|max:50',
+            'promo_code' => 'nullable|string|max:50',
+            'promo_total_fee' => 'nullable|numeric',
         ]);
 
         $user = User::create([
@@ -278,12 +287,29 @@ class DoctorController extends Controller
             'role' => 'doctor',
         ]);
 
-        $plainPassword = $validatedData['password'];
+        $plainPassword = $request->password;
         Session::put('welcome_password_' . $user->id, $plainPassword);
         Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail('Doctor'));
 
         $feeService = app(RegistrationFeeService::class);
-        if ($link = $feeService->createPaymentLink($user, $user->role)) {
+        $promoNotes = [];
+        $feeOverride = $request->input('promo_total_fee');
+        
+        if ($request->filled('promo_code')) {
+            $promoNotes = [
+                'promo_code' => $request->promo_code,
+                'promo_discount_percentage' => $request->promo_discount_percentage,
+                'promo_discount_amount' => $request->promo_discount_amount,
+                'promo_total_fee' => $request->promo_total_fee,
+            ];
+
+            $promo = \App\Models\PromoCode::where('code', $request->promo_code)->first();
+            if ($promo) {
+                $promo->incrementUsageIfAvailable();
+            }
+        }
+
+        if ($link = $feeService->createPaymentLink($user, $user->role, $feeOverride, $promoNotes)) {
             Mail::to($user->email)->send(
                 new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
             );
@@ -330,8 +356,12 @@ class DoctorController extends Controller
             'digital_signature_path' => $digitalSignaturePath,
             'primary_qualification' => $validatedData['primary_qualification'],
             'primary_qualification_other' => $validatedData['primary_qualification'] === 'other' ? ($validatedData['primary_qualification_other'] ?? null) : null,
+            'primary_institute' => $validatedData['primary_institute'] ?? null,
+            'primary_year' => $validatedData['primary_year'] ?? null,
             'post_graduation' => $validatedData['post_graduation'] ?? null,
             'post_graduation_other' => ($validatedData['post_graduation'] ?? null) === 'other' ? ($validatedData['post_graduation_other'] ?? null) : null,
+            'pg_institute' => $validatedData['pg_institute'] ?? null,
+            'pg_year' => $validatedData['pg_year'] ?? null,
             'specialization' => $validatedData['specialization'] ?? [],
             'degree_certificates_path' => $degreeCertificatesPaths,
             'years_of_experience' => $validatedData['years_of_experience'],
@@ -423,8 +453,12 @@ class DoctorController extends Controller
             // C. Qualifications & Experience
             'primary_qualification' => ['required', Rule::in(['bams', 'other'])],
             'primary_qualification_other' => 'nullable|string|max:255',
+            'primary_institute' => 'nullable|string|max:255',
+            'primary_year' => 'nullable|integer|min:1950|max:'.date('Y'),
             'post_graduation' => ['nullable', Rule::in(['md_ayurveda', 'ms_ayurveda', 'other'])],
             'post_graduation_other' => 'nullable|string|max:255',
+            'pg_institute' => 'nullable|string|max:255',
+            'pg_year' => 'nullable|integer|min:1950|max:'.date('Y'),
             'specialization' => 'nullable|array',
             'specialization.*' => 'string|max:255',
             'degree_certificates' => 'nullable|array',
@@ -535,8 +569,12 @@ class DoctorController extends Controller
             'digital_signature_path' => $digitalSignaturePath,
             'primary_qualification' => $validatedData['primary_qualification'],
             'primary_qualification_other' => $validatedData['primary_qualification'] === 'other' ? ($validatedData['primary_qualification_other'] ?? null) : null,
+            'primary_institute' => $validatedData['primary_institute'] ?? null,
+            'primary_year' => $validatedData['primary_year'] ?? null,
             'post_graduation' => $validatedData['post_graduation'] ?? null,
             'post_graduation_other' => ($validatedData['post_graduation'] ?? null) === 'other' ? ($validatedData['post_graduation_other'] ?? null) : null,
+            'pg_institute' => $validatedData['pg_institute'] ?? null,
+            'pg_year' => $validatedData['pg_year'] ?? null,
             'specialization' => $validatedData['specialization'] ?? [],
             'degree_certificates_path' => $degreeCertificatesPaths,
             'years_of_experience' => $validatedData['years_of_experience'],

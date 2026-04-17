@@ -168,9 +168,12 @@ class MindfulnessPractitionerController extends Controller
             'practitioner_type.*' => 'string',
             'years_of_experience' => 'nullable|integer',
             'current_workplace' => 'nullable|string|max:255',
+            'highest_education' => 'nullable|string|max:255',
+            'institute_university' => 'nullable|string|max:255',
+            'year_of_passing' => 'nullable|integer|min:1950|max:'.date('Y'),
             'website_social_links' => 'nullable|array',
 
-            'highest_education' => 'nullable|string|max:255',
+
             'mindfulness_training_details' => 'nullable|string|max:1000',
             'additional_certifications' => 'nullable|string|max:1000',
             'certificates' => 'nullable|array',
@@ -195,6 +198,10 @@ class MindfulnessPractitionerController extends Controller
             'short_bio' => 'nullable|string|max:1000',
             'coaching_style' => 'nullable|string|max:1000',
             'target_audience' => 'nullable|string|max:1000',
+
+            // Payment & Promocode
+            'promo_code' => 'nullable|string|max:50',
+            'promo_total_fee' => 'nullable|numeric',
         ]);
 
         DB::beginTransaction();
@@ -213,7 +220,24 @@ class MindfulnessPractitionerController extends Controller
             Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail('Mindfulness Counsellor'));
 
             $feeService = app(RegistrationFeeService::class);
-            if ($link = $feeService->createPaymentLink($user, $user->role)) {
+            $promoNotes = [];
+            $feeOverride = $request->input('promo_total_fee');
+
+            if ($request->filled('promo_code')) {
+                $promoNotes = [
+                    'promo_code' => $request->promo_code,
+                    'promo_discount_percentage' => $request->promo_discount_percentage,
+                    'promo_discount_amount' => $request->promo_discount_amount,
+                    'promo_total_fee' => $request->promo_total_fee,
+                ];
+
+                $promo = \App\Models\PromoCode::where('code', $request->promo_code)->first();
+                if ($promo) {
+                    $promo->incrementUsageIfAvailable();
+                }
+            }
+
+            if ($link = $feeService->createPaymentLink($user, $user->role, $feeOverride, $promoNotes)) {
                 Mail::to($user->email)->send(
                     new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
                 );
@@ -301,9 +325,12 @@ class MindfulnessPractitionerController extends Controller
             'practitioner_type.*' => 'string',
             'years_of_experience' => 'nullable|integer',
             'current_workplace' => 'nullable|string|max:255',
+            'highest_education' => 'nullable|string|max:255',
+            'institute_university' => 'nullable|string|max:255',
+            'year_of_passing' => 'nullable|integer|min:1950|max:'.date('Y'),
             'website_social_links' => 'nullable|array',
 
-            'highest_education' => 'nullable|string|max:255',
+
             'mindfulness_training_details' => 'nullable|string|max:1000',
             'additional_certifications' => 'nullable|string|max:1000',
             'certificates' => 'nullable|array',

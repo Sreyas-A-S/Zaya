@@ -33,6 +33,7 @@ use App\Models\YogaTherapist;
 use App\Services\WordPressBlogService;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 
 class WebController extends Controller
 {
@@ -749,38 +750,12 @@ class WebController extends Controller
             'openRegisterToken' => $token,
         ];
 
-        // Fetch registration fee data
-        $roleMap = [
-            'doctor' => 'doctor_registration_fee',
-            'mindfulness_practitioner' => 'mindfulness_registration_fee',
-            'yoga_therapist' => 'yoga_registration_fee',
-            'translator' => 'translator_registration_fee',
-        ];
-
-        $feeKey = $roleMap[$joinRole];
-        $countryCode = 'all';
-        $openLink = null;
-        if ($token) {
-            $openLink = OpenRegisterLink::where('token', $token)->first();
-            if ($openLink && $openLink->currency) {
-                $countryToCurrency = config('currencies.country_to_currency', []);
-                $revMap = array_flip($countryToCurrency);
-                $countryCode = $revMap[$openLink->currency] ?? 'all';
-            }
-        }
-
-        $financeSettings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
-        $viewData['registrationFeeEnabled'] = filter_var($financeSettings[$feeKey . '_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
-        $viewData['registrationFee'] = (float) ($financeSettings[$feeKey] ?? 0);
-        $viewData['registrationCurrency'] = $openLink && $openLink->currency ? $openLink->currency : ($financeSettings[$feeKey . '_currency'] ?? 'EUR');
-        $viewData['registrationCurrencySymbol'] = get_currency_symbol($viewData['registrationCurrency']);
-
+        $viewData['financeSettings'] = HomepageSetting::getSectionValues('finance', $language);
         if ($joinRole === 'doctor') {
             $viewData['specializations'] = Specialization::where('status', 1)->get();
             $viewData['consultationExpertise'] = AyurvedaExpertise::where('status', 1)->get();
             $viewData['healthConditions'] = HealthCondition::where('status', 1)->get();
             $viewData['externalTherapies'] = ExternalTherapy::where('status', 1)->get();
-            $viewData['financeSettings'] = HomepageSetting::getSectionValues('finance', $language);
         } elseif ($joinRole === 'mindfulness_practitioner') {
             $viewData['mindfulnessServices'] = MindfulnessService::where('status', 1)->get();
             $viewData['clientConcerns'] = ClientConcern::where('status', 1)->get();
@@ -887,6 +862,7 @@ class WebController extends Controller
 
             $feeKey = match ($role) {
                 'client' => 'client_registration_fee',
+                'patient' => 'client_registration_fee',
                 'doctor' => 'doctor_registration_fee',
                 'mindfulness_practitioner' => 'mindfulness_registration_fee',
                 'yoga_therapist' => 'yoga_registration_fee',
@@ -917,7 +893,10 @@ class WebController extends Controller
 
         // Check usage type
         if ($promo->usage_type !== 'both' && $promo->usage_type !== $usageType) {
-            return response()->json(['message' => 'This promo code is not applicable for ' . $usageType . '.'], 422);
+            // User requested to allow promo codes on all registration pages regardless of their saved usage_type
+            if ($usageType !== 'registration') {
+                return response()->json(['message' => 'This promo code is not applicable for ' . $usageType . '.'], 422);
+            }
         }
 
         if ($promo->expiry_date && $promo->expiry_date->isPast()) {
@@ -1100,7 +1079,10 @@ class WebController extends Controller
             ->get();
         $consultationPreferences = \App\Models\ClientConsultationPreference::all();
 
-        $userPromoCodes = auth()->check() ? auth()->user()->userPromoCodes()->latest()->get() : collect();
+        $userPromoCodes = collect();
+        if (auth()->check() && Schema::hasTable('user_promo_codes')) {
+            $userPromoCodes = auth()->user()->userPromoCodes()->latest()->get();
+        }
 
         return view('book-session', compact('practitioners', 'selectedPractitioner', 'services', 'languages', 'consultationPreferences', 'prefilledService', 'userPromoCodes'));
     }

@@ -210,7 +210,12 @@
                                                                             <div class="row g-3">
                                                                                 <div class="col-md-3">
                                                                                     <label class="form-label">Year of Passing</label>
-                                                                                    <input type="text" class="form-control" name="qualifications[0][year_of_passing]" placeholder="YYYY">
+                                                                                    <select class="form-select" name="qualifications[0][year_of_passing]">
+                                                                                        <option value="">Select Year</option>
+                                                                                        @for($year = date('Y'); $year >= 1950; $year--)
+                                                                                            <option value="{{ $year }}">{{ $year }}</option>
+                                                                                        @endfor
+                                                                                    </select>
                                                                                 </div>
                                                                                 <div class="col-md-5">
                                                                                     <label class="form-label">Institute / School Name</label>
@@ -706,7 +711,16 @@
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label">Year of Passing</label>
-                            <input type="text" class="form-control" name="qualifications[${qualIndex}][year_of_passing]" placeholder="YYYY">
+                            <select class="form-select" name="qualifications[${qualIndex}][year_of_passing]">
+                                <option value="">Select Year</option>
+                                ${(() => {
+                                    let options = '';
+                                    for(let y = new Date().getFullYear(); y >= 1950; y--) {
+                                        options += `<option value="${y}">${y}</option>`;
+                                    }
+                                    return options;
+                                })()}
+                            </select>
                         </div>
                         <div class="col-md-5">
                             <label class="form-label">Institute / School Name</label>

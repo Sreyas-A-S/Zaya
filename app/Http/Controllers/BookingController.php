@@ -155,7 +155,7 @@ class BookingController extends Controller
             if (!empty($notes['promo_code'])) {
                 $promo = \App\Models\PromoCode::where('code', $notes['promo_code'])->first();
                 if ($promo) {
-                    $promo->increment('used_count');
+                    $promo->incrementUsageIfAvailable();
                 }
             }
 
