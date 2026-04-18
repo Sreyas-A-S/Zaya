@@ -1088,18 +1088,22 @@
                             const tzCountry = tzCountryMap[tz];
                             if (tzCountry) {
                                 callback(tzCountry);
-                                // Silently enrich address fields in the background via IP API
+                                // Set the country/nationality dropdown from timezone immediately
+                                applyGeoToForm('', '', '', tzCountry.toUpperCase());
+
+                                // Enrich other fields (city, region, zip) in background via IP, 
+                                // but pass null for country to avoid overriding the timezone detection.
                                 fetch('https://ipapi.co/json/')
                                     .then(r => r.json())
                                     .then(d => {
                                         if (d && d.country_code && !d.error) {
-                                            applyGeoToForm(d.city, d.region, d.postal, d.country_code);
+                                            applyGeoToForm(d.city, d.region, d.postal, null);
                                         }
                                     })
                                     .catch(() => {});
-                                return; // Done — timezone matched
+                                return;
                             }
-                        } catch(e) { /* Intl API not available, fall through to IP detection */ }
+                        } catch(e) {}
 
                         // --- Method 2: ipapi.co (IP-based, used only when timezone unmapped) ---
                         fetch('https://ipapi.co/json/')

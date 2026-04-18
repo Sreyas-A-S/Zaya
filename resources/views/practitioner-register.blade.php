@@ -1036,10 +1036,16 @@
                             const cc = tzMap[tz];
                             if (cc) {
                                 callback(cc);
-                                // Silently enrich address fields via IP in background
+                                
+                                // Map detected code back to common names for the dropdown immediately
+                                const ccToName = { 'in': 'India', 'ae': 'United Arab Emirates', 'us': 'United States', 'gb': 'United Kingdom', 'fr': 'France' };
+                                if (ccToName[cc]) applyPractitionerGeo('', '', '', ccToName[cc]);
+
+                                // Enrich other fields (city, region, zip) in background via IP, 
+                                // but pass null for country to avoid overriding the timezone-based detection.
                                 fetch('https://ipapi.co/json/')
                                     .then(r => r.json())
-                                    .then(d => { if (d && d.country_code && !d.error) applyPractitionerGeo(d.city, d.region, d.postal, d.country_name); })
+                                    .then(d => { if (d && d.country_code && !d.error) applyPractitionerGeo(d.city, d.region, d.postal, null); })
                                     .catch(() => {});
                                 return;
                             }
