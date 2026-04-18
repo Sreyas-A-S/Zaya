@@ -21,6 +21,7 @@ use App\Models\MindfulnessService;
 use App\Models\ClientConcern;
 use App\Models\TranslatorService;
 use App\Models\TranslatorSpecialization;
+use App\Models\Qualification;
 use App\Models\Service;
 use App\Models\ServicePackage;
 use App\Models\Testimonial;
@@ -713,6 +714,8 @@ class WebController extends Controller
         $practitionerRegistrationCurrency = strtoupper($financeSettings['practitioner_registration_fee_currency'] ?? config('currencies.default', 'EUR'));
         $practitionerRegistrationCurrencySymbol = config('currencies.symbols')[$practitionerRegistrationCurrency] ?? $practitionerRegistrationCurrency;
 
+        $languages = \App\Models\Language::where('status', 'active')->orderBy('name')->get();
+
         return view('practitioner-register', compact(
             'wellnessConsultations',
             'bodyTherapies',
@@ -720,7 +723,8 @@ class WebController extends Controller
             'practitionerRegistrationFee',
             'practitionerRegistrationFeeEnabled',
             'practitionerRegistrationCurrency',
-            'practitionerRegistrationCurrencySymbol'
+            'practitionerRegistrationCurrencySymbol',
+            'languages'
         ));
     }
 
@@ -755,6 +759,7 @@ class WebController extends Controller
             $viewData['consultationExpertise'] = AyurvedaExpertise::where('status', 1)->get();
             $viewData['healthConditions'] = HealthCondition::where('status', 1)->get();
             $viewData['externalTherapies'] = ExternalTherapy::where('status', 1)->get();
+            $viewData['qualifications'] = Qualification::where('status', 1)->get();
         } elseif ($joinRole === 'mindfulness_practitioner') {
             $viewData['mindfulnessServices'] = MindfulnessService::where('status', 1)->get();
             $viewData['clientConcerns'] = ClientConcern::where('status', 1)->get();

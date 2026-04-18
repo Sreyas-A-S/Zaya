@@ -502,23 +502,70 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             try {
-            // Phone input with country flags + dial codes
+            // Phone input with country flags + dial codes (auto-detect country via timezone then IP)
             const phoneInput = document.querySelector("#phone");
             if (phoneInput && window.intlTelInput) {
                 const iti = window.intlTelInput(phoneInput, {
                     utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
                     separateDialCode: true,
                     initialCountry: "auto",
+                    preferredCountries: ["in", "ae", "us", "gb", "fr"],
                     geoIpLookup: function(callback) {
-                        fetch("/geoip/country", { headers: { 'Accept': 'application/json' } })
-                            .then(res => {
-                                if (!res.ok) throw new Error('Failed');
-                                return res.json();
+                        // Method 1: Browser Timezone (accurate, unaffected by VPN/ISP routing)
+                        const tzMap = {
+                            'Asia/Kolkata':'in','Asia/Calcutta':'in','Asia/Colombo':'lk',
+                            'Asia/Kathmandu':'np','Asia/Dhaka':'bd','Asia/Karachi':'pk',
+                            'Asia/Dubai':'ae','Asia/Abu_Dhabi':'ae','Asia/Muscat':'om',
+                            'Asia/Riyadh':'sa','Asia/Kuwait':'kw','Asia/Doha':'qa',
+                            'Asia/Bahrain':'bh','Asia/Beirut':'lb','Asia/Baghdad':'iq',
+                            'Asia/Tehran':'ir','Asia/Baku':'az','Asia/Tbilisi':'ge',
+                            'Asia/Yerevan':'am','Asia/Tashkent':'uz','Asia/Almaty':'kz',
+                            'Asia/Kabul':'af','Asia/Bangkok':'th','Asia/Jakarta':'id',
+                            'Asia/Manila':'ph','Asia/Singapore':'sg','Asia/Kuala_Lumpur':'my',
+                            'Asia/Tokyo':'jp','Asia/Seoul':'kr','Asia/Shanghai':'cn',
+                            'Asia/Hong_Kong':'hk','Asia/Taipei':'tw','Asia/Rangoon':'mm',
+                            'Europe/Paris':'fr','Europe/London':'gb','Europe/Dublin':'ie',
+                            'Europe/Berlin':'de','Europe/Madrid':'es','Europe/Rome':'it',
+                            'Europe/Amsterdam':'nl','Europe/Brussels':'be','Europe/Vienna':'at',
+                            'Europe/Zurich':'ch','Europe/Stockholm':'se','Europe/Oslo':'no',
+                            'Europe/Copenhagen':'dk','Europe/Helsinki':'fi','Europe/Warsaw':'pl',
+                            'Europe/Prague':'cz','Europe/Budapest':'hu','Europe/Bucharest':'ro',
+                            'Europe/Athens':'gr','Europe/Istanbul':'tr','Europe/Lisbon':'pt',
+                            'Europe/Kiev':'ua','Europe/Minsk':'by','Europe/Moscow':'ru',
+                            'Africa/Cairo':'eg','Africa/Casablanca':'ma','Africa/Lagos':'ng',
+                            'Africa/Nairobi':'ke','Africa/Johannesburg':'za','Africa/Accra':'gh',
+                            'America/New_York':'us','America/Chicago':'us','America/Los_Angeles':'us',
+                            'America/Denver':'us','America/Phoenix':'us','Pacific/Honolulu':'us',
+                            'America/Toronto':'ca','America/Vancouver':'ca',
+                            'America/Sao_Paulo':'br','America/Buenos_Aires':'ar',
+                            'America/Mexico_City':'mx','America/Bogota':'co',
+                            'America/Lima':'pe','America/Santiago':'cl',
+                            'Pacific/Auckland':'nz','Australia/Sydney':'au',
+                            'Australia/Melbourne':'au','Australia/Perth':'au',
+                        };
+                        try {
+                            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                            const cc = tzMap[tz];
+                            if (cc) { callback(cc); return; }
+                        } catch(e) {}
+                        // Method 2: ipapi.co (IP fallback)
+                        fetch("https://ipapi.co/json/")
+                            .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+                            .then(data => {
+                                if (!data.country_code || data.error) throw new Error();
+                                callback(data.country_code.toLowerCase());
                             })
-                            .then(data => callback((data && data.country_code ? String(data.country_code).toLowerCase() : 'in')))
-                            .catch(() => callback("in"));
+                            .catch(() => {
+                                // Method 3: Cloudflare trace
+                                fetch("https://www.cloudflare.com/cdn-cgi/trace")
+                                    .then(res => res.text())
+                                    .then(text => {
+                                        const match = text.match(/loc=([A-Z]{2})/);
+                                        callback(match ? match[1].toLowerCase() : "in");
+                                    })
+                                    .catch(() => callback("in"));
+                            });
                     },
-                    preferredCountries: ["in", "ae", "us", "gb"]
                 });
 
                 const form = phoneInput.closest('form');

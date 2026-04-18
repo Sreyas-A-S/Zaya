@@ -1467,9 +1467,9 @@
         $('#form-modal-title').text('Edit Counsellor');
 
         // Password fields specific logic
-        $('.password-field').hide();
-        $('input[name="password"]').removeAttr('required');
-        $('input[name="password_confirmation"]').removeAttr('required');
+        $('.password-field').show();
+        $('input[name="password"]').removeAttr('required').val('');
+        $('input[name="password_confirmation"]').removeAttr('required').val('');
 
         $.get("{{ url('admin/mindfulness-practitioners') }}/" + id + "/edit", function(response) {
             let u = response.user;
@@ -2192,6 +2192,7 @@
         // Reset form fields
         $('#practitioner-form')[0].reset();
         if (iti) {
+            iti.setCountry('in');
             iti.setNumber('');
         }
         $('#practitioner_id').val('');
@@ -2241,6 +2242,20 @@
         $('#confirm-call-btn').attr('href', 'tel:' + phone);
         $('#call-confirmation-modal').modal('show');
     });
+
+    function togglePasswordVisibility(inputId, iconId) {
+        var input = document.getElementById(inputId);
+        var icon = document.getElementById(iconId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = "password";
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
 </script>
 <style>
     /* Fix for intl-tel-input flags showing wrong/misaligned in Admiro theme */
@@ -2477,6 +2492,13 @@
         width: 1.1em;
         height: 1.1em;
         margin-top: 0.2em;
+    }
+
+    /* Hide browser default password reveal icons to prevent double eyes */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-webkit-contacts-auto-fill-button,
+    input[type="password"]::-webkit-credentials-auto-fill-button {
+        display: none !important;
     }
 </style>
 @endsection

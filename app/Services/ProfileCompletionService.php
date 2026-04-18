@@ -16,7 +16,7 @@ class ProfileCompletionService
                 return [
                     'profile' => [
                         'first_name', 'last_name', 'gender', 'dob', 'phone', 'city', 'state', 'zip_code', 'country', 
-                        'ayush_registration_number', 'state_council_name', 'registration_certificate_path', 
+                        'ayush_registration_number', 'state_council_name', 'reg_certificate_path', 
                         'digital_signature_path', 'primary_qualification', 'years_of_experience', 'current_workplace', 
                         'address_line_1', 'pan_number', 'pan_upload_path', 'bank_holder_name', 'bank_name', 
                         'account_number', 'ifsc_code', 'cancelled_cheque_path', 'short_bio'
@@ -200,7 +200,7 @@ class ProfileCompletionService
         $labels = [
             'dob' => 'Date of Birth',
             'pan_upload_path' => 'PAN Card Copy',
-            'registration_certificate_path' => 'Registration Certificate',
+            'reg_certificate_path' => 'Registration Certificate',
             'digital_signature_path' => 'Digital Signature',
             'ayush_registration_confirmed' => 'AYUSH Confirmation',
             'ayush_guidelines_agreed' => 'Guidelines Agreement',

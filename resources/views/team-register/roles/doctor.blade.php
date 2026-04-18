@@ -48,7 +48,9 @@
         <select name="primary_qualification" required
             class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
             <option value="">{{ __('Select') }}</option>
-            <option value="bams" @selected(old('primary_qualification') === 'bams')>{{ __('BAMS') }}</option>
+            @foreach(($qualifications ?? []) as $q)
+                <option value="{{ $q->name }}" @selected(old('primary_qualification') === $q->name)>{{ $q->name }}</option>
+            @endforeach
             <option value="other" @selected(old('primary_qualification') === 'other')>{{ __('Other') }}</option>
         </select>
         <input type="text" name="primary_qualification_other" value="{{ old('primary_qualification_other') }}"

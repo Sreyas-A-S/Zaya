@@ -991,6 +991,7 @@
             $('#password-requirements, #password-match-error').addClass('d-none');
             $('#password-confirm-input').removeClass('is-invalid');
             if (typeof window.iti !== 'undefined') {
+                window.iti.setCountry('in');
                 window.iti.setNumber('');
             }
         });
@@ -1011,6 +1012,7 @@
                 if (user.phone) {
                     window.iti.setNumber(user.phone);
                 } else {
+                    window.iti.setCountry('in');
                     window.iti.setNumber('');
                 }
 
@@ -1292,6 +1294,7 @@
         $('#fm-modal-title').text('Register Finance Manager');
         $('#financeManagerForm')[0].reset();
         if (typeof window.iti !== 'undefined') {
+            window.iti.setCountry('in');
             window.iti.setNumber('');
         }
         $('#fm-countries, #fm-languages').val([]).trigger('change');

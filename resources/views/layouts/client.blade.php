@@ -284,35 +284,9 @@
                         </button>
                         @endif
 
-                        @if(isset($active_promo_codes) && $active_promo_codes->count() > 0)
+                      
                         <!-- Promo Codes -->
-                        <div class="relative">
-                            <div onclick="togglePromoDropdown('mobile')"
-                                class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white relative shadow-sm cursor-pointer hover:bg-primary transition-colors">
-                                <i class="ri-ticket-line text-lg"></i>
-                            </div>
-                            
-                            <div id="promo-dropdown-mobile" class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 hidden overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                                <div class="p-4 border-b border-gray-50 bg-[#F9FBF9]">
-                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Available Promo Codes</p>
-                                </div>
-                                <div class="max-h-[250px] overflow-y-auto p-2">
-                                    @foreach($active_promo_codes as $promo)
-                                    <div class="p-3 mb-2 bg-gray-50 rounded-xl last:mb-0" onclick="copyToClipboard('{{ $promo->code }}')">
-                                        <div class="flex justify-between items-center mb-1">
-                                            <span class="text-[11px] font-black text-secondary">{{ $promo->code }}</span>
-                                            <span class="text-[9px] font-bold text-emerald-600">{{ $promo->type == 'percentage' ? $promo->reward . '%' : '$' . $promo->reward }} OFF</span>
-                                        </div>
-                                        <p class="text-[10px] text-gray-500 line-clamp-1">{{ $promo->description }}</p>
-                                    </div>
-                                    @endforeach
-                                </div>
-                                <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
-                                    <a href="{{ route('promo-codes.index') }}" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View All Promo Codes</a>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
+                       
 
                         <!-- Coin -->
                         <div class="relative">
@@ -434,54 +408,7 @@
                         </div>
                     </div>
 
-                    @if(isset($active_promo_codes) && $active_promo_codes->count() > 0)
-                    <!-- Promo Codes -->
-                    <div class="relative hidden lg:block">
-                        <div onclick="togglePromoDropdown('desktop')"
-                            class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white relative shadow-sm cursor-pointer hover:bg-primary transition-all duration-300 ring-4 ring-secondary/10">
-                            <i class="ri-ticket-2-line text-lg"></i>
-                            <div class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-white rounded-full flex items-center justify-center shadow-sm">
-                                <span class="text-[10px] font-black text-white">{{ $active_promo_codes->count() }}</span>
-                            </div>
-                        </div>
-                        
-                        <div id="promo-dropdown-desktop" class="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 hidden overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                            <div class="p-5 border-b border-gray-50 bg-[#F9FBF9]">
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Exclusive Offers</p>
-                                <h4 class="text-base font-black text-secondary tracking-tight">Your Promo Codes</h4>
-                            </div>
-                            <div class="max-h-[350px] overflow-y-auto py-2">
-                                @foreach($active_promo_codes as $promo)
-                                <div class="px-5 py-4 hover:bg-gray-50 transition-colors cursor-pointer group" onclick="copyToClipboard('{{ $promo->code }}')">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <div class="flex items-center gap-2">
-                                            <span class="px-3 py-1 bg-secondary text-white text-[11px] font-black rounded-lg uppercase tracking-wider shadow-sm group-hover:scale-105 transition-transform">
-                                                {{ $promo->code }}
-                                            </span>
-                                            <i class="ri-file-copy-line text-gray-300 group-hover:text-secondary transition-colors"></i>
-                                        </div>
-                                        <span class="text-[11px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
-                                            {{ $promo->type == 'percentage' ? $promo->reward . '%' : '$' . $promo->reward }} OFF
-                                        </span>
-                                    </div>
-                                    <p class="text-xs text-gray-600 font-bold leading-relaxed mb-2">{{ $promo->description }}</p>
-                                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
-                                        @if($promo->expiry_date)
-                                        <span class="text-[10px] text-gray-400 flex items-center font-bold uppercase tracking-wider"><i class="ri-time-line mr-1 text-xs"></i> Exp: {{ $promo->expiry_date->format('M d, Y') }}</span>
-                                        @else
-                                        <span class="text-[10px] text-gray-400 flex items-center font-bold uppercase tracking-wider"><i class="ri-infinity-line mr-1 text-xs"></i> No Expiry</span>
-                                        @endif
-                                        <span class="text-[10px] text-secondary font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Click to copy</span>
-                                    </div>
-                                </div>
-                                    @endforeach
-                            </div>
-                            <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
-                                <a href="{{ route('promo-codes.index') }}" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View All Promo Codes</a>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
+                  
 
                     <!-- Notification -->
                     <div class="relative">

@@ -109,4 +109,71 @@ class Doctor extends Model
         );
         return array_values(array_unique(array_filter($list, fn ($v) => trim((string) $v) !== '')));
     }
+
+    // Aliases for Profile Completion and Generic Views
+    public function getStateCouncilNameAttribute()
+    {
+        return $this->state_ayurveda_council_name;
+    }
+
+    public function setStateCouncilNameAttribute($value)
+    {
+        $this->attributes['state_ayurveda_council_name'] = $value;
+    }
+
+    public function getBankHolderNameAttribute()
+    {
+        return $this->bank_account_holder_name;
+    }
+
+    public function setBankHolderNameAttribute($value)
+    {
+        $this->attributes['bank_account_holder_name'] = $value;
+    }
+
+    public function getRegistrationCertificatePathAttribute()
+    {
+        return $this->reg_certificate_path;
+    }
+
+    public function setRegistrationCertificatePathAttribute($value)
+    {
+        $this->attributes['reg_certificate_path'] = $value;
+    }
+
+    public function getPanCardPathAttribute()
+    {
+        return $this->pan_upload_path;
+    }
+
+    public function setPanCardPathAttribute($value)
+    {
+        $this->attributes['pan_upload_path'] = $value;
+    }
+
+
+    public function getAadhaarCardPathAttribute()
+    {
+        return $this->aadhaar_upload_path;
+    }
+
+    public function setAadhaarCardPathAttribute($value)
+    {
+        $this->attributes['aadhaar_upload_path'] = $value;
+    }
+
+    public function getSignaturePathAttribute()
+    {
+        return $this->digital_signature_path;
+    }
+
+    public function setSignaturePathAttribute($value)
+    {
+        $this->attributes['digital_signature_path'] = $value;
+    }
+
+    public function getCancelledChequePathAttribute($value)
+    {
+        return $value ?? ($this->attributes['cancelled_cheque_path'] ?? null);
+    }
 }

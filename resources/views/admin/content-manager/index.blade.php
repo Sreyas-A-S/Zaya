@@ -947,6 +947,7 @@
             $('.password-field').show();
             $('#password, #password_confirmation').attr('required', 'required');
             if (typeof window.iti !== 'undefined') {
+                window.iti.setCountry('in');
                 window.iti.setNumber('');
             }
         });
@@ -967,6 +968,7 @@
                     }
                     window.iti.setNumber(rawNumber);
                 } else {
+                    window.iti.setCountry('in');
                     window.iti.setNumber('');
                 }
 
@@ -1251,6 +1253,7 @@
         $('#cm-modal-title').text('Register Content Manager');
         $('#contentManagerForm')[0].reset();
         if (typeof window.iti !== 'undefined') {
+            window.iti.setCountry('in');
             window.iti.setNumber('');
         }
         $('#country, #language').val([]).trigger('change');

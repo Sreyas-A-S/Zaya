@@ -1293,6 +1293,7 @@ function openCreateModal() {
                             window.translatorChoices.additional.removeActiveItems();
                         }
                         if (translatorIti) {
+                            translatorIti.setCountry('in');
                             translatorIti.setNumber('');
                         }
                         $('#source_languages_capabilities_container, #target_languages_capabilities_container, #additional_languages_capabilities_container').empty();

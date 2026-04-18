@@ -276,8 +276,10 @@
                                         <div class="col-md-6">
                                             <label class="form-label">Primary Qualification</label>
                                             <select class="form-select" name="primary_qualification" id="primary_qualification" required>
-                                                <option value="bams">BAMS</option>
-                                                <option value="other">Other</option>
+                                                <option value="">Select Qualification</option>
+                                                @foreach($qualifications as $qual)
+                                                    <option value="{{ $qual->name }}">{{ $qual->name }}</option>
+                                                @endforeach
                                             </select>
                                             <input type="text" class="form-control mt-2 d-none" name="primary_qualification_other" id="primary_qualification_other" placeholder="Specify Other Qualification">
                                         </div>
@@ -1748,6 +1750,7 @@
     function openCreateModal() {
         $('#doctor-form')[0].reset();
         if (iti) {
+            iti.setCountry('in');
             iti.setNumber('');
         }
         $('#doctor_id').val('');
@@ -1837,6 +1840,7 @@
                     phoneInput.value = currentVal.substring(1);
                 }
             } else if (iti) {
+                iti.setCountry('in');
                 iti.setNumber('');
             }
             $('[name="email"]').val(doctor.email);

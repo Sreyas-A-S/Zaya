@@ -12,6 +12,7 @@ use App\Models\WellnessConsultation;
 use App\Models\BodyTherapy;
 use App\Models\PractitionerModality;
 use App\Models\ClientConsultationPreference;
+use App\Models\Qualification;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Str;
 
@@ -38,6 +39,7 @@ class MasterDataController extends Controller
         'translator_specializations' => \App\Models\TranslatorSpecialization::class,
         'yoga_expertises' => \App\Models\YogaExpertise::class,
         'service_categories' => \App\Models\ServiceCategory::class,
+        'qualifications' => Qualification::class,
     ];
 
     protected $titles = [
@@ -55,6 +57,7 @@ class MasterDataController extends Controller
         'translator_specializations' => 'Translator Specializations',
         'yoga_expertises' => 'Yoga Expertises',
         'service_categories' => 'Service Categories',
+        'qualifications' => 'Primary Qualifications',
     ];
 
     /**

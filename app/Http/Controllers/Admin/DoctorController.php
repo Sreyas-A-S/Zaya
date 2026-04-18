@@ -10,6 +10,7 @@ use App\Models\Specialization;
 use App\Models\AyurvedaExpertise;
 use App\Models\HealthCondition;
 use App\Models\ExternalTherapy;
+use App\Models\Qualification;
 use App\Mail\SetPasswordMail;
 use App\Mail\PractitionerApplicationSubmittedMail;
 use App\Mail\RegistrationFeePaymentLinkMail;
@@ -164,7 +165,8 @@ class DoctorController extends Controller
             $countries = $allCountries->whereIn('id', $assignedCountryIds);
         }
 
-        return view('admin.doctors.index', compact('specializations', 'expertises', 'healthConditions', 'externalTherapies', 'languages', 'countries', 'currencies'));
+        $qualifications = Qualification::where('status', true)->get();
+        return view('admin.doctors.index', compact('specializations', 'expertises', 'healthConditions', 'externalTherapies', 'languages', 'countries', 'currencies', 'qualifications'));
     }
 
     /**
@@ -198,7 +200,7 @@ class DoctorController extends Controller
             'digital_signature' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // C. Qualifications & Experience
-            'primary_qualification' => ['required', Rule::in(['bams', 'other'])],
+            'primary_qualification' => ['required', 'string', 'max:255'],
             'primary_qualification_other' => 'nullable|string|max:255',
             'primary_institute' => 'nullable|string|max:255',
             'primary_year' => 'nullable|integer|min:1950|max:'.date('Y'),
@@ -451,7 +453,7 @@ class DoctorController extends Controller
             'digital_signature' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // C. Qualifications & Experience
-            'primary_qualification' => ['required', Rule::in(['bams', 'other'])],
+            'primary_qualification' => ['required', 'string', 'max:255'],
             'primary_qualification_other' => 'nullable|string|max:255',
             'primary_institute' => 'nullable|string|max:255',
             'primary_year' => 'nullable|integer|min:1950|max:'.date('Y'),

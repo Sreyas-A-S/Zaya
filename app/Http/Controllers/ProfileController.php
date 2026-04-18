@@ -13,6 +13,8 @@ use App\Models\PractitionerReview;
 use App\Models\PractitionerGallery;
 use App\Traits\ImageUploadTrait;
 use Carbon\Carbon;
+use App\Models\Specialization;
+use App\Models\Qualification;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -1005,7 +1007,7 @@ class ProfileController extends Controller
         }
 
         $countries = Country::query()
-            ->where('status', true)
+            ->where('status', 'active')
             ->orderBy('name')
             ->get(['id', 'name', 'code']);
 
@@ -1593,10 +1595,12 @@ class ProfileController extends Controller
                 $allConditions = \App\Models\TranslatorService::where('status', true)->pluck('name');
                 break;
         }
+        
+        $allQualifications = Qualification::where('status', true)->pluck('name');
 
         $currencies = config('currencies.symbols');
 
-        return view('client.complete-profile', compact('user', 'profile', 'countries', 'allLanguages', 'countryCodes', 'allSpecialities', 'allConditions', 'currencies'));
+        return view('client.complete-profile', compact('user', 'profile', 'countries', 'allLanguages', 'countryCodes', 'allSpecialities', 'allConditions', 'currencies', 'allQualifications'));
     }
 
     public function storeCompleteProfile(Request $request)
@@ -1650,7 +1654,8 @@ class ProfileController extends Controller
         
         // Handle file uploads based on role requirements
         $fileFields = [
-            'registration_certificate_path', 'digital_signature_path', 'pan_upload_path', 'cancelled_cheque_path',
+            'reg_certificate_path', 'digital_signature_path', 'pan_upload_path', 'cancelled_cheque_path',
+            'registration_certificate_path', 'signature_path', 'pan_card_path', 'aadhaar_card_path',
             'doc_cover_letter', 'doc_certificates', 'doc_experience', 'doc_registration', 'doc_ethics', 
             'doc_contract', 'doc_id_proof', 'gov_id_upload_path', 'registration_proof_path', 'certificates_path'
         ];
@@ -1679,7 +1684,7 @@ class ProfileController extends Controller
         if ($user->role === 'doctor') {
             $booleanFields = [
                 'ayush_registration_confirmed', 'ayush_guidelines_agreed', 'document_verification_consented', 
-                'policies_agreed', 'prescription_understanding_atgreed', 'confidentiality_consented'
+                'policies_agreed', 'prescription_understanding_agreed', 'confidentiality_consented'
             ];
 
             foreach ($booleanFields as $field) {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\YogaTherapist;
+use App\Models\Qualification;
 use App\Mail\SetPasswordMail;
 use App\Mail\PractitionerApplicationSubmittedMail;
 use App\Mail\RegistrationFeePaymentLinkMail;
@@ -143,7 +144,8 @@ class YogaTherapistController extends Controller
 
         $currencies = config('currencies.symbols');
 
-        return view('admin.yoga_therapists.index', compact('areasOfExpertise', 'consultationModes', 'languages', 'countries', 'currencies'));
+        $qualifications = Qualification::where('status', true)->get();
+        return view('admin.yoga_therapists.index', compact('areasOfExpertise', 'consultationModes', 'languages', 'countries', 'currencies', 'qualifications'));
     }
 
     public function store(Request $request)

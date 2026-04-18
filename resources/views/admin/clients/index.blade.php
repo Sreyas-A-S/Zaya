@@ -1251,7 +1251,12 @@
 
                 if (data.patient) {
                     if (clientIti) {
-                        clientIti.setNumber(data.patient.phone || '');
+                        if (data.patient.phone) {
+                            clientIti.setNumber(data.patient.phone);
+                        } else {
+                            clientIti.setCountry('in');
+                            clientIti.setNumber('');
+                        }
                     } else {
                         $('input[name="phone"]').val(data.patient.phone);
                     }
@@ -1469,6 +1474,7 @@
             window.resetClientStepper();
         }
         if (clientIti) {
+            clientIti.setCountry('in');
             clientIti.setNumber('');
         }
         $('input[name="mobile_country_code"]').val('');

@@ -177,40 +177,7 @@
                 </a>
             </div>
 
-            @if(in_array($user->role, ['practitioner','doctor','mindfulness_practitioner','yoga_therapist']))
-            <!-- Practitioner Gallery -->
-            <div class="w-full mt-20 relative">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-medium font-sans! text-gray-800">{{ __('Practitioner Gallery') }}</h3>
-            <button onclick="openGalleryModal()" class="text-gray-400 hover:text-secondary transition-colors">
-                <i class="ri-pencil-line text-xl"></i>
-            </button>
-        </div>
-                <div class="grid grid-cols-2 gap-3">
-                    @forelse($sanctuaryImages->take(3) as $index => $img)
-                        @if($index === 2 && $sanctuaryImages->count() > 3)
-                            <div class="relative cursor-pointer group" onclick="openGalleryModal()">
-                                <img src="{{ asset('storage/' . $img->image_path) }}"
-                                    alt="Gallery {{ $index + 1 }}"
-                                    class="h-[110px] w-full object-cover rounded-xl shadow-sm">
-                                <div class="absolute inset-0 bg-secondary/30 backdrop-blur-[2px] rounded-xl flex items-center justify-center border border-white/20 shadow-inner group-hover:bg-secondary/40 transition-all">
-                                    <span class="text-white text-xl font-bold tracking-wider">+{{ $sanctuaryImages->count() - 2 }}</span>
-                                </div>
-                            </div>
-                        @else
-                            <img src="{{ asset('storage/' . $img->image_path) }}"
-                                alt="Gallery {{ $index + 1 }}"
-                                class="{{ $index === 0 ? 'col-span-2 h-[140px]' : 'h-[110px]' }} w-full object-cover rounded-xl shadow-sm">
-                        @endif
-                    @empty
-                        <div class="col-span-2 py-8 bg-gray-50 rounded-xl border border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400">
-                            <i class="ri-image-add-line text-3xl mb-2"></i>
-                            <p class="text-sm">{{ __('No gallery images') }}</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-            @endif
+          
         </div>
 
 
@@ -297,6 +264,120 @@
                         <span class="text-gray-400 text-lg no-items-msg">No conditions listed.</span>
                     @endforelse
                 </div>
+            </div>
+        </div>
+
+        <!-- Documents & KYC Card -->
+        <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12">
+            <h2 class="text-2xl font-medium font-sans! text-secondary mb-8">Documents & Certifications</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                @php
+                    $roleDocs = [
+                        'doctor' => [
+                            'reg_certificate_path' => 'Registration Certificate',
+                            'aadhaar_upload_path' => 'Aadhaar Card Copy',
+                            'pan_upload_path' => 'PAN Card Copy',
+                            'digital_signature_path' => 'Digital Signature',
+                            'cancelled_cheque_path' => 'Cancelled Cheque',
+                            'degree_certificates_path' => 'Degree Certificates'
+                        ],
+                        'practitioner' => [
+                            'doc_id_proof' => 'ID Proof (Passport/Aadhar)',
+                            'doc_certificates' => 'Educational Certificates',
+                            'doc_experience' => 'Experience Certificate',
+                            'doc_registration' => 'Signed Registration Form',
+                            'doc_ethics' => 'Signed Code of Ethics',
+                            'doc_contract' => 'Signed ZAYA Contract',
+                        ],
+                        'mindfulness_practitioner' => [
+                            'certificates_path' => 'Professional Certificates',
+                            'registration_proof_path' => 'Registration Proof',
+                            'gov_id_upload_path' => 'Government ID Proof',
+                            'cancelled_cheque_path' => 'Cancelled Cheque',
+                        ],
+                        'yoga_therapist' => [
+                            'registration_proof_path' => 'Registration Proof',
+                            'certificates_path' => 'Yoga Therapy Certificates',
+                            'gov_id_upload_path' => 'Government ID Proof',
+                            'cancelled_cheque_path' => 'Cancelled Cheque',
+                        ],
+                        'translator' => [
+                            'gov_id_upload_path' => 'Government ID Proof',
+                            'cancelled_cheque_path' => 'Cancelled Cheque',
+                        ],
+                    ];
+
+                    // Handle hyphenated roles
+                    $normalizedRole = str_replace('-', '_', $user->role);
+                    $currentDocs = $roleDocs[$normalizedRole] ?? [];
+                @endphp
+
+                @forelse($currentDocs as $field => $label)
+                    <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col justify-between">
+                        <div class="mb-4">
+                            <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">{{ $label }}</p>
+                            @if($profile && $profile->$field)
+                                @if(is_array($profile->$field))
+                                    <div class="text-xs text-green-600 font-bold flex items-center gap-1">
+                                        <i class="ri-checkbox-circle-fill"></i>
+                                        {{ count($profile->$field) }} {{ __('Files Uploaded') }}
+                                    </div>
+                                @else
+                                    <div class="text-xs text-green-600 font-bold flex items-center gap-1">
+                                        <i class="ri-checkbox-circle-fill"></i>
+                                        {{ __('Document Uploaded') }}
+                                    </div>
+                                @endif
+                            @else
+                                <div class="text-xs text-amber-500 font-bold flex items-center gap-1">
+                                    <i class="ri-error-warning-fill"></i>
+                                    {{ __('Not Provided') }}
+                                </div>
+                            @endif
+                        </div>
+
+                        @if($profile && $profile->$field)
+                            <div class="flex flex-wrap gap-2">
+                                @if(is_array($profile->$field))
+                                    @foreach($profile->$field as $idx => $path)
+                                        <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-100 shadow-sm">
+                                            <span class="text-[10px] font-bold text-gray-500">File {{ $idx + 1 }}</span>
+                                            <a href="{{ asset('storage/' . $path) }}" target="_blank" class="text-secondary hover:text-opacity-80 transition-colors">
+                                                <i class="ri-eye-line"></i>
+                                            </a>
+                                            <a href="{{ asset('storage/' . $path) }}" download class="text-secondary hover:text-opacity-80 transition-colors">
+                                                <i class="ri-download-line"></i>
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm">
+                                        <a href="{{ asset('storage/' . $profile->$field) }}" target="_blank" class="flex items-center gap-2 text-sm font-bold text-secondary hover:underline">
+                                            <i class="ri-eye-line text-lg"></i>
+                                            View
+                                        </a>
+                                        <div class="w-px h-4 bg-gray-200"></div>
+                                        <a href="{{ asset('storage/' . $profile->$field) }}" download class="flex items-center gap-2 text-sm font-bold text-secondary hover:underline">
+                                            <i class="ri-download-line text-lg"></i>
+                                            Download
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        @else
+                            <a href="{{ route('profile.complete') }}?tab=documents" class="text-xs font-bold text-secondary hover:underline flex items-center gap-1">
+                                <i class="ri-add-circle-line"></i>
+                                {{ __('Upload Now') }}
+                            </a>
+                        @endif
+                    </div>
+                @empty
+                    <div class="col-span-2 py-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                        <i class="ri-information-line text-3xl text-gray-300 mb-2 block"></i>
+                        <p class="text-gray-400 font-medium">{{ __('No specific documents required.') }}</p>
+                    </div>
+                @endforelse
             </div>
         </div>
         @endif
@@ -727,10 +808,7 @@
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                     <div class="col-span-1 md:col-span-2 grid grid-cols-3 gap-4">
-                        <div class="col-span-1">
-                            <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Code') }}</label>
-                            <input type="text" name="mobile_country_code" value="{{ old('mobile_country_code', $profile->mobile_country_code ?? '') }}" placeholder="+1" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
-                        </div>
+                        
                         <div class="col-span-2">
                             <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Phone') }}</label>
                             <input type="text" name="phone" value="{{ old('phone', $profile->phone ?? ($user->phone ?? '')) }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">

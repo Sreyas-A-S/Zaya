@@ -1474,6 +1474,7 @@
     function openCreateModal() {
         $('#practitioner-form')[0].reset();
         if (iti) {
+            iti.setCountry('in');
             iti.setNumber('');
         }
         $('#practitioner_id').val('');
