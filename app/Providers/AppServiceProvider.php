@@ -28,18 +28,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Relation::morphMap([
-            'App\Models\Practitioner' => \App\Models\Practitioner::class,
-            'AppModelsPractitioner' => \App\Models\Practitioner::class,
             'practitioner' => \App\Models\Practitioner::class,
-            'App\Models\Doctor' => \App\Models\Doctor::class,
-            'AppModelsDoctor' => \App\Models\Doctor::class,
             'doctor' => \App\Models\Doctor::class,
-            'App\Models\MindfulnessPractitioner' => \App\Models\MindfulnessPractitioner::class,
-            'AppModelsMindfulnessPractitioner' => \App\Models\MindfulnessPractitioner::class,
             'mindfulness_practitioner' => \App\Models\MindfulnessPractitioner::class,
-            'App\Models\YogaTherapist' => \App\Models\YogaTherapist::class,
-            'AppModelsYogaTherapist' => \App\Models\YogaTherapist::class,
             'yoga_therapist' => \App\Models\YogaTherapist::class,
+            'translator' => \App\Models\Translator::class,
         ]);
 
         Schema::defaultStringLength(191);
@@ -57,8 +50,12 @@ class AppServiceProvider extends ServiceProvider
             $availableLanguages = collect();
             $userBalance = 0;
             $activePromoCodes = collect();
+            $globalHealthConditions = collect();
 
             try {
+                // Fetch active health conditions for footer/global use
+                $globalHealthConditions = \App\Models\HealthCondition::where('status', true)->take(6)->pluck('name');
+
                 // Fetch available languages that have homepage settings
                 $availableLocales = \App\Models\HomepageSetting::distinct('language')->pluck('language')->toArray();
                 
@@ -83,14 +80,24 @@ class AppServiceProvider extends ServiceProvider
                     $referralEarned = \App\Models\Transaction::where('referrer_id', $currentUser->id)->sum('referrer_share');
                     $userBalance = $earned + $referralEarned;
 
-                    // Fetch active promo codes
-                    $activePromoCodes = \App\Models\PromoCode::where('status', true)
+                    // Fetch active promo codes (Global + User Specific)
+                    $globalCodes = \App\Models\PromoCode::where('status', true)
                         ->where(function($q) {
                             $q->where('expiry_date', '>=', now()->toDateString())
                               ->orWhereNull('expiry_date');
                         })
-                        ->whereIn('usage_type', ['booking', 'both'])
                         ->get();
+                    
+                    $userLinkedCodes = \App\Models\UserPromoCode::where('user_id', $currentUser->id)->pluck('promo_code')->toArray();
+                    $specificCodes = \App\Models\PromoCode::whereIn('code', $userLinkedCodes)
+                        ->where('status', true)
+                        ->where(function($q) {
+                            $q->where('expiry_date', '>=', now()->toDateString())
+                              ->orWhereNull('expiry_date');
+                        })
+                        ->get();
+
+                    $activePromoCodes = $globalCodes->concat($specificCodes)->unique('code');
                 }
             } catch (\Exception $e) {
                 \Log::error("Database error in AppServiceProvider: " . $e->getMessage());
@@ -101,7 +108,8 @@ class AppServiceProvider extends ServiceProvider
                 'available_languages' => $availableLanguages,
                 'current_locale' => $language,
                 'user_balance' => $userBalance,
-                'active_promo_codes' => $activePromoCodes
+                'active_promo_codes' => $activePromoCodes,
+                'global_health_conditions' => $globalHealthConditions
             ]);
         });
     }

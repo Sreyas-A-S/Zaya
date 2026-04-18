@@ -36,11 +36,111 @@ class BookingController extends Controller
             'total_price' => 'required|numeric|min:0',
             'currency' => 'nullable|string',
             'promo_code' => 'nullable|string|exists:promo_codes,code',
-            'discount_amount' => 'nullable|numeric|min:0'
+            'discount_amount' => 'nullable|numeric|min:0',
+            'coins_applied' => 'nullable|boolean'
         ]);
 
         $practitioner = Practitioner::with('user')->findOrFail($request->practitioner_id);
+        $user = Auth::user();
         $currency = $request->currency ?? 'INR';
+
+        // 1. Calculate Subtotal on Server (Security: Don't trust request total_price)
+        $subtotal = 0;
+        $userServices = \App\Models\UserService::where('user_id', $practitioner->user_id)
+            ->whereIn('service_id', $request->service_ids)
+            ->where('status', 'active')
+            ->get();
+        
+        \Log::info('Booking Calculation Debug:', [
+            'practitioner_user_id' => $practitioner->user_id,
+            'service_ids' => $request->service_ids,
+            'services_found_count' => $userServices->count()
+        ]);
+
+        foreach ($userServices as $us) {
+            $subtotal += (float) $us->rate;
+            \Log::info("Adding service rate: {$us->rate} for service ID: {$us->service_id}");
+        }
+        
+        // Fallback to request price if no specific rates found
+        if ($subtotal <= 0) {
+            $subtotal = (float) $request->total_price;
+            \Log::info("Fallback subtotal from request: {$subtotal}");
+        }
+
+        // ... validation logic ...
+
+        // Final amount to be paid
+        $finalPayable = max(0, $subtotal - $promoDiscount - $coinDiscount);
+        
+        \Log::info('Final Totals:', [
+            'subtotal' => $subtotal,
+            'promo_discount' => $promoDiscount,
+            'coin_discount' => $coinDiscount,
+            'final_payable' => $finalPayable
+        ]);
+
+        // 4. Availability Check
+        if (!$this->checkSlotAvailability($request->practitioner_id, $request->booking_date, $request->booking_time)) {
+            return response()->json(['success' => false, 'message' => 'This slot was just taken. Please choose another time.'], 422);
+        }
+
+        // 5. Handle Test Mode OR Zero-Payable Bookings
+        if ($request->test_mode || $finalPayable <= 0) {
+            $prefix = $request->test_mode ? 'ZAYA-TEST-' : 'ZAYA-FREE-';
+            $booking = Booking::create([
+                'invoice_no' => $prefix . date('Ymd') . '-' . strtoupper(Str::random(4)),
+                'user_id' => $user->id,
+                'profile_id' => $practitioner->id,
+                'practitioner_type' => $practitioner->getMorphClass(),
+                'service_ids' => $request->service_ids,
+                'mode' => $request->mode,
+                'conditions' => $request->conditions ?? null,
+                'booking_date' => $request->booking_date,
+                'booking_time' => $request->booking_time,
+                'total_price' => $subtotal,
+                'promo_code' => $promoCode,
+                'discount_amount' => $promoDiscount,
+                'coins_used' => $coinsUsed,
+                'coin_discount' => $coinDiscount,
+                'currency' => $currency,
+                'status' => 'confirmed',
+                'razorpay_payment_id' => $request->test_mode ? 'MO_TEST_PAYMENT' : 'ZERO_PAYMENT',
+            ]);
+
+            // Deduct Coins
+            if ($coinsUsed > 0) {
+                $user->coins = max(0, $user->coins - $coinsUsed);
+                $user->save();
+            }
+
+            // Increment Promo Usage
+            if ($promoCode) {
+                $promo = \App\Models\PromoCode::where('code', $promoCode)->first();
+                if ($promo) $promo->incrementUsageIfAvailable();
+            }
+
+            // Record Financial Transaction
+            $this->recordTransaction([
+                'type' => 'booking',
+                'amount' => $booking->total_price,
+                'user_id' => $booking->user_id,
+                'practitioner_id' => $practitioner->user_id ?? null,
+                'booking_id' => $booking->id,
+                'payment_id' => $request->test_mode ? 'MO_TEST_PAYMENT' : 'ZERO_PAYMENT',
+                'currency' => $currency,
+                'coins_used' => $coinsUsed,
+                'coin_discount' => $coinDiscount,
+            ]);
+
+            $successMsg = $request->test_mode ? 'Test booking confirmed successfully!' : 'Booking confirmed! (Discount applied)';
+
+            return response()->json([
+                'success' => true,
+                'message' => $successMsg,
+                'redirect_url' => route('invoice.show', $booking->invoice_no),
+            ]);
+        }
 
         // ... (check availability)
 
@@ -50,26 +150,29 @@ class BookingController extends Controller
         $razorpaySecret = config('services.razorpay.secret');
 
         if ($razorpayKey && $razorpaySecret) {
+            $verifySsl = config('services.razorpay.verify_ssl');
             try {
                 $response = Http::withBasicAuth($razorpayKey, $razorpaySecret)
+                    ->withOptions(['verify' => $verifySsl])
                     ->post('https://api.razorpay.com/v1/payment_links', [
-                        'amount' => (int)($request->total_price * 100),
+                        'amount' => (int)(round($finalPayable, 2) * 100),
                         'currency' => $currency,
                         'accept_partial' => false,
                         'description' => 'Booking Session - Zaya Wellness',
                         'customer' => [
-                            'name' => Auth::user()->name,
-                            'email' => Auth::user()->email,
-                            'contact' => Auth::user()->phone ?? '',
+                            'name' => $user->name,
+                            'email' => $user->email,
+                            'contact' => $user->phone ?? '',
                         ],
                         'notify' => [
                             'sms' => true,
                             'email' => true,
                         ],
-                        'callback_url' => route('booking.callback'),
+                        'callback_url' => route('bookings.payment.callback'),
                         'callback_method' => 'get',
                         'notes' => [
-                            'practitioner_id' => $request->practitioner_id,
+                            'practitioner_id' => $practitioner->id,
+                            'practitioner_type' => $practitioner->getMorphClass(),
                             'booking_date' => $request->booking_date,
                             'booking_time' => $request->booking_time,
                             'service_ids' => implode(',', $request->service_ids),
@@ -78,6 +181,8 @@ class BookingController extends Controller
                             'total_price' => $request->total_price,
                             'promo_code' => $request->promo_code,
                             'discount_amount' => $request->discount_amount,
+                            'coins_used' => $coinsUsed,
+                            'coin_discount' => $coinDiscount,
                             'currency' => $currency
                         ]
                     ]);
@@ -137,7 +242,8 @@ class BookingController extends Controller
             $booking = Booking::create([
                 'invoice_no' => 'ZAYA-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
                 'user_id' => Auth::id(),
-                'practitioner_id' => $notes['practitioner_id'],
+                'profile_id' => $notes['practitioner_id'],
+                'practitioner_type' => $notes['practitioner_type'] ?? 'practitioner',
                 'service_ids' => explode(',', $notes['service_ids']),
                 'mode' => $notes['mode'],
                 'conditions' => $notes['conditions'] ?? null,
@@ -146,11 +252,20 @@ class BookingController extends Controller
                 'total_price' => $notes['total_price'],
                 'promo_code' => $notes['promo_code'] ?? null,
                 'discount_amount' => $notes['discount_amount'] ?? 0.00,
+                'coins_used' => $notes['coins_used'] ?? 0,
+                'coin_discount' => $notes['coin_discount'] ?? 0.00,
                 'currency' => $notes['currency'],
                 'status' => 'confirmed',
                 'razorpay_order_id' => $paymentLinkId,
                 'razorpay_payment_id' => $paymentId,
             ]);
+
+            // Deduct Coins from user balance if used
+            if ($booking->coins_used > 0) {
+                $user = Auth::user();
+                $user->coins = max(0, $user->coins - $booking->coins_used);
+                $user->save();
+            }
 
             if (!empty($notes['promo_code'])) {
                 $promo = \App\Models\PromoCode::where('code', $notes['promo_code'])->first();
@@ -161,21 +276,6 @@ class BookingController extends Controller
 
             // Record Financial Transaction
             $practitioner = $booking->practitioner;
-            $countryId = null;
-            try {
-                $client = $booking->user;
-                $raw = $client ? ($client->national_id ?? null) : null;
-                if (is_array($raw)) {
-                    foreach ($raw as $v) { if (is_numeric($v)) { $countryId = (int) $v; break; } }
-                } elseif (is_numeric($raw)) {
-                    $countryId = (int) $raw;
-                } elseif (is_string($raw)) {
-                    $decoded = json_decode($raw, true);
-                    if (is_array($decoded)) {
-                        foreach ($decoded as $v) { if (is_numeric($v)) { $countryId = (int) $v; break; } }
-                    }
-                }
-            } catch (\Throwable $e) {}
 
             $this->recordTransaction([
                 'type' => 'booking',
@@ -185,7 +285,8 @@ class BookingController extends Controller
                 'booking_id' => $booking->id,
                 'payment_id' => $paymentId,
                 'currency' => $booking->currency ?? 'INR',
-                'country_id' => $countryId,
+                'coins_used' => $booking->coins_used,
+                'coin_discount' => $booking->coin_discount,
             ]);
 
             return redirect()->route('invoice.show', $booking->invoice_no)->with('success', 'Booking confirmed!');
@@ -196,7 +297,8 @@ class BookingController extends Controller
             $booking = Booking::create([
                 'invoice_no' => 'ZAYA-OVB-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
                 'user_id' => Auth::id(),
-                'practitioner_id' => $notes['practitioner_id'],
+                'profile_id' => $notes['practitioner_id'],
+                'practitioner_type' => $notes['practitioner_type'] ?? 'practitioner',
                 'service_ids' => explode(',', $notes['service_ids']),
                 'mode' => $notes['mode'],
                 'conditions' => $notes['conditions'] ?? null,
@@ -219,7 +321,7 @@ class BookingController extends Controller
 
     private function checkSlotAvailability($practitionerId, $date, $time)
     {
-        return !Booking::where('practitioner_id', $practitionerId)
+        return !Booking::where('profile_id', $practitionerId)
             ->where('booking_date', $date)
             ->where('booking_time', $time)
             ->whereIn('status', ['confirmed', 'completed', 'paid'])

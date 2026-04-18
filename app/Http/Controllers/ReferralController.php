@@ -116,7 +116,7 @@ class ReferralController extends Controller
             }
 
             if ($status === 'paid') {
-                $this->createReferredBooking($referral, null, $clientCountryId);
+                $this->createReferredBooking($referral, null);
             }
 
             $referralResults[] = $referralNo;
@@ -195,29 +195,12 @@ class ReferralController extends Controller
         return response()->json(['success' => 'A new OTP has been sent to your email.']);
     }
 
-    private function createReferredBooking($referral, $paymentId = null, $countryId = null)
+    private function createReferredBooking($referral, $paymentId = null)
     {
         $oldBooking = $referral->booking;
         $referredToUser = User::with(['practitioner', 'doctor'])->find($referral->referred_to_id);
         $currency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referredToUser) ?? config('currencies.default', 'INR')));
 
-        if ($countryId === null) {
-            try {
-                $client = $referral->user;
-                $raw = $client ? ($client->national_id ?? null) : null;
-                if (is_array($raw)) {
-                    foreach ($raw as $v) { if (is_numeric($v)) { $countryId = (int) $v; break; } }
-                } elseif (is_numeric($raw)) {
-                    $countryId = (int) $raw;
-                } elseif (is_string($raw)) {
-                    $decoded = json_decode($raw, true);
-                    if (is_array($decoded)) {
-                        foreach ($decoded as $v) { if (is_numeric($v)) { $countryId = (int) $v; break; } }
-                    }
-                }
-            } catch (\Throwable $e) {}
-        }
-        
         $newBooking = Booking::create([
             'invoice_no' => $referral->referral_no,
             'user_id' => $referral->user_id,
@@ -253,7 +236,6 @@ class ReferralController extends Controller
             'referral_id' => $referral->id,
             'payment_id' => $paymentId,
             'currency' => $currency,
-            'country_id' => $countryId,
             'referrer_role' => $referral->referredBy->role ?? null,
             'referred_role' => $referredToUser->role ?? null,
         ]);

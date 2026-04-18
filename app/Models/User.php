@@ -270,11 +270,13 @@ class User extends Authenticatable implements JWTSubject
         }
 
         // Return a consistent placeholder based on role or a safe default
-        if ($this->role && in_array($this->role, ['client', 'patient'])) {
-            return asset('frontend/assets/profile-dummy-img.png');
+        $practitionerRoles = ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist', 'translator'];
+        if ($this->role && in_array($this->role, $practitionerRoles)) {
+            return asset('frontend/assets/lilly-profile-pic.png');
         }
-        return asset('admiro/assets/images/user/user.png');
-    }
+
+        return asset('frontend/assets/profile-dummy-img.png');
+        }
 
     public function practitionerTransactions()
     {

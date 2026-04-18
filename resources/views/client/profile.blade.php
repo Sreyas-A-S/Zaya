@@ -270,10 +270,10 @@
         @if(!in_array($user->role, ['client', 'patient']))
         <!-- Specialities & Conditions Card -->
         <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12">
-            <div id="profile-visibility-warning" class="{{ (empty($specialities) || empty($conditions)) ? '' : 'hidden' }} mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl flex items-start shadow-sm">
+            <div id="profile-visibility-warning" class="{{ (!empty($specialities) || !empty($conditions)) ? 'hidden' : '' }} mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl flex items-start shadow-sm">
                 <i class="ri-information-line mr-3 text-xl mt-0.5"></i>
                 <p class="text-sm font-medium">
-                    {{ __('Your profile will only be displayed to the public once you have added your Specialities and the Conditions you support.') }}
+                    {{ __('Your profile will only be displayed to the public once you have added either your Specialities or the Conditions you support.') }}
                 </p>
             </div>
 
@@ -958,10 +958,10 @@
                         const hasSpecs = specContainer && specContainer.querySelectorAll('span:not(.no-items-msg)').length > 0;
                         const hasConds = condContainer && condContainer.querySelectorAll('span:not(.no-items-msg)').length > 0;
 
-                        if (!hasSpecs || !hasConds) {
-                            warning.classList.remove('hidden');
-                        } else {
+                        if (hasSpecs || hasConds) {
                             warning.classList.add('hidden');
+                        } else {
+                            warning.classList.remove('hidden');
                         }
                     }
                 } else {

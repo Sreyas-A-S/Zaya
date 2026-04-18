@@ -24,6 +24,8 @@ class Transaction extends Model
         'referrer_share',
         'company_commission_percent',
         'referrer_commission_percent',
+        'coins_used',
+        'coin_discount',
         'payment_id',
         'status',
         'type',
@@ -36,6 +38,7 @@ class Transaction extends Model
         'referrer_share' => 'decimal:2',
         'company_commission_percent' => 'decimal:2',
         'referrer_commission_percent' => 'decimal:2',
+        'coin_discount' => 'decimal:2',
     ];
 
     public function user()

@@ -3,12 +3,9 @@
         $details = $practitioner;
         $user = $practitioner->user;
         $name = $user ? $user->name : 'Unknown';
-        $roleName = 'Practitioner';
-        if (!empty($details->consultations) && is_array($details->consultations) && count($details->consultations) > 0) {
-            $roleName = $details->consultations[0];
-        }
+        $roleName = $details->subtitle_display;
 
-        $image = asset('frontend/assets/dummy-practitioner-img.webp'); // Default image
+        $image = asset('frontend/assets/lilly-profile-pic.png'); // Default image
         if ($details->profile_photo_path) {
             $image = asset('storage/' . $details->profile_photo_path);
         }

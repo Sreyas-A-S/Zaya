@@ -124,7 +124,7 @@
                         style="transition-delay: {{ $index * 100 }}ms;">
                         <div class="h-64 overflow-hidden mb-4 relative">
                             @php
-                                $imagePath = $service->image ? (str_starts_with($service->image, 'frontend/') ? asset($service->image) : asset('storage/' . $service->image)) : asset('admiro/assets/images/user/user.png');
+                                $imagePath = $service->image ? (str_starts_with($service->image, 'frontend/') ? asset($service->image) : asset('storage/' . $service->image)) : asset('frontend/assets/service-placeholder.png');
                             @endphp
                             <img src="{{ $imagePath }}" alt="{{ $service->title }}"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
@@ -423,10 +423,10 @@
     </section>
 
     <!-- Announcement Card -->
-    <div id="announcement-card" class="fixed bottom-0 right-0 z-[999] opacity-0 pointer-events-none transition-all duration-1000 transform translate-y-10">
+    <div id="announcement-card" class="fixed bottom-0 right-0 z-[999] opacity-0 pointer-events-none transition-all duration-500 transform translate-y-10">
         <div class="relative bg-white border-t border-l border-gray-200 shadow-[-15px_-15px_40px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-stretch max-w-[450px] transition-transform duration-300 hover:-translate-y-2">
             <!-- Close Button Inside -->
-            <button onclick="document.getElementById('announcement-card').remove()" 
+            <button onclick="closeAnnouncementCard()" 
                     class="absolute top-2 right-2 w-6 h-6 bg-gray-100 text-gray-400 hover:bg-red-500 hover:text-white flex items-center justify-center z-[1001] transition-all">
                 <i class="ri-close-line"></i>
             </button>
@@ -438,11 +438,11 @@
                 </div>
                 @endif
                 <div class="p-8 pr-12 flex flex-col justify-center gap-2">
-                    <span class="text-[10px] font-black text-primary uppercase tracking-widest leading-none">New Announcement</span>
+                    <span class="text-[10px] font-black text-primary uppercase tracking-widest leading-none" data-i18n="New Announcement">New Announcement</span>
                     <h4 class="text-base font-bold text-gray-800 line-clamp-1 leading-tight">{{ $latestAnnouncement['title'] }}</h4>
                     <p class="text-sm text-gray-500 line-clamp-2 leading-snug">{{ \Illuminate\Support\Str::limit($latestAnnouncement['excerpt'], 100) }}</p>
                     <a href="{{ $latestAnnouncement['link'] }}" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1">
-                        Read More <i class="ri-arrow-right-s-line"></i>
+                        <span data-i18n="Read More">Read More</span> <i class="ri-arrow-right-s-line"></i>
                     </a>
                 </div>
             @else
@@ -451,8 +451,8 @@
                         <i class="ri-notification-3-line text-3xl"></i>
                     </div>
                     <div class="flex flex-col gap-1">
-                        <span class="text-[11px] font-black text-primary uppercase tracking-widest leading-none">Announcements</span>
-                        <span class="text-lg font-bold text-gray-800 whitespace-nowrap leading-none">Latest Updates & News</span>
+                        <span class="text-[11px] font-black text-primary uppercase tracking-widest leading-none" data-i18n="Announcements">Announcements</span>
+                        <span class="text-lg font-bold text-gray-800 whitespace-nowrap leading-none" data-i18n="Latest Updates & News">Latest Updates & News</span>
                     </div>
                     <div class="absolute right-6 top-1/2 -translate-y-1/2">
                         <i class="ri-arrow-right-line text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all text-2xl"></i>
@@ -463,6 +463,15 @@
     </div>
 
     <script>
+        function closeAnnouncementCard() {
+            const card = document.getElementById('announcement-card');
+            if (card) {
+                card.classList.remove('opacity-100', 'translate-y-0');
+                card.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+                setTimeout(() => card.remove(), 500);
+            }
+        }
+
         window.addEventListener('load', function() {
             setTimeout(() => {
                 const card = document.getElementById('announcement-card');
@@ -551,7 +560,7 @@ $(document).ready(function() {
                             resultsContainer.append('<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Practitioners</div>');
                             data.practitioners.forEach(function(item) {
                             const resultItem = `
-                                <a href="/book-session/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                <a href="/practitioner/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
                                     <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">                                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                         </div>
                                         <div class="flex flex-col text-left">

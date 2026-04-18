@@ -39,7 +39,7 @@ class PractitionerAvailabilityService
         $dateObj = Carbon::parse($date);
 
         $providerId = $provider->id;
-        $providerType = get_class($provider);
+        $providerType = $provider->getMorphClass();
         \Log::info("Fetching slots for provider $providerId ($providerType) on $date");
 
         if (isset($provider->booking_window_days) && $provider->booking_window_days) {
@@ -80,6 +80,8 @@ class PractitionerAvailabilityService
 
         // 4. Generate potential slots
         $generatedSlots = [];
+        $providerNotice = $provider->min_notice_hours ?? 1;
+
         foreach ($availableBlocks as $block) {
             $start = Carbon::parse($block->start_time);
             $end = Carbon::parse($block->end_time);
@@ -91,7 +93,7 @@ class PractitionerAvailabilityService
                     'time' => $current->format('h:i A'),
                     'start_raw' => $current->format('H:i:s'),
                     'duration' => $duration,
-                    'notice' => $block->min_notice_hours ?? 0
+                    'notice' => $providerNotice
                 ];
                 $current->addMinutes($duration);
             }
@@ -115,12 +117,12 @@ class PractitionerAvailabilityService
         if ($provider instanceof Translator) {
             $bookingQuery->where(function($q) use ($providerId) {
                 $q->where(function($sq) use ($providerId) {
-                    $sq->where('practitioner_id', $providerId)
+                    $sq->where('profile_id', $providerId)
                        ->where('practitioner_type', Translator::class);
                 })->orWhere('translator_id', $providerId);
             });
         } else {
-            $bookingQuery->where('practitioner_id', $providerId)
+            $bookingQuery->where('profile_id', $providerId)
                          ->where('practitioner_type', $providerType);
         }
         

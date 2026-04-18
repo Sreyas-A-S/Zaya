@@ -10,7 +10,7 @@
                 <!-- Left Text -->
                 <div>
                     <div class="mb-8 animate-on-scroll">
-                        <span class="bg-accent text-secondary px-8 py-2.5 rounded-full font-medium text-base inline-block">
+                        <span class="bg-accent text-secondary px-8 py-2.5 rounded-full font-medium text-base inline-block" data-i18n="{{ $settings['blogs_page_badge'] ?? 'Our Blogs' }}">
                             {{ __($settings['blogs_page_badge'] ?? 'Our Blogs') }}
                         </span>
                     </div>
@@ -391,5 +391,29 @@
             }
         });
     </script>
+
+    @push('scripts')
+    <script>
+        // Listen for language changes to reload page and fetch translated WP content
+        const originalToggleLanguageBlogs = window.togglePageLanguage;
+        window.togglePageLanguage = function(targetLocale) {
+            if (typeof originalToggleLanguageBlogs === 'function') {
+                fetch(`{{ url('/lang') }}/${targetLocale}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status) {
+                        window.location.reload();
+                    }
+                });
+            }
+        };
+    </script>
+    @endpush
 
 @endsection

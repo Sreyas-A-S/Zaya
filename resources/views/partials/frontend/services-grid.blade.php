@@ -5,7 +5,7 @@
         <div class="bg-white rounded-[20px] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group h-full cursor-pointer">
             <!-- Image -->
             <div class="h-64 overflow-hidden">
-                <img src="{{ $service->image ? (Str::startsWith($service->image, 'frontend/') ? asset($service->image) : asset('storage/' . $service->image)) : asset('frontend/assets/ayurveda-and-panchakarma.png') }}"
+                <img src="{{ $service->image ? (Str::startsWith($service->image, 'frontend/') ? asset($service->image) : asset('storage/' . $service->image)) : asset('frontend/assets/service-placeholder.png') }}"
                     alt="{{ $service->title }}"
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
             </div>

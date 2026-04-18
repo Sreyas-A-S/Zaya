@@ -11,7 +11,7 @@ class Booking extends Model
 
     protected $fillable = [
         'user_id',
-        'practitioner_id',
+        'profile_id',
         'practitioner_type',
         'invoice_no',
         'service_ids',
@@ -28,6 +28,8 @@ class Booking extends Model
         'total_price',
         'promo_code',
         'discount_amount',
+        'coins_used',
+        'coin_discount',
         'currency',
         'status',
         'reminder_sent',
@@ -43,6 +45,7 @@ class Booking extends Model
         'need_translator' => 'boolean',
         'booking_date' => 'date',
         'total_price' => 'decimal:2',
+        'coin_discount' => 'decimal:2',
         'reminder_sent' => 'boolean',
         'payment_details' => 'encrypted:array',
         'conditions' => 'encrypted',
@@ -56,7 +59,7 @@ class Booking extends Model
 
     public function practitioner()
     {
-        return $this->morphTo();
+        return $this->morphTo('practitioner', 'practitioner_type', 'profile_id');
     }
 
     public function language()

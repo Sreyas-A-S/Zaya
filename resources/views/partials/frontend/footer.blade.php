@@ -60,15 +60,16 @@
                     </ul>
                 </div>
 
-                <!-- Column 3: Conditions -->
+                 <!-- Column 3: Conditions -->
                 <div class="order-2 z-1 pb-4 md:pb-0">
                     <div class="flex justify-between items-center cursor-pointer md:cursor-auto" onclick="toggleFooterMenu('conditions')">
                         <h4 id="footer-conditions-title" class="font-medium font-sans! mb-0 md:mb-6 text-xl text-[#2E2E2E]" data-i18n="{{ $site_settings['conditions_heading'] ?? 'Conditions We Support' }}">
                             {{ __($site_settings['conditions_heading'] ?? 'Conditions We Support') }}</h4>
                         <i class="ri-add-line text-2xl md:hidden text-[#2E2E2E]" id="conditions-icon"></i>
                     </div>
-                    <ul id="conditions-menu" class="hidden md:block! space-y-4 text-base font-regular text-[#2E2E2E]/80 pt-6 md:pt-0">
-                        <!-- Populated dynamically based on zipcode (or global defaults) -->
+                    <ul id="conditions-menu" class="hidden md:block! space-y-4 text-base font-regular text-[#2E2E2E]/80 pt-6 md:pt-0">                        @foreach($global_health_conditions ?? [] as $condition)
+                        <li><a href="{{ route('find-practitioner', ['query' => $condition]) }}" class="hover:text-[#79584B] transition-colors">{{ $condition }}</a></li>
+                        @endforeach
                     </ul>
                 </div>
 
@@ -145,10 +146,15 @@
 
     <script>
     const conditionsMenu = document.getElementById('conditions-menu');
-    const defaultConditionsHtml = conditionsMenu ? conditionsMenu.innerHTML : '';
+    const defaultConditionsHtml = `
+        @foreach($global_health_conditions ?? [] as $condition)
+        <li><a href="{{ route('find-practitioner', ['query' => $condition]) }}" class="hover:text-[#79584B] transition-colors">{{ $condition }}</a></li>
+        @endforeach
+    `;
 
-    function renderSupportedConditions(conditions) {
+    function renderSupportedConditions(conditions, isLocal = false) {
         if (!conditionsMenu) return;
+
         if (!conditions || !conditions.length) {
             conditionsMenu.innerHTML = defaultConditionsHtml;
             return;
@@ -161,7 +167,8 @@
         conditionsMenu.innerHTML = conditions.slice(0, 6).map(function (label) {
             const safe = String(label).replace(/</g, '&lt;').replace(/>/g, '&gt;');
             const href = baseUrl + '?query=' + encodeURIComponent(label) + zipParam;
-            return '<li><a href="' + href + '" class="hover:text-[#79584B] transition-colors">' + safe + '</a></li>';
+            const icon = isLocal ? '<i class="ri-map-pin-line text-[10px] ml-1 opacity-50"></i>' : '';
+            return '<li><a href="' + href + '" class="hover:text-[#79584B] transition-colors flex items-center">' + safe + icon + '</a></li>';
         }).join('');
     }
 
@@ -175,7 +182,7 @@
                 url: url + params,
                 type: 'GET',
                 success: function (res) {
-                    if (res && res.success) renderSupportedConditions(res.conditions || []);
+                    if (res && res.success) renderSupportedConditions(res.conditions || [], res.is_local || false);
                 },
                 error: function () {
                     // fallback to default static list
@@ -187,7 +194,7 @@
 
         fetch(url + params, { headers: { 'Accept': 'application/json' } })
             .then(r => r.ok ? r.json() : null)
-            .then(res => { if (res && res.success) renderSupportedConditions(res.conditions || []); })
+            .then(res => { if (res && res.success) renderSupportedConditions(res.conditions || [], res.is_local || false); })
             .catch(() => renderSupportedConditions([]));
     }
 

@@ -28,7 +28,7 @@
 
                     @if(!$service->image && $service->images->isEmpty())
                     <div class="swiper-slide">
-                        <img src="{{ asset('frontend/assets/ayurveda-and-panchakarma-01.jpg') }}"
+                        <img src="{{ asset('frontend/assets/service-placeholder.png') }}"
                             alt="{{ $service->title }}" class="w-full h-full object-cover">
                     </div>
                     @endif

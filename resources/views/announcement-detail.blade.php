@@ -8,9 +8,9 @@
             <!-- Breadcrumb -->
             <nav class="mb-8">
                 <ol class="flex items-center gap-2 text-sm">
-                    <li><a href="{{ route('home') }}" class="text-gray-400 hover:text-secondary transition-colors">Home</a></li>
+                    <li><a href="{{ route('home') }}" class="text-gray-400 hover:text-secondary transition-colors" data-i18n="Home">{{ __('Home') }}</a></li>
                     <li class="text-gray-300">/</li>
-                    <li><a href="{{ route('announcements') }}" class="text-gray-400 hover:text-secondary transition-colors">Announcements</a></li>
+                    <li><a href="{{ route('announcements') }}" class="text-gray-400 hover:text-secondary transition-colors" data-i18n="Announcements">{{ __('Announcements') }}</a></li>
                     <li class="text-gray-300">/</li>
                     <li class="text-secondary line-clamp-1">{{ Str::limit($announcement['title'], 40) }}</li>
                 </ol>
@@ -18,8 +18,8 @@
 
             <!-- Header -->
             <div class="mb-10 text-center">
-                <span class="bg-accent text-secondary px-4 py-1.5 rounded-full text-sm font-medium inline-block mb-4">
-                    Announcement
+                <span class="bg-accent text-secondary px-4 py-1.5 rounded-full text-sm font-medium inline-block mb-4" data-i18n="Announcement">
+                    {{ __('Announcement') }}
                 </span>
                 <h1 class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary leading-tight mb-6">
                     {{ $announcement['title'] }}
@@ -51,7 +51,7 @@
 
             <!-- Share Section -->
             <div class="mt-12 pt-8 border-t border-gray-100 flex flex-col items-center gap-4">
-                <span class="text-gray-400 text-sm font-medium uppercase tracking-wide">Share this announcement</span>
+                <span class="text-gray-400 text-sm font-medium uppercase tracking-wide" data-i18n="Share this announcement">{{ __('Share this announcement') }}</span>
                 <div class="flex items-center gap-3">
                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}"
                         target="_blank"
@@ -84,9 +84,9 @@
     <section class="py-16 bg-gray-50 px-4 md:px-6">
         <div class="container mx-auto max-w-7xl">
             <div class="flex items-center justify-between mb-8">
-                <h3 class="text-2xl font-serif font-bold text-primary">Other Announcements</h3>
+                <h3 class="text-2xl font-serif font-bold text-primary" data-i18n="Other Announcements">{{ __('Other Announcements') }}</h3>
                 <a href="{{ route('announcements') }}" class="text-secondary font-medium hover:text-primary transition-colors flex items-center gap-1">
-                    View All <i class="ri-arrow-right-line"></i>
+                    <span data-i18n="View All">{{ __('View All') }}</span> <i class="ri-arrow-right-line"></i>
                 </a>
             </div>
 
@@ -121,5 +121,29 @@
         </div>
     </section>
     @endif
+
+    @push('scripts')
+    <script>
+        // Listen for language changes to reload page and fetch translated WP content
+        const originalToggleLanguageDetail = window.togglePageLanguage;
+        window.togglePageLanguage = function(targetLocale) {
+            if (typeof originalToggleLanguageDetail === 'function') {
+                fetch(`{{ url('/lang') }}/${targetLocale}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status) {
+                        window.location.reload();
+                    }
+                });
+            }
+        };
+    </script>
+    @endpush
 
 @endsection

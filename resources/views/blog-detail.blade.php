@@ -11,10 +11,10 @@
                     <!-- Breadcrumb -->
                     <nav class="mb-8">
                         <ol class="flex items-center gap-2 text-sm">
-                            <li><a href="{{ route('home') }}" class="text-gray-400 hover:text-secondary transition-colors">Home</a>
+                            <li><a href="{{ route('home') }}" class="text-gray-400 hover:text-secondary transition-colors" data-i18n="Home">{{ __('Home') }}</a>
                             </li>
                             <li class="text-gray-300">/</li>
-                            <li><a href="{{ route('blogs') }}" class="text-gray-400 hover:text-secondary transition-colors">Blog</a>
+                            <li><a href="{{ route('blogs') }}" class="text-gray-400 hover:text-secondary transition-colors" data-i18n="Blog">{{ __('Blog') }}</a>
                             </li>
                             <li class="text-gray-300">/</li>
                             <li class="text-secondary line-clamp-1">{{ Str::limit($blogPost['title'], 40) }}</li>
@@ -273,6 +273,26 @@
 
 @push('scripts')
 <script>
+    // Listen for language changes to reload page and fetch translated WP content
+    const originalToggleLanguageBlogDetail = window.togglePageLanguage;
+    window.togglePageLanguage = function(targetLocale) {
+        if (typeof originalToggleLanguageBlogDetail === 'function') {
+            fetch(`{{ url('/lang') }}/${targetLocale}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status) {
+                    window.location.reload();
+                }
+            });
+        }
+    };
+
     document.addEventListener('DOMContentLoaded', function() {
         loadComments();
     });

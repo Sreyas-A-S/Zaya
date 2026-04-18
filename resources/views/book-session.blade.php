@@ -89,13 +89,13 @@
         $practitionerImage = $activePractitioner && $activePractitioner->profile_photo_path
         ? asset('storage/' . $activePractitioner->profile_photo_path)
         : asset('frontend/assets/lilly-profile-pic.png');
-        $practitionerRole = optional($prefilledService)->title ?: ($activePractitioner->other_modalities[0] ?? ($activePractitioner->consultations[0] ?? 'Practitioner'));
+        $practitionerRole = optional($prefilledService)->title ?: ($activePractitioner ? $activePractitioner->subtitle_display : 'Practitioner');
         $practitionerRating = $activePractitioner ? number_format($activePractitioner->average_rating, 1) : '0.0';
         $practitionerLocation = $activePractitioner ? $activePractitioner->city_state : 'Location not set';
-        $practitionerConditions = $activePractitioner ? (array) ($activePractitioner->consultations ?? []) : [];
-        if (empty($practitionerConditions) && $activePractitioner && !empty($activePractitioner->other_modalities)) {
-            $practitionerConditions = (array) $activePractitioner->other_modalities;
-        }
+        $practitionerConditions = $activePractitioner ? (array) ($activePractitioner->conditions_list ?? []) : [];
+        @endphp
+
+        @php
         // Collect practitioner service durations/rates
         $practitionerServices = $activePractitioner && $activePractitioner->user
             ? $activePractitioner->user->userServices()->with('service')->where('status', 'active')->get()->groupBy('service_id')
@@ -252,8 +252,13 @@
                 <div class="mb-10">
                 <h3 class="text-gray-700 font-normal mb-4 text-lg" data-i18n="Why do you want to meet this practitioner?">{{ __('Why do you want to meet this practitioner?') }}
                 </h3>
-                <input type="text" id="conditions-input" placeholder="{{ __('Add conditions...') }}" readonly 
-                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400 mb-4 cursor-default" data-i18n-placeholder="Add conditions...">
+                
+                <div class="flex items-center bg-[#F5F5F5] rounded-[30px] border border-transparent overflow-hidden mb-6 min-h-[60px] px-6 transition-colors focus-within:bg-[#EAEAEA]">
+                    <div id="selected-conditions-container" class="flex items-center flex-wrap gap-2 py-2" style="flex: 1;">
+                        <span id="conditions-placeholder" class="text-sm text-gray-400 select-none">{{ __('Add conditions...') }}</span>
+                        <!-- dynamically added pills go here -->
+                    </div>
+                </div>
 
                 <!-- Condition Tags -->
                 <div class="flex flex-wrap gap-2" id="condition-tags-wrapper">
@@ -491,42 +496,131 @@
             </div>
 
             <!-- Promo Code Section -->
-            <div class="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="text-gray-800 font-medium flex items-center gap-2">
-                        <i class="ri-ticket-line text-secondary text-lg"></i>
-                        Apply Promo Code
-                    </h4>
-                    <button type="button" onclick="openPromoModal()" class="text-secondary text-sm font-medium hover:underline cursor-pointer">
-                        Choose from saved
-                    </button>
+            <div id="promo-section-wrapper" class="mb-4 transition-all duration-300">
+                <!-- Collapsed State -->
+                <div id="promo-collapsed" onclick="toggleSection('promo')" class="flex items-center justify-between p-5 bg-gray-50 border border-gray-100 rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center text-secondary">
+                            <i class="ri-coupon-2-line text-lg"></i>
+                        </div>
+                        <span class="text-sm font-bold text-gray-700">Apply Promo Code</span>
+                    </div>
+                    <i class="ri-add-line text-gray-400"></i>
                 </div>
-                <div class="flex gap-3">
-                    <div class="relative flex-1">
-                        <input type="text" id="promo-code-input" placeholder="Enter code here..." 
-                            class="w-full py-3.5 px-6 bg-white rounded-full border border-gray-200 outline-none text-sm text-gray-700 placeholder:text-gray-400 focus:border-secondary transition-all">
-                        <button type="button" id="clear-promo-btn" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 hidden" onclick="clearPromoCode()">
-                            <i class="ri-close-circle-fill text-xl"></i>
+
+                <!-- Expanded State (Hidden by default) -->
+                <div id="promo-expanded" class="hidden p-6 bg-white rounded-2xl border border-secondary/20 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-gray-800 font-bold flex items-center gap-2">
+                            <i class="ri-coupon-2-line text-secondary text-lg"></i>
+                            Apply Promo Code
+                        </h4>
+                        <div class="flex items-center gap-3">
+                            <button type="button" onclick="openPromoModal()" class="text-secondary text-xs font-bold uppercase tracking-widest hover:underline cursor-pointer">
+                                Saved
+                            </button>
+                            <button onclick="toggleSection('promo')" class="text-gray-400 hover:text-gray-600"><i class="ri-subtract-line"></i></button>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="relative flex-1">
+                            <input type="text" id="promo-code-input" placeholder="Enter code here..." 
+                                class="w-full py-3.5 px-6 bg-gray-50 rounded-full border border-gray-200 outline-none text-sm text-gray-700 placeholder:text-gray-400 focus:border-secondary transition-all">
+                            <button type="button" id="clear-promo-btn" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 hidden" onclick="clearPromoCode()">
+                                <i class="ri-close-circle-fill text-xl"></i>
+                            </button>
+                        </div>
+                        <button type="button" onclick="applyPromoCode()" id="apply-promo-btn"
+                            class="bg-secondary text-white px-8 py-3.5 rounded-full font-medium text-sm hover:bg-primary transition-all shadow-sm">
+                            Apply
                         </button>
                     </div>
-                    <button type="button" onclick="applyPromoCode()" id="apply-promo-btn"
-                        class="bg-secondary text-white px-8 py-3.5 rounded-full font-medium text-sm hover:bg-primary transition-all shadow-sm">
-                        Apply
-                    </button>
+                    <div id="promo-message" class="mt-3 text-xs font-medium hidden"></div>
                 </div>
-                <div id="promo-message" class="mt-3 text-xs font-medium hidden"></div>
+            </div>
+
+            <!-- Zaya Coins Section -->
+            @if(isset($coinSetting) && (!auth()->check() || in_array(auth()->user()->role, ['client', 'patient'])))
+            <div id="coins-section-wrapper" class="mb-8 transition-all duration-300">
+                <!-- Collapsed State -->
+                <div id="coins-collapsed" onclick="toggleSection('coins')" class="flex items-center justify-between p-5 bg-secondary/5 border border-secondary/10 rounded-2xl cursor-pointer hover:bg-secondary/10 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-secondary/20 rounded-xl flex items-center justify-center text-secondary">
+                            <i class="ri-coins-line text-lg"></i>
+                        </div>
+                        <span class="text-sm font-bold text-gray-700">Zaya Coins</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        @if(auth()->check())
+                            <span class="text-xs font-bold text-secondary">{{ auth()->user()->coins ?? 0 }} available</span>
+                        @else
+                            <span class="text-xs text-gray-400">Login to use</span>
+                        @endif
+                        <i class="ri-add-line text-gray-400"></i>
+                    </div>
+                </div>
+
+                <!-- Expanded State (Hidden by default) -->
+                <div id="coins-expanded" class="hidden p-6 bg-white rounded-2xl border border-secondary/20 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center text-secondary">
+                                <i class="ri-coins-line text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-gray-800 font-bold leading-none mb-1">Zaya Coins</h4>
+                                @if(auth()->check())
+                                    <p class="text-xs text-gray-500">Available: <span class="font-bold text-secondary">{{ auth()->user()->coins ?? 0 }} coins</span></p>
+                                @else
+                                    <p class="text-xs text-gray-500">Login to use your coins</p>
+                                @endif
+                            </div>
+                        </div>
+                        <button onclick="toggleSection('coins')" class="text-gray-400 hover:text-gray-600"><i class="ri-subtract-line"></i></button>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <span class="text-sm font-medium text-gray-700">Use coins for this booking</span>
+                        @if(auth()->check())
+                            @if(auth()->user()->coins > 0)
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="use-coins-toggle" class="sr-only peer" onchange="toggleCoinsUsage()">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+                            </label>
+                            @else
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">Insufficient</span>
+                            @endif
+                        @else
+                            <a href="{{ route('login') }}" class="text-[10px] font-bold text-secondary uppercase tracking-widest bg-secondary/10 px-3 py-1 rounded-full hover:bg-secondary hover:text-white transition-all">Login</a>
+                        @endif
+                    </div>
+                    
+                    <div id="coin-discount-message" class="mt-4 text-xs font-medium text-emerald-600 hidden">
+                        <i class="ri-checkbox-circle-fill mr-1"></i> 
+                        You are using <span id="coins-to-use">0</span> coins for a discount of <span id="coin-value-display"></span>
+                    </div>
+                </div>
+            </div>
+            @endif
                 
-                <!-- Discount Breakdown -->
-                <div id="discount-breakdown" class="mt-6 pt-6 border-t border-gray-200 hidden">
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-sm text-gray-500 font-medium">
-                            <span>Subtotal</span>
-                            <span id="breakdown-subtotal"></span>
-                        </div>
-                        <div class="flex justify-between text-sm text-emerald-600 font-bold">
-                            <span id="breakdown-label">Discount</span>
-                            <span id="breakdown-discount"></span>
-                        </div>
+            <!-- Discount Breakdown -->
+            <div id="discount-breakdown" class="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100 hidden">
+                <div class="space-y-3">
+                    <div class="flex justify-between text-sm text-gray-500 font-medium">
+                        <span>Subtotal</span>
+                        <span id="breakdown-subtotal"></span>
+                    </div>
+                    <div id="promo-discount-row" class="flex justify-between text-sm text-emerald-600 font-bold hidden">
+                        <span id="breakdown-label">Promo Discount</span>
+                        <span id="breakdown-discount"></span>
+                    </div>
+                    <div id="coin-discount-row" class="flex justify-between text-sm text-emerald-600 font-bold hidden">
+                        <span>Coin Discount</span>
+                        <span id="breakdown-coin-discount"></span>
+                    </div>
+                    <div class="pt-3 border-t border-gray-200 flex justify-between text-base text-gray-900 font-bold">
+                        <span>Final Total</span>
+                        <span id="breakdown-final-total"></span>
                     </div>
                 </div>
             </div>
@@ -565,6 +659,29 @@
     </div>
 
     <script>
+        const COIN_VALUE = {{ $coinSetting->coin_value ?? 0 }};
+        const USER_COINS_BALANCE = {{ auth()->check() ? auth()->user()->coins : 0 }};
+        let coinsApplied = false;
+
+        function toggleSection(type) {
+            const collapsed = document.getElementById(`${type}-collapsed`);
+            const expanded = document.getElementById(`${type}-expanded`);
+            if (!collapsed || !expanded) return;
+
+            if (expanded.classList.contains('hidden')) {
+                expanded.classList.remove('hidden');
+                collapsed.classList.add('hidden');
+            } else {
+                expanded.classList.add('hidden');
+                collapsed.classList.remove('hidden');
+            }
+        }
+
+        function toggleCoinsUsage() {
+            coinsApplied = document.getElementById('use-coins-toggle').checked;
+            renderSelectedServices(); // Recalculate everything
+        }
+
         function scrollServices(direction) {
             const wrapper = document.getElementById('available-services-container');
             if (!wrapper) return;
@@ -745,6 +862,7 @@
             const bookingTime = scheduleItem?.querySelector('.time-value')?.value;
 
             const totalPrice = getEffectiveTotalPrice();
+            const testMode = document.getElementById('test-payment-toggle')?.checked || false;
 
             if (!bookingDate || !bookingTime || serviceIds.length === 0) {
                 showToast('Please select at least one service and its schedule (Date & Time).', 'warning');
@@ -766,7 +884,9 @@
                 total_price: totalPrice,
                 currency: currency,
                 promo_code: appliedPromoCode,
-                discount_amount: promoDiscountAmount
+                discount_amount: promoDiscountAmount,
+                coins_applied: coinsApplied,
+                test_mode: testMode
             };
 
             try {
@@ -1053,19 +1173,64 @@
                 const step3Content = document.getElementById('step-3-content');
                 lastComputedTotal = total;
                 
-                const finalTotal = Math.max(0, total - promoDiscountAmount);
+                // Calculate Coin Discount
+                let coinDiscount = 0;
+                let coinsToUse = 0;
+                
+                if (coinsApplied && total > 0 && COIN_VALUE > 0) {
+                    // Max discount is subtotal after promo
+                    const afterPromo = Math.max(0, total - promoDiscountAmount);
+                    const potentialCoinDiscount = USER_COINS_BALANCE * COIN_VALUE;
+                    
+                    if (potentialCoinDiscount > afterPromo) {
+                        coinDiscount = afterPromo;
+                        coinsToUse = Math.ceil(afterPromo / COIN_VALUE);
+                    } else {
+                        coinDiscount = potentialCoinDiscount;
+                        coinsToUse = USER_COINS_BALANCE;
+                    }
+                }
+
+                const finalTotal = Math.max(0, total - promoDiscountAmount - coinDiscount);
                 const testToggle = document.getElementById('test-payment-toggle');
                 const showTest = testToggle && testToggle.checked;
                 const currencyCode = document.getElementById('booking-currency')?.value || 'INR';
                 
-                // The visibility of step-3-content is managed by showStep()
+                // Update Coin Message
+                const coinMsg = document.getElementById('coin-discount-message');
+                if (coinMsg) {
+                    if (coinsApplied && coinsToUse > 0) {
+                        coinMsg.classList.remove('hidden');
+                        document.getElementById('coins-to-use').textContent = coinsToUse;
+                        document.getElementById('coin-value-display').textContent = `${currencySymbol} ${coinDiscount.toFixed(2)}`;
+                    } else {
+                        coinMsg.classList.add('hidden');
+                    }
+                }
 
                 // Update Breakdown UI
                 const breakdownEl = document.getElementById('discount-breakdown');
-                if (promoDiscountAmount > 0) {
+                const promoRow = document.getElementById('promo-discount-row');
+                const coinRow = document.getElementById('coin-discount-row');
+
+                if (promoDiscountAmount > 0 || coinDiscount > 0) {
                     breakdownEl.classList.remove('hidden');
                     document.getElementById('breakdown-subtotal').textContent = `${currencySymbol} ${total.toFixed(2)}`;
-                    document.getElementById('breakdown-discount').textContent = `- ${currencySymbol} ${promoDiscountAmount.toFixed(2)}`;
+                    document.getElementById('breakdown-final-total').textContent = `${currencySymbol} ${finalTotal.toFixed(2)}`;
+
+                    if (promoDiscountAmount > 0) {
+                        promoRow.classList.remove('hidden');
+                        document.getElementById('breakdown-discount').textContent = `- ${currencySymbol} ${promoDiscountAmount.toFixed(2)}`;
+                    } else {
+                        promoRow.classList.add('hidden');
+                    }
+
+                    if (coinDiscount > 0) {
+                        coinRow.classList.remove('hidden');
+                        document.getElementById('breakdown-coin-discount').textContent = `- ${currencySymbol} ${coinDiscount.toFixed(2)}`;
+                    } else {
+                        coinRow.classList.add('hidden');
+                    }
                 } else {
                     breakdownEl.classList.add('hidden');
                 }
@@ -1108,8 +1273,8 @@
                         checkedBoxes.forEach(box => {
                             const val = box.value;
                             const pill = document.createElement('div');
-                            pill.className = 'px-4 py-2 rounded-full border border-gray-300 bg-transparent text-gray-700 text-sm font-normal whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1 hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] transition-colors';
-                            pill.textContent = val;
+                            pill.className = 'px-4 py-2 rounded-full border border-gray-300 bg-transparent text-gray-700 text-sm font-normal whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-2 hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] transition-colors group';
+                            pill.innerHTML = `<span>${val}</span><i class="ri-close-line text-gray-400 group-hover:text-[#423131] transition-colors"></i>`;
                             pill.onclick = (e) => {
                                 e.preventDefault();
                                 box.checked = false;
@@ -1322,10 +1487,41 @@
 
             // Condition tags selection - toggle active state and update input
             function updateConditionsInput() {
-                const input = document.getElementById('conditions-input');
+                const container = document.getElementById('selected-conditions-container');
+                const placeholder = document.getElementById('conditions-placeholder');
                 const checkedBoxes = document.querySelectorAll('.condition-tag input[type="checkbox"]:checked');
                 const values = Array.from(checkedBoxes).map(cb => cb.closest('.condition-tag').textContent.trim());
-                input.value = values.join(',  ');
+
+                if (container) {
+                   // Clear all pills (keep placeholder)
+                   Array.from(container.querySelectorAll('.condition-pill')).forEach(p => p.remove());
+
+                   if (values.length > 0) {
+                       if (placeholder) placeholder.classList.add('hidden');
+
+                       checkedBoxes.forEach(checkbox => {
+                           const val = checkbox.closest('.condition-tag').textContent.trim();
+                           const pill = document.createElement('div');
+                           pill.className = 'condition-pill px-4 py-2 rounded-full border border-gray-300 bg-transparent text-gray-700 text-sm font-normal whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-2 hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] transition-colors group';
+                           pill.innerHTML = `<span>${val}</span><i class="ri-close-line text-gray-400 group-hover:text-[#423131] transition-colors"></i>`;
+                           pill.onclick = (e) => {
+                               e.preventDefault();
+                               e.stopPropagation();
+                               checkbox.checked = false;
+                               // Trigger visual update of the tag below
+                               const tag = checkbox.closest('.condition-tag');
+                               if (tag) {
+                                   tag.classList.remove('border-[#FABD4D]', 'bg-[#FABD4D]', 'text-[#423131]');
+                                   tag.classList.add('border-gray-200', 'bg-white', 'text-gray-600');
+                               }
+                               updateConditionsInput();
+                           };
+                           container.appendChild(pill);
+                       });
+                   } else {
+                       if (placeholder) placeholder.classList.remove('hidden');
+                   }
+                }
 
                 // Update Step 3 "Condition" section
                 const step3Container = document.getElementById('condition-selected-tags');
@@ -1349,7 +1545,7 @@
                 conditionActionBtn.addEventListener('click', function() {
                     showStep(2);
                     setTimeout(() => {
-                        const target = document.getElementById('conditions-input');
+                        const target = document.getElementById('selected-conditions-container');
                         if (target) {
                             target.scrollIntoView({
                                 behavior: 'smooth',
@@ -1359,7 +1555,6 @@
                     }, 300);
                 });
             }
-
             document.querySelectorAll('.condition-tag').forEach(tag => {
                 tag.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -1378,7 +1573,8 @@
                 });
             });
 
-
+            // Initialize UI
+            updateConditionsInput();
         });
         // Custom dropdown functions
         function toggleDropdown(dropdownId) {
@@ -1812,7 +2008,11 @@
 
             // If no slots available, show message and don't display the header/grid
             if (!slots || slots.length === 0) {
-                const html = `<div class="text-center py-6 text-sm text-gray-500">No available slots for this practitioner on the selected date.</div>`;
+                const isTodaySelected = new Date(dateValue).toDateString() === new Date().toDateString();
+                const msg = isTodaySelected 
+                    ? "All slots for today have already passed or are within the notice period. Please select another date."
+                    : "No available slots for this practitioner on the selected date.";
+                const html = `<div class="text-center py-6 px-4 text-sm text-gray-500">${msg}</div>`;
                 wrapper.innerHTML = html;
                 return;
             }

@@ -98,7 +98,7 @@
                         <a href="{{ $service->slug ? route('service-detail', $service->slug) : '#' }}" class="block group cursor-pointer">
                             <div class="w-full aspect-video overflow-hidden mb-5 bg-gray-100">
                                 @php
-                                    $imageUrl = asset('frontend/assets/wellness-based-ayurveda-consultation.png'); // fallback
+                                    $imageUrl = asset('frontend/assets/service-placeholder.png'); // fallback
                                     if ($service->image) {
                                         if (str_starts_with($service->image, 'http')) {
                                             $imageUrl = $service->image;

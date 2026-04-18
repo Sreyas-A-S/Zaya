@@ -32,7 +32,7 @@ class YogaTherapist extends Model
     protected $fillable = [
         'user_id',
         'payout_currency',
-        'slug',
+        'min_notice_hours',
         'first_name',
         'last_name',
         'phone',
@@ -122,6 +122,14 @@ class YogaTherapist extends Model
     }
 
     public function getExpertisesListAttribute()
+    {
+        $list = array_merge(
+            (array) ($this->areas_of_expertise ?? [])
+        );
+        return array_values(array_unique(array_filter($list, fn ($v) => trim((string) $v) !== '')));
+    }
+
+    public function getConditionsListAttribute()
     {
         $list = array_merge(
             (array) ($this->areas_of_expertise ?? [])

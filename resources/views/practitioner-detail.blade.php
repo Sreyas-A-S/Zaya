@@ -1,5 +1,17 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+</style>
+@endpush
+
 @section('content')
     @php
         $firstName = $practitioner->first_name ?? $practitioner->user->first_name ?? 'Professional';
@@ -144,36 +156,60 @@
                 <h3 class="text-2xl md:text-3xl font-serif text-[#4A7060]">{{ $site_settings['practitioner_legacy_subtitle'] ?? 'Precision and Passion Across Every Field' }}</h3>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 text-center md:text-left">
-                <!-- Column 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-center md:text-left">
+                <!-- Column 1: Specialities -->
                 <div class="flex flex-col items-center md:items-start pl-0 md:pl-10">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-16 h-16 rounded-full bg-[#56B280] flex items-center justify-center text-white text-3xl shadow-md"><i class="ri-briefcase-4-line"></i></div>
-                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_consultations_title'] ?? 'Consultations' }}</h4>
+                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_consultations_title'] ?? 'Specialities' }}</h4>
                     </div>
                     <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
-                        @foreach($consultations as $item) <li>{{ $item }}</li> @endforeach
+                        @foreach($practitioner->specialization ?? $practitioner->practitioner_type ?? $practitioner->yoga_therapist_type ?? [] as $item) 
+                            <li>{{ $item }}</li> 
+                        @endforeach
                     </ul>
                 </div>
-                <!-- Column 2 -->
+                <!-- Column 2: Conditions Supported -->
                 <div class="flex flex-col items-center md:items-start pl-0 md:pl-10">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-16 h-16 rounded-full bg-[#56B280] flex items-center justify-center text-white text-3xl shadow-md"><i class="ri-shield-check-line"></i></div>
-                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_therapies_title'] ?? 'Therapies' }}</h4>
+                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_therapies_title'] ?? 'Conditions Supported' }}</h4>
                     </div>
                     <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
-                        @foreach($therapies as $item) <li>{{ $item }}</li> @endforeach
+                        @foreach($practitioner->conditions_list as $item) 
+                            <li>{{ $item }}</li> 
+                        @endforeach
                     </ul>
                 </div>
-                <!-- Column 3 -->
-                <div class="flex flex-col items-center md:items-start pl-0 md:pl-10">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-16 h-16 rounded-full bg-[#56B280] flex items-center justify-center text-white text-3xl shadow-md"><i class="ri-user-heart-line"></i></div>
-                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_modalities_title'] ?? 'Other Modalities' }}</h4>
-                    </div>
-                    <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
-                        @foreach($modalities as $item) <li>{{ $item }}</li> @endforeach
-                    </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- A Glimpse Into My Practice Section -->
+    <section class="py-16 md:py-20 bg-gradient-to-r from-[#EEEEEE] to-[#FAFAFA]">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between xl:px-16 gap-8 text-center md:text-left">
+                <!-- Left: Heading -->
+                <div class="md:w-1/3 flex justify-center md:justify-start">
+                    <h2 class="text-3xl md:text-[38px] font-serif font-bold text-secondary leading-tight">
+                        {!! str_replace("\n", '<br />', $site_settings['practitioner_glimpse_title'] ?? "A Glimpse Into\nMy Practice") !!}
+                    </h2>
+                </div>
+
+                <!-- Center: Description -->
+                <div class="md:w-1/3 flex justify-center md:text-center">
+                    <p class="text-gray-800 text-base mb-0 max-w-90">
+                        {{ $site_settings['practitioner_glimpse_description'] ?? 'Explore the spaces, rituals, and healing moments that define my approach to Ayurvedic wellness and patient care.' }}
+                    </p>
+                </div>
+
+                <!-- Right: Action Button -->
+                <div class="md:w-1/3 flex justify-center md:justify-end">
+                    <a href="{{ route('gallery') }}"
+                       class="bg-secondary text-white px-8 py-3 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-base flex items-center gap-2">
+                        {{ $site_settings['practitioner_explore_gallery_btn'] ?? 'Explore Our Gallery' }}
+                        <i class="ri-arrow-right-line"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -187,32 +223,78 @@
                 <p class="text-gray-500 leading-relaxed text-lg">{{ $site_settings['practitioner_stories_description'] ?? 'The true measure of ZAYA Wellness lies in the journeys of our members.' }}</p>
             </div>
 
-            <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-                @if($practitioner->reviews)
-                    @forelse($practitioner->reviews->where('status', true) as $review)
-                    <div class="break-inside-avoid bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.25)] border border-gray-100 transition-shadow">
-                        <div class="flex items-center gap-4 mb-6">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($review->user->name ?? 'User') }}&background=random" class="w-12 h-12 rounded-full object-cover">
-                            <div>
-                                <h4 class="font-bold text-black text-lg">{{ $review->user->name ?? 'Anonymous' }}</h4>
-                                <p class="text-gray-400 text-xs uppercase">{{ $review->created_at->format('M d, Y') }}</p>
+            <div class="relative">
+                <div id="reviews-container" class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6 overflow-hidden transition-all duration-700 ease-in-out" style="max-height: 550px;">
+                    @if($practitioner->reviews)
+                        @forelse($practitioner->reviews->where('status', true) as $review)
+                        <div class="break-inside-avoid mb-6 bg-white p-8 rounded-2xl shadow-[0_8px_48px_rgba(134,134,134,0.15)] border border-gray-50 transition-all hover:shadow-lg">
+                            <div class="flex items-center gap-4 mb-6">
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($review->user->name ?? 'User') }}&background=random" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-bold text-black text-lg">{{ $review->user->name ?? 'Anonymous' }}</h4>
+                                    <p class="text-gray-400 text-xs uppercase tracking-wider">{{ $review->created_at->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-6 italic">"{{ $review->comment }}"</p>
+                            <div class="flex text-[#DEDD66] gap-1 text-lg">
+                                @for($i = 1; $i <= 5; $i++) @if($i <= $review->rating) <i class="ri-star-fill"></i> @else <i class="ri-star-line"></i> @endif @endfor
                             </div>
                         </div>
-                        <p class="text-gray-600 text-sm leading-relaxed mb-6">"{{ $review->comment }}"</p>
-                        <div class="flex text-[#DEDD66] gap-1 text-lg">
-                            @for($i = 1; $i <= 5; $i++) @if($i <= $review->rating) <i class="ri-star-fill"></i> @else <i class="ri-star-line"></i> @endif @endfor
-                        </div>
-                    </div>
-                    @empty
-                    <div class="col-span-full text-center py-10"><p class="text-gray-500 italic">{{ $site_settings['practitioner_no_reviews'] ?? 'No reviews yet.' }}</p></div>
-                    @endforelse
-                @endif
+                        @empty
+                        <div class="col-span-full text-center py-10"><p class="text-gray-500 italic">{{ $site_settings['practitioner_no_reviews'] ?? 'No reviews yet.' }}</p></div>
+                        @endforelse
+                    @endif
+                </div>
+
+                <!-- Bottom Fade Overlay -->
+                <div id="reviews-fade" class="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/80 to-transparent z-10 pointer-events-none transition-opacity duration-500"></div>
             </div>
+
+            <!-- Load More Button -->
+            @if($practitioner->reviews && $practitioner->reviews->where('status', true)->count() > 3)
+            <div class="text-center mt-8 relative z-20">
+                <button id="load-more-reviews" onclick="toggleReviews()" 
+                    class="bg-white border border-gray-200 text-secondary px-8 py-3 rounded-full font-bold text-sm shadow-sm hover:border-secondary hover:text-primary transition-all inline-flex items-center gap-2 group">
+                    <span id="load-more-text">View All Reviews</span>
+                    <i id="load-more-icon" class="ri-arrow-down-s-line text-lg group-hover:translate-y-0.5 transition-transform"></i>
+                </button>
+            </div>
+            @endif
         </div>
     </section>
 
+    @push('scripts')
+    <script>
+        function toggleReviews() {
+            const container = document.getElementById('reviews-container');
+            const fade = document.getElementById('reviews-fade');
+            const text = document.getElementById('load-more-text');
+            const icon = document.getElementById('load-more-icon');
+
+            if (container.classList.contains('expanded')) {
+                container.style.maxHeight = '550px';
+                container.classList.remove('expanded');
+                fade.style.opacity = '1';
+                text.innerText = 'View All Reviews';
+                icon.classList.replace('ri-arrow-up-s-line', 'ri-arrow-down-s-line');
+                
+                const headerOffset = 150;
+                const elementPosition = container.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+            } else {
+                container.style.maxHeight = container.scrollHeight + 100 + 'px';
+                container.classList.add('expanded');
+                fade.style.opacity = '0';
+                text.innerText = 'Show Less';
+                icon.classList.replace('ri-arrow-down-s-line', 'ri-arrow-up-s-line');
+            }
+        }
+    </script>
+    @endpush
+
     <!-- Bottom CTA -->
-    <section class="py-4 mb-20">
+    <section class="py-4 mb-10">
         <div class="container-fluid mx-auto">
             <div class="bg-[#F9EBD6] px-8 md:px-12 py-5 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
                 <p class="text-gray-700 text-base md:text-lg text-center md:text-left">

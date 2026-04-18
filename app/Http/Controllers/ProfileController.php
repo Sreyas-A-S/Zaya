@@ -11,6 +11,8 @@ use App\Models\UserService;
 use App\Models\Practitioner;
 use App\Models\PractitionerReview;
 use App\Models\PractitionerGallery;
+use App\Models\PromoCode;
+use App\Models\UserPromoCode;
 use App\Traits\ImageUploadTrait;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
@@ -408,23 +410,35 @@ class ProfileController extends Controller
     public function promoCodes()
     {
         $user = Auth::user();
-        
-        $activePromoCodes = \App\Models\PromoCode::where('status', true)
+
+        // 1. Get global active promo codes
+        $globalPromoCodes = PromoCode::where('status', true)
             ->where(function($q) {
                 $q->where('expiry_date', '>=', now()->toDateString())
                   ->orWhereNull('expiry_date');
             })
-            ->whereIn('usage_type', ['booking', 'both'])
             ->get();
 
-        $usedPromoCodes = \App\Models\Booking::where('user_id', $user->id)
+        // 2. Get codes specifically added by/for this user
+        $userLinkedCodes = UserPromoCode::where('user_id', $user->id)->pluck('promo_code')->toArray();
+        $specificPromoCodes = PromoCode::whereIn('code', $userLinkedCodes)
+            ->where('status', true)
+            ->where(function($q) {
+                $q->where('expiry_date', '>=', now()->toDateString())
+                  ->orWhereNull('expiry_date');
+            })
+            ->get();
+
+        // 3. Merge and unique
+        $activePromoCodes = $globalPromoCodes->concat($specificPromoCodes)->unique('code');
+
+        $usedPromoCodes = Booking::where('user_id', $user->id)
             ->whereNotNull('promo_code')
             ->pluck('promo_code')
             ->toArray();
 
         return view('client.promo-codes', compact('activePromoCodes', 'usedPromoCodes'));
     }
-
     public function healthJourney()
     {
         $user = Auth::user();
@@ -636,7 +650,8 @@ class ProfileController extends Controller
         $profile = $user->practitioner ?? $user->doctor ?? $user->mindfulnessPractitioner ?? $user->yogaTherapist ?? null;
         $reminderLeadTime = $profile->reminder_lead_time ?? 60;
 
-        $nextOnlineBooking = Booking::where('practitioner_id', $user->profile_id)
+        $nextOnlineBooking = Booking::where('profile_id', $user->profile_id)
+            ->where('practitioner_type', $user->getMorphClass())
             ->where('mode', 'online')
             ->where('status', 'confirmed')
             ->whereDate('booking_date', '>=', now()->toDateString())
@@ -1778,7 +1793,7 @@ class ProfileController extends Controller
         // Reviews received by this user (if they are a professional)
         if ($user->profile_id && in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'])) {
             $receivedReviews = PractitionerReview::with('user')
-                ->where('practitioner_id', $user->profile_id)
+                ->where('profile_id', $user->profile_id)->where('practitioner_type', $user->getMorphClass())
                 ->where('status', true)
                 ->latest()
                 ->paginate(10, ['*'], 'received_page');
@@ -1840,6 +1855,49 @@ class ProfileController extends Controller
             ->exists();
 
         return response()->json(['exists' => $exists]);
+    }
+
+    public function storePromoCode(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|max:50'
+        ]);
+
+        $code = strtoupper(trim($request->code));
+        $user = Auth::user();
+
+        // 1. Check if the promo code exists and is active
+        $promo = PromoCode::where('code', $code)
+            ->where('status', true)
+            ->where(function($q) {
+                $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now()->toDateString());
+            })->first();
+
+        if (!$promo) {
+            return back()->with('error', 'Invalid or expired promo code.');
+        }
+
+        // 2. Check usage limit
+        if ($promo->usage_limit !== null && $promo->used_count >= $promo->usage_limit) {
+            return back()->with('error', 'This promo code has reached its usage limit.');
+        }
+
+        // 3. Check if user already has it
+        $exists = UserPromoCode::where('user_id', $user->id)
+            ->where('promo_code', $code)
+            ->exists();
+
+        if ($exists) {
+            return back()->with('info', 'This promo code is already in your list.');
+        }
+
+        // 4. Link to user
+        UserPromoCode::create([
+            'user_id' => $user->id,
+            'promo_code' => $code
+        ]);
+
+        return back()->with('success', 'Promo code added to your exclusive offers!');
     }
 
 }

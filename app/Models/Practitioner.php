@@ -39,6 +39,7 @@ class Practitioner extends Model
         'status',
         'booking_window_days',
         'reminder_lead_time',
+        'min_notice_hours',
         'first_name',
         'last_name',
         'slug',
@@ -127,24 +128,27 @@ class Practitioner extends Model
 
     public function getSubtitleDisplayAttribute()
     {
-        $consultations = $this->consultations ?? [];
-        if (!is_array($consultations)) $consultations = [$consultations];
-        
-        $modalities = $this->other_modalities ?? [];
-        if (!is_array($modalities)) $modalities = [$modalities];
-
-        $subtitle = $modalities[0] ?? ($consultations[0] ?? ($this->user->role ?? 'Professional'));
+        $specialization = (array) ($this->specialization ?? []);
+        $subtitle = $specialization[0] ?? ($this->other_modalities[0] ?? ($this->consultations[0] ?? ($this->user->role ?? 'Professional')));
         return str_replace('_', ' ', ucfirst($subtitle));
     }
 
     public function getExpertisesListAttribute()
     {
         $list = array_merge(
-            (array) ($this->specialization ?? []),
             (array) ($this->health_conditions_treated ?? []),
+            (array) ($this->specialization ?? []),
             (array) ($this->body_therapies ?? []),
             (array) ($this->consultations ?? []),
             (array) ($this->other_modalities ?? [])
+        );
+        return array_values(array_unique(array_filter($list, fn ($v) => trim((string) $v) !== '')));
+    }
+
+    public function getConditionsListAttribute()
+    {
+        $list = array_merge(
+            (array) ($this->health_conditions_treated ?? [])
         );
         return array_values(array_unique(array_filter($list, fn ($v) => trim((string) $v) !== '')));
     }

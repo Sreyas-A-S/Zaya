@@ -23,7 +23,18 @@
     .calendar-grid-wrapper { display: grid; grid-template-columns: repeat(7, 1fr); background-color: var(--cal-border); gap: 1px; border: 1.5px solid var(--cal-border); border-radius: 24px; overflow: hidden; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05); }
     .calendar-day-cell { background-color: #fff; aspect-ratio: 1 / 1; padding: 10px; display: flex; flex-direction: column; transition: all 0.2s ease; position: relative; min-height: 90px; }
     .calendar-day-number { font-size: 16px; font-weight: 800; color: #374151; margin-bottom: 4px; }
-    .calendar-day-cell.is-today .calendar-day-number { background-color: var(--cal-secondary); color: #fff; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px; }
+    .calendar-day-cell.is-today .calendar-day-number { 
+        background-color: #2E4B3D !important; 
+        color: #ffffff !important; 
+        width: 32px; 
+        height: 32px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        border-radius: 50%; 
+        font-size: 14px;
+        box-shadow: 0 4px 10px rgba(46, 75, 61, 0.2);
+    }
     .calendar-day-cell.is-outside { background-color: #F9FAFB; opacity: 0.5; cursor: not-allowed; }
     .calendar-day-cell.is-past { background-color: #FDFDFD; opacity: 0.3; cursor: not-allowed; }
     
@@ -75,7 +86,7 @@
     <!-- Tab 1: Calendar -->
     <div id="calendar-tab" class="tab-content">
         @if(isset($profile))
-        <div class="w-full bg-white rounded-[40px] border border-[#2E4B3D]/12 overflow-hidden shadow-sm">
+        <div class="w-full bg-white rounded-[40px] border border-[#2E4B3D]/12 overflow-hidden shadow-sm cal-container">
             <div class="p-8 border-b border-[#2E4B3D]/12 flex justify-end">
                 <div class="flex items-center gap-4 bg-[#F6F7F7] p-2 rounded-2xl">
                     <button onclick="changeMonth(-1)" class="w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm hover:text-secondary transition-all"><i class="ri-arrow-left-s-line text-xl"></i></button>
@@ -115,6 +126,23 @@
                 <form action="{{ route('time-slots.update-weekly-slots') }}" method="POST" class="space-y-6">
                     @csrf
                     <input type="hidden" name="off_slots" id="weekly-off-slots-input" value="">
+                    
+                    <div class="flex flex-wrap items-center gap-4 mb-8">
+                        <span class="text-xs font-bold text-secondary uppercase tracking-wider">Apply this schedule for:</span>
+                        <select id="apply-until-preset" onchange="handlePresetChange(this.value)" class="border-b-2 border-secondary/20 bg-transparent px-2 py-1 text-sm font-bold text-secondary outline-none focus:border-secondary transition-all cursor-pointer">
+                            <option value="today">Today Only</option>
+                            <option value="tomorrow">Until Tomorrow</option>
+                            <option value="this-week">Until End of Week</option>
+                            <option value="this-month">Until End of Month</option>
+                            <option value="3-months">Next 3 Months</option>
+                            <option value="6-months">Next 6 Months</option>
+                            <option value="1-year" selected>Next 1 Year</option>
+                            <option value="custom">Custom Date...</option>
+                        </select>
+                        <input type="date" id="apply-until-input" name="apply_until" value="{{ date('Y-m-d', strtotime('+1 year')) }}" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d', strtotime('+2 years')) }}" 
+                               class="hidden border-b-2 border-secondary/20 bg-transparent px-2 py-1 text-sm font-bold text-secondary outline-none focus:border-secondary transition-all cursor-pointer">
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-3">Start Time</label>
@@ -146,7 +174,7 @@
                         <p id="preview-error" class="text-xs text-red-400 mt-2 hidden"></p>
                     </div>
 
-                    <button type="submit" class="px-10 py-4 bg-secondary text-white rounded-2xl font-bold hover:opacity-90 shadow-lg shadow-secondary/10 transition-all">Apply to All Working Days</button>
+                    <button type="submit" class="px-10 py-4 bg-secondary text-white rounded-2xl font-bold hover:opacity-90 shadow-lg shadow-secondary/10 transition-all">Apply to Chosen Range</button>
                 </form>
             </div>
         </div>
@@ -210,6 +238,17 @@
                             <div class="flex items-center text-xs text-gray-400 px-4">
                                 <i class="ri-information-line mr-1"></i>
                                 Reminder emails are sent 60 minutes before the session.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-3">Minimum Booking Notice</label>
+                        <div class="flex gap-3">
+                            <input type="number" name="min_notice_hours" value="{{ $profile->min_notice_hours ?? 1 }}" min="0" max="168" class="flex-1 border border-gray-100 bg-gray-50 rounded-2xl px-5 py-4 text-base outline-none focus:border-secondary transition-all">
+                            <div class="flex items-center text-xs text-gray-400 px-4">
+                                <i class="ri-information-line mr-1"></i>
+                                How many hours in advance should clients book? (Set to 0 for instant booking)
                             </div>
                         </div>
                     </div>
@@ -286,7 +325,7 @@
 <script>
     let currentDate = new Date();
     const availabilities = @json($availabilities);
-    const bookingWindowDays = {{ $profile->booking_window_days ?? 14 }};
+    const bookingWindowDays = {{ $profile->booking_window_days ?? 365 }};
 
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
@@ -504,40 +543,64 @@
         grid.innerHTML = ''; grid.className = 'calendar-grid-wrapper';
         const year = currentDate.getFullYear(); const month = currentDate.getMonth();
         monthDisplay.innerText = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
+        
+        // Get first day of month (0=Sun, 1=Mon, ..., 6=Sat)
         let firstDay = new Date(year, month, 1).getDay();
+        // Convert to Monday-based (0=Mon, 1=Tue, ..., 6=Sun)
         let startIndex = (firstDay === 0) ? 6 : firstDay - 1; 
+        
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const currentWin = parseInt(document.getElementById('final-window-days')?.value) || bookingWindowDays;
-        const today = new Date(); today.setHours(0,0,0,0);
-        const maxDate = new Date(today); maxDate.setDate(today.getDate() + currentWin);
+        
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        
+        const maxDate = new Date(today);
+        maxDate.setDate(today.getDate() + currentWin);
         
         for (let i = 0; i < startIndex; i++) {
-            const el = document.createElement('div'); el.className = 'bg-[#F9FAFB] aspect-square'; grid.appendChild(el);
+            const el = document.createElement('div');
+            el.className = 'bg-[#F9FAFB] aspect-square opacity-50';
+            grid.appendChild(el);
         }
+
         for (let day = 1; day <= daysInMonth; day++) {
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const dateObj = new Date(year, month, day); const dayOfWeek = dateObj.getDay();
-            const isPast = dateObj < today; const isOut = dateObj > maxDate;
-            const cell = document.createElement('div'); cell.className = 'calendar-day-cell';
-            if (isPast) cell.classList.add('is-past'); else if (isOut) cell.classList.add('is-outside');
+            const dateObj = new Date(year, month, day);
+            dateObj.setHours(0, 0, 0, 0);
             
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dayOfWeek = dateObj.getDay(); 
+            
+            const isToday = dateObj.getTime() === today.getTime();
+            const isPast = dateObj < today;
+            const isOut = dateObj > maxDate;
+
+            const cell = document.createElement('div');
+            cell.className = 'calendar-day-cell';
+            if (isToday) cell.classList.add('is-today');
+            if (isPast) cell.classList.add('is-past');
+            else if (isOut) cell.classList.add('is-outside');
+
+            // Find availability for this day
             const custom = availabilities.filter(a => {
                 if (!a.specific_date) return false;
                 const d = new Date(a.specific_date);
-                return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+                d.setHours(0,0,0,0);
+                return d.getTime() === dateObj.getTime();
             });
             const hasC = custom.length > 0;
             const hasW = !hasC && availabilities.some(a => a.day_of_week === dayOfWeek && !a.specific_date);
             const isOff = (hasC && custom.some(e => !e.start_time && !e.is_available)) || 
                         (!hasC && availabilities.some(a => a.day_of_week === dayOfWeek && !a.specific_date && !a.is_available && !a.start_time));
 
-            if (today.toDateString() === dateObj.toDateString()) cell.classList.add('is-today');
             let html = '';
             if (!isPast && !isOut) {
                 if (isOff) html += '<div class="slot-indicator slot-off">OFF</div>';
                 else if (hasC) html += '<div class="slot-indicator bg-orange-100 text-orange-600 border border-orange-200">CUSTOM</div>';
                 else if (hasW) html += '<div class="slot-indicator slot-available">WEEKLY</div>';
-            } else if (isOut) html += '<div class="text-[9px] text-gray-300 mt-2"><i class="ri-lock-line"></i></div>';
+            } else if (isOut) {
+                html += '<div class="text-[9px] text-gray-300 mt-2"><i class="ri-lock-line"></i></div>';
+            }
             
             cell.innerHTML = `<span class="calendar-day-number">${day}</span><div class="flex-1 flex flex-col justify-center items-center">${html}</div>`;
             if (!isPast && !isOut) cell.onclick = () => openManageDayModal(dateStr);
@@ -546,6 +609,53 @@
     }
 
     function changeMonth(delta) { currentDate.setMonth(currentDate.getMonth() + delta); renderCalendar(); }
+
+    function handlePresetChange(val) {
+        const input = document.getElementById('apply-until-input');
+        const today = new Date();
+        let target = new Date();
+
+        if (val === 'custom') {
+            input.classList.remove('hidden');
+            return;
+        } else {
+            input.classList.add('hidden');
+        }
+
+        switch(val) {
+            case 'today':
+                // target is today
+                break;
+            case 'tomorrow':
+                target.setDate(today.getDate() + 1);
+                break;
+            case 'this-week':
+                // End of current week (Sunday)
+                const day = today.getDay();
+                const diff = (day === 0 ? 0 : 7 - day);
+                target.setDate(today.getDate() + diff);
+                break;
+            case 'this-month':
+                // Last day of current month
+                target = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                break;
+            case '3-months':
+                target.setMonth(today.getMonth() + 3);
+                break;
+            case '6-months':
+                target.setMonth(today.getMonth() + 6);
+                break;
+            case '1-year':
+                target.setFullYear(today.getFullYear() + 1);
+                break;
+        }
+
+        // Format to YYYY-MM-DD for the input
+        const y = target.getFullYear();
+        const m = String(target.getMonth() + 1).padStart(2, '0');
+        const d = String(target.getDate()).padStart(2, '0');
+        input.value = `${y}-${m}-${d}`;
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         const dailyForm = document.getElementById('daily-settings-form');

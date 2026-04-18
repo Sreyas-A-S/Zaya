@@ -311,9 +311,14 @@
 
                         // Reload for pages with complex dynamic content that cannot be easily patched via AJAX
                         // and don't listen to the custom event (or need full reload anyway)
-                        const reloadNeededPages = ['/blogs', '/contact-us', '/book-session'];
+                        const reloadNeededPages = ['/blogs', '/contact-us', '/book-session', '/announcements'];
                         const currentPath = window.location.pathname;
-                        const shouldReload = reloadNeededPages.some(path => currentPath.includes(path));
+                        let shouldReload = reloadNeededPages.some(path => currentPath.includes(path));
+                        
+                        // Force reload on home page for announcement card dynamic content
+                        if (currentPath === '/' || currentPath.endsWith('/index.php') || currentPath.endsWith('/home')) {
+                            shouldReload = true;
+                        }
                         
                         if (shouldReload) {
                             location.reload();

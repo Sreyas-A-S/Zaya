@@ -446,7 +446,7 @@
                                     resultsContainer.insertAdjacentHTML('beforeend', '<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Practitioners</div>');
                                     data.practitioners.forEach(function(item) {
                                         const resultItem = `
-                                            <a href="/book-session/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                            <a href="/practitioner/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
                                                 <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
                                                     <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                                 </div>

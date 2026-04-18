@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Models\HomepageSetting;
 use App\Models\ReferralCommissionRate;
 use App\Models\User;
+use App\Models\OpenRegisterLink;
 use Illuminate\Support\Str;
 
 trait FinancialTrait
@@ -16,16 +17,30 @@ trait FinancialTrait
     public function recordTransaction($data)
     {
         $type = $data['type'] ?? 'booking'; // booking (direct), referral
-        $amount = $data['amount'];
+        $amount = (float) $data['amount'];
         
         $companyPercent = 0;
         $referrerPercent = 0;
         $countryId = $data['country_id'] ?? null;
         $referrerRole = $data['referrer_role'] ?? null;
+        $referrerId = $data['referrer_id'] ?? null;
 
         $payerUser = isset($data['user_id']) ? User::find($data['user_id']) : null;
         if (!$countryId && $payerUser) {
             $countryId = $this->resolveCountryIdFromUser($payerUser);
+        }
+
+        // Persistent Referrer Check: If no explicit referrer, check if user was referred during registration
+        if (!$referrerId && $payerUser && $payerUser->open_register_link_id) {
+            $link = OpenRegisterLink::find($payerUser->open_register_link_id);
+            if ($link && $link->created_by) {
+                $referrerId = $link->created_by;
+                // If it's a booking by a referred user, we treat it as a referral transaction
+                $type = 'referral';
+                if (!$referrerRole) {
+                    $referrerRole = User::whereKey($referrerId)->value('role');
+                }
+            }
         }
 
         $practitionerRole = $data['referred_role'] ?? null;
@@ -118,7 +133,7 @@ trait FinancialTrait
             'transaction_no' => 'TRX-' . strtoupper(Str::random(12)),
             'user_id' => $data['user_id'],
             'practitioner_id' => $data['practitioner_id'],
-            'referrer_id' => $data['referrer_id'] ?? null,
+            'referrer_id' => $referrerId,
             'booking_id' => $data['booking_id'] ?? null,
             'referral_id' => $data['referral_id'] ?? null,
             'country_id' => $countryId,

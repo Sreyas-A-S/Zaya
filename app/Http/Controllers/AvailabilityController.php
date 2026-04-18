@@ -34,7 +34,7 @@ class AvailabilityController extends Controller
         }
 
         $availabilities = PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('practitioner_type', get_class($profile))
+            ->where('practitioner_type', $profile->getMorphClass())
             ->orderBy('day_of_week')
             ->orderBy('start_time')
             ->get();
@@ -68,7 +68,7 @@ class AvailabilityController extends Controller
 
         // 1. Clear existing slots for this pattern/date
         $query = PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('practitioner_type', get_class($profile));
+            ->where('practitioner_type', $profile->getMorphClass());
             
         if ($request->specific_date) {
             $query->where('specific_date', $request->specific_date);
@@ -97,7 +97,7 @@ class AvailabilityController extends Controller
 
             PractitionerAvailability::create([
                 'practitioner_id' => $profile->id,
-                'practitioner_type' => get_class($profile),
+                'practitioner_type' => $profile->getMorphClass(),
                 'day_of_week' => $request->day_of_week,
                 'specific_date' => $request->specific_date,
                 'start_time' => $current->format('H:i:s'),
@@ -126,14 +126,14 @@ class AvailabilityController extends Controller
         $dayOfWeek = $dateObj->dayOfWeek;
 
         $customSlots = PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('practitioner_type', get_class($profile))
+            ->where('practitioner_type', $profile->getMorphClass())
             ->where('specific_date', $date)
             ->orderBy('start_time')
             ->get();
 
         $isCustom = $customSlots->isNotEmpty();
         $slots = $isCustom ? $customSlots : PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('practitioner_type', get_class($profile))
+            ->where('practitioner_type', $profile->getMorphClass())
             ->where('day_of_week', $dayOfWeek)
             ->whereNull('specific_date')
             ->orderBy('start_time')
@@ -210,7 +210,7 @@ class AvailabilityController extends Controller
 
         // Get weekly off days
         $offDayIndexes = PractitionerAvailability::where('practitioner_id', $p->id)
-            ->where('practitioner_type', get_class($p))
+            ->where('practitioner_type', $p->getMorphClass())
             ->whereNull('specific_date')
             ->whereNull('start_time')
             ->where('is_available', false)
@@ -219,7 +219,7 @@ class AvailabilityController extends Controller
 
         // Get specific date off days
         $offDateDays = PractitionerAvailability::where('practitioner_id', $p->id)
-            ->where('practitioner_type', get_class($p))
+            ->where('practitioner_type', $p->getMorphClass())
             ->whereNotNull('specific_date')
             ->whereNull('start_time')
             ->where('is_available', false)
@@ -263,13 +263,13 @@ class AvailabilityController extends Controller
                 // OR if they are assigned as a translator to another professional's session
                 $query->where(function($q) use ($p) {
                     $q->where(function($sq) use ($p) {
-                        $sq->where('practitioner_id', $p->id)
+                        $sq->where('profile_id', $p->id)
                            ->where('practitioner_type', Translator::class);
                     })->orWhere('translator_id', $p->id);
                 });
             } else {
-                $query->where('practitioner_id', $p->id)
-                      ->where('practitioner_type', get_class($p));
+                $query->where('profile_id', $p->id)
+                      ->where('practitioner_type', $p->getMorphClass());
             }
 
             $bookedSlots = $query->pluck('booking_time')->toArray();
@@ -293,7 +293,7 @@ class AvailabilityController extends Controller
         $request->validate(['date' => 'required|date']);
 
         PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('practitioner_type', get_class($profile))
+            ->where('practitioner_type', $profile->getMorphClass())
             ->where('specific_date', $request->date)
             ->delete();
 
@@ -311,10 +311,12 @@ class AvailabilityController extends Controller
 
         $request->validate([
             'booking_window_days' => 'required|integer|min:1|max:365',
+            'min_notice_hours' => 'nullable|integer|min:0|max:168',
         ]);
 
         $profile->update([
             'booking_window_days' => $request->booking_window_days,
+            'min_notice_hours' => $request->min_notice_hours ?? 1,
         ]);
 
         return back()->with('success', 'Booking settings updated successfully.');
@@ -335,14 +337,14 @@ class AvailabilityController extends Controller
 
         // Clear all future custom overrides
         PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('practitioner_type', get_class($profile))
+            ->where('practitioner_type', $profile->getMorphClass())
             ->whereNotNull('specific_date')
             ->where('specific_date', '>=', now()->toDateString())
             ->delete();
 
         // 1. Remove all current weekly off records
         PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('practitioner_type', get_class($profile))
+            ->where('practitioner_type', $profile->getMorphClass())
             ->whereNull('specific_date')
             ->whereNull('start_time')
             ->where('is_available', false)
@@ -352,14 +354,14 @@ class AvailabilityController extends Controller
         foreach ($offDays as $day) {
             // Delete any existing active weekly slots for this day
             PractitionerAvailability::where('practitioner_id', $profile->id)
-                ->where('practitioner_type', get_class($profile))
+                ->where('practitioner_type', $profile->getMorphClass())
                 ->whereNull('specific_date')
                 ->where('day_of_week', $day)
                 ->delete();
 
             PractitionerAvailability::create([
                 'practitioner_id' => $profile->id,
-                'practitioner_type' => get_class($profile),
+                'practitioner_type' => $profile->getMorphClass(),
                 'day_of_week' => (int)$day,
                 'is_available' => false
             ]);
@@ -375,24 +377,30 @@ class AvailabilityController extends Controller
         if (!$profile) return back()->with('error', 'No profile linked.');
 
         $request->validate([
+            'apply_until' => 'nullable|date|after_or_equal:today',
             'start_time' => 'required',
             'end_time' => 'required|after:start_time',
             'slot_duration' => 'required|integer|min:1|max:480',
             'off_slots' => 'nullable|string',
         ]);
 
+        $applyUntil = $request->apply_until ? \Carbon\Carbon::parse($request->apply_until) : now()->addYear();
         $offSlots = $request->off_slots ? explode(',', $request->off_slots) : [];
 
-        // Clear all future custom overrides
+        // 1. Update the booking window to match the chosen range
+        $days = now()->diffInDays($applyUntil);
+        $profile->update(['booking_window_days' => $days]);
+
+        // 2. Clear all future custom overrides to ensure new weekly settings take effect
         PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('practitioner_type', get_class($profile))
+            ->where('practitioner_type', $profile->getMorphClass())
             ->whereNotNull('specific_date')
             ->where('specific_date', '>=', now()->toDateString())
             ->delete();
 
-        // Get days that are NOT off days
+        // 3. Get days that are NOT off days
         $offDayIndexes = PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('practitioner_type', get_class($profile))
+            ->where('practitioner_type', $profile->getMorphClass())
             ->whereNull('specific_date')
             ->whereNull('start_time')
             ->where('is_available', false)
@@ -405,7 +413,7 @@ class AvailabilityController extends Controller
         foreach ($workingDayIndexes as $dayIndex) {
             // Remove existing weekly active slots for this day
             PractitionerAvailability::where('practitioner_id', $profile->id)
-                ->where('practitioner_type', get_class($profile))
+                ->where('practitioner_type', $profile->getMorphClass())
                 ->whereNull('specific_date')
                 ->where('day_of_week', $dayIndex)
                 ->where('is_available', true)
@@ -428,7 +436,7 @@ class AvailabilityController extends Controller
 
                 PractitionerAvailability::create([
                     'practitioner_id' => $profile->id,
-                    'practitioner_type' => get_class($profile),
+                    'practitioner_type' => $profile->getMorphClass(),
                     'day_of_week' => $dayIndex,
                     'start_time' => $current->format('H:i:s'),
                     'end_time' => $current->copy()->addMinutes($duration)->format('H:i:s'),
@@ -440,7 +448,7 @@ class AvailabilityController extends Controller
             }
         }
 
-        return back()->with('success', 'Weekly working hours updated for all active days.');
+        return back()->with('success', 'Weekly working hours updated for the chosen period.');
     }
 
     public function toggleOffDay(Request $request)
@@ -452,7 +460,7 @@ class AvailabilityController extends Controller
         $request->validate(['date' => 'required|date']);
 
         $existing = PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('practitioner_type', get_class($profile))
+            ->where('practitioner_type', $profile->getMorphClass())
             ->where('specific_date', $request->date)
             ->whereNull('start_time')
             ->first();
@@ -462,13 +470,13 @@ class AvailabilityController extends Controller
             return response()->json(['status' => 'available', 'message' => 'Date marked as available']);
         } else {
             PractitionerAvailability::where('practitioner_id', $profile->id)
-                ->where('practitioner_type', get_class($profile))
+                ->where('practitioner_type', $profile->getMorphClass())
                 ->where('specific_date', $request->date)
                 ->delete();
 
             PractitionerAvailability::create([
                 'practitioner_id' => $profile->id,
-                'practitioner_type' => get_class($profile),
+                'practitioner_type' => $profile->getMorphClass(),
                 'specific_date' => $request->date,
                 'is_available' => false
             ]);
@@ -490,7 +498,7 @@ class AvailabilityController extends Controller
 
         PractitionerAvailability::create([
             'practitioner_id' => $profile->id,
-            'practitioner_type' => get_class($profile),
+            'practitioner_type' => $profile->getMorphClass(),
             'specific_date' => $request->date,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
@@ -506,7 +514,7 @@ class AvailabilityController extends Controller
         $profile = $this->getProfessionalProfile($user);
 
         $availability = PractitionerAvailability::where('practitioner_id', $profile->id)
-            ->where('practitioner_type', get_class($profile))
+            ->where('practitioner_type', $profile->getMorphClass())
             ->where('id', $id)
             ->firstOrFail();
 

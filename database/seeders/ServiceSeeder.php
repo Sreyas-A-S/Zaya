@@ -49,7 +49,7 @@ class ServiceSeeder extends Seeder
                     'description' => 'Professional ' . $s['title'] . ' session focused on your holistic well-being.',
                     'status' => true,
                     'order_column' => $index + 1,
-                    'image' => 'frontend/assets/ayurveda-and-panchakarma.png' // Default image
+                    'image' => 'frontend/assets/service-placeholder.png' // Default image
                 ]
             );
         }

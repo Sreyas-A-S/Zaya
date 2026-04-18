@@ -88,24 +88,27 @@ class Doctor extends Model
 
     public function getSubtitleDisplayAttribute()
     {
-        $specialization = $this->specialization ?? [];
-        if (!is_array($specialization)) $specialization = [$specialization];
-        
-        $expertise = $this->consultation_expertise ?? [];
-        if (!is_array($expertise)) $expertise = [$expertise];
-
-        $subtitle = $specialization[0] ?? ($expertise[0] ?? 'Ayurvedic Doctor');
+        $specialization = (array) ($this->specialization ?? []);
+        $subtitle = $specialization[0] ?? ($this->consultation_expertise[0] ?? 'Ayurvedic Doctor');
         return str_replace('_', ' ', ucfirst($subtitle));
     }
 
     public function getExpertisesListAttribute()
     {
         $list = array_merge(
+            (array) ($this->health_conditions_treated ?? []),
             (array) ($this->specialization ?? []),
             (array) ($this->consultation_expertise ?? []),
-            (array) ($this->health_conditions_treated ?? []),
             (array) ($this->panchakarma_procedures ?? []),
             (array) ($this->external_therapies ?? [])
+        );
+        return array_values(array_unique(array_filter($list, fn ($v) => trim((string) $v) !== '')));
+    }
+
+    public function getConditionsListAttribute()
+    {
+        $list = array_merge(
+            (array) ($this->health_conditions_treated ?? [])
         );
         return array_values(array_unique(array_filter($list, fn ($v) => trim((string) $v) !== '')));
     }

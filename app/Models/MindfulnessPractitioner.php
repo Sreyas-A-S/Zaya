@@ -34,6 +34,7 @@ class MindfulnessPractitioner extends Model
     protected $fillable = [
         'user_id',
         'payout_currency',
+        'min_notice_hours',
         'slug',
         'first_name',
         'last_name',
@@ -122,9 +123,7 @@ class MindfulnessPractitioner extends Model
 
     public function getSubtitleDisplayAttribute()
     {
-        $types = $this->practitioner_type ?? [];
-        if (!is_array($types)) $types = [$types];
-
+        $types = (array) ($this->practitioner_type ?? []);
         $subtitle = $types[0] ?? 'Mindfulness Counsellor';
         return str_replace('_', ' ', ucfirst($subtitle));
     }
@@ -132,9 +131,17 @@ class MindfulnessPractitioner extends Model
     public function getExpertisesListAttribute()
     {
         $list = array_merge(
-            (array) ($this->services_offered ?? []),
             (array) ($this->client_concerns ?? []),
-            (array) ($this->practitioner_type ?? [])
+            (array) ($this->practitioner_type ?? []),
+            (array) ($this->services_offered ?? [])
+        );
+        return array_values(array_unique(array_filter($list, fn ($v) => trim((string) $v) !== '')));
+    }
+
+    public function getConditionsListAttribute()
+    {
+        $list = array_merge(
+            (array) ($this->client_concerns ?? [])
         );
         return array_values(array_unique(array_filter($list, fn ($v) => trim((string) $v) !== '')));
     }

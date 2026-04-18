@@ -11,10 +11,45 @@
             <i class="ri-ticket-2-fill text-2xl"></i>
         </div>
         <div>
-            <h1 class="text-3xl font-black text-secondary tracking-tight">Your Exclusive Offers</h1>
-            <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Boost your wellness journey with special discounts</p>
+            <h1 class="text-3xl font-black text-secondary tracking-tight" data-i18n="Exclusive Offers">{{ __('Exclusive Offers') }}</h1>
         </div>
     </div>
+</div>
+
+<!-- Add Promo Code Section -->
+<div class="mb-12 max-w-lg">
+    <form action="{{ route('promo-codes.store') }}" method="POST">
+        @csrf
+        <div class="group bg-white p-1.5 rounded-full border border-[#2E4B3D]/12 flex items-center shadow-sm focus-within:border-secondary focus-within:shadow-md transition-all duration-300">
+            <div class="flex-1 px-5 flex items-center gap-3">
+                <i class="ri-add-circle-line text-gray-400 group-focus-within:text-secondary transition-colors text-lg"></i>
+                <input type="text" name="code" placeholder="{{ __('Enter new promo code here...') }}" data-i18n-placeholder="Enter new promo code here..."
+                    class="w-full bg-transparent border-none outline-none text-sm font-bold text-secondary placeholder:text-gray-400 placeholder:font-medium uppercase"
+                    required>
+            </div>
+            <button type="submit" class="bg-secondary text-white px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-[0.15em] hover:bg-primary transition-all shadow-lg shadow-secondary/10 active:scale-95">
+                {{ __('Add Code') }}
+            </button>
+        </div>
+    </form>
+    @if(session('info'))
+        <div class="mt-3 ml-6 flex items-center gap-2 animate-fade-in">
+            <i class="ri-information-line text-amber-500 text-sm"></i>
+            <span class="text-[10px] font-bold text-amber-600 uppercase tracking-wider">{{ session('info') }}</span>
+        </div>
+    @endif
+    @if(session('success'))
+        <div class="mt-3 ml-6 flex items-center gap-2 animate-fade-in">
+            <i class="ri-checkbox-circle-line text-emerald-500 text-sm"></i>
+            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">{{ session('success') }}</span>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="mt-3 ml-6 flex items-center gap-2 animate-fade-in">
+            <i class="ri-error-warning-line text-red-500 text-sm"></i>
+            <span class="text-[10px] font-bold text-red-600 uppercase tracking-wider">{{ session('error') }}</span>
+        </div>
+    @endif
 </div>
 
 <!-- Promo Codes Grid -->
@@ -79,4 +114,29 @@
 </div>
 
 <div class="h-10"></div>
+@endsection
+
+@section('scripts')
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+</style>
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            if (window.showZayaToast) {
+                window.showZayaToast('Promo code ' + text + ' copied to clipboard!', 'success', 'Promo');
+            } else {
+                alert('Promo code ' + text + ' copied to clipboard!');
+            }
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    }
+</script>
 @endsection

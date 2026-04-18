@@ -7,15 +7,15 @@
         <div class="container mx-auto">
             <div class="max-w-4xl mx-auto text-center">
                 <div class="mb-6 animate-on-scroll">
-                    <span class="bg-accent text-secondary px-8 py-2.5 rounded-full font-medium text-base inline-block">
-                        Announcements
+                    <span class="bg-accent text-secondary px-8 py-2.5 rounded-full font-medium text-base inline-block" data-i18n="Announcements">
+                        {{ __('Announcements') }}
                     </span>
                 </div>
-                <h1 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-6 leading-tight">
-                    Latest Updates
+                <h1 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-6 leading-tight" data-i18n="Latest Updates">
+                    {{ __('Latest Updates') }}
                 </h1>
-                <p class="text-gray-500 leading-relaxed text-lg font-light max-w-2xl mx-auto">
-                    Stay up to date with the latest announcements, events, and important information from Zaya Wellness.
+                <p class="text-gray-500 leading-relaxed text-lg font-light max-w-2xl mx-auto" data-i18n="Stay up to date with the latest announcements, events, and important information from Zaya Wellness.">
+                    {{ __('Stay up to date with the latest announcements, events, and important information from Zaya Wellness.') }}
                 </p>
             </div>
         </div>
@@ -150,13 +150,41 @@
                     <div class="w-24 h-24 mx-auto mb-6 bg-accent/20 rounded-full flex items-center justify-center">
                         <i class="ri-notification-off-line text-4xl text-secondary"></i>
                     </div>
-                    <h3 class="text-2xl font-serif font-semibold text-primary mb-3">No Announcements Found</h3>
-                    <p class="text-gray-500 max-w-md mx-auto">
-                        There are no announcements at this time. Please check back later.
+                    <h3 class="text-2xl font-serif font-semibold text-primary mb-3" data-i18n="No Announcements Found">
+                        {{ __('No Announcements Found') }}
+                    </h3>
+                    <p class="text-gray-500 max-w-md mx-auto" data-i18n="There are no announcements at this time. Please check back later.">
+                        {{ __('There are no announcements at this time. Please check back later.') }}
                     </p>
                 </div>
             @endif
         </div>
     </section>
+
+    @push('scripts')
+    <script>
+        // Listen for language changes to reload page and fetch translated WP content
+        const originalToggleLanguage = window.togglePageLanguage;
+        window.togglePageLanguage = function(targetLocale) {
+            // Call original if it exists
+            if (typeof originalToggleLanguage === 'function') {
+                fetch(`{{ url('/lang') }}/${targetLocale}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status) {
+                        // On announcements page, we MUST reload to get the correct WP posts
+                        window.location.reload();
+                    }
+                });
+            }
+        };
+    </script>
+    @endpush
 
 @endsection
