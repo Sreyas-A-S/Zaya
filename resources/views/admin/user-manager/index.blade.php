@@ -906,6 +906,7 @@
             $('#password-requirements, #password-match-error').addClass('d-none');
             $('#password-confirm-input').removeClass('is-invalid');
             if (typeof window.iti !== 'undefined') {
+                window.iti.setCountry('in');
                 window.iti.setNumber('');
             }
         });
@@ -944,6 +945,7 @@
                     }
                     window.iti.setNumber(rawNumber);
                 } else {
+                    window.iti.setCountry('in');
                     window.iti.setNumber('');
                 }
 
@@ -1240,6 +1242,7 @@
         $('#um-modal-title').text('Register User Manager');
         $('#userManagerForm')[0].reset();
         if (typeof window.iti !== 'undefined') {
+            window.iti.setCountry('in');
             window.iti.setNumber('');
         }
         $('#country, #language').val([]).trigger('change');

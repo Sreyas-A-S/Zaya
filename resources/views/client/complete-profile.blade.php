@@ -292,7 +292,12 @@
                         </div>
                         <div>
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Primary Qualification') }}</label>
-                            <input type="text" name="primary_qualification" value="{{ $profile->primary_qualification ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
+                            <select name="primary_qualification" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none bg-white">
+                                <option value="">{{ __('Select Qualification') }}</option>
+                                @foreach($allQualifications as $qual)
+                                    <option value="{{ $qual }}" {{ strcasecmp($profile->primary_qualification ?? '', $qual) == 0 ? 'selected' : '' }}>{{ $qual }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div>
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Years of Experience') }}</label>
@@ -552,8 +557,9 @@
                         $roleDocs = [
                             'doctor' => [
                                 'registration_certificate_path' => 'Registration Certificate',
-                                'digital_signature_path' => 'Digital Signature',
-                                'pan_upload_path' => 'PAN Card Copy',
+                                'aadhaar_card_path' => 'Aadhaar Card Copy',
+                                'signature_path' => 'Digital Signature',
+                                'pan_card_path' => 'PAN Card Copy',
                                 'cancelled_cheque_path' => 'Cancelled Cheque',
                             ],
                             'practitioner' => [
@@ -590,7 +596,7 @@
                     <div class="p-6 bg-gray-50 rounded-2xl border border-gray-100">
                         <label class="block text-sm font-bold text-secondary mb-3">{{ $label }}</label>
                         <div class="flex flex-col gap-4">
-                            @if(!empty($profile->$field))
+                            @if($profile->$field)
                             <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-secondary/10">
                                 <div class="flex items-center gap-2 text-xs text-green-600 font-bold">
                                     <i class="ri-checkbox-circle-fill text-lg"></i>

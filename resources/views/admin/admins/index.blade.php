@@ -765,6 +765,7 @@
                 .attr('pattern', '(?=.*\\\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}')
                 .attr('title', 'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.');
             if (typeof window.iti !== 'undefined') {
+                window.iti.setCountry('in');
                 window.iti.setNumber('');
             }
         });
@@ -833,6 +834,7 @@
                 }
                 window.iti.setNumber(rawNumber);
             } else {
+                window.iti.setCountry('in');
                 window.iti.setNumber('');
             }
 

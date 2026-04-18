@@ -819,6 +819,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             }
             $('#languages_capabilities_container').empty();
             if (therapistIti) {
+                therapistIti.setCountry('in');
                 therapistIti.setNumber('');
             }
 

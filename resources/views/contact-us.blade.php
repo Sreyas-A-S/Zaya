@@ -373,14 +373,38 @@
             // Initialize intl-tel-input
           const phoneInput = document.querySelector('#phone');
 
-if (phoneInput && window.intlTelInput) {
-    window.contactIti = window.intlTelInput(phoneInput, {
-        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
-        separateDialCode: true,
-        autoPlaceholder: "polite",
-        initialCountry: "in",
-        preferredCountries: ["in", "ae", "us", "gb"]
-    });
+                if (phoneInput && window.intlTelInput) {
+                    window.contactIti = window.intlTelInput(phoneInput, {
+                        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+                        separateDialCode: true,
+                        autoPlaceholder: "polite",
+                        initialCountry: "auto",
+                        preferredCountries: ["in", "ae", "us", "gb", "fr"],
+                        geoIpLookup: function(callback) {
+                            const tzMap = {
+                                'Asia/Kolkata':'in','Asia/Calcutta':'in','Asia/Colombo':'lk',
+                                'Asia/Kathmandu':'np','Asia/Dhaka':'bd','Asia/Karachi':'pk',
+                                'Asia/Dubai':'ae','Asia/Abu_Dhabi':'ae','Asia/Muscat':'om',
+                                'Asia/Riyadh':'sa','Asia/Kuwait':'kw','Asia/Doha':'qa',
+                                'Asia/Bahrain':'bh','Asia/Beirut':'lb','Asia/Amman':'jo',
+                                'Europe/Paris':'fr','Europe/London':'gb','Europe/Dublin':'ie',
+                                'Europe/Berlin':'de','Europe/Madrid':'es','Europe/Rome':'it',
+                                'Europe/Amsterdam':'nl','Europe/Brussels':'be',
+                                'America/New_York':'us','America/Chicago':'us','America/Los_Angeles':'us',
+                                'Pacific/Auckland':'nz','Australia/Sydney':'au',
+                            };
+                            try {
+                                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                const cc = tzMap[tz];
+                                if (cc) { callback(cc); return; }
+                            } catch(e) {}
+                            
+                            fetch("https://ipapi.co/json/")
+                                .then(res => res.json())
+                                .then(data => callback(data.country_code ? data.country_code.toLowerCase() : "in"))
+                                .catch(() => callback("in"));
+                        }
+                    });
 
     phoneInput.addEventListener('input', function () {
         // Strip non-digits since dial code is separate

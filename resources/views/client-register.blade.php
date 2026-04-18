@@ -1010,34 +1010,123 @@
             // Geolocation and Mobile Phone Flag Initialization
             const phoneInputField = document.querySelector("input[name='mobile']");
             if (phoneInputField) {
+
+                // Helper: populate address fields from geo data
+                function applyGeoToForm(city, region, postal, countryCode) {
+                    const cityInput = document.querySelector("input[name='city']");
+                    if (cityInput && !cityInput.value && city) cityInput.value = city;
+
+                    const stateInput = document.querySelector("input[name='state']");
+                    if (stateInput && !stateInput.value && region) stateInput.value = region;
+
+                    const zipInput = document.querySelector("input[name='zip_code']");
+                    if (zipInput && !zipInput.value && postal) zipInput.value = postal;
+
+                    // Update Nationality Select (TomSelect) using country code
+                    const nationalitySelect = document.querySelector('#nationality-select');
+                    if (nationalitySelect && nationalitySelect.tomselect && countryCode) {
+                        nationalitySelect.tomselect.setValue(countryCode);
+                    }
+                }
+
                 const iti = window.intlTelInput(phoneInputField, {
                     initialCountry: "auto",
                     geoIpLookup: function(callback) {
-                        fetch("https://ipapi.co/json")
-                            .then(res => res.json())
+
+                        // --- Method 1: Browser Timezone (most accurate, NOT affected by VPN/ISP) ---
+                        // Maps the user's OS timezone directly to a country code.
+                        const tzCountryMap = {
+                            'Asia/Kolkata':'in','Asia/Calcutta':'in','Asia/Colombo':'lk',
+                            'Asia/Kathmandu':'np','Asia/Dhaka':'bd','Asia/Karachi':'pk',
+                            'Asia/Dubai':'ae','Asia/Abu_Dhabi':'ae','Asia/Muscat':'om',
+                            'Asia/Riyadh':'sa','Asia/Kuwait':'kw','Asia/Doha':'qa',
+                            'Asia/Bahrain':'bh','Asia/Beirut':'lb','Asia/Amman':'jo',
+                            'Asia/Baghdad':'iq','Asia/Tehran':'ir','Asia/Baku':'az',
+                            'Asia/Tbilisi':'ge','Asia/Yerevan':'am','Asia/Tashkent':'uz',
+                            'Asia/Almaty':'kz','Asia/Bishkek':'kg','Asia/Kabul':'af',
+                            'Asia/Bangkok':'th','Asia/Jakarta':'id','Asia/Manila':'ph',
+                            'Asia/Singapore':'sg','Asia/Kuala_Lumpur':'my',
+                            'Asia/Tokyo':'jp','Asia/Seoul':'kr','Asia/Shanghai':'cn',
+                            'Asia/Hong_Kong':'hk','Asia/Taipei':'tw','Asia/Rangoon':'mm',
+                            'Asia/Phnom_Penh':'kh','Asia/Vientiane':'la',
+                            'Asia/Ulaanbaatar':'mn','Asia/Vladivostok':'ru',
+                            'Europe/Paris':'fr','Europe/London':'gb','Europe/Dublin':'ie',
+                            'Europe/Berlin':'de','Europe/Madrid':'es','Europe/Rome':'it',
+                            'Europe/Amsterdam':'nl','Europe/Brussels':'be',
+                            'Europe/Vienna':'at','Europe/Zurich':'ch',
+                            'Europe/Stockholm':'se','Europe/Oslo':'no',
+                            'Europe/Copenhagen':'dk','Europe/Helsinki':'fi',
+                            'Europe/Warsaw':'pl','Europe/Prague':'cz',
+                            'Europe/Budapest':'hu','Europe/Bucharest':'ro',
+                            'Europe/Athens':'gr','Europe/Istanbul':'tr',
+                            'Europe/Lisbon':'pt','Europe/Kiev':'ua',
+                            'Europe/Minsk':'by','Europe/Moscow':'ru',
+                            'Europe/Riga':'lv','Europe/Tallinn':'ee',
+                            'Europe/Vilnius':'lt','Europe/Sofia':'bg',
+                            'Europe/Zagreb':'hr','Europe/Ljubljana':'si',
+                            'Europe/Bratislava':'sk','Europe/Belgrade':'rs',
+                            'Africa/Cairo':'eg','Africa/Casablanca':'ma',
+                            'Africa/Lagos':'ng','Africa/Nairobi':'ke',
+                            'Africa/Johannesburg':'za','Africa/Accra':'gh',
+                            'Africa/Tunis':'tn','Africa/Algiers':'dz',
+                            'America/New_York':'us','America/Chicago':'us',
+                            'America/Los_Angeles':'us','America/Denver':'us',
+                            'America/Phoenix':'us','America/Anchorage':'us',
+                            'Pacific/Honolulu':'us',
+                            'America/Toronto':'ca','America/Vancouver':'ca',
+                            'America/Sao_Paulo':'br','America/Buenos_Aires':'ar',
+                            'America/Mexico_City':'mx','America/Bogota':'co',
+                            'America/Lima':'pe','America/Santiago':'cl',
+                            'America/Caracas':'ve','America/Montevideo':'uy',
+                            'Pacific/Auckland':'nz','Australia/Sydney':'au',
+                            'Australia/Melbourne':'au','Australia/Brisbane':'au',
+                            'Australia/Perth':'au','Australia/Adelaide':'au',
+                        };
+
+                        try {
+                            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                            const tzCountry = tzCountryMap[tz];
+                            if (tzCountry) {
+                                callback(tzCountry);
+                                // Set the country/nationality dropdown from timezone immediately
+                                applyGeoToForm('', '', '', tzCountry.toUpperCase());
+
+                                // Enrich other fields (city, region, zip) in background via IP, 
+                                // but pass null for country to avoid overriding the timezone detection.
+                                fetch('https://ipapi.co/json/')
+                                    .then(r => r.json())
+                                    .then(d => {
+                                        if (d && d.country_code && !d.error) {
+                                            applyGeoToForm(d.city, d.region, d.postal, null);
+                                        }
+                                    })
+                                    .catch(() => {});
+                                return;
+                            }
+                        } catch(e) {}
+
+                        // --- Method 2: ipapi.co (IP-based, used only when timezone unmapped) ---
+                        fetch('https://ipapi.co/json/')
+                            .then(res => { if (!res.ok) throw new Error(); return res.json(); })
                             .then(data => {
-                                // Auto-fill other location fields if they are empty
-                                const cityInput = document.querySelector("input[name='city']");
-                                if (cityInput && !cityInput.value) cityInput.value = data.city;
-
-                                const stateInput = document.querySelector("input[name='state']");
-                                if (stateInput && !stateInput.value) stateInput.value = data.region;
-
-                                const zipInput = document.querySelector("input[name='zip_code']");
-                                if (zipInput && !zipInput.value) zipInput.value = data.postal;
-
-                                // Update Nationality Select (TomSelect) using country code
-                                const nationalitySelect = document.querySelector('#nationality-select');
-                                if (nationalitySelect && nationalitySelect.tomselect && data.country_code) {
-                                    nationalitySelect.tomselect.setValue(data.country_code);
-                                }
-
-                                callback(data.country_code);
+                                if (!data.country_code || data.error) throw new Error();
+                                applyGeoToForm(data.city, data.region, data.postal, data.country_code);
+                                callback(data.country_code.toLowerCase());
                             })
-                            .catch(() => callback("in"));
+                            .catch(() => {
+                                // --- Method 3: Cloudflare trace (plain text, last resort) ---
+                                fetch('https://www.cloudflare.com/cdn-cgi/trace')
+                                    .then(res => res.text())
+                                    .then(text => {
+                                        const match = text.match(/loc=([A-Z]{2})/);
+                                        callback(match ? match[1].toLowerCase() : 'in');
+                                    })
+                                    .catch(() => callback('in'));
+                            });
                     },
                     utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
                     separateDialCode: true,
+                    preferredCountries: ["in", "ae", "us", "gb", "fr"],
                 });
             }
 

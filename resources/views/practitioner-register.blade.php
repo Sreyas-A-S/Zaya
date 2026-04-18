@@ -564,19 +564,9 @@
                                     <select id="lang-input"
                                         class="w-full py-3.5 pl-6 pr-14 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]">
                                         <option value="">{{ __('Select Language') }}</option>
-                                        <option value="English">English</option>
-                                        <option value="Arabic">Arabic</option>
-                                        <option value="French">French</option>
-                                        <option value="Spanish">Spanish</option>
-                                        <option value="German">German</option>
-                                        <option value="Hindi">Hindi</option>
-                                        <option value="Malayalam">Malayalam</option>
-                                        <option value="Tamil">Tamil</option>
-                                        <option value="Chinese">Chinese</option>
-                                        <option value="Japanese">Japanese</option>
-                                        <option value="Italian">Italian</option>
-                                        <option value="Russian">Russian</option>
-                                        <option value="Portuguese">Portuguese</option>
+                                        @foreach(($languages ?? []) as $lang)
+                                            <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                        @endforeach
                                     </select>
                                     <button type="button" id="lang-add-btn"
                                         class="absolute right-2 top-1/2 -translate-y-1/2 w-[34px] h-[34px] rounded-full flex justify-center items-center transition-all duration-300 bg-[#E5E5E5] text-white cursor-not-allowed pointer-events-none z-10">
@@ -984,35 +974,101 @@
 
             const phoneInput = document.querySelector("#phone");
             if (phoneInput) {
+
+                // Helper: populate address fields from geo data
+                function applyPractitionerGeo(city, region, postal, countryName) {
+                    const cityInput = document.querySelector("input[name='city']");
+                    if (cityInput && !cityInput.value && city) cityInput.value = city;
+
+                    const stateInput = document.querySelector("input[name='state']");
+                    if (stateInput && !stateInput.value && region) stateInput.value = region;
+
+                    const zipInput = document.querySelector("input[name='zip_code']");
+                    if (zipInput && !zipInput.value && postal) zipInput.value = postal;
+
+                    // Update Country Select (TomSelect)
+                    const countrySelect = document.querySelector('#country-select');
+                    if (countrySelect && countrySelect.tomselect && !countrySelect.value && countryName) {
+                        countrySelect.tomselect.setValue(countryName);
+                    }
+                }
+
                 const iti = window.intlTelInput(phoneInput, {
                     utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
                     separateDialCode: true,
                     initialCountry: "auto",
+                    preferredCountries: ["in", "ae", "us", "gb", "fr"],
                     geoIpLookup: function(callback) {
-                        fetch("https://ipapi.co/json")
-                            .then(res => res.json())
+                        // Method 1: Browser Timezone (accurate, unaffected by VPN/ISP routing)
+                        const tzMap = {
+                            'Asia/Kolkata':'in','Asia/Calcutta':'in','Asia/Colombo':'lk',
+                            'Asia/Kathmandu':'np','Asia/Dhaka':'bd','Asia/Karachi':'pk',
+                            'Asia/Dubai':'ae','Asia/Abu_Dhabi':'ae','Asia/Muscat':'om',
+                            'Asia/Riyadh':'sa','Asia/Kuwait':'kw','Asia/Doha':'qa',
+                            'Asia/Bahrain':'bh','Asia/Beirut':'lb','Asia/Baghdad':'iq',
+                            'Asia/Tehran':'ir','Asia/Baku':'az','Asia/Tbilisi':'ge',
+                            'Asia/Yerevan':'am','Asia/Tashkent':'uz','Asia/Almaty':'kz',
+                            'Asia/Kabul':'af','Asia/Bangkok':'th','Asia/Jakarta':'id',
+                            'Asia/Manila':'ph','Asia/Singapore':'sg','Asia/Kuala_Lumpur':'my',
+                            'Asia/Tokyo':'jp','Asia/Seoul':'kr','Asia/Shanghai':'cn',
+                            'Asia/Hong_Kong':'hk','Asia/Taipei':'tw','Asia/Rangoon':'mm',
+                            'Europe/Paris':'fr','Europe/London':'gb','Europe/Dublin':'ie',
+                            'Europe/Berlin':'de','Europe/Madrid':'es','Europe/Rome':'it',
+                            'Europe/Amsterdam':'nl','Europe/Brussels':'be','Europe/Vienna':'at',
+                            'Europe/Zurich':'ch','Europe/Stockholm':'se','Europe/Oslo':'no',
+                            'Europe/Copenhagen':'dk','Europe/Helsinki':'fi','Europe/Warsaw':'pl',
+                            'Europe/Prague':'cz','Europe/Budapest':'hu','Europe/Bucharest':'ro',
+                            'Europe/Athens':'gr','Europe/Istanbul':'tr','Europe/Lisbon':'pt',
+                            'Europe/Kiev':'ua','Europe/Minsk':'by','Europe/Moscow':'ru',
+                            'Africa/Cairo':'eg','Africa/Casablanca':'ma','Africa/Lagos':'ng',
+                            'Africa/Nairobi':'ke','Africa/Johannesburg':'za','Africa/Accra':'gh',
+                            'America/New_York':'us','America/Chicago':'us','America/Los_Angeles':'us',
+                            'America/Denver':'us','America/Phoenix':'us','Pacific/Honolulu':'us',
+                            'America/Toronto':'ca','America/Vancouver':'ca',
+                            'America/Sao_Paulo':'br','America/Buenos_Aires':'ar',
+                            'America/Mexico_City':'mx','America/Bogota':'co',
+                            'America/Lima':'pe','America/Santiago':'cl',
+                            'Pacific/Auckland':'nz','Australia/Sydney':'au',
+                            'Australia/Melbourne':'au','Australia/Perth':'au',
+                        };
+                        try {
+                            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                            const cc = tzMap[tz];
+                            if (cc) {
+                                callback(cc);
+                                
+                                // Map detected code back to common names for the dropdown immediately
+                                const ccToName = { 'in': 'India', 'ae': 'United Arab Emirates', 'us': 'United States', 'gb': 'United Kingdom', 'fr': 'France' };
+                                if (ccToName[cc]) applyPractitionerGeo('', '', '', ccToName[cc]);
+
+                                // Enrich other fields (city, region, zip) in background via IP, 
+                                // but pass null for country to avoid overriding the timezone-based detection.
+                                fetch('https://ipapi.co/json/')
+                                    .then(r => r.json())
+                                    .then(d => { if (d && d.country_code && !d.error) applyPractitionerGeo(d.city, d.region, d.postal, null); })
+                                    .catch(() => {});
+                                return;
+                            }
+                        } catch(e) {}
+                        // Method 2: ipapi.co (IP fallback for unmapped timezones)
+                        fetch("https://ipapi.co/json/")
+                            .then(res => { if (!res.ok) throw new Error(); return res.json(); })
                             .then(data => {
-                                // Auto-fill location fields if they are empty
-                                const cityInput = document.querySelector("input[name='city']");
-                                if (cityInput && !cityInput.value) cityInput.value = data.city;
-
-                                const stateInput = document.querySelector("input[name='state']");
-                                if (stateInput && !stateInput.value) stateInput.value = data.region;
-
-                                const zipInput = document.querySelector("input[name='zip_code']");
-                                if (zipInput && !zipInput.value) zipInput.value = data.postal;
-
-                                // Update Country Select (TomSelect)
-                                const countrySelect = document.querySelector('#country-select');
-                                if (countrySelect && countrySelect.tomselect) {
-                                    countrySelect.tomselect.setValue(data.country_name);
-                                }
-
-                                callback(data.country_code);
+                                if (!data.country_code || data.error) throw new Error();
+                                applyPractitionerGeo(data.city, data.region, data.postal, data.country_name);
+                                callback(data.country_code.toLowerCase());
                             })
-                            .catch(() => callback("in"));
+                            .catch(() => {
+                                // Method 3: Cloudflare trace
+                                fetch("https://www.cloudflare.com/cdn-cgi/trace")
+                                    .then(res => res.text())
+                                    .then(text => {
+                                        const match = text.match(/loc=([A-Z]{2})/);
+                                        callback(match ? match[1].toLowerCase() : "in");
+                                    })
+                                    .catch(() => callback("in"));
+                            });
                     },
-                    preferredCountries: ["in", "ae", "us", "gb"]
                 });
 
                 const form = document.querySelector("#practitioner-form");
