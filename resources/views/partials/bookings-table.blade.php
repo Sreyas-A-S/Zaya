@@ -1,7 +1,11 @@
 <div id="bookings-container">
     <div class="bg-white rounded-2xl border border-[#2E4B3D]/12 overflow-hidden mb-8">
         <div class="p-6 border-b border-[#2E4B3D]/12">
+            @if($user->role === 'client' || $user->role === 'patient' || $user->role === 'translator')
             <h2 class="text-xl font-medium text-secondary">{{ $user->role === 'translator' ? 'Translation Sessions' : 'My Bookings' }}</h2>
+            @else
+            <h2 class="text-xl font-medium text-secondary">Sessions</h2>
+            @endif
         </div>
 
         <div class="overflow-x-auto">
@@ -148,8 +152,10 @@
                                     <i class="ri-calendar-line text-3xl text-gray-300"></i>
                                 </div>
                                 <p class="text-lg font-medium text-secondary mb-1">No bookings found</p>
-                                <p class="text-sm text-gray-400 mb-6">You haven't booked any sessions yet.</p>
+                                <p class="text-sm text-gray-400 {{ ($user->role === 'client' || $user->role === 'patient') ? 'mb-6' : '' }}">You haven't booked any sessions yet.</p>
+                                @if($user->role === 'client' || $user->role === 'patient')
                                 <a href="{{ route('find-practitioner') }}" class="bg-secondary text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-primary transition-colors">Book Your First Session</a>
+                                @endif
                             </div>
                         </td>
                     </tr>

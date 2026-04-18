@@ -54,6 +54,8 @@ class Practitioner extends Model
         'consultations',
         'body_therapies',
         'other_modalities',
+        'specialization',
+        'health_conditions_treated',
         'additional_courses',
         'languages_spoken',
         'can_translate_english',
@@ -76,6 +78,8 @@ class Practitioner extends Model
         'consultations' => 'array',
         'body_therapies' => 'array',
         'other_modalities' => 'array',
+        'specialization' => 'array',
+        'health_conditions_treated' => 'array',
         'languages_spoken' => 'array',
         'dob' => 'date',
         'can_translate_english' => 'boolean',
@@ -136,6 +140,8 @@ class Practitioner extends Model
     public function getExpertisesListAttribute()
     {
         $list = array_merge(
+            (array) ($this->specialization ?? []),
+            (array) ($this->health_conditions_treated ?? []),
             (array) ($this->body_therapies ?? []),
             (array) ($this->consultations ?? []),
             (array) ($this->other_modalities ?? [])

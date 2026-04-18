@@ -288,7 +288,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('State Council Name') }}</label>
-                            <input type="text" name="state_council_name" value="{{ $profile->state_council_name ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
+                            <input type="text" name="state_ayurveda_council_name" value="{{ $profile->state_ayurveda_council_name ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Primary Qualification') }}</label>
@@ -405,18 +405,18 @@
 
                         <div>
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Specialities') }}</label>
-                            <select id="specialities-select" name="{{ $user->role == 'doctor' ? 'specialization' : ($user->role == 'practitioner' ? 'consultations' : ($user->role == 'mindfulness_practitioner' ? 'practitioner_type' : ($user->role == 'yoga_therapist' ? 'areas_of_expertise' : 'fields_of_specialization'))) }}[]" multiple>
+                            <select id="specialities-select" name="{{ in_array($user->role, ['doctor', 'practitioner']) ? 'specialization' : ($user->role == 'mindfulness_practitioner' ? 'practitioner_type' : ($user->role == 'yoga_therapist' ? 'areas_of_expertise' : 'fields_of_specialization')) }}[]" multiple>
                                 @foreach($allSpecialities as $item)
-                                    <option value="{{ $item }}" {{ in_array($item, (array)($profile->specialization ?? $profile->consultations ?? $profile->practitioner_type ?? $profile->fields_of_specialization ?? $profile->areas_of_expertise ?? [])) ? 'selected' : '' }}>{{ $item }}</option>
+                                    <option value="{{ $item }}" {{ in_array($item, (array)($profile->specialization ?? $profile->practitioner_type ?? $profile->fields_of_specialization ?? $profile->areas_of_expertise ?? [])) ? 'selected' : '' }}>{{ $item }}</option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Conditions / Services Offered') }}</label>
-                            <select id="conditions-select" name="{{ $user->role == 'doctor' ? 'health_conditions_treated' : ($user->role == 'practitioner' ? 'body_therapies' : ($user->role == 'mindfulness_practitioner' ? 'client_concerns' : ($user->role == 'yoga_therapist' ? 'consultation_modes' : 'services_offered'))) }}[]" multiple>
+                            <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Conditions I Support') }}</label>
+                            <select id="conditions-select" name="{{ in_array($user->role, ['doctor', 'practitioner']) ? 'health_conditions_treated' : ($user->role == 'mindfulness_practitioner' ? 'client_concerns' : ($user->role == 'yoga_therapist' ? 'consultation_modes' : 'services_offered')) }}[]" multiple>
                                 @foreach($allConditions as $item)
-                                    <option value="{{ $item }}" {{ in_array($item, (array)($profile->health_conditions_treated ?? $profile->body_therapies ?? $profile->client_concerns ?? $profile->services_offered ?? $profile->consultation_modes ?? [])) ? 'selected' : '' }}>{{ $item }}</option>
+                                    <option value="{{ $item }}" {{ in_array($item, (array)($profile->health_conditions_treated ?? $profile->client_concerns ?? $profile->services_offered ?? $profile->consultation_modes ?? [])) ? 'selected' : '' }}>{{ $item }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -436,7 +436,7 @@
                     @if(in_array($user->role, ['mindfulness_practitioner', 'yoga_therapist', 'practitioner', 'doctor']))
                     <div>
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Short Bio') }}</label>
-                        <textarea name="{{ $user->role == 'practitioner' ? 'profile_bio' : 'short_bio' }}" rows="4" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">{{ $profile->short_bio ?? $profile->profile_bio ?? '' }}</textarea>
+                        <textarea name="{{ $user->role == 'doctor' ? 'short_doctor_bio' : ($user->role == 'practitioner' ? 'profile_bio' : 'short_bio') }}" rows="4" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">{{ $profile->short_doctor_bio ?? $profile->short_bio ?? $profile->profile_bio ?? '' }}</textarea>
                     </div>
                     @endif
 
@@ -491,7 +491,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Bank Holder Name') }}</label>
-                        <input type="text" name="bank_holder_name" value="{{ $profile->bank_holder_name ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
+                        <input type="text" name="{{ $user->role == 'doctor' ? 'bank_account_holder_name' : 'bank_holder_name' }}" value="{{ $profile->bank_account_holder_name ?? $profile->bank_holder_name ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Bank Name') }}</label>

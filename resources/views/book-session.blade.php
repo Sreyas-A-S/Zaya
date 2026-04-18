@@ -248,30 +248,29 @@
                     </button>
                 </div>
 
-                <!-- Why do you want to meet this counsellor -->
+                <!-- Why do you want to meet this practitioner -->
                 <div class="mb-10">
-                    <h3 class="text-gray-700 font-normal mb-4 text-lg" data-i18n="Why do you want to meet this counsellor?">{{ __('Why do you want to meet this counsellor?') }}
-                    </h3>
-                    <input type="text" id="conditions-input" placeholder="{{ __('Add conditions...') }}" readonly 
-                        class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400 mb-4 cursor-default" data-i18n-placeholder="Add conditions...">
+                <h3 class="text-gray-700 font-normal mb-4 text-lg" data-i18n="Why do you want to meet this practitioner?">{{ __('Why do you want to meet this practitioner?') }}
+                </h3>
+                <input type="text" id="conditions-input" placeholder="{{ __('Add conditions...') }}" readonly 
+                    class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400 mb-4 cursor-default" data-i18n-placeholder="Add conditions...">
 
-                    <!-- Condition Tags -->
-                    <div class="flex flex-wrap gap-2" id="condition-tags-wrapper">
-                        @forelse($practitionerConditions as $condition)
-                            @php $label = is_array($condition) ? ($condition['title'] ?? $condition['name'] ?? '') : $condition; @endphp
-                            @if(!empty($label))
-                            <label
-                                class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]">
-                                <input type="checkbox" name="conditions[]" value="{{ $label }}" class="sr-only">
-                                <span>{{ $label }}</span>
-                            </label>
-                            @endif
-                        @empty
-                            <p class="text-sm text-gray-500">{{ __('This counsellor has not listed specific conditions.') }}</p>
-                        @endforelse
-                    </div>
+                <!-- Condition Tags -->
+                <div class="flex flex-wrap gap-2" id="condition-tags-wrapper">
+                    @forelse($practitionerConditions as $condition)
+                        @php $label = is_array($condition) ? ($condition['title'] ?? $condition['name'] ?? '') : $condition; @endphp
+                        @if(!empty($label))
+                        <label
+                            class="condition-tag select-none inline-flex items-center px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 cursor-pointer transition-all duration-200 bg-white hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131]">
+                            <input type="checkbox" name="conditions[]" value="{{ $label }}" class="sr-only">
+                            <span>{{ $label }}</span>
+                        </label>
+                        @endif
+                    @empty
+                        <p class="text-sm text-gray-500">{{ __('This practitioner has not listed specific conditions.') }}</p>
+                    @endforelse
                 </div>
-
+                </div>
                 <!-- Explain your situation -->
                 <div class="mb-10">
                     <h3 class="text-gray-700 font-normal mb-4 text-lg" data-i18n="Do you want to explain your situation?">
@@ -593,22 +592,26 @@
         });
 
         function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
+            if (window.showZayaToast) {
+                window.showZayaToast(message, type, 'Booking');
+            } else {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
 
-            container.appendChild(toast);
+                container.appendChild(toast);
 
-            // Force reflow
-            toast.offsetHeight;
+                // Force reflow
+                toast.offsetHeight;
 
-            toast.classList.add('show');
+                toast.classList.add('show');
 
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 400);
-            }, 5000);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 400);
+                }, 5000);
+            }
         }
 
         let lastComputedTotal = null;
@@ -1809,7 +1812,7 @@
 
             // If no slots available, show message and don't display the header/grid
             if (!slots || slots.length === 0) {
-                const html = `<div class="text-center py-6 text-sm text-gray-500">No available slots for this counsellor on the selected date.</div>`;
+                const html = `<div class="text-center py-6 text-sm text-gray-500">No available slots for this practitioner on the selected date.</div>`;
                 wrapper.innerHTML = html;
                 return;
             }

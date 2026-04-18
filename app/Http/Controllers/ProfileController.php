@@ -983,8 +983,8 @@ class ProfileController extends Controller
 
         switch ($user->role) {
             case 'practitioner':
-                $allSpecialities = \App\Models\WellnessConsultation::where('status', true)->pluck('name');
-                $allConditions = \App\Models\BodyTherapy::where('status', true)->pluck('name');
+                $allSpecialities = \App\Models\Specialization::where('status', true)->pluck('name');
+                $allConditions = \App\Models\HealthCondition::where('status', true)->pluck('name');
                 break;
             case 'doctor':
                 $allSpecialities = \App\Models\Specialization::where('status', true)->pluck('name');
@@ -1104,7 +1104,7 @@ class ProfileController extends Controller
         if ($updateType === 'specialities') {
             $specialities = $request->input('specialities', []);
             switch ($user->role) {
-                case 'practitioner': $data['consultations'] = $specialities; break;
+                case 'practitioner': $data['specialization'] = $specialities; break;
                 case 'doctor': $data['specialization'] = $specialities; break;
                 case 'mindfulness_practitioner': $data['practitioner_type'] = $specialities; break;
                 case 'yoga_therapist': $data['yoga_therapist_type'] = $specialities; break;
@@ -1113,7 +1113,7 @@ class ProfileController extends Controller
         } elseif ($updateType === 'conditions') {
             $conditions = $request->input('conditions', []);
             switch ($user->role) {
-                case 'practitioner': $data['body_therapies'] = $conditions; break;
+                case 'practitioner': $data['health_conditions_treated'] = $conditions; break;
                 case 'doctor': $data['health_conditions_treated'] = $conditions; break;
                 case 'mindfulness_practitioner': $data['client_concerns'] = $conditions; break;
                 case 'yoga_therapist': $data['areas_of_expertise'] = $conditions; break;
@@ -1574,8 +1574,8 @@ class ProfileController extends Controller
         $allConditions = [];
         switch ($user->role) {
             case 'practitioner':
-                $allSpecialities = \App\Models\WellnessConsultation::where('status', true)->pluck('name');
-                $allConditions = \App\Models\BodyTherapy::where('status', true)->pluck('name');
+                $allSpecialities = \App\Models\Specialization::where('status', true)->pluck('name');
+                $allConditions = \App\Models\HealthCondition::where('status', true)->pluck('name');
                 break;
             case 'doctor':
                 $allSpecialities = \App\Models\Specialization::where('status', true)->pluck('name');
@@ -1626,6 +1626,9 @@ class ProfileController extends Controller
             'account_number' => 'nullable|string|max:50',
             'ifsc_code' => 'nullable|string|max:20',
             'bank_holder_name' => 'nullable|string|max:255',
+            'bank_account_holder_name' => 'nullable|string|max:255',
+            'state_ayurveda_council_name' => 'nullable|string|max:255',
+            'short_doctor_bio' => 'nullable|string',
         ]);
 
         // Update User Model (Global fields)
@@ -1678,10 +1681,9 @@ class ProfileController extends Controller
         // Handle Boolean fields (Consents for Doctors)
         if ($user->role === 'doctor') {
             $booleanFields = [
-                'ayush_registration_confirmed', 'ayush_guidelines_agreed', 'document_verification_consented', 
-                'policies_agreed', 'prescription_understanding_atgreed', 'confidentiality_consented'
+                'ayush_registration_confirmed', 'ayush_guidelines_agreed', 'document_verification_consented',
+                'policies_agreed', 'prescription_understanding_agreed', 'confidentiality_consented'
             ];
-
             foreach ($booleanFields as $field) {
                 $data[$field] = $request->has($field);
             }

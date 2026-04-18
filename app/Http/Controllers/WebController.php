@@ -65,11 +65,28 @@ class WebController extends Controller
         }
         $language = App::getLocale();
         $languages = Language::where('status', 'active')->get();
-        $practitioners = Practitioner::with(['user', 'reviews'])
-            ->where('status', 'active')
-            ->latest()
-            ->take(8)
-            ->get();
+
+        $p1 = Practitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
+            ->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0')
+            ->latest()->take(5)->get();
+        
+        $p2 = Doctor::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
+            ->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0')
+            ->latest()->take(5)->get();
+
+        $p3 = MindfulnessPractitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('practitioner_type')->whereRaw('JSON_LENGTH(practitioner_type) > 0')
+            ->whereNotNull('client_concerns')->whereRaw('JSON_LENGTH(client_concerns) > 0')
+            ->latest()->take(5)->get();
+
+        $p4 = YogaTherapist::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('areas_of_expertise')->whereRaw('JSON_LENGTH(areas_of_expertise) > 0')
+            ->latest()->take(5)->get();
+
+        $practitioners = $p1->merge($p2)->merge($p3)->merge($p4)->sortByDesc('created_at')->take(8);
+
         $testimonials = Testimonial::withCount(['likes', 'replies'])->where('status', 'approved')->latest()->get();
         $ip = request()->ip();
         $testimonials->each(function ($testimonial) use ($ip) {
@@ -79,8 +96,39 @@ class WebController extends Controller
         });
         $services = Service::where('status', true)->orderBy('order_column')->get();
         $settings = HomepageSetting::getAllSettings($language);
+        $latestAnnouncement = $this->getLatestAnnouncement();
 
-        return view('index', compact('practitioners', 'testimonials', 'services', 'settings', 'language', 'languages'));
+        return view('index', compact('practitioners', 'testimonials', 'services', 'settings', 'language', 'languages', 'latestAnnouncement'));
+    }
+
+    /**
+     * Helper to fetch the latest announcement for homepage
+     */
+    private function getLatestAnnouncement()
+    {
+        try {
+            $params = ['per_page' => 1, '_embed' => 1];
+            // Try 'announcement'
+            $response = $this->fetchFromWordPress('announcement', $params);
+            if (empty($response)) {
+                // Try 'announcements'
+                $response = $this->fetchFromWordPress('announcements', $params);
+            }
+
+            if (!empty($response) && is_array($response) && isset($response[0])) {
+                $post = $response[0];
+                return [
+                    'title' => $post->title->rendered ?? 'Latest Update',
+                    'excerpt' => strip_tags($post->excerpt->rendered ?? $post->content->rendered ?? ''),
+                    'image' => $post->_embedded->{'wp:featuredmedia'}[0]->source_url ?? null,
+                    'slug' => $post->slug ?? null,
+                    'link' => isset($post->slug) ? route('announcement-detail', $post->slug) : route('announcements')
+                ];
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error fetching latest announcement: ' . $e->getMessage());
+        }
+        return null;
     }
 
     public function comingSoon()
@@ -225,10 +273,25 @@ class WebController extends Controller
         $zipcode = trim((string) $request->query('zipcode', $request->query('pincode', session('global_zipcode', session('global_pincode', '')))));
         $searchQuery = trim((string) $request->query('query', ''));
 
-        $practitionerQuery = Practitioner::with(['user', 'reviews', 'userServices.service'])->where('status', 'active');
-        $doctorQuery = Doctor::with(['user', 'reviews', 'userServices.service'])->where('status', 'active');
-        $mindfulnessQuery = MindfulnessPractitioner::with(['user', 'reviews', 'userServices.service'])->where('status', 'active');
-        $yogaQuery = YogaTherapist::with(['user', 'reviews', 'userServices.service'])->where('status', 'active');
+        $practitionerQuery = Practitioner::with(['user', 'reviews', 'userServices.service'])
+            ->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
+            ->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
+
+        $doctorQuery = Doctor::with(['user', 'reviews', 'userServices.service'])
+            ->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
+            ->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
+
+        $mindfulnessQuery = MindfulnessPractitioner::with(['user', 'reviews', 'userServices.service'])
+            ->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('practitioner_type')->whereRaw('JSON_LENGTH(practitioner_type) > 0')
+            ->whereNotNull('client_concerns')->whereRaw('JSON_LENGTH(client_concerns) > 0');
+
+        $yogaQuery = YogaTherapist::with(['user', 'reviews', 'userServices.service'])
+            ->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('areas_of_expertise')->whereRaw('JSON_LENGTH(areas_of_expertise) > 0');
+        
 
         if ($zipcode !== '') {
             $practitionerQuery->where('zip_code', 'LIKE', "%{$zipcode}%");
@@ -407,8 +470,20 @@ class WebController extends Controller
 
         // Search Practitioners, Doctors, etc.
         $applySearchFilter = function ($q, $modelType, $query) {
-            $q->where('status', 'active')
-              ->where(function ($sq) use ($modelType, $query) {
+            $q->whereIn('status', ['active', 'approved']);
+
+            // Apply completeness filter
+            if ($modelType === 'practitioner' || $modelType === 'doctor') {
+                $q->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
+                  ->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
+            } elseif ($modelType === 'mindfulness') {
+                $q->whereNotNull('practitioner_type')->whereRaw('JSON_LENGTH(practitioner_type) > 0')
+                  ->whereNotNull('client_concerns')->whereRaw('JSON_LENGTH(client_concerns) > 0');
+            } elseif ($modelType === 'yoga') {
+                $q->whereNotNull('areas_of_expertise')->whereRaw('JSON_LENGTH(areas_of_expertise) > 0');
+            }
+
+            $q->where(function ($sq) use ($modelType, $query) {
                   $like = "%{$query}%";
                   $sq->where('first_name', 'LIKE', $like)
                     ->orWhere('last_name', 'LIKE', $like)
@@ -487,7 +562,9 @@ class WebController extends Controller
         $query = $request->get('query');
         if (empty($query)) return response()->json([]);
 
-        $cities = Practitioner::where('status', 'active')
+        $cities = Practitioner::whereIn('status', ['active', 'approved'])
+            ->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
+            ->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0')
             ->where('city', 'LIKE', "%{$query}%")
             ->distinct()
             ->pluck('city')
@@ -495,7 +572,9 @@ class WebController extends Controller
                 return ['name' => $city, 'type' => 'city'];
             });
 
-        $zips = Practitioner::where('status', 'active')
+        $zips = Practitioner::whereIn('status', ['active', 'approved'])
+            ->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
+            ->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0')
             ->where('zip_code', 'LIKE', "%{$query}%")
             ->distinct()
             ->pluck('zip_code')
@@ -616,10 +695,20 @@ class WebController extends Controller
         $language = App::getLocale();
         $settings = HomepageSetting::getAllSettings($language);
 
-        $pQuery = Practitioner::with(['user', 'reviews'])->where('status', 'active');
-        $dQuery = Doctor::with(['user', 'reviews'])->where('status', 'active');
-        $mQuery = MindfulnessPractitioner::with(['user', 'reviews'])->where('status', 'active');
-        $yQuery = YogaTherapist::with(['user', 'reviews'])->where('status', 'active');
+        $pQuery = Practitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
+            ->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
+        
+        $dQuery = Doctor::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
+            ->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
+        
+        $mQuery = MindfulnessPractitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('practitioner_type')->whereRaw('JSON_LENGTH(practitioner_type) > 0')
+            ->whereNotNull('client_concerns')->whereRaw('JSON_LENGTH(client_concerns) > 0');
+        
+        $yQuery = YogaTherapist::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('areas_of_expertise')->whereRaw('JSON_LENGTH(areas_of_expertise) > 0');
 
         // Only show practitioners who offer some service
         $serviceCheck = function ($q) {
@@ -1014,10 +1103,20 @@ class WebController extends Controller
             $prefilledService = Service::find($request->query('service_id'));
         }
 
-        $pQuery = Practitioner::with(['user', 'reviews'])->where('status', 'active');
-        $dQuery = Doctor::with(['user', 'reviews'])->where('status', 'active');
-        $mQuery = MindfulnessPractitioner::with(['user', 'reviews'])->where('status', 'active');
-        $yQuery = YogaTherapist::with(['user', 'reviews'])->where('status', 'active');
+        $pQuery = Practitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
+            ->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
+        
+        $dQuery = Doctor::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
+            ->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
+        
+        $mQuery = MindfulnessPractitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('practitioner_type')->whereRaw('JSON_LENGTH(practitioner_type) > 0')
+            ->whereNotNull('client_concerns')->whereRaw('JSON_LENGTH(client_concerns) > 0');
+        
+        $yQuery = YogaTherapist::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereNotNull('areas_of_expertise')->whereRaw('JSON_LENGTH(areas_of_expertise) > 0');
 
         // Only show practitioners who offer some service
         $serviceCheck = function ($q) {

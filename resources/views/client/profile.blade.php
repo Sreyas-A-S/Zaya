@@ -52,6 +52,14 @@
         background: transparent !important;
         color: #F3324C !important;
     }
+    .ts-dropdown {
+        z-index: 100001 !important;
+    }
+    /* Ensure the modal doesn't clip the dropdown if not using dropdownParent */
+    #specialitiesModal .overflow-hidden, 
+    #conditionsModal .overflow-hidden {
+        overflow: visible !important;
+    }
 </style>
 @endpush
 
@@ -83,11 +91,8 @@
 
     switch($user->role) {
         case 'practitioner':
-            $specialities = array_merge(
-                (array)($profile->consultations ?? []),
-                (array)($profile->other_modalities ?? [])
-            );
-            $conditions = (array)($profile->body_therapies ?? []);
+            $specialities = (array)($profile->specialization ?? []);
+            $conditions = (array)($profile->health_conditions_treated ?? []);
             break;
         case 'doctor':
             $specialities = (array)($profile->specialization ?? []);
@@ -265,6 +270,13 @@
         @if(!in_array($user->role, ['client', 'patient']))
         <!-- Specialities & Conditions Card -->
         <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12">
+            <div id="profile-visibility-warning" class="{{ (empty($specialities) || empty($conditions)) ? '' : 'hidden' }} mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl flex items-start shadow-sm">
+                <i class="ri-information-line mr-3 text-xl mt-0.5"></i>
+                <p class="text-sm font-medium">
+                    {{ __('Your profile will only be displayed to the public once you have added your Specialities and the Conditions you support.') }}
+                </p>
+            </div>
+
             <!-- Specialities -->
             <div class="relative mb-8">
                 <button onclick="openSpecialitiesModal()" class="absolute top-0 right-0 text-gray-400 hover:text-secondary transition-colors">
@@ -510,7 +522,7 @@
                                     <span class="dropdown-selected text-sm text-gray-700">Healing Sanctuary</span>
                                     <i class="ri-arrow-down-s-line text-gray-400 text-lg transition-transform duration-300 dropdown-icon"></i>
                                 </button>
-                                <div class="dropdown-menu absolute z-10 left-0 right-0 top-[calc(100%+4px)] bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px]">
+                                <div class="dropdown-menu absolute z-[100002] left-0 right-0 top-[calc(100%+4px)] bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px]">
                                     <button type="button" class="dropdown-item w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-secondary transition-colors" data-value="sanctuary">Healing Sanctuary</button>
                                     <button type="button" class="dropdown-item w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-secondary transition-colors" data-value="rituals">Expressive Rituals</button>
                                     <button type="button" class="dropdown-item w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-secondary transition-colors" data-value="soul">Medium of the Soul</button>
@@ -837,15 +849,22 @@
     let specialitiesSelect, conditionsSelect;
 
     document.addEventListener('DOMContentLoaded', function() {
+        // Common Tom Select config
+        const commonConfig = {
+            plugins: ['remove_button'],
+            create: true,
+            persist: false,
+            maxItems: 15,
+            maxOptions: 100, // Show more options by default
+            dropdownParent: 'body', // Layer on top of everything
+        };
+
         // Initialize Tom Select for Specialities
         const specEl = document.getElementById('specialities-select');
         if (specEl) {
             specialitiesSelect = new TomSelect('#specialities-select', {
-                plugins: ['remove_button'],
-                create: true,
-                persist: false,
+                ...commonConfig,
                 placeholder: 'Select or type specialities...',
-                maxItems: 15,
             });
         }
 
@@ -853,11 +872,8 @@
         const condEl = document.getElementById('conditions-select');
         if (condEl) {
             conditionsSelect = new TomSelect('#conditions-select', {
-                plugins: ['remove_button'],
-                create: true,
-                persist: false,
+                ...commonConfig,
                 placeholder: 'Select or type conditions...',
-                maxItems: 15,
             });
         }
     });
@@ -932,6 +948,22 @@
                     
                     if (modalId === 'specialitiesModal') closeSpecialitiesModal();
                     else closeConditionsModal();
+
+                    // Dynamic Warning Check
+                    const warning = document.getElementById('profile-visibility-warning');
+                    if (warning) {
+                        const specContainer = document.getElementById('specialities-display-container');
+                        const condContainer = document.getElementById('conditions-display-container');
+                        
+                        const hasSpecs = specContainer && specContainer.querySelectorAll('span:not(.no-items-msg)').length > 0;
+                        const hasConds = condContainer && condContainer.querySelectorAll('span:not(.no-items-msg)').length > 0;
+
+                        if (!hasSpecs || !hasConds) {
+                            warning.classList.remove('hidden');
+                        } else {
+                            warning.classList.add('hidden');
+                        }
+                    }
                 } else {
                     showToast(res.message || 'Update failed', 'error');
                 }
@@ -1133,14 +1165,19 @@
     }
 
     function showToast(message, type = 'success') {
-        Toastify({
-            text: message,
-            duration: 3000,
-            gravity: "top",
-            position: "right",
-            backgroundColor: type === 'success' ? "#2E4B3D" : "#F3324C",
-            stopOnFocus: true,
-        }).showToast();
+        if (window.showZayaToast) {
+            window.showZayaToast(message, type, 'Profile');
+        } else {
+            // Fallback if not loaded
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: type === 'success' ? "#2E4B3D" : "#F3324C",
+                stopOnFocus: true,
+            }).showToast();
+        }
     }
 
     function performBatchUpload() {
