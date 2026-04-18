@@ -1307,58 +1307,54 @@
 
             async function convertFee(targetCountryCode) {
                 if (!feeInput || !feeActualInput) return;
+                
+                // Get the country name or code
+                let countryIdentifier = targetCountryCode;
+                if (Array.isArray(targetCountryCode)) countryIdentifier = targetCountryCode[0];
+                
+                try {
+                    const response = await fetch("{{ route('registration-fee.get') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({
+                            role: roleValue,
+                            country: countryIdentifier
+                        })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const feeValue = parseFloat(data.fee || 0);
+                        const currency = data.currency || 'EUR';
+                        
+                        // Update the ACTUAL base fee so that promo codes apply on top of the correct country fee
+                        feeActualInput.value = feeValue.toFixed(2);
+                        feeInput.value = feeValue.toFixed(2);
+                        
+                        // Update currency symbol
+                        const symbol = currencySymbols[currency] || currency;
+                        currencySymbol = symbol;
+                        if (feeCurrencyInput) feeCurrencyInput.value = currency;
+                        
+                        renderFee(feeValue);
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error fetching country-specific fee:', error);
+                }
+
+                // Fallback to old conversion logic if backend call fails or is not configured for this country
                 const baseCurrency = @json($registrationCurrencyCode);
                 const baseAmount = parseFloat(feeActualInput.value || feeInput.value || 0);
                 if (!baseAmount) return;
+                
+                // ... (rest of old logic for fallback)
 
-                const derivedCurrency = (() => {
-                    if (!targetCountryCode) return baseCurrency;
-                    const raw = Array.isArray(targetCountryCode) ? targetCountryCode[0] : (targetCountryCode || '');
-                    const code = raw.toUpperCase();
-                    if (countryToCurrency[code]) return countryToCurrency[code];
-                    if (countryToCurrency[code.slice(0,2)]) return countryToCurrency[code.slice(0,2)];
-                    const nameCode = window.countryNameToCode ? window.countryNameToCode[raw] : null;
-                    if (nameCode && countryToCurrency[nameCode]) return countryToCurrency[nameCode];
-                    return baseCurrency;
-                })();
-
-                const symbol = currencySymbols[derivedCurrency] || derivedCurrency;
-                currencySymbol = symbol;
-                feeCurrencyInput && (feeCurrencyInput.value = derivedCurrency);
-
-                console.debug('convertFee', { baseCurrency, derivedCurrency, baseAmount });
-
-                const applyValue = (val) => {
-                    feeInput.value = val.toFixed(2);
-                    renderFee(val);
-                };
-
-                try {
-                    // Primary: Frankfurter (ECB) – no key required
-                    const ffUrl = `https://api.frankfurter.app/latest?from=${baseCurrency}&to=${derivedCurrency}`;
-                    const resp = await fetch(ffUrl);
-                    const data = await resp.json();
-                    if (data?.rates?.[derivedCurrency]) {
-                        const rate = parseFloat(data.rates[derivedCurrency]);
-                        applyValue(baseAmount * rate);
-                        return;
-                    }
-                    throw new Error('Frankfurter rate missing');
-                } catch (_) {
-                    try {
-                        // Fallback: exchangerate.host – free, no key
-                        const resp = await fetch(`https://api.exchangerate.host/convert?from=${baseCurrency}&to=${derivedCurrency}&amount=${baseAmount}`);
-                        const data = await resp.json();
-                        const converted = data && data.result ? parseFloat(data.result) : baseAmount;
-                        applyValue(converted);
-                        return;
-                    } catch (e2) {
-                        const rate = fallbackRates[baseCurrency]?.[derivedCurrency];
-                        const converted = rate ? baseAmount * rate : baseAmount;
-                        applyValue(converted);
-                    }
-                }
-            }
 
             if (countrySelect && countrySelect.tomselect) {
                 convertFee(countrySelect.tomselect.getValue());

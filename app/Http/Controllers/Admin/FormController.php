@@ -76,9 +76,9 @@ class FormController extends Controller
                     $url = url('/open-register/' . $role . '/signature=' . $row->token);
                     return '
                         <a href="' . e($viewUrl) . '" class="btn btn-primary btn-sm me-1">View</a>
-                        <button type="button" class="btn btn-info btn-sm shareLink me-1 text-white" data-url="' . e($url) . '" title="Share via Email">
+                        <a href="javascript:void(0)" class="btn btn-success btn-sm shareLink me-1 text-white" data-url="' . e($url) . '" title="Share">
                             <i class="fa-solid fa-share-nodes"></i>
-                        </button>
+                        </a>
                         <button type="button" class="btn btn-danger btn-sm deleteLink" data-id="' . e($row->id) . '" title="Delete">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -88,7 +88,8 @@ class FormController extends Controller
                 ->make(true);
         }
 
-        return view('admin.forms.index');
+        $currencies = config('currencies.symbols', []);
+        return view('admin.forms.index', compact('currencies'));
     }
 
     public function generateLink(Request $request)
@@ -101,6 +102,7 @@ class FormController extends Controller
 
         $validated = $request->validate([
             'user_type' => ['required', 'string', 'max:100'],
+            'currency' => ['required', 'string', 'max:10'],
             'expires_at' => ['nullable', 'date', 'after_or_equal:today'],
         ]);
 
@@ -113,6 +115,7 @@ class FormController extends Controller
         $token = Str::random(64);
         $record = OpenRegisterLink::create([
             'role' => $normalized,
+            'currency' => $validated['currency'],
             'token' => $token,
             'status' => 'active',
             'created_by' => Auth::id(),

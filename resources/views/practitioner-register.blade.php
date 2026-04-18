@@ -783,7 +783,7 @@
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const registrationCurrencySymbol = @json($practitionerRegistrationCurrencySymbol ?? '€');
+            let registrationCurrencySymbol = @json($practitionerRegistrationCurrencySymbol ?? '€');
 
             function renderRegistrationFee() {
                 const feeContainer = document.querySelector('[data-registration-fee-container]');
@@ -795,6 +795,57 @@
             }
 
             renderRegistrationFee();
+
+            // Country change listener to update registration fee
+            const countrySelect = document.querySelector('#country-select');
+            if (countrySelect) {
+                const updateFee = async (countryName) => {
+                    try {
+                        const response = await fetch("{{ route('registration-fee.get') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({
+                                role: roleValue,
+                                country: countryName
+                            })
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            const feeValue = parseFloat(data.fee || 0);
+                            const currency = data.currency || 'EUR';
+                            
+                            if (feeInput && feeActualInput) {
+                                feeActualInput.value = feeValue.toFixed(2);
+                                feeInput.value = feeValue.toFixed(2);
+                            }
+                            
+                            // Update global currency symbol if needed
+                            // Note: registrationCurrencySymbol is defined in the template
+                            if (typeof currencySymbols !== 'undefined' && currencySymbols[currency]) {
+                                registrationCurrencySymbol = currencySymbols[currency];
+                            } else {
+                                registrationCurrencySymbol = currency;
+                            }
+                            
+                            renderRegistrationFee();
+                        }
+                    } catch (error) {
+                        console.error('Error fetching country-specific fee:', error);
+                    }
+                };
+
+                if (countrySelect.tomselect) {
+                    countrySelect.tomselect.on('change', (val) => updateFee(val));
+                } else {
+                    countrySelect.addEventListener('change', (e) => updateFee(e.target.value));
+                }
+            }
 
             // Promo code apply + fee breakdown
             const promoInput = document.getElementById('promocode-input');

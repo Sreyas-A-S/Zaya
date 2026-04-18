@@ -46,6 +46,9 @@ class PromoCodeController extends Controller
                             <a href="javascript:void(0)" class="text-info viewPromoCode" data-id="'.$row->id.'" title="View">
                                 <i class="iconly-Show icli" style="font-size: 20px;"></i>
                             </a>
+                            <a href="javascript:void(0)" class="text-success sharePromoCode" data-id="'.$row->id.'" data-code="'.$row->code.'" title="Share">
+                                <i class="fa-solid fa-share-nodes" style="font-size: 18px;"></i>
+                            </a>
                             <a href="javascript:void(0)" class="text-primary editPromoCode" data-id="'.$row->id.'" title="Edit">
                                 <i class="iconly-Edit-Square icli" style="font-size: 20px;"></i>
                             </a>

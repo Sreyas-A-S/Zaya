@@ -272,28 +272,54 @@
 
 <h2 class="text-xl md:text-2xl font-sans! font-medium text-gray-900 mb-8">{{ __('Declaration & Consent') }}</h2>
 <div class="bg-white rounded-2xl p-6 mb-12 space-y-4">
-    <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="ayush_confirmation" value="1" class="mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('ayush_confirmation'))>
-        <span>{{ __('I confirm I am a registered AYUSH Doctor.') }}</span>
+    <label class="flex items-start gap-3 text-gray-700 font-bold border-b pb-3 mb-3">
+        <input type="checkbox" id="check-all-consent" class="mt-1 h-5 w-5 rounded border-gray-300">
+        <span>{{ __('Check All Declaration & Consent') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="guidelines_agreement" value="1" class="mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('guidelines_agreement'))>
+        <input type="checkbox" name="ayush_confirmation" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('ayush_confirmation'))>
+        <span>{{ __('I confirm I am a registered AYUSH Practitioner.') }}</span>
+    </label>
+    <label class="flex items-start gap-3 text-gray-700">
+        <input type="checkbox" name="guidelines_agreement" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('guidelines_agreement'))>
         <span>{{ __('I agree to follow AYUSH and platform guidelines.') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="document_consent" value="1" class="mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('document_consent'))>
+        <input type="checkbox" name="document_consent" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('document_consent'))>
         <span>{{ __('I consent to document verification for onboarding.') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="policies_agreement" value="1" class="mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('policies_agreement'))>
+        <input type="checkbox" name="policies_agreement" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('policies_agreement'))>
         <span>{{ __('I agree to platform policies and terms.') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="prescription_understanding" value="1" class="mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('prescription_understanding'))>
+        <input type="checkbox" name="prescription_understanding" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('prescription_understanding'))>
         <span>{{ __('I understand prescription and consultation responsibilities.') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="confidentiality_consent" value="1" class="mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('confidentiality_consent'))>
+        <input type="checkbox" name="confidentiality_consent" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('confidentiality_consent'))>
         <span>{{ __('I agree to maintain client confidentiality.') }}</span>
     </label>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkAll = document.getElementById('check-all-consent');
+        const checkboxes = document.querySelectorAll('.consent-checkbox');
+
+        if (checkAll) {
+            checkAll.addEventListener('change', function() {
+                checkboxes.forEach(cb => {
+                    cb.checked = checkAll.checked;
+                });
+            });
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const allChecked = Array.from(checkboxes).every(c => c.checked);
+                    checkAll.checked = allChecked;
+                });
+            });
+        }
+    });
+</script>

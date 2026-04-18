@@ -43,11 +43,19 @@ trait FinancialTrait
                     ->first();
             }
 
+            // Fallback to Global Role-wise Settings (country_id IS NULL)
+            if (!$rate && $practitionerRole) {
+                $rate = ReferralCommissionRate::whereNull('country_id')
+                    ->where('type', 'direct')
+                    ->where('referred_role', $practitionerRole)
+                    ->first();
+            }
+
             if ($rate) {
                 $companyPercent = (float) $rate->company_commission_percent;
             } else {
-                // Fallback to global settings
-                $settings = HomepageSetting::where('section', 'finance')->where('language', 'en')->pluck('value', 'key');
+                // Final fallback to hardcoded global settings
+                $settings = HomepageSetting::where('section', 'finance')->where('language', 'en')->where('country_code', 'all')->pluck('value', 'key');
                 $companyPercent = (float) ($settings['company_booking_commission'] ?? 10);
             }
             $referrerPercent = 0;
@@ -72,12 +80,29 @@ trait FinancialTrait
                 }
             }
 
+            // Fallback to Global Role-wise Settings (country_id IS NULL)
+            if (!$rate && $practitionerRole) {
+                $rate = ReferralCommissionRate::whereNull('country_id')
+                    ->where('type', 'referral')
+                    ->where('referrer_role', $referrerRole ?: 'practitioner')
+                    ->where('referred_role', $practitionerRole)
+                    ->first();
+
+                if (!$rate && $referrerRole && $referrerRole !== 'practitioner') {
+                    $rate = ReferralCommissionRate::whereNull('country_id')
+                        ->where('type', 'referral')
+                        ->where('referrer_role', 'practitioner')
+                        ->where('referred_role', $practitionerRole)
+                        ->first();
+                }
+            }
+
             if ($rate) {
                 $companyPercent = (float) $rate->company_commission_percent;
                 $referrerPercent = (float) $rate->referrer_commission_percent;
             } else {
-                // Fallback to global settings
-                $settings = HomepageSetting::where('section', 'finance')->where('language', 'en')->pluck('value', 'key');
+                // Final fallback to hardcoded global settings
+                $settings = HomepageSetting::where('section', 'finance')->where('language', 'en')->where('country_code', 'all')->pluck('value', 'key');
                 $companyPercent = (float) ($settings['company_referral_commission'] ?? 0);
                 $referrerPercent = (float) ($settings['practitioner_referral_commission'] ?? 5);
             }

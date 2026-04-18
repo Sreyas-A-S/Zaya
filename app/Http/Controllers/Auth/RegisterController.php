@@ -337,7 +337,15 @@ class RegisterController extends Controller
         }
 
         $language = session('locale', 'en');
-        $financeSettings = HomepageSetting::getSectionValues('finance', $language);
+        $countryName = $request->input('country');
+        $countryCode = 'all';
+        if ($countryName) {
+            $dbCountry = \App\Models\Country::where('name', $countryName)->first();
+            if ($dbCountry) {
+                $countryCode = strtoupper($dbCountry->code);
+            }
+        }
+        $financeSettings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
         $feeKey = $feeKeyMap[$role];
 
         $baseFee = $financeSettings[$feeKey] ?? '0';

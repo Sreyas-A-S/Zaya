@@ -153,6 +153,7 @@ Route::get('/captcha', [CaptchaController::class, 'generate'])->name('captcha');
 Route::get('/geoip/country', [GeoIpController::class, 'country'])->name('geoip.country');
 Route::get('/magic-login', [\App\Http\Controllers\Auth\MagicLoginController::class, 'login'])->name('magic.login');
 Route::post('/validate-promo-code', [WebController::class, 'validatePromoCode'])->name('promo.validate')->middleware('throttle:5,1');
+Route::post('/get-registration-fee', [WebController::class, 'getRegistrationFee'])->name('registration-fee.get');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource('/admins', AdminsController::class);
@@ -222,6 +223,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     // Financial Tracking
     Route::get('financial/transactions', [\App\Http\Controllers\Admin\FinancialController::class, 'index'])->name('financial.index');
     Route::get('financial/practitioner-balances', [\App\Http\Controllers\Admin\FinancialController::class, 'practitionerBalances'])->name('financial.practitioners');
+    Route::get('financial/coins', [\App\Http\Controllers\Admin\CoinManagementController::class, 'index'])->name('coins');
+    Route::post('financial/coins', [\App\Http\Controllers\Admin\CoinManagementController::class, 'update'])->name('coins.update');
+    Route::post('financial/coins/update-user', [\App\Http\Controllers\Admin\CoinManagementController::class, 'updateUsersCoins'])->name('coins.update-user');
 
     // System Utilities
     Route::get('run-scheduler', function() {
@@ -310,7 +314,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('languages/{id}/status', [\App\Http\Controllers\Admin\LanguageController::class, 'updateStatus'])->name('languages.status');
     Route::post('/change-language/{id}', [LanguageController::class, 'change'])->name('change-language');
     Route::post('/change-country/{code}', function ($code) {
-        session(['admin_country' => strtolower($code)]);
+        $code = ($code === 'all') ? 'all' : strtoupper($code);
+        session(['admin_country' => $code]);
         return response()->json(['status' => true]);
     })->name('change-country');
 

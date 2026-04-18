@@ -9,11 +9,11 @@
             <div class="col-sm-6">
                 <h3>Finance Settings</h3>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-6 text-end">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="fa-solid fa-house"></i></a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="iconly-Home icli"></i></a></li>
                     <li class="breadcrumb-item">Finance</li>
-                    <li class="breadcrumb-item active">Other Fees</li>
+                    <li class="breadcrumb-item active">Settings</li>
                 </ol>
             </div>
         </div>
@@ -25,13 +25,25 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header pb-0 card-no-border">
-                    <h3>Fees Configuration</h3>
-                    <p>Update registration fees and other financial parameters.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3>Fees Configuration ({{ $countryCode === 'all' ? 'Global' : strtoupper($countryCode) }})</h3>
+                            <p>Update registration fees and other financial parameters for <strong>{{ $countryCode === 'all' ? 'All Regions' : strtoupper($countryCode) }}</strong>.</p>
+                        </div>
+                        @if($countryCode !== 'all')
+                            <span class="badge bg-info px-3 py-2">Country-Specific Mode</span>
+                        @endif
+                    </div>
                 </div>
                 <div class="card-body">
                     <form id="financeSettingsForm" action="{{ route('admin.other-fees.update') }}" method="POST">
                         @csrf
-                        @php $settingsByKey = $settings->keyBy('key'); @endphp
+                        @php 
+                            $settingsByKey = $settings->keyBy('key'); 
+                            $isDisabled = ($countryCode === 'all');
+                        @endphp
+
+
 
                         @php
                             $feePairs = [
@@ -42,7 +54,10 @@
                                 ['fee' => 'yoga_registration_fee', 'enable' => 'yoga_registration_fee_enabled', 'currency' => 'yoga_registration_fee_currency'],
                                 ['fee' => 'translator_registration_fee', 'enable' => 'translator_registration_fee_enabled', 'currency' => 'translator_registration_fee_currency'],
                             ];
-                            $currencyOptions = ['EUR','USD','INR','GBP','AED'];
+                            $currencyOptions = array_keys(config('currencies.symbols', []));
+                            if (empty($currencyOptions)) {
+                                $currencyOptions = ['EUR','USD','INR','GBP','AED'];
+                            }
                         @endphp
 
                         <div class="row g-4">
@@ -61,13 +76,24 @@
                                         $enableId = $enableKey . '-input';
                                         $currencyId = $currencyKey . '-input';
                                         $enabled = $enableSetting ? filter_var($enableSetting->value, FILTER_VALIDATE_BOOLEAN) : false;
+                                        
+                                        // Use mapped currency if in country mode, else use stored value
                                         $currencyValue = $currencySetting->value ?? 'EUR';
+                                        $isCurrencyDisabled = false;
+
+                                        if ($countryCode !== 'all' && $mappedCurrency) {
+                                            $currencyValue = $mappedCurrency;
+                                            $isCurrencyDisabled = true;
+                                        }
                                     @endphp
                                     <div class="col-md-6 d-flex align-items-start justify-content-between gap-3 flex-wrap">
                                         <div class="flex-grow-1">
                                             <label class="form-label fw-bold" for="{{ $feeId }}">{{ ucwords(str_replace('_', ' ', $feeKey)) }}</label>
                                             <div class="input-group">
-                                                <select class="form-select w-auto" style="max-width:110px" name="{{ $currencyKey }}" id="{{ $currencyId }}">
+                                                @if($isCurrencyDisabled)
+                                                    <input type="hidden" name="{{ $currencyKey }}" value="{{ $currencyValue }}">
+                                                @endif
+                                                <select class="form-select w-auto" style="max-width:110px" name="{{ $currencyKey }}" id="{{ $currencyId }}" {{ ($isDisabled || $isCurrencyDisabled) ? 'disabled' : '' }}>
                                                     @foreach($currencyOptions as $opt)
                                                         <option value="{{ $opt }}" {{ $currencyValue === $opt ? 'selected' : '' }}>{{ $opt }}</option>
                                                     @endforeach
@@ -77,7 +103,8 @@
                                                     id="{{ $feeId }}"
                                                     value="{{ $feeSetting->value }}"
                                                     class="form-control"
-                                                    placeholder="Amount">
+                                                    placeholder="Amount"
+                                                    {{ $isDisabled ? 'disabled' : '' }}>
                                             </div>
                                         </div>
                                         @if($enableSetting)
@@ -88,7 +115,8 @@
                                                     id="{{ $enableId }}"
                                                     name="{{ $enableKey }}"
                                                     value="1"
-                                                    {{ $enabled ? 'checked' : '' }}>
+                                                    {{ $enabled ? 'checked' : '' }}
+                                                    {{ $isDisabled ? 'disabled' : '' }}>
                                                 <label class="form-check-label" for="{{ $enableId }}">{{ __('Enabled') }}</label>
                                             </div>
                                         </div>
@@ -128,7 +156,8 @@
                                                 id="{{ $inputId }}"
                                                 value="{{ $setting->value }}"
                                                 class="form-control"
-                                                placeholder="Enter percentage (0-100)...">
+                                                placeholder="Enter percentage (0-100)..."
+                                                {{ $isDisabled ? 'disabled' : '' }}>
                                             <span class="input-group-text">%</span>
                                         </div>
                                     </div>
@@ -164,7 +193,8 @@
                                             id="{{ $inputId }}"
                                             value="{{ $setting->value }}"
                                             class="form-control"
-                                            placeholder="Enter {{ $placeholder }}...">
+                                            placeholder="Enter {{ $placeholder }}..."
+                                            {{ $isDisabled ? 'disabled' : '' }}>
                                     @elseif($setting->type === 'boolean')
                                         <div class="ms-auto">
                                             <div class="form-check form-switch mt-0">
@@ -174,7 +204,8 @@
                                                     id="{{ $inputId }}"
                                                     name="{{ $setting->key }}"
                                                     value="1"
-                                                    {{ $isChecked ? 'checked' : '' }}>
+                                                    {{ $isChecked ? 'checked' : '' }}
+                                                    {{ $isDisabled ? 'disabled' : '' }}>
                                                 <label class="form-check-label" for="{{ $inputId }}">
                                                     {{ __('Enabled') }}
                                                 </label>
@@ -185,11 +216,18 @@
                             @endforeach
                         </div>
 
+                        @if(!$isDisabled)
                         <div class="card-footer text-end mt-4">
                             <button type="submit" id="saveSettingsBtn" class="btn btn-primary px-5">
                                 <i class="fa-solid fa-save me-2"></i> Save Changes
                             </button>
                         </div>
+                        @else
+                        <div class="mt-5 text-center bg-light p-4 rounded-3">
+                            <i class="iconly-Info-Circle icli text-info fs-3 mb-2"></i>
+                            <p class="mb-0 text-muted">Please select a specific country from the navbar to manage its fees and commissions.</p>
+                        </div>
+                        @endif
                     </form>
                 </div>
             </div>
@@ -203,31 +241,27 @@
     $(document).ready(function() {
         $('#financeSettingsForm').on('submit', function(e) {
             e.preventDefault();
-
-            let form = $(this);
-            let btn = $('#saveSettingsBtn');
-            let formData = form.serialize();
-
-            btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i> Saving...');
-
+            
+            const btn = $('#saveSettingsBtn');
+            const originalContent = btn.html();
+            
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> Saving...');
+            
             $.ajax({
-                url: form.attr('action'),
-                type: 'POST',
-                data: formData,
+                url: $(this).attr('action'),
+                method: 'POST',
+                data: $(this).serialize(),
                 success: function(response) {
                     if (response.success) {
-                        showToast(response.message);
+                        showToast(response.message || 'Settings updated successfully.');
                     }
                 },
                 error: function(xhr) {
-                    let errorMsg = 'An error occurred while saving.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMsg = xhr.responseJSON.message;
-                    }
-                    showToast(errorMsg, 'error');
+                    showToast('Error updating settings. Please try again.', 'error');
+                    console.error(xhr.responseText);
                 },
                 complete: function() {
-                    btn.prop('disabled', false).html('<i class="fa-solid fa-save me-2"></i> Save Changes');
+                    btn.prop('disabled', false).html(originalContent);
                 }
             });
         });
