@@ -87,7 +87,7 @@ class ZegoController extends Controller
         } else {
             // If a booking DOES exist, enforce strict participant check
             if ($user) {
-                $isAuthorized = ($user->id === $booking->user_id || $user->id === $booking->practitioner_id);
+                $isAuthorized = ($user->id === $booking->user_id || ($booking->practitioner && $user->id === $booking->practitioner->user_id));
                 
                 if (!$isAuthorized && $user->role !== 'admin') {
                     return redirect()->route('dashboard')->with('error', 'You are not authorized to join this private meeting.');

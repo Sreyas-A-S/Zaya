@@ -118,7 +118,7 @@ class BookingController extends Controller
         ]);
 
         // 4. Availability Check
-        if (!$this->checkSlotAvailability($request->practitioner_id, $request->booking_date, $request->booking_time)) {
+        if (!$this->checkSlotAvailability($practitioner->id, $practitioner->getMorphClass(), $request->booking_date, $request->booking_time)) {
             return response()->json(['success' => false, 'message' => 'This slot was just taken. Please choose another time.'], 422);
         }
 
@@ -278,6 +278,7 @@ class BookingController extends Controller
         // CRITICAL: Final availability check now that money is received
         $isAvailable = $this->checkSlotAvailability(
             $notes['practitioner_id'], 
+            $notes['practitioner_type'] ?? 'App\\Models\\Practitioner',
             $notes['booking_date'], 
             $notes['booking_time']
         );
@@ -366,9 +367,10 @@ class BookingController extends Controller
         }
     }
 
-    private function checkSlotAvailability($practitionerId, $date, $time)
+    private function checkSlotAvailability($profileId, $type, $date, $time)
     {
-        return !Booking::where('profile_id', $practitionerId)
+        return !Booking::where('profile_id', $profileId)
+            ->where('practitioner_type', $type)
             ->where('booking_date', $date)
             ->where('booking_time', $time)
             ->whereIn('status', ['confirmed', 'completed', 'paid'])

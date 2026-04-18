@@ -27,7 +27,8 @@ class BookingSeeder extends Seeder
         for ($i = 1; $i <= 5; $i++) {
             Booking::create([
                 'user_id' => $user->id,
-                'practitioner_id' => $practitioner->id,
+                'profile_id' => $practitioner->id,
+                'practitioner_type' => Practitioner::class,
                 'service_ids' => $services,
                 'mode' => 'online',
                 'booking_date' => now()->subDays($i * 7),
@@ -43,7 +44,8 @@ class BookingSeeder extends Seeder
         for ($i = 1; $i <= 2; $i++) {
             Booking::create([
                 'user_id' => $user->id,
-                'practitioner_id' => $practitioner->id,
+                'profile_id' => $practitioner->id,
+                'practitioner_type' => Practitioner::class,
                 'service_ids' => $services,
                 'mode' => 'online',
                 'booking_date' => now()->addDays($i * 7),

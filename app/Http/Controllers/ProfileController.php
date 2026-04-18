@@ -41,7 +41,8 @@ class ProfileController extends Controller
             $query->where('translator_id', $profileId);
         } else {
             // Practitioners, Doctors, Mindfulness, Yoga
-            $query->where('practitioner_id', $profileId);
+            $query->where('profile_id', $profileId)
+                  ->where('practitioner_type', $user->getMorphClass());
         }
 
         return $query;
@@ -293,7 +294,7 @@ class ProfileController extends Controller
         $consultationFormRole = in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'], true)
             ? $user->role
             : null;
-        $isOwner = $booking->user_id === $user->id || $booking->practitioner_id === $user->profile_id;
+        $isOwner = $booking->user_id === $user->id || ($booking->profile_id === $user->profile_id && $booking->practitioner_type === $user->getMorphClass());
 
         if (!$consultationFormRole || !$isOwner) {
             abort(403);
@@ -351,7 +352,7 @@ class ProfileController extends Controller
         $consultationFormRole = in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'], true)
             ? $user->role
             : null;
-        $isOwner = $booking->user_id === $user->id || $booking->practitioner_id === $user->profile_id;
+        $isOwner = $booking->user_id === $user->id || ($booking->profile_id === $user->profile_id && $booking->practitioner_type === $user->getMorphClass());
 
         if (!$consultationFormRole || !$isOwner) {
             abort(403);
@@ -753,7 +754,7 @@ class ProfileController extends Controller
         $booking = Booking::findOrFail($id);
 
         // Security check: Only the practitioner assigned to the booking can assign a translator
-        if ($booking->practitioner_id !== $user->profile_id && !in_array($user->role, ['admin', 'super-admin'])) {
+        if (($booking->profile_id !== $user->profile_id || $booking->practitioner_type !== $user->getMorphClass()) && !in_array($user->role, ['admin', 'super-admin'])) {
             return response()->json(['error' => 'Unauthorized action.'], 403);
         }
 

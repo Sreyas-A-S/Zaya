@@ -204,7 +204,8 @@ class ReferralController extends Controller
         $newBooking = Booking::create([
             'invoice_no' => $referral->referral_no,
             'user_id' => $referral->user_id,
-            'practitioner_id' => $referredToUser->profile_id ?? $referredToUser->practitioner->id ?? $referredToUser->doctor->id ?? null,
+            'profile_id' => $referredToUser->profile_id,
+            'practitioner_type' => $referredToUser->profile->getMorphClass(),
             'service_ids' => $referral->service_ids,
             'mode' => $oldBooking->mode,
             'conditions' => $oldBooking->conditions,
