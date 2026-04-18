@@ -303,6 +303,7 @@ class BookingController extends Controller
                 'status' => 'confirmed',
                 'razorpay_order_id' => $paymentLinkId,
                 'razorpay_payment_id' => $paymentId,
+                'additional_info' => isset($notes['additional_info']) ? json_decode($notes['additional_info'], true) : null,
             ]);
 
             // Deduct Coins from user balance if used
@@ -356,6 +357,7 @@ class BookingController extends Controller
                 'status' => 'pending_reschedule', // Special status
                 'razorpay_order_id' => $paymentLinkId,
                 'razorpay_payment_id' => $paymentId,
+                'additional_info' => isset($notes['additional_info']) ? json_decode($notes['additional_info'], true) : null,
             ]);
 
             \Log::warning("OVERBOOKING DETECTED for Booking ID #{$booking->id}. Payment received but slot was taken.");
