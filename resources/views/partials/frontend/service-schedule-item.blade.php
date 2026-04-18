@@ -18,6 +18,9 @@
         </div>
         <div class="relative flex-1">
             <div class="duration-picker-trigger h-full py-2 px-4 bg-[#F5F5F5] rounded-full flex items-center justify-between cursor-pointer hover:bg-[#EEEEEE] transition-colors"
+                data-rate="{{ $defaultRate->rate ?? 0 }}"
+                data-symbol="{{ $defaultSymbol }}"
+                data-currency="{{ $defaultCurrency }}"
                 onclick="
                             const dd = this.nextElementSibling.nextElementSibling; 
                             dd.classList.toggle('hidden'); 
@@ -48,11 +51,15 @@
                     @php
                         $label = ($rate->duration ?? '') . ' Min';
                         $price = $rate->rate ?? 0;
+                        $symbol = $symbols[$rate->currency ?? $defaultCurrency] ?? ($rate->currency ?? $defaultCurrency);
                     @endphp
                     <label
                         class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-xl group select-none">
                         <div class="flex items-center gap-3">
                             <input type="radio" name="temp_duration_{{ $service->id }}" value="{{ $label }}"
+                                data-rate="{{ $price }}"
+                                data-currency="{{ $rate->currency ?? $defaultCurrency }}"
+                                data-symbol="{{ $symbol }}"
                                 class="peer hidden" {{ $idx === 0 ? 'checked' : '' }}>
                             <div
                                 class="w-4 h-4 rounded-full border-4 border-gray-300 peer-checked:border-[#F5A623] flex items-center justify-center transition-colors">
@@ -62,7 +69,6 @@
                             </div>
                             <span class="text-[15px] text-[#404040]">{{ $label }}</span>
                         </div>
-                        @php $symbol = $symbols[$rate->currency ?? $defaultCurrency] ?? ($rate->currency ?? $defaultCurrency); @endphp
                         <span class="text-[15px] font-medium text-[#29724C]" data-currency="{{ $rate->currency ?? $defaultCurrency }}" data-symbol="{{ $symbol }}">{{ $symbol }} {{ number_format($price, 2) }}</span>
                     </label>
                     @empty

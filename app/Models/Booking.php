@@ -37,7 +37,8 @@ class Booking extends Model
         'razorpay_payment_id',
         'razorpay_payment_url',
         'recording_url',
-        'payment_details'
+        'payment_details',
+        'additional_info'
     ];
 
     protected $casts = [

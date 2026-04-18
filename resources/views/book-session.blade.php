@@ -93,13 +93,14 @@
         $practitionerRating = $activePractitioner ? number_format($activePractitioner->average_rating, 1) : '0.0';
         $practitionerLocation = $activePractitioner ? $activePractitioner->city_state : 'Location not set';
         $practitionerConditions = $activePractitioner ? (array) ($activePractitioner->conditions_list ?? []) : [];
-        @endphp
-
-        @php
+        
         // Collect practitioner service durations/rates
         $practitionerServices = $activePractitioner && $activePractitioner->user
             ? $activePractitioner->user->userServices()->with('service')->where('status', 'active')->get()->groupBy('service_id')
             : collect();
+        @endphp
+
+        @php
         $countryCurrencyMap = [
             'IN' => 'INR','IND' => 'INR','INDIA' => 'INR',
             'US' => 'USD','USA' => 'USD','UNITED STATES' => 'USD',
@@ -317,8 +318,15 @@
                         
                         <div class="services-scroll-wrapper no-scrollbar" id="available-services-container">
                             @forelse($services as $service)
+                            @php
+                                $serviceRate = 0;
+                                if (isset($practitionerServices[$service->id])) {
+                                    $serviceRate = $practitionerServices[$service->id]->first()->rate ?? 0;
+                                }
+                            @endphp
                             <label class="service-tag-label inline-block cursor-pointer select-none shrink-0" data-service-name="{{ strtolower($service->title) }}" data-service-id="{{ $service->id }}">
                                 <input type="checkbox" class="peer hidden" value="{{ $service->title }}" 
+                                    data-rate="{{ $serviceRate }}"
                                     {{ (isset($prefilledService) && $prefilledService->id == $service->id) || (!isset($prefilledService) && $loop->first) ? 'checked' : '' }}>
                                 <div
                                     class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-700 text-sm font-normal transition-colors peer-checked:bg-[#FABD4D] peer-checked:border-[#FABD4D] peer-checked:text-[#423131] hover:bg-[#FABD4D] hover:border-[#FABD4D] whitespace-nowrap">
@@ -636,7 +644,7 @@
 
             <!-- Test Payment Toggle -->
             <div class="flex items-center justify-center gap-3 mb-6">
-                <input type="checkbox" id="test-payment-toggle" class="h-4 w-4 accent-[#F5A623] cursor-pointer">
+                <input type="checkbox" id="test-payment-toggle" onchange="renderSelectedServices()" class="h-4 w-4 accent-[#F5A623] cursor-pointer">
                 <label for="test-payment-toggle" class="text-sm text-gray-600 cursor-pointer">
                     Test payment (use INR 1.00)
                 </label>
@@ -871,6 +879,20 @@
                 return;
             }
 
+            const serviceDetails = serviceIds.map(id => {
+                const item = document.querySelector(`.service-schedule-item[data-service-id="${id}"]`);
+                const trigger = item.querySelector('.duration-picker-trigger');
+                return {
+                    service_id: id,
+                    title: item.querySelector('input[type="text"]').value,
+                    duration: item.querySelector('.duration-value').value,
+                    day: item.querySelector('.day-label').textContent,
+                    time: item.querySelector('.time-label').textContent,
+                    rate: trigger ? trigger.dataset.rate : 0,
+                    currency: trigger ? trigger.dataset.currency : currency
+                };
+            });
+
             const payload = {
                 practitioner_id: practitionerId,
                 service_ids: serviceIds,
@@ -886,7 +908,12 @@
                 promo_code: appliedPromoCode,
                 discount_amount: promoDiscountAmount,
                 coins_applied: coinsApplied,
-                test_mode: testMode
+                test_mode: testMode,
+                additional_info: {
+                    sessions: serviceDetails,
+                    client_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    browser_language: navigator.language
+                }
             };
 
             try {
@@ -903,15 +930,11 @@
                 const data = await response.json();
 
                 if (response.ok && data.success && data.redirect_url) {
-                    showToast(data.message || 'Booking created! Redirecting to payment...', 'success');
                     sessionStorage.setItem('booking_reset', '1');
-                    
+
                     // Direct redirection in current window
-                    setTimeout(() => {
-                        window.location.href = data.redirect_url;
-                    }, 800);
-                } else {
-                    showToast(data.message || 'Error creating booking. Please try again.', 'error');
+                    window.location.href = data.redirect_url;
+                } else {                    showToast(data.message || 'Error creating booking. Please try again.', 'error');
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                 }
@@ -1107,22 +1130,15 @@
                         day = scheduleItem.querySelector('.day-label').textContent || "Day";
                         time = scheduleItem.querySelector('.time-label').textContent || "Time";
 
-                        // Get price and currency from the SELECTED duration radio in the dropdown
-                        // The duration-dropdown for THIS service
-                        const durationDropdown = scheduleItem.querySelector('.duration-dropdown');
-                        const checkedRadio = durationDropdown ? durationDropdown.querySelector('input[type="radio"]:checked') : null;
-                        
-                        if (checkedRadio) {
-                            const priceEl = checkedRadio.closest('label').querySelector('[data-symbol]');
-                            if (priceEl) {
-                                currencySymbol = priceEl.dataset.symbol || currencySymbol;
-                                activeCurrencySymbol = currencySymbol;
-                                const priceText = priceEl.textContent.replace(/[^\d.]/g, '');
-                                price = parseFloat(priceText) || 0;
-                                
-                                if (!determinedCurrencyCode) {
-                                    determinedCurrencyCode = priceEl.dataset.currency;
-                                }
+                        // Get price and currency from the duration trigger (which stores current selection)
+                        const trigger = scheduleItem.querySelector('.duration-picker-trigger');
+                        if (trigger) {
+                            price = parseFloat(trigger.dataset.rate) || 0;
+                            currencySymbol = trigger.dataset.symbol || currencySymbol;
+                            activeCurrencySymbol = currencySymbol;
+                            
+                            if (!determinedCurrencyCode) {
+                                determinedCurrencyCode = trigger.dataset.currency;
                             }
                         }
                     }
@@ -1191,9 +1207,12 @@
                     }
                 }
 
-                const finalTotal = Math.max(0, total - promoDiscountAmount - coinDiscount);
                 const testToggle = document.getElementById('test-payment-toggle');
                 const showTest = testToggle && testToggle.checked;
+                
+                // If test mode is enabled, force price to 1.00 for the gateway/display
+                const finalTotal = showTest ? 1.00 : Math.max(0, total - promoDiscountAmount - coinDiscount);
+                
                 const currencyCode = document.getElementById('booking-currency')?.value || 'INR';
                 
                 // Update Coin Message

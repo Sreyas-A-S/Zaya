@@ -68,10 +68,47 @@ class BookingController extends Controller
             \Log::info("Fallback subtotal from request: {$subtotal}");
         }
 
-        // ... validation logic ...
+        // 2. Validate Promo Code
+        $promoDiscount = 0;
+        $promoCode = null;
+        if ($request->promo_code) {
+            $promo = \App\Models\PromoCode::where('code', $request->promo_code)
+                ->where('status', true)
+                ->where(function($q) {
+                    $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now()->toDateString());
+                })->first();
+            
+            if ($promo && ($promo->usage_limit === null || $promo->used_count < $promo->usage_limit)) {
+                $promoCode = $promo->code;
+                if ($promo->type === 'percentage') {
+                    $promoDiscount = ($subtotal * $promo->value) / 100;
+                } else {
+                    $promoDiscount = $promo->value;
+                }
+            }
+        }
+
+        // 3. Calculate Coin Discount
+        $coinsUsed = 0;
+        $coinDiscount = 0;
+        if ($request->coins_applied && $user->coins > 0) {
+            $coinSetting = \App\Models\CoinSetting::where('currency_code', $currency)->where('status', true)->first();
+            if ($coinSetting && $coinSetting->coin_value > 0) {
+                $afterPromo = max(0, $subtotal - $promoDiscount);
+                
+                $potentialDiscount = $user->coins * $coinSetting->coin_value;
+                if ($potentialDiscount > $afterPromo) {
+                    $coinDiscount = $afterPromo;
+                    $coinsUsed = ceil($afterPromo / $coinSetting->coin_value);
+                } else {
+                    $coinDiscount = $potentialDiscount;
+                    $coinsUsed = $user->coins;
+                }
+            }
+        }
 
         // Final amount to be paid
-        $finalPayable = max(0, $subtotal - $promoDiscount - $coinDiscount);
+        $finalPayable = $request->test_mode ? 1.00 : max(0, $subtotal - $promoDiscount - $coinDiscount);
         
         \Log::info('Final Totals:', [
             'subtotal' => $subtotal,
@@ -85,11 +122,10 @@ class BookingController extends Controller
             return response()->json(['success' => false, 'message' => 'This slot was just taken. Please choose another time.'], 422);
         }
 
-        // 5. Handle Test Mode OR Zero-Payable Bookings
-        if ($request->test_mode || $finalPayable <= 0) {
-            $prefix = $request->test_mode ? 'ZAYA-TEST-' : 'ZAYA-FREE-';
+        // 5. Handle Zero-Payable Bookings (Bypass Razorpay only if 0)
+        if ($finalPayable <= 0) {
             $booking = Booking::create([
-                'invoice_no' => $prefix . date('Ymd') . '-' . strtoupper(Str::random(4)),
+                'invoice_no' => 'ZAYA-FREE-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
                 'user_id' => $user->id,
                 'profile_id' => $practitioner->id,
                 'practitioner_type' => $practitioner->getMorphClass(),
@@ -105,7 +141,8 @@ class BookingController extends Controller
                 'coin_discount' => $coinDiscount,
                 'currency' => $currency,
                 'status' => 'confirmed',
-                'razorpay_payment_id' => $request->test_mode ? 'MO_TEST_PAYMENT' : 'ZERO_PAYMENT',
+                'razorpay_payment_id' => 'ZERO_PAYMENT',
+                'additional_info' => $request->additional_info,
             ]);
 
             // Deduct Coins
@@ -125,19 +162,17 @@ class BookingController extends Controller
                 'type' => 'booking',
                 'amount' => $booking->total_price,
                 'user_id' => $booking->user_id,
-                'practitioner_id' => $practitioner->user_id ?? null,
+                'practitioner_id' => $practitioner->user_id,
                 'booking_id' => $booking->id,
-                'payment_id' => $request->test_mode ? 'MO_TEST_PAYMENT' : 'ZERO_PAYMENT',
+                'payment_id' => 'ZERO_PAYMENT',
                 'currency' => $currency,
                 'coins_used' => $coinsUsed,
                 'coin_discount' => $coinDiscount,
             ]);
 
-            $successMsg = $request->test_mode ? 'Test booking confirmed successfully!' : 'Booking confirmed! (Discount applied)';
-
             return response()->json([
                 'success' => true,
-                'message' => $successMsg,
+                'message' => 'Booking confirmed! (Discount applied)',
                 'redirect_url' => route('invoice.show', $booking->invoice_no),
             ]);
         }
@@ -180,18 +215,28 @@ class BookingController extends Controller
                             'conditions' => $request->conditions,
                             'total_price' => $request->total_price,
                             'promo_code' => $request->promo_code,
-                            'discount_amount' => $request->discount_amount,
+                            'discount_amount' => $promoDiscount,
                             'coins_used' => $coinsUsed,
                             'coin_discount' => $coinDiscount,
-                            'currency' => $currency
-                        ]
-                    ]);
+                            'currency' => $currency,
+                            'additional_info' => json_encode($request->additional_info)
+                            ]
+                            ]);
 
                 if ($response->successful()) {
                     $paymentUrl = $response->json('short_url');
+                } else {
+                    \Log::error('Razorpay API Error:', [
+                        'status' => $response->status(),
+                        'body' => $response->body(),
+                        'payload' => [
+                            'amount' => (int)(round($finalPayable, 2) * 100),
+                            'currency' => $currency,
+                        ]
+                    ]);
                 }
             } catch (\Exception $e) {
-                \Log::error('Razorpay Connection Error: ' . $e->getMessage());
+                \Log::error('Razorpay Connection Exception: ' . $e->getMessage());
             }
         }
 

@@ -1793,7 +1793,7 @@ class ProfileController extends Controller
         // Reviews received by this user (if they are a professional)
         if ($user->profile_id && in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'])) {
             $receivedReviews = PractitionerReview::with('user')
-                ->where('profile_id', $user->profile_id)->where('practitioner_type', $user->getMorphClass())
+                ->where('practitioner_id', $user->profile_id)
                 ->where('status', true)
                 ->latest()
                 ->paginate(10, ['*'], 'received_page');
