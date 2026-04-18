@@ -238,6 +238,7 @@ class WebController extends Controller
         }
 
         $selectedService = null;
+        $serviceForFilter = null;
         if ($request->filled('service')) {
             $service = $request->query('service');
             $serviceForFilter = $service;
