@@ -749,8 +749,7 @@
         function getEffectiveTotalPrice() {
             const baseTotal = lastComputedTotal !== null ? lastComputedTotal : getDisplayedTotalPrice();
             const discountedTotal = Math.max(0, baseTotal - promoDiscountAmount);
-            const testToggle = document.getElementById('test-payment-toggle');
-            return testToggle && testToggle.checked ? 1 : discountedTotal;
+            return discountedTotal;
         }
 
         let appliedPromoCode = null;
@@ -1174,16 +1173,16 @@
             const priceContainer = document.getElementById('step-3-total-amount');
             const step3Content = document.getElementById('step-3-content');
             lastComputedTotal = total;
-            
+
             // Calculate Coin Discount
             let coinDiscount = 0;
             let coinsToUse = 0;
-            
+
             if (coinsApplied && total > 0 && COIN_VALUE > 0) {
                 // Max discount is subtotal after promo
                 const afterPromo = Math.max(0, total - promoDiscountAmount);
                 const potentialCoinDiscount = USER_COINS_BALANCE * COIN_VALUE;
-                
+
                 if (potentialCoinDiscount > afterPromo) {
                     coinDiscount = afterPromo;
                     coinsToUse = Math.ceil(afterPromo / COIN_VALUE);
@@ -1195,12 +1194,12 @@
 
             const testToggle = document.getElementById('test-payment-toggle');
             const showTest = testToggle && testToggle.checked;
-            
-            // If test mode is enabled, force price to 1.00 for the gateway/display
-            const finalTotal = showTest ? 1.00 : Math.max(0, total - promoDiscountAmount - coinDiscount);
-            
+
+            // Keep UI showing real total, but indicate test charge
+            const finalTotal = Math.max(0, total - promoDiscountAmount - coinDiscount);
+
             const currencyCode = document.getElementById('booking-currency')?.value || 'INR';
-            
+
             // Update Coin Message
             const coinMsg = document.getElementById('coin-discount-message');
             if (coinMsg) {
@@ -1242,13 +1241,17 @@
 
             if (priceContainer) {
                 if (showTest) {
-                    priceContainer.innerHTML = `${currencySymbol} ${finalTotal.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ TEST</span>`;
+                    priceContainer.innerHTML = `
+                        <div class="flex flex-col items-center">
+                            <div>${currencySymbol} ${finalTotal.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ ${currencyCode}</span></div>
+                            <div class="text-xs bg-red-100 text-red-600 px-3 py-1 rounded-full font-bold uppercase mt-2 animate-pulse">Test Mode: Only ₹1.00 will be charged</div>
+                        </div>
+                    `;
                 } else {
                     priceContainer.innerHTML = `${currencySymbol} ${finalTotal.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ ${currencyCode}</span>`;
                 }
             }
         }
-
         async function renderSelectedServices() {
             // Clear promo code when services change to avoid incorrect discount amounts
             if (appliedPromoCode) {

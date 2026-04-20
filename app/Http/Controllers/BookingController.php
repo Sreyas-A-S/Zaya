@@ -37,7 +37,8 @@ class BookingController extends Controller
             'currency' => 'nullable|string',
             'promo_code' => 'nullable|string|exists:promo_codes,code',
             'discount_amount' => 'nullable|numeric|min:0',
-            'coins_applied' => 'nullable|boolean'
+            'coins_applied' => 'nullable|boolean',
+            'test_mode' => 'nullable|boolean'
         ]);
 
         $practitioner = Practitioner::with('user')->findOrFail($request->practitioner_id);
