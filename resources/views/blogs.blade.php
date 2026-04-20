@@ -185,49 +185,58 @@
                                     {{-- Previous Button --}}
                                     @if($pagination['currentPage'] > 1)
                                         <a href="{{ route('blogs', array_merge(request()->query(), ['page' => $pagination['currentPage'] - 1])) }}" 
-                                           class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 group">
+                                           class="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 text-xs rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 group">
                                             <i class="ri-arrow-left-s-line text-xl"></i>
                                         </a>
                                     @else
-                                        <span class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-100 text-gray-300 cursor-not-allowed">
+                                        <span class="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 text-xs rounded-full border border-gray-100 text-gray-300 cursor-not-allowed">
                                             <i class="ri-arrow-left-s-line text-xl"></i>
                                         </span>
                                     @endif
 
                                     {{-- Page Numbers --}}
                                     @php
-                                        $start = max(1, $pagination['currentPage'] - 2);
-                                        $end = min($pagination['totalPages'], $pagination['currentPage'] + 2);
-                                        
-                                        // Adjust if we're near the start or end
-                                        if ($pagination['currentPage'] <= 3) {
-                                            $end = min(5, $pagination['totalPages']);
+                                        $window = 1; // 1 page on each side → total 3 pages
+
+                                        $start = $pagination['currentPage'] - $window;
+                                        $end = $pagination['currentPage'] + $window;
+
+                                        // եթե start goes below 1 → shift right
+                                        if ($start < 1) {
+                                            $end += (1 - $start);
+                                            $start = 1;
                                         }
-                                        if ($pagination['currentPage'] >= $pagination['totalPages'] - 2) {
-                                            $start = max(1, $pagination['totalPages'] - 4);
+
+                                        // եթե end exceeds total → shift left
+                                        if ($end > $pagination['totalPages']) {
+                                            $start -= ($end - $pagination['totalPages']);
+                                            $end = $pagination['totalPages'];
                                         }
+
+                                        // final safety
+                                        $start = max(1, $start);
                                     @endphp
 
                                     {{-- First page and ellipsis --}}
                                     @if($start > 1)
                                         <a href="{{ route('blogs', array_merge(request()->query(), ['page' => 1])) }}" 
-                                           class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300">
+                                           class="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 text-xs rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300">
                                             1
                                         </a>
                                         @if($start > 2)
-                                            <span class="flex items-center justify-center w-8 text-gray-400">...</span>
+                                            <span class="flex items-center justify-center w-auto text-gray-400">...</span>
                                         @endif
                                     @endif
 
                                     {{-- Page number links --}}
                                     @for($i = $start; $i <= $end; $i++)
                                         @if($i == $pagination['currentPage'])
-                                            <span class="flex items-center justify-center w-12 h-12 rounded-full bg-secondary text-white font-medium shadow-lg shadow-secondary/30">
+                                            <span class="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 text-xs rounded-full bg-secondary text-white font-medium shadow-lg shadow-secondary/30">
                                                 {{ $i }}
                                             </span>
                                         @else
                                             <a href="{{ route('blogs', array_merge(request()->query(), ['page' => $i])) }}" 
-                                               class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300">
+                                               class="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 text-xs rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300">
                                                 {{ $i }}
                                             </a>
                                         @endif
@@ -236,10 +245,10 @@
                                     {{-- Last page and ellipsis --}}
                                     @if($end < $pagination['totalPages'])
                                         @if($end < $pagination['totalPages'] - 1)
-                                            <span class="flex items-center justify-center w-8 text-gray-400">...</span>
+                                            <span class="flex items-center justify-center w-auto text-gray-400">...</span>
                                         @endif
                                         <a href="{{ route('blogs', array_merge(request()->query(), ['page' => $pagination['totalPages']])) }}" 
-                                           class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300">
+                                           class="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 text-xs rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300">
                                             {{ $pagination['totalPages'] }}
                                         </a>
                                     @endif
@@ -247,11 +256,11 @@
                                     {{-- Next Button --}}
                                     @if($pagination['currentPage'] < $pagination['totalPages'])
                                         <a href="{{ route('blogs', array_merge(request()->query(), ['page' => $pagination['currentPage'] + 1])) }}" 
-                                           class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 group">
+                                           class="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 text-xs rounded-full border border-gray-200 text-gray-600 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 group">
                                             <i class="ri-arrow-right-s-line text-xl"></i>
                                         </a>
                                     @else
-                                        <span class="flex items-center justify-center w-12 h-12 rounded-full border border-gray-100 text-gray-300 cursor-not-allowed">
+                                        <span class="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 text-xs rounded-full border border-gray-100 text-gray-300 cursor-not-allowed">
                                             <i class="ri-arrow-right-s-line text-xl"></i>
                                         </span>
                                     @endif
