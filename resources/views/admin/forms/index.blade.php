@@ -105,6 +105,8 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline-dark" type="button" data-bs-dismiss="modal">Close</button>
+                                <button class="btn btn-outline-success" type="button" data-bs-dismiss="modal">Submit</button>
+
             </div>
         </div>
     </div>
