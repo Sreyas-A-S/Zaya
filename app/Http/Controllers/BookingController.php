@@ -187,12 +187,17 @@ class BookingController extends Controller
 
         if ($razorpayKey && $razorpaySecret) {
             $verifySsl = config('services.razorpay.verify_ssl');
+            
+            // If test mode is active, we force currency to INR and amount to 1.00
+            $gatewayAmount = $request->test_mode ? 1.00 : $finalPayable;
+            $gatewayCurrency = $request->test_mode ? 'INR' : $currency;
+
             try {
                 $response = Http::withBasicAuth($razorpayKey, $razorpaySecret)
                     ->withOptions(['verify' => $verifySsl])
                     ->post('https://api.razorpay.com/v1/payment_links', [
-                        'amount' => (int)(round($finalPayable, 2) * 100),
-                        'currency' => $currency,
+                        'amount' => (int)(round($gatewayAmount, 2) * 100),
+                        'currency' => $gatewayCurrency,
                         'accept_partial' => false,
                         'description' => 'Booking Session - Zaya Wellness',
                         'customer' => [
