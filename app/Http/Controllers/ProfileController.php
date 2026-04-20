@@ -41,8 +41,9 @@ class ProfileController extends Controller
             $query->where('translator_id', $profileId);
         } else {
             // Practitioners, Doctors, Mindfulness, Yoga
+            $morphClass = $user->profile ? $user->profile->getMorphClass() : $role;
             $query->where('profile_id', $profileId)
-                  ->where('practitioner_type', $user->getMorphClass());
+                  ->where('practitioner_type', $morphClass);
         }
 
         return $query;

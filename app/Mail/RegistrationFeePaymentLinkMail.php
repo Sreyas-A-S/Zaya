@@ -32,6 +32,9 @@ class RegistrationFeePaymentLinkMail extends Mailable
 
     public function content(): Content
     {
+        $rolesWithoutTimeline = ['Doctor', 'Mindfulness Counsellor', 'Mindfulness Practitioner', 'Yoga Therapist', 'Translator'];
+        $reviewTimeline = in_array($this->roleLabel, $rolesWithoutTimeline) ? "review only" : "up to 30 days";
+
         $button = '<a href="' . e($this->paymentUrl) . '" style="display:inline-block;padding:14px 24px;background:#2E4B3C;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;">Pay Registration Fee</a>';
 
         return new Content(
@@ -45,7 +48,7 @@ class RegistrationFeePaymentLinkMail extends Mailable
                     'email' => '',
                     'phone' => '',
                     'user_type' => [],
-                    'message' => "Amount: {$this->currency} " . number_format($this->amount, 2) . "\nReview timeline: up to 30 days\n\nClick the button below to pay:",
+                    'message' => "Amount: {$this->currency} " . number_format($this->amount, 2) . "\nReview timeline: {$reviewTimeline}\n\nClick the button below to pay:",
                 ],
                 'outro' => $button,
             ],
