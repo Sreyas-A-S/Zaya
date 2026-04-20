@@ -777,6 +777,7 @@
             btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i>';
 
             try {
+                const currency = document.getElementById('booking-currency')?.value || 'INR';
                 const response = await fetch('{{ route('promo.validate') }}', {
                     method: 'POST',
                     headers: {
