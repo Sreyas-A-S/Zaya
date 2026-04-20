@@ -87,7 +87,6 @@ class PractitionerController extends Controller
                                 ->orWhere('users.last_name', 'LIKE', "%$searchValue%")
                                 ->orWhere('users.email', 'LIKE', "%$searchValue%")
                                 ->orWhere('practitioners.phone', 'LIKE', "%$searchValue%")
-                                ->orWhere('practitioners.nationality', 'LIKE', "%$searchValue%")
                                 ->orWhere('practitioners.city', 'LIKE', "%$searchValue%")
                                 ->orWhere('practitioners.state', 'LIKE', "%$searchValue%")
                                 ->orWhere('practitioners.country', 'LIKE', "%$searchValue%")

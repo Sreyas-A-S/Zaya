@@ -154,8 +154,9 @@ trait AdminFilterTrait
         ];
         
         foreach ($joins as $join) {
-            if (in_array($join->table, $specializedTables)) {
-                return $join->table;
+            $tableName = is_string($join->table) ? trim($join->table) : $join->table;
+            if (in_array($tableName, $specializedTables)) {
+                return $tableName;
             }
         }
         

@@ -281,12 +281,23 @@
                 item.onclick = () => selectProfessional(p.id, p.name, p.service_fee, p.profile_pic, role);
 
                 const canViewProfile = (p.role === 'practitioner');
+
+                const recommendedBadge = p.is_recommended
+                    ? `<span class="text-[9px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-black uppercase tracking-widest border border-blue-100">⭐ Recommended</span>`
+                    : '';
+
+                const matchingChips = (p.matched_expertises || []).map(exp => 
+                    `<span class="text-[8px] bg-white border border-secondary/10 text-secondary/60 px-1.5 py-0.5 rounded mt-1">${exp}</span>`
+                ).join(' ');
                 
                 item.innerHTML = `
                     <div class="flex items-center gap-4">
                         <img src="${p.profile_pic}" class="w-12 h-12 rounded-xl object-cover border border-gray-100 shadow-sm">
                         <div>
-                            <p class="text-sm font-bold text-secondary leading-tight">${p.name}</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-secondary leading-tight mb-0">${p.name}</p>
+                                ${recommendedBadge}
+                            </div>
                             <div class="flex flex-wrap items-center gap-2 mt-1">
                                 <span class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${p.handles_service ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-50 text-gray-400'}">
                                     ${p.handles_service ? 'Handles Service' : 'Consultation Only'}
@@ -297,6 +308,7 @@
                                     </span>
                                 ` : ''}
                             </div>
+                            <div class="flex flex-wrap gap-1 mt-1">${matchingChips}</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">

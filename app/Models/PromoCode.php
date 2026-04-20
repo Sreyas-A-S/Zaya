@@ -19,6 +19,7 @@ class PromoCode extends Model
         'usage_limit',
         'used_count',
         'expiry_date',
+        'currency',
         'status',
     ];
 

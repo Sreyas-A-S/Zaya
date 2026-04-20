@@ -433,13 +433,13 @@
 
             @if($latestAnnouncement)
                 @if($latestAnnouncement['image'])
-                <div class="w-full md:w-40 h-40 md:h-auto shrink-0 overflow-hidden bg-gray-100">
+                <div class="w-auto md:w-40 h-40 md:h-auto shrink-0 overflow-hidden bg-gray-100 m-3 border border-gray-100">
                     <img src="{{ $latestAnnouncement['image'] }}" alt="Announcement" class="w-full h-full object-cover">
                 </div>
                 @endif
-                <div class="p-8 pr-12 flex flex-col justify-center gap-2">
+                <div class="p-6 md:p-8 md:pl-2 pr-12 flex flex-col justify-center gap-2">
                     <span class="text-[10px] font-black text-primary uppercase tracking-widest leading-none" data-i18n="New Announcement">New Announcement</span>
-                    <h4 class="text-base font-bold text-gray-800 line-clamp-1 leading-tight">{{ $latestAnnouncement['title'] }}</h4>
+                    <h4 class="text-lg md:text-xl font-bold text-gray-800 line-clamp-1 leading-tight">{{ $latestAnnouncement['title'] }}</h4>
                     <p class="text-sm text-gray-500 line-clamp-2 leading-snug">{{ \Illuminate\Support\Str::limit($latestAnnouncement['excerpt'], 100) }}</p>
                     <a href="{{ $latestAnnouncement['link'] }}" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1">
                         <span data-i18n="Read More">Read More</span> <i class="ri-arrow-right-s-line"></i>

@@ -969,9 +969,11 @@ class WebController extends Controller
             'amount' => ['nullable', 'numeric', 'min:0'],
             'usage_type' => ['nullable', 'string', 'in:registration,booking'],
             'country' => ['nullable', 'string'],
+            'currency' => ['nullable', 'string', 'max:10'],
         ]);
 
         $usageType = $request->input('usage_type', 'registration');
+        $currency = $request->input('currency', 'INR');
         $baseFee = 0.0;
 
         if ($usageType === 'registration') {
@@ -1030,6 +1032,11 @@ class WebController extends Controller
 
         if (!is_null($promo->usage_limit) && (int) $promo->used_count >= (int) $promo->usage_limit) {
             return response()->json(['message' => 'Promo code usage limit reached.'], 422);
+        }
+
+        // Check currency for fixed promo codes
+        if ($promo->type === 'fixed' && $promo->currency && $promo->currency !== $currency) {
+            return response()->json(['message' => 'This promo code is only valid for ' . $promo->currency . ' transactions.'], 422);
         }
 
         $reward = is_numeric($promo->reward) ? (float) $promo->reward : 0.0;

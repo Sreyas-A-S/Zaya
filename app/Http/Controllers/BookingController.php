@@ -37,7 +37,8 @@ class BookingController extends Controller
             'currency' => 'nullable|string',
             'promo_code' => 'nullable|string|exists:promo_codes,code',
             'discount_amount' => 'nullable|numeric|min:0',
-            'coins_applied' => 'nullable|boolean'
+            'coins_applied' => 'nullable|boolean',
+            'test_mode' => 'nullable|boolean'
         ]);
 
         $practitioner = Practitioner::with('user')->findOrFail($request->practitioner_id);
@@ -391,27 +392,74 @@ class BookingController extends Controller
 
         if ($query) $usersQuery->where('name', 'LIKE', "%{$query}%");
 
-        $users = $usersQuery->limit(5)->get();
+        // Prepare matching criteria from current booking
+        $matchCriteria = [];
+        if ($booking) {
+            if ($booking->service_ids) {
+                $serviceTitles = Service::whereIn('id', (array) $booking->service_ids)->pluck('title')->toArray();
+                $matchCriteria = array_merge($matchCriteria, $serviceTitles);
+            }
+            if ($booking->conditions) {
+                // Assuming conditions might be a string or array, normalize it
+                $bookingConditions = is_array($booking->conditions) ? $booking->conditions : explode(',', (string)$booking->conditions);
+                $matchCriteria = array_merge($matchCriteria, array_map('trim', $bookingConditions));
+            }
+        }
+        $matchCriteria = array_unique(array_filter($matchCriteria));
 
-        $results = $users->map(function ($u) use ($booking) {
-            $handlesService = false; $serviceFee = 0;
+        $users = $usersQuery->get(); // Fetch all for sorting, or we can use a more complex query
+
+        $results = $users->map(function ($u) use ($booking, $matchCriteria) {
+            $handlesService = false;
+            $serviceFee = 0;
+            $isRecommended = false;
+            $matchedExpertises = [];
+
             if ($booking && in_array($u->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'])) {
+                // 1. Check if they handle the EXACT services requested
                 $userServices = \App\Models\UserService::where('user_id', $u->id)->whereIn('service_id', $booking->service_ids ?? [])->get();
                 if ($userServices->isNotEmpty()) {
                     $handlesService = true;
                     $serviceFee = $userServices->sum('rate');
                 }
+
+                // 2. Check for Recommendation (Service overlap or Condition match)
+                $profile = $u->profile;
+                if ($profile) {
+                    $practitionerExpertises = (array) ($profile->expertises_list ?? []);
+                    $practitionerConditions = (array) ($profile->conditions_list ?? []);
+                    
+                    // Check intersection
+                    $matches = array_intersect(
+                        array_map('strtolower', (array)$matchCriteria),
+                        array_map('strtolower', array_merge($practitionerExpertises, $practitionerConditions))
+                    );
+
+                    if (!empty($matches)) {
+                        $isRecommended = true;
+                        $matchedExpertises = array_values($matches);
+                    }
+                }
             }
+
             return [
-                'id' => $u->id, 'name' => $u->name, 'role' => $u->role,
+                'id' => $u->id,
+                'name' => $u->name,
+                'role' => $u->role,
                 'role_label' => str_replace('_', ' ', ucfirst($u->role)),
-                'handles_service' => $handlesService, 'service_fee' => $serviceFee,
+                'handles_service' => $handlesService,
+                'service_fee' => $serviceFee,
+                'is_recommended' => $isRecommended,
+                'matched_expertises' => $matchedExpertises,
                 'profile_pic' => $u->profile_pic ? (str_starts_with($u->profile_pic, 'http') ? $u->profile_pic : asset('storage/' . $u->profile_pic)) : asset('frontend/assets/profile-dummy-img.png'),
                 'profile_url' => $u->profile_url,
             ];
         });
 
-        return response()->json($results);
+        // Sort: Recommended first
+        $results = $results->sortByDesc('is_recommended')->values();
+
+        return response()->json($results->take(10));
     }
 
     public function getProfessionalProfile(Request $request, User $user)
