@@ -336,9 +336,9 @@
                                                 </div>
                                                 <div class="relative flex-1">
                                                     <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">{{ config('currencies.symbols')[$defaultCurrency ?? 'INR'] ?? '₹' }}</span>
-                                                    <input type="number" name="services[0][rates][0][rate]" step="0.01" required placeholder="0.00" readonly class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 bg-[#f3f4f6] focus:ring-0 outline-none font-bold text-secondary text-base sm:text-lg cursor-not-allowed">
+                                                    <input type="number" name="services[0][rates][0][rate]" step="0.01" required placeholder="0.00"  class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 bg-[#f3f4f6] focus:ring-0 outline-none font-bold text-secondary text-base sm:text-lg ">
                                                 </div>
-                                                <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
+                                                <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" >
                                                     <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
                                                 </button>
                                             </div>
