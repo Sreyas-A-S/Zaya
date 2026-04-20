@@ -61,9 +61,7 @@
                     <a class="nav-link" id="v-pills-experience-tab" data-bs-toggle="pill" href="#v-pills-experience" role="tab" aria-controls="v-pills-experience" aria-selected="false">
                         <i class="iconly-Star icli"></i> Experience & Referral
                     </a>
-                    <a class="nav-link" id="v-pills-security-tab" data-bs-toggle="pill" href="#v-pills-security" role="tab" aria-controls="v-pills-security" aria-selected="false">
-                        <i class="iconly-Lock icli"></i> Security Settings
-                    </a>
+                   
                 </div>
                 
                 <hr>
@@ -248,27 +246,7 @@
                 </div>
 
                 <!-- Security Tab -->
-                <div class="tab-pane fade" id="v-pills-security" role="tabpanel" aria-labelledby="v-pills-security-tab">
-                    <div class="card detail-card p-4">
-                        <div class="section-header">
-                            <h5 class="mb-0 text-primary">Security & Account Settings</h5>
-                        </div>
-                        <div class="row g-4">
-                            <div class="col-md-12">
-                                <div class="alert alert-light-warning">
-                                    <h6 class="text-warning fw-bold mb-2"><i class="fa fa-info-circle me-2"></i>Note for Administrators</h6>
-                                    <p class="mb-0 small">Password changes should only be performed via the Edit modal to ensure proper encryption and security protocols.</p>
-                                </div>
-                                <div class="mt-4">
-                                    <p class="info-label">Last Login IP</p>
-                                    <p class="info-value">{{ $user->last_login_ip ?? 'Never' }}</p>
-                                    <p class="info-label mt-3">Email Verified At</p>
-                                    <p class="info-value">@if($user->email_verified_at) <span class="text-success"><i class="fa fa-check-circle me-1"></i>{{ $user->email_verified_at->format('d M, Y H:i') }}</span> @else <span class="text-danger">Not Verified</span> @endif</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
 
             </div>
         </div>
