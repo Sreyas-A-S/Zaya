@@ -78,7 +78,7 @@
                 </div>
                 <div>
                     <p id="client_panel_gender_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_gender_label'] ?? 'Gender' }}">{{ __($site_settings['client_panel_gender_label'] ?? 'Gender') }}</p>
-                    <p class="text-base font-normal text-gray-800">{{ ucfirst(__($profile->gender ?? ($user->gender ?? ($site_settings['client_panel_not_set'] ?? 'Not set')))) }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ ucfirst(__($profile?->gender ?? ($user->gender ?? ($site_settings['client_panel_not_set'] ?? 'Not set')))) }}</p>
                 </div>
                 <div>
                     <p id="client_panel_dob_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_dob_label'] ?? 'DOB' }}">{{ __($site_settings['client_panel_dob_label'] ?? 'DOB') }}</p>
@@ -86,7 +86,7 @@
                 </div>
                 <div>
                     <p class="text-base text-gray-400 mb-1">{{ __('Nationality') }}</p>
-                    <p class="text-base font-normal text-gray-800">{{ $profile->nationality ?? ($profile->country ?? ($user->nationality ? $user->nationality->name : __($site_settings['client_panel_not_set'] ?? 'Not set'))) }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ $profile?->nationality ?? ($profile?->country ?? ($user->nationality ? $user->nationality->name : __($site_settings['client_panel_not_set'] ?? 'Not set'))) }}</p>
                 </div>
             </div>
 
@@ -99,11 +99,11 @@
                 </div>
                 <div>
                     <p id="client_panel_phone_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_phone_label'] ?? 'Phone' }}">{{ __($site_settings['client_panel_phone_label'] ?? 'Phone') }}</p>
-                    <p class="text-base font-normal text-gray-800">{{ ($profile->mobile_country_code ? $profile->mobile_country_code . '-' : '') . ($profile->phone ?? ($user->phone ?? __($site_settings['client_panel_not_set'] ?? 'Not set'))) }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ ($profile?->mobile_country_code ? $profile->mobile_country_code . '-' : '') . ($profile?->phone ?? ($user->phone ?? __($site_settings['client_panel_not_set'] ?? 'Not set'))) }}</p>
                 </div>
                 <div>
                     <p id="client_panel_address_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_address_label'] ?? 'Address' }}">{{ __($site_settings['client_panel_address_label'] ?? 'Address') }}</p>
-                    <p class="text-base font-normal text-gray-800 leading-snug">{{ $profile->address ?? ($profile->city_state ?? __($site_settings['client_panel_location_not_set'] ?? 'Location not set')) }}</p>
+                    <p class="text-base font-normal text-gray-800 leading-snug">{{ $profile?->address ?? ($profile?->city_state ?? __($site_settings['client_panel_location_not_set'] ?? 'Location not set')) }}</p>
                 </div>
             </div>
         </div>
@@ -456,9 +456,9 @@
         <button
             id="gdpr-toggle"
             onclick="toggleConsent(this)"
-            class="w-10 h-5 {{ ($user->patient->data_sharing_consent ?? false) ? 'bg-secondary' : 'bg-gray-300' }} rounded-full relative flex items-center transition-colors cursor-pointer">
+            class="w-10 h-5 {{ ($user->patient?->data_sharing_consent ?? false) ? 'bg-secondary' : 'bg-gray-300' }} rounded-full relative flex items-center transition-colors cursor-pointer">
             <div
-                class="w-4 h-4 bg-white rounded-full absolute left-0.5 shadow-sm transition-transform duration-300 {{ ($user->patient->data_sharing_consent ?? false) ? 'translate-x-5' : '' }}">
+                class="w-4 h-4 bg-white rounded-full absolute left-0.5 shadow-sm transition-transform duration-300 {{ ($user->patient?->data_sharing_consent ?? false) ? 'translate-x-5' : '' }}">
             </div>
         </button>
     </div>
