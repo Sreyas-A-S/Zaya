@@ -99,7 +99,7 @@
                 </div>
                 <div>
                     <p id="client_panel_phone_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_phone_label'] ?? 'Phone' }}">{{ __($site_settings['client_panel_phone_label'] ?? 'Phone') }}</p>
-                    <p class="text-base font-normal text-gray-800">{{ ($profile?->mobile_country_code ? $profile->mobile_country_code . '-' : '') . ($profile?->phone ?? ($user->phone ?? __($site_settings['client_panel_not_set'] ?? 'Not set'))) }}</p>
+                    <p class="text-base font-normal text-gray-800">{{ ($profile?->mobile_country_code ? $profile?->mobile_country_code . '-' : '') . ($profile?->phone ?? ($user->phone ?? __($site_settings['client_panel_not_set'] ?? 'Not set'))) }}</p>
                 </div>
                 <div>
                     <p id="client_panel_address_label" class="text-base text-gray-400 mb-1" data-i18n="{{ $site_settings['client_panel_address_label'] ?? 'Address' }}">{{ __($site_settings['client_panel_address_label'] ?? 'Address') }}</p>
@@ -277,7 +277,7 @@
                             <span class="text-gray-800 text-base">•</span>
                             <p class="text-xs text-gray-600 font-normal">
                                 @if($user->role === 'client' || $user->role === 'patient')
-                                    ({{ __($site_settings['client_panel_session_with'] ?? 'Session with') }} {{ $booking->practitioner->user->name ?? 'Practitioner' }})
+                                    ({{ __($site_settings['client_panel_session_with'] ?? 'Session with') }} {{ $booking->practitioner?->user?->name ?? 'Practitioner' }})
                                 @else
                                     ({{ __($site_settings['client_panel_client_label'] ?? 'Client') }}: {{ $booking->user->name ?? 'Patient' }})
                                 @endif
@@ -311,7 +311,7 @@
                             <span class="text-gray-800 text-base">•</span>
                             <p class="text-xs text-gray-600 font-normal">
                                 @if($user->role === 'client' || $user->role === 'patient')
-                                    ({{ __($site_settings['client_panel_session_with'] ?? 'Session with') }} {{ $booking->practitioner->user->name ?? 'Practitioner' }})
+                                    ({{ __($site_settings['client_panel_session_with'] ?? 'Session with') }} {{ $booking->practitioner?->user?->name ?? 'Practitioner' }})
                                 @else
                                     ({{ __($site_settings['client_panel_client_label'] ?? 'Client') }}: {{ $booking->user->name ?? 'Patient' }})
                                 @endif
@@ -405,7 +405,7 @@
         @forelse($reviews as $review)
         <div class="border-b border-[#DDDDDD] pb-6">
             <div class="flex items-center space-x-3 mb-3">
-                <h3 class="font-sans! text-base font-medium text-gray-800">{{ $review->practitioner->user->name }}</h3>
+                <h3 class="font-sans! text-base font-medium text-gray-800">{{ $review->practitioner?->user?->name ?? 'Practitioner' }}</h3>
                 <span class="text-xs md:text-sm text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
                 {{-- <div class="flex items-center gap-3 ml-auto shrink-0">
                     <button
