@@ -47,6 +47,10 @@ trait AdminFilterTrait
                         $q->whereIn($effectiveTable . '.country', $assignedCountryNames);
                     }
                 });
+            } else {
+                // If not Super Admin and has NO assigned countries, they should see NO data
+                $query->whereRaw('1 = 0');
+                return $query;
             }
 
             if (!empty($user->languages)) {
@@ -71,6 +75,9 @@ trait AdminFilterTrait
                         }
                     });
                 }
+            } else {
+                 // If not Super Admin and has NO assigned languages, they should see NO data if language filtering is applicable
+                 // But typically country is the primary filter. Let's stick with country for now to avoid being too restrictive if languages aren't set.
             }
         }
 
