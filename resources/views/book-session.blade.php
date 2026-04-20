@@ -644,7 +644,7 @@
 
             <!-- Test Payment Toggle -->
             <div class="flex items-center justify-center gap-3 mb-6">
-                <input type="checkbox" id="test-payment-toggle" onchange="renderSelectedServices()" class="h-4 w-4 accent-[#F5A623] cursor-pointer">
+                <input type="checkbox" id="test-payment-toggle" class="h-4 w-4 accent-[#F5A623] cursor-pointer">
                 <label for="test-payment-toggle" class="text-sm text-gray-600 cursor-pointer">
                     Test payment (use INR 1.00)
                 </label>
