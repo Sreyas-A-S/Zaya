@@ -464,62 +464,6 @@
                             </div>
                         @endif
 
-                        <!-- Payment Section -->
-                        @if($registrationFeeEnabled)
-                            <div class="mb-10 border-t border-gray-100 pt-10">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-                                    <div>
-                                        <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Registration Fee Amount') }}</label>
-                                        <div class="relative w-full">
-                                            <div class="w-full h-[58px] bg-[#F5F5F5] rounded-full flex items-center pl-8 pr-2" data-registration-fee-container>
-                                                <span class="text-gray-900 text-[1.05rem] font-medium" id="registration-fee-display">
-                                                    {{ $registrationCurrencySymbol }} {{ number_format($registrationFee ?? 0, 2, '.', '') }}
-                                                </span>
-                                                <input type="hidden" name="registration_fee" id="registration_fee" value="{{ number_format($registrationFee ?? 0, 2, '.', '') }}">
-                                                <input type="hidden" name="registration_fee_actual" id="registration_fee_actual" value="{{ number_format($registrationFee ?? 0, 2, '.', '') }}">
-                                                <input type="hidden" name="registration_fee_currency" id="registration-fee-currency" value="{{ $registrationCurrency }}">
-                                                <div class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-sm font-medium">
-                                                    {{ __('Application Fee') }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Promocode') }}</label>
-                                        <div class="relative w-full">
-                                            <input type="text" name="promocode" id="promocode-input" placeholder="CODE1234" class="w-full h-[58px] pl-6 pr-28 bg-white rounded-full border border-dashed border-[#CFCFCF] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#FABC41] focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)]">
-                                            <button type="button" id="promo-apply-btn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-7 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer">{{ __('Apply') }}</button>
-                                        </div>
-                                    </div>
-
-                                    <div id="promo-breakdown" class="hidden mt-6 md:col-span-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                        <div>
-                                            <label class="block text-gray-600 text-xs font-bold uppercase mb-2">{{ __('Actual Fee') }}</label>
-                                            <input type="text" id="promo-actual-fee" readonly class="w-full h-[48px] px-5 bg-[#F5F5F5] rounded-xl border-none outline-none text-sm text-gray-700">
-                                        </div>
-                                        <div>
-                                            <label class="block text-gray-600 text-xs font-bold uppercase mb-2">{{ __('Discount %') }}</label>
-                                            <input type="text" id="promo-discount-percentage" readonly class="w-full h-[48px] px-5 bg-[#F5F5F5] rounded-xl border-none outline-none text-sm text-gray-700">
-                                        </div>
-                                        <div>
-                                            <label class="block text-gray-600 text-xs font-bold uppercase mb-2">{{ __('Discount Amount') }}</label>
-                                            <input type="text" id="promo-discount-amount" readonly class="w-full h-[48px] px-5 bg-[#F5F5F5] rounded-xl border-none outline-none text-sm text-gray-700">
-                                        </div>
-                                        <div>
-                                            <label class="block text-gray-600 text-xs font-bold uppercase mb-2">{{ __('Payable Fee') }}</label>
-                                            <input type="text" id="promo-total-fee" readonly class="w-full h-[48px] px-5 bg-emerald-50 rounded-xl border border-emerald-100 outline-none text-sm text-emerald-700 font-bold">
-                                        </div>
-
-                                        <input type="hidden" name="promo_code" id="promo-code-hidden" value="">
-                                        <input type="hidden" name="promo_discount_percentage" id="promo-discount-percentage-hidden" value="">
-                                        <input type="hidden" name="promo_discount_amount" id="promo-discount-amount-hidden" value="">
-                                        <input type="hidden" name="promo_total_fee" id="promo-total-fee-hidden" value="">
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
                         <div class="mb-10">
                             <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Captcha Verification') }} <span class="text-red-500">*</span></label>
                             <div class="flex items-center gap-3">
