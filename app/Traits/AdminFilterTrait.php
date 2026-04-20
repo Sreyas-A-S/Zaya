@@ -43,8 +43,20 @@ trait AdminFilterTrait
                         $q->whereIn('financial-managers.country_id', $assignedCountryIds);
                     } else {
                         // For specialized tables like doctors, practitioners, etc.
-                        $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
-                        $q->whereIn($effectiveTable . '.country', $assignedCountryNames);
+                        $countries = \App\Models\Country::whereIn('id', $assignedCountryIds)->get();
+                        $assignedCountryNames = $countries->pluck('name')->toArray();
+                        
+                        // Add common abbreviations/variants for better matching
+                        $variants = [];
+                        foreach ($assignedCountryNames as $name) {
+                            if ($name === 'United Arab Emirates') $variants[] = 'UAE';
+                            if ($name === 'United Kingdom') $variants[] = 'UK';
+                            if ($name === 'United States') $variants[] = 'USA';
+                            // Add more if needed or use a mapping
+                        }
+                        $allSearchNames = array_merge($assignedCountryNames, $variants);
+                        
+                        $q->whereIn($effectiveTable . '.country', $allSearchNames);
                     }
                 });
             } else {
@@ -92,7 +104,11 @@ trait AdminFilterTrait
                               ->orWhereJsonContains('users.national_id', (int)$country->id);
                         });
                     } else {
-                        $query->where($effectiveTable . '.country', $country->name);
+                        $searchNames = [$country->name];
+                        if ($country->name === 'United Arab Emirates') $searchNames[] = 'UAE';
+                        if ($country->name === 'United Kingdom') $searchNames[] = 'UK';
+                        if ($country->name === 'United States') $searchNames[] = 'USA';
+                        $query->whereIn($effectiveTable . '.country', $searchNames);
                     }
                 } elseif ($type === 'financial-manager') {
                     $query->where('financial-managers.country_id', $country->id);
