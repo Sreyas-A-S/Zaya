@@ -162,15 +162,7 @@
                                     {{ $patient->country ?? 'N/A' }}
                                 </p>
                             </div>
-                            <div class="col-md-4">
-                                <p class="info-label">Payout Currency</p>
-                                <p class="info-value">
-                                    {{ $patient->payout_currency ?? 'N/A' }} 
-                                    @if($patient->payout_currency && isset($currencies[$patient->payout_currency]))
-                                        ({{ $currencies[$patient->payout_currency] }})
-                                    @endif
-                                </p>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
