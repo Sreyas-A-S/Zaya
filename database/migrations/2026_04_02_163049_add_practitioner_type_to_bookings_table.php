@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table->string('practitioner_type')->default('App\\Models\\Practitioner')->after('practitioner_id');
+            $table->string('practitioner_type')->default('practitioner')->after('practitioner_id');
             $table->index(['practitioner_id', 'practitioner_type']);
         });
     }

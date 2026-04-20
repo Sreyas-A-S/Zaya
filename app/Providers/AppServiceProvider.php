@@ -34,6 +34,13 @@ class AppServiceProvider extends ServiceProvider
             'mindfulness_practitioner' => \App\Models\MindfulnessPractitioner::class,
             'yoga_therapist' => \App\Models\YogaTherapist::class,
             'translator' => \App\Models\Translator::class,
+            
+            // Fallbacks for corrupted data (missing backslashes)
+            'AppModelsPractitioner' => \App\Models\Practitioner::class,
+            'AppModelsDoctor' => \App\Models\Doctor::class,
+            'AppModelsMindfulnessPractitioner' => \App\Models\MindfulnessPractitioner::class,
+            'AppModelsYogaTherapist' => \App\Models\YogaTherapist::class,
+            'AppModelsTranslator' => \App\Models\Translator::class,
         ]);
 
         Schema::defaultStringLength(191);
