@@ -44,10 +44,7 @@ trait AdminFilterTrait
                     } else {
                         // For specialized tables like doctors, practitioners, etc.
                         $assignedCountryNames = \App\Models\Country::whereIn('id', $assignedCountryIds)->pluck('name')->toArray();
-                        $q->where(function($sq) use ($effectiveTable, $assignedCountryNames) {
-                            $sq->whereIn($effectiveTable . '.country', $assignedCountryNames)
-                              ->orWhereIn($effectiveTable . '.nationality', $assignedCountryNames);
-                        });
+                        $q->whereIn($effectiveTable . '.country', $assignedCountryNames);
                     }
                 });
             }
@@ -88,10 +85,7 @@ trait AdminFilterTrait
                               ->orWhereJsonContains('users.national_id', (int)$country->id);
                         });
                     } else {
-                        $query->where(function($q) use ($effectiveTable, $country) {
-                            $q->where($effectiveTable . '.country', $country->name)
-                              ->orWhere($effectiveTable . '.nationality', $country->name);
-                        });
+                        $query->where($effectiveTable . '.country', $country->name);
                     }
                 } elseif ($type === 'financial-manager') {
                     $query->where('financial-managers.country_id', $country->id);

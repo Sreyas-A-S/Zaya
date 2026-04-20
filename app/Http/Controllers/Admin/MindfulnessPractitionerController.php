@@ -82,7 +82,6 @@ class MindfulnessPractitionerController extends Controller
                                 ->orWhere('users.email', 'LIKE', "%$searchValue%")
                                 ->orWhere('mindfulness_practitioners.phone', 'LIKE', "%$searchValue%")
                                 ->orWhere('mindfulness_practitioners.country', 'LIKE', "%$searchValue%")
-                                ->orWhere('mindfulness_practitioners.nationality', 'LIKE', "%$searchValue%")
                                 ->orWhere('mindfulness_practitioners.city', 'LIKE', "%$searchValue%")
                                 ->orWhere('mindfulness_practitioners.state', 'LIKE', "%$searchValue%")
                                 ->orWhere('mindfulness_practitioners.current_workplace', 'LIKE', "%$searchValue%")
