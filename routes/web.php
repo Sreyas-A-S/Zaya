@@ -55,7 +55,7 @@ Route::get('forgot-password/reset', [\App\Http\Controllers\Auth\ClientForgotPass
 Route::post('forgot-password/reset', [\App\Http\Controllers\Auth\ClientForgotPasswordController::class, 'resetPassword'])->name('client.forgot-password.reset.update');
 
 Route::post('login', [LoginController::class, 'login']);
-Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+Route::match(['get', 'post'], 'logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('set-password', [SetPasswordController::class, 'show'])->name('set-password.show');
 Route::post('set-password', [SetPasswordController::class, 'update'])->name('set-password.update');

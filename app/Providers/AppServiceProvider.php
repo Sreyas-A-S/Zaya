@@ -27,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Log::info('AppServiceProvider boot started');
         Relation::morphMap([
             'practitioner' => \App\Models\Practitioner::class,
             'doctor' => \App\Models\Doctor::class,

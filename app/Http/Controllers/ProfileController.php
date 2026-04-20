@@ -91,7 +91,7 @@ class ProfileController extends Controller
             ->take(10)
             ->get();
 
-        $reviews = PractitionerReview::with('practitioner.user')
+        $reviews =  PractitionerReview::with('practitioner.user')
             ->where('user_id', $user->id)
             ->latest()
             ->get();
