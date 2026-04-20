@@ -433,7 +433,7 @@
 
             @if($latestAnnouncement)
                 @if($latestAnnouncement['image'])
-                <div class="w-auto md:w-40 h-40 md:h-auto shrink-0 overflow-hidden bg-gray-100 m-3 rounded-xl border border-gray-100">
+                <div class="w-auto md:w-40 h-40 md:h-auto shrink-0 overflow-hidden bg-gray-100 m-3 border border-gray-100">
                     <img src="{{ $latestAnnouncement['image'] }}" alt="Announcement" class="w-full h-full object-cover">
                 </div>
                 @endif

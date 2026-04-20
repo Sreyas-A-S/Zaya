@@ -97,6 +97,7 @@ class DoctorController extends Controller
                                 ->orWhere('doctors.city', 'LIKE', "%$searchValue%")
                                 ->orWhere('doctors.state', 'LIKE', "%$searchValue%")
                                 ->orWhere('doctors.country', 'LIKE', "%$searchValue%")
+                                ->orWhere('doctors.nationality', 'LIKE', "%$searchValue%")
                                 ->orWhere('doctors.specialization', 'LIKE', "%$searchValue%")
                                 ->orWhere('doctors.consultation_expertise', 'LIKE', "%$searchValue%")
                                 ->orWhere('doctors.health_conditions_treated', 'LIKE', "%$searchValue%");

@@ -787,7 +787,8 @@
                     body: JSON.stringify({
                         code: code,
                         amount: currentSubtotal,
-                        usage_type: 'booking'
+                        usage_type: 'booking',
+                        currency: currency
                     })
                 });
 

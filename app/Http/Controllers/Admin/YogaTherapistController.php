@@ -85,6 +85,7 @@ class YogaTherapistController extends Controller
                                 ->orWhere('users.email', 'LIKE', "%$searchValue%")
                                 ->orWhere('yoga_therapists.phone', 'LIKE', "%$searchValue%")
                                 ->orWhere('yoga_therapists.country', 'LIKE', "%$searchValue%")
+                                ->orWhere('yoga_therapists.nationality', 'LIKE', "%$searchValue%")
                                 ->orWhere('yoga_therapists.city', 'LIKE', "%$searchValue%")
                                 ->orWhere('yoga_therapists.state', 'LIKE', "%$searchValue%")
                                 ->orWhere('yoga_therapists.current_organization', 'LIKE', "%$searchValue%")
