@@ -203,9 +203,9 @@
                     <i class="ri-wallet-3-line mr-3 text-lg"></i> <span id="client_panel_sidebar_transaction_vault" data-i18n="Transaction Vault">{{ __($site_settings['client_panel_sidebar_transaction_vault'] ?? 'Transaction Vault') }}</span>
                 </a>
                 @if(in_array($user->role, ['client', 'patient']))
-                <a href="{{ route('promo-codes.index') }}"
-                    class="flex items-center px-8 py-3 {{ request()->routeIs('promo-codes.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
-                    <i class="ri-ticket-2-line mr-3 text-lg"></i> <span>{{ __('Promo Codes') }}</span>
+                <a href="{{ route('rewards.index') }}"
+                    class="flex items-center px-8 py-3 {{ request()->routeIs('rewards.index') ? 'bg-[#F6F6F6] text-[#2B4C3B]' : 'text-[#8F8F8F] hover:bg-[#F6F6F6] hover:text-secondary' }} font-normal transition-colors">
+                    <i class="ri-ticket-2-line mr-3 text-lg"></i> <span>{{ __('Rewards') }}</span>
                 </a>
                 @endif
                 <a href="{{ route('reviews.index') }}"
@@ -398,7 +398,7 @@
                                     </div>
                                 </div>
                                 <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
-                                    <a href="{{ route('promo-codes.index') }}" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View Rewards</a>
+                                    <a href="{{ route('rewards.index') }}" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View Rewards</a>
                                 </div>
                             @else
                                 <!-- Professional: Earnings Balance -->

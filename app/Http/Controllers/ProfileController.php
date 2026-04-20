@@ -441,7 +441,10 @@ class ProfileController extends Controller
             ->pluck('promo_code')
             ->toArray();
 
-        return view('client.promo-codes', compact('activePromoCodes', 'usedPromoCodes'));
+        // Get coin settings for the user's currency
+        $coinSetting = \App\Models\CoinSetting::where('currency_code', $user->currency)->where('status', true)->first();
+
+        return view('client.rewards', compact('activePromoCodes', 'usedPromoCodes', 'user', 'coinSetting'));
     }
     public function healthJourney()
     {
