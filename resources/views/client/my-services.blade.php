@@ -132,6 +132,22 @@
         </script>
     @endif
 
+    @if($errors->any())
+        <div class="px-6 py-4 bg-red-50 border border-red-200 text-red-800 rounded-2xl flex flex-col shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+            <div class="flex items-center mb-2">
+                <div class="w-10 h-10 bg-red-500/10 rounded-full flex items-center justify-center mr-4">
+                    <i class="ri-error-warning-fill text-2xl text-red-600"></i>
+                </div>
+                <span class="font-bold">Please correct the following errors:</span>
+            </div>
+            <ul class="list-disc list-inside text-sm ml-14 font-medium">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="flex gap-3 mt-2 mb-2">
         <button id="tab-services-btn" class="tab-pill active" onclick="switchMyServicesTab('services')">Services</button>
         <button id="tab-video-btn" class="tab-pill inactive" onclick="switchMyServicesTab('video')">Video Link & Reminder</button>
@@ -329,7 +345,7 @@
                                             <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
                                             <div class="flex gap-2 sm:gap-3">
                                                 <div class="relative w-24">
-                                                    <div class="h-[54px] sm:h-[58px] w-full bg-[#f3f4f6] border border-gray-200 rounded-lg flex items-center justify-center text-sm font-black text-secondary cursor-not-allowed">
+                                                    <div class="h-[54px] sm:h-[58px] w-full bg-[#f3f4f6] border border-gray-200 rounded-lg flex items-center justify-center text-sm font-black text-secondary ">
                                                         {{ $defaultCurrency ?? 'INR' }}
                                                     </div>
                                                     <input type="hidden" name="services[0][currency]" value="{{ $defaultCurrency ?? 'INR' }}">
@@ -338,7 +354,7 @@
                                                     <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">{{ config('currencies.symbols')[$defaultCurrency ?? 'INR'] ?? '₹' }}</span>
                                                     <input type="number" name="services[0][rates][0][rate]" step="0.01" required placeholder="0.00"  class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 bg-[#f3f4f6] focus:ring-0 outline-none font-bold text-secondary text-base sm:text-lg ">
                                                 </div>
-                                                <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" >
+                                                <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center  border border-gray-100" >
                                                     <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
                                                 </button>
                                             </div>
@@ -566,7 +582,7 @@ async function fetchAvailableServices() {
                                     </div>
                                     <div class="relative flex-1">
                                         <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">${CURRENCY_SYMBOLS[DEFAULT_CURRENCY] || '₹'}</span>
-                                        <input type="number" name="services[${currentIdx}][rates][0][rate]" step="0.01" required placeholder="0.00" readonly class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 bg-[#f3f4f6] focus:ring-0 outline-none font-bold text-secondary text-base sm:text-lg cursor-not-allowed">
+                                        <input type="number" name="services[${currentIdx}][rates][0][rate]" step="0.01" required placeholder="0.00"  class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 bg-[#f3f4f6] focus:ring-0 outline-none font-bold text-secondary text-base sm:text-lg ">
                                     </div>
                                     <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
                                         <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
@@ -614,7 +630,7 @@ async function fetchAvailableServices() {
                 <div class="flex gap-2 sm:gap-3">
                     <div class="relative flex-1">
                         <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">${currentSymbol}</span>
-                        <input type="number" name="services[${serviceIdx}][rates][${rateIdx}][rate]" step="0.01" required placeholder="0.00" readonly class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 bg-[#f3f4f6] focus:ring-0 outline-none font-bold text-secondary text-base sm:text-lg cursor-not-allowed">
+                        <input type="number" name="services[${serviceIdx}][rates][${rateIdx}][rate]" step="0.01" required placeholder="0.00"  class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 bg-[#f3f4f6] focus:ring-0 outline-none font-bold text-secondary text-base sm:text-lg ">
                     </div>
                     <button type="button" onclick="confirmRemoveRateRow(this)" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100">
                         <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
@@ -767,7 +783,7 @@ async function fetchAvailableServices() {
                                 ` : ''}
                                 <div class="relative flex-1">
                                     <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">${CURRENCY_SYMBOLS[rate.currency] || CURRENCY_SYMBOLS[DEFAULT_CURRENCY] || '₹'}</span>
-                                    <input type="number" name="services[0][rates][${index}][rate]" value="${parseFloat(rate.rate).toFixed(2)}" step="0.01" required placeholder="0.00" readonly class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 bg-[#f3f4f6] focus:ring-0 outline-none font-bold text-secondary text-base sm:text-lg cursor-not-allowed">
+                                    <input type="number" name="services[0][rates][${index}][rate]" value="${parseFloat(rate.rate).toFixed(2)}" step="0.01" required placeholder="0.00"  class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 bg-[#f3f4f6] focus:ring-0 outline-none font-bold text-secondary text-base sm:text-lg ">
                                 </div>
                                 ${index > 0 ? `
                                 <button type="button" onclick="confirmRemoveRateRow(this)" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100">
