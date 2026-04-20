@@ -28,12 +28,17 @@ class PractitionerApplicationSubmittedMail extends Mailable
 
     public function content(): Content
     {
+        $rolesWithoutTimeline = ['Doctor', 'Mindfulness Counsellor', 'Mindfulness Practitioner', 'Yoga Therapist', 'Translator'];
+        $reviewText = in_array($this->roleLabel, $rolesWithoutTimeline) 
+            ? "Your application will be reviewed by our Approval Commission." 
+            : "Your application will be reviewed by our Approval Commission within 30 days.";
+
         return new Content(
             view: 'emails.default',
             with: [
                 'title' => 'Thank you for your interest in Zaya Wellness',
                 'intro' => "We thank you for your interest in joining the ZAYA Wellness online consultation portal—an Indian initiative launched in 2025 to connect Ayurvedic doctors, spiritual counsellors, and yoga therapists with clients worldwide. Our mission is to empower holistic practitioners and offer authentic, expert-led care.",
-                'outro' => "Incomplete applications will not be reviewed. Please ensure all documents are legible and complete to avoid delays. Your application will be reviewed by our Approval Commission within 30 days. You will receive a response via email.",
+                'outro' => "Incomplete applications will not be reviewed. Please ensure all documents are legible and complete to avoid delays. {$reviewText} You will receive a response via email.",
             ],
         );
     }

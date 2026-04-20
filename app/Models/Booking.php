@@ -49,8 +49,9 @@ class Booking extends Model
         'coin_discount' => 'decimal:2',
         'reminder_sent' => 'boolean',
         'payment_details' => 'encrypted:array',
-        'conditions' => 'encrypted',
+        'conditions' => 'encrypted:array',
         'situation' => 'encrypted',
+        'additional_info' => 'array',
     ];
 
     public function user()

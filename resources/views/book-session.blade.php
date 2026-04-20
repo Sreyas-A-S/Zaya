@@ -283,7 +283,7 @@
                         {{ __('Do you want to explain your situation?') }}
                         <span class="italic" data-i18n="(Optional)">({{ __('Optional') }})</span>
                     </h3>
-                    <textarea placeholder="{{ __('Write here...') }}"
+                    <textarea id="situation-input" placeholder="{{ __('Write here...') }}"
                         class="w-full py-4 px-5 bg-[#F5F5F5] rounded-2xl outline-none text-sm text-gray-700 min-h-[120px] resize-y placeholder:text-gray-400 focus:border-primary focus:bg-white border border-transparent" data-i18n-placeholder="Write here..."></textarea>
                     <p class="text-right text-sm text-gray-400 mt-2 italic" data-i18n="(Paragraph should contain 100 words only)">(Paragraph should contain 100 words
                         only)</p>
@@ -858,7 +858,8 @@
 
             const modeButton = document.querySelector('.session-mode-btn.bg-\\[\\#FABD4D\\]');
             const mode = modeButton?.dataset?.mode || 'online';
-            const conditions = document.getElementById('conditions-input')?.value;
+            const conditions = Array.from(document.querySelectorAll('.condition-tag input[type="checkbox"]:checked')).map(cb => cb.value);
+            const situation = document.getElementById('situation-input')?.value;
             const needTranslator = document.getElementById('need-translator')?.checked;
             const fromLanguage = document.getElementById('from-language-value')?.value;
             const toLanguage = document.getElementById('to-language-value')?.value;
@@ -899,6 +900,7 @@
                 service_ids: serviceIds,
                 mode: mode,
                 conditions: conditions,
+                situation: situation,
                 need_translator: needTranslator,
                 from_language: fromLanguage,
                 to_language: toLanguage,
