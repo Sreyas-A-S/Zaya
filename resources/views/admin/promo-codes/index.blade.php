@@ -102,6 +102,15 @@
                             </select>
                         </div>
 
+                        <div class="col-md-6" id="currency-selection-wrapper">
+                            <label class="form-label fw-bold">Currency</label>
+                            <select class="form-select" id="promo-code-currency" name="currency">
+                                @foreach($currencies as $code => $symbol)
+                                    <option value="{{ $code }}" {{ $code == 'INR' ? 'selected' : '' }}>{{ $code }} ({{ $symbol }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Reward Value</label>
                             <div class="input-group">
@@ -201,6 +210,7 @@
                         <tr><th class="bg-light">Usage Context</th><td id="view-usage-type"></td></tr>
                         <tr><th class="bg-light">Discount Type</th><td id="view-type"></td></tr>
                         <tr><th class="bg-light">Reward Value</th><td id="view-reward"></td></tr>
+                        <tr><th class="bg-light">Currency</th><td id="view-currency"></td></tr>
                         <tr><th class="bg-light">Usage Limit</th><td id="view-usage-limit"></td></tr>
                         <tr><th class="bg-light">Used Count</th><td id="view-used-count"></td></tr>
                         <tr><th class="bg-light">Expiry Date</th><td id="view-expiry-date"></td></tr>
@@ -259,6 +269,8 @@
 
 @section('scripts')
 <script>
+    const currencySymbols = @json($currencies);
+
     $(document).ready(function() {
         $(document).on('click', '.sharePromoCode', function() {
             var code = $(this).data('code');
@@ -282,8 +294,21 @@
             $temp.remove();
             showToast('Promo code copied to clipboard!');
         });
-        $('#promo-code-type').on('change', function() {
-            $('#reward-addon').text($(this).val() === 'percentage' ? '%' : '₹');
+
+        function updateRewardAddon() {
+            const type = $('#promo-code-type').val();
+            if (type === 'percentage') {
+                $('#reward-addon').text('%');
+                $('#currency-selection-wrapper').addClass('d-none');
+            } else {
+                const currency = $('#promo-code-currency').val();
+                $('#reward-addon').text(currencySymbols[currency] || currency);
+                $('#currency-selection-wrapper').removeClass('d-none');
+            }
+        }
+
+        $('#promo-code-type, #promo-code-currency').on('change', function() {
+            updateRewardAddon();
         });
 
         var table = $('#promo-codes-table').DataTable({
@@ -347,8 +372,9 @@
                 $('#promo-code-usage_type').val(data.usage_type);
                 $('#promo-code-type').val(data.type);
                 $('#promo-code-reward').val(data.reward);
+                $('#promo-code-currency').val(data.currency || 'INR');
                 $('#promo-code-description').val(data.description);
-                $('#reward-addon').text(data.type === 'percentage' ? '%' : '₹');
+                updateRewardAddon();
                 $('#promo-code-usage_limit').val(data.usage_limit);
                 $('#promo-code-expiry_date').val(data.expiry_date ? data.expiry_date.split('T')[0] : '');
                 $('#promo-code-status').val(data.status ? 1 : 0);
@@ -373,7 +399,15 @@
                 let uType = data.usage_type.charAt(0).toUpperCase() + data.usage_type.slice(1);
                 $('#view-usage-type').text(uType);
                 $('#view-type').text(data.type === 'fixed' ? 'Fixed Amount' : 'Percentage (%)');
-                $('#view-reward').text(data.type === 'percentage' ? data.reward + '%' : '$' + data.reward);
+                
+                if (data.type === 'percentage') {
+                    $('#view-reward').text(data.reward + '%');
+                    $('#view-currency').text('N/A');
+                } else {
+                    let symbol = currencySymbols[data.currency] || data.currency;
+                    $('#view-reward').text(symbol + ' ' + data.reward);
+                    $('#view-currency').text(data.currency);
+                }
                 
                 $('#view-usage-limit').text(data.usage_limit || 'Unlimited');
                 $('#view-used-count').text(data.used_count || 0);
@@ -410,6 +444,9 @@
         $('#promo-code-id').val('');
         $('.benefit-checkbox').prop('checked', false);
         $('#modal-title').text('Add New Promo Code');
+        $('#promo-code-currency').val('INR');
+        $('#reward-addon').text('₹');
+        $('#currency-selection-wrapper').removeClass('d-none');
         $('#promo-code-modal').modal('show');
     }
 
@@ -426,4 +463,3 @@
     }
 </script>
 @endsection
-

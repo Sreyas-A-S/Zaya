@@ -33,6 +33,8 @@ class PromoCodeController extends Controller
                 $data->whereDate('expiry_date', $request->expiry_date_filter);
             }
 
+            $currencySymbols = config('currencies.symbols');
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('used_limit', function ($row) {
@@ -65,10 +67,12 @@ class PromoCodeController extends Controller
                 ->editColumn('usage_type', function($row) {
                     return ucfirst($row->usage_type);
                 })
-                ->editColumn('reward', function($row) {
-                    $html = $row->type == 'percentage' ? $row->reward . '%' : '$' . $row->reward;
-                   
-                    return $html;
+                ->editColumn('reward', function($row) use ($currencySymbols) {
+                    if ($row->type == 'percentage') {
+                        return $row->reward . '%';
+                    }
+                    $symbol = $currencySymbols[$row->currency] ?? $row->currency;
+                    return ($symbol ?: '$') . ' ' . $row->reward;
                 })
                 ->editColumn('expiry_date', function($row) {
                     return $row->expiry_date ? $row->expiry_date->format('Y-m-d') : 'N/A';
@@ -92,7 +96,8 @@ class PromoCodeController extends Controller
                 ->make(true);
         }
 
-        return view('admin.promo-codes.index');
+        $currencies = config('currencies.symbols');
+        return view('admin.promo-codes.index', compact('currencies'));
     }
 
     /**
@@ -105,6 +110,7 @@ class PromoCodeController extends Controller
             'type' => 'required|in:fixed,percentage',
             'usage_type' => 'required|in:registration,booking,both',
             'reward' => 'required|numeric|min:0',
+            'currency' => 'required_if:type,fixed|nullable|string|max:10',
             'description' => 'nullable|string',
             'benefits' => 'nullable|array',
             'usage_limit' => 'nullable|integer|min:1',
@@ -138,6 +144,7 @@ class PromoCodeController extends Controller
             'type' => 'required|in:fixed,percentage',
             'usage_type' => 'required|in:registration,booking,both',
             'reward' => 'required|numeric|min:0',
+            'currency' => 'required_if:type,fixed|nullable|string|max:10',
             'description' => 'nullable|string',
             'benefits' => 'nullable|array',
             'usage_limit' => 'nullable|integer|min:1',

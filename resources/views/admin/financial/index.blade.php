@@ -30,7 +30,6 @@
                         <div class="media-body">
                             <span class="m-0">Total Revenue ({{ $balance->currency }})</span>
                             <h4 class="mb-0 counter">{{ number_format($balance->total_revenue, 2) }}</h4>
-                            <i class="icon-bg" data-feather="database"></i>
                         </div>
                     </div>
                 </div>
@@ -44,7 +43,6 @@
                         <div class="media-body">
                             <span class="m-0">Company Share</span>
                             <h4 class="mb-0 counter">{{ number_format($balance->total_company, 2) }}</h4>
-                            <i class="icon-bg" data-feather="shopping-bag"></i>
                         </div>
                     </div>
                 </div>
@@ -58,7 +56,6 @@
                         <div class="media-body">
                             <span class="m-0">Specialist Shares</span>
                             <h4 class="mb-0 counter">{{ number_format($balance->total_practitioners, 2) }}</h4>
-                            <i class="icon-bg" data-feather="user-check"></i>
                         </div>
                     </div>
                 </div>
@@ -72,7 +69,6 @@
                         <div class="media-body">
                             <span class="m-0">Referrer Shares</span>
                             <h4 class="mb-0 counter">{{ number_format($balance->total_referrers, 2) }}</h4>
-                            <i class="icon-bg" data-feather="users"></i>
                         </div>
                     </div>
                 </div>
@@ -94,6 +90,7 @@
                         <table class="display" id="transactions-table">
                             <thead>
                                 <tr>
+                                    <th>SL No</th>
                                     <th>Date</th>
                                     <th>Trx No</th>
                                     <th>Type</th>
@@ -103,6 +100,7 @@
                                     <th>Company Share</th>
                                     <th>Specialist Share</th>
                                     <th>Referrer Share</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                         </table>
@@ -122,6 +120,7 @@
             serverSide: true,
             ajax: "{{ route('admin.financial.index') }}",
             columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'created_at', name: 'created_at' },
                 { data: 'transaction_no', name: 'transaction_no' },
                 { data: 'type', name: 'type' },
@@ -130,9 +129,19 @@
                 { data: 'total_amount', name: 'total_amount' },
                 { data: 'company_share', name: 'company_share' },
                 { data: 'practitioner_share', name: 'practitioner_share' },
-                { data: 'referrer_share', name: 'referrer_share' }
+                { data: 'referrer_share', name: 'referrer_share' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
             ],
-            order: [[0, 'desc']]
+            order: [[1, 'desc']]
+        });
+
+        // Show global loader on PDF download click
+        $(document).on('click', 'a[href*="/download"]', function() {
+            $('.loader-wrapper').fadeIn('fast');
+            // Hide loader after a few seconds as the browser download doesn't trigger a page refresh
+            setTimeout(function() {
+                $('.loader-wrapper').fadeOut('slow');
+            }, 3000);
         });
     });
 </script>

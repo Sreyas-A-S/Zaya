@@ -470,7 +470,7 @@
                             <div class="py-2">
                                 @forelse($languages as $language)
                                     <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="{{ $language->name }}">{{ $language->name }}</div>
+                                        data-value="{{ $language->name }}">{{ $language->display_name }}</div>
                                 @empty
                                     <div class="px-6 py-3 text-sm text-gray-400">No languages available.</div>
                                 @endforelse
@@ -493,7 +493,7 @@
                             <div class="py-2">
                                 @forelse($languages as $language)
                                     <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="{{ $language->name }}">{{ $language->name }}</div>
+                                        data-value="{{ $language->name }}">{{ $language->display_name }}</div>
                                 @empty
                                     <div class="px-6 py-3 text-sm text-gray-400">No languages available.</div>
                                 @endforelse
@@ -1080,188 +1080,374 @@
             }
         }
 
+        function updateStep3Services() {
+            const container = document.getElementById('step3-services-container');
+            const step3Content = document.getElementById('step-3-content');
+            if (!container) return;
+
+            const selectedServices = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
+            container.innerHTML = '';
+
+            if (selectedServices.length === 0) {
+                container.innerHTML = '<div class="text-sm text-gray-400">No services selected.</div>';
+                if (step3Content) step3Content.classList.add('hidden');
+                updateTotalPrice(0);
+                return;
+            }
+
+            let total = 0;
+            let determinedCurrencyCode = null;
+            let activeCurrencySymbol = document.querySelector('#step-3-total-amount')?.textContent.trim().split(' ')[0] || '₹';
+
+            selectedServices.forEach(checkbox => {
+                const label = checkbox.closest('.service-tag-label');
+                const serviceName = checkbox.value;
+                const serviceId = label.dataset.serviceId;
+
+                // Find scheduling details in Step 2
+                const scheduleItem = document.querySelector(`.service-schedule-item[data-service-id="${serviceId}"]`);
+                let duration = "Duration";
+                let day = "Day";
+                let time = "Time";
+                let price = 0; 
+                let currencySymbol = activeCurrencySymbol;
+
+                if (scheduleItem) {
+                    duration = scheduleItem.querySelector('.duration-value').value || "Duration";
+                    day = scheduleItem.querySelector('.day-label').textContent || "Day";
+                    time = scheduleItem.querySelector('.time-label').textContent || "Time";
+
+                    // Get price and currency from the duration trigger (which stores current selection)
+                    const trigger = scheduleItem.querySelector('.duration-picker-trigger');
+                    if (trigger) {
+                        price = parseFloat(trigger.dataset.rate) || 0;
+                        currencySymbol = trigger.dataset.symbol || currencySymbol;
+                        activeCurrencySymbol = currencySymbol;
+                        
+                        if (!determinedCurrencyCode) {
+                            determinedCurrencyCode = trigger.dataset.currency;
+                        }
+                    }
+                }
+
+                total += price;
+
+                const html = `
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                        <div class="md:col-span-5">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="text-lg font-medium text-gray-900">${serviceName}</h3>
+                                <span class="bg-[#FABD4D] text-[#423131] text-xs px-2 py-1 rounded-full">${duration}</span>
+                            </div>
+                            <div class="text-gray-500 text-sm">
+                                ${day} <span class="mx-2">•</span> ${time}
+                            </div>
+                        </div>
+                        <div class="md:col-span-4 text-center md:border-l md:border-r border-gray-200 h-full flex items-center justify-start lg:justify-center">
+                            <span class="text-xl font-medium text-gray-900">${currencySymbol} ${price.toFixed(2)}</span>
+                        </div>
+                        <div class="md:col-span-3 text-right">
+                            <button type="button"
+                                onclick="showStep(2); setTimeout(() => {
+                                    const target = document.querySelector('.service-schedule-item[data-service-id=\\'${serviceId}\\']');
+                                    if (target) target.scrollIntoView({behavior: 'smooth', block: 'center'});
+                                }, 100);"
+                                class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-8 py-2.5 rounded-full text-sm font-medium transition-colors border-none cursor-pointer">
+                                Change
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+
+            // Update the hidden currency input for the entire booking
+            if (determinedCurrencyCode) {
+                const currencyInput = document.getElementById('booking-currency');
+                if (currencyInput) currencyInput.value = determinedCurrencyCode;
+            }
+
+            updateTotalPrice(total, activeCurrencySymbol);
+        }
+
+        function updateTotalPrice(total, currencySymbol = lastCurrencySymbol) {
+            const priceContainer = document.getElementById('step-3-total-amount');
+            const step3Content = document.getElementById('step-3-content');
+            lastComputedTotal = total;
+            
+            // Calculate Coin Discount
+            let coinDiscount = 0;
+            let coinsToUse = 0;
+            
+            if (coinsApplied && total > 0 && COIN_VALUE > 0) {
+                // Max discount is subtotal after promo
+                const afterPromo = Math.max(0, total - promoDiscountAmount);
+                const potentialCoinDiscount = USER_COINS_BALANCE * COIN_VALUE;
+                
+                if (potentialCoinDiscount > afterPromo) {
+                    coinDiscount = afterPromo;
+                    coinsToUse = Math.ceil(afterPromo / COIN_VALUE);
+                } else {
+                    coinDiscount = potentialCoinDiscount;
+                    coinsToUse = USER_COINS_BALANCE;
+                }
+            }
+
+            const testToggle = document.getElementById('test-payment-toggle');
+            const showTest = testToggle && testToggle.checked;
+            
+            // If test mode is enabled, force price to 1.00 for the gateway/display
+            const finalTotal = showTest ? 1.00 : Math.max(0, total - promoDiscountAmount - coinDiscount);
+            
+            const currencyCode = document.getElementById('booking-currency')?.value || 'INR';
+            
+            // Update Coin Message
+            const coinMsg = document.getElementById('coin-discount-message');
+            if (coinMsg) {
+                if (coinsApplied && coinsToUse > 0) {
+                    coinMsg.classList.remove('hidden');
+                    document.getElementById('coins-to-use').textContent = coinsToUse;
+                    document.getElementById('coin-value-display').textContent = `${currencySymbol} ${coinDiscount.toFixed(2)}`;
+                } else {
+                    coinMsg.classList.add('hidden');
+                }
+            }
+
+            // Update Breakdown UI
+            const breakdownEl = document.getElementById('discount-breakdown');
+            const promoRow = document.getElementById('promo-discount-row');
+            const coinRow = document.getElementById('coin-discount-row');
+
+            if (promoDiscountAmount > 0 || coinDiscount > 0) {
+                breakdownEl.classList.remove('hidden');
+                document.getElementById('breakdown-subtotal').textContent = `${currencySymbol} ${total.toFixed(2)}`;
+                document.getElementById('breakdown-final-total').textContent = `${currencySymbol} ${finalTotal.toFixed(2)}`;
+
+                if (promoDiscountAmount > 0) {
+                    promoRow.classList.remove('hidden');
+                    document.getElementById('breakdown-discount').textContent = `- ${currencySymbol} ${promoDiscountAmount.toFixed(2)}`;
+                } else {
+                    promoRow.classList.add('hidden');
+                }
+
+                if (coinDiscount > 0) {
+                    coinRow.classList.remove('hidden');
+                    document.getElementById('breakdown-coin-discount').textContent = `- ${currencySymbol} ${coinDiscount.toFixed(2)}`;
+                } else {
+                    coinRow.classList.add('hidden');
+                }
+            } else {
+                breakdownEl.classList.add('hidden');
+            }
+
+            if (priceContainer) {
+                if (showTest) {
+                    priceContainer.innerHTML = `${currencySymbol} ${finalTotal.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ TEST</span>`;
+                } else {
+                    priceContainer.innerHTML = `${currencySymbol} ${finalTotal.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ ${currencyCode}</span>`;
+                }
+            }
+        }
+
+        async function renderSelectedServices() {
+            // Clear promo code when services change to avoid incorrect discount amounts
+            if (appliedPromoCode) {
+                clearPromoCode();
+            }
+
+            const checkedBoxes = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
+            const selectedServicesContainer = document.getElementById('selected-services-container');
+            const searchDivider = document.getElementById('service-search-divider');
+            const serviceSearchInputWrapper = document.getElementById('service-search-input-wrapper');
+
+            if (selectedServicesContainer) {
+                selectedServicesContainer.innerHTML = '';
+
+                if (checkedBoxes.length > 0) {
+                    if (searchDivider) {
+                        searchDivider.style.display = 'block';
+                    }
+                    if (serviceSearchInputWrapper) {
+                        serviceSearchInputWrapper.style.flex = '0 0 160px';
+                    }
+
+                    checkedBoxes.forEach(box => {
+                        const val = box.value;
+                        const pill = document.createElement('div');
+                        pill.className = 'px-4 py-2 rounded-full border border-gray-300 bg-transparent text-gray-700 text-sm font-normal whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-2 hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] transition-colors group';
+                        pill.innerHTML = `<span>${val}</span><i class="ri-close-line text-gray-400 group-hover:text-[#423131] transition-colors"></i>`;
+                        pill.onclick = (e) => {
+                            e.preventDefault();
+                            box.checked = false;
+                            renderSelectedServices();
+                        };
+                        selectedServicesContainer.appendChild(pill);
+                    });
+                } else {
+                    if (searchDivider) {
+                        searchDivider.style.display = 'none';
+                    }
+                    if (serviceSearchInputWrapper) {
+                        serviceSearchInputWrapper.style.flex = '1';
+                    }
+                }
+            }
+
+            // Ensure all selected services have a schedule form
+            const practitionerId = @json($activePractitioner ? $activePractitioner->id : null);
+            const scheduleContainer = document.getElementById('service-schedule-container');
+            
+            for (const checkbox of checkedBoxes) {
+                const label = checkbox.closest('.service-tag-label');
+                const serviceId = label.dataset.serviceId;
+                let scheduleItem = document.querySelector(`.service-schedule-item[data-service-id="${serviceId}"]`);
+                
+                if (!scheduleItem && practitionerId) {
+                    try {
+                        const response = await fetch(`{{ route('fetch-service-schedule-form') }}?service_id=${serviceId}&practitioner_id=${practitionerId}`);
+                        const html = await response.text();
+                        if (scheduleContainer) {
+                            scheduleContainer.insertAdjacentHTML('beforeend', html);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching schedule form:', error);
+                    }
+                }
+            }
+
+            syncScheduleWithSelection(checkedBoxes);
+            
+            // Toggle scheduling section visibility
+            if (scheduleContainer) {
+                if (checkedBoxes.length > 0) {
+                    scheduleContainer.classList.remove('hidden');
+                } else {
+                    scheduleContainer.classList.add('hidden');
+                }
+            }
+
+            updateStep3Services(); // Update Step 3 list
+        }
+
+        function resetScheduleItem(item) {
+            item.querySelectorAll('.duration-value, .day-value, .time-value').forEach(input => {
+                input.value = '';
+            });
+
+            item.querySelectorAll('.duration-dropdown input[type="radio"]').forEach(radio => {
+                radio.checked = false;
+            });
+
+            item.querySelectorAll('.duration-label').forEach(label => {
+                label.textContent = 'Duration';
+                label.classList.add('text-gray-600');
+                label.classList.remove('text-[#252525]', 'font-medium');
+            });
+
+            item.querySelectorAll('.day-label').forEach(label => {
+                label.textContent = 'Day';
+                label.classList.add('text-gray-700');
+                label.classList.remove('text-gray-400');
+            });
+
+            item.querySelectorAll('.time-label').forEach(label => {
+                label.textContent = 'Time';
+                label.classList.add('text-gray-700');
+                label.classList.remove('text-gray-400');
+            });
+        }
+
+        function updateScheduleIndices() {
+            let idx = 1;
+            const allItems = document.querySelectorAll('.service-schedule-item');
+            allItems.forEach(item => {
+                const label = item.querySelector('.service-index');
+                if (!label) return;
+                if (item.classList.contains('hidden')) return;
+                label.textContent = idx;
+                idx += 1;
+            });
+        }
+
+        function syncScheduleWithSelection(checkedBoxes) {
+            const selectedIds = new Set(
+                Array.from(checkedBoxes).map(box => box.closest('.service-tag-label').dataset.serviceId)
+            );
+
+            const allItems = document.querySelectorAll('.service-schedule-item');
+            allItems.forEach(item => {
+                const id = item.dataset.serviceId || '';
+                if (selectedIds.has(id)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                    resetScheduleItem(item);
+                }
+            });
+
+            updateScheduleIndices();
+        }
+
+        function updateConditionsInput() {
+            const container = document.getElementById('selected-conditions-container');
+            const placeholder = document.getElementById('conditions-placeholder');
+            const checkedBoxes = document.querySelectorAll('.condition-tag input[type="checkbox"]:checked');
+            const values = Array.from(checkedBoxes).map(cb => cb.closest('.condition-tag').textContent.trim());
+
+            if (container) {
+                // Clear all pills (keep placeholder)
+                Array.from(container.querySelectorAll('.condition-pill')).forEach(p => p.remove());
+
+                if (values.length > 0) {
+                    if (placeholder) placeholder.classList.add('hidden');
+
+                    checkedBoxes.forEach(checkbox => {
+                        const val = checkbox.closest('.condition-tag').textContent.trim();
+                        const pill = document.createElement('div');
+                        pill.className = 'condition-pill px-4 py-2 rounded-full border border-gray-300 bg-transparent text-gray-700 text-sm font-normal whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-2 hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] transition-colors group';
+                        pill.innerHTML = `<span>${val}</span><i class="ri-close-line text-gray-400 group-hover:text-[#423131] transition-colors"></i>`;
+                        pill.onclick = (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            checkbox.checked = false;
+                            // Trigger visual update of the tag below
+                            const tag = checkbox.closest('.condition-tag');
+                            if (tag) {
+                                tag.classList.remove('border-[#FABD4D]', 'bg-[#FABD4D]', 'text-[#423131]');
+                                tag.classList.add('border-gray-200', 'bg-white', 'text-gray-600');
+                            }
+                            updateConditionsInput();
+                        };
+                        container.appendChild(pill);
+                    });
+                } else {
+                    if (placeholder) placeholder.classList.remove('hidden');
+                }
+            }
+
+            // Update Step 3 "Condition" section
+            const step3Container = document.getElementById('condition-selected-tags');
+            if (step3Container) {
+                step3Container.innerHTML = '';
+                if (values.length === 0) {
+                    step3Container.innerHTML = '<span class="text-gray-400 text-sm">No conditions selected</span>';
+                } else {
+                    values.forEach(val => {
+                        const pill = document.createElement('div');
+                        pill.className = 'px-4 py-1.5 rounded-full border border-gray-300 bg-[#FABD4D] text-[#423131] text-sm font-normal';
+                        pill.textContent = val;
+                        step3Container.appendChild(pill);
+                    });
+                }
+            }
+        }
+
         // Translator checkbox toggle
         document.addEventListener('DOMContentLoaded', function() {
             // Fetch off days when page loads
             fetchOffDays();
             
             showStep(currentStep);
-            // Service tags selection and syncing with search box
-            const selectedServicesContainer = document.getElementById('selected-services-container');
-            const searchDivider = document.getElementById('service-search-divider');
-            const serviceSearchInputWrapper = document.getElementById('service-search-input-wrapper');
-            const serviceSearchInput = document.getElementById('service-search-input');
-            const serviceSearchEmpty = document.getElementById('service-search-empty');
-
-            function updateStep3Services() {
-                const container = document.getElementById('step3-services-container');
-                const step3Content = document.getElementById('step-3-content');
-                if (!container) return;
-
-                const selectedServices = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
-                container.innerHTML = '';
-
-                if (selectedServices.length === 0) {
-                    container.innerHTML = '<div class="text-sm text-gray-400">No services selected.</div>';
-                    if (step3Content) step3Content.classList.add('hidden');
-                    updateTotalPrice(0);
-                    return;
-                }
-
-                let total = 0;
-                let determinedCurrencyCode = null;
-                let activeCurrencySymbol = document.querySelector('#step-3-total-amount')?.textContent.trim().split(' ')[0] || '₹';
-
-                selectedServices.forEach(checkbox => {
-                    const label = checkbox.closest('.service-tag-label');
-                    const serviceName = checkbox.value;
-                    const serviceId = label.dataset.serviceId;
-
-                    // Find scheduling details in Step 2
-                    const scheduleItem = document.querySelector(`.service-schedule-item[data-service-id="${serviceId}"]`);
-                    let duration = "Duration";
-                    let day = "Day";
-                    let time = "Time";
-                    let price = 0; 
-                    let currencySymbol = activeCurrencySymbol;
-
-                    if (scheduleItem) {
-                        duration = scheduleItem.querySelector('.duration-value').value || "Duration";
-                        day = scheduleItem.querySelector('.day-label').textContent || "Day";
-                        time = scheduleItem.querySelector('.time-label').textContent || "Time";
-
-                        // Get price and currency from the duration trigger (which stores current selection)
-                        const trigger = scheduleItem.querySelector('.duration-picker-trigger');
-                        if (trigger) {
-                            price = parseFloat(trigger.dataset.rate) || 0;
-                            currencySymbol = trigger.dataset.symbol || currencySymbol;
-                            activeCurrencySymbol = currencySymbol;
-                            
-                            if (!determinedCurrencyCode) {
-                                determinedCurrencyCode = trigger.dataset.currency;
-                            }
-                        }
-                    }
-
-                    total += price;
-
-                    const html = `
-                        <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                            <div class="md:col-span-5">
-                                <div class="flex items-center gap-3 mb-1">
-                                    <h3 class="text-lg font-medium text-gray-900">${serviceName}</h3>
-                                    <span class="bg-[#FABD4D] text-[#423131] text-xs px-2 py-1 rounded-full">${duration}</span>
-                                </div>
-                                <div class="text-gray-500 text-sm">
-                                    ${day} <span class="mx-2">•</span> ${time}
-                                </div>
-                            </div>
-                            <div class="md:col-span-4 text-center md:border-l md:border-r border-gray-200 h-full flex items-center justify-start lg:justify-center">
-                                <span class="text-xl font-medium text-gray-900">${currencySymbol} ${price.toFixed(2)}</span>
-                            </div>
-                            <div class="md:col-span-3 text-right">
-                                <button type="button"
-                                    onclick="showStep(2); setTimeout(() => {
-                                        const target = document.querySelector('.service-schedule-item[data-service-id=\\'${serviceId}\\']');
-                                        if (target) target.scrollIntoView({behavior: 'smooth', block: 'center'});
-                                    }, 100);"
-                                    class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-8 py-2.5 rounded-full text-sm font-medium transition-colors border-none cursor-pointer">
-                                    Change
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', html);
-                });
-
-                // Update the hidden currency input for the entire booking
-                if (determinedCurrencyCode) {
-                    const currencyInput = document.getElementById('booking-currency');
-                    if (currencyInput) currencyInput.value = determinedCurrencyCode;
-                }
-
-                updateTotalPrice(total, activeCurrencySymbol);
-            }
-
-
-            function updateTotalPrice(total, currencySymbol = lastCurrencySymbol) {
-                const priceContainer = document.getElementById('step-3-total-amount');
-                const step3Content = document.getElementById('step-3-content');
-                lastComputedTotal = total;
-                
-                // Calculate Coin Discount
-                let coinDiscount = 0;
-                let coinsToUse = 0;
-                
-                if (coinsApplied && total > 0 && COIN_VALUE > 0) {
-                    // Max discount is subtotal after promo
-                    const afterPromo = Math.max(0, total - promoDiscountAmount);
-                    const potentialCoinDiscount = USER_COINS_BALANCE * COIN_VALUE;
-                    
-                    if (potentialCoinDiscount > afterPromo) {
-                        coinDiscount = afterPromo;
-                        coinsToUse = Math.ceil(afterPromo / COIN_VALUE);
-                    } else {
-                        coinDiscount = potentialCoinDiscount;
-                        coinsToUse = USER_COINS_BALANCE;
-                    }
-                }
-
-                const testToggle = document.getElementById('test-payment-toggle');
-                const showTest = testToggle && testToggle.checked;
-                
-                // If test mode is enabled, force price to 1.00 for the gateway/display
-                const finalTotal = showTest ? 1.00 : Math.max(0, total - promoDiscountAmount - coinDiscount);
-                
-                const currencyCode = document.getElementById('booking-currency')?.value || 'INR';
-                
-                // Update Coin Message
-                const coinMsg = document.getElementById('coin-discount-message');
-                if (coinMsg) {
-                    if (coinsApplied && coinsToUse > 0) {
-                        coinMsg.classList.remove('hidden');
-                        document.getElementById('coins-to-use').textContent = coinsToUse;
-                        document.getElementById('coin-value-display').textContent = `${currencySymbol} ${coinDiscount.toFixed(2)}`;
-                    } else {
-                        coinMsg.classList.add('hidden');
-                    }
-                }
-
-                // Update Breakdown UI
-                const breakdownEl = document.getElementById('discount-breakdown');
-                const promoRow = document.getElementById('promo-discount-row');
-                const coinRow = document.getElementById('coin-discount-row');
-
-                if (promoDiscountAmount > 0 || coinDiscount > 0) {
-                    breakdownEl.classList.remove('hidden');
-                    document.getElementById('breakdown-subtotal').textContent = `${currencySymbol} ${total.toFixed(2)}`;
-                    document.getElementById('breakdown-final-total').textContent = `${currencySymbol} ${finalTotal.toFixed(2)}`;
-
-                    if (promoDiscountAmount > 0) {
-                        promoRow.classList.remove('hidden');
-                        document.getElementById('breakdown-discount').textContent = `- ${currencySymbol} ${promoDiscountAmount.toFixed(2)}`;
-                    } else {
-                        promoRow.classList.add('hidden');
-                    }
-
-                    if (coinDiscount > 0) {
-                        coinRow.classList.remove('hidden');
-                        document.getElementById('breakdown-coin-discount').textContent = `- ${currencySymbol} ${coinDiscount.toFixed(2)}`;
-                    } else {
-                        coinRow.classList.add('hidden');
-                    }
-                } else {
-                    breakdownEl.classList.add('hidden');
-                }
-
-                if (priceContainer) {
-                    if (showTest) {
-                        priceContainer.innerHTML = `${currencySymbol} ${finalTotal.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ TEST</span>`;
-                    } else {
-                        priceContainer.innerHTML = `${currencySymbol} ${finalTotal.toFixed(2)} <span class="text-xl text-gray-400 font-normal">/ ${currencyCode}</span>`;
-                    }
-                }
-            }
 
             const testPaymentToggle = document.getElementById('test-payment-toggle');
             if (testPaymentToggle) {
@@ -1269,141 +1455,6 @@
                     const baseTotal = lastComputedTotal !== null ? lastComputedTotal : getDisplayedTotalPrice();
                     updateTotalPrice(baseTotal);
                 });
-            }
-
-            async function renderSelectedServices() {
-                // Clear promo code when services change to avoid incorrect discount amounts
-                if (appliedPromoCode) {
-                    clearPromoCode();
-                }
-
-                const checkedBoxes = Array.from(document.querySelectorAll('.service-tag-label input[type="checkbox"]:checked'));
-                if (selectedServicesContainer) {
-                    selectedServicesContainer.innerHTML = '';
-
-                    if (checkedBoxes.length > 0) {
-                        if (searchDivider) {
-                            searchDivider.style.display = 'block';
-                        }
-                        if (serviceSearchInputWrapper) {
-                            serviceSearchInputWrapper.style.flex = '0 0 160px';
-                        }
-
-                        checkedBoxes.forEach(box => {
-                            const val = box.value;
-                            const pill = document.createElement('div');
-                            pill.className = 'px-4 py-2 rounded-full border border-gray-300 bg-transparent text-gray-700 text-sm font-normal whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-2 hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] transition-colors group';
-                            pill.innerHTML = `<span>${val}</span><i class="ri-close-line text-gray-400 group-hover:text-[#423131] transition-colors"></i>`;
-                            pill.onclick = (e) => {
-                                e.preventDefault();
-                                box.checked = false;
-                                renderSelectedServices();
-                            };
-                            selectedServicesContainer.appendChild(pill);
-                        });
-                    } else {
-                        if (searchDivider) {
-                            searchDivider.style.display = 'none';
-                        }
-                        if (serviceSearchInputWrapper) {
-                            serviceSearchInputWrapper.style.flex = '1';
-                        }
-                    }
-                }
-
-                // Ensure all selected services have a schedule form
-                const practitionerId = @json($activePractitioner ? $activePractitioner->id : null);
-                const scheduleContainer = document.getElementById('service-schedule-container');
-                
-                for (const checkbox of checkedBoxes) {
-                    const label = checkbox.closest('.service-tag-label');
-                    const serviceId = label.dataset.serviceId;
-                    let scheduleItem = document.querySelector(`.service-schedule-item[data-service-id="${serviceId}"]`);
-                    
-                    if (!scheduleItem && practitionerId) {
-                        try {
-                            const response = await fetch(`{{ route('fetch-service-schedule-form') }}?service_id=${serviceId}&practitioner_id=${practitionerId}`);
-                            const html = await response.text();
-                            if (scheduleContainer) {
-                                scheduleContainer.insertAdjacentHTML('beforeend', html);
-                            }
-                        } catch (error) {
-                            console.error('Error fetching schedule form:', error);
-                        }
-                    }
-                }
-
-                syncScheduleWithSelection(checkedBoxes);
-                
-                // Toggle scheduling section visibility
-                if (scheduleContainer) {
-                    if (checkedBoxes.length > 0) {
-                        scheduleContainer.classList.remove('hidden');
-                    } else {
-                        scheduleContainer.classList.add('hidden');
-                    }
-                }
-
-                updateStep3Services(); // Update Step 3 list
-            }
-
-            function resetScheduleItem(item) {
-                item.querySelectorAll('.duration-value, .day-value, .time-value').forEach(input => {
-                    input.value = '';
-                });
-
-                item.querySelectorAll('.duration-dropdown input[type="radio"]').forEach(radio => {
-                    radio.checked = false;
-                });
-
-                item.querySelectorAll('.duration-label').forEach(label => {
-                    label.textContent = 'Duration';
-                    label.classList.add('text-gray-600');
-                    label.classList.remove('text-[#252525]', 'font-medium');
-                });
-
-                item.querySelectorAll('.day-label').forEach(label => {
-                    label.textContent = 'Day';
-                    label.classList.add('text-gray-700');
-                    label.classList.remove('text-gray-400');
-                });
-
-                item.querySelectorAll('.time-label').forEach(label => {
-                    label.textContent = 'Time';
-                    label.classList.add('text-gray-700');
-                    label.classList.remove('text-gray-400');
-                });
-            }
-
-            function updateScheduleIndices() {
-                let idx = 1;
-                const allItems = document.querySelectorAll('.service-schedule-item');
-                allItems.forEach(item => {
-                    const label = item.querySelector('.service-index');
-                    if (!label) return;
-                    if (item.classList.contains('hidden')) return;
-                    label.textContent = idx;
-                    idx += 1;
-                });
-            }
-
-            function syncScheduleWithSelection(checkedBoxes) {
-                const selectedIds = new Set(
-                    Array.from(checkedBoxes).map(box => box.closest('.service-tag-label').dataset.serviceId)
-                );
-
-                const allItems = document.querySelectorAll('.service-schedule-item');
-                allItems.forEach(item => {
-                    const id = item.dataset.serviceId || '';
-                    if (selectedIds.has(id)) {
-                        item.classList.remove('hidden');
-                    } else {
-                        item.classList.add('hidden');
-                        resetScheduleItem(item);
-                    }
-                });
-
-                updateScheduleIndices();
             }
 
             document.querySelectorAll('.service-tag-label input[type="checkbox"]').forEach(box => {
@@ -1416,6 +1467,9 @@
 
             // Service search with AJAX
             let searchTimeout = null;
+            const serviceSearchInput = document.getElementById('service-search-input');
+            const serviceSearchEmpty = document.getElementById('service-search-empty');
+            
             if (serviceSearchInput) {
                 serviceSearchInput.addEventListener('input', function() {
                     const query = this.value.trim();
@@ -1503,61 +1557,6 @@
                     this.classList.remove('bg-[#EAEAEA]', 'text-[#747474]');
                 });
             });
-
-            // Condition tags selection - toggle active state and update input
-            function updateConditionsInput() {
-                const container = document.getElementById('selected-conditions-container');
-                const placeholder = document.getElementById('conditions-placeholder');
-                const checkedBoxes = document.querySelectorAll('.condition-tag input[type="checkbox"]:checked');
-                const values = Array.from(checkedBoxes).map(cb => cb.closest('.condition-tag').textContent.trim());
-
-                if (container) {
-                   // Clear all pills (keep placeholder)
-                   Array.from(container.querySelectorAll('.condition-pill')).forEach(p => p.remove());
-
-                   if (values.length > 0) {
-                       if (placeholder) placeholder.classList.add('hidden');
-
-                       checkedBoxes.forEach(checkbox => {
-                           const val = checkbox.closest('.condition-tag').textContent.trim();
-                           const pill = document.createElement('div');
-                           pill.className = 'condition-pill px-4 py-2 rounded-full border border-gray-300 bg-transparent text-gray-700 text-sm font-normal whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-2 hover:border-[#FABD4D] hover:bg-[#FABD4D] hover:text-[#423131] transition-colors group';
-                           pill.innerHTML = `<span>${val}</span><i class="ri-close-line text-gray-400 group-hover:text-[#423131] transition-colors"></i>`;
-                           pill.onclick = (e) => {
-                               e.preventDefault();
-                               e.stopPropagation();
-                               checkbox.checked = false;
-                               // Trigger visual update of the tag below
-                               const tag = checkbox.closest('.condition-tag');
-                               if (tag) {
-                                   tag.classList.remove('border-[#FABD4D]', 'bg-[#FABD4D]', 'text-[#423131]');
-                                   tag.classList.add('border-gray-200', 'bg-white', 'text-gray-600');
-                               }
-                               updateConditionsInput();
-                           };
-                           container.appendChild(pill);
-                       });
-                   } else {
-                       if (placeholder) placeholder.classList.remove('hidden');
-                   }
-                }
-
-                // Update Step 3 "Condition" section
-                const step3Container = document.getElementById('condition-selected-tags');
-                if (step3Container) {
-                    step3Container.innerHTML = '';
-                    if (values.length === 0) {
-                        step3Container.innerHTML = '<span class="text-gray-400 text-sm">No conditions selected</span>';
-                    } else {
-                        values.forEach(val => {
-                            const pill = document.createElement('div');
-                            pill.className = 'px-4 py-1.5 rounded-full border border-gray-300 bg-[#FABD4D] text-[#423131] text-sm font-normal';
-                            pill.textContent = val;
-                            step3Container.appendChild(pill);
-                        });
-                    }
-                }
-            }
 
             const conditionActionBtn = document.getElementById('condition-action-btn');
             if (conditionActionBtn) {
