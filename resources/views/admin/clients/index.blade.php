@@ -423,14 +423,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
-                            <select class="form-select" name="payout_currency" id="client_payout_currency">
-                                @foreach($currencies as $code => $symbol)
-                                <option value="{{ $code }}">{{ $code }} ({{ $symbol }})</option>
-                                @endforeach
-                            </select>
-                        </div>
+                        
                     </div>
                 </div>
 
