@@ -68,13 +68,17 @@ class RegistrationFeeService
                     'currency' => $currency,
                     'description' => 'Registration Fee - ' . $map[$role]['label'],
                     'customer' => [
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'contact' => $user->phone ?? '',
+                        'name' => (string) ($user->name ?? 'User'),
+                        'email' => (string) $user->email,
+                        'contact' => (string) ($user->phone ?? $user->mobile ?? ''),
                     ],
-                    'callback_url' => route('admin.registration-fees.callback'),
+                    'notify' => [
+                        'sms' => false,
+                        'email' => true,
+                    ],
+                    'callback_url' => route('registration-fees.callback'),
                     'callback_method' => 'get',
-                    'notes' => $notes,
+                    'notes' => array_map('strval', $notes),
                 ]);
 
             if ($response->successful()) {

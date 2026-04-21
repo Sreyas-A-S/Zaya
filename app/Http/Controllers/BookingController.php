@@ -186,6 +186,13 @@ class BookingController extends Controller
         $razorpayKey = config('services.razorpay.key');
         $razorpaySecret = config('services.razorpay.secret');
 
+        \Log::info('Razorpay Attempt:', [
+            'has_key' => !empty($razorpayKey),
+            'has_secret' => !empty($razorpaySecret),
+            'payable' => $finalPayable,
+            'currency' => $currency
+        ]);
+
         if ($razorpayKey && $razorpaySecret) {
             $verifySsl = config('services.razorpay.verify_ssl');
             
@@ -194,64 +201,65 @@ class BookingController extends Controller
             $gatewayCurrency = $request->test_mode ? 'INR' : $currency;
 
             try {
+                $payload = [
+                    'amount' => (int)(round($gatewayAmount, 2) * 100),
+                    'currency' => $gatewayCurrency,
+                    'accept_partial' => false,
+                    'description' => 'Booking Session - Zaya Wellness',
+                    'customer' => [
+                        'name' => (string) ($user->name ?? 'Client'),
+                        'email' => (string) $user->email,
+                        'contact' => (string) ($user->phone ?? $user->mobile ?? ''),
+                    ],
+                    'notify' => [
+                        'sms' => false, // SMS often fails due to invalid phone formats, keep email only for reliability
+                        'email' => true,
+                    ],
+                    'callback_url' => route('bookings.payment.callback'),
+                    'callback_method' => 'get',
+                    'notes' => [
+                        'practitioner_id' => (string) $practitioner->id,
+                        'practitioner_type' => (string) $practitioner->getMorphClass(),
+                        'booking_date' => (string) $request->booking_date,
+                        'booking_time' => (string) $request->booking_time,
+                        'service_ids' => is_array($request->service_ids) ? implode(',', $request->service_ids) : (string) $request->service_ids,
+                        'mode' => (string) $request->mode,
+                        'conditions' => is_array($request->conditions) ? json_encode($request->conditions) : (string) $request->conditions,
+                        'situation' => (string) ($request->situation ?? ''),
+                        'total_price' => (string) $subtotal,
+                        'promo_code' => (string) ($promoCode ?? ''),
+                        'discount_amount' => (string) $promoDiscount,
+                        'coins_used' => (string) $coinsUsed,
+                        'coin_discount' => (string) $coinDiscount,
+                        'currency' => (string) $currency,
+                        'additional_info' => is_array($request->additional_info) ? json_encode($request->additional_info) : (string) ($request->additional_info ?? '')
+                    ]
+                ];
+
                 $response = Http::withBasicAuth($razorpayKey, $razorpaySecret)
-                    ->withOptions(['verify' => $verifySsl])
-                    ->post('https://api.razorpay.com/v1/payment_links', [
-                        'amount' => (int)(round($gatewayAmount, 2) * 100),
-                        'currency' => $gatewayCurrency,
-                        'accept_partial' => false,
-                        'description' => 'Booking Session - Zaya Wellness',
-                        'customer' => [
-                            'name' => $user->name,
-                            'email' => $user->email,
-                            'contact' => $user->phone ?? '',
-                        ],
-                        'notify' => [
-                            'sms' => true,
-                            'email' => true,
-                        ],
-                        'callback_url' => route('bookings.payment.callback'),
-                        'callback_method' => 'get',
-                        'notes' => [
-                            'practitioner_id' => $practitioner->id,
-                            'practitioner_type' => $practitioner->getMorphClass(),
-                            'booking_date' => $request->booking_date,
-                            'booking_time' => $request->booking_time,
-                            'service_ids' => implode(',', $request->service_ids),
-                            'mode' => $request->mode,
-                            'conditions' => json_encode($request->conditions),
-                            'situation' => $request->situation,
-                            'total_price' => $request->total_price,
-                            'promo_code' => $request->promo_code,
-                            'discount_amount' => $promoDiscount,
-                            'coins_used' => $coinsUsed,
-                            'coin_discount' => $coinDiscount,
-                            'currency' => $currency,
-                            'additional_info' => json_encode($request->additional_info)
-                            ]
-                            ]);
+                    ->withOptions(['verify' => (bool)$verifySsl])
+                    ->post('https://api.razorpay.com/v1/payment_links', $payload);
 
                 if ($response->successful()) {
                     $paymentUrl = $response->json('short_url');
                 } else {
+                    $errorBody = $response->json();
+                    $errorMsg = $errorBody['error']['description'] ?? 'Razorpay API Error';
                     \Log::error('Razorpay API Error:', [
                         'status' => $response->status(),
                         'body' => $response->body(),
-                        'payload' => [
-                            'amount' => (int)(round($finalPayable, 2) * 100),
-                            'currency' => $currency,
-                        ]
+                        'payload' => $payload
                     ]);
+                    return response()->json(['success' => false, 'message' => 'Payment Error: ' . $errorMsg], 422);
                 }
             } catch (\Exception $e) {
                 \Log::error('Razorpay Connection Exception: ' . $e->getMessage());
+                return response()->json(['success' => false, 'message' => 'Could not connect to payment gateway.'], 503);
             }
         }
 
         if (!$paymentUrl) {
-            // If payment fails or is not configured, we might allow manual confirmation if admin allows
-            // or just return error.
-            return response()->json(['success' => false, 'message' => 'Payment gateway unavailable.'], 503);
+            return response()->json(['success' => false, 'message' => 'Payment gateway is not configured correctly.'], 503);
         }
 
         return response()->json([
