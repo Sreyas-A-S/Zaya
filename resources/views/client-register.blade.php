@@ -710,14 +710,14 @@
                     </div>
                 </div>
 
-                @if($clientRegistrationFeeEnabled && ($clientRegistrationFee ?? 0) > 0)
+                @if($clientRegistrationFeeEnabled)
                 <!-- Payment & Promocode (from Admin > Other Fees) -->
-                <div class="mb-10 border-t border-gray-200 pt-10">
+                <div class="mb-10 border-t border-gray-200 pt-10" id="registration-fee-field-wrapper">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 items-end">
                         <div>
                             <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Registration Fee Amount') }}</label>
                             <div class="relative w-full">
-                                <div class="w-full h-[52px] bg-[#F5F5F5] rounded-full flex items-center pl-6 pr-2">
+                                <div class="w-full h-[52px] bg-[#F5F5F5] rounded-full flex items-center pl-6 pr-2" data-registration-fee-container>
                                     <span class="text-gray-900 text-[0.95rem] font-medium" id="registration-fee-display">
                                         {{ $registrationCurrencySymbol }} {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
                                     </span>
@@ -1462,11 +1462,20 @@
             }
 
             function renderFee(value) {
-                const feeDisplay = feeInput?.closest('.relative')?.querySelector('span');
+                const feeDisplay = document.getElementById('registration-fee-display');
+                const feeWrapper = document.getElementById('registration-fee-field-wrapper');
                 const displayValue = value !== undefined ? value : feeInput?.value;
                 const currCode = feeCurrencyInput?.value || '';
-                if (feeInput && feeDisplay) {
-                    feeDisplay.textContent = `${currencySymbol} ${Number(displayValue || 0).toFixed(2)}${currCode ? ' ('+currCode+')' : ''}`;
+
+                const numericValue = parseFloat(displayValue || 0);
+
+                if (numericValue <= 0) {
+                    if (feeWrapper) feeWrapper.classList.add('hidden');
+                } else {
+                    if (feeWrapper) feeWrapper.classList.remove('hidden');
+                    if (feeDisplay) {
+                        feeDisplay.textContent = `${currencySymbol} ${numericValue.toFixed(2)}${currCode ? ' ('+currCode+')' : ''}`;
+                    }
                 }
             }
 
@@ -1475,14 +1484,17 @@
             }
 
             if (countrySelect) {
-                const initial = countrySelect.value || countrySelect.dataset.default || (countrySelect.tomselect ? countrySelect.tomselect.getValue() : '');
+                const initial = countrySelect.value || countrySelect.dataset.default || '';
                 convertFee(initial);
                 
-                if (countrySelect.tomselect) {
-                    countrySelect.tomselect.on('change', (val) => convertFee(val));
-                } else {
-                    countrySelect.addEventListener('change', (e) => convertFee(e.target.value));
-                }
+                // Use a small delay to ensure TomSelect is initialized
+                setTimeout(() => {
+                    if (countrySelect.tomselect) {
+                        countrySelect.tomselect.on('change', (val) => convertFee(val));
+                    } else {
+                        countrySelect.addEventListener('change', (e) => convertFee(e.target.value));
+                    }
+                }, 100);
             }
 
             function clearPromo() {

@@ -878,11 +878,14 @@
                     }
                 };
 
-                if (countrySelect.tomselect) {
-                    countrySelect.tomselect.on('change', (val) => updateFee(val));
-                } else {
-                    countrySelect.addEventListener('change', (e) => updateFee(e.target.value));
-                }
+                // Use a small delay to ensure TomSelect is initialized
+                setTimeout(() => {
+                    if (countrySelect.tomselect) {
+                        countrySelect.tomselect.on('change', (val) => updateFee(val));
+                    } else {
+                        countrySelect.addEventListener('change', (e) => updateFee(e.target.value));
+                    }
+                }, 100);
             }
 
             // Promo code apply + fee breakdown
