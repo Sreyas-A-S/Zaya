@@ -11,7 +11,20 @@ return new class extends Migration
     {
         $tableName = 'booking_reservations';
         
-        // 1. Drop old index if exists
+        // 1. Identify and drop foreign key if exists
+        // Laravel convention: booking_reservations_practitioner_id_foreign
+        // Or if it was renamed: booking_reservations_profile_id_foreign
+        $fks = DB::select("SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_NAME = '{$tableName}' AND CONSTRAINT_TYPE = 'FOREIGN KEY' AND TABLE_SCHEMA = DATABASE()");
+        foreach($fks as $fk) {
+            $name = $fk->CONSTRAINT_NAME;
+            if (str_contains($name, 'practitioner_id') || str_contains($name, 'profile_id')) {
+                Schema::table($tableName, function (Blueprint $table) use ($name) {
+                    $table->dropForeign($name);
+                });
+            }
+        }
+
+        // 2. Drop problematic index if exists
         $indexes = DB::select("SHOW INDEX FROM {$tableName}");
         $hasOldIndex = false;
         foreach($indexes as $idx) {
@@ -24,7 +37,7 @@ return new class extends Migration
             });
         }
 
-        // 2. Fix columns and add new index
+        // 3. Fix columns
         Schema::table($tableName, function (Blueprint $table) {
             if (Schema::hasColumn('booking_reservations', 'practitioner_id')) {
                 $table->renameColumn('practitioner_id', 'profile_id');
@@ -35,7 +48,7 @@ return new class extends Migration
             }
         });
         
-        // 3. Add new index if not exists
+        // 4. Add new index if not exists
         $indexes = DB::select("SHOW INDEX FROM {$tableName}");
         $hasNewIndex = false;
         foreach($indexes as $idx) {
@@ -53,6 +66,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Not strictly needed for fixing fast, but good practice
+        // Not strictly needed for fix
     }
 };
