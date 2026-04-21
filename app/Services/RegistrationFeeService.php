@@ -112,13 +112,9 @@ class RegistrationFeeService
         }
 
         if ($country) {
-            // If it's a name, we might need to map it back to a code
-            // For now, let's assume it's a code if length is 2, or try to find it
-            if (strlen($country) === 2) {
-                return strtoupper($country);
-            }
-            
-            $dbCountry = \App\Models\Country::where('name', $country)->first();
+            $dbCountry = \App\Models\Country::where('name', $country)
+                ->orWhere('code', strtoupper($country))
+                ->first();
             if ($dbCountry) {
                 return strtoupper($dbCountry->code);
             }

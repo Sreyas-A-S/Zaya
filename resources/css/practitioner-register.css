@@ -52,6 +52,7 @@ h6 {
    ======================================== */
 #nationality-select+.ts-wrapper,
 #country-select+.ts-wrapper,
+#payout-currency-select+.ts-wrapper,
 .education-country-select+.ts-wrapper,
 #lang-input+.ts-wrapper {
     width: 100%;
@@ -63,7 +64,8 @@ h6 {
 }
 
 #nationality-select+.ts-wrapper .ts-control,
-#country-select+.ts-wrapper .ts-control {
+#country-select+.ts-wrapper .ts-control,
+#payout-currency-select+.ts-wrapper .ts-control {
     padding: 14px 24px;
     background: #FFFFFF;
     border-radius: 9999px;
@@ -124,7 +126,8 @@ h6 {
 }
 
 #nationality-select+.ts-wrapper .ts-control:hover,
-#country-select+.ts-wrapper .ts-control:hover {
+#country-select+.ts-wrapper .ts-control:hover,
+#payout-currency-select+.ts-wrapper .ts-control:hover {
     background: #FAFAFA;
 }
 
@@ -138,6 +141,7 @@ h6 {
 
 #nationality-select+.ts-wrapper.focus .ts-control,
 #country-select+.ts-wrapper.focus .ts-control,
+#payout-currency-select+.ts-wrapper.focus .ts-control,
 #lang-input+.ts-wrapper.focus .ts-control,
 .education-country-select+.ts-wrapper.focus .ts-control {
     border-color: #97563D;
@@ -147,6 +151,7 @@ h6 {
 
 #nationality-select+.ts-wrapper .ts-control input,
 #country-select+.ts-wrapper .ts-control input,
+#payout-currency-select+.ts-wrapper .ts-control input,
 #lang-input+.ts-wrapper .ts-control input,
 .education-country-select+.ts-wrapper .ts-control input {
     color: #374151;
@@ -154,6 +159,7 @@ h6 {
 
 #nationality-select+.ts-wrapper .ts-control input::placeholder,
 #country-select+.ts-wrapper .ts-control input::placeholder,
+#payout-currency-select+.ts-wrapper .ts-control input::placeholder,
 #lang-input+.ts-wrapper .ts-control input::placeholder,
 .education-country-select+.ts-wrapper .ts-control input::placeholder {
     color: #9CA3AF;
@@ -161,6 +167,7 @@ h6 {
 
 #nationality-select+.ts-wrapper .ts-dropdown,
 #country-select+.ts-wrapper .ts-dropdown,
+#payout-currency-select+.ts-wrapper .ts-dropdown,
 #lang-input+.ts-wrapper .ts-dropdown,
 .education-country-select+.ts-wrapper .ts-dropdown {
     border: 1px solid #E5E7EB;
@@ -173,6 +180,7 @@ h6 {
 
 #nationality-select+.ts-wrapper .ts-dropdown .ts-dropdown-content,
 #country-select+.ts-wrapper .ts-dropdown .ts-dropdown-content,
+#payout-currency-select+.ts-wrapper .ts-dropdown .ts-dropdown-content,
 #lang-input+.ts-wrapper .ts-dropdown .ts-dropdown-content,
 .education-country-select+.ts-wrapper .ts-dropdown .ts-dropdown-content {
     max-height: 200px;
@@ -191,6 +199,7 @@ h6 {
 .country-option:hover,
 #nationality-select+.ts-wrapper .ts-dropdown .option.active,
 #country-select+.ts-wrapper .ts-dropdown .option.active,
+#payout-currency-select+.ts-wrapper .ts-dropdown .option.active,
 .education-country-select+.ts-wrapper .ts-dropdown .option.active {
     background: #FFF7EF;
 }

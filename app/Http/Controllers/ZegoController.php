@@ -16,55 +16,6 @@ use Illuminate\Support\Str;
 
 class ZegoController extends Controller
 {
-    /**
-     * Pre-authorizes an instant meeting ID or generates a Google Meet link.
-     */
-    public function initInstantMeeting(Request $request)
-    {
-        $user = Auth::user();
-        $professionalRoles = ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist', 'translator', 'admin'];
-        
-        if (!$user || !in_array($user->role, $professionalRoles)) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-        }
-
-        $provider = $request->input('provider', 'zegocloud');
-
-        if ($provider === 'google_meet') {
-            $googleService = new \App\Support\Google\GoogleCalendarService();
-            if (!$googleService->isConfigured()) {
-                return response()->json(['success' => false, 'message' => 'Google Meet is not configured on the server.'], 500);
-            }
-
-            try {
-                $meeting = $googleService->createMeeting(
-                    "Instant Session by " . $user->name,
-                    now()->toIso8601String(),
-                    60,
-                    [$user->email] // Add practitioner as attendee so they can record
-                );
-
-                return response()->json([
-                    'success' => true,
-                    'channel' => $meeting['id'], // We store the Google event ID
-                    'redirect_url' => $meeting['hangout_link']
-                ]);
-            } catch (\Exception $e) {
-                return response()->json(['success' => false, 'message' => 'Google Meet Error: ' . $e->getMessage()], 500);
-            }
-        }
-
-        $channel = 'zaya-' . strtolower(Str::random(10));
-        
-        // Temporarily authorize this channel ID for this specific user in cache (10 min expiry)
-        Cache::put('instant_meeting_' . $channel, $user->id, now()->addMinutes(10));
-
-        return response()->json([
-            'success' => true,
-            'channel' => $channel
-        ]);
-    }
-
     public function join(Request $request, string $channel, bool $isPublicMeeting = false)
     {
         $user = Auth::user();

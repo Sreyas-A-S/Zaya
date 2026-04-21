@@ -31,7 +31,7 @@ class PractitionerApplicationSubmittedMail extends Mailable
         $rolesWithoutTimeline = ['Doctor', 'Mindfulness Counsellor', 'Mindfulness Practitioner', 'Yoga Therapist', 'Translator'];
         $reviewText = in_array($this->roleLabel, $rolesWithoutTimeline) 
             ? "Your application will be reviewed by our Approval Commission." 
-            : "Your application will be reviewed by our Approval Commission within 30 days.";
+            : "Your application will be reviewed by our Approval Commission within 21 days.";
 
         return new Content(
             view: 'emails.default',
