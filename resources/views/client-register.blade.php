@@ -1323,7 +1323,7 @@
                             'Accept': 'application/json',
                             'Content-Type': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': csrfToken
+                            'X-CSRF-TOKEN': getCsrfToken()
                         },
                         body: JSON.stringify({
                             role: roleValue,

@@ -904,7 +904,9 @@ class WebController extends Controller
         
         $countryCode = 'all';
         if ($countryName) {
-            $dbCountry = \App\Models\Country::where('name', $countryName)->first();
+            $dbCountry = \App\Models\Country::where('name', $countryName)
+                ->orWhere('code', strtoupper($countryName))
+                ->first();
             if ($dbCountry) {
                 $countryCode = strtoupper($dbCountry->code);
             }
@@ -929,7 +931,18 @@ class WebController extends Controller
         $currencyKey = $feeKey . '_currency';
 
         $fee = (float) ($settings[$feeKey] ?? 0);
-        $currency = $settings[$currencyKey] ?? 'EUR';
+        
+        // Accurate currency fetching logic
+        $currency = $settings[$currencyKey] ?? null;
+        
+        if (!$currency && $countryCode !== 'all') {
+            $countryToCurrency = config('currencies.country_to_currency', []);
+            $currency = $countryToCurrency[$countryCode] ?? 'EUR';
+        }
+
+        if (!$currency) {
+            $currency = 'EUR';
+        }
 
         // Override with token currency if available
         if ($token) {

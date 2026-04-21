@@ -167,93 +167,31 @@ class RegisterController extends Controller
                 'translator',
             ];
 
-            if ($request->role === 'practitioner') {
-                $this->createPractitionerProfile($user, $request);
-            } elseif ($request->role === 'doctor') {
-                $this->createDoctorProfile($user, $request);
-            } elseif ($request->role === 'mindfulness_practitioner') {
-                $this->createMindfulnessPractitionerProfile($user, $request);
-            } elseif ($request->role === 'yoga_therapist') {
-                $this->createYogaTherapistProfile($user, $request);
-            } elseif ($request->role === 'translator') {
-                $this->createTranslatorProfile($user, $request);
-            } elseif ($request->role === 'patient' || $request->role === 'client') {
-                $this->createPatientProfile($user, $request);
-            }
+            if (in_array($user->role, $teamRoles, true)) {
+                Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail(ucwords(str_replace('_', ' ', $user->role))));
 
-            // Removed link usage update as links are now multi-use.
-            // if ($openRegisterLink) {
-            //     $update = ['used_at' => now()];
-            //     if (Schema::hasColumn('open_register_links', 'used_by')) {
-            //         $update['used_by'] = $user->id;
-            //     }
-            //     $openRegisterLink->fill($update)->save();
-            // }
-
-            DB::commit();
-
-            $paymentLink = null;
-            try {
-                $feeService = app(RegistrationFeeService::class);
-                $isTeamRole = in_array($user->role, $teamRoles, true);
-                $promoRole = $user->role === 'patient' ? 'client' : $user->role;
-                $promoNotes = [];
-                $feeOverride = null;
-                $isPromoEligibleRole = in_array($promoRole, [
-                    'client',
-                    'practitioner',
-                    'doctor',
-                    'mindfulness_practitioner',
-                    'yoga_therapist',
-                    'translator',
-                ], true);
-
-                if ($isPromoEligibleRole) {
-                    [$feeOverride, $promoNotes] = $this->resolveRegistrationPromo($request, $promoRole);
-                    if (!empty($promoNotes['promo_code'] ?? null)) {
-                        $promo = PromoCode::where('code', $promoNotes['promo_code'])->first();
-                        if ($promo) {
-                            $promo->incrementUsageIfAvailable();
-                        }
-                    }
-                }
-
-                if ($isTeamRole) {
-                    Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail(ucwords(str_replace('_', ' ', $user->role))));
-
-                    if ($feeOverride !== null && $feeOverride <= 0) {
-                        $paymentLink = null;
-                    } else {
-                        $paymentLink = $feeService->createPaymentLink($user, $user->role, $feeOverride, $promoNotes);
-                    }
-
-                    if ($paymentLink) {
-                        Mail::to($user->email)->send(
-                            new RegistrationFeePaymentLinkMail($paymentLink['role_label'], $paymentLink['amount'], $paymentLink['currency'], $paymentLink['payment_url'])
-                        );
-                    }
+                if ($feeOverride !== null && $feeOverride <= 0) {
+                    $paymentLink = null;
                 } else {
-                    Mail::to($user->email)->send(new WelcomeUserMail($user->email, $request->password, url('/zaya-login'), $user->role));
-                    if ($feeOverride !== null && $feeOverride <= 0) {
-                        $paymentLink = null;
-                    } else {
-                        $paymentLink = $feeService->createPaymentLink($user, 'client', $feeOverride, $promoNotes);
-                    }
-                    if ($paymentLink) {
-                        Mail::to($user->email)->send(
-                            new RegistrationFeePaymentLinkMail($paymentLink['role_label'], $paymentLink['amount'], $paymentLink['currency'], $paymentLink['payment_url'])
-                        );
-                        // Prefer directing the user to pay immediately if possible
-                        $this->guard()->login($user);
-                        return redirect()->away($paymentLink['payment_url']);
-                    }
+                    $paymentLink = $feeService->createPaymentLink($user, $user->role, $feeOverride, $promoNotes);
                 }
-            } catch (\Exception $e) {
-                \Log::error('Public Registration Welcome Email Error: ' . $e->getMessage());
-            }
 
-            // For "Join our team" roles, do not auto-login; send user to login page.
-            if (in_array($request->role, $teamRoles, true)) {
+                if ($paymentLink) {
+                    Mail::to($user->email)->send(
+                        new RegistrationFeePaymentLinkMail($paymentLink['role_label'], $paymentLink['amount'], $paymentLink['currency'], $paymentLink['payment_url'])
+                    );
+                    
+                    // Redirect to payment immediately
+                    if ($request->wantsJson()) {
+                        return response()->json([
+                            'success' => 'Registration successful! Redirecting to payment...',
+                            'redirect_url' => $paymentLink['payment_url']
+                        ], 201);
+                    }
+                    return redirect()->away($paymentLink['payment_url']);
+                }
+
+                // If no payment required (fee is 0 or payment link creation failed/skipped)
                 if ($request->wantsJson()) {
                     return response()->json(['success' => 'Registration successful! Your application is under review.'], 201);
                 }
@@ -263,14 +201,28 @@ class RegisterController extends Controller
                     ->with('success', 'Registration successful! Your application is under review.');
             }
 
-            $this->guard()->login($user);
-
-            if ($response = $this->registered($request, $user)) {
-                return $response;
+            // For Clients/Patients
+            Mail::to($user->email)->send(new WelcomeUserMail($user->email, $request->password, url('/zaya-login'), $user->role));
+            
+            if ($feeOverride !== null && $feeOverride <= 0) {
+                $paymentLink = null;
+            } else {
+                $paymentLink = $feeService->createPaymentLink($user, 'client', $feeOverride, $promoNotes);
             }
 
+            if ($paymentLink) {
+                Mail::to($user->email)->send(
+                    new RegistrationFeePaymentLinkMail($paymentLink['role_label'], $paymentLink['amount'], $paymentLink['currency'], $paymentLink['payment_url'])
+                );
+                // Prefer directing the user to pay immediately if possible
+                $this->guard()->login($user);
+                return redirect()->away($paymentLink['payment_url']);
+            }
+
+            // No payment required for client
+            $this->guard()->login($user);
             if ($request->wantsJson()) {
-                return response()->json(['success' => 'Registration successful! Your application is under review.'], 201);
+                return response()->json(['success' => 'Registration successful!'], 201);
             }
             return redirect($this->redirectPath());
         } catch (ValidationException $e) {
@@ -340,7 +292,9 @@ class RegisterController extends Controller
         $countryName = $request->input('country');
         $countryCode = 'all';
         if ($countryName) {
-            $dbCountry = \App\Models\Country::where('name', $countryName)->first();
+            $dbCountry = \App\Models\Country::where('name', $countryName)
+                ->orWhere('code', strtoupper($countryName))
+                ->first();
             if ($dbCountry) {
                 $countryCode = strtoupper($dbCountry->code);
             }

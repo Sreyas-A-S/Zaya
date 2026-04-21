@@ -56,26 +56,26 @@
             <!-- Step Indicator -->
             <div class="sticky top-0 z-50 bg-white flex justify-center pb-6 pt-8 mb-20 border-b border-[#D0D0D0]">
                 <div class="flex items-start justify-center gap-0" id="step-indicator">
-                    <div class="flex flex-col items-center relative z-[2]">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#60E48C] text-white"
+                    <div class="flex flex-col items-center relative z-[2] cursor-pointer group" onclick="showTab(1)">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#60E48C] text-white group-hover:scale-110"
                             id="step-circle-1">1</div>
-                        <span class="text-sm lg:text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap"
+                        <span class="text-sm lg:text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap group-hover:text-primary"
                             id="step-label-1">{{ __('Basic Details') }}</span>
                     </div>
                     <div class="w-[60px] md:w-[100px] xl:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative"
                         id="step-line-1"></div>
-                    <div class="flex flex-col items-center relative z-[2]">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]"
+                    <div class="flex flex-col items-center relative z-[2] cursor-pointer group" onclick="showTab(2)">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B] group-hover:scale-110"
                             id="step-circle-2">2</div>
-                        <span class="text-sm lg:text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap"
+                        <span class="text-sm lg:text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap group-hover:text-primary"
                             id="step-label-2">{{ __('Qualifications') }}</span>
                     </div>
                     <div class="w-[60px] md:w-[100px] xl:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative"
                         id="step-line-2"></div>
-                    <div class="flex flex-col items-center relative z-[2]">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]"
+                    <div class="flex flex-col items-center relative z-[2] cursor-pointer group" onclick="showTab(3)">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B] group-hover:scale-110"
                             id="step-circle-3">3</div>
-                        <span class="text-sm lg:text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap"
+                        <span class="text-sm lg:text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap group-hover:text-primary"
                             id="step-label-3">{{ __('Verification') }}</span>
                     </div>
                 </div>
@@ -625,7 +625,7 @@
                     @if($practitionerRegistrationFeeEnabled)
                         <div class='mb-12 border-t border-[#E5E5E5] pt-12'>
                             <div class='grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12'>
-                                <div>
+                                <div id="registration-fee-field-wrapper">
                                     <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Registration Fee Amount') }}</label>
                                     <div class='relative w-full'>
                                         <div class='w-full h-[58px] bg-[#F5F5F5] rounded-full flex items-center pl-8 pr-2' data-registration-fee-container>
@@ -640,16 +640,15 @@
                                 <div>
                                     <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Payout Currency') }}</label>
                                     <div class='relative w-full'>
-                                        <select name="payout_currency" class="w-full h-[58px] pl-6 pr-12 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#FABC41] focus:bg-white focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)] appearance-none">
+                                        <select id="payout-currency-select" name="payout_currency" 
+                                            data-default="{{ $practitionerRegistrationCurrency ?? 'EUR' }}" required>
+                                            <option value="">{{ __('Select Currency') }}</option>
                                             @foreach(config('currencies.symbols') as $code => $symbol)
-                                                <option value="{{ $code }}" {{ $code === ($practitionerRegistrationCurrency ?? 'EUR') ? 'selected' : '' }}>
+                                                <option value="{{ $code }}">
                                                     {{ $code }} ({{ $symbol }})
                                                 </option>
                                             @endforeach
                                         </select>
-                                        <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none">
-                                             <i class="ri-arrow-down-s-line text-gray-400 text-xl"></i>
-                                        </div>
                                     </div>
                                 </div>
 
@@ -720,7 +719,7 @@
                 <button type="button"
                     class="bg-[#F5A623] text-[#423131] py-3.5 px-8 rounded-full font-normal text-base transition-all duration-300 cursor-pointer border-none hover:bg-[#A87139] hover:text-white hover:-translate-y-0.5"
                     id="next-btn" onclick="nextTab()">
-                    <span id="next-btn-text">{{ __('Save & Continue') }}</span>
+                    <span id="next-btn-text">{!! __('Save & Continue') !!}</span>
                 </button>
             </div>
         </div>
@@ -784,17 +783,51 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let registrationCurrencySymbol = @json($practitionerRegistrationCurrencySymbol ?? '€');
+            const currencySymbols = @json(config('currencies.symbols', []));
+
+            function getCsrfToken() {
+                return document.querySelector('input[name="_token"]')?.value ||
+                    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                    '';
+            }
+            const roleValue = document.querySelector('input[name="role"]')?.value || 'practitioner';
+            const feeInput = document.querySelector('input[name="registration_fee"]');
+            const feeActualInput = document.querySelector('input[name="registration_fee_actual"]');
 
             function renderRegistrationFee() {
                 const feeContainer = document.querySelector('[data-registration-fee-container]');
+                const feeWrapper = document.getElementById('registration-fee-field-wrapper');
                 if (!feeContainer) return;
                 const feeInput = feeContainer.querySelector('input[name="registration_fee"]');
                 const feeText = feeContainer.querySelector('span');
                 if (!feeInput || !feeText) return;
-                feeText.textContent = `${registrationCurrencySymbol} ${feeInput.value || '0.00'}`;
+
+                const feeValue = parseFloat(feeInput.value || 0);
+                if (feeValue <= 0) {
+                    if (feeWrapper) feeWrapper.classList.add('hidden');
+                } else {
+                    if (feeWrapper) feeWrapper.classList.remove('hidden');
+                    feeText.textContent = `${registrationCurrencySymbol} ${feeValue.toFixed(2)}`;
+                }
             }
 
             renderRegistrationFee();
+
+            // Initialize Payout Currency TomSelect
+            const payoutCurrencySelectEl = document.querySelector('#payout-currency-select');
+            let payoutCurrencyTomSelect = null;
+            if (payoutCurrencySelectEl) {
+                payoutCurrencyTomSelect = new TomSelect(payoutCurrencySelectEl, {
+                    maxItems: 1,
+                    placeholder: '{{ __('Select Currency') }}',
+                    closeAfterSelect: true,
+                });
+                
+                const defaultCurrency = payoutCurrencySelectEl.dataset.default;
+                if (defaultCurrency) {
+                    payoutCurrencyTomSelect.setValue(defaultCurrency);
+                }
+            }
 
             // Country change listener to update registration fee
             const countrySelect = document.querySelector('#country-select');
@@ -807,7 +840,7 @@
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': csrfToken
+                                'X-CSRF-TOKEN': getCsrfToken()
                             },
                             body: JSON.stringify({
                                 role: roleValue,
@@ -824,10 +857,15 @@
                                 feeActualInput.value = feeValue.toFixed(2);
                                 feeInput.value = feeValue.toFixed(2);
                             }
+
+                            // Update Payout Currency dropdown using TomSelect if available
+                            if (payoutCurrencyTomSelect) {
+                                payoutCurrencyTomSelect.setValue(currency);
+                            } else if (payoutCurrencySelectEl) {
+                                payoutCurrencySelectEl.value = currency;
+                            }
                             
-                            // Update global currency symbol if needed
-                            // Note: registrationCurrencySymbol is defined in the template
-                            if (typeof currencySymbols !== 'undefined' && currencySymbols[currency]) {
+                            if (currencySymbols[currency]) {
                                 registrationCurrencySymbol = currencySymbols[currency];
                             } else {
                                 registrationCurrencySymbol = currency;
@@ -861,15 +899,6 @@
             const promoDiscountPercentageHidden = document.getElementById('promo-discount-percentage-hidden');
             const promoDiscountAmountHidden = document.getElementById('promo-discount-amount-hidden');
             const promoTotalFeeHidden = document.getElementById('promo-total-fee-hidden');
-
-            const feeInput = document.querySelector('input[name="registration_fee"]');
-            const feeActualInput = document.querySelector('input[name="registration_fee_actual"]');
-            function getCsrfToken() {
-                return document.querySelector('input[name="_token"]')?.value ||
-                    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
-                    '';
-            }
-            const roleValue = document.querySelector('input[name=\"role\"]')?.value || 'practitioner';
 
             function clearPromo() {
                 if (promoBreakdown) promoBreakdown.classList.add('hidden');
@@ -1149,7 +1178,7 @@
             if (currentTab === totalTabs) {
                 nextBtnText.textContent = '{{ __('Complete Application') }}';
             } else {
-                nextBtnText.textContent = '{{ __('Save & Continue') }}';
+                nextBtnText.textContent = '{!! __('Save & Continue') !!}';
             }
         }
 
@@ -1257,16 +1286,19 @@
         }
 
         async function nextTab() {
-            if (!validateStep()) {
-                // Focus the first invalid element
-                const firstInvalid = document.querySelector('.border-red-500');
-                if (firstInvalid) firstInvalid.focus();
-                return;
-            }
+            // Run validation to show errors but don't block tab switching
+            const isStepValid = validateStep();
 
             if (currentTab < totalTabs) {
                 showTab(currentTab + 1);
             } else {
+                // Final submission - block if not valid
+                if (!isStepValid) {
+                    const firstInvalid = document.querySelector('.border-red-500');
+                    if (firstInvalid) firstInvalid.focus();
+                    return;
+                }
+
                 const form = document.getElementById('practitioner-form');
                 const nextBtn = document.getElementById('next-btn');
                 const btnText = document.getElementById('next-btn-text');
