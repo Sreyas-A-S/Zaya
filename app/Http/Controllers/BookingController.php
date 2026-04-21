@@ -307,8 +307,17 @@ class BookingController extends Controller
 
         $bookingData = $reservation->booking_data;
 
-        // SUCCESS PATH
-        $booking = Booking::create([
+        // CRITICAL: Final availability check now that money is received
+        $isAvailable = $this->checkSlotAvailability(
+            $reservation->profile_id, 
+            $reservation->practitioner_type,
+            $reservation->booking_date, 
+            $reservation->booking_time
+        );
+
+        if ($isAvailable) {
+            // SUCCESS PATH
+            $booking = Booking::create([
             'invoice_no' => 'ZAYA-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
             'user_id' => $reservation->user_id,
             'profile_id' => $reservation->profile_id,

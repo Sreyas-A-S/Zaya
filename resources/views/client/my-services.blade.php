@@ -498,8 +498,17 @@ async function fetchAvailableServices() {
             width: '100%',
             dropdownParent: $('#addServiceModal'),
         });
-        $(el).on('change', () => refreshAllSelects(elementId));
+        
+        // Remove old listeners to prevent recursive loops and duplicate calls
+        $(el).off('change').on('change', function(e) {
+            // Only refresh if it was a user interaction, not a programmatic set
+            if (e.originalEvent) {
+                refreshAllSelects(elementId);
+            }
+        });
+        
         toggleSelectLoader(el, false);
+        return select2Instances[elementId];
     }
 
     async function refreshAllSelects(changedId = null) {
@@ -600,7 +609,7 @@ async function fetchAvailableServices() {
         `;
         
         container.appendChild(row);
-        initSelect2(id);
+        await initSelect2(id);
         attachCurrencyListeners(row);
         serviceRowIndex++;
         container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
@@ -725,82 +734,85 @@ async function fetchAvailableServices() {
         setTimeout(() => modal.classList.add('hidden'), 300);
     }
 
-    function openAddServiceModal() {
+    let isResettingModal = false;
+
+    async function openAddServiceModal() {
+        if (isResettingModal) return; // Wait for cleanup if in progress
+
         const modal = document.getElementById('addServiceModal');
         const content = document.getElementById('addModalContent');
         
         modal.classList.remove('hidden');
-        setTimeout(() => {
-            content.classList.remove('scale-95', 'opacity-0');
-            content.classList.add('scale-100', 'opacity-100');
-            
-            // Initialize Select2 for the first row if not already done
-            const firstSelectId = 'service-select-0';
-            if (document.getElementById(firstSelectId) && !select2Instances[firstSelectId]) {
-                initSelect2(firstSelectId);
-            }
-            attachCurrencyListeners();
-        }, 10);
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+        
+        // Initialize Select2 for the first row if not already done
+        const firstSelectId = 'service-select-0';
+        if (document.getElementById(firstSelectId) && !select2Instances[firstSelectId]) {
+            await initSelect2(firstSelectId);
+        }
+        attachCurrencyListeners();
         
         document.body.style.overflow = 'hidden';
     }
-    function manageService(serviceId, rates = []) {
-        openAddServiceModal();
-        setTimeout(() => {
-            const select = document.getElementById('service-select-0');
-            if (select) {
-                $(select).val(String(serviceId)).trigger('change');
-            }
 
-            // Populate rates if provided
-            if (rates && rates.length > 0) {
-                const ratesContainer = document.querySelector('.rates-container');
-                // Clear existing initial row (keep only the container)
-                ratesContainer.innerHTML = '';
-                
-                rates.forEach((rate, index) => {
-                    const row = document.createElement('div');
-                    row.className = 'rate-row grid grid-cols-1 sm:grid-cols-[1fr_1.5fr] gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 shadow-sm mb-4';
-                    row.innerHTML = `
-                        <div>
-                            <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Duration</label>
-                            <div class="relative">
-                                <i class="ri-time-fill absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 text-base sm:text-lg"></i>
-                                <input type="number" name="services[0][rates][${index}][duration]" value="${rate.duration}" required placeholder="60" class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-sm sm:text-base">
-                                <span class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] sm:text-xs font-bold uppercase">Min</span>
-                            </div>
+    async function manageService(serviceId, rates = []) {
+        await openAddServiceModal();
+        
+        const select = document.getElementById('service-select-0');
+        if (select) {
+            // Set value and trigger change with originalEvent=null to prevent refreshAllSelects loop
+            $(select).val(String(serviceId)).trigger('change');
+        }
+
+        // Populate rates if provided
+        if (rates && rates.length > 0) {
+            const ratesContainer = document.querySelector('.rates-container');
+            // Clear existing initial row (keep only the container)
+            ratesContainer.innerHTML = '';
+            
+            rates.forEach((rate, index) => {
+                const row = document.createElement('div');
+                row.className = 'rate-row grid grid-cols-1 sm:grid-cols-[1fr_1.5fr] gap-4 sm:gap-6 items-end bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-[#2E4B3D]/5 shadow-sm mb-4';
+                row.innerHTML = `
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Duration</label>
+                        <div class="relative">
+                            <i class="ri-time-fill absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 text-base sm:text-lg"></i>
+                            <input type="number" name="services[0][rates][${index}][duration]" value="${rate.duration}" required placeholder="60" class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 focus:ring-4 focus:ring-secondary/5 focus:border-secondary transition-all outline-none font-bold text-secondary text-sm sm:text-base">
+                            <span class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] sm:text-xs font-bold uppercase">Min</span>
                         </div>
-                        <div>
-                            <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
-                            <div class="flex gap-2 sm:gap-3">
-                                ${index === 0 ? `
-                                <div class="relative w-24">
-                                    <div class="h-[54px] sm:h-[58px] w-full bg-[#f3f4f6] border border-gray-200 rounded-lg flex items-center justify-center text-sm font-black text-secondary cursor-not-allowed">
-                                        ${rate.currency || DEFAULT_CURRENCY}
-                                    </div>
-                                    <input type="hidden" name="services[0][currency]" value="${rate.currency || DEFAULT_CURRENCY}">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wide">Rate</label>
+                        <div class="flex gap-2 sm:gap-3">
+                            ${index === 0 ? `
+                            <div class="relative w-24">
+                                <div class="h-[54px] sm:h-[58px] w-full bg-[#f3f4f6] border border-gray-200 rounded-lg flex items-center justify-center text-sm font-black text-secondary cursor-not-allowed">
+                                    ${rate.currency || DEFAULT_CURRENCY}
                                 </div>
-                                ` : ''}
-                                <div class="relative flex-1">
-                                    <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">${CURRENCY_SYMBOLS[rate.currency] || CURRENCY_SYMBOLS[DEFAULT_CURRENCY] || '₹'}</span>
-                                    <input type="number" name="services[0][rates][${index}][rate]" value="${parseFloat(rate.rate).toFixed(2)}" step="0.01" required placeholder="0.00"  class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 bg-[#f3f4f6] focus:ring-0 outline-none font-bold text-secondary text-base sm:text-lg ">
-                                </div>
-                                ${index > 0 ? `
-                                <button type="button" onclick="confirmRemoveRateRow(this)" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100">
-                                    <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
-                                </button>
-                                ` : `
-                                <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
-                                    <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
-                                </button>
-                                `}
+                                <input type="hidden" name="services[0][currency]" value="${rate.currency || DEFAULT_CURRENCY}">
                             </div>
+                            ` : ''}
+                            <div class="relative flex-1">
+                                <span class="currency-symbol absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-secondary/40 font-black text-base sm:text-lg">${CURRENCY_SYMBOLS[rate.currency] || CURRENCY_SYMBOLS[DEFAULT_CURRENCY] || '₹'}</span>
+                                <input type="number" name="services[0][rates][${index}][rate]" value="${parseFloat(rate.rate).toFixed(2)}" step="0.01" required placeholder="0.00"  class="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl border border-gray-200 bg-[#f3f4f6] focus:ring-0 outline-none font-bold text-secondary text-base sm:text-lg ">
+                            </div>
+                            ${index > 0 ? `
+                            <button type="button" onclick="confirmRemoveRateRow(this)" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100">
+                                <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
+                            </button>
+                            ` : `
+                            <button type="button" class="w-12 h-11 sm:w-14 sm:h-[54px] rounded-lg sm:rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center cursor-not-allowed border border-gray-100" disabled>
+                                <i class="ri-delete-bin-fill text-lg sm:text-xl"></i>
+                            </button>
+                            `}
                         </div>
-                    `;
-                    ratesContainer.appendChild(row);
-                });
-            }
-        }, 250);
+                    </div>
+                `;
+                ratesContainer.appendChild(row);
+            });
+        }
     }
 
     function closeAddServiceModal() {
@@ -810,6 +822,7 @@ async function fetchAvailableServices() {
         content.classList.add('scale-95', 'opacity-0');
         content.classList.remove('scale-100', 'opacity-100');
         
+        isResettingModal = true;
         setTimeout(() => {
             modal.classList.add('hidden');
             document.body.style.overflow = 'auto';
@@ -817,6 +830,8 @@ async function fetchAvailableServices() {
             // Reset state
             const container = document.getElementById('services-container');
             const rows = container.querySelectorAll('.service-row');
+            
+            // Remove all but the first row
             for (let i = 1; i < rows.length; i++) {
                 const selectId = rows[i].querySelector('.service-selector').id;
                 if (select2Instances[selectId]) {
@@ -826,17 +841,30 @@ async function fetchAvailableServices() {
                 rows[i].remove();
             }
             
-            const firstRatesContainer = rows[0].querySelector('.rates-container');
-            const firstRates = firstRatesContainer.querySelectorAll('.rate-row');
-            for (let i = 1; i < firstRates.length; i++) {
-                firstRates[i].remove();
+            // Reset the first row's rates
+            if (rows[0]) {
+                const firstRatesContainer = rows[0].querySelector('.rates-container');
+                const firstRates = firstRatesContainer.querySelectorAll('.rate-row');
+                for (let i = 1; i < firstRates.length; i++) {
+                    firstRates[i].remove();
+                }
+                
+                // Clear inputs in the remaining first rate row
+                const firstRateInputs = firstRates[0].querySelectorAll('input');
+                firstRateInputs.forEach(input => {
+                    if (input.type !== 'hidden') input.value = '';
+                });
+            }
+
+            if (select2Instances['service-select-0']) {
+                const $sel = $('#service-select-0');
+                $sel.val(null);
+                // Trigger change without originalEvent to prevent full refresh
+                $sel.trigger({ type: 'change', originalEvent: null });
             }
             
-            if (select2Instances['service-select-0']) {
-                $('#service-select-0').val(null).trigger('change');
-            }
             serviceRowIndex = 1;
-            cachedAvailableServices = null; // Reset cache so it refreshes next time
+            isResettingModal = false;
         }, 300);
     }
 
