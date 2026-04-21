@@ -17,59 +17,11 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- JaaS (8x8) -->
-                <button onclick="redirectToPlatform('jaas')" class="group p-6 bg-[#FDFDFD] border border-[#2E4B3D]/10 rounded-[32px] hover:border-secondary hover:bg-secondary/5 transition-all text-left relative overflow-hidden">
-                    <div class="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/20">
-                        <i class="ri-shield-user-fill text-white text-2xl"></i>
-                    </div>
-                    <h4 class="text-lg font-bold text-secondary mb-1">JaaS (8x8)</h4>
-                    <p class="text-gray-400 text-xs leading-relaxed">High-quality, secure enterprise video by Jitsi. Best for standard sessions.</p>
-                    <div class="absolute bottom-4 right-6 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all">
-                        <i class="ri-arrow-right-line text-secondary text-xl"></i>
-                    </div>
-                </button>
-
-                <!-- Daily.co -->
-                <button onclick="redirectToPlatform('daily')" class="group p-6 bg-[#FDFDFD] border border-[#2E4B3D]/10 rounded-[32px] hover:border-secondary hover:bg-secondary/5 transition-all text-left relative overflow-hidden">
-                    <div class="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-orange-500/20">
-                        <i class="ri-flashlight-fill text-white text-2xl"></i>
-                    </div>
-                    <h4 class="text-lg font-bold text-secondary mb-1">Daily.co</h4>
-                    <p class="text-gray-400 text-xs leading-relaxed">Simple, fast, and reliable browser-based video. Modern prebuilt interface.</p>
-                    <div class="absolute bottom-4 right-6 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all">
-                        <i class="ri-arrow-right-line text-secondary text-xl"></i>
-                    </div>
-                </button>
-
-                <!-- Agora -->
-                <button onclick="redirectToPlatform('agora')" class="group p-6 bg-[#FDFDFD] border border-[#2E4B3D]/10 rounded-[32px] hover:border-secondary hover:bg-secondary/5 transition-all text-left relative overflow-hidden">
-                    <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/20">
-                        <i class="ri-broadcast-fill text-white text-2xl"></i>
-                    </div>
-                    <h4 class="text-lg font-bold text-secondary mb-1">Agora</h4>
-                    <p class="text-gray-400 text-xs leading-relaxed">Low-latency global real-time engagement. Custom embedded experience.</p>
-                    <div class="absolute bottom-4 right-6 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all">
-                        <i class="ri-arrow-right-line text-secondary text-xl"></i>
-                    </div>
-                </button>
-
-                <!-- ZEGOCLOUD -->
-                <button onclick="redirectToPlatform('zegocloud')" class="group p-6 bg-[#FDFDFD] border border-[#2E4B3D]/10 rounded-[32px] hover:border-secondary hover:bg-secondary/5 transition-all text-left relative overflow-hidden">
-                    <div class="w-12 h-12 bg-fuchsia-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-fuchsia-500/20">
-                        <i class="ri-apps-2-fill text-white text-2xl"></i>
-                    </div>
-                    <h4 class="text-lg font-bold text-secondary mb-1">ZEGOCLOUD</h4>
-                    <p class="text-gray-400 text-xs leading-relaxed">Prebuilt ZEGOCLOUD meeting UI for fast hosted video sessions.</p>
-                    <div class="absolute bottom-4 right-6 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all">
-                        <i class="ri-arrow-right-line text-secondary text-xl"></i>
-                    </div>
-                </button>
-
+            <div class="grid grid-cols-1 gap-4">
                 <!-- Google Meet -->
-                <button onclick="redirectToPlatform('google_meet')" class="group p-6 bg-[#FDFDFD] border border-[#2E4B3D]/10 rounded-[32px] hover:border-secondary hover:bg-secondary/5 transition-all text-left relative overflow-hidden">
-                    <div class="w-12 h-12 bg-white border border-gray-100 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-gray-200/50">
-                        <svg class="w-7 h-7" viewBox="0 0 48 48">
+                <button onclick="redirectToPlatform('google_meet')" class="group p-8 bg-[#FDFDFD] border border-[#2E4B3D]/10 rounded-[32px] hover:border-secondary hover:bg-secondary/5 transition-all text-left relative overflow-hidden">
+                    <div class="w-14 h-14 bg-white border border-gray-100 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-gray-200/50">
+                        <svg class="w-8 h-8" viewBox="0 0 48 48">
                             <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
                             <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
                             <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
@@ -77,12 +29,15 @@
                             <path fill="none" d="M0 0h48v48H0z"></path>
                         </svg>
                     </div>
-                    <h4 class="text-lg font-bold text-secondary mb-1">Google Meet</h4>
-                    <p class="text-gray-400 text-xs leading-relaxed">Start an instant meeting via Google Meet in a new browser tab.</p>
-                    <div class="absolute bottom-4 right-6 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all">
-                        <i class="ri-arrow-right-line text-secondary text-xl"></i>
+                    <div class="flex flex-col">
+                        <h4 class="text-xl font-bold text-secondary mb-1">Google Meet</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">Start an instant meeting via Google Meet in a new browser tab.</p>
+                    </div>
+                    <div class="absolute bottom-6 right-8 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all">
+                        <i class="ri-arrow-right-line text-secondary text-2xl"></i>
                     </div>
                 </button>
+
 
                 <!-- Help Info -->
                 <div class="p-6 bg-gray-50 rounded-[32px] flex items-center gap-4">

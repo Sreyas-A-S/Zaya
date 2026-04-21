@@ -1727,7 +1727,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         return parsed;
                     };
 
-                    const renderLanguages = (langs) => {
+                    const renderBadges = (langs) => {
                         if (!langs) return '<span class="text-muted">None</span>';
                         let data = langs;
                         if (typeof data === 'string') {
@@ -1748,10 +1748,10 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                     if (item.write) caps.push('Write');
                                     if (item.speak) caps.push('Speak');
                                     const capsStr = caps.length ? ` (${caps.join(', ')})` : '';
-                                    return `<span class="badge bg-light text-dark border">${name}${capsStr}</span>`;
+                                    return `<span class="badge bg-light text-dark border me-1 mb-1">${name}${capsStr}</span>`;
                                 }).join('');
                             }
-                            return data.map(l => `<span class="badge bg-light text-dark border">${l}</span>`).join('');
+                            return data.map(l => `<span class="badge bg-light text-dark border me-1 mb-1">${l}</span>`).join('');
                         }
                         if (typeof data === 'object') {
                             let html = '';
@@ -1762,177 +1762,152 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                 if (caps && caps.write) capList.push('Write');
                                 if (caps && caps.speak) capList.push('Speak');
                                 const capsStr = capList.length ? ` (${capList.join(', ')})` : '';
-                                html += `<span class="badge bg-light text-dark border">${name}${capsStr}</span>`;
+                                html += `<span class="badge bg-light text-dark border me-1 mb-1">${name}${capsStr}</span>`;
                             });
                             return html || '<span class="text-muted">None</span>';
                         }
-                        return `<span class="badge bg-light text-dark border">${String(data)}</span>`;
+                        return `<span class="badge bg-light text-dark border me-1 mb-1">${String(data)}</span>`;
                     };
 
                     let html = `
-                    <div class="row g-4">
-                        <div class="col-md-3 text-center border-end pe-3">
-                             <div class="position-relative d-inline-block mb-3">
+                <div class="row">
+                    <!-- Left Sidebar Profile -->
+                    <div class="col-md-4 border-end">
+                        <div class="text-center mb-4">
+                            <div class="position-relative d-inline-block">
                                 <img src="${t.profile_photo_path ? '/storage/' + t.profile_photo_path : defaultProfile}" 
-                                     class="rounded-circle shadow-sm img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
-                                <div class="mt-2">
-                                    <span class="badge rounded-pill ${String(t.status || '').toLowerCase() === 'active' ? 'bg-success' : 'bg-danger'} border border-white">
-                                        ${String(t.status || 'inactive').toUpperCase() === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'}
-                                    </span>
+                                     class="img-fluid rounded-circle mb-3 shadow-sm" 
+                                     style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #fff;">
+                                <span class="position-absolute bottom-0 end-0 badge rounded-pill ${String(t.status || '').toLowerCase() === 'active' ? 'bg-success' : 'bg-danger'}" style="transform: translate(-10%, -10%);">
+                                    ${(t.status || 'inactive').toUpperCase()}
+                                </span>
+                            </div>
+                            <h4 class="mb-1">${t.first_name} ${t.last_name}</h4>
+                            <p class="text-muted mb-1 small text-uppercase fw-bold">${t.gender || 'N/A'} • ${formatDate(t.dob)}</p>
+                            <p class="text-muted mb-2"><i class="fa-solid fa-envelope me-1"></i> ${u.email}</p>
+                            <p class="text-muted"><i class="fa-solid fa-phone me-1"></i> ${t.phone || 'N/A'}</p>
+                            
+                            <div class="d-flex justify-content-center gap-2 mt-2">
+                                ${t.website_social_links && t.website_social_links.website ? `<a href="${t.website_social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs" title="Website"><i class="fa fa-globe"></i></a>` : ''}
+                                ${t.website_social_links && t.website_social_links.facebook ? `<a href="${t.website_social_links.facebook}" target="_blank" class="btn btn-outline-primary btn-xs" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>` : ''}
+                                ${t.website_social_links && t.website_social_links.instagram ? `<a href="${t.website_social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs" title="Instagram"><i class="fa-brands fa-instagram"></i></a>` : ''}
+                                ${t.website_social_links && t.website_social_links.linkedin ? `<a href="${t.website_social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>` : ''}
+                                ${t.website_social_links && t.website_social_links.youtube ? `<a href="${t.website_social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs" title="YouTube"><i class="fa-brands fa-youtube"></i></a>` : ''}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="mb-3">
+                            <h6 class="f-w-600">Short Bio</h6>
+                            <div class="bio-wrapper" style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                                <p class="small text-muted mb-0">${t.short_bio || 'No bio provided.'}</p>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="f-w-600">Languages</h6>
+                            <div>${renderBadges(t.languages_spoken)}</div>
+                        </div>
+                    </div>
+
+                    <!-- Right Main Content Tabs -->
+                    <div class="col-md-8">
+                        <ul class="nav nav-tabs border-tab nav-primary mb-3" id="viewTab" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#v-pro" role="tab"><i class="fa-solid fa-briefcase me-2"></i>Professional</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#v-expert" role="tab"><i class="fa-solid fa-star me-2"></i>Expertise</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#v-qual" role="tab"><i class="fa-solid fa-graduation-cap me-2"></i>Qualifications</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#v-ident" role="tab"><i class="fa-solid fa-id-card me-2"></i>KYC & Bank</a></li>
+                        </ul>
+                        <div class="tab-content mt-3" id="viewTabContent">
+                            <!-- Professional -->
+                            <div class="tab-pane fade show active" id="v-pro" role="tabpanel">
+                                <div class="row g-3">
+                                    <div class="col-12"><h6 class="text-primary border-bottom pb-2">Professional Profile</h6></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Type</label><p class="f-w-600">${t.yoga_therapist_type || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Experience</label><p class="f-w-600">${t.years_of_experience || 0} Years</p></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Organization</label><p class="f-w-600">${t.current_organization || 'N/A'}</p></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Workplace Address</label><p class="f-w-600">${t.workplace_address || 'N/A'}</p></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Address</label><p class="f-w-600">${[t.address_line_1 || t.address, t.address_line_2, t.city, t.state, t.zip_code, t.country].filter(Boolean).join(', ') || 'N/A'}</p></div>
+                                    
+                                    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Registration</h6></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Reg Number</label><p class="f-w-600">${t.registration_number || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Affiliated Body</label><p class="f-w-600">${t.affiliated_body || 'N/A'}</p></div>
+                                    <div class="col-12">
+                                        ${t.registration_proof_path ? `<a href="/storage/${t.registration_proof_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-pdf me-1"></i> View Reg Proof</a>` : ''}
+                                    </div>
                                 </div>
                             </div>
-                            <h5 class="fw-bold text-dark mb-1 text-break">${t.first_name} ${t.last_name}</h5>
-                            <p class="text-muted small mb-2 text-break">${u.email}</p>
-                            <p class="text-muted small mb-3"><i class="fa fa-phone me-1"></i> ${t.phone || 'N/A'}</p>
-                        </div>
-                        <div class="col-md-9 ps-3">
-                             <ul class="nav nav-tabs nav-primary nav-fill" id="viewTab" role="tablist">
-                                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#v-personal" role="tab">Personal</a></li>
-                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#v-pro" role="tab">Professional</a></li>
-                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#v-expert" role="tab">Expertise</a></li>
-                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#v-qual" role="tab">Qualifications</a></li>
-                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#v-ident" role="tab">Identity</a></li>
-                            </ul>
-                            <div class="tab-content mt-4">
-                                <!-- Personal -->
-                                <div class="tab-pane fade show active" id="v-personal">
-                                    <h6 class="text-primary fw-bold mb-3">Bio & Contact</h6>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <p class="text-muted small mb-1">Gender</p>
-                                            <p class="fw-medium">${t.gender || 'N/A'}</p>
+
+                            <!-- Expertise -->
+                            <div class="tab-pane fade" id="v-expert" role="tabpanel">
+                                <div class="row g-3">
+                                    <div class="col-12"><h6 class="text-primary border-bottom pb-2">Areas of Expertise</h6></div>
+                                    <div class="col-12">
+                                        <div>
+                                            ${(() => {
+                                                const list = normalizeList(t.areas_of_expertise);
+                                                return list.length ? list.map(a => `<span class="badge bg-light text-dark border me-1 mb-1">${a}</span>`).join('') : 'None';
+                                            })()}
                                         </div>
-                                        <div class="col-md-6">
-                                            <p class="text-muted small mb-1">DOB</p>
-                                            <p class="fw-medium">${formatDate(t.dob)}</p>
-                                        </div>
-                                        <div class="col-12">
-                                            <p class="text-muted small mb-1">Address</p>
-                                            <p class="fw-medium">${[t.address_line_1 || t.address, t.address_line_2, t.city, t.state, t.zip_code, t.country].filter(Boolean).join(', ') || 'N/A'}</p>
-                                        </div>
-                                         <div class="col-12">
-                                            <p class="text-muted small mb-1">Short Bio</p>
-                                            <p class="text-dark bg-light p-3 rounded small">${t.short_bio || 'N/A'}</p>
-                                        </div>
-                                        <div class="col-12">
-                                            <p class="text-muted small mb-1">Social / Website</p>
-                                            <div class="d-flex flex-wrap gap-2 mt-1">
-                                                ${t.website_social_links && t.website_social_links.website ? `<a href="${t.website_social_links.website}" target="_blank" class="btn btn-outline-primary btn-xs" title="Website"><i class="fa-solid fa-globe"></i></a>` : ''}
-                                                ${t.website_social_links && t.website_social_links.facebook ? `<a href="${t.website_social_links.facebook}" target="_blank" class="btn btn-outline-primary btn-xs" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>` : ''}
-                                                ${t.website_social_links && t.website_social_links.instagram ? `<a href="${t.website_social_links.instagram}" target="_blank" class="btn btn-outline-danger btn-xs" title="Instagram"><i class="fa-brands fa-instagram"></i></a>` : ''}
-                                                ${t.website_social_links && t.website_social_links.linkedin ? `<a href="${t.website_social_links.linkedin}" target="_blank" class="btn btn-outline-info btn-xs" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>` : ''}
-                                                ${t.website_social_links && t.website_social_links.youtube ? `<a href="${t.website_social_links.youtube}" target="_blank" class="btn btn-outline-danger btn-xs" title="YouTube"><i class="fa-brands fa-youtube"></i></a>` : ''}
-                                            </div>
+                                    </div>
+                                    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Consultation Modes</h6></div>
+                                    <div class="col-12">
+                                        <div>
+                                            ${(() => {
+                                                const list = normalizeList(t.consultation_modes);
+                                                return list.length ? list.map(m => `<span class="badge bg-info text-dark me-1 mb-1">${m}</span>`).join('') : 'None';
+                                            })()}
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Professional -->
-                                <div class="tab-pane fade" id="v-pro">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <p class="text-muted small mb-1">Type</p>
-                                            <p class="fw-bold">${t.yoga_therapist_type || 'N/A'}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p class="text-muted small mb-1">Experience</p>
-                                            <p class="fw-bold">${t.years_of_experience || 0} Years</p>
-                                        </div>
-                                        <div class="col-12">
-                                            <p class="text-muted small mb-1">Organization</p>
-                                            <p class="fw-medium">${t.current_organization || 'N/A'}</p>
-                                        </div>
-                                        <div class="col-12">
-                                            <p class="text-muted small mb-1">Workplace Address</p>
-                                            <p class="fw-medium">${t.workplace_address || 'N/A'}</p>
-                                        </div>
-                                        <h6 class="text-primary fw-bold mt-4 mb-3 border-top pt-3">Registration</h6>
-                                        <div class="col-md-6">
-                                            <p class="text-muted small mb-1">Reg Number</p>
-                                            <p class="fw-medium">${t.registration_number || 'N/A'}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p class="text-muted small mb-1">Body</p>
-                                            <p class="fw-medium">${t.affiliated_body || 'N/A'}</p>
-                                        </div>
-                                        <div class="col-12">
-                                             ${t.registration_proof_path ? `<a href="/storage/${t.registration_proof_path}" target="_blank" class="btn btn-sm btn-outline-primary">View Reg Proof</a>` : ''}
+                            </div>
+
+                            <!-- Qualifications -->
+                            <div class="tab-pane fade" id="v-qual" role="tabpanel">
+                                <div class="row g-3">
+                                    <div class="col-12"><h6 class="text-primary border-bottom pb-2">Education</h6></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Highest Education</label><p class="f-w-600">${t.highest_education || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Institute & Year</label><p class="f-w-600">${t.institute_university || ''} ${t.year_of_passing ? '(' + t.year_of_passing + ')' : ''}</p></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Certification Details</label><p class="f-w-600">${t.certification_details || 'N/A'}</p></div>
+                                    <div class="col-12"><label class="small text-muted mb-0">Additional Certifications</label><p class="f-w-600">${t.additional_certifications || 'N/A'}</p></div>
+                                    <div class="col-12 mt-2">
+                                        <label class="small text-muted mb-2">Certificates</label>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            ${t.certificates_path ? t.certificates_path.map((path, i) => `<a href="/storage/${path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-pdf me-1"></i> Certificate ${i+1}</a>`).join('') : '<span class="text-muted small">No certificates uploaded</span>'}
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Expertise -->
-                                <div class="tab-pane fade" id="v-expert">
-                                    <h6 class="fw-bold mb-3">Areas of Expertise</h6>
-                                    <div class="d-flex flex-wrap gap-2 mb-4">
-                                    ${(() => {
-                                        const list = normalizeList(t.areas_of_expertise);
-                                        return list.length ? list.map(a => `<span class="badge bg-light text-dark border">${a}</span>`).join('') : 'None';
-                                    })()}
-                                    </div>
-                                    <h6 class="fw-bold mb-3">Setup</h6>
-                                    <p class="text-muted small mb-1">Modes</p>
-                                    <div class="d-flex flex-wrap gap-2 mb-3">
-                                    ${(() => {
-                                        const list = normalizeList(t.consultation_modes);
-                                        return list.length ? list.join(', ') : 'None';
-                                    })()}
-                                    </div>
-                                    <p class="text-muted small mb-1">Languages</p>
-                                    <div class="d-flex flex-wrap gap-2">
-                                         ${renderLanguages(t.languages_spoken)}
-                                    </div>
-                                </div>
-                                <!-- Qualifications -->
-                                <div class="tab-pane fade" id="v-qual">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <p class="text-muted small mb-1">Highest Education</p>
-                                            <p class="fw-bold">${t.highest_education || 'N/A'}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p class="text-muted small mb-1">Institute & Year</p>
-                                            <p class="fw-bold">${t.institute_university || ''} ${t.year_of_passing ? '(' + t.year_of_passing + ')' : ''}</p>
-                                        </div>
-                                    </div>
-                                    <p class="text-muted small mb-1 mt-3">Certification Details</p>
-                                    <p class="bg-light p-3 rounded mb-3">${t.certification_details || 'N/A'}</p>
-                                    <p class="text-muted small mb-1">Additional Certs</p>
-                                    <p class="bg-light p-3 rounded mb-3">${t.additional_certifications || 'N/A'}</p>
-                                    <p class="text-muted small mb-2">Certificates</p>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        ${t.certificates_path ? t.certificates_path.map((path, i) => `<a href="/storage/${path}" target="_blank" class="badge bg-primary text-white p-2">Cert ${i+1}</a>`).join('') : 'None'}
-                                    </div>
-                                </div>
-                                <!-- Identity -->
-                                <div class="tab-pane fade" id="v-ident">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <p class="text-muted small mb-1">Gov ID</p>
-                                            <p class="fw-medium">${t.gov_id_type || 'N/A'}</p>
-                                        </div>
-                                         <div class="col-md-6">
-                                            <p class="text-muted small mb-1">PAN</p>
-                                            <p class="fw-medium">${t.pan_number || 'N/A'}</p>
-                                        </div>
-                                        <div class="col-12">
-                                            ${t.gov_id_upload_path ? `<a href="/storage/${t.gov_id_upload_path}" target="_blank" class="btn btn-sm btn-primary">View ID</a>` : 'Not Uploaded'}
-                                        </div>
-                                        <div class="col-12 border-top pt-3 mt-3">
-                                            <h6 class="fw-bold">Banking</h6>
-                                            <p class="mb-1"><strong>Bank:</strong> ${t.bank_name || 'N/A'}</p>
-                                            <p class="mb-1"><strong>Holder:</strong> ${t.bank_holder_name || 'N/A'}</p>
-                                            <p class="mb-1 font-monospace"><strong>Acc:</strong> ${t.account_number || 'N/A'}</p>
-                                            <p class="mb-1 font-monospace"><strong>IFSC:</strong> ${t.ifsc_code || 'N/A'}</p>
-                                            <p class="mb-1"><strong>UPI:</strong> ${t.upi_id || 'N/A'}</p>
-                                             ${t.cancelled_cheque_path ? `<a href="/storage/${t.cancelled_cheque_path}" target="_blank" class="btn btn-sm btn-outline-secondary mt-2">View Cheque</a>` : ''}
+                            </div>
+
+                            <!-- Identity & Bank -->
+                            <div class="tab-pane fade" id="v-ident" role="tabpanel">
+                                <div class="row g-3">
+                                    <div class="col-12"><h6 class="text-primary border-bottom pb-2">Identity Proof</h6></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Gov ID Type</label><p class="f-w-600">${t.gov_id_type || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">PAN Number</label><p class="f-w-600">${t.pan_number || 'N/A'}</p></div>
+                                    
+                                    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Bank Details</h6></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Bank Name</label><p class="f-w-600">${t.bank_name || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Account Holder</label><p class="f-w-600">${t.bank_holder_name || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Account Number</label><p class="f-w-600 font-monospace">${t.account_number || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">IFSC Code</label><p class="f-w-600 font-monospace">${t.ifsc_code || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">UPI ID</label><p class="f-w-600">${t.upi_id || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Payout Currency</label><p class="f-w-600">${t.payout_currency || 'N/A'}</p></div>
+                                    
+                                    <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Documents</h6>
+                                        <div class="d-flex flex-wrap gap-2 pt-1">
+                                            ${t.gov_id_upload_path ? `<a href="/storage/${t.gov_id_upload_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-id-card me-1"></i> ID Proof</a>` : ''}
+                                            ${t.cancelled_cheque_path ? `<a href="/storage/${t.cancelled_cheque_path}" target="_blank" class="badge badge-light-primary text-decoration-none"><i class="fa-solid fa-file-image me-1"></i> Bank Proof</a>` : ''}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                `;
+                    </div>
+                </div>`;
+
                     $('#view-modal-content').html(html);
                     $('#therapist-view-modal').modal('show');
+
                 });
             });
 
@@ -1944,14 +1919,15 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 var currentStatus = String($this.data('status')).toLowerCase();
 
                 $('#status-therapist-id').val(id);
-                $('#status-select-input').val(currentStatus); // Pre-select current status
+                $('#status-select-input-therapist').val(currentStatus); // Pre-select current status
                 $('#status-confirmation-modal').modal('show');
             });
 
             // Handle Confirm Status Change
             $('#confirm-status-btn').on('click', function() {
                 var id = $('#status-therapist-id').val();
-                var newStatus = $('#status-select-input').val();
+                var newStatus = $('#status-select-input-therapist').val();
+
                 var btn = $(this);
 
                 btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
@@ -2199,7 +2175,49 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             display: none !important;
         }
     </style>
+    <!-- View Modal -->
+    <div class="modal fade" id="therapist-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yoga Therapist Details</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="view-modal-content">
+                    <!-- Content will be injected by AJAX -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Confirmation Modal -->
+    <div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Status</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="fa-solid fa-circle-info text-info mb-3" style="font-size: 50px;"></i>
+                    <h5>Change Status?</h5>
+                    <p>Are you sure you want to change the status for this therapist?</p>
+                    <input type="hidden" id="status-therapist-id">
+                    <select class="form-select mt-3" id="status-select-input-therapist">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Call Confirmation Modal -->
+
     <div class="modal fade" id="call-confirmation-modal-yoga" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">

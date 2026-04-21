@@ -2181,6 +2181,8 @@
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Bank Name</label><p class="f-w-600">${p.bank_name || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Number</label><p class="f-w-600">${p.account_number || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">IFSC Code</label><p class="f-w-600">${p.ifsc_code || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">Payout Currency</label><p class="f-w-600">${p.payout_currency || 'N/A'}</p></div>
+
                                     
                                     <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Documents Status</h6>
                                         <div class="d-flex flex-wrap gap-2 pt-1">
