@@ -864,17 +864,85 @@
     <script>
         // Custom Select Logic (Generic)
         document.addEventListener('DOMContentLoaded', function () {
-            // Handle form submission with loading state
             const registrationForm = document.getElementById('registration-form');
+            // Handle form submission via AJAX
             if (registrationForm) {
-                registrationForm.addEventListener('submit', function() {
+                registrationForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
                     const submitBtn = document.getElementById('submit-btn');
+                    const btnLoader = submitBtn?.querySelector('.btn-loader');
+
                     if (submitBtn) {
+                        submitBtn.disabled = true;
                         submitBtn.classList.add('loading');
                     }
+
+                    try {
+                        const formData = new FormData(this);
+                        const response = await fetch(this.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        const data = await response.json().catch(() => ({}));
+
+                        if (response.ok) {
+                            // Show Thank You Popup
+                            const popup = document.getElementById('thank-you-popup');
+                            if (popup) {
+                                popup.classList.remove('hidden');
+                                popup.classList.add('flex');
+                            }
+
+                            // If redirected to payment
+                            if (data.redirect_url) {
+                                setTimeout(() => {
+                                    window.location.href = data.redirect_url;
+                                }, 1500);
+                                return;
+                            }
+
+                            // Otherwise, normal registration success
+                            if (data.success && typeof showZayaToast === 'function') {
+                                showZayaToast(data.success, 'success');
+                            }
+                        } else {
+                            let errorMessage = 'Validation failed. Please check your inputs.';
+                            if (data.errors) {
+                                errorMessage = Object.values(data.errors)[0][0];
+                            } else if (data.message) {
+                                errorMessage = data.message;
+                            }
+
+                            if (typeof showZayaToast === 'function') {
+                                showZayaToast(errorMessage, 'error');
+                            } else {
+                                alert(errorMessage);
+                            }
+
+                            // Reset button
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.classList.remove('loading');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Submission Error:', error);
+                        if (typeof showZayaToast === 'function') {
+                            showZayaToast('An error occurred. Please try again.', 'error');
+                        }
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('loading');
+                        }
+                    }
                 });
-            }
-            function setupCustomSelect(selectId, inputId, selectedId, flagId = null) {
+            }            function setupCustomSelect(selectId, inputId, selectedId, flagId = null) {
                 const select = document.getElementById(selectId);
                 const input = document.getElementById(inputId);
                 const selectedText = document.getElementById(selectedId);
@@ -1356,21 +1424,8 @@
                 const baseCurrency = @json($registrationCurrencyCode);
                 const baseAmount = parseFloat(feeActualInput.value || feeInput.value || 0);
                 if (!baseAmount) return;
-                
+
                 // ... (rest of old logic for fallback)
-
-
-            if (countrySelect && countrySelect.tomselect) {
-                convertFee(countrySelect.tomselect.getValue());
-                countrySelect.tomselect.on('change', (val) => convertFee(val));
-            } else if (countrySelect) {
-                convertFee(countrySelect.value);
-                countrySelect.addEventListener('change', (e) => convertFee(e.target.value));
-                setTimeout(() => {
-                    if (countrySelect.tomselect) {
-                        countrySelect.tomselect.on('change', (val) => convertFee(val));
-                    }
-                }, 500);
             }
 
             function renderFee(value) {
@@ -1387,17 +1442,13 @@
             }
 
             if (countrySelect) {
-                const initial = countrySelect.value || countrySelect.dataset.default || countrySelect.tomselect?.getValue();
+                const initial = countrySelect.value || countrySelect.dataset.default || (countrySelect.tomselect ? countrySelect.tomselect.getValue() : '');
                 convertFee(initial);
+                
                 if (countrySelect.tomselect) {
                     countrySelect.tomselect.on('change', (val) => convertFee(val));
                 } else {
                     countrySelect.addEventListener('change', (e) => convertFee(e.target.value));
-                    setTimeout(() => {
-                        if (countrySelect.tomselect) {
-                            countrySelect.tomselect.on('change', (val) => convertFee(val));
-                        }
-                    }, 500);
                 }
             }
 
