@@ -1,5 +1,5 @@
 <div id="bookings-container">
-    <div class="bg-white rounded-2xl border border-[#2E4B3D]/12 overflow-hidden mb-8">
+    <div class="bg-white rounded-2xl border border-[#2E4B3D]/12 mb-8">
         <div class="p-6 border-b border-[#2E4B3D]/12">
             @if($user->role === 'client' || $user->role === 'patient' || $user->role === 'translator')
             <h2 class="text-xl font-medium text-secondary">{{ $user->role === 'translator' ? 'Translation Sessions' : 'My Bookings' }}</h2>
@@ -8,7 +8,7 @@
             @endif
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-visible">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-[#F9F9F9]">
@@ -105,7 +105,7 @@
                                     <i class="ri-more-2-fill text-xl"></i>
                                 </button>
 
-                                <div class="dropdown-menu absolute right-0 mt-2 w-56 rounded-xl shadow-xl bg-white border border-[#2E4B3D]/12 divide-y divide-gray-50 focus:outline-none z-[100] hidden">
+                                <div class="dropdown-menu absolute right-0 mt-2 w-56 rounded-xl shadow-xl bg-white border border-[#2E4B3D]/12 divide-y divide-gray-50 focus:outline-none z-[999] hidden">
                                     <div class="py-1">
                                         @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
                                         <a href="{{ route('bookings.consultation-form.show', $booking->id) }}" class="group flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
