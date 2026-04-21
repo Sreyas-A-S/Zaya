@@ -146,6 +146,21 @@ class RegisterController extends Controller
 
             event(new Registered($user = $this->create($request->all())));
 
+            // Create Profile based on role
+            if ($request->role === 'practitioner') {
+                $this->createPractitionerProfile($user, $request);
+            } elseif ($request->role === 'doctor') {
+                $this->createDoctorProfile($user, $request);
+            } elseif ($request->role === 'mindfulness_practitioner') {
+                $this->createMindfulnessPractitionerProfile($user, $request);
+            } elseif ($request->role === 'yoga_therapist') {
+                $this->createYogaTherapistProfile($user, $request);
+            } elseif ($request->role === 'translator') {
+                $this->createTranslatorProfile($user, $request);
+            } elseif ($request->role === 'patient' || $request->role === 'client') {
+                $this->createPatientProfile($user, $request);
+            }
+
             // General promo code tracking for all users
             $promoCode = trim((string) ($request->input('promo_code') ?: $request->input('promocode', '')));
             if ($promoCode !== '') {
@@ -156,6 +171,31 @@ class RegisterController extends Controller
                     $user->userPromoCodes()->firstOrCreate([
                         'promo_code' => $promoCode
                     ]);
+                }
+            }
+
+            DB::commit();
+
+            $feeService = app(RegistrationFeeService::class);
+            $promoRole = $user->role === 'patient' ? 'client' : $user->role;
+            $promoNotes = [];
+            $feeOverride = null;
+            $isPromoEligibleRole = in_array($promoRole, [
+                'client',
+                'practitioner',
+                'doctor',
+                'mindfulness_practitioner',
+                'yoga_therapist',
+                'translator',
+            ], true);
+
+            if ($isPromoEligibleRole) {
+                [$feeOverride, $promoNotes] = $this->resolveRegistrationPromo($request, $promoRole);
+                if (!empty($promoNotes['promo_code'] ?? null)) {
+                    $promo = PromoCode::where('code', $promoNotes['promo_code'])->first();
+                    if ($promo) {
+                        $promo->incrementUsageIfAvailable();
+                    }
                 }
             }
 
@@ -346,6 +386,18 @@ class RegisterController extends Controller
         $clientId = 'CL-' . strtoupper(Str::random(8));
         $age = $request->dob ? Carbon::parse($request->dob)->age : null;
 
+        $countryCode = strtoupper(trim((string) $request->country));
+        $dbCountry = \App\Models\Country::where('name', $countryCode)
+            ->orWhere('code', $countryCode)
+            ->first();
+        $finalCountryCode = $dbCountry ? strtoupper($dbCountry->code) : $countryCode;
+        
+        $payoutCurrency = $request->payout_currency;
+        if (empty($payoutCurrency)) {
+            $map = config('currencies.country_to_currency', []);
+            $payoutCurrency = $map[$finalCountryCode] ?? config('currencies.default', 'INR');
+        }
+
         $user->patient()->create([
             'client_id' => $clientId,
             'dob' => $request->dob,
@@ -356,7 +408,7 @@ class RegisterController extends Controller
             'city' => $request->city,
             'state' => $request->state,
             'country' => $request->country,
-            'payout_currency' => $request->payout_currency,
+            'payout_currency' => $payoutCurrency,
             'zip_code' => $request->zip_code,
             'phone' => $request->mobile_number,
             'mobile_country_code' => $request->mobile_country_code,
@@ -827,8 +879,20 @@ class RegisterController extends Controller
             'address_line_2' => ['nullable', 'string', 'max:500'],
             'state' => ['nullable', 'string', 'max:255'],
             'country' => ['nullable', 'string', 'max:255'],
-            'payout_currency' => ['required', 'string', 'max:10'],
+            'payout_currency' => ['nullable', 'string', 'max:10'],
         ];
+
+        $teamRoles = [
+            'practitioner',
+            'doctor',
+            'mindfulness_practitioner',
+            'yoga_therapist',
+            'translator',
+        ];
+
+        if (isset($data['role']) && in_array($data['role'], $teamRoles, true)) {
+            $rules['payout_currency'] = ['required', 'string', 'max:10'];
+        }
 
         if (isset($data['role']) && in_array($data['role'], ['practitioner', 'doctor', 'patient', 'client'], true)) {
             $rules['dob'][] = 'required';

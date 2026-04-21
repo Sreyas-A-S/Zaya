@@ -1336,18 +1336,61 @@
                          }, 1500);
                      } else {
                          const data = await response.json();
-                         let errorMessage = 'Validation failed. Please check your inputs.';
-                        if (data.errors && Object.keys(data.errors).length > 0) {
-                            errorMessage = data.errors[Object.keys(data.errors)[0]][0];
-                        } else if (data.message) {
-                            errorMessage = data.message;
-                        }
+                         
+                         // Clear any existing errors first
+                         document.querySelectorAll('.error-message').forEach(el => el.remove());
+                         document.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500', 'focus:border-red-500'));
 
-                        if (typeof showZayaToast === 'function') {
-                            showZayaToast(errorMessage, 'error');
-                        } else {
-                            alert(errorMessage);
-                        }
+                         if (data.errors) {
+                             let firstErrorField = null;
+                             
+                             Object.keys(data.errors).forEach((fieldName, index) => {
+                                 // Handle nested fields like education[0][type]
+                                 let input = document.querySelector(`[name="${fieldName}"]`);
+                                 if (!input) {
+                                     // Try to find by ID or partial match for complex names if needed
+                                     input = document.getElementById(fieldName);
+                                 }
+
+                                 if (input) {
+                                     if (index === 0) firstErrorField = input;
+                                     
+                                     input.classList.add('border-red-500', 'focus:border-red-500');
+                                     const err = document.createElement('p');
+                                     err.className = 'error-message text-red-500 text-sm mt-1';
+                                     err.textContent = data.errors[fieldName][0];
+                                     
+                                     const parent = input.parentElement;
+                                     if (parent) {
+                                         parent.style.position = 'relative';
+                                         parent.appendChild(err);
+                                     }
+                                     
+                                     // Find which tab this field is in and show it
+                                     const tab = input.closest('[id^="tab-"]');
+                                     if (tab && index === 0) {
+                                         const tabNum = parseInt(tab.id.replace('tab-', ''));
+                                         showTab(tabNum);
+                                     }
+                                 }
+                             });
+
+                             if (firstErrorField) {
+                                 firstErrorField.focus();
+                                 firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                             }
+
+                             if (typeof showZayaToast === 'function') {
+                                 showZayaToast('Please fix the errors highlighted below.', 'error');
+                             }
+                         } else {
+                            let errorMessage = data.message || 'Validation failed. Please check your inputs.';
+                            if (typeof showZayaToast === 'function') {
+                                showZayaToast(errorMessage, 'error');
+                            } else {
+                                alert(errorMessage);
+                            }
+                         }
 
                         nextBtn.disabled = false;
                         btnText.textContent = originalText;

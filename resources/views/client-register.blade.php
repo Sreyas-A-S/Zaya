@@ -870,8 +870,17 @@
                 registrationForm.addEventListener('submit', async function(e) {
                     e.preventDefault();
 
-                    const submitBtn = document.getElementById('submit-btn');
-                    const btnLoader = submitBtn?.querySelector('.btn-loader');
+                    // Client-side password validation
+                    if (passwordInput && confirmPasswordInput && passwordInput.value !== confirmPasswordInput.value) {
+                        checkPasswordMatch();
+                        confirmPasswordInput.focus();
+                        if (typeof showZayaToast === 'function') {
+                            showZayaToast('Passwords do not match.', 'error');
+                        }
+                        return;
+                    }
+
+                    const submitBtn = document.getElementById('submit-btn');                    const btnLoader = submitBtn?.querySelector('.btn-loader');
 
                     if (submitBtn) {
                         submitBtn.disabled = true;
@@ -912,17 +921,47 @@
                                 showZayaToast(data.success, 'success');
                             }
                         } else {
-                            let errorMessage = 'Validation failed. Please check your inputs.';
-                            if (data.errors) {
-                                errorMessage = Object.values(data.errors)[0][0];
-                            } else if (data.message) {
-                                errorMessage = data.message;
-                            }
+                            // Clear any existing errors first
+                            document.querySelectorAll('.error-message').forEach(el => el.remove());
+                            document.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500', 'focus:border-red-500'));
 
-                            if (typeof showZayaToast === 'function') {
-                                showZayaToast(errorMessage, 'error');
+                            if (data.errors) {
+                                let firstErrorField = null;
+
+                                Object.keys(data.errors).forEach((fieldName, index) => {
+                                    const input = document.querySelector(`[name="${fieldName}"]`) || document.getElementById(fieldName);
+
+                                    if (input) {
+                                        if (index === 0) firstErrorField = input;
+
+                                        input.classList.add('border-red-500', 'focus:border-red-500');
+                                        const err = document.createElement('p');
+                                        err.className = 'error-message text-red-500 text-sm mt-1';
+                                        err.textContent = data.errors[fieldName][0];
+
+                                        const parent = input.parentElement;
+                                        if (parent) {
+                                            parent.style.position = 'relative';
+                                            parent.appendChild(err);
+                                        }
+                                    }
+                                });
+
+                                if (firstErrorField) {
+                                    firstErrorField.focus();
+                                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+
+                                if (typeof showZayaToast === 'function') {
+                                    showZayaToast('Please fix the errors highlighted below.', 'error');
+                                }
                             } else {
-                                alert(errorMessage);
+                                let errorMessage = data.message || 'Validation failed. Please check your inputs.';
+                                if (typeof showZayaToast === 'function') {
+                                    showZayaToast(errorMessage, 'error');
+                                } else {
+                                    alert(errorMessage);
+                                }
                             }
 
                             // Reset button
@@ -930,8 +969,7 @@
                                 submitBtn.disabled = false;
                                 submitBtn.classList.remove('loading');
                             }
-                        }
-                    } catch (error) {
+                        }                    } catch (error) {
                         console.error('Submission Error:', error);
                         if (typeof showZayaToast === 'function') {
                             showZayaToast('An error occurred. Please try again.', 'error');
@@ -1301,15 +1339,8 @@
         passwordInput.addEventListener('input', checkPasswordMatch);
         confirmPasswordInput.addEventListener('input', checkPasswordMatch);
 
-        // Form Submit Validation
+        // Form Submit Validation removed - logic consolidated into AJAX handler
         const registrationForm = document.getElementById('registration-form');
-        registrationForm.addEventListener('submit', function (e) {
-            if (passwordInput.value !== confirmPasswordInput.value) {
-                e.preventDefault();
-                checkPasswordMatch();
-                confirmPasswordInput.focus();
-            }
-        });
 
         // Show Thank You Popup if success session exists
         @if(session('success'))
@@ -1327,6 +1358,8 @@
             if (popup) {
                 popup.classList.add('hidden');
                 popup.classList.remove('flex');
+                // Redirect to login or dashboard after successful registration
+                window.location.href = "{{ route('zaya-login') }}";
             }
         }
 
