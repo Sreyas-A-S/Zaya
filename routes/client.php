@@ -13,8 +13,8 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/consultations', [ProfileController::class, 'bookings'])->name('consultations.index');
     Route::get('/bookings', [ProfileController::class, 'bookings'])->name('bookings.index');
     Route::get('/transactions', [ProfileController::class, 'transactions'])->name('transactions.index');
-    Route::get('/promo-codes', [ProfileController::class, 'promoCodes'])->name('promo-codes.index');
-    Route::post('/promo-codes', [ProfileController::class, 'storePromoCode'])->name('promo-codes.store');
+    Route::get('/rewards', [ProfileController::class, 'promoCodes'])->name('rewards.index');
+    Route::post('/rewards', [ProfileController::class, 'storePromoCode'])->name('rewards.store');
     Route::get('/conference-history', [ProfileController::class, 'conferences'])->name('conferences.index');
     Route::post('/conference/instant-init', [ZegoController::class, 'initInstantMeeting'])->name('zego.instant.init');
     Route::get('/recordings/{id}', [ProfileController::class, 'showRecording'])->name('recordings.show');

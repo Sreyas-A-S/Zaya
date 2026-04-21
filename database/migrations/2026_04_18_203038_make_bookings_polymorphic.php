@@ -16,7 +16,7 @@ return new class extends Migration
                 $table->renameColumn('practitioner_id', 'profile_id');
             }
             if (!Schema::hasColumn('bookings', 'practitioner_type')) {
-                $table->string('practitioner_type')->default('App\\Models\\Practitioner')->after('user_id');
+                $table->string('practitioner_type')->default('practitioner')->after('user_id');
             }
         });
         

@@ -38,6 +38,7 @@ class ReferralCommissionController extends Controller
             'doctor' => 'Doctor',
             'yoga_therapist' => 'Yoga Therapist',
             'mindfulness_practitioner' => 'Mindfulness Counsellor',
+            'translator' => 'Translator',
         ];
 
         // Load specific rates for the selected country

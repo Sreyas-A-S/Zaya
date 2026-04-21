@@ -16,7 +16,7 @@ return new class extends Migration
             $table->dropForeign(['practitioner_id']);
             
             // Add practitioner_type for polymorphism
-            $table->string('practitioner_type')->default('App\\Models\\Practitioner')->after('practitioner_id');
+            $table->string('practitioner_type')->default('practitioner')->after('practitioner_id');
             
             // Index the polymorphic columns
             $table->index(['practitioner_id', 'practitioner_type'], 'practitioner_availability_index');

@@ -32,8 +32,8 @@ jobs:
       - name: ⚙️ Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
-          extensions: mbstring, xml, ctype, iconv, pdo_mysql
+          php-version: "8.3"
+          extensions: mbstring, xml, ctype, iconv, pdo_mysql, sodium
           coverage: none
 
       - name: 📦 Install Composer Dependencies

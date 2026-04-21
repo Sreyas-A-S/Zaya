@@ -264,7 +264,7 @@ class AvailabilityController extends Controller
                 $query->where(function($q) use ($p) {
                     $q->where(function($sq) use ($p) {
                         $sq->where('profile_id', $p->id)
-                           ->where('practitioner_type', Translator::class);
+                           ->where('practitioner_type', 'translator');
                     })->orWhere('translator_id', $p->id);
                 });
             } else {

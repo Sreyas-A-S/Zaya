@@ -286,7 +286,7 @@ class BookingController extends Controller
         // CRITICAL: Final availability check now that money is received
         $isAvailable = $this->checkSlotAvailability(
             $notes['practitioner_id'], 
-            $notes['practitioner_type'] ?? 'App\\Models\\Practitioner',
+            $notes['practitioner_type'] ?? 'practitioner',
             $notes['booking_date'], 
             $notes['booking_time']
         );

@@ -118,7 +118,7 @@ class PractitionerAvailabilityService
             $bookingQuery->where(function($q) use ($providerId) {
                 $q->where(function($sq) use ($providerId) {
                     $sq->where('profile_id', $providerId)
-                       ->where('practitioner_type', Translator::class);
+                       ->where('practitioner_type', 'translator');
                 })->orWhere('translator_id', $providerId);
             });
         } else {

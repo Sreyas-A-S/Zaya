@@ -51,14 +51,15 @@ class CoinManagementController extends Controller
         $request->validate([
             'currency_code' => 'required|string',
             'coin_value' => 'required|numeric|min:0',
+            'referral_coins' => 'required|integer|min:0',
         ]);
 
         CoinSetting::updateOrCreate(
             ['currency_code' => $request->currency_code],
-            ['coin_value' => $request->coin_value]
+            ['coin_value' => $request->coin_value, 'referral_coins' => $request->referral_coins]
         );
 
-        return back()->with('success', 'Coin value updated successfully for ' . $request->currency_code);
+        return back()->with('success', 'Coin settings updated successfully for ' . $request->currency_code);
     }
 
     public function updateUsersCoins(Request $request)
