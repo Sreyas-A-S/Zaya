@@ -318,7 +318,7 @@ class PractitionerController extends Controller
             if ($request->has('qualifications')) {
                 foreach ($request->qualifications as $qual) {
                     if (!empty($qual['institute_name'])) {
-                        $user->practitioner->qualifications()->create($qual);
+                        $practitioner->qualifications()->create($qual);
                     }
                 }
             }

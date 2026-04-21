@@ -120,17 +120,7 @@
                     </div>
 
                     <div class="col-span-1 md:col-span-2 grid grid-cols-4 gap-4">
-                        <div class="col-span-1">
-                            <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Code') }}</label>
-                            <select name="mobile_country_code" id="country-code-select" class="w-full">
-                                <option value="">Code</option>
-                                @foreach($countryCodes as $cc)
-                                    <option value="{{ $cc['code'] }}" {{ ($profile->mobile_country_code ?? '') == $cc['code'] ? 'selected' : '' }}>
-                                        {{ $cc['code'] }} ({{ $cc['name'] }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        
                         <div class="col-span-3">
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Phone Number') }}</label>
                             <input type="text" name="phone" value="{{ $profile->phone ?? $user->phone ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
