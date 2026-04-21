@@ -181,22 +181,40 @@ class BookingController extends Controller
 
         // ... (check availability)
 
+        // 6. Create Temporary Reservation (to avoid Razorpay notes character limit)
+        $reservationToken = 'RES-' . strtoupper(Str::random(12));
+        $reservation = \App\Models\BookingReservation::create([
+            'user_id' => $user->id,
+            'profile_id' => $practitioner->id,
+            'practitioner_type' => $practitioner->getMorphClass(),
+            'booking_date' => $request->booking_date,
+            'booking_time' => $request->booking_time,
+            'reservation_token' => $reservationToken,
+            'status' => 'reserved',
+            'expires_at' => now()->addMinutes(30),
+            'booking_data' => [
+                'service_ids' => $request->service_ids,
+                'mode' => $request->mode,
+                'conditions' => $request->conditions,
+                'situation' => $request->situation,
+                'total_price' => $subtotal,
+                'promo_code' => $promoCode,
+                'discount_amount' => $promoDiscount,
+                'coins_used' => $coinsUsed,
+                'coin_discount' => $coinDiscount,
+                'currency' => $currency,
+                'additional_info' => $request->additional_info,
+            ]
+        ]);
+
         // --- Razorpay Payment Link Creation ---
         $paymentUrl = null;
         $razorpayKey = config('services.razorpay.key');
         $razorpaySecret = config('services.razorpay.secret');
 
-        \Log::info('Razorpay Attempt:', [
-            'has_key' => !empty($razorpayKey),
-            'has_secret' => !empty($razorpaySecret),
-            'payable' => $finalPayable,
-            'currency' => $currency
-        ]);
-
         if ($razorpayKey && $razorpaySecret) {
             $verifySsl = config('services.razorpay.verify_ssl');
             
-            // If test mode is active, we force currency to INR and amount to 1.00
             $gatewayAmount = $request->test_mode ? 1.00 : $finalPayable;
             $gatewayCurrency = $request->test_mode ? 'INR' : $currency;
 
@@ -211,30 +229,17 @@ class BookingController extends Controller
                         'email' => (string) $user->email,
                         'contact' => (string) ($user->phone ?? $user->mobile ?? ''),
                     ],
-                    'notify' => [
-                        'sms' => false, // SMS often fails due to invalid phone formats, keep email only for reliability
-                        'email' => true,
-                    ],
+                    'notify' => ['sms' => false, 'email' => true],
                     'callback_url' => route('bookings.payment.callback'),
                     'callback_method' => 'get',
                     'notes' => [
-                        'practitioner_id' => (string) $practitioner->id,
-                        'practitioner_type' => (string) $practitioner->getMorphClass(),
-                        'booking_date' => (string) $request->booking_date,
-                        'booking_time' => (string) $request->booking_time,
-                        'service_ids' => is_array($request->service_ids) ? implode(',', $request->service_ids) : (string) $request->service_ids,
-                        'mode' => (string) $request->mode,
-                        'conditions' => is_array($request->conditions) ? json_encode($request->conditions) : (string) $request->conditions,
-                        'situation' => (string) ($request->situation ?? ''),
-                        'total_price' => (string) $subtotal,
-                        'promo_code' => (string) ($promoCode ?? ''),
-                        'discount_amount' => (string) $promoDiscount,
-                        'coins_used' => (string) $coinsUsed,
-                        'coin_discount' => (string) $coinDiscount,
-                        'currency' => (string) $currency,
-                        'additional_info' => is_array($request->additional_info) ? json_encode($request->additional_info) : (string) ($request->additional_info ?? '')
+                        'reservation_token' => (string) $reservationToken,
+                        'user_id' => (string) $user->id,
+                        'practitioner_id' => (string) $practitioner->id
                     ]
                 ];
+
+                \Log::info('Razorpay Payment Link Payload:', $payload);
 
                 $response = Http::withBasicAuth($razorpayKey, $razorpaySecret)
                     ->withOptions(['verify' => (bool)$verifySsl])
@@ -245,15 +250,9 @@ class BookingController extends Controller
                 } else {
                     $errorBody = $response->json();
                     $errorMsg = $errorBody['error']['description'] ?? 'Razorpay API Error';
-                    \Log::error('Razorpay API Error:', [
-                        'status' => $response->status(),
-                        'body' => $response->body(),
-                        'payload' => $payload
-                    ]);
                     return response()->json(['success' => false, 'message' => 'Payment Error: ' . $errorMsg], 422);
                 }
             } catch (\Exception $e) {
-                \Log::error('Razorpay Connection Exception: ' . $e->getMessage());
                 return response()->json(['success' => false, 'message' => 'Could not connect to payment gateway.'], 503);
             }
         }
@@ -289,54 +288,67 @@ class BookingController extends Controller
         }
 
         $pData = $response->json();
-        $notes = $pData['notes'];
+        $notes = $pData['notes'] ?? [];
+        $reservationToken = $notes['reservation_token'] ?? null;
 
-        // CRITICAL: Final availability check now that money is received
-        $isAvailable = $this->checkSlotAvailability(
-            $notes['practitioner_id'], 
-            $notes['practitioner_type'] ?? 'practitioner',
-            $notes['booking_date'], 
-            $notes['booking_time']
-        );
+        if (!$reservationToken) {
+            \Log::error('Razorpay Callback Error: No reservation token in notes.', ['link_id' => $paymentLinkId]);
+            return redirect()->route('home')->with('error', 'Invalid payment details.');
+        }
 
-        if ($isAvailable) {
-            // SUCCESS PATH
-            $booking = Booking::create([
-                'invoice_no' => 'ZAYA-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
-                'user_id' => Auth::id(),
-                'profile_id' => $notes['practitioner_id'],
-                'practitioner_type' => $notes['practitioner_type'] ?? 'practitioner',
-                'service_ids' => explode(',', $notes['service_ids']),
-                'mode' => $notes['mode'],
-                'conditions' => isset($notes['conditions']) ? json_decode($notes['conditions'], true) : null,
-                'situation' => $notes['situation'] ?? null,
-                'booking_date' => $notes['booking_date'],
-                'booking_time' => $notes['booking_time'],
-                'total_price' => $notes['total_price'],
-                'promo_code' => $notes['promo_code'] ?? null,
-                'discount_amount' => $notes['discount_amount'] ?? 0.00,
-                'coins_used' => $notes['coins_used'] ?? 0,
-                'coin_discount' => $notes['coin_discount'] ?? 0.00,
-                'currency' => $notes['currency'],
-                'status' => 'confirmed',
-                'razorpay_order_id' => $paymentLinkId,
-                'razorpay_payment_id' => $paymentId,
-                'additional_info' => isset($notes['additional_info']) ? json_decode($notes['additional_info'], true) : null,
-            ]);
+        $reservation = \App\Models\BookingReservation::where('reservation_token', $reservationToken)
+            ->where('status', 'reserved')
+            ->first();
 
-            // Deduct Coins from user balance if used
-            if ($booking->coins_used > 0) {
-                $user = Auth::user();
+        if (!$reservation) {
+             \Log::error('Razorpay Callback Error: Reservation not found or already processed.', ['token' => $reservationToken]);
+             return redirect()->route('home')->with('error', 'Booking session expired or already processed.');
+        }
+
+        $bookingData = $reservation->booking_data;
+
+        // SUCCESS PATH
+        $booking = Booking::create([
+            'invoice_no' => 'ZAYA-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
+            'user_id' => $reservation->user_id,
+            'profile_id' => $reservation->profile_id,
+            'practitioner_type' => $reservation->practitioner_type,
+            'service_ids' => $bookingData['service_ids'],
+            'mode' => $bookingData['mode'],
+            'conditions' => $bookingData['conditions'] ?? null,
+            'situation' => $bookingData['situation'] ?? null,
+            'booking_date' => $reservation->booking_date,
+            'booking_time' => $reservation->booking_time,
+            'total_price' => $bookingData['total_price'],
+            'promo_code' => $bookingData['promo_code'] ?? null,
+            'discount_amount' => $bookingData['discount_amount'] ?? 0.00,
+            'coins_used' => $bookingData['coins_used'] ?? 0,
+            'coin_discount' => $bookingData['coin_discount'] ?? 0.00,
+            'currency' => $bookingData['currency'],
+            'status' => 'confirmed',
+            'razorpay_order_id' => $paymentLinkId,
+            'razorpay_payment_id' => $paymentId,
+            'additional_info' => $bookingData['additional_info'] ?? null,
+        ]);
+
+        // Mark reservation as confirmed
+        $reservation->update(['status' => 'confirmed']);
+
+        // Deduct Coins from user balance if used
+        if ($booking->coins_used > 0) {
+            $user = User::find($booking->user_id);
+            if ($user) {
                 $user->coins = max(0, $user->coins - $booking->coins_used);
                 $user->save();
             }
+        }
 
-            if (!empty($notes['promo_code'])) {
-                $promo = \App\Models\PromoCode::where('code', $notes['promo_code'])->first();
-                if ($promo) {
-                    $promo->incrementUsageIfAvailable();
-                }
+        if (!empty($booking->promo_code)) {
+            $promo = \App\Models\PromoCode::where('code', $booking->promo_code)->first();
+            if ($promo) {
+                $promo->incrementUsageIfAvailable();
             }
+        }
 
             // Record Financial Transaction
             $practitioner = $booking->practitioner;
@@ -360,23 +372,23 @@ class BookingController extends Controller
             // and notify admin to handle refund or move.
             $booking = Booking::create([
                 'invoice_no' => 'ZAYA-OVB-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
-                'user_id' => Auth::id(),
-                'profile_id' => $notes['practitioner_id'],
-                'practitioner_type' => $notes['practitioner_type'] ?? 'practitioner',
-                'service_ids' => explode(',', $notes['service_ids']),
-                'mode' => $notes['mode'],
-                'conditions' => isset($notes['conditions']) ? json_decode($notes['conditions'], true) : null,
-                'situation' => $notes['situation'] ?? null,
-                'booking_date' => $notes['booking_date'],
-                'booking_time' => $notes['booking_time'],
-                'total_price' => $notes['total_price'],
-                'promo_code' => $notes['promo_code'] ?? null,
-                'discount_amount' => $notes['discount_amount'] ?? 0.00,
-                'currency' => $notes['currency'],
+                'user_id' => $reservation->user_id,
+                'profile_id' => $reservation->profile_id,
+                'practitioner_type' => $reservation->practitioner_type,
+                'service_ids' => $bookingData['service_ids'],
+                'mode' => $bookingData['mode'],
+                'conditions' => $bookingData['conditions'] ?? null,
+                'situation' => $bookingData['situation'] ?? null,
+                'booking_date' => $reservation->booking_date,
+                'booking_time' => $reservation->booking_time,
+                'total_price' => $bookingData['total_price'],
+                'promo_code' => $bookingData['promo_code'] ?? null,
+                'discount_amount' => $bookingData['discount_amount'] ?? 0.00,
+                'currency' => $bookingData['currency'],
                 'status' => 'pending_reschedule', // Special status
                 'razorpay_order_id' => $paymentLinkId,
                 'razorpay_payment_id' => $paymentId,
-                'additional_info' => isset($notes['additional_info']) ? json_decode($notes['additional_info'], true) : null,
+                'additional_info' => $bookingData['additional_info'] ?? null,
             ]);
 
             \Log::warning("OVERBOOKING DETECTED for Booking ID #{$booking->id}. Payment received but slot was taken.");

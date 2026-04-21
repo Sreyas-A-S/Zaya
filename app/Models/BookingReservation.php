@@ -13,7 +13,8 @@ class BookingReservation extends Model
 
     protected $fillable = [
         'user_id',
-        'practitioner_id',
+        'profile_id',
+        'practitioner_type',
         'booking_date',
         'booking_time',
         'reservation_token',
