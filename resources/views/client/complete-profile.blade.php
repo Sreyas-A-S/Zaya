@@ -33,10 +33,13 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
     input[type="date"] {
-        height: 50px; /* Matching standard py-3 inputs */
-        line-height: 1.2;
+        min-height: 50px;
+        -webkit-appearance: none;
+        appearance: none;
         display: flex;
         align-items: center;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
     }
 
     input[type="date"]::-webkit-inner-spin-button,

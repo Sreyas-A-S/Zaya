@@ -222,10 +222,12 @@
     /* Normalize Date Inputs for Mobile (iOS fix) */
     input[type="date"].form-control {
         min-height: 50px;
+        -webkit-appearance: none;
+        appearance: none;
         display: flex;
         align-items: center;
-        padding-top: 12px;
-        padding-bottom: 12px;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
     }
 
     /* Premium Button & Modal Adjustments */
