@@ -31,41 +31,55 @@
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Hide native calendar icon */
+    input[type="date"]::-webkit-inner-spin-button,
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        opacity: 0;
+    }
 </style>
 @endpush
 
 @section('content')
 <div class="w-full">
     <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+        <div class="text-center md:text-left">
             <h1 class="text-xl font-black text-secondary">{{ __('Edit Profile') }}</h1>
             <p class="text-xs text-gray-400 font-medium">{{ __('Profile settings for ' . ucfirst(str_replace('_', ' ', $user->role))) }}</p>
         </div>
-        <div class="bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100 flex items-center gap-3">
-            <div class="w-24 bg-amber-200/30 rounded-full h-1 overflow-hidden">
+        <div class="bg-amber-50 px-4 py-2 rounded-2xl border border-amber-100 flex items-center gap-3 mx-auto md:mx-0 w-full md:w-auto max-w-[200px] md:max-w-none">
+            <div class="flex-1 bg-amber-200/30 rounded-full h-1.5 overflow-hidden">
                 <div class="bg-amber-500 h-full transition-all duration-1000" style="width: {{ $user->profile_status['percentage'] }}%"></div>
             </div>
-            <span class="text-xs font-black text-amber-600">{{ $user->profile_status['percentage'] }}%</span>
+            <span class="text-sm font-black text-amber-600">{{ $user->profile_status['percentage'] }}%</span>
         </div>
     </div>
 
     <!-- Tab Navigation -->
-    <div class="flex items-center gap-4 md:gap-8 border-b border-gray-100 mb-8 overflow-x-auto no-scrollbar">
-        <button type="button" onclick="switchTab('personal')" class="tab-btn active pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-personal">
+    <div class="flex items-center gap-6 md:gap-8 border-b border-gray-100 mb-6 md:mb-10 overflow-x-auto no-scrollbar -mx-5 px-5 md:mx-0 md:px-0 justify-start md:justify-start">
+        <button type="button" onclick="switchTab('personal')" class="tab-btn active pb-4 text-xs md:text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-personal">
             01. {{ __('Personal Details') }}
         </button>
         @if(!in_array($user->role, ['client', 'patient']))
-            <button type="button" onclick="switchTab('professional')" class="tab-btn pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-professional">
+            <button type="button" onclick="switchTab('professional')" class="tab-btn pb-4 text-xs md:text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-professional">
                 02. {{ __('Professional') }}
             </button>
-            <button type="button" onclick="switchTab('financial')" class="tab-btn pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-financial">
+            <button type="button" onclick="switchTab('financial')" class="tab-btn pb-4 text-xs md:text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-financial">
                 03. {{ __('KYC & Bank') }}
             </button>
-            <button type="button" onclick="switchTab('documents')" class="tab-btn pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-documents">
+            <button type="button" onclick="switchTab('documents')" class="tab-btn pb-4 text-xs md:text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-documents">
                 04. {{ __('Documents') }}
             </button>
         @else
-            <button type="button" onclick="switchTab('preferences')" class="tab-btn pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-preferences">
+            <button type="button" onclick="switchTab('preferences')" class="tab-btn pb-4 text-xs md:text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-preferences">
                 02. {{ __('Preferences & Referral') }}
             </button>
         @endif
@@ -76,7 +90,7 @@
 
         <!-- 1. Personal Tab (All Roles) -->
         <div id="tab-personal" class="tab-content active animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div class="bg-white rounded-3xl md:rounded-[2rem] p-5 md:p-8 border border-gray-100 shadow-sm space-y-8">
+            <div class="bg-white rounded-3xl md:rounded-[2rem] p-4 md:p-8 border border-gray-100 shadow-sm space-y-6 md:space-y-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-secondary/5 flex items-center justify-center text-secondary">
                         <i class="ri-user-smile-line text-xl"></i>
@@ -86,17 +100,19 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Email Address') }}</label>
-                        <div class="relative flex items-center">
-                            <input type="email" name="email" id="email-input" value="{{ $user->email }}" class="w-full pl-4 pr-32 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
-                            <div class="absolute right-2 flex items-center gap-2">
-                                <span id="email-verified-badge" class="{{ $user->email_verified_at ? '' : 'hidden' }} px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase tracking-wider rounded-lg border border-green-100 flex items-center gap-1">
-                                    <i class="ri-checkbox-circle-fill"></i> {{ __('Verified') }}
-                                </span>
-                                <button type="button" id="send-otp-btn" onclick="sendOTP()" class="{{ $user->email_verified_at ? 'hidden' : '' }} px-4 py-1.5 bg-secondary text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-opacity-90 transition-all">
-                                    {{ __('Verify Now') }}
-                                </button>
+                        <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Email Address') }}</label>
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <div class="relative flex-1">
+                                <input type="email" name="email" id="email-input" value="{{ $user->email }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 {{ $user->email_verified_at ? '' : 'hidden' }}" id="email-verified-badge">
+                                    <span class="px-2 py-0.5 bg-green-50 text-green-600 text-[10px] font-black uppercase tracking-wider rounded-lg border border-green-100 flex items-center gap-1">
+                                        <i class="ri-checkbox-circle-fill"></i>
+                                    </span>
+                                </div>
                             </div>
+                            <button type="button" id="send-otp-btn" onclick="sendOTP()" class="{{ $user->email_verified_at ? 'hidden' : '' }} px-6 py-3 bg-secondary text-white text-xs font-black uppercase tracking-wider rounded-xl hover:bg-opacity-90 transition-all shadow-sm shadow-secondary/10">
+                                {{ __('Verify Now') }}
+                            </button>
                         </div>
                         <p id="email-change-warning" class="hidden mt-2 text-[10px] text-amber-600 font-bold uppercase tracking-wider">
                             <i class="ri-error-warning-line"></i> {{ __('Email changed. Re-verification required.') }}
@@ -119,16 +135,13 @@
                         </div>
                     </div>
 
-                    <div class="col-span-1 md:col-span-2 grid grid-cols-4 gap-4">
-                        
-                        <div class="col-span-3">
-                            <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Phone Number') }}</label>
-                            <input type="text" name="phone" value="{{ $profile->phone ?? $user->phone ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
-                        </div>
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Phone Number') }}</label>
+                        <input type="text" name="phone" value="{{ $profile->phone ?? $user->phone ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Gender') }}</label>
+                        <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Gender') }}</label>
                         <select name="gender" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none bg-white">
                             <option value="">{{ __('Select Gender') }}</option>
                             <option value="male" {{ (strtolower($profile->gender ?? $user->gender ?? '') == 'male') ? 'selected' : '' }}>Male</option>
@@ -138,7 +151,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Date of Birth') }}</label>
+                        <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Date of Birth') }}</label>
                         <div class="relative group">
                             <input type="date" name="dob" value="{{ $profile->dob ? \Carbon\Carbon::parse($profile->dob)->format('Y-m-d') : '' }}" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none bg-white transition-all">
                             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-colors pointer-events-none">

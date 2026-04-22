@@ -60,6 +60,20 @@
     #conditionsModal .overflow-hidden {
         overflow: visible !important;
     }
+    
+    /* Hide native calendar icon */
+    input[type="date"]::-webkit-inner-spin-button,
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        opacity: 0;
+    }
 </style>
 @endpush
 
@@ -137,7 +151,7 @@
     <div class="lg:col-span-4 xl:col-span-3 flex flex-col gap-8">
 
         <!-- Profile Card -->
-        <div class="bg-white rounded-xl px-5 pt-12 pb-5 flex flex-col items-center border border-[#2E4B3D]/12">
+        <div class="bg-white rounded-3xl px-5 pt-12 pb-5 flex flex-col items-center border border-[#2E4B3D]/12">
             <div class="relative mb-6">
                 @php
                     $avatar = $user->profile_pic_url;
@@ -193,7 +207,7 @@
     <div class="lg:col-span-8 xl:col-span-9 flex flex-col gap-8">
 
         <!-- Personal Details Card -->
-        <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12 relative">
+        <div class="bg-white rounded-3xl p-5 md:p-8 lg:p-12 border border-[#2E4B3D]/12 relative">
             <button type="button" onclick="openPersonalEditModal()" class="absolute top-8 right-8 text-gray-400 hover:text-secondary transition-colors">
                 <i class="ri-pencil-line text-2xl"></i>
             </button>
@@ -202,33 +216,33 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-y-8 gap-x-6">
                 <div>
-                    <p class="text-lg text-gray-400 mb-1">Age</p>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Age</p>
                     <p class="text-lg font-normal text-gray-800">{{ $age }}</p>
                 </div>
                 <div>
-                    <p class="text-lg text-gray-400 mb-1">Gender</p>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Gender</p>
                     <p class="text-lg font-normal text-gray-800">{{ $gender }}</p>
                 </div>
                 <div>
-                    <p class="text-lg text-gray-400 mb-1">DOB</p>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">DOB</p>
                     <p class="text-lg font-normal text-gray-800">{{ $dob }}</p>
                 </div>
 
                 <div>
-                    <p class="text-lg text-gray-400 mb-1">Nationality</p>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Nationality</p>
                     <p class="text-lg font-normal text-gray-800">{{ $nationality }}</p>
                 </div>
                 <div>
-                    <p class="text-lg text-gray-400 mb-1">Phone</p>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Phone</p>
                     <p class="text-lg font-normal text-gray-800">{{ $phone }}</p>
                 </div>
                 <div>
-                    <p class="text-lg text-gray-400 mb-1">Email</p>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Email</p>
                     <p class="text-lg font-normal text-gray-800">{{ $email }}</p>
                 </div>
 
                 <div class="md:col-span-3">
-                    <p class="text-lg text-gray-400 mb-1">Address</p>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Address</p>
                     <p class="text-lg font-normal text-gray-800 leading-relaxed">{{ $address }}</p>
                 </div>
             </div>
@@ -236,7 +250,7 @@
 
         @if(!in_array($user->role, ['client', 'patient']))
         <!-- Specialities & Conditions Card -->
-        <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12">
+        <div class="bg-white rounded-3xl p-5 md:p-8 lg:p-12 border border-[#2E4B3D]/12">
             <div id="profile-visibility-warning" class="{{ (!empty($specialities) || !empty($conditions)) ? 'hidden' : '' }} mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl flex items-start shadow-sm">
                 <i class="ri-information-line mr-3 text-xl mt-0.5"></i>
                 <p class="text-sm font-medium">
@@ -280,7 +294,7 @@
         </div>
 
         <!-- Documents & KYC Card -->
-        <div class="bg-white rounded-xl px-5 py-8 lg:p-12 border border-[#2E4B3D]/12">
+        <div class="bg-white rounded-3xl p-5 md:p-8 lg:p-12 border border-[#2E4B3D]/12">
             <h2 class="text-2xl font-medium font-sans! text-secondary mb-8">Documents & Certifications</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -514,7 +528,7 @@
 
 <!-- Specialities Modal -->
 <div id="specialitiesModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+    <div class="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide shadow-2xl">
         <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
             <h3 class="text-2xl font-bold text-secondary">Edit Specialities</h3>
             <button onclick="closeSpecialitiesModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
@@ -547,7 +561,7 @@
 
 <!-- Conditions Modal -->
 <div id="conditionsModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+    <div class="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide shadow-2xl">
         <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
             <h3 class="text-2xl font-bold text-secondary">Edit Conditions I Support</h3>
             <button onclick="closeConditionsModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
@@ -735,7 +749,7 @@
 
 <!-- Change Password Modal -->
 <div id="passwordModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+    <div class="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide shadow-2xl">
         <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
             <h3 class="text-2xl font-bold text-secondary">Change Password</h3>
             <button onclick="closePasswordModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
@@ -808,8 +822,8 @@
 
 <!-- Personal Details Edit Modal -->
 <div id="personal-edit-modal" class="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
-    <div class="bg-white rounded-[32px] w-full max-w-[520px] overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-200" id="personalEditContent">
-        <div class="p-8">
+    <div class="bg-white rounded-3xl md:rounded-[32px] w-full max-w-[520px] max-h-[90vh] overflow-y-auto scrollbar-hide shadow-2xl scale-95 opacity-0 transition-all duration-200" id="personalEditContent">
+        <div class="p-5 md:p-8">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-bold text-secondary">{{ __('Edit Personal Details') }}</h3>
                 <button type="button" onclick="closePersonalEditModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400">
@@ -818,16 +832,13 @@
             </div>
             <form method="POST" action="{{ route('profile.updatePersonal') }}">
                 @csrf
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-                    <div class="col-span-1 md:col-span-2 grid grid-cols-3 gap-4">
-                        
-                        <div class="col-span-2">
-                            <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Phone') }}</label>
-                            <input type="text" name="phone" value="{{ old('phone', $profile->phone ?? ($user->phone ?? '')) }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-6">
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 block">{{ __('Phone') }}</label>
+                        <input type="text" name="phone" value="{{ old('phone', $profile->phone ?? ($user->phone ?? '')) }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
                     </div>
                     <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Gender') }}</label>
+                        <label class="text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 block">{{ __('Gender') }}</label>
                         <select name="gender" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-white focus:border-secondary outline-none">
                             <option value="">{{ __('Select gender') }}</option>
                             @foreach (['male' => 'Male', 'female' => 'Female', 'transgender' => 'Transgender', 'other' => 'Other'] as $value => $label)
@@ -836,15 +847,18 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('DOB') }}</label>
-                        <input type="date" name="dob" value="{{ old('dob', $profile && $profile->dob ? \Illuminate\Support\Carbon::parse($profile->dob)->format('Y-m-d') : '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
+                        <label class="text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 block">{{ __('DOB') }}</label>
+                        <div class="relative">
+                            <input type="date" name="dob" value="{{ old('dob', $profile && $profile->dob ? \Illuminate\Support\Carbon::parse($profile->dob)->format('Y-m-d') : '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none pr-10 appearance-none">
+                            <i class="ri-calendar-line absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
                     </div>
                     <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Email') }}</label>
+                        <label class="text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 block">{{ __('Email') }}</label>
                         <input type="email" value="{{ $email }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-100 text-gray-500 cursor-not-allowed" readonly>
                     </div>
                     <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Nationality') }}</label>
+                        <label class="text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 block">{{ __('Nationality') }}</label>
                         <select name="nationality" class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-white focus:border-secondary outline-none">
                             <option value="">{{ __('Select nationality') }}</option>
                             @foreach($countries as $country)
@@ -855,27 +869,27 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Address Line 1') }}</label>
+                        <label class="text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 block">{{ __('Address Line 1') }}</label>
                         <input type="text" name="address_line_1" value="{{ old('address_line_1', $profile->address_line_1 ?? $profile->residential_address ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
                     </div>
                     <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Address Line 2') }}</label>
+                        <label class="text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 block">{{ __('Address Line 2') }}</label>
                         <input type="text" name="address_line_2" value="{{ old('address_line_2', $profile->address_line_2 ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
                     </div>
                     <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('City') }}</label>
+                        <label class="text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 block">{{ __('City') }}</label>
                         <input type="text" name="city" value="{{ old('city', $profile->city ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
                     </div>
                     <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('State') }}</label>
+                        <label class="text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 block">{{ __('State') }}</label>
                         <input type="text" name="state" value="{{ old('state', $profile->state ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
                     </div>
                     <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Zip Code') }}</label>
+                        <label class="text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 block">{{ __('Zip Code') }}</label>
                         <input type="text" name="zip_code" value="{{ old('zip_code', $profile->zip_code ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
                     </div>
                     <div>
-                        <label class="text-sm text-gray-500 font-semibold mb-2 block">{{ __('Country') }}</label>
+                        <label class="text-[11px] uppercase tracking-wider text-gray-500 font-bold mb-2 block">{{ __('Country') }}</label>
                         <input type="text" name="country" value="{{ old('country', $profile->country ?? '') }}" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:border-secondary outline-none">
                     </div>
                 </div>
