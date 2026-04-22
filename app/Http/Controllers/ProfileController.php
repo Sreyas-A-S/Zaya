@@ -1513,7 +1513,7 @@ class ProfileController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'code']);
 
-        $allLanguages = \App\Models\Language::orderBy('name')->pluck('name');
+        $allLanguages = \App\Models\Language::where('status', 'active')->orderBy('name')->get();
 
         // Functional Country Codes
         $countryCodes = [
