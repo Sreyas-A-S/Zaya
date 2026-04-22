@@ -359,6 +359,15 @@
                 }, 1000);
             }
 
+            // Prevent Accidental Reload
+            window.addEventListener('beforeunload', function (e) {
+                // If meeting has started, show confirmation
+                if (meetingStartedAt) {
+                    e.preventDefault();
+                    e.returnValue = ''; // Standard way to trigger the browser's "Leave site?" dialog
+                }
+            });
+
             window.switchProvider = (nextProvider) => {
                 if (nextProvider === 'zegocloud') {
                     window.location.href = zegoUrl;
