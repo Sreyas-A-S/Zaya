@@ -193,7 +193,64 @@
         color: #51bb25;
     }
 
+    /* Mobile Responsive & Date Field Adjustments */
+    @media (max-width: 768px) {
+        .stepper-horizontal {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stepper-horizontal::before {
+            display: none;
+        }
+        .stepper-horizontal .stepper-item {
+            margin-bottom: 10px;
+        }
+        .modal-body {
+            max-height: 80vh !important;
+            padding: 15px !important;
+        }
+        .avatar-upload {
+            max-width: 120px;
+        }
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+        }
+    }
 
+    /* Normalize Date Inputs for Mobile (iOS fix) */
+    input[type="date"].form-control {
+        min-height: 50px;
+        -webkit-appearance: none;
+        appearance: none;
+        display: flex;
+        align-items: center;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* Premium Button & Modal Adjustments */
+    #submit-btn {
+        box-shadow: 0 4px 12px rgba(81, 187, 37, 0.2);
+    }
+    #next-btn {
+        box-shadow: 0 4px 12px rgba(var(--theme-default-rgb), 0.2);
+    }
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .modal-header {
+        border-bottom: 1px solid #f0f0f0;
+        padding: 20px 25px;
+    }
+    .modal-footer {
+        border-top: 1px solid #f0f0f0;
+        padding: 20px 25px;
+    }
 </style>
 <div class="container-fluid">
     <div class="page-title">
@@ -417,11 +474,21 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Country <span class="text-danger">*</span></label>
-                            <select class="form-select" name="country" required>
+                            <select class="form-select" name="country" id="client_country" required>
                                 <option value="">Select Country</option>
                                 @foreach($countries as $country)
-                                <option value="{{ $country->name }}">{{ $country->name }}</option>
+                                <option value="{{ $country->name }}" data-code="{{ $country->code }}">{{ $country->name }}</option>
                                 @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
+                            <select class="form-select" name="payout_currency" id="client_payout_currency" required>
+                                <option value="INR">INR - Indian Rupee</option>
+                                <option value="USD">USD - US Dollar</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="GBP">GBP - British Pound</option>
+                                <option value="AED">AED - UAE Dirham</option>
                             </select>
                         </div>
                         
@@ -487,7 +554,7 @@
                             <label class="form-label" required>Languages Spoken</label>
                             <select class="form-select" id="languages_select" multiple>
                                 @foreach($languages as $lang)
-                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                 @endforeach
                             </select>
                             <div id="languages_capabilities_container"></div>
@@ -1212,17 +1279,29 @@
         });
 
         // Edit Client
-        $(document).on('click', '.editClient', function() {
-            let id = $(this).data('id');
-            $.get("{{ url('admin/clients') }}/" + id + "/edit", function(data) {
-                $('#form-modal-title').text('Edit Client');
+        $(document).on('click', '.editClient', function(e) {
+            e.preventDefault();
+            const btn = $(this);
+            const id = btn.data('id');
+            
+            if (!id || btn.hasClass('disabled')) return;
+
+            btn.addClass('disabled').find('i').addClass('fa-spin');
+
+            $.get("{{ url('admin/clients') }}/" + id + "/edit")
+            .done(function(data) {
+                console.log('Edit Data:', data);
+                
+                const form = $('#client-form');
+                form[0].reset();
+                $('#form-modal-title').text('Edit Client: ' + (data.name || ''));
                 $('#form-method').val('PUT');
                 $('#client_id_hidden').val(data.id);
                 
                 // Clear previous validation results
-                const form = $('#client-form');
                 form.find('.is-invalid').removeClass('is-invalid');
                 form.find('.invalid-feedback').remove();
+                
                 $('input[name="first_name"]').val(data.first_name);
                 $('input[name="middle_name"]').val(data.middle_name);
                 $('input[name="last_name"]').val(data.last_name);
@@ -1282,31 +1361,49 @@
                     
                     if (data.patient.consultation_preferences) {
                         $('.pref-checkbox').prop('checked', false);
-                        data.patient.consultation_preferences.forEach(function(val) {
-                            $(`input[name="consultation_preferences[]"][value="${val}"]`).prop('checked', true);
-                        });
+                        let prefs = data.patient.consultation_preferences;
+                        if (typeof prefs === 'string') {
+                            try { prefs = JSON.parse(prefs); } catch(e) { prefs = []; }
+                        }
+                        if (Array.isArray(prefs)) {
+                            prefs.forEach(function(val) {
+                                $(`input[name="consultation_preferences[]"][value="${val}"]`).prop('checked', true);
+                            });
+                        }
                     } else {
                         $('.pref-checkbox').prop('checked', false);
                     }
 
                     // Handle Languages Spoken (Choices.js)
                     $('#languages_capabilities_container').empty();
-                    if (data.patient.languages_spoken) {
-                        const langs = Array.isArray(data.patient.languages_spoken) ? data.patient.languages_spoken : [];
-
-                        if (langs.length > 0 && typeof langs[0] === 'string') {
-                            languageChoices.setChoiceByValue(langs);
-                        } else {
-                            const langValues = [];
-                            $.each(data.patient.languages_spoken, function(key, caps) {
-                                const langName = caps.language || key;
-                                langValues.push(langName);
-                                addLanguageCapabilityRow(langName, langName, caps);
-                            });
-                            languageChoices.setChoiceByValue(langValues);
-                        }
-                    } else {
-                        languageChoices.removeActiveItems();
+                    if (languageChoices) {
+                        try {
+                            languageChoices.removeActiveItems();
+                            if (data.patient.languages_spoken) {
+                                const langs = Array.isArray(data.patient.languages_spoken) ? data.patient.languages_spoken : [];
+                                if (langs.length > 0 && typeof langs[0] === 'string') {
+                                    const langCodes = [];
+                                    langs.forEach(l => {
+                                        let opt = langSelect.querySelector(`option[value="${l}"]`) || 
+                                                  Array.from(langSelect.options).find(o => o.getAttribute('data-name') === l || o.text.includes(l));
+                                        if (opt) langCodes.push(opt.value);
+                                    });
+                                    languageChoices.setChoiceByValue(langCodes);
+                                } else {
+                                    const langCodes = [];
+                                    $.each(data.patient.languages_spoken, function(key, caps) {
+                                        const langKey = caps.language || key;
+                                        let opt = langSelect.querySelector(`option[value="${langKey}"]`) || 
+                                                  Array.from(langSelect.options).find(o => o.getAttribute('data-name') === langKey || o.text.includes(langKey));
+                                        if (opt) {
+                                            langCodes.push(opt.value);
+                                            addLanguageCapabilityRow(opt.value, opt.text, caps);
+                                        }
+                                    });
+                                    languageChoices.setChoiceByValue(langCodes);
+                                }
+                            }
+                        } catch (err) { console.error('Choices error:', err); }
                     }
                 } else {
                     $('#client-form')[0].reset();
@@ -1316,9 +1413,12 @@
                     $('input[name="last_name"]').val(data.last_name);
                     $('input[name="email"]').val(data.email);
                     $('#imagePreview').css('background-image', "url('{{ asset('admiro/assets/images/user/user.png') }}')");
+                    if (languageChoices) languageChoices.removeActiveItems();
                 }
 
-                new bootstrap.Modal(document.getElementById('client-form-modal')).show();
+                // Initialize and show modal
+                const modalEl = document.getElementById('client-form-modal');
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
 
                 // For Edit: Use the same stepper flow as Create, but without payment step
                 currentStep = 1;
@@ -1327,6 +1427,13 @@
                 $('.stepper-horizontal .stepper-item[data-step="6"]').hide();
                 $('#step-6').addClass('d-none');
                 updateStepper();
+            })
+            .fail(function(xhr) {
+                console.error('Fetch error:', xhr);
+                showToast('Failed to load client data. Please try again.', 'error');
+            })
+            .always(function() {
+                btn.removeClass('disabled').find('i').removeClass('fa-spin');
             });
         });
     
@@ -1487,7 +1594,7 @@
         // Reset Checkboxes
         $('.pref-checkbox').prop('checked', false);
 
-        new bootstrap.Modal(document.getElementById('client-form-modal')).show();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('client-form-modal')).show();
     }
 
     // Expose to window for the button onclick

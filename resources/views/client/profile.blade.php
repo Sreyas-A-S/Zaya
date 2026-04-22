@@ -61,10 +61,21 @@
         overflow: visible !important;
     }
     
+    input[type="date"] {
+        min-height: 50px;
+        -webkit-appearance: none;
+        appearance: none;
+        display: flex;
+        align-items: center;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
     input[type="date"]::-webkit-inner-spin-button,
     input[type="date"]::-webkit-calendar-picker-indicator {
         opacity: 0;
         -webkit-appearance: none;
+        display: none;
     }
 </style>
 @endpush

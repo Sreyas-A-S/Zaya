@@ -496,7 +496,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                             <label class="form-label fw-bold" required>Languages Spoken</label>
                             <select class="form-select" id="languages_select" multiple>
                                 @foreach($languages as $lang)
-                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                 @endforeach
                             </select>
                             <div id="languages_capabilities_container"></div>
@@ -1601,19 +1601,32 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
                     if (languagesData && Object.keys(languagesData).length) {
                         if (Array.isArray(languagesData) && (languagesData.length === 0 || typeof languagesData[0] === 'string')) {
-                            if (window.languageChoices) {
-                                window.languageChoices.setChoiceByValue(languagesData);
-                            }
-                            languagesData.forEach(lang => addLanguageCapabilityRow(lang, lang));
-                        } else {
-                            const langValues = [];
-                            $.each(languagesData, function(key, caps) {
-                                const langName = (caps && caps.language) ? caps.language : key;
-                                langValues.push(langName);
-                                addLanguageCapabilityRow(langName, langName, caps || {});
+                            const langCodes = [];
+                            languagesData.forEach(l => {
+                                let opt = langSelect.querySelector(`option[value="${l}"]`) || 
+                                          Array.from(langSelect.options).find(o => o.getAttribute('data-name') === l || o.text.includes(l));
+                                if (opt) langCodes.push(opt.value);
                             });
                             if (window.languageChoices) {
-                                window.languageChoices.setChoiceByValue(langValues);
+                                window.languageChoices.setChoiceByValue(langCodes);
+                            }
+                            langCodes.forEach(code => {
+                                let opt = langSelect.querySelector(`option[value="${code}"]`);
+                                addLanguageCapabilityRow(code, opt ? opt.text : code);
+                            });
+                        } else {
+                            const langCodes = [];
+                            $.each(languagesData, function(key, caps) {
+                                const langKey = (caps && caps.language) ? caps.language : key;
+                                let opt = langSelect.querySelector(`option[value="${langKey}"]`) || 
+                                          Array.from(langSelect.options).find(o => o.getAttribute('data-name') === langKey || o.text.includes(langKey));
+                                if (opt) {
+                                    langCodes.push(opt.value);
+                                    addLanguageCapabilityRow(opt.value, opt.text, caps || {});
+                                }
+                            });
+                            if (window.languageChoices) {
+                                window.languageChoices.setChoiceByValue(langCodes);
                             }
                         }
                     }

@@ -14,9 +14,39 @@ class Patient extends Model
 
     protected $casts = [
         'dob' => 'date',
-        'consultation_preferences' => 'encrypted:json',
         'languages_spoken' => 'array',
     ];
+
+    /**
+     * Gracefully handle encrypted consultation_preferences
+     * fallback to raw or empty array if decryption fails
+     */
+    public function getConsultationPreferencesAttribute($value)
+    {
+        if (empty($value)) return [];
+
+        try {
+            // Laravel's encrypted:json cast essentially does this:
+            $decrypted = decrypt($value);
+            return is_string($decrypted) ? json_decode($decrypted, true) : $decrypted;
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            // Fallback: If it's already a JSON string (not encrypted), try to decode it
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+            return [];
+        }
+    }
+
+    public function setConsultationPreferencesAttribute($value)
+    {
+        if (is_null($value)) {
+            $this->attributes['consultation_preferences'] = null;
+        } else {
+            $this->attributes['consultation_preferences'] = encrypt(is_array($value) ? json_encode($value) : $value);
+        }
+    }
 
     public function user()
     {

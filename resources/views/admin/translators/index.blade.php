@@ -278,14 +278,14 @@
                                             <select class="form-select" name="native_language" required>
                                                 <option value="">Select</option>
                                                 @foreach($languages as $lang)
-                                                <option value="{{ $lang->name }}">{{ $lang->display_name }}</option>
+                                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                                 @endforeach                                            </select>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Source Languages <span class="text-danger">*</span></label>
                                             <select class="form-select" id="source_languages_select" multiple required>
                                                 @foreach($languages as $lang)
-                                                <option value="{{ $lang->name }}">{{ $lang->display_name }}</option>
+                                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                                 @endforeach                                            </select>
                                             <div id="source_languages_capabilities_container"></div>
                                         </div>
@@ -293,7 +293,7 @@
                                             <label class="form-label">Target Languages <span class="text-danger">*</span></label>
                                             <select class="form-select" id="target_languages_select" multiple required>
                                                 @foreach($languages as $lang)
-                                                <option value="{{ $lang->name }}">{{ $lang->display_name }}</option>
+                                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                                 @endforeach                                            </select>
                                             <div id="target_languages_capabilities_container"></div>
                                         </div>
@@ -301,7 +301,7 @@
                                             <label class="form-label">Additional Languages</label>
                                             <select class="form-select" id="additional_languages_select" multiple>
                                                 @foreach($languages as $lang)
-                                                <option value="{{ $lang->name }}">{{ $lang->display_name }}</option>
+                                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                                 @endforeach                                            </select>
                                             <div id="additional_languages_capabilities_container"></div>
                                         </div>
@@ -1505,7 +1505,12 @@ function openCreateModal() {
                             $('#imageUpload').val('');
                             croppedFile = null;
 
-                            $('select[name="native_language"]').val(t.native_language);
+                            if (t.native_language) {
+                                let nativeSelect = document.querySelector('select[name="native_language"]');
+                                let nativeOpt = nativeSelect.querySelector(`option[value="${t.native_language}"]`) || 
+                                                Array.from(nativeSelect.options).find(o => o.getAttribute('data-name') === t.native_language || o.text.includes(t.native_language));
+                                if (nativeOpt) $('select[name="native_language"]').val(nativeOpt.value);
+                            }
 
                             // Handle Languages
                             const handleLangs = (field, containerId, choicesInstance) => {
@@ -1513,16 +1518,31 @@ function openCreateModal() {
                                 if (t[field]) {
                                     const langs = Array.isArray(t[field]) ? t[field] : [];
                                     if (langs.length > 0 && typeof langs[0] === 'string') {
-                                        choicesInstance.setChoiceByValue(langs);
-                                        langs.forEach(l => addLanguageCapabilityRow(l, l, field));
-                                    } else {
-                                        const langValues = [];
-                                        $.each(t[field], function(key, caps) {
-                                            const langName = caps.language || key;
-                                            langValues.push(langName);
-                                            addLanguageCapabilityRow(langName, langName, field, caps);
+                                        const langCodes = [];
+                                        const selectEl = document.querySelector(`select[id="${field}_select"]`);
+                                        langs.forEach(l => {
+                                            let opt = selectEl ? (selectEl.querySelector(`option[value="${l}"]`) || 
+                                                      Array.from(selectEl.options).find(o => o.getAttribute('data-name') === l || o.text.includes(l))) : null;
+                                            if (opt) langCodes.push(opt.value);
                                         });
-                                        choicesInstance.setChoiceByValue(langValues);
+                                        choicesInstance.setChoiceByValue(langCodes);
+                                        langCodes.forEach(code => {
+                                            let opt = selectEl ? selectEl.querySelector(`option[value="${code}"]`) : null;
+                                            addLanguageCapabilityRow(code, opt ? opt.text : code, field);
+                                        });
+                                    } else {
+                                        const langCodes = [];
+                                        const selectEl = document.querySelector(`select[id="${field}_select"]`);
+                                        $.each(t[field], function(key, caps) {
+                                            const langKey = caps.language || key;
+                                            let opt = selectEl ? (selectEl.querySelector(`option[value="${langKey}"]`) || 
+                                                      Array.from(selectEl.options).find(o => o.getAttribute('data-name') === langKey || o.text.includes(langKey))) : null;
+                                            if (opt) {
+                                                langCodes.push(opt.value);
+                                                addLanguageCapabilityRow(opt.value, opt.text, field, caps);
+                                            }
+                                        });
+                                        choicesInstance.setChoiceByValue(langCodes);
                                     }
                                 } else {
                                     choicesInstance.removeActiveItems();

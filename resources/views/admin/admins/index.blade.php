@@ -354,8 +354,8 @@
                             <label class="form-label">Nationality <span class="text-danger">*</span></label>
                             <select name="country[]" id="edit_country" class="form-control select2 w-100" multiple required>
                                 @foreach($allCountries as $country)
-                                <option value="{{ $country->id }}" data-flag="{{ strtolower($country->code) }}">
-                                    {{ $country->name }}
+                                <option value="{{ $country->id }}" data-flag="{{ strtolower($country->code) }}" data-name="{{ $country->name }}">
+                                    {{ $country->flag }} {{ $country->name }}
                                 </option>
                                 @endforeach
                             </select>
@@ -365,8 +365,8 @@
                             <label class="form-label">Language <span class="text-danger">*</span></label>
                             <select name="language[]" id="edit_language" class="form-control select2 w-100" multiple required>
                                 @foreach($languages as $language)
-                                <option value="{{ $language->id }}">
-                                    {{ $language->name }}
+                                <option value="{{ $language->id }}" data-name="{{ $language->name }}" data-code="{{ $language->code }}">
+                                    {{ $language->flag }} {{ $language->display_name }}
                                 </option>
                                 @endforeach
                             </select>

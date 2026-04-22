@@ -478,7 +478,7 @@
                                             <label class="form-label">Languages Spoken <span class="text-danger">*</span></label>
                                             <select class="form-select" name="languages[]" id="languages_select" multiple required>
                                                 @foreach($languages as $lang)
-                                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                                 @endforeach
                                             </select>
 
@@ -1581,14 +1581,22 @@
                     if (Array.isArray(p.languages_spoken)) {
                         $.each(p.languages_spoken, function(index, value) {
                             if (typeof value === 'string') {
-                                selectedLanguages.push(value);
-                                addLanguageCapabilityRow(value, value, {});
+                                let opt = langSelect.querySelector(`option[value="${value}"]`) || 
+                                          Array.from(langSelect.options).find(o => o.getAttribute('data-name') === value || o.text.includes(value));
+                                if (opt) {
+                                    selectedLanguages.push(opt.value);
+                                    addLanguageCapabilityRow(opt.value, opt.text, {});
+                                }
                             }
                         });
                     } else {
                         $.each(p.languages_spoken, function(langName, capabilities) {
-                            selectedLanguages.push(langName);
-                            addLanguageCapabilityRow(langName, langName, capabilities);
+                            let opt = langSelect.querySelector(`option[value="${langName}"]`) || 
+                                      Array.from(langSelect.options).find(o => o.getAttribute('data-name') === langName || o.text.includes(langName));
+                            if (opt) {
+                                selectedLanguages.push(opt.value);
+                                addLanguageCapabilityRow(opt.value, opt.text, capabilities);
+                            }
                         });
                     }
                     if (selectedLanguages.length > 0) {

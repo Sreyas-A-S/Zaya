@@ -661,7 +661,7 @@
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Languages Spoken') }}</label>
                         <select id="languages-select" name="languages[]" multiple placeholder="{{ __('Select Languages') }}">
                             @foreach($languages as $lang)
-                                <option value="{{ $lang->code }}">{{ $lang->name }}</option>
+                                <option value="{{ $lang->code }}">{{ $lang->display_name }}</option>
                             @endforeach
                         </select>
                     </div>

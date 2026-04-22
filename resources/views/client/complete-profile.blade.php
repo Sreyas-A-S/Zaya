@@ -32,10 +32,21 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
+    input[type="date"] {
+        min-height: 50px;
+        -webkit-appearance: none;
+        appearance: none;
+        display: flex;
+        align-items: center;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
     input[type="date"]::-webkit-inner-spin-button,
     input[type="date"]::-webkit-calendar-picker-indicator {
         opacity: 0;
         -webkit-appearance: none;
+        display: none;
     }
 </style>
 @endpush
@@ -437,7 +448,9 @@
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Languages Spoken') }}</label>
                             <select id="languages-spoken-select" name="languages_spoken[]" multiple>
                                 @foreach($allLanguages as $lang)
-                                    <option value="{{ $lang }}" {{ in_array($lang, (array)($profile->languages_spoken ?? [])) ? 'selected' : '' }}>{{ $lang }}</option>
+                                    <option value="{{ $lang->code }}" {{ in_array($lang->code, (array)($profile->languages_spoken ?? [])) || in_array($lang->name, (array)($profile->languages_spoken ?? [])) ? 'selected' : '' }}>
+                                        {{ $lang->flag }} {{ $lang->display_name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>

@@ -149,9 +149,9 @@
                                             
                                             <div class="mb-4">
                                                 <label class="form-label">Languages Spoken</label>
-                                                <select class="form-select" name="languages_spoken[]" multiple aria-label="Select languages" style="height: 120px;">
+                                                <select class="form-select" name="languages[]" multiple aria-label="Select languages" style="height: 120px;">
                                                     @foreach($languages as $lang)
-                                                        <option value="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->name }}</option>
+                                                        <option value="{{ $lang->code }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                                     @endforeach
                                                 </select>
                                                 <small class="text-muted">Hold Ctrl/Cmd to select multiple.</small>

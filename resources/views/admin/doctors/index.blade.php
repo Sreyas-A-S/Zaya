@@ -583,7 +583,7 @@
                                             <label class="form-label">Languages Spoken</label>
                                             <select class="form-select" id="languages_select" multiple>
                                                 @foreach($languages as $lang)
-                                                <option value="{{ $lang->name }}">{{ $lang->name }}</option>
+                                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                                 @endforeach
                                             </select>
                                             <div id="languages_capabilities_container"></div>
@@ -1911,16 +1911,25 @@
 
                 // If the data is stored as objects with capabilities
                 if (langs.length > 0 && typeof langs[0] === 'string') {
-                    languageChoices.setChoiceByValue(langs);
-                } else {
-                    // It's an object/array of objects
-                    const langValues = [];
-                    $.each(profile.languages_spoken, function(key, caps) {
-                        const langName = caps.language || key;
-                        langValues.push(langName);
-                        addLanguageCapabilityRow(langName, langName, caps);
+                    const langCodes = [];
+                    langs.forEach(l => {
+                        let opt = langSelect.querySelector(`option[value="${l}"]`) || 
+                                  Array.from(langSelect.options).find(o => o.getAttribute('data-name') === l || o.text.includes(l));
+                        if (opt) langCodes.push(opt.value);
                     });
-                    languageChoices.setChoiceByValue(langValues);
+                    languageChoices.setChoiceByValue(langCodes);
+                } else {
+                    const langCodes = [];
+                    $.each(profile.languages_spoken, function(key, caps) {
+                        const langKey = caps.language || key;
+                        let opt = langSelect.querySelector(`option[value="${langKey}"]`) || 
+                                  Array.from(langSelect.options).find(o => o.getAttribute('data-name') === langKey || o.text.includes(langKey));
+                        if (opt) {
+                            langCodes.push(opt.value);
+                            addLanguageCapabilityRow(opt.value, opt.text, caps);
+                        }
+                    });
+                    languageChoices.setChoiceByValue(langCodes);
                 }
             } else {
                 languageChoices.removeActiveItems();
