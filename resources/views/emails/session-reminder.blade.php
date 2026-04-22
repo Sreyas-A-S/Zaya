@@ -55,7 +55,10 @@
                 @endif
             </div>
 
-            
+            <div style="margin: 40px 0;">
+                <a href="{{ $videoLink }}" class="join-button">Join Meeting Now</a>
+            </div>
+
             <p class="notice">
                 If the button above doesn't work, copy and paste this link into your browser:<br>
                 <span style="word-break: break-all; color: #2E4B3C; font-weight: 500;">{{ $videoLink }}</span>

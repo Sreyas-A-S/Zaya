@@ -6,7 +6,7 @@
                 <button onclick="startInstantMeeting('jaas')" 
                    class="px-5 py-3 bg-secondary text-white rounded-full font-medium flex items-center gap-2 hover:bg-opacity-90 transition-all border border-secondary cursor-pointer shadow-lg shadow-secondary/20">
                     <i id="instant-meet-icon" class="ri-vidicon-line text-lg"></i>
-                    <span id="instant-meet-text">Start JaaS Session</span>
+                    <span id="instant-meet-text">Start Session</span>
                 </button>
             </div>
         </div>

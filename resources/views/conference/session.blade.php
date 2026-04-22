@@ -45,26 +45,7 @@
                             <i class="ri-share-forward-line text-xl"></i>
                         </button>
                         
-                        <div class="flex bg-gray-100 p-1 rounded-full gap-1">
-                            <button onclick="switchProvider('jaas')"
-                                class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all {{ $provider === 'jaas' ? 'bg-secondary text-white shadow-sm' : 'text-gray-400 hover:text-secondary' }}">
-                                JaaS (8x8)
-                            </button>
-                            <button onclick="switchProvider('daily')"
-                                class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all {{ $provider === 'daily' ? 'bg-secondary text-white shadow-sm' : 'text-gray-400 hover:text-secondary' }}">
-                                Daily.co
-                            </button>
-                            <button onclick="switchProvider('zegocloud')"
-                                class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all {{ $provider === 'zegocloud' ? 'bg-secondary text-white shadow-sm' : 'text-gray-400 hover:text-secondary' }}">
-                                ZEGOCLOUD
-                            </button>
-                            @if($agoraAvailable)
-                            <button onclick="switchProvider('agora')"
-                                class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all {{ $provider === 'agora' ? 'bg-secondary text-white shadow-sm' : 'text-gray-400 hover:text-secondary' }}">
-                                Agora
-                            </button>
-                            @endif
-                        </div>
+
 
                         <button onclick="togglePiP()"
                             class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer"
@@ -170,7 +151,7 @@
                             Ready to Join?
                         </h2>
                         <p class="text-white/60 mb-10 max-w-md text-lg">
-                            You are joining via <span class="text-white font-bold uppercase tracking-wider">{{ $provider === 'jaas' ? 'JaaS' : ($provider === 'daily' ? 'Daily.co' : 'Agora') }}</span>.
+                            You are joining the consultation session.
                         </p>
 
                         <div id="setup-feedback" class="mb-6 text-white/80 text-sm hidden">
@@ -184,10 +165,7 @@
                                 <span>Join Meeting Now</span>
                             </button>
                             
-                            <button onclick="switchProvider('choose')"
-                                class="text-white/50 hover:text-white text-sm font-medium transition-colors">
-                                Switch Platform
-                            </button>
+
                         </div>
                     @endif
                 </div>
@@ -277,7 +255,7 @@
                     <div class="flex items-center gap-3">
                         <i class="ri-shield-check-line text-secondary"></i>
                         <p class="text-xs text-gray-400 font-medium italic">
-                            Secure encrypted session via {{ $provider === 'jaas' ? 'JaaS' : ($provider === 'daily' ? 'Daily.co' : 'Agora') }}</p>
+                            Secure encrypted session</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -363,16 +341,23 @@
             };
 
             // Timer Logic
-            let timerStartTime = Date.now();
-            setInterval(() => {
-                const now = Date.now();
-                const diff = Math.floor((now - timerStartTime) / 1000);
-                const h = Math.floor(diff / 3600).toString().padStart(2, '0');
-                const m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
-                const s = (diff % 60).toString().padStart(2, '0');
+            let timerInterval = null;
+            function startTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                
+                let timerStartTime = Date.now();
                 const timerEl = document.getElementById('timer');
-                if (timerEl) timerEl.innerText = `${h}:${m}:${s}`;
-            }, 1000);
+                if (timerEl) timerEl.innerText = "00:00:00";
+
+                timerInterval = setInterval(() => {
+                    const now = Date.now();
+                    const diff = Math.floor((now - timerStartTime) / 1000);
+                    const h = Math.floor(diff / 3600).toString().padStart(2, '0');
+                    const m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
+                    const s = (diff % 60).toString().padStart(2, '0');
+                    if (timerEl) timerEl.innerText = `${h}:${m}:${s}`;
+                }, 1000);
+            }
 
             window.switchProvider = (nextProvider) => {
                 if (nextProvider === 'zegocloud') {
@@ -410,6 +395,8 @@
                 if (btn) btn.disabled = true;
                 if (feedback) feedback.classList.remove('hidden');
                 meetingStartedAt = new Date().toISOString();
+                
+                startTimer();
                 await beginRecording(true);
 
                 if (provider === 'jaas') initJitsi();
@@ -423,8 +410,19 @@
                     roomName: jitsiRoom,
                     parentNode: container,
                     jwt: jitsiJwt,
-                    configOverwrite: { prejoinPageEnabled: false },
-                    interfaceConfigOverwrite: { SHOW_JITSI_WATERMARK: false },
+                    configOverwrite: { 
+                        prejoinPageEnabled: true,
+                        prejoinConfig: { 
+                            enabled: true,
+                            hideDisplayName: true
+                        },
+                        readOnlyName: true,
+                        disableProfile: true
+                    },
+                    interfaceConfigOverwrite: { 
+                        SHOW_JITSI_WATERMARK: false,
+                        DISABLE_PROFILE: true
+                    },
                     userInfo: { displayName: "{{ addslashes($user->name ?? 'Guest') }}" }
                 });
                 jitsiApi.addEventListeners({
