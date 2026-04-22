@@ -441,10 +441,27 @@ class ProfileController extends Controller
             ->pluck('promo_code')
             ->toArray();
 
+        // Ensure user has a referral token
+        if (!$user->referral_token) {
+            $user->generateReferralToken();
+        }
+
+        // Get referred users
+        $referrals = $user->referrals()->with('patient')->latest()->get();
+
         // Get coin settings for the user's currency
         $coinSetting = \App\Models\CoinSetting::where('currency_code', $user->currency)->where('status', true)->first();
 
-        return view('client.rewards', compact('activePromoCodes', 'usedPromoCodes', 'user', 'coinSetting'));
+        return view('client.rewards', compact('activePromoCodes', 'usedPromoCodes', 'user', 'coinSetting', 'referrals'));
+    }
+
+    public function regenerateReferralToken()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $user->generateReferralToken();
+
+        return back()->with('success', 'Your referral link has been regenerated. Old links will no longer work.');
     }
     public function healthJourney()
     {
@@ -604,7 +621,9 @@ class ProfileController extends Controller
         // Consent Status
         $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($booking->practitioner->user_id ?? 0, $booking->user_id);
 
-        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent'));
+        $firstPractitioner = $referralChain[0]['practitioner'] ?? 'Unknown';
+
+        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner'));
     }
 
     public function viewClientProfile($id)

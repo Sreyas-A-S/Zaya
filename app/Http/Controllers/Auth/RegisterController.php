@@ -58,11 +58,21 @@ class RegisterController extends Controller
 
     public function showRegistrationForm($type)
     {
+        if (request()->has('ref')) {
+            session(['referral_code' => request('ref')]);
+        }
+
         if (!in_array($type, ['practitioner', 'patient', 'client'])) {
             abort(404);
         }
 
-        $currencies = config('currencies.symbols');
+        $language = session('locale', 'en');
+        // We'll use 'all' as default country for initial settings but also try to derive from request
+        $countryCode = $request->get('country', 'all');
+        $financeSettings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
+
+        $countries = \App\Models\Country::all();
+        $countryToCurrency = config('currencies.country_to_currency', []);
 
         if ($type === 'practitioner') {
             $languages = \App\Models\Language::all();
@@ -70,15 +80,34 @@ class RegisterController extends Controller
             $bodyTherapies = BodyTherapy::where('status', 1)->get();
             $practitionerModalities = PractitionerModality::where('status', 1)->get();
 
-            return view('auth.register_practitioner', compact('languages', 'wellnessConsultations', 'bodyTherapies', 'practitionerModalities', 'currencies'));
+            $registrationFee = (float) ($financeSettings['practitioner_registration_fee'] ?? 0);
+            $registrationFeeEnabled = filter_var($financeSettings['practitioner_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
+            $registrationCurrency = strtoupper($financeSettings['practitioner_registration_fee_currency'] ?? config('currencies.default', 'EUR'));
+
+            return view('auth.register_practitioner', compact(
+                'languages', 'wellnessConsultations', 'bodyTherapies', 'practitionerModalities', 
+                'currencies', 'countries', 'registrationFee', 'registrationFeeEnabled', 'registrationCurrency', 'countryToCurrency'
+            ));
         }
 
         if ($type === 'patient' || $type === 'client') {
             $languages = \App\Models\Language::all();
-            return view('auth.register_patient', compact('languages', 'currencies'));
+            
+            $registrationFee = (float) ($financeSettings['client_registration_fee'] ?? 0);
+            $registrationFeeEnabled = filter_var($financeSettings['client_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
+            $registrationCurrency = strtoupper($financeSettings['client_registration_fee_currency'] ?? config('currencies.default', 'EUR'));
+
+            return view('auth.register_patient', compact(
+                'languages', 'currencies', 'countries', 'registrationFee', 'registrationFeeEnabled', 'registrationCurrency', 'countryToCurrency'
+            ));
         }
 
-        return view('auth.register', ['type' => $type, 'currencies' => $currencies]);
+        return view('auth.register', [
+            'type' => $type, 
+            'currencies' => $currencies, 
+            'countries' => $countries,
+            'countryToCurrency' => $countryToCurrency
+        ]);
     }
 
     /**
@@ -173,6 +202,31 @@ class RegisterController extends Controller
                     ]);
                 }
             }
+
+            // Award referral coins if applicable
+            if ($user->referred_by) {
+                $referrer = \App\Models\User::find($user->referred_by);
+                if ($referrer) {
+                    $coinSetting = \App\Models\CoinSetting::where('currency_code', $referrer->currency)->where('status', true)->first();
+                    if ($coinSetting && $coinSetting->referral_coins > 0) {
+                        $referrer->increment('coins', $coinSetting->referral_coins);
+                        
+                        // Create a coin transaction record for the referral bonus
+                        \App\Models\CoinTransaction::create([
+                            'user_id' => $referrer->id,
+                            'amount' => $coinSetting->referral_coins,
+                            'type' => 'referral_bonus',
+                            'description' => 'Referral bonus for inviting ' . $user->name,
+                            'metadata' => [
+                                'referred_user_id' => $user->id,
+                                'referred_user_name' => $user->name,
+                            ]
+                        ]);
+                    }
+                }
+            }
+
+            session()->forget('referral_code');
 
             DB::commit();
 
@@ -1055,6 +1109,7 @@ class RegisterController extends Controller
             'password' => Hash::make($rawPassword),
             'role' => $data['role'],
             'open_register_link_id' => !empty($data['open_register_token']) ? \App\Models\OpenRegisterLink::where('token', $data['open_register_token'])->value('id') : null,
+            'referred_by' => session('referral_code') ? \App\Models\User::where('referral_token', session('referral_code'))->value('id') : null,
         ]);
     }
     /**
