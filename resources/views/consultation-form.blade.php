@@ -1,13 +1,22 @@
-@extends('layouts.client')
+@extends($isMinimal ? 'layouts.empty' : 'layouts.client')
 
 @section('title', 'Consultation Form | Zaya Wellness')
 
 @section('content')
 @php
     $payload = old() ?: ($consultationPayload ?? []);
-    $roleLabel = $consultationFormRole ? \Illuminate\Support\Str::headline(str_replace('_', ' ', $consultationFormRole)) : 'Consultation';
+    $roleLabel = $roleForSchema ? \Illuminate\Support\Str::headline(str_replace('_', ' ', $roleForSchema)) : 'Consultation';
     $bookingDate = $booking->booking_date?->format('M d, Y');
 @endphp
+
+@if($isMinimal)
+<style>
+    body { background: #fff !important; }
+    .main-content { padding: 0 !important; margin: 0 !important; }
+    .consultation-hero { border-radius: 0; border-top: 0; border-left: 0; border-right: 0; margin-bottom: 1.5rem; padding: 1.5rem; }
+    .consultation-hero h1 { font-size: 1.5rem; }
+</style>
+@endif
 
 @push('styles')
 <style>
@@ -229,6 +238,12 @@
             <p class="consultation-kicker">Digital Consultation Intake</p>
             
             <div class="consultation-badges">
+                @if(!$canEdit)
+                    <span class="consultation-badge border-amber-200 bg-amber-50 text-amber-700">
+                        <i class="ri-eye-line"></i>
+                        Read-Only Mode
+                    </span>
+                @endif
                 <span class="consultation-badge">
                     <i class="ri-calendar-event-line"></i>
                     Booking {{ $booking->invoice_no }}

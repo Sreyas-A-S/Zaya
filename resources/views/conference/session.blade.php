@@ -14,10 +14,10 @@
         </div>
     @endif
 
-    <div class="max-w-6xl mx-auto {{ $isMeetingPopout ? 'h-full max-w-none' : '' }}">
+    <div class="max-w-7xl mx-auto {{ $isMeetingPopout ? 'h-full max-w-none' : '' }} flex flex-col lg:flex-row gap-6 transition-all duration-500" id="session-wrapper">
         <!-- Meeting Portal Card -->
-        <div
-            class="{{ $isMeetingPopout ? 'h-full overflow-hidden rounded-none border-0 shadow-none bg-[#07110B]' : 'bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)]' }}">
+        <div id="video-container"
+            class="flex-1 transition-all duration-500 {{ $isMeetingPopout ? 'h-full overflow-hidden rounded-none border-0 shadow-none bg-[#07110B]' : 'bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)]' }}">
 
             @if(!$isMeetingPopout)
                 <!-- Meeting Header -->
@@ -39,6 +39,14 @@
                     </div>
 
                     <div class="flex items-center gap-3">
+                        @if($booking)
+                        <button onclick="toggleClinicalNotes()" id="clinical-notes-btn"
+                            class="px-4 py-2 bg-secondary text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-secondary/20">
+                            <i class="ri-file-list-3-line text-lg"></i>
+                            Clinical Records
+                        </button>
+                        @endif
+
                         <button onclick="copyMeetingLink()"
                             class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer"
                             title="Copy Meeting Link">
@@ -180,7 +188,7 @@
                             
                             <h2 class="text-2xl font-black text-secondary tracking-tight mb-2">Session Completed</h2>
                             <p class="text-sm text-gray-500 mb-8 leading-relaxed">
-                                Thank you for your time. Your session #{{ $booking->invoice_no ?? 'N/A' }} has been successfully completed.
+                                Thank you for your time. Your session {{ $booking ? '#' . $booking->invoice_no : 'Ref: ' . $channel }} has been successfully completed.
                             </p>
 
                             <div class="grid grid-cols-2 gap-3 mb-8">
@@ -199,7 +207,7 @@
                                     Back to Dashboard
                                     <i class="ri-arrow-right-line"></i>
                                 </a>
-                                <button onclick="window.location.href='mailto:support@zayawellness.com?subject=Session Feedback #{{ $booking->invoice_no }}'" class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] hover:text-secondary transition-colors">
+                                <button onclick="window.location.href='mailto:support@zayawellness.com?subject=Session Feedback #{{ $booking?->invoice_no ?? $channel }}'" class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] hover:text-secondary transition-colors">
                                     Need help? Report an issue
                                 </button>
                             </div>
@@ -301,6 +309,31 @@
                 </div>
             @endif
         </div>
+
+        <!-- Clinical Records Sidebar -->
+        @if($booking)
+        <div id="clinical-sidebar" class="hidden w-full lg:w-[450px] bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)] flex flex-col transition-all duration-500">
+            <div class="p-6 border-b border-[#2E4B3D]/12 flex items-center justify-between bg-[#FDFDFD]">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-secondary/5 rounded-xl flex items-center justify-center">
+                        <i class="ri-file-list-3-line text-secondary text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-secondary leading-none mb-1">Clinical Records</h2>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Client: {{ $booking->user->name }}</p>
+                    </div>
+                </div>
+                <button onclick="toggleClinicalNotes()" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-all cursor-pointer">
+                    <i class="ri-close-line text-xl"></i>
+                </button>
+            </div>
+            <div class="flex-1 relative bg-gray-50/50">
+                <iframe src="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'minimal' => 1]) }}" 
+                        class="absolute inset-0 w-full h-full border-0"
+                        id="clinical-iframe"></iframe>
+            </div>
+        </div>
+        @endif
     </div>
 
     @if($provider === 'agora')
@@ -425,6 +458,34 @@
                     else alert('Meeting link copied!');
                 });
             };
+
+            window.toggleClinicalNotes = () => {
+                const sidebar = document.getElementById('clinical-sidebar');
+                const btn = document.getElementById('clinical-notes-btn');
+                const container = document.getElementById('session-wrapper');
+                
+                if (!sidebar) return;
+
+                const isHidden = sidebar.classList.contains('hidden');
+                
+                if (isHidden) {
+                    sidebar.classList.remove('hidden');
+                    if (btn) btn.classList.add('bg-primary');
+                    localStorage.setItem('clinical_sidebar_open', 'true');
+                } else {
+                    sidebar.classList.add('hidden');
+                    if (btn) btn.classList.remove('bg-primary');
+                    localStorage.setItem('clinical_sidebar_open', 'false');
+                }
+            };
+
+            // Restore Clinical Sidebar State
+            if (localStorage.getItem('clinical_sidebar_open') === 'true') {
+                const sidebar = document.getElementById('clinical-sidebar');
+                const btn = document.getElementById('clinical-notes-btn');
+                if (sidebar) sidebar.classList.remove('hidden');
+                if (btn) btn.classList.add('bg-primary');
+            }
 
             window.showSummary = () => {
                 allowExit = true;

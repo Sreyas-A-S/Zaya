@@ -292,17 +292,37 @@ class ProfileController extends Controller
         $user = Auth::user();
         $booking = Booking::with(['practitioner.user', 'user', 'translator.user', 'consultationForms.doctor'])->findOrFail($id);
 
-        $consultationFormRole = in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'], true)
-            ? $user->role
-            : null;
-        $isOwner = $booking->user_id === $user->id || ($booking->profile_id === $user->profile_id && $booking->practitioner_type === $user->getMorphClass());
+        $isPractitioner = ($booking->practitioner && $booking->practitioner->user_id === $user->id);
+        $isTranslator = ($booking->translator && $booking->translator->user_id === $user->id);
+        $isClient = ($booking->user_id === $user->id);
+        
+        // Referral access
+        $isReferrer = Referral::where('booking_id', $booking->id)->where('referred_by_id', $user->id)->exists();
+        $isReferredTo = Referral::where('referral_no', $booking->invoice_no)->where('referred_to_id', $user->id)->exists();
 
-        if (!$consultationFormRole || !$isOwner) {
-            abort(403);
+        $canEdit = $isPractitioner || $isTranslator;
+        $canView = $canEdit || $isClient || $isReferrer || $isReferredTo;
+
+        if (!$canView) {
+            abort(403, 'You do not have permission to access this consultation form.');
+        }
+
+        $isMinimal = $request->query('minimal') === '1';
+
+        // Determine which schema to use for the form fields
+        // Default to the practitioner's role or the current user's professional role
+        $roleForSchema = null;
+        if ($isPractitioner) {
+            $roleForSchema = $user->role;
+        } elseif ($isReferredTo) {
+            $roleForSchema = $user->role;
+        } else {
+            // Fallback to the booking's actual practitioner role
+            $roleForSchema = $booking->practitioner->user->role ?? 'practitioner';
         }
 
         $consultationSchema = [];
-        $schemaPath = resource_path('schemas/consultation/' . $consultationFormRole . '.json');
+        $schemaPath = resource_path('schemas/consultation/' . $roleForSchema . '.json');
         if (file_exists($schemaPath)) {
             $decoded = json_decode((string) file_get_contents($schemaPath), true);
             if (is_array($decoded)) {
@@ -341,22 +361,23 @@ class ProfileController extends Controller
             'consultationPayload',
             'existingForm',
             'allForms',
-            'consultationFormRole'
+            'roleForSchema',
+            'canEdit',
+            'canView',
+            'isMinimal'
         ));
     }
 
     public function storeConsultationForm(Request $request, $id)
     {
         $user = Auth::user();
-        $booking = Booking::with(['practitioner.user', 'user'])->findOrFail($id);
+        $booking = Booking::with(['practitioner.user', 'user', 'translator.user'])->findOrFail($id);
 
-        $consultationFormRole = in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'], true)
-            ? $user->role
-            : null;
-        $isOwner = $booking->user_id === $user->id || ($booking->profile_id === $user->profile_id && $booking->practitioner_type === $user->getMorphClass());
-
-        if (!$consultationFormRole || !$isOwner) {
-            abort(403);
+        $isPractitioner = ($booking->practitioner && $booking->practitioner->user_id === $user->id);
+        $isTranslator = ($booking->translator && $booking->translator->user_id === $user->id);
+        
+        if (!$isPractitioner && !$isTranslator) {
+            abort(403, 'You do not have permission to update this consultation record.');
         }
 
         $formId = $request->input('form_id');

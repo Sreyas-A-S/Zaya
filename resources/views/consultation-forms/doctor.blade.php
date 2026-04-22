@@ -85,9 +85,9 @@
                         <tbody>
                             @foreach($presentingComplaints as $index => $row)
                             <tr>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="presenting_complaints[{{ $index }}][complaint]" value="{{ $row['complaint'] }}" placeholder="Complaint"></td>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="presenting_complaints[{{ $index }}][duration]" value="{{ $row['duration'] }}" placeholder="Duration"></td>
-                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="presenting_complaints[{{ $index }}][detailed_history]" placeholder="Onset, progression, previous treatments">{{ $row['detailed_history'] }}</textarea></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="presenting_complaints[{{ $index }}][complaint]" value="{{ $row['complaint'] }}" placeholder="Complaint" @readonly(!$canEdit)></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="presenting_complaints[{{ $index }}][duration]" value="{{ $row['duration'] }}" placeholder="Duration" @readonly(!$canEdit)></td>
+                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="presenting_complaints[{{ $index }}][detailed_history]" placeholder="Onset, progression, previous treatments" @readonly(!$canEdit)>{{ $row['detailed_history'] }}</textarea></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -108,19 +108,23 @@
                         <tbody data-repeat-body="past_medical_history">
                             @foreach($pastMedicalRows as $index => $row)
                             <tr data-repeat-row data-row-index="{{ $index }}">
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="past_medical_history[{{ $index }}][condition]" value="{{ $row['condition'] }}" placeholder="Condition"></td>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="past_medical_history[{{ $index }}][duration_or_date_of_diagnosis]" value="{{ $row['duration_or_date_of_diagnosis'] }}" placeholder="Duration or date"></td>
-                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="past_medical_history[{{ $index }}][notes]" placeholder="Notes">{{ $row['notes'] }}</textarea></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="past_medical_history[{{ $index }}][condition]" value="{{ $row['condition'] }}" placeholder="Condition" @readonly(!$canEdit)></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="past_medical_history[{{ $index }}][duration_or_date_of_diagnosis]" value="{{ $row['duration_or_date_of_diagnosis'] }}" placeholder="Duration or date" @readonly(!$canEdit)></td>
+                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="past_medical_history[{{ $index }}][notes]" placeholder="Notes" @readonly(!$canEdit)>{{ $row['notes'] }}</textarea></td>
                                 <td class="p-2">
+                                    @if($canEdit)
                                     <button type="button" class="text-xs font-semibold text-red-600" data-repeat-remove="past_medical_history">Remove</button>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
+                    @if($canEdit)
                     <button type="button" data-repeat-add="past_medical_history" class="text-sm font-semibold text-secondary hover:text-primary">
                         <i class="ri-add-line"></i> Add other condition
                     </button>
+                    @endif
                     <template data-repeat-template="past_medical_history">
                         <tr data-repeat-row data-row-index="__INDEX__">
                             <td class="p-2"><input class="w-full border rounded px-3 py-2" name="past_medical_history[__INDEX__][condition]" placeholder="Condition"></td>
@@ -146,16 +150,16 @@
                         <tbody>
                             @foreach($familyHistory as $index => $row)
                             <tr>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="family_history[{{ $index }}][disorder]" value="{{ $row['disorder'] }}" placeholder="Disorder"></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="family_history[{{ $index }}][disorder]" value="{{ $row['disorder'] }}" placeholder="Disorder" @readonly(!$canEdit)></td>
                                 <td class="p-2">
-                                    <select class="w-full border rounded px-3 py-2" name="family_history[{{ $index }}][affected_family_member]">
+                                    <select class="w-full border rounded px-3 py-2" name="family_history[{{ $index }}][affected_family_member]" @disabled(!$canEdit)>
                                         <option value="">Select</option>
                                         @foreach(['Mother','Father','Brother','Sister','Maternal Grandparents','Paternal Grandparents'] as $member)
                                             <option value="{{ $member }}" @selected($row['affected_family_member'] === $member)>{{ $member }}</option>
                                         @endforeach
                                     </select>
                                 </td>
-                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="family_history[{{ $index }}][notes]" placeholder="Notes">{{ $row['notes'] }}</textarea></td>
+                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="family_history[{{ $index }}][notes]" placeholder="Notes" @readonly(!$canEdit)>{{ $row['notes'] }}</textarea></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -248,15 +252,15 @@
                                 @endforeach
                             </div>
                         </div>
-                        <input class="border rounded px-3 py-2" type="time" name="personal_history[sleep][bedtime]" value="{{ $oldOrPayload('personal_history.sleep.bedtime') }}" placeholder="Bedtime">
-                        <input class="border rounded px-3 py-2" type="text" name="personal_history[sleep][time_to_fall_asleep]" value="{{ $oldOrPayload('personal_history.sleep.time_to_fall_asleep') }}" placeholder="Time to fall asleep">
-                        <input class="border rounded px-3 py-2" type="text" name="personal_history[sleep][night_awakenings]" value="{{ $oldOrPayload('personal_history.sleep.night_awakenings') }}" placeholder="Night awakenings">
-                        <input class="border rounded px-3 py-2" type="text" name="personal_history[sleep][time_to_get_back_to_sleep]" value="{{ $oldOrPayload('personal_history.sleep.time_to_get_back_to_sleep') }}" placeholder="Time to get back to sleep">
-                        <input class="border rounded px-3 py-2" type="time" name="personal_history[sleep][wake_up_time]" value="{{ $oldOrPayload('personal_history.sleep.wake_up_time') }}" placeholder="Wake up time">
-                        <input class="border rounded px-3 py-2" type="time" name="personal_history[sleep][getting_out_of_bed]" value="{{ $oldOrPayload('personal_history.sleep.getting_out_of_bed') }}" placeholder="Getting out of bed">
-                        <label><input type="checkbox" name="personal_history[sleep][dreams]" value="1" @checked((bool) $oldOrPayload('personal_history.sleep.dreams'))> Dreams</label>
-                        <label><input type="checkbox" name="personal_history[sleep][nightmares]" value="1" @checked((bool) $oldOrPayload('personal_history.sleep.nightmares'))> Nightmares</label>
-                        <textarea class="border rounded px-3 py-2 md:col-span-2" rows="2" name="personal_history[sleep][comments]" placeholder="Comments">{{ $oldOrPayload('personal_history.sleep.comments') }}</textarea>
+                        <input class="border rounded px-3 py-2" type="time" name="personal_history[sleep][bedtime]" value="{{ $oldOrPayload('personal_history.sleep.bedtime') }}" placeholder="Bedtime" @readonly(!$canEdit)>
+                        <input class="border rounded px-3 py-2" type="text" name="personal_history[sleep][time_to_fall_asleep]" value="{{ $oldOrPayload('personal_history.sleep.time_to_fall_asleep') }}" placeholder="Time to fall asleep" @readonly(!$canEdit)>
+                        <input class="border rounded px-3 py-2" type="text" name="personal_history[sleep][night_awakenings]" value="{{ $oldOrPayload('personal_history.sleep.night_awakenings') }}" placeholder="Night awakenings" @readonly(!$canEdit)>
+                        <input class="border rounded px-3 py-2" type="text" name="personal_history[sleep][time_to_get_back_to_sleep]" value="{{ $oldOrPayload('personal_history.sleep.time_to_get_back_to_sleep') }}" placeholder="Time to get back to sleep" @readonly(!$canEdit)>
+                        <input class="border rounded px-3 py-2" type="time" name="personal_history[sleep][wake_up_time]" value="{{ $oldOrPayload('personal_history.sleep.wake_up_time') }}" placeholder="Wake up time" @readonly(!$canEdit)>
+                        <input class="border rounded px-3 py-2" type="time" name="personal_history[sleep][getting_out_of_bed]" value="{{ $oldOrPayload('personal_history.sleep.getting_out_of_bed') }}" placeholder="Getting out of bed" @readonly(!$canEdit)>
+                        <label><input type="checkbox" name="personal_history[sleep][dreams]" value="1" @checked((bool) $oldOrPayload('personal_history.sleep.dreams')) @disabled(!$canEdit)> Dreams</label>
+                        <label><input type="checkbox" name="personal_history[sleep][nightmares]" value="1" @checked((bool) $oldOrPayload('personal_history.sleep.nightmares')) @disabled(!$canEdit)> Nightmares</label>
+                        <textarea class="border rounded px-3 py-2 md:col-span-2" rows="2" name="personal_history[sleep][comments]" placeholder="Comments" @readonly(!$canEdit)>{{ $oldOrPayload('personal_history.sleep.comments') }}</textarea>
                     </div>
                 </div>
 
@@ -264,21 +268,21 @@
                     <h3 class="font-medium mb-2">Appetite</h3>
                     <div class="flex flex-wrap gap-4 text-sm mb-3">
                         @foreach(['Good', 'Moderate', 'Poor'] as $option)
-                            <label><input type="radio" name="personal_history[appetite][level]" value="{{ $option }}" @checked($oldOrPayload('personal_history.appetite.level') === $option)> {{ $option }}</label>
+                            <label><input type="radio" name="personal_history[appetite][level]" value="{{ $option }}" @checked($oldOrPayload('personal_history.appetite.level') === $option) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
-                    <label><input type="checkbox" name="personal_history[appetite][strong_digestive_fire]" value="1" @checked((bool) $oldOrPayload('personal_history.appetite.strong_digestive_fire'))> Feels digestive fire is strong</label>
-                    <textarea class="border rounded px-3 py-2 w-full mt-3" rows="2" name="personal_history[appetite][comments]" placeholder="Comments">{{ $oldOrPayload('personal_history.appetite.comments') }}</textarea>
+                    <label><input type="checkbox" name="personal_history[appetite][strong_digestive_fire]" value="1" @checked((bool) $oldOrPayload('personal_history.appetite.strong_digestive_fire')) @disabled(!$canEdit)> Feels digestive fire is strong</label>
+                    <textarea class="border rounded px-3 py-2 w-full mt-3" rows="2" name="personal_history[appetite][comments]" placeholder="Comments" @readonly(!$canEdit)>{{ $oldOrPayload('personal_history.appetite.comments') }}</textarea>
                 </div>
 
                 <div>
                     <h3 class="font-medium mb-2">Gastric Distress</h3>
                     <div class="flex flex-wrap gap-4 text-sm mb-3">
                         @foreach(['Abdominal Pain', 'Bloating', 'Nausea', 'Acid Reflux', 'Burning Sensation'] as $option)
-                            <label><input type="checkbox" name="personal_history[gastric_distress][symptoms][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.gastric_distress.symptoms'), $option))> {{ $option }}</label>
+                            <label><input type="checkbox" name="personal_history[gastric_distress][symptoms][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.gastric_distress.symptoms'), $option)) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
-                    <textarea class="border rounded px-3 py-2 w-full" rows="2" name="personal_history[gastric_distress][comments]" placeholder="Comments">{{ $oldOrPayload('personal_history.gastric_distress.comments') }}</textarea>
+                    <textarea class="border rounded px-3 py-2 w-full" rows="2" name="personal_history[gastric_distress][comments]" placeholder="Comments" @readonly(!$canEdit)>{{ $oldOrPayload('personal_history.gastric_distress.comments') }}</textarea>
                 </div>
 
                 <div>
@@ -288,7 +292,7 @@
                             <label>Type</label>
                             <div class="flex gap-4">
                                 @foreach(['Vegetarian', 'Non-Vegetarian', 'Mixed'] as $option)
-                                    <label><input type="radio" name="personal_history[diet][type]" value="{{ $option }}" @checked($oldOrPayload('personal_history.diet.type') === $option)> {{ $option }}</label>
+                                    <label><input type="radio" name="personal_history[diet][type]" value="{{ $option }}" @checked($oldOrPayload('personal_history.diet.type') === $option) @disabled(!$canEdit)> {{ $option }}</label>
                                 @endforeach
                             </div>
                         </div>
@@ -296,7 +300,7 @@
                             <label>Quantity per meal</label>
                             <div class="flex gap-4">
                                 @foreach(['Small', 'Moderate', 'Large'] as $option)
-                                    <label><input type="radio" name="personal_history[diet][quantity_per_meal]" value="{{ $option }}" @checked($oldOrPayload('personal_history.diet.quantity_per_meal') === $option)> {{ $option }}</label>
+                                    <label><input type="radio" name="personal_history[diet][quantity_per_meal]" value="{{ $option }}" @checked($oldOrPayload('personal_history.diet.quantity_per_meal') === $option) @disabled(!$canEdit)> {{ $option }}</label>
                                 @endforeach
                             </div>
                         </div>
@@ -304,7 +308,7 @@
                             <label>Timing</label>
                             <div class="flex gap-4">
                                 @foreach(['Timely intake', 'Irregular'] as $option)
-                                    <label><input type="checkbox" name="personal_history[diet][timing][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.diet.timing'), $option))> {{ $option }}</label>
+                                    <label><input type="checkbox" name="personal_history[diet][timing][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.diet.timing'), $option)) @disabled(!$canEdit)> {{ $option }}</label>
                                 @endforeach
                             </div>
                         </div>
@@ -312,14 +316,14 @@
                             <label>Food type</label>
                             <div class="flex gap-4">
                                 @foreach(['Junk food', 'Homely food'] as $option)
-                                    <label><input type="checkbox" name="personal_history[diet][food_type][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.diet.food_type'), $option))> {{ $option }}</label>
+                                    <label><input type="checkbox" name="personal_history[diet][food_type][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.diet.food_type'), $option)) @disabled(!$canEdit)> {{ $option }}</label>
                                 @endforeach
                             </div>
                         </div>
-                        <input class="border rounded px-3 py-2" type="text" name="personal_history[diet][breakfast]" value="{{ $oldOrPayload('personal_history.diet.breakfast') }}" placeholder="Breakfast">
-                        <input class="border rounded px-3 py-2" type="text" name="personal_history[diet][lunch]" value="{{ $oldOrPayload('personal_history.diet.lunch') }}" placeholder="Lunch">
-                        <input class="border rounded px-3 py-2" type="text" name="personal_history[diet][dinner]" value="{{ $oldOrPayload('personal_history.diet.dinner') }}" placeholder="Dinner">
-                        <textarea class="border rounded px-3 py-2 md:col-span-2" rows="2" name="personal_history[diet][comments]" placeholder="Comments">{{ $oldOrPayload('personal_history.diet.comments') }}</textarea>
+                        <input class="border rounded px-3 py-2" type="text" name="personal_history[diet][breakfast]" value="{{ $oldOrPayload('personal_history.diet.breakfast') }}" placeholder="Breakfast" @readonly(!$canEdit)>
+                        <input class="border rounded px-3 py-2" type="text" name="personal_history[diet][lunch]" value="{{ $oldOrPayload('personal_history.diet.lunch') }}" placeholder="Lunch" @readonly(!$canEdit)>
+                        <input class="border rounded px-3 py-2" type="text" name="personal_history[diet][dinner]" value="{{ $oldOrPayload('personal_history.diet.dinner') }}" placeholder="Dinner" @readonly(!$canEdit)>
+                        <textarea class="border rounded px-3 py-2 md:col-span-2" rows="2" name="personal_history[diet][comments]" placeholder="Comments" @readonly(!$canEdit)>{{ $oldOrPayload('personal_history.diet.comments') }}</textarea>
                     </div>
                 </div>
 
@@ -327,61 +331,61 @@
                     <h3 class="font-medium mb-2">Allergies</h3>
                     <div class="flex flex-wrap gap-4 text-sm mb-3">
                         @foreach(['Food', 'Environmental'] as $option)
-                            <label><input type="checkbox" name="personal_history[allergies][types][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.allergies.types'), $option))> {{ $option }}</label>
+                            <label><input type="checkbox" name="personal_history[allergies][types][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.allergies.types'), $option)) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
-                    <input class="border rounded px-3 py-2 w-full" type="text" name="personal_history[allergies][other]" value="{{ $oldOrPayload('personal_history.allergies.other') }}" placeholder="Other">
+                    <input class="border rounded px-3 py-2 w-full" type="text" name="personal_history[allergies][other]" value="{{ $oldOrPayload('personal_history.allergies.other') }}" placeholder="Other" @readonly(!$canEdit)>
                 </div>
 
                 <div>
                     <h3 class="font-medium mb-2">Addictions / Habits</h3>
                     <div class="flex flex-wrap gap-4 text-sm mb-3">
                         @foreach(['Alcohol', 'Smoking', 'Coffee', 'Sugar'] as $option)
-                            <label><input type="checkbox" name="personal_history[addictions_habits][types][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.addictions_habits.types'), $option))> {{ $option }}</label>
+                            <label><input type="checkbox" name="personal_history[addictions_habits][types][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.addictions_habits.types'), $option)) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
-                    <input class="border rounded px-3 py-2 w-full" type="text" name="personal_history[addictions_habits][other]" value="{{ $oldOrPayload('personal_history.addictions_habits.other') }}" placeholder="Other">
+                    <input class="border rounded px-3 py-2 w-full" type="text" name="personal_history[addictions_habits][other]" value="{{ $oldOrPayload('personal_history.addictions_habits.other') }}" placeholder="Other" @readonly(!$canEdit)>
                 </div>
 
                 <div>
                     <h3 class="font-medium mb-2">Nature of Work</h3>
                     <div class="flex flex-wrap gap-4 text-sm mb-3">
                         @foreach(['Sedentary', 'Sitting', 'Standing', 'Travelling'] as $option)
-                            <label><input type="checkbox" name="personal_history[nature_of_work][types][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.nature_of_work.types'), $option))> {{ $option }}</label>
+                            <label><input type="checkbox" name="personal_history[nature_of_work][types][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.nature_of_work.types'), $option)) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
-                    <textarea class="border rounded px-3 py-2 w-full" rows="2" name="personal_history[nature_of_work][comments]" placeholder="Comments">{{ $oldOrPayload('personal_history.nature_of_work.comments') }}</textarea>
+                    <textarea class="border rounded px-3 py-2 w-full" rows="2" name="personal_history[nature_of_work][comments]" placeholder="Comments" @readonly(!$canEdit)>{{ $oldOrPayload('personal_history.nature_of_work.comments') }}</textarea>
                 </div>
 
                 <div>
                     <h3 class="font-medium mb-2">Exercise / Sports</h3>
                     <div class="flex flex-wrap gap-4 text-sm mb-3">
                         @foreach(['No Exercise', 'Mild', 'Occasional Vigorous', 'Regular Vigorous'] as $option)
-                            <label><input type="radio" name="personal_history[exercise_sports][level]" value="{{ $option }}" @checked($oldOrPayload('personal_history.exercise_sports.level') === $option)> {{ $option }}</label>
+                            <label><input type="radio" name="personal_history[exercise_sports][level]" value="{{ $option }}" @checked($oldOrPayload('personal_history.exercise_sports.level') === $option) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
-                    <textarea class="border rounded px-3 py-2 w-full" rows="2" name="personal_history[exercise_sports][comments]" placeholder="Comments">{{ $oldOrPayload('personal_history.exercise_sports.comments') }}</textarea>
+                    <textarea class="border rounded px-3 py-2 w-full" rows="2" name="personal_history[exercise_sports][comments]" placeholder="Comments" @readonly(!$canEdit)>{{ $oldOrPayload('personal_history.exercise_sports.comments') }}</textarea>
                 </div>
 
                 <div>
                     <h3 class="font-medium mb-2">Psychological / Emotional Status</h3>
                     <div class="flex flex-wrap gap-4 text-sm mb-3">
                         @foreach(['Anxious', 'Fearful', 'Depressed', 'Stressed', 'Arrogant', 'Confident in decisions', 'Confused'] as $option)
-                            <label><input type="checkbox" name="personal_history[psychological_status][states][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.psychological_status.states'), $option))> {{ $option }}</label>
+                            <label><input type="checkbox" name="personal_history[psychological_status][states][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('personal_history.psychological_status.states'), $option)) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
-                    <label><input type="checkbox" name="personal_history[psychological_status][history_of_trauma]" value="1" @checked((bool) $oldOrPayload('personal_history.psychological_status.history_of_trauma'))> History of trauma</label>
-                    <textarea class="border rounded px-3 py-2 w-full mt-3" rows="2" name="personal_history[psychological_status][comments]" placeholder="Comments">{{ $oldOrPayload('personal_history.psychological_status.comments') }}</textarea>
+                    <label><input type="checkbox" name="personal_history[psychological_status][history_of_trauma]" value="1" @checked((bool) $oldOrPayload('personal_history.psychological_status.history_of_trauma')) @disabled(!$canEdit)> History of trauma</label>
+                    <textarea class="border rounded px-3 py-2 w-full mt-3" rows="2" name="personal_history[psychological_status][comments]" placeholder="Comments" @readonly(!$canEdit)>{{ $oldOrPayload('personal_history.psychological_status.comments') }}</textarea>
                 </div>
 
                 <div>
                     <h3 class="font-medium mb-2">Physical Strength</h3>
                     <div class="flex gap-4 text-sm mb-3">
                         @foreach(['Good', 'Fatigue'] as $option)
-                            <label><input type="radio" name="personal_history[physical_strength][status]" value="{{ $option }}" @checked($oldOrPayload('personal_history.physical_strength.status') === $option)> {{ $option }}</label>
+                            <label><input type="radio" name="personal_history[physical_strength][status]" value="{{ $option }}" @checked($oldOrPayload('personal_history.physical_strength.status') === $option) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
-                    <textarea class="border rounded px-3 py-2 w-full" rows="2" name="personal_history[physical_strength][comments]" placeholder="Comments">{{ $oldOrPayload('personal_history.physical_strength.comments') }}</textarea>
+                    <textarea class="border rounded px-3 py-2 w-full" rows="2" name="personal_history[physical_strength][comments]" placeholder="Comments" @readonly(!$canEdit)>{{ $oldOrPayload('personal_history.physical_strength.comments') }}</textarea>
                 </div>
             </div>
         </section>
@@ -409,7 +413,7 @@
                 ] as $key => $label)
                     <div>
                         <label class="block text-sm font-medium mb-1">{{ $label }}</label>
-                        <input class="border rounded px-3 py-2 w-full" type="text" name="sensory_systemic_observations[{{ $key }}]" value="{{ $oldOrPayload('sensory_systemic_observations.' . $key) }}">
+                        <input class="border rounded px-3 py-2 w-full" type="text" name="sensory_systemic_observations[{{ $key }}]" value="{{ $oldOrPayload('sensory_systemic_observations.' . $key) }}" @readonly(!$canEdit)>
                     </div>
                 @endforeach
             </div>
@@ -418,25 +422,25 @@
             <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 overflow-x-auto">
             <h2 class="text-lg font-semibold text-secondary mb-3">Anthropometrics</h2>
             <div class="grid md:grid-cols-3 gap-3">
-                <input class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[height_cm]" value="{{ $oldOrPayload('anthropometrics.height_cm') }}" placeholder="Height (cm)">
-                <input class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[weight_kg]" value="{{ $oldOrPayload('anthropometrics.weight_kg') }}" placeholder="Weight (kg)">
-                <input class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[bmi]" value="{{ $oldOrPayload('anthropometrics.bmi') }}" placeholder="BMI" readonly>
+                <input class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[height_cm]" value="{{ $oldOrPayload('anthropometrics.height_cm') }}" placeholder="Height (cm)" @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[weight_kg]" value="{{ $oldOrPayload('anthropometrics.weight_kg') }}" placeholder="Weight (kg)" @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[bmi]" value="{{ $oldOrPayload('anthropometrics.bmi') }}" placeholder="BMI" readonly @readonly(!$canEdit)>
             </div>
-            <textarea class="border rounded px-3 py-2 w-full mt-3" rows="2" name="anthropometrics[comments]" placeholder="Comments">{{ $oldOrPayload('anthropometrics.comments') }}</textarea>
+            <textarea class="border rounded px-3 py-2 w-full mt-3" rows="2" name="anthropometrics[comments]" placeholder="Comments" @readonly(!$canEdit)>{{ $oldOrPayload('anthropometrics.comments') }}</textarea>
         </section>
 
             <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 overflow-x-auto">
             <h2 class="text-lg font-semibold text-secondary mb-3">Menstrual / Reproductive History</h2>
             <div class="grid md:grid-cols-2 gap-3">
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[age_of_menarche]" value="{{ $oldOrPayload('menstrual_reproductive_history.age_of_menarche') }}" placeholder="Age of menarche">
-                <input class="border rounded px-3 py-2" type="date" name="menstrual_reproductive_history[lmp]" value="{{ $oldOrPayload('menstrual_reproductive_history.lmp') }}" placeholder="LMP">
-                <input class="border rounded px-3 py-2" type="text" name="menstrual_reproductive_history[interval]" value="{{ $oldOrPayload('menstrual_reproductive_history.interval') }}" placeholder="Interval">
-                <input class="border rounded px-3 py-2" type="text" name="menstrual_reproductive_history[duration]" value="{{ $oldOrPayload('menstrual_reproductive_history.duration') }}" placeholder="Duration">
+                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[age_of_menarche]" value="{{ $oldOrPayload('menstrual_reproductive_history.age_of_menarche') }}" placeholder="Age of menarche" @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="date" name="menstrual_reproductive_history[lmp]" value="{{ $oldOrPayload('menstrual_reproductive_history.lmp') }}" placeholder="LMP" @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="text" name="menstrual_reproductive_history[interval]" value="{{ $oldOrPayload('menstrual_reproductive_history.interval') }}" placeholder="Interval" @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="text" name="menstrual_reproductive_history[duration]" value="{{ $oldOrPayload('menstrual_reproductive_history.duration') }}" placeholder="Duration" @readonly(!$canEdit)>
                 <div>
                     <label class="block text-sm font-medium mb-1">Cycles</label>
                     <div class="flex gap-4">
                         @foreach(['Regular', 'Irregular'] as $option)
-                            <label><input type="radio" name="menstrual_reproductive_history[cycles]" value="{{ $option }}" @checked($oldOrPayload('menstrual_reproductive_history.cycles') === $option)> {{ $option }}</label>
+                            <label><input type="radio" name="menstrual_reproductive_history[cycles]" value="{{ $option }}" @checked($oldOrPayload('menstrual_reproductive_history.cycles') === $option) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
                 </div>
@@ -444,7 +448,7 @@
                     <label class="block text-sm font-medium mb-1">Bleeding</label>
                     <div class="flex flex-wrap gap-4">
                         @foreach(['Spotting', 'Scanty', 'Moderate', 'Excessive'] as $option)
-                            <label><input type="radio" name="menstrual_reproductive_history[bleeding]" value="{{ $option }}" @checked($oldOrPayload('menstrual_reproductive_history.bleeding') === $option)> {{ $option }}</label>
+                            <label><input type="radio" name="menstrual_reproductive_history[bleeding]" value="{{ $option }}" @checked($oldOrPayload('menstrual_reproductive_history.bleeding') === $option) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
                 </div>
@@ -452,7 +456,7 @@
                     <label class="block text-sm font-medium mb-1">Associated Complaints</label>
                     <div class="flex flex-wrap gap-4">
                         @foreach(['Pain', 'Nausea', 'Vomiting', 'Constipation', 'Diarrhoea'] as $option)
-                            <label><input type="checkbox" name="menstrual_reproductive_history[associated_complaints][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('menstrual_reproductive_history.associated_complaints'), $option))> {{ $option }}</label>
+                            <label><input type="checkbox" name="menstrual_reproductive_history[associated_complaints][]" value="{{ $option }}" @checked($isChecked($oldOrPayload('menstrual_reproductive_history.associated_complaints'), $option)) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
                 </div>
@@ -460,7 +464,7 @@
                     <label class="block text-sm font-medium mb-1">Menopause</label>
                     <div class="flex gap-4">
                         @foreach(['Attained', 'Not Attained'] as $option)
-                            <label><input type="radio" name="menstrual_reproductive_history[menopause][attained]" value="{{ $option }}" @checked($oldOrPayload('menstrual_reproductive_history.menopause.attained') === $option)> {{ $option }}</label>
+                            <label><input type="radio" name="menstrual_reproductive_history[menopause][attained]" value="{{ $option }}" @checked($oldOrPayload('menstrual_reproductive_history.menopause.attained') === $option) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
                 </div>
@@ -468,33 +472,33 @@
                     <label class="block text-sm font-medium mb-1">Type</label>
                     <div class="flex gap-4">
                         @foreach(['Natural', 'Surgical'] as $option)
-                            <label><input type="radio" name="menstrual_reproductive_history[menopause][type]" value="{{ $option }}" @checked($oldOrPayload('menstrual_reproductive_history.menopause.type') === $option)> {{ $option }}</label>
+                            <label><input type="radio" name="menstrual_reproductive_history[menopause][type]" value="{{ $option }}" @checked($oldOrPayload('menstrual_reproductive_history.menopause.type') === $option) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
                 </div>
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][number_of_pregnancies]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.number_of_pregnancies') }}" placeholder="Number of pregnancies">
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][number_of_labours]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.number_of_labours') }}" placeholder="Number of labours">
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][stillbirths]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.stillbirths') }}" placeholder="Stillbirths">
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][abortions]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.abortions') }}" placeholder="Abortions">
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][year_of_last_childbirth]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.year_of_last_childbirth') }}" placeholder="Year of last childbirth">
+                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][number_of_pregnancies]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.number_of_pregnancies') }}" placeholder="Number of pregnancies" @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][number_of_labours]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.number_of_labours') }}" placeholder="Number of labours" @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][stillbirths]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.stillbirths') }}" placeholder="Stillbirths" @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][abortions]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.abortions') }}" placeholder="Abortions" @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][year_of_last_childbirth]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.year_of_last_childbirth') }}" placeholder="Year of last childbirth" @readonly(!$canEdit)>
                 <div>
                     <label class="block text-sm font-medium mb-1">Nature of labour</label>
                     <div class="flex flex-wrap gap-4">
                         @foreach(['Normal', 'Caesarean', 'Forceps', 'Other'] as $option)
-                            <label><input type="radio" name="menstrual_reproductive_history[obstetric_history][nature_of_labour]" value="{{ $option }}" @checked($oldOrPayload('menstrual_reproductive_history.obstetric_history.nature_of_labour') === $option)> {{ $option }}</label>
+                            <label><input type="radio" name="menstrual_reproductive_history[obstetric_history][nature_of_labour]" value="{{ $option }}" @checked($oldOrPayload('menstrual_reproductive_history.obstetric_history.nature_of_labour') === $option) @disabled(!$canEdit)> {{ $option }}</label>
                         @endforeach
                     </div>
                 </div>
-                <textarea class="border rounded px-3 py-2 md:col-span-2" rows="2" name="menstrual_reproductive_history[history_of_infections]" placeholder="History of infections">{{ $oldOrPayload('menstrual_reproductive_history.history_of_infections') }}</textarea>
-                <textarea class="border rounded px-3 py-2 md:col-span-2" rows="2" name="menstrual_reproductive_history[contraception_history]" placeholder="Contraception history">{{ $oldOrPayload('menstrual_reproductive_history.contraception_history') }}</textarea>
+                <textarea class="border rounded px-3 py-2 md:col-span-2" rows="2" name="menstrual_reproductive_history[history_of_infections]" placeholder="History of infections" @readonly(!$canEdit)>{{ $oldOrPayload('menstrual_reproductive_history.history_of_infections') }}</textarea>
+                <textarea class="border rounded px-3 py-2 md:col-span-2" rows="2" name="menstrual_reproductive_history[contraception_history]" placeholder="Contraception history" @readonly(!$canEdit)>{{ $oldOrPayload('menstrual_reproductive_history.contraception_history') }}</textarea>
             </div>
         </section>
 
             <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 overflow-x-auto">
             <h2 class="text-lg font-semibold text-secondary mb-3">Musculoskeletal and Edema</h2>
             <div class="grid md:grid-cols-2 gap-3">
-                <textarea class="border rounded px-3 py-2" rows="3" name="musculoskeletal_edema[musculoskeletal_pain]" placeholder="Musculoskeletal pain">{{ $oldOrPayload('musculoskeletal_edema.musculoskeletal_pain') }}</textarea>
-                <textarea class="border rounded px-3 py-2" rows="3" name="musculoskeletal_edema[edema]" placeholder="Edema">{{ $oldOrPayload('musculoskeletal_edema.edema') }}</textarea>
+                <textarea class="border rounded px-3 py-2" rows="3" name="musculoskeletal_edema[musculoskeletal_pain]" placeholder="Musculoskeletal pain" @readonly(!$canEdit)>{{ $oldOrPayload('musculoskeletal_edema.musculoskeletal_pain') }}</textarea>
+                <textarea class="border rounded px-3 py-2" rows="3" name="musculoskeletal_edema[edema]" placeholder="Edema" @readonly(!$canEdit)>{{ $oldOrPayload('musculoskeletal_edema.edema') }}</textarea>
             </div>
         </section>
                 </div>
@@ -637,9 +641,9 @@
                         <tbody>
                             @foreach($constitutionList as $index => $row)
                             <tr>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="ayurvedic_summary[constitution_analysis][{{ $index }}][parameter]" value="{{ $row['parameter'] }}" placeholder="Parameter"></td>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="ayurvedic_summary[constitution_analysis][{{ $index }}][observation]" value="{{ $row['observation'] }}" placeholder="Observation"></td>
-                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="ayurvedic_summary[constitution_analysis][{{ $index }}][notes]" placeholder="Notes">{{ $row['notes'] }}</textarea></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="ayurvedic_summary[constitution_analysis][{{ $index }}][parameter]" value="{{ $row['parameter'] }}" placeholder="Parameter" @readonly(!$canEdit)></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="ayurvedic_summary[constitution_analysis][{{ $index }}][observation]" value="{{ $row['observation'] }}" placeholder="Observation" @readonly(!$canEdit)></td>
+                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="ayurvedic_summary[constitution_analysis][{{ $index }}][notes]" placeholder="Notes" @readonly(!$canEdit)>{{ $row['notes'] }}</textarea></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -659,9 +663,9 @@
                         <tbody>
                             @foreach($majorFindings as $index => $row)
                             <tr>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="ayurvedic_summary[major_findings_from_investigation][{{ $index }}][investigation]" value="{{ $row['investigation'] }}" placeholder="Investigation"></td>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="ayurvedic_summary[major_findings_from_investigation][{{ $index }}][range]" value="{{ $row['range'] }}" placeholder="Range"></td>
-                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="ayurvedic_summary[major_findings_from_investigation][{{ $index }}][notes]" placeholder="Notes">{{ $row['notes'] }}</textarea></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="ayurvedic_summary[major_findings_from_investigation][{{ $index }}][investigation]" value="{{ $row['investigation'] }}" placeholder="Investigation" @readonly(!$canEdit)></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="ayurvedic_summary[major_findings_from_investigation][{{ $index }}][range]" value="{{ $row['range'] }}" placeholder="Range" @readonly(!$canEdit)></td>
+                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="ayurvedic_summary[major_findings_from_investigation][{{ $index }}][notes]" placeholder="Notes" @readonly(!$canEdit)>{{ $row['notes'] }}</textarea></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -670,24 +674,24 @@
 
                 <div>
                     <label class="block text-sm font-medium mb-1">Explanation of Imbalances</label>
-                    <textarea class="border rounded px-3 py-2 w-full" rows="3" name="ayurvedic_summary[explanation_of_imbalances]" placeholder="Explanation of imbalances">{{ $oldOrPayload('ayurvedic_summary.explanation_of_imbalances') }}</textarea>
+                    <textarea class="border rounded px-3 py-2 w-full" rows="3" name="ayurvedic_summary[explanation_of_imbalances]" placeholder="Explanation of imbalances" @readonly(!$canEdit)>{{ $oldOrPayload('ayurvedic_summary.explanation_of_imbalances') }}</textarea>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium mb-1">Samprapti / Pathogenesis</label>
-                    <textarea class="border rounded px-3 py-2 w-full" rows="4" name="ayurvedic_summary[samprapti_pathogenesis]" placeholder="Samprapti / Pathogenesis">{{ $oldOrPayload('ayurvedic_summary.samprapti_pathogenesis') }}</textarea>
+                    <textarea class="border rounded px-3 py-2 w-full" rows="4" name="ayurvedic_summary[samprapti_pathogenesis]" placeholder="Samprapti / Pathogenesis" @readonly(!$canEdit)>{{ $oldOrPayload('ayurvedic_summary.samprapti_pathogenesis') }}</textarea>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-3">
-                    <input class="border rounded px-3 py-2" type="text" name="ayurvedic_summary[diagnosis_prognosis][diagnosis]" value="{{ $oldOrPayload('ayurvedic_summary.diagnosis_prognosis.diagnosis') }}" placeholder="Diagnosis">
-                    <input class="border rounded px-3 py-2" type="text" name="ayurvedic_summary[diagnosis_prognosis][rogi_bala]" value="{{ $oldOrPayload('ayurvedic_summary.diagnosis_prognosis.rogi_bala') }}" placeholder="Rogi Bala">
-                    <input class="border rounded px-3 py-2" type="text" name="ayurvedic_summary[diagnosis_prognosis][roga_bala]" value="{{ $oldOrPayload('ayurvedic_summary.diagnosis_prognosis.roga_bala') }}" placeholder="Roga Bala">
-                    <input class="border rounded px-3 py-2" type="text" name="ayurvedic_summary[diagnosis_prognosis][prognosis]" value="{{ $oldOrPayload('ayurvedic_summary.diagnosis_prognosis.prognosis') }}" placeholder="Prognosis">
+                    <input class="border rounded px-3 py-2" type="text" name="ayurvedic_summary[diagnosis_prognosis][diagnosis]" value="{{ $oldOrPayload('ayurvedic_summary.diagnosis_prognosis.diagnosis') }}" placeholder="Diagnosis" @readonly(!$canEdit)>
+                    <input class="border rounded px-3 py-2" type="text" name="ayurvedic_summary[diagnosis_prognosis][rogi_bala]" value="{{ $oldOrPayload('ayurvedic_summary.diagnosis_prognosis.rogi_bala') }}" placeholder="Rogi Bala" @readonly(!$canEdit)>
+                    <input class="border rounded px-3 py-2" type="text" name="ayurvedic_summary[diagnosis_prognosis][roga_bala]" value="{{ $oldOrPayload('ayurvedic_summary.diagnosis_prognosis.roga_bala') }}" placeholder="Roga Bala" @readonly(!$canEdit)>
+                    <input class="border rounded px-3 py-2" type="text" name="ayurvedic_summary[diagnosis_prognosis][prognosis]" value="{{ $oldOrPayload('ayurvedic_summary.diagnosis_prognosis.prognosis') }}" placeholder="Prognosis" @readonly(!$canEdit)>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium mb-1">Objectives to Achieve</label>
-                    <textarea class="border rounded px-3 py-2 w-full" rows="3" name="ayurvedic_summary[objectives_to_achieve]" placeholder="Objectives to achieve">{{ $oldOrPayload('ayurvedic_summary.objectives_to_achieve') }}</textarea>
+                    <textarea class="border rounded px-3 py-2 w-full" rows="3" name="ayurvedic_summary[objectives_to_achieve]" placeholder="Objectives to achieve" @readonly(!$canEdit)>{{ $oldOrPayload('ayurvedic_summary.objectives_to_achieve') }}</textarea>
                 </div>
             </div>
         </section>
@@ -720,12 +724,12 @@
                         <tbody>
                             @foreach($internalMedicines as $index => $row)
                             <tr>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="treatment_plan[internal_medicines][{{ $index }}][medicine_name]" value="{{ $row['medicine_name'] }}" placeholder="Medicine name"></td>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="treatment_plan[internal_medicines][{{ $index }}][form]" value="{{ $row['form'] }}" placeholder="Form"></td>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="treatment_plan[internal_medicines][{{ $index }}][dose]" value="{{ $row['dose'] }}" placeholder="Dose"></td>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="treatment_plan[internal_medicines][{{ $index }}][timing]" value="{{ $row['timing'] }}" placeholder="Timing"></td>
-                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="treatment_plan[internal_medicines][{{ $index }}][duration]" value="{{ $row['duration'] }}" placeholder="Duration"></td>
-                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="treatment_plan[internal_medicines][{{ $index }}][indications]" placeholder="Indications">{{ $row['indications'] }}</textarea></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="treatment_plan[internal_medicines][{{ $index }}][medicine_name]" value="{{ $row['medicine_name'] }}" placeholder="Medicine name" @readonly(!$canEdit)></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="treatment_plan[internal_medicines][{{ $index }}][form]" value="{{ $row['form'] }}" placeholder="Form" @readonly(!$canEdit)></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="treatment_plan[internal_medicines][{{ $index }}][dose]" value="{{ $row['dose'] }}" placeholder="Dose" @readonly(!$canEdit)></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="treatment_plan[internal_medicines][{{ $index }}][timing]" value="{{ $row['timing'] }}" placeholder="Timing" @readonly(!$canEdit)></td>
+                                <td class="p-2"><input class="w-full border rounded px-3 py-2" name="treatment_plan[internal_medicines][{{ $index }}][duration]" value="{{ $row['duration'] }}" placeholder="Duration" @readonly(!$canEdit)></td>
+                                <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="treatment_plan[internal_medicines][{{ $index }}][indications]" placeholder="Indications" @readonly(!$canEdit)>{{ $row['indications'] }}</textarea></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -735,15 +739,15 @@
                 <div class="grid md:grid-cols-3 gap-3">
                     <div>
                         <h3 class="font-medium mb-2">External Therapies</h3>
-                        <textarea class="border rounded px-3 py-2 w-full" rows="4" name="treatment_plan[external_therapies_notes]" placeholder="Therapy name, type, medium used, duration, frequency, indications">{{ $oldOrPayload('treatment_plan.external_therapies_notes') }}</textarea>
+                        <textarea class="border rounded px-3 py-2 w-full" rows="4" name="treatment_plan[external_therapies_notes]" placeholder="Therapy name, type, medium used, duration, frequency, indications" @readonly(!$canEdit)>{{ $oldOrPayload('treatment_plan.external_therapies_notes') }}</textarea>
                     </div>
                     <div>
                         <h3 class="font-medium mb-2">Self-Care Therapies</h3>
-                        <textarea class="border rounded px-3 py-2 w-full" rows="4" name="treatment_plan[self_care_therapies_notes]" placeholder="Therapy name, type, medium used, duration, frequency, indications">{{ $oldOrPayload('treatment_plan.self_care_therapies_notes') }}</textarea>
+                        <textarea class="border rounded px-3 py-2 w-full" rows="4" name="treatment_plan[self_care_therapies_notes]" placeholder="Therapy name, type, medium used, duration, frequency, indications" @readonly(!$canEdit)>{{ $oldOrPayload('treatment_plan.self_care_therapies_notes') }}</textarea>
                     </div>
                     <div>
                         <h3 class="font-medium mb-2">Prescribed Practices</h3>
-                        <textarea class="border rounded px-3 py-2 w-full" rows="4" name="treatment_plan[prescribed_practices_notes]" placeholder="Practice, type, duration, frequency, timing, indications">{{ $oldOrPayload('treatment_plan.prescribed_practices_notes') }}</textarea>
+                        <textarea class="border rounded px-3 py-2 w-full" rows="4" name="treatment_plan[prescribed_practices_notes]" placeholder="Practice, type, duration, frequency, timing, indications" @readonly(!$canEdit)>{{ $oldOrPayload('treatment_plan.prescribed_practices_notes') }}</textarea>
                     </div>
                 </div>
             </div>
@@ -752,29 +756,29 @@
             <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3">
             <h2 class="text-lg font-semibold text-secondary mb-3">Lifestyle and Dietary Advice</h2>
             <div class="grid md:grid-cols-3 gap-3">
-                <textarea class="border rounded px-3 py-2" rows="3" name="lifestyle_dietary_advice[pathya]" placeholder="Pathya">{{ $oldOrPayload('lifestyle_dietary_advice.pathya') }}</textarea>
-                <textarea class="border rounded px-3 py-2" rows="3" name="lifestyle_dietary_advice[apathya]" placeholder="Apathya">{{ $oldOrPayload('lifestyle_dietary_advice.apathya') }}</textarea>
-                <textarea class="border rounded px-3 py-2" rows="3" name="lifestyle_dietary_advice[daily_routine_suggestions]" placeholder="Daily routine suggestions">{{ $oldOrPayload('lifestyle_dietary_advice.daily_routine_suggestions') }}</textarea>
+                <textarea class="border rounded px-3 py-2" rows="3" name="lifestyle_dietary_advice[pathya]" placeholder="Pathya" @readonly(!$canEdit)>{{ $oldOrPayload('lifestyle_dietary_advice.pathya') }}</textarea>
+                <textarea class="border rounded px-3 py-2" rows="3" name="lifestyle_dietary_advice[apathya]" placeholder="Apathya" @readonly(!$canEdit)>{{ $oldOrPayload('lifestyle_dietary_advice.apathya') }}</textarea>
+                <textarea class="border rounded px-3 py-2" rows="3" name="lifestyle_dietary_advice[daily_routine_suggestions]" placeholder="Daily routine suggestions" @readonly(!$canEdit)>{{ $oldOrPayload('lifestyle_dietary_advice.daily_routine_suggestions') }}</textarea>
             </div>
         </section>
 
             <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3">
             <h2 class="text-lg font-semibold text-secondary mb-3">Follow-Up Plan</h2>
             <div class="grid md:grid-cols-3 gap-3">
-                <input class="border rounded px-3 py-2" type="text" name="follow_up_plan[next_review_dates]" value="{{ $oldOrPayload('follow_up_plan.next_review_dates') }}" placeholder="Next review date(s)">
-                <textarea class="border rounded px-3 py-2" rows="3" name="follow_up_plan[therapy_adjustments]" placeholder="Therapy adjustments">{{ $oldOrPayload('follow_up_plan.therapy_adjustments') }}</textarea>
-                <textarea class="border rounded px-3 py-2" rows="3" name="follow_up_plan[expected_outcomes]" placeholder="Expected outcomes">{{ $oldOrPayload('follow_up_plan.expected_outcomes') }}</textarea>
+                <input class="border rounded px-3 py-2" type="text" name="follow_up_plan[next_review_dates]" value="{{ $oldOrPayload('follow_up_plan.next_review_dates') }}" placeholder="Next review date(s)" @readonly(!$canEdit)>
+                <textarea class="border rounded px-3 py-2" rows="3" name="follow_up_plan[therapy_adjustments]" placeholder="Therapy adjustments" @readonly(!$canEdit)>{{ $oldOrPayload('follow_up_plan.therapy_adjustments') }}</textarea>
+                <textarea class="border rounded px-3 py-2" rows="3" name="follow_up_plan[expected_outcomes]" placeholder="Expected outcomes" @readonly(!$canEdit)>{{ $oldOrPayload('follow_up_plan.expected_outcomes') }}</textarea>
             </div>
         </section>
 
             <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3">
             <h2 class="text-lg font-semibold text-secondary mb-3">Treating Consultant</h2>
             <div class="grid md:grid-cols-2 gap-3">
-                <input class="border rounded px-3 py-2" type="text" name="treating_consultant[name]" value="{{ $oldOrPayload('treating_consultant.name', $user->name ?? '') }}" placeholder="Name">
-                <input class="border rounded px-3 py-2" type="text" name="treating_consultant[tcmc_reg_no]" value="{{ $oldOrPayload('treating_consultant.tcmc_reg_no') }}" placeholder="TCMC Reg No.">
-                <input class="border rounded px-3 py-2" type="text" name="treating_consultant[zaya_unique_id_no]" value="{{ $oldOrPayload('treating_consultant.zaya_unique_id_no') }}" placeholder="Zaya Unique ID No.">
-                <input class="border rounded px-3 py-2" type="text" name="treating_consultant[speciality]" value="{{ $oldOrPayload('treating_consultant.speciality') }}" placeholder="Speciality">
-                <textarea class="border rounded px-3 py-2 md:col-span-2" rows="3" name="treating_consultant[signature]" placeholder="Signature">{{ $oldOrPayload('treating_consultant.signature') }}</textarea>
+                <input class="border rounded px-3 py-2" type="text" name="treating_consultant[name]" value="{{ $oldOrPayload('treating_consultant.name', $user->name ?? '') }}" placeholder="Name" @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="text" name="treating_consultant[tcmc_reg_no]" value="{{ $oldOrPayload('treating_consultant.tcmc_reg_no') }}" placeholder="TCMC Reg No." @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="text" name="treating_consultant[zaya_unique_id_no]" value="{{ $oldOrPayload('treating_consultant.zaya_unique_id_no') }}" placeholder="Zaya Unique ID No." @readonly(!$canEdit)>
+                <input class="border rounded px-3 py-2" type="text" name="treating_consultant[speciality]" value="{{ $oldOrPayload('treating_consultant.speciality') }}" placeholder="Speciality" @readonly(!$canEdit)>
+                <textarea class="border rounded px-3 py-2 md:col-span-2" rows="3" name="treating_consultant[signature]" placeholder="Signature" @readonly(!$canEdit)>{{ $oldOrPayload('treating_consultant.signature') }}</textarea>
             </div>
         </section>
                 </div>
@@ -791,9 +795,11 @@
                 </div>
 
                 <div class="flex gap-3">
+                    @if($canEdit)
                     <button type="submit" class="px-8 py-3 rounded-full bg-secondary text-white text-sm font-bold hover:shadow-lg transition-all">
                         <i class="ri-save-line mr-2"></i> Save Form
                     </button>
+                    @endif
                     <a href="{{ route('bookings.index') }}" class="px-6 py-3 rounded-full border border-gray-200 text-sm font-bold text-gray-400 hover:text-gray-600 transition-all">
                         Back
                     </a>
