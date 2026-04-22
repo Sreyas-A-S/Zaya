@@ -55,7 +55,7 @@
                 @if($booking->mode === 'online')
                 <div class="detail-row">
                     <span class="label">Meeting Link:</span>
-                    <span class="value"><a href="{{ route('conference.join', ['channel' => $booking->invoice_no]) }}" style="color: #2E4B3C;">Click here to join</a></span>
+                    <span class="value"><a href="{{ route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']) }}" style="color: #2E4B3C;">Click here to join</a></span>
                 </div>
                 @endif
                 
