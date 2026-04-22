@@ -174,6 +174,41 @@
             pointer-events: none;
             opacity: 0.8;
         }
+
+        /* Date Input Custom Styles */
+        .date-input-wrapper {
+            position: relative;
+        }
+
+        .date-input-wrapper input[type="date"] {
+            -webkit-appearance: none;
+            appearance: none;
+            padding-right: 50px;
+        }
+
+        .date-input-wrapper .calendar-icon {
+            position: absolute;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9CA3AF;
+            pointer-events: none;
+            font-size: 1.2rem;
+        }
+
+        /* Hide native calendar picker indicator in Chrome/Edge while keeping it for Safari if needed, 
+           but since we use appearance:none, Safari hides it anyway. */
+        .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
+            opacity: 0;
+        }
     </style>
 </head>
 
@@ -297,8 +332,11 @@
                             </div>
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('DOB') }} @if(($joinRole ?? '') === 'doctor')<span class="text-red-500">*</span>@endif</label>
-                                <input type="date" name="dob" value="{{ old('dob') }}" max="{{ now()->format('Y-m-d') }}" {{ ($joinRole ?? '') === 'doctor' ? 'required' : '' }}
-                                    class="reg-input">
+                                <div class="date-input-wrapper">
+                                    <input type="date" name="dob" value="{{ old('dob') }}" max="{{ now()->format('Y-m-d') }}" {{ ($joinRole ?? '') === 'doctor' ? 'required' : '' }}
+                                        class="reg-input">
+                                    <i class="ri-calendar-line calendar-icon"></i>
+                                </div>
                             </div>
                             @if(($joinRole ?? '') === 'doctor')
                                 <div>
