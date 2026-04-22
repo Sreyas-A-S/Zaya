@@ -247,7 +247,9 @@
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Languages Spoken') }}</label>
                         <select id="languages-spoken-select" name="languages_spoken[]" multiple>
                             @foreach($allLanguages as $lang)
-                                <option value="{{ $lang }}" {{ in_array($lang, (array)($profile->languages_spoken ?? [])) ? 'selected' : '' }}>{{ $lang }}</option>
+                                <option value="{{ $lang->code }}" {{ in_array($lang->code, (array)($profile->languages_spoken ?? [])) || in_array($lang->name, (array)($profile->languages_spoken ?? [])) ? 'selected' : '' }}>
+                                    {{ $lang->flag }} {{ $lang->display_name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -274,7 +276,7 @@
                         {{ __('Previous') }}
                     </button>
                     <button type="submit" class="px-12 py-4 bg-secondary text-white font-black rounded-2xl shadow-xl shadow-secondary/20 hover:bg-opacity-90 transform hover:-translate-y-1 transition-all text-lg">
-                        {{ __('Save Profile') }}
+                        {{ __('Save') }}
                     </button>
                 </div>
             </div>
@@ -385,7 +387,9 @@
                             <select name="native_language" id="native-language-select" class="w-full">
                                 <option value="">{{ __('Select Language') }}</option>
                                 @foreach($allLanguages as $lang)
-                                    <option value="{{ $lang }}" {{ ($profile->native_language ?? '') == $lang ? 'selected' : '' }}>{{ $lang }}</option>
+                                    <option value="{{ $lang->code }}" {{ ($profile->native_language ?? '') == $lang->code || ($profile->native_language ?? '') == $lang->name ? 'selected' : '' }}>
+                                        {{ $lang->flag }} {{ $lang->display_name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -411,7 +415,9 @@
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Source Languages') }}</label>
                             <select id="source-languages-select" name="source_languages[]" multiple>
                                 @foreach($allLanguages as $lang)
-                                    <option value="{{ $lang }}" {{ in_array($lang, (array)($profile->source_languages ?? [])) ? 'selected' : '' }}>{{ $lang }}</option>
+                                    <option value="{{ $lang->code }}" {{ in_array($lang->code, (array)($profile->source_languages ?? [])) || in_array($lang->name, (array)($profile->source_languages ?? [])) ? 'selected' : '' }}>
+                                        {{ $lang->flag }} {{ $lang->display_name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -419,7 +425,9 @@
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Target Languages') }}</label>
                             <select id="target-languages-select" name="target_languages[]" multiple>
                                 @foreach($allLanguages as $lang)
-                                    <option value="{{ $lang }}" {{ in_array($lang, (array)($profile->target_languages ?? [])) ? 'selected' : '' }}>{{ $lang }}</option>
+                                    <option value="{{ $lang->code }}" {{ in_array($lang->code, (array)($profile->target_languages ?? [])) || in_array($lang->name, (array)($profile->target_languages ?? [])) ? 'selected' : '' }}>
+                                        {{ $lang->flag }} {{ $lang->display_name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
