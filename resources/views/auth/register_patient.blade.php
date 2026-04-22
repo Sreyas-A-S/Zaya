@@ -40,6 +40,9 @@
                                     <form method="POST" action="{{ route('register') }}" id="patientRegForm" class="theme-form">
                                         @csrf
                                         <input type="hidden" name="role" value="patient">
+                                        <input type="hidden" name="registration_fee" id="registration_fee_input" value="{{ $registrationFee }}">
+                                        <input type="hidden" name="registration_fee_actual" id="registration_fee_actual_input" value="{{ $registrationFee }}">
+                                        <input type="hidden" name="registration_currency" id="registration_currency_input" value="{{ $registrationCurrency }}">
 
                                         <!-- Step 1: Personal Info -->
                                         <div class="step-content" id="step1">
@@ -73,6 +76,15 @@
                                                 <div class="col-12">
                                                     <label class="form-label">Location / Address</label>
                                                     <textarea class="form-control" name="address" rows="2" placeholder="Full Address"></textarea>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label">Country <span class="text-danger">*</span></label>
+                                                    <select class="form-select" name="country" required id="country-select">
+                                                        <option value="">Select Country</option>
+                                                        @foreach($countries as $country)
+                                                            <option value="{{ $country->code }}">{{ $country->name }}</option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <label class="form-label">Country Code</label>
@@ -159,6 +171,22 @@
                                             <div class="mb-4 d-none" id="referrer_name_div">
                                                 <label class="form-label">Name of Referring Practitioner or Client</label>
                                                 <input type="text" class="form-control" name="referrer_name">
+                                            </div>
+
+                                            <div id="registration-fee-field-wrapper" class="card bg-info-light border-0 mb-4 {{ ($registrationFee <= 0) ? 'd-none' : '' }}">
+                                                <div class="card-body p-3">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <h6 class="mb-0 fw-bold">Registration Fee</h6>
+                                                            <small class="text-muted">A one-time fee to join our platform</small>
+                                                        </div>
+                                                        <div class="text-end">
+                                                            <h5 class="mb-0 text-primary fw-bold" id="registration-fee-display">
+                                                                {{ $currencies[$registrationCurrency] ?? $registrationCurrency }} {{ number_format($registrationFee, 2) }}
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div class="d-flex gap-3 mt-4">
@@ -317,6 +345,68 @@
                 $('#referrer_name_div').addClass('d-none');
             }
         });
+
+        // Registration Fee Logic
+        const feeInput = document.getElementById('registration_fee_input');
+        const feeActualInput = document.getElementById('registration_fee_actual_input');
+        const feeCurrencyInput = document.getElementById('registration_currency_input');
+        const feeDisplay = document.getElementById('registration-fee-display');
+        const feeWrapper = document.getElementById('registration-fee-field-wrapper');
+        const countrySelect = document.getElementById('country-select');
+        const currencySymbols = @json($currencies);
+
+        async function updateRegistrationFee(countryCode) {
+            if (!feeInput || !countryCode) return;
+
+            try {
+                const response = await fetch("{{ route('registration-fee.get') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        role: 'client',
+                        country: countryCode
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const feeValue = parseFloat(data.fee || 0);
+                    const currency = data.currency || 'EUR';
+                    const symbol = currencySymbols[currency] || currency;
+
+                    if (feeInput) feeInput.value = feeValue.toFixed(2);
+                    if (feeActualInput) feeActualInput.value = feeValue.toFixed(2);
+                    if (feeCurrencyInput) feeCurrencyInput.value = currency;
+
+                    if (feeDisplay) {
+                        feeDisplay.textContent = `${symbol} ${feeValue.toFixed(2)}`;
+                    }
+
+                    if (feeValue <= 0) {
+                        feeWrapper?.classList.add('d-none');
+                    } else {
+                        feeWrapper?.classList.remove('d-none');
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching registration fee:', error);
+            }
+        }
+
+        if (countrySelect) {
+            countrySelect.addEventListener('change', function() {
+                updateRegistrationFee(this.value);
+            });
+            // Initial check
+            if (countrySelect.value) {
+                updateRegistrationFee(countrySelect.value);
+            }
+        }
     });
 </script>
 @endsection

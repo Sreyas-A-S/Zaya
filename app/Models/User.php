@@ -36,6 +36,8 @@ class User extends Authenticatable implements JWTSubject
         'profile_pic',
         'phone',
         'promo_code',
+        'referral_token',
+        'referred_by',
         'open_register_link_id',
         'google_id',
         'facebook_id',
@@ -291,5 +293,30 @@ class User extends Authenticatable implements JWTSubject
     public function userPromoCodes()
     {
         return $this->hasMany(UserPromoCode::class);
+    }
+
+    public function referrals()
+    {
+        return $this->hasMany(User::class, 'referred_by');
+    }
+
+    public function referrer()
+    {
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+
+    public function generateReferralToken()
+    {
+        do {
+            $token = \Illuminate\Support\Str::random(10);
+        } while (self::where('referral_token', $token)->exists());
+
+        $this->update(['referral_token' => $token]);
+        return $token;
+    }
+
+    public function coinTransactions()
+    {
+        return $this->hasMany(CoinTransaction::class);
     }
 }

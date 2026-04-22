@@ -918,52 +918,63 @@
                     '';
             }
 
-            async function convertFee(targetCountryName) {
+            async function updateCountryFee(targetCountryName) {
                 if (!feeInput || !feeActualInput) return;
-                const baseCurrency = "{{ $feeCurrency ?? 'EUR' }}";
-                const baseAmount = parseFloat(feeActualInput.value || 0);
-                if (!baseAmount) return;
 
-                // Derive currency from country name
-                let derivedCurrency = baseCurrency;
-                const countries = @json($countries->pluck('code', 'name')->toArray() ?? []);
-                const countryCode = countries[targetCountryName];
-                
-                if (countryCode && countryToCurrency[countryCode.toUpperCase()]) {
-                    derivedCurrency = countryToCurrency[countryCode.toUpperCase()];
-                }
-
-                const symbol = currencySymbols[derivedCurrency] || derivedCurrency;
-                feeCurrencyInput && (feeCurrencyInput.value = derivedCurrency);
-
-                const applyValue = (val) => {
-                    feeInput.value = val.toFixed(2);
-                    const display = document.getElementById('registration-fee-display');
-                    if (display) display.textContent = `${symbol} ${val.toFixed(2)} (${derivedCurrency})`;
-                };
-
+                // The registration-fee.get endpoint expects 'country' as code or name.
+                // We'll pass the name as selected from the dropdown.
                 try {
-                    const ffUrl = `https://api.frankfurter.app/latest?from=${baseCurrency}&to=${derivedCurrency}`;
-                    const resp = await fetch(ffUrl);
-                    const data = await resp.json();
-                    if (data?.rates?.[derivedCurrency]) {
-                        applyValue(baseAmount * data.rates[derivedCurrency]);
+                    const response = await fetch("{{ route('registration-fee.get') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': getCsrfToken()
+                        },
+                        body: JSON.stringify({
+                            role: "{{ $joinRole }}",
+                            country: targetCountryName
+                        })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const feeValue = parseFloat(data.fee || 0);
+                        const currency = data.currency || 'EUR';
+                        const symbol = currencySymbols[currency] || currency;
+
+                        feeActualInput.value = feeValue.toFixed(2);
+                        feeInput.value = feeValue.toFixed(2);
+                        if (feeCurrencyInput) feeCurrencyInput.value = currency;
+
+                        const display = document.getElementById('registration-fee-display');
+                        if (display) {
+                            if (feeValue > 0) {
+                                display.textContent = `${symbol} ${feeValue.toFixed(2)} (${currency})`;
+                                // Also update the actual input if needed
+                            } else {
+                                display.textContent = '0.00';
+                            }
+                        }
+
+                        // Re-render display if needed or hide breakdown
+                        promoBreakdown?.classList.add('hidden');
                         return;
                     }
-                } catch (e) {}
-
-                const rate = fallbackRates[baseCurrency]?.[derivedCurrency];
-                applyValue(rate ? baseAmount * rate : baseAmount);
+                } catch (e) {
+                    console.error('Error fetching country-specific fee:', e);
+                }
             }
 
             if (countrySelect) {
                 if (countrySelect.tomselect) {
-                    countrySelect.tomselect.on('change', (val) => convertFee(val));
+                    countrySelect.tomselect.on('change', (val) => updateCountryFee(val));
                 } else {
-                    countrySelect.addEventListener('change', (e) => convertFee(e.target.value));
+                    countrySelect.addEventListener('change', (e) => updateCountryFee(e.target.value));
                 }
                 const initial = countrySelect.value || (countrySelect.tomselect ? countrySelect.tomselect.getValue() : '');
-                if (initial) convertFee(initial);
+                if (initial) updateCountryFee(initial);
             }
 
             promoApplyBtn?.addEventListener('click', async () => {

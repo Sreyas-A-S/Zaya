@@ -17,6 +17,7 @@
         }
     }
     .iti { width: 100% !important; display: block !important; }
+    .choices { width: 100% !important; }
 
     #clients-table_wrapper .dataTables_filter {
         display: flex;
@@ -317,17 +318,17 @@
 
 <!-- Form Modal (Create/Edit) -->
 <div class="modal fade" id="client-form-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered w-100" role="document">
         <div class="modal-content">
-            <form id="client-form" method="POST" class="theme-form" novalidate>
+            <form id="client-form" method="POST" class="theme-form w-100" novalidate>
                 @csrf
                 <input type="hidden" name="_method" id="form-method" value="POST">
                 <input type="hidden" name="client_id" id="client_id_hidden">
-                <div class="modal-header">
+                <div class="modal-header w-100">
                     <h5 class="modal-title" id="form-modal-title">Register New Client</h5>
                     <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
+                <div class="modal-body p-4 w-100" style="max-height: 70vh; overflow-y: auto; overflow-x: hidden;">
                     <!-- Stepper Progress Bar -->
                     <div class="stepper-horizontal mb-4">
                     <div class="stepper-item active" data-step="1">
@@ -580,14 +581,14 @@
                 <div class="step-content d-none" id="step-5">
                     <h5 class="text-primary mb-3 text-center">Step 5: Account Security</h5>
                     <div class="row g-3 mb-4">
-                        <div class="col-md-6 offset-md-3">
+                        <div class="col-md-6">
                              <label class="form-label">Password <span class="text-danger">*</span> <span class="text-muted small" id="password-hint-new">(New clients only)</span></label>
                              <input type="password" class="form-control" name="password" id="password-input"
                                  minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
                                  oninput="validatePasswordMatch()" required>
                              <div id="password-requirements" class="text-danger small mt-1 d-none">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
                         </div>
-                        <div class="col-md-6 offset-md-3">
+                        <div class="col-md-6">
                              <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
                              <input type="password" class="form-control" name="password_confirmation" id="password-confirm-input"
                                  minlength="8" oninput="validatePasswordMatch()" required>
@@ -664,7 +665,7 @@
                 </div>
                 </div> <!-- Closing modal-body -->
 
-                <div class="modal-footer justify-content-between mt-4">
+                <div class="modal-footer justify-content-between mt-4 w-100">
                     <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">Previous</button>
                     <div class="ms-auto">
                         <button type="button" class="btn btn-primary" id="next-btn">Next</button>

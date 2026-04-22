@@ -130,31 +130,138 @@
 
 <!-- Zaya Coins Tab -->
 <div id="tab-content-zaya-coins" class="tab-content hidden">
-    <div class="max-w-4xl">
-        <!-- Simple Coins Balance -->
-        <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-8 shadow-sm mb-10 flex items-center gap-6">
-            <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 shadow-inner">
-                <i class="ri-coins-fill text-3xl"></i>
-            </div>
-            <div>
-                <p class="text-gray-400 text-xs font-black uppercase tracking-widest mb-1">Your Total Balance</p>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-secondary tracking-tight">{{ number_format($user->coins ?? 0) }}</span>
-                    <span class="text-sm font-bold text-gray-500 uppercase tracking-widest">Zaya Coins</span>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <!-- Balance & Action Column -->
+        <div class="space-y-8">
+            <!-- Balance Card -->
+            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 p-8 shadow-sm hover:shadow-md transition-all duration-300">
+                <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mb-6 shadow-inner">
+                    <i class="ri-coins-fill text-3xl"></i>
                 </div>
+                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Available Rewards</p>
+                <div class="flex items-baseline gap-2 mb-2">
+                    <span class="text-4xl font-black text-secondary tracking-tight">{{ number_format($user->coins ?? 0) }}</span>
+                    <span class="text-sm font-bold text-gray-500 uppercase tracking-widest">Coins</span>
+                </div>
+                <p class="text-xs font-medium text-gray-400 leading-relaxed">
+                    100 Coins = {{ ($coinSetting->currency_symbol ?? '$') }} {{ number_format(($coinSetting->coin_value ?? 0.01) * 100, 2) }} discount on your next booking.
+                </p>
+            </div>
+
+            <!-- Referral Card -->
+            <div class="bg-secondary rounded-[2.5rem] p-8 shadow-xl shadow-secondary/20 text-white relative overflow-hidden group">
+                <div class="relative z-10">
+                    <h3 class="text-xl font-black mb-2">Invite Friends</h3>
+                    <p class="text-white/60 text-sm font-medium mb-8 leading-relaxed">Give your friends the gift of wellness. When they join, you earn <span class="text-amber-300 font-black">{{ $coinSetting->referral_coins ?? 0 }} coins</span>!</p>
+                    
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 mb-6">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-white/40 mb-2">Your Unique Link</p>
+                        <div class="flex items-center gap-3">
+                            <code class="text-xs font-bold text-amber-200 truncate flex-1">{{ route('register.form', ['type' => 'client', 'ref' => $user->referral_token]) }}</code>
+                            <button onclick="copyToClipboard('{{ route('register.form', ['type' => 'client', 'ref' => $user->referral_token]) }}')" class="hover:text-amber-300 transition-colors">
+                                <i class="ri-file-copy-line text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="openReferralModal()" class="bg-white text-secondary py-3 rounded-xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">
+                            Share Link
+                        </button>
+                        <form action="{{ route('rewards.regenerate') }}" method="POST" onsubmit="return confirm('Wait! If you regenerate your link, old links shared with friends will stop working. Continue?')">
+                            @csrf
+                            <button type="submit" class="w-full h-full border border-white/20 hover:bg-white/10 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">
+                                Refresh Link
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Decorative Circles -->
+                <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/5 rounded-full"></div>
+                <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-white/5 rounded-full group-hover:scale-110 transition-transform duration-700"></div>
             </div>
         </div>
 
-        <!-- How to earn coins -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 p-8 shadow-sm">
-                <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6">
-                    <i class="ri-user-add-line text-3xl"></i>
+        <!-- Referrals History Column -->
+        <div class="lg:col-span-2">
+            <h3 class="text-xl font-black text-secondary mb-6 flex items-center gap-3">
+                <i class="ri-team-line text-emerald-600"></i>
+                Your Referrals
+            </h3>
+
+            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm">
+                @forelse($referrals as $referred)
+                    <div class="p-6 border-b border-gray-50 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center gap-5">
+                            <div class="w-12 h-12 rounded-2xl overflow-hidden bg-gray-100 border-2 border-white shadow-sm">
+                                <img src="{{ $referred->profile_pic_url }}" alt="{{ $referred->name }}" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-black text-secondary text-base">{{ $referred->name }}</h4>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Joined {{ $referred->created_at->format('M d, Y') }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="flex items-center gap-1.5 text-emerald-600 font-black">
+                                <i class="ri-add-circle-fill"></i>
+                                <span>{{ $coinSetting->referral_coins ?? 0 }}</span>
+                                <span class="text-[10px] uppercase tracking-widest text-gray-400">Coins</span>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="py-20 text-center">
+                        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="ri-user-follow-line text-4xl text-gray-200"></i>
+                        </div>
+                        <h4 class="text-lg font-black text-secondary/40">No referrals yet</h4>
+                        <p class="text-gray-400 text-sm font-medium">Invite your friends to start earning Zaya Coins!</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Share Referral Modal (Hidden by default) -->
+<div id="referral-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 hidden">
+    <div class="absolute inset-0 bg-secondary/80 backdrop-blur-2xl" onclick="closeReferralModal()"></div>
+    <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 relative z-10 shadow-2xl animate-fade-in">
+        <button onclick="closeReferralModal()" class="absolute top-8 right-8 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-secondary hover:bg-gray-100 rounded-full transition-all">
+            <i class="ri-close-line text-2xl"></i>
+        </button>
+
+        <div class="text-center mb-10">
+            <div class="w-20 h-20 bg-emerald-50 rounded-[2rem] flex items-center justify-center text-emerald-600 mx-auto mb-6">
+                <i class="ri-share-forward-fill text-4xl"></i>
+            </div>
+            <h2 class="text-3xl font-black text-secondary mb-2 tracking-tight">Share the Wellness</h2>
+            <p class="text-gray-500 font-medium">Invite your friends via social media or email</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mb-10">
+            <a href="https://wa.me/?text={{ urlencode('Hey! Join me on Zaya Wellness and get professional sessions. Sign up here: ' . route('register.form', ['type' => 'client', 'ref' => $user->referral_token])) }}" target="_blank" class="flex flex-col items-center gap-3 group">
+                <div class="w-14 h-14 bg-[#25D366] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-[#25D366]/20 group-hover:-translate-y-1 transition-transform">
+                    <i class="ri-whatsapp-line text-3xl"></i>
                 </div>
-                <h3 class="text-xl font-black text-secondary mb-3">Refer a Friend</h3>
-                <a href="{{ route('profile') }}#referral-section" class="inline-flex items-center text-xs font-black text-secondary uppercase tracking-widest hover:text-primary transition-colors group">
-                    Get Referral Link <i class="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform"></i>
-                </a>
+                <span class="text-xs font-black text-gray-400 uppercase tracking-widest">WhatsApp</span>
+            </a>
+            <a href="mailto:?subject=Join me on Zaya Wellness&body={{ urlencode('Hey! I think you would love Zaya Wellness. You can book sessions with top practitioners. Join using my link: ' . route('register.form', ['type' => 'client', 'ref' => $user->referral_token])) }}" class="flex flex-col items-center gap-3 group">
+                <div class="w-14 h-14 bg-blue-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:-translate-y-1 transition-transform">
+                    <i class="ri-mail-send-line text-3xl"></i>
+                </div>
+                <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Email</span>
+            </a>
+        </div>
+
+        <div class="bg-[#F9FBF9] rounded-2xl p-5 border border-[#2E4B3D]/5">
+            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Or copy your direct link</p>
+            <div class="flex items-center gap-4">
+                <input type="text" readonly value="{{ route('register.form', ['type' => 'client', 'ref' => $user->referral_token]) }}" class="bg-transparent border-none font-bold text-secondary text-sm flex-1 focus:ring-0">
+                <button onclick="copyToClipboard('{{ route('register.form', ['type' => 'client', 'ref' => $user->referral_token]) }}')" class="bg-secondary text-white px-5 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary transition-all">
+                    Copy
+                </button>
             </div>
         </div>
     </div>
@@ -207,6 +314,16 @@
         const activeBtn = document.getElementById('tab-btn-' + tabId);
         activeBtn.classList.add('border-secondary', 'text-secondary');
         activeBtn.classList.remove('border-transparent', 'text-gray-400');
+    }
+
+    function openReferralModal() {
+        document.getElementById('referral-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeReferralModal() {
+        document.getElementById('referral-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
     }
 </script>
 @endsection

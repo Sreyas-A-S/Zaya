@@ -3,7 +3,7 @@
 @section('title', 'Booking Details')
 
 @section('content')
-<div class="max-w-5xl mx-auto py-6 px-2 md:py-8 md:px-4">
+<div class="py-6 px-1 md:py-8 md:px-0">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
@@ -20,7 +20,7 @@
                     </li>
                 </ol>
             </nav>
-            <h1 class="text-3xl font-black text-secondary tracking-tight">Session #{{ $booking->invoice_no }}</h1>
+            <h1 class="text-2xl md:text-3xl font-black text-secondary tracking-tight">Session #{{ $booking->invoice_no }}</h1>
         </div>
         <div class="flex items-center gap-3">
             @if($booking->status === 'confirmed')
@@ -84,16 +84,66 @@
 
             <!-- Referral History -->
             <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm p-5 md:p-8">
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Referral History</h3>
-                    <i class="ri-history-line text-gray-300 text-xl"></i>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div>
+                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Referral History</h3>
+                        <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                <span class="text-secondary/40">Origin:</span> 
+                                <span class="text-secondary">{{ $firstPractitioner }}</span>
+                            </p>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                <span class="text-secondary/40">Viewer:</span> 
+                                <span class="text-secondary">{{ $user->name }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <i class="ri-history-line text-gray-300 text-xl hidden md:block"></i>
                 </div>
 
                 <div class="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-100 before:to-transparent">
                     @foreach($referralChain as $node)
-                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    @php
+                        $isCurrentUserNode = false;
+                        if (isset($node['booking']) && $node['booking']) {
+                            $isCurrentUserNode = ($node['booking']->practitioner->user_id ?? 0) === $user->id;
+                        } elseif (isset($node['referral']) && $node['referral']) {
+                            $isCurrentUserNode = ($node['referral']->referred_to_id ?? 0) === $user->id;
+                        }
+                    @endphp
+                    <div class="relative flex items-center justify-between md:justify-center group is-active">
+                        <!-- Content Left (for even items on md) -->
+                        <div class="hidden md:block md:w-[45%] md:pr-8 text-right">
+                            @if($loop->even)
+                                <div class="p-5 rounded-3xl border {{ $node['type'] === 'current' ? 'border-secondary/20 bg-secondary/5' : ($isCurrentUserNode ? 'border-primary/20 bg-primary/5' : 'border-gray-50 bg-[#F9FBF9]') }} shadow-sm transition-all">
+                                    <div class="flex items-center justify-end gap-2 mb-1">
+                                        @if(isset($node['date']))
+                                        <time class="text-[9px] font-bold text-gray-400">{{ $node['date']->format('M d, Y') }}</time>
+                                        @endif
+                                        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                            {{ $node['type'] === 'parent' ? 'Referred From' : ($node['type'] === 'current' ? 'Current Session' : 'Referred To') }}
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-3">
+                                        @if($node['type'] === 'child' && $node['status'] === 'paid')
+                                            <i class="ri-checkbox-circle-fill text-emerald-500" title="Booking Confirmed"></i>
+                                        @endif
+                                        <p class="text-sm font-black text-secondary">
+                                            {{ $node['practitioner'] }}
+                                            @if($isCurrentUserNode)
+                                                <span class="ml-1 text-[9px] bg-primary text-white px-1.5 py-0.5 rounded-full uppercase tracking-tighter">You</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                    @if(isset($node['booking']) && $node['booking'])
+                                        <p class="text-[10px] text-gray-400 mt-1">Ref: #{{ $node['booking']->invoice_no }}</p>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+
                         <!-- Dot -->
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 {{ $node['type'] === 'current' ? 'bg-secondary text-white' : 'bg-gray-50 text-gray-400' }} z-10 transition-all">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white shadow-sm shrink-0 {{ $node['type'] === 'current' ? 'bg-secondary text-white' : ($isCurrentUserNode ? 'bg-primary text-white' : 'bg-gray-50 text-gray-400') }} z-10 transition-all">
                             @if($node['type'] === 'parent')
                                 <i class="ri-arrow-up-line"></i>
                             @elseif($node['type'] === 'current')
@@ -102,25 +152,64 @@
                                 <i class="ri-arrow-down-line"></i>
                             @endif
                         </div>
-                        <!-- Content -->
-                        <div class="w-[calc(100%-3.5rem)] md:w-[45%] p-4 md:p-5 rounded-3xl border {{ $node['type'] === 'current' ? 'border-secondary/20 bg-secondary/5' : 'border-gray-50 bg-[#F9FBF9]' }} shadow-sm">
-                            <div class="flex items-center justify-between gap-2 mb-1">
-                                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                                    {{ $node['type'] === 'parent' ? 'Referred From' : ($node['type'] === 'current' ? 'Current Session' : 'Referred To') }}
-                                </p>
-                                @if(isset($node['date']))
-                                <time class="text-[9px] font-bold text-gray-400">{{ $node['date']->format('M d, Y') }}</time>
-                                @endif
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <p class="text-sm font-black text-secondary">{{ $node['practitioner'] }}</p>
-                                @if($node['type'] === 'child' && $node['status'] === 'paid')
-                                    <i class="ri-checkbox-circle-fill text-emerald-500" title="Booking Confirmed"></i>
-                                @endif
-                            </div>
-                            @if(isset($node['booking']) && $node['booking'])
-                                <p class="text-[10px] text-gray-400 mt-1">Ref: #{{ $node['booking']->invoice_no }}</p>
+
+                        <!-- Content Right (for mobile AND odd items on md) -->
+                        <div class="w-[calc(100%-3.5rem)] md:w-[45%] md:pl-8">
+                            @if($loop->odd || request()->is('mobile*'))
+                                <div class="p-4 md:p-5 rounded-3xl border {{ $node['type'] === 'current' ? 'border-secondary/20 bg-secondary/5' : ($isCurrentUserNode ? 'border-primary/20 bg-primary/5' : 'border-gray-50 bg-[#F9FBF9]') }} shadow-sm transition-all">
+                                    <div class="flex items-center justify-between gap-2 mb-1">
+                                        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                            {{ $node['type'] === 'parent' ? 'Referred From' : ($node['type'] === 'current' ? 'Current Session' : 'Referred To') }}
+                                        </p>
+                                        @if(isset($node['date']))
+                                        <time class="text-[9px] font-bold text-gray-400">{{ $node['date']->format('M d, Y') }}</time>
+                                        @endif
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <p class="text-sm font-black text-secondary">
+                                            {{ $node['practitioner'] }}
+                                            @if($isCurrentUserNode)
+                                                <span class="ml-1 text-[9px] bg-primary text-white px-1.5 py-0.5 rounded-full uppercase tracking-tighter">You</span>
+                                            @endif
+                                        </p>
+                                        @if($node['type'] === 'child' && $node['status'] === 'paid')
+                                            <i class="ri-checkbox-circle-fill text-emerald-500" title="Booking Confirmed"></i>
+                                        @endif
+                                    </div>
+                                    @if(isset($node['booking']) && $node['booking'])
+                                        <p class="text-[10px] text-gray-400 mt-1">Ref: #{{ $node['booking']->invoice_no }}</p>
+                                    @endif
+                                </div>
                             @endif
+                            {{-- On mobile, we always want the content here --}}
+                            <div class="md:hidden">
+                                @if($loop->even)
+                                    <div class="p-4 rounded-3xl border {{ $node['type'] === 'current' ? 'border-secondary/20 bg-secondary/5' : ($isCurrentUserNode ? 'border-primary/20 bg-primary/5' : 'border-gray-50 bg-[#F9FBF9]') }} shadow-sm transition-all">
+                                        <div class="flex items-center justify-between gap-2 mb-1">
+                                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                                {{ $node['type'] === 'parent' ? 'Referred From' : ($node['type'] === 'current' ? 'Current Session' : 'Referred To') }}
+                                            </p>
+                                            @if(isset($node['date']))
+                                            <time class="text-[9px] font-bold text-gray-400">{{ $node['date']->format('M d, Y') }}</time>
+                                            @endif
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <p class="text-sm font-black text-secondary">
+                                                {{ $node['practitioner'] }}
+                                                @if($isCurrentUserNode)
+                                                    <span class="ml-1 text-[9px] bg-primary text-white px-1.5 py-0.5 rounded-full uppercase tracking-tighter">You</span>
+                                                @endif
+                                            </p>
+                                            @if($node['type'] === 'child' && $node['status'] === 'paid')
+                                                <i class="ri-checkbox-circle-fill text-emerald-500" title="Booking Confirmed"></i>
+                                            @endif
+                                        </div>
+                                        @if(isset($node['booking']) && $node['booking'])
+                                            <p class="text-[10px] text-gray-400 mt-1">Ref: #{{ $node['booking']->invoice_no }}</p>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
                     @endforeach
