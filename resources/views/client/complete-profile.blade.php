@@ -32,18 +32,10 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* Hide native calendar icon */
     input[type="date"]::-webkit-inner-spin-button,
     input[type="date"]::-webkit-calendar-picker-indicator {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        cursor: pointer;
         opacity: 0;
+        -webkit-appearance: none;
     }
 </style>
 @endpush
@@ -153,8 +145,8 @@
                     <div>
                         <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Date of Birth') }}</label>
                         <div class="relative group">
-                            <input type="date" name="dob" value="{{ $profile->dob ? \Carbon\Carbon::parse($profile->dob)->format('Y-m-d') : '' }}" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none bg-white transition-all">
-                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-colors pointer-events-none">
+                            <input type="date" name="dob" value="{{ $profile->dob ? \Carbon\Carbon::parse($profile->dob)->format('Y-m-d') : '' }}" class="w-full pl-4 pr-11 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none bg-white transition-all">
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-colors pointer-events-none">
                                 <i class="ri-calendar-line text-lg"></i>
                             </div>
                         </div>

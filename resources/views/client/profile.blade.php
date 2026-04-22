@@ -61,18 +61,10 @@
         overflow: visible !important;
     }
     
-    /* Hide native calendar icon */
     input[type="date"]::-webkit-inner-spin-button,
     input[type="date"]::-webkit-calendar-picker-indicator {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        cursor: pointer;
         opacity: 0;
+        -webkit-appearance: none;
     }
 </style>
 @endpush
