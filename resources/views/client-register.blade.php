@@ -222,20 +222,30 @@
         .date-input-wrapper input[type="date"] {
             -webkit-appearance: none;
             appearance: none;
+            padding-right: 50px !important;
         }
 
-        .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+        .date-input-wrapper .calendar-icon {
             position: absolute;
             right: 20px;
             top: 50%;
             transform: translateY(-50%);
-            cursor: pointer;
-            opacity: 0.6;
-            transition: opacity 0.2s;
+            color: #9CA3AF;
+            pointer-events: none;
+            font-size: 1.2rem;
+            z-index: 10;
         }
 
-        .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator:hover {
-            opacity: 1;
+        .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
+            opacity: 0;
         }
 
         /* Tom Select Premium Alignment */
@@ -514,6 +524,7 @@
                         <div class="date-input-wrapper">
                             <input type="date" name="dob" value="{{ old('dob') }}" id="dob-input"
                                 class="reg-input @error('dob') border-red-500! @enderror" placeholder="{{ __('dd-mm-yyyy') }}" required>
+                            <i class="ri-calendar-line calendar-icon"></i>
                         </div>
                         @error('dob')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
