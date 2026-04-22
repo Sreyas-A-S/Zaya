@@ -45,30 +45,7 @@
                             <i class="ri-share-forward-line text-xl"></i>
                         </button>
                         
-                        <div class="flex bg-gray-100 p-1 rounded-full gap-1">
-                            <button onclick="switchProvider('jaas')"
-                                class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all {{ $provider === 'jaas' ? 'bg-secondary text-white shadow-sm' : 'text-gray-400 hover:text-secondary' }}">
-                                JaaS (8x8)
-                            </button>
-                            <button onclick="switchProvider('daily')"
-                                class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all {{ $provider === 'daily' ? 'bg-secondary text-white shadow-sm' : 'text-gray-400 hover:text-secondary' }}">
-                                Daily.co
-                            </button>
-                            <button onclick="switchProvider('zegocloud')"
-                                class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all text-gray-400 hover:text-secondary">
-                                ZEGOCLOUD
-                            </button>
-                            <button onclick="switchProvider('livekit')"
-                                class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all {{ $provider === 'livekit' ? 'bg-secondary text-white shadow-sm' : 'text-gray-400 hover:text-secondary' }}">
-                                LiveKit
-                            </button>
-                            @if($agoraAvailable)
-                            <button onclick="switchProvider('agora')"
-                                class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all {{ $provider === 'agora' ? 'bg-secondary text-white shadow-sm' : 'text-gray-400 hover:text-secondary' }}">
-                                Agora
-                            </button>
-                            @endif
-                        </div>
+
 
                         <button onclick="togglePiP()"
                             class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer"
@@ -158,15 +135,6 @@
                                 <p class="text-white/40 text-xs">Hosted prebuilt video conference via ZEGOCLOUD UIKit.</p>
                             </button>
 
-                            <button onclick="switchProvider('livekit')" 
-                                class="p-6 bg-white/5 border border-white/10 rounded-[24px] hover:bg-white/10 transition-all text-left group">
-                                <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                    <i class="ri-live-fill text-white text-xl"></i>
-                                </div>
-                                <h3 class="text-white font-bold text-lg mb-1">LiveKit</h3>
-                                <p class="text-white/40 text-xs">Open source WebRTC infrastructure and Cloud.</p>
-                            </button>
-
                             @if($agoraAvailable)
                             <button onclick="switchProvider('agora')" 
                                 class="p-6 bg-white/5 border border-white/10 rounded-[24px] hover:bg-white/10 transition-all text-left group">
@@ -183,7 +151,7 @@
                             Ready to Join?
                         </h2>
                         <p class="text-white/60 mb-10 max-w-md text-lg">
-                            You are joining via <span class="text-white font-bold uppercase tracking-wider">{{ $provider === 'jaas' ? 'JaaS' : ($provider === 'daily' ? 'Daily.co' : ($provider === 'livekit' ? 'LiveKit' : 'Agora')) }}</span>.
+                            You are joining the consultation session.
                         </p>
 
                         <div id="setup-feedback" class="mb-6 text-white/80 text-sm hidden">
@@ -197,10 +165,7 @@
                                 <span>Join Meeting Now</span>
                             </button>
                             
-                            <button onclick="switchProvider('choose')"
-                                class="text-white/50 hover:text-white text-sm font-medium transition-colors">
-                                Switch Platform
-                            </button>
+
                         </div>
                     @endif
                 </div>
@@ -241,7 +206,7 @@
                 @endif
 
                 <!-- Shared Desktop Hover Controls for SDK providers -->
-                @if(in_array($provider, ['jaas', 'daily', 'agora']))
+                @if(in_array($provider, ['daily', 'agora']))
                     <div class="hidden md:block absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30">
                         <div class="flex items-center justify-center gap-6">
                             <button id="audio-toggle" class="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all active:scale-90 cursor-pointer">
@@ -265,7 +230,7 @@
             </div>
 
             <!-- Mobile Controls -->
-            @if(!$isMeetingPopout && in_array($provider, ['jaas', 'daily', 'agora']))
+            @if(!$isMeetingPopout && in_array($provider, ['daily', 'agora']))
                 <div class="md:hidden px-4 py-6 bg-[#0A1209] border-t border-white/10 flex justify-center">
                     <div class="flex items-center justify-center gap-6 w-full max-w-xs">
                         <button id="audio-toggle-mobile" class="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer">
@@ -290,7 +255,7 @@
                     <div class="flex items-center gap-3">
                         <i class="ri-shield-check-line text-secondary"></i>
                         <p class="text-xs text-gray-400 font-medium italic">
-                            Secure encrypted session via {{ $provider === 'jaas' ? 'JaaS' : ($provider === 'daily' ? 'Daily.co' : ($provider === 'livekit' ? 'LiveKit' : 'Agora')) }}</p>
+                            Secure encrypted session</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -359,7 +324,6 @@
             const dailyToken = "{{ $dailyToken }}";
             const conferencesUrl = "{{ route('conferences.index') }}";
             const zegoUrl = "{{ route('zego.join', ['channel' => $channel]) }}";
-            const livekitUrl = "{{ route('livekit.join', ['channel' => $channel]) ?? '#' }}";
             const bookingId = {{ (int) ($booking->id ?? 0) }};
             const uploadRecordingUrl = "{{ route('conference.upload-recording') }}";
             const csrfToken = "{{ csrf_token() }}";
@@ -377,24 +341,36 @@
             };
 
             // Timer Logic
-            let timerStartTime = Date.now();
-            setInterval(() => {
-                const now = Date.now();
-                const diff = Math.floor((now - timerStartTime) / 1000);
-                const h = Math.floor(diff / 3600).toString().padStart(2, '0');
-                const m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
-                const s = (diff % 60).toString().padStart(2, '0');
+            let timerInterval = null;
+            function startTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                
+                let timerStartTime = Date.now();
                 const timerEl = document.getElementById('timer');
-                if (timerEl) timerEl.innerText = `${h}:${m}:${s}`;
-            }, 1000);
+                if (timerEl) timerEl.innerText = "00:00:00";
+
+                timerInterval = setInterval(() => {
+                    const now = Date.now();
+                    const diff = Math.floor((now - timerStartTime) / 1000);
+                    const h = Math.floor(diff / 3600).toString().padStart(2, '0');
+                    const m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
+                    const s = (diff % 60).toString().padStart(2, '0');
+                    if (timerEl) timerEl.innerText = `${h}:${m}:${s}`;
+                }, 1000);
+            }
+
+            // Prevent Accidental Reload
+            window.addEventListener('beforeunload', function (e) {
+                // If meeting has started, show confirmation
+                if (meetingStartedAt) {
+                    e.preventDefault();
+                    e.returnValue = ''; // Standard way to trigger the browser's "Leave site?" dialog
+                }
+            });
 
             window.switchProvider = (nextProvider) => {
                 if (nextProvider === 'zegocloud') {
                     window.location.href = zegoUrl;
-                    return;
-                }
-                if (nextProvider === 'livekit') {
-                    window.location.href = livekitUrl;
                     return;
                 }
 
@@ -428,6 +404,8 @@
                 if (btn) btn.disabled = true;
                 if (feedback) feedback.classList.remove('hidden');
                 meetingStartedAt = new Date().toISOString();
+                
+                startTimer();
                 await beginRecording(true);
 
                 if (provider === 'jaas') initJitsi();
@@ -441,8 +419,19 @@
                     roomName: jitsiRoom,
                     parentNode: container,
                     jwt: jitsiJwt,
-                    configOverwrite: { prejoinPageEnabled: false },
-                    interfaceConfigOverwrite: { SHOW_JITSI_WATERMARK: false },
+                    configOverwrite: { 
+                        prejoinPageEnabled: true,
+                        prejoinConfig: { 
+                            enabled: true,
+                            hideDisplayName: true
+                        },
+                        readOnlyName: true,
+                        disableProfile: true
+                    },
+                    interfaceConfigOverwrite: { 
+                        SHOW_JITSI_WATERMARK: false,
+                        DISABLE_PROFILE: true
+                    },
                     userInfo: { displayName: "{{ addslashes($user->name ?? 'Guest') }}" }
                 });
                 jitsiApi.addEventListeners({
