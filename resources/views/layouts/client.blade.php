@@ -353,7 +353,7 @@
                         class="w-25 lg:w-20 h-25 lg:h-20 rounded-full object-cover p-1 bg-white">
                     <div>
                         <h1 class="text-3xl lg:text-4xl font-bold font-sans! text-secondary mb-2">{{ $user->name }}</h1>
-                        <div class="flex flex-wrap gap-y-1 items-center text-gray-500 text-sm space-x-4">
+                        <div class="flex flex-wrap gap-y-2 justify-center lg:justify-start items-center text-gray-500 text-sm gap-x-4">
                             <span class="flex items-center"><i class="ri-map-pin-line mr-1"></i> <span id="loc-label">{{ $user->profile?->city_state ?? ($user->profile?->address ?? __($site_settings['client_panel_location_not_set'] ?? 'Location not set')) }}</span></span>
                             <span class="flex items-center">
                                 <i class="ri-mail-line mr-1"></i> 

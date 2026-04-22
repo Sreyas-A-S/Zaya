@@ -1,6 +1,6 @@
 <div id="bookings-container">
-    <div class="bg-white rounded-2xl border border-[#2E4B3D]/12 mb-8">
-        <div class="p-6 border-b border-[#2E4B3D]/12">
+    <div class="bg-white rounded-3xl border border-[#2E4B3D]/12 mb-8 overflow-hidden">
+        <div class="p-4 md:p-6 border-b border-[#2E4B3D]/12">
             @if($user->role === 'client' || $user->role === 'patient' || $user->role === 'translator')
             <h2 class="text-xl font-medium text-secondary">{{ $user->role === 'translator' ? 'Translation Sessions' : 'My Bookings' }}</h2>
             @else
@@ -8,18 +8,18 @@
             @endif
         </div>
 
-        <div class="overflow-x-visible">
-            <table class="w-full text-left border-collapse">
+        <div class="overflow-x-auto scrollbar-hide">
+            <table class="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                     <tr class="bg-[#F9F9F9]">
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">SL No.</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{{ ($user->role === 'client' || $user->role === 'patient') ? 'Practitioner' : 'Client' }}</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Mode</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Amount</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">SL No.</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">ID</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">{{ ($user->role === 'client' || $user->role === 'patient') ? 'Practitioner' : 'Client' }}</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Date & Time</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Mode</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Amount</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Status</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right whitespace-nowrap">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#2E4B3D]/12">
@@ -60,7 +60,7 @@
                                 @endif
                             </div>
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-secondary">{{ $booking->booking_date->format('M d, Y') }}</div>
                             <div class="text-xs text-gray-400">{{ $booking->booking_time }}</div>
                         </td>
@@ -146,7 +146,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-20 text-center text-gray-500">
+                        <td colspan="8" class="px-4 md:px-6 py-12 md:py-20 text-center text-gray-500">
                             <div class="flex flex-col items-center">
                                 <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                                     <i class="ri-calendar-line text-3xl text-gray-300"></i>

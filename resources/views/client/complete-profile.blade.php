@@ -50,7 +50,7 @@
     </div>
 
     <!-- Tab Navigation -->
-    <div class="flex items-center gap-8 border-b border-gray-100 mb-8 overflow-x-auto no-scrollbar">
+    <div class="flex items-center gap-4 md:gap-8 border-b border-gray-100 mb-8 overflow-x-auto no-scrollbar">
         <button type="button" onclick="switchTab('personal')" class="tab-btn active pb-4 text-sm font-bold text-gray-400 whitespace-nowrap transition-all" id="tab-btn-personal">
             01. {{ __('Personal Details') }}
         </button>
@@ -76,7 +76,7 @@
 
         <!-- 1. Personal Tab (All Roles) -->
         <div id="tab-personal" class="tab-content active animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-8">
+            <div class="bg-white rounded-3xl md:rounded-[2rem] p-5 md:p-8 border border-gray-100 shadow-sm space-y-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-secondary/5 flex items-center justify-center text-secondary">
                         <i class="ri-user-smile-line text-xl"></i>
@@ -139,7 +139,12 @@
 
                     <div>
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Date of Birth') }}</label>
-                        <input type="date" name="dob" value="{{ $profile->dob ? \Carbon\Carbon::parse($profile->dob)->format('Y-m-d') : '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
+                        <div class="relative group">
+                            <input type="date" name="dob" value="{{ $profile->dob ? \Carbon\Carbon::parse($profile->dob)->format('Y-m-d') : '' }}" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none bg-white transition-all">
+                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-colors pointer-events-none">
+                                <i class="ri-calendar-line text-lg"></i>
+                            </div>
+                        </div>
                     </div>
 
                     @if(in_array($user->role, ['practitioner', 'client', 'patient']))
@@ -204,7 +209,7 @@
         @if(in_array($user->role, ['client', 'patient']))
         <!-- 2. Preferences & Referral Tab (Client Only) -->
         <div id="tab-preferences" class="tab-content animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-8">
+            <div class="bg-white rounded-3xl md:rounded-[2rem] p-5 md:p-8 border border-gray-100 shadow-sm space-y-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-secondary/5 flex items-center justify-center text-secondary">
                         <i class="ri-heart-line text-xl"></i>
@@ -261,7 +266,7 @@
         @else
         <!-- 2. Professional Tab (Practitioners/Doctors/Translators) -->
         <div id="tab-professional" class="tab-content animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-8">
+            <div class="bg-white rounded-3xl md:rounded-[2rem] p-5 md:p-8 border border-gray-100 shadow-sm space-y-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-secondary/5 flex items-center justify-center text-secondary">
                         <i class="ri-briefcase-line text-xl"></i>
@@ -477,7 +482,7 @@
 
         <!-- 3. Financial Tab -->
         <div id="tab-financial" class="tab-content animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-8">
+            <div class="bg-white rounded-3xl md:rounded-[2rem] p-5 md:p-8 border border-gray-100 shadow-sm space-y-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-secondary/5 flex items-center justify-center text-secondary">
                         <i class="ri-bank-card-line text-xl"></i>
@@ -540,7 +545,7 @@
 
         <!-- 4. Documents Tab -->
         <div id="tab-documents" class="tab-content animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-8">
+            <div class="bg-white rounded-3xl md:rounded-[2rem] p-5 md:p-8 border border-gray-100 shadow-sm space-y-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-secondary/5 flex items-center justify-center text-secondary">
                         <i class="ri-file-upload-line text-xl"></i>
@@ -636,7 +641,7 @@
 <!-- Confirmation Modal -->
 <div id="confirmation-modal" class="fixed inset-0 z-[100002] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 px-4">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="toggleModal(false)"></div>
-    <div class="relative bg-white rounded-[2rem] p-8 md:p-10 max-w-[450px] w-full text-center shadow-2xl transform transition-all duration-300 scale-90">
+    <div class="relative bg-white rounded-3xl md:rounded-[2rem] p-6 md:p-10 max-w-[450px] w-full text-center shadow-2xl transform transition-all duration-300 scale-90">
         <button onclick="toggleModal(false)" class="absolute top-6 right-8 text-gray-300 hover:text-gray-500 transition-colors">
             <i class="ri-close-line text-2xl"></i>
         </button>
@@ -649,11 +654,11 @@
                 {{ __('Please ensure all your details and documents are accurate. Once submitted, our team will verify your information to unlock all features.') }}
             </p>
         </div>
-        <div class="flex gap-4">
-            <button onclick="toggleModal(false)" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-full font-bold hover:bg-gray-50 transition-all">
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <button onclick="toggleModal(false)" class="w-full sm:flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-full font-bold hover:bg-gray-50 transition-all text-sm md:text-base">
                 {{ __('Review Again') }}
             </button>
-            <button onclick="submitFinalForm()" class="flex-1 px-6 py-3 bg-secondary text-white rounded-full font-bold hover:bg-opacity-90 transition-all">
+            <button onclick="submitFinalForm()" class="w-full sm:flex-1 px-6 py-3 bg-secondary text-white rounded-full font-bold hover:bg-opacity-90 transition-all text-sm md:text-base">
                 {{ __('Confirm & Submit') }}
             </button>
         </div>
