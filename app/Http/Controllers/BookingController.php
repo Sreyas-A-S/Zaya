@@ -428,6 +428,14 @@ class BookingController extends Controller
         $booking = $bookingId ? Booking::find($bookingId) : null;
         $usersQuery = User::whereIn('role', $roles)->where('status', 'active')->where('id', '!=', $currentUser->id);
 
+        // Ensure the professional profile is also active
+        $usersQuery->where(function($q) {
+            $q->whereHas('practitioner', fn($sub) => $sub->where('status', 'active'))
+              ->orWhereHas('doctor', fn($sub) => $sub->where('status', 'active'))
+              ->orWhereHas('mindfulnessPractitioner', fn($sub) => $sub->where('status', 'active'))
+              ->orWhereHas('yogaTherapist', fn($sub) => $sub->where('status', 'active'));
+        });
+
         if ($query) $usersQuery->where('name', 'LIKE', "%{$query}%");
 
         // Prepare matching criteria from current booking

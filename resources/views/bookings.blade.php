@@ -87,24 +87,56 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         // Action Dropdown Logic
+        const allMenus = document.querySelectorAll('.action-dropdown .dropdown-menu');
+        
+        function closeAllMenus() {
+            document.querySelectorAll('.action-dropdown .dropdown-menu').forEach(m => {
+                m.classList.add('hidden');
+                m.style.position = '';
+                m.style.top = '';
+                m.style.left = '';
+                m.style.right = '';
+                m.style.bottom = '';
+            });
+        }
+
+        window.addEventListener('scroll', closeAllMenus, true);
+        window.addEventListener('resize', closeAllMenus);
+
         document.addEventListener('click', function(e) {
             const trigger = e.target.closest('.dropdown-trigger');
-            const allMenus = document.querySelectorAll('.action-dropdown .dropdown-menu');
             
             if (trigger) {
                 const menu = trigger.nextElementSibling;
                 const isOpen = !menu.classList.contains('hidden');
                 
-                // Close all other menus
-                allMenus.forEach(m => m.classList.add('hidden'));
+                closeAllMenus();
                 
                 if (!isOpen) {
                     menu.classList.remove('hidden');
+                    
+                    // Use fixed positioning to escape overflow-hidden container
+                    const triggerRect = trigger.getBoundingClientRect();
+                    menu.style.position = 'fixed';
+                    menu.style.right = (window.innerWidth - triggerRect.right) + 'px';
+                    
+                    // Collision check
+                    menu.style.top = 'auto';
+                    menu.style.bottom = 'auto';
+                    
+                    // We need layout context to check height
+                    const menuRect = menu.getBoundingClientRect();
+                    if ((triggerRect.bottom + menuRect.height + 10) > window.innerHeight && triggerRect.top > menuRect.height) {
+                        // Pop upwards
+                        menu.style.bottom = (window.innerHeight - triggerRect.top + 8) + 'px';
+                    } else {
+                        // Pop downwards
+                        menu.style.top = (triggerRect.bottom + 8) + 'px';
+                    }
                 }
                 e.stopPropagation();
             } else {
-                // Close all menus when clicking outside
-                allMenus.forEach(m => m.classList.add('hidden'));
+                closeAllMenus();
             }
         });
 

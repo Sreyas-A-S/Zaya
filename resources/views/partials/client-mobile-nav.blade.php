@@ -7,7 +7,7 @@
 <div class="lg:hidden flex space-x-6 overflow-x-auto scrollbar-hide mb-5 pb-2">
     <!-- Dashboard -->
     @if(request()->routeIs('dashboard'))
-        <button onclick="if(typeof switchMobileTab === 'function') switchMobileTab('dashboard')" 
+        <button id="client_panel_sidebar_dashboard_mobile" onclick="if(typeof switchMobileTab === 'function') switchMobileTab('dashboard')" 
             class="leading-none text-base text-secondary font-bold whitespace-nowrap cursor-pointer transition-colors border-b-2 border-secondary pb-1 flex items-center shrink-0">
             {{ __($site_settings['client_panel_sidebar_dashboard'] ?? 'Dashboard') }}
         </button>
@@ -42,7 +42,7 @@
 
     <!-- Bookings -->
     @if(in_array($user->role, ['client', 'patient']))
-    <a href="{{ route('bookings.index') }}" 
+    <a id="client_panel_sidebar_bookings_mobile" href="{{ route('bookings.index') }}" 
         class="leading-none text-base {{ request()->routeIs('bookings.index') ? 'text-secondary border-b-2 border-secondary pb-1 font-bold' : 'text-[#8F8F8F] font-medium' }} whitespace-nowrap cursor-pointer transition-colors flex items-center shrink-0">
         {{ __($site_settings['client_panel_sidebar_bookings'] ?? 'Bookings') }}
     </a>
@@ -63,12 +63,12 @@
 
     <!-- Transaction Vault -->
     @if(request()->routeIs('dashboard'))
-        <button onclick="if(typeof switchMobileTab === 'function') switchMobileTab('transactions')" 
+        <button id="client_panel_sidebar_transaction_vault_mobile" onclick="if(typeof switchMobileTab === 'function') switchMobileTab('transactions')" 
             class="leading-none text-base text-[#8F8F8F] font-medium whitespace-nowrap cursor-pointer transition-colors flex items-center shrink-0">
             {{ __($site_settings['client_panel_sidebar_transaction_vault'] ?? 'Transaction Vault') }}
         </button>
     @else
-        <a href="{{ route('transactions.index') }}" 
+        <a id="client_panel_sidebar_transaction_vault_mobile" href="{{ route('transactions.index') }}" 
             class="leading-none text-base {{ request()->routeIs('transactions.index') ? 'text-secondary border-b-2 border-secondary pb-1 font-bold' : 'text-[#8F8F8F] font-medium' }} whitespace-nowrap cursor-pointer transition-colors flex items-center shrink-0">
             {{ __($site_settings['client_panel_sidebar_transaction_vault'] ?? 'Transaction Vault') }}
         </a>
