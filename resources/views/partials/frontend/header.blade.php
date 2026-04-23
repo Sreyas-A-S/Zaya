@@ -360,12 +360,24 @@
             const modal = document.getElementById('logoutConfirmModalHeader');
             if (event.target == modal) closeLogoutModalHeader();
         });
+
+        function handleLogoutHeader(btn) {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            const originalText = btn.innerText;
+            btn.innerHTML = `<div class="flex items-center justify-center gap-2">
+                <i class="ri-loader-4-line animate-spin text-xl"></i>
+                <span>${originalText}</span>
+            </div>`;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+            document.getElementById('logout-form-desktop').submit();
+        }
     </script>
 
 </header>
 
 <!-- Logout Confirmation Modal -->
-<div id="logoutConfirmModalHeader" class="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+<div id="logoutConfirmModalHeader" class="fixed inset-0 bg-[#1A1A1A]/40 hidden z-[100] flex items-center justify-center p-4">
     <div class="bg-white rounded-[40px] w-full max-w-[340px] overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-200" id="logoutModalContentHeader">
         <div class="p-10 text-center">
             <div class="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-red-100">
@@ -375,7 +387,7 @@
             <p class="text-gray-500 mb-8 leading-relaxed font-medium text-base">{{ __('Are you sure you want to end your session and logout?') }}</p>
             
             <div class="flex flex-col gap-3">
-                <button type="button" onclick="document.getElementById('logout-form-desktop').submit();" class="w-full py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 transition-all text-lg shadow-xl shadow-red-200">{{ __('Yes, Logout') }}</button>
+                <button type="button" onclick="handleLogoutHeader(this);" class="w-full py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 transition-all text-lg shadow-xl shadow-red-200">{{ __('Yes, Logout') }}</button>
                 <button type="button" onclick="closeLogoutModalHeader()" class="w-full py-4 bg-gray-50 text-gray-500 font-black rounded-2xl hover:bg-gray-100 transition-all text-lg">{{ __('Cancel') }}</button>
             </div>
         </div>

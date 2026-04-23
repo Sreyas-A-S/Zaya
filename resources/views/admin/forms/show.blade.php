@@ -67,7 +67,7 @@
                             <table class="table table-bordered mb-0">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
+                                        <th>Sl No</th>
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Role</th>

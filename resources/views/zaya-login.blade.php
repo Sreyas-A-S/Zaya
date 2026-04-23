@@ -96,7 +96,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('login') }}" class="space-y-6">
+            <form method="POST" action="{{ route('login') }}" class="space-y-6" id="login-form">
                 @csrf
                 @if(isset($redirect))
                     <input type="hidden" name="redirect" value="{{ $redirect }}">
@@ -252,9 +252,10 @@
                     }
                 </script>
 
-                <button type="submit"
-                    class="w-full bg-gradient-to-r from-[#422251] to-[#AA349F] text-white py-4 rounded-full font-medium text-base lg:text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200 cursor-pointer">
-                    {{ __('Login') }}
+                <button type="submit" id="login-submit-btn"
+                    class="w-full bg-gradient-to-r from-[#422251] to-[#AA349F] text-white py-4 rounded-full font-medium text-base lg:text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200 cursor-pointer flex items-center justify-center gap-2">
+                    <span id="login-btn-text">{{ __('Login') }}</span>
+                    <i id="login-btn-loader" class="ri-loader-4-line animate-spin hidden"></i>
                 </button>
             </form>
 
@@ -295,9 +296,31 @@
                   }
               }).catch(err => {
                   console.error('Language switch failed:', err);
-                  // Optional: fallback to regular reload or notify user
               });
         }
+
+        // Prevent double submission
+        document.getElementById('login-form').addEventListener('submit', function() {
+            const btn = document.getElementById('login-submit-btn');
+            const text = document.getElementById('login-btn-text');
+            const loader = document.getElementById('login-btn-loader');
+            
+            if (btn) {
+                btn.disabled = true;
+                btn.blur(); // Remove browser focus
+                btn.style.filter = 'blur(1px)'; // Add visual blur
+                btn.classList.add('opacity-70', 'cursor-not-allowed');
+                btn.classList.remove('transform', 'hover:-translate-y-0.5', 'hover:shadow-xl', 'cursor-pointer');
+                
+                if (loader) {
+                    loader.classList.remove('hidden');
+                    loader.classList.add('inline-block');
+                }
+                if (text) {
+                    text.textContent = "{{ __('Logging in...') }}";
+                }
+            }
+        });
     </script>
 </body>
 
