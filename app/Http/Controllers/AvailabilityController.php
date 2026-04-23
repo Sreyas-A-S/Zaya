@@ -51,6 +51,8 @@ class AvailabilityController extends Controller
             return back()->with('error', 'You need a professional profile to create slots.');
         }
 
+        $timezone = derive_timezone_from_user($profile);
+
         $request->validate([
             'day_of_week' => 'nullable|integer|min:0|max:6',
             'specific_date' => 'nullable|date',
@@ -61,7 +63,7 @@ class AvailabilityController extends Controller
         ]);
 
         if ($request->specific_date && !$request->has('day_of_week')) {
-            $request->merge(['day_of_week' => \Carbon\Carbon::parse($request->specific_date)->dayOfWeek]);
+            $request->merge(['day_of_week' => \Carbon\Carbon::parse($request->specific_date, $timezone)->dayOfWeek]);
         }
 
         $offSlots = $request->off_slots ? explode(',', $request->off_slots) : [];
@@ -78,8 +80,8 @@ class AvailabilityController extends Controller
         $query->delete();
 
         // 2. Generate and create slots
-        $start = \Carbon\Carbon::parse($request->start_time);
-        $end = \Carbon\Carbon::parse($request->end_time);
+        $start = \Carbon\Carbon::parse($request->start_time, $timezone);
+        $end = \Carbon\Carbon::parse($request->end_time, $timezone);
         $duration = (int) $request->slot_duration;
 
         $current = $start->copy();
@@ -89,7 +91,7 @@ class AvailabilityController extends Controller
             // Check if this slot start time is in our "off" list
             $isOff = false;
             foreach($offSlots as $os) {
-                if (\Carbon\Carbon::parse($os)->format('H:i:s') === $currentTimeStr) {
+                if (\Carbon\Carbon::parse($os, $timezone)->format('H:i:s') === $currentTimeStr) {
                     $isOff = true;
                     break;
                 }
@@ -122,7 +124,8 @@ class AvailabilityController extends Controller
         $profile = $this->getProfessionalProfile($user);
         if (!$profile) return response()->json(['error' => 'No profile'], 403);
 
-        $dateObj = \Carbon\Carbon::parse($date);
+        $timezone = derive_timezone_from_user($profile);
+        $dateObj = \Carbon\Carbon::parse($date, $timezone);
         $dayOfWeek = $dateObj->dayOfWeek;
 
         $customSlots = PractitionerAvailability::where('practitioner_id', $profile->id)
@@ -144,13 +147,14 @@ class AvailabilityController extends Controller
             'date' => $date,
             'formatted_date' => $dateObj->format('M d, Y'),
             'is_custom' => $isCustom,
-            'slots' => $slots->map(function($s) {
+            'timezone' => $timezone,
+            'slots' => $slots->map(function($s) use ($timezone) {
                 return [
                     'id' => $s->id,
-                    'start' => $s->start_time ? \Carbon\Carbon::parse($s->start_time)->format('h:i A') : null,
-                    'start_24' => $s->start_time ? \Carbon\Carbon::parse($s->start_time)->format('H:i') : null,
-                    'end' => $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('h:i A') : null,
-                    'end_24' => $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('H:i') : null,
+                    'start' => $s->start_time ? \Carbon\Carbon::parse($s->start_time, $timezone)->format('h:i A') : null,
+                    'start_24' => $s->start_time ? \Carbon\Carbon::parse($s->start_time, $timezone)->format('H:i') : null,
+                    'end' => $s->end_time ? \Carbon\Carbon::parse($s->end_time, $timezone)->format('h:i A') : null,
+                    'end_24' => $s->end_time ? \Carbon\Carbon::parse($s->end_time, $timezone)->format('H:i') : null,
                     'duration' => $s->slot_duration,
                     'is_available' => (bool)$s->is_available
                 ];

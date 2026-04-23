@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Referral;
 use App\Models\Conference;
 use App\Models\Country;
 use App\Models\ConsultationForm;
@@ -473,6 +474,10 @@ class ProfileController extends Controller
         // Get coin settings for the user's currency
         $coinSetting = \App\Models\CoinSetting::where('currency_code', $user->currency)->where('status', true)->first();
 
+        if (request()->ajax()) {
+            return view('partials.promo-codes-grid', compact('activePromoCodes', 'usedPromoCodes', 'user', 'coinSetting', 'referrals'))->render();
+        }
+
         return view('client.rewards', compact('activePromoCodes', 'usedPromoCodes', 'user', 'coinSetting', 'referrals'));
     }
 
@@ -509,15 +514,31 @@ class ProfileController extends Controller
     public function bookings(Request $request)
     {
         $user = Auth::user();
-        $bookings = $this->getBookingQuery($user)
-            ->latest()
-            ->paginate(15);
+        $search = $request->input('search');
+
+        $query = $this->getBookingQuery($user);
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('invoice_no', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function($sub) use ($search) {
+                      $sub->where('name', 'LIKE', "%{$search}%");
+                  })
+                  ->orWhereHas('practitioner.user', function($sub) use ($search) {
+                      $sub->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        $bookings = $query->latest()
+            ->paginate(15)
+            ->withQueryString();
 
         if ($request->ajax()) {
             return view('partials.bookings-table', compact('user', 'bookings'))->render();
         }
 
-        return view('bookings', compact('user', 'bookings'));
+        return view('bookings', compact('user', 'bookings', 'search'));
     }
 
     public function conferences(Request $request)
@@ -1042,27 +1063,33 @@ class ProfileController extends Controller
         // Master Data for Specialities & Conditions
         $allSpecialities = [];
         $allConditions = [];
+        $allModalities = [];
 
         switch ($user->role) {
             case 'practitioner':
                 $allSpecialities = \App\Models\Specialization::where('status', true)->pluck('name');
                 $allConditions = \App\Models\HealthCondition::where('status', true)->pluck('name');
+                $allModalities = \App\Models\PractitionerModality::where('status', true)->pluck('name');
                 break;
             case 'doctor':
                 $allSpecialities = \App\Models\Specialization::where('status', true)->pluck('name');
                 $allConditions = \App\Models\HealthCondition::where('status', true)->pluck('name');
+                $allModalities = \App\Models\PractitionerModality::where('status', true)->pluck('name');
                 break;
             case 'mindfulness_practitioner':
                 $allSpecialities = \App\Models\MindfulnessService::where('status', true)->pluck('name');
                 $allConditions = \App\Models\ClientConcern::where('status', true)->pluck('name');
+                $allModalities = \App\Models\PractitionerModality::where('status', true)->pluck('name');
                 break;
             case 'yoga_therapist':
                 // Yoga therapist specialities are currently free text or generic
                 $allConditions = \App\Models\YogaExpertise::pluck('name');
+                $allModalities = \App\Models\PractitionerModality::where('status', true)->pluck('name');
                 break;
             case 'translator':
                 $allSpecialities = \App\Models\TranslatorSpecialization::where('status', true)->pluck('name');
                 $allConditions = \App\Models\TranslatorService::where('status', true)->pluck('name');
+                $allModalities = \App\Models\PractitionerModality::where('status', true)->pluck('name');
                 break;
         }
 
@@ -1083,7 +1110,8 @@ class ProfileController extends Controller
             'upcomingServices',
             'gallery',
             'allSpecialities',
-            'allConditions'
+            'allConditions',
+            'allModalities'
         ));
         }
     public function uploadGalleryImage(Request $request)
@@ -1181,14 +1209,28 @@ class ProfileController extends Controller
                 case 'yoga_therapist': $data['areas_of_expertise'] = $conditions; break;
                 case 'translator': $data['services_offered'] = $conditions; break;
             }
+        } elseif ($updateType === 'modalities') {
+            $modalities = $request->input('modalities', []);
+            $data['other_modalities'] = $modalities;
         }
 
         if (!empty($data)) {
             $profile->update($data);
         }
 
-        $label = $updateType === 'specialities' ? 'Specialities' : 'Conditions';
-        $items = ($updateType === 'specialities') ? ($data['consultations'] ?? $data['specialization'] ?? $data['practitioner_type'] ?? $data['yoga_therapist_type'] ?? $data['fields_of_specialization'] ?? []) : ($data['body_therapies'] ?? $data['health_conditions_treated'] ?? $data['client_concerns'] ?? $data['areas_of_expertise'] ?? $data['services_offered'] ?? []);
+        $labelMap = [
+            'specialities' => 'Specialities',
+            'conditions' => 'Conditions',
+            'modalities' => 'Modalities'
+        ];
+        $label = $labelMap[$updateType] ?? 'Details';
+
+        $items = match($updateType) {
+            'specialities' => ($data['consultations'] ?? $data['specialization'] ?? $data['practitioner_type'] ?? $data['yoga_therapist_type'] ?? $data['fields_of_specialization'] ?? []),
+            'conditions' => ($data['body_therapies'] ?? $data['health_conditions_treated'] ?? $data['client_concerns'] ?? $data['areas_of_expertise'] ?? $data['services_offered'] ?? []),
+            'modalities' => ($data['other_modalities'] ?? []),
+            default => []
+        };
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -1271,20 +1313,27 @@ class ProfileController extends Controller
         }
 
         // Try to find the booking for session tracking
-        $booking = \App\Models\Booking::where('id', function($query) use ($channel) {
-            $query->select('id')->from('bookings')->whereRaw("LOWER(REPLACE(invoice_no, '-', '')) = LOWER(?)", [str_replace('zaya-', '', $channel)]);
-        })->orWhere('id', (int)str_replace('zaya-', '', $channel))->first();
+        // 1. Try direct ID (old method)
+        // 2. Try invoice_no (current method)
+        $booking = \App\Models\Booking::with(['user', 'practitioner.user'])
+            ->where(function($q) use ($channel) {
+                $q->where('invoice_no', $channel)
+                  ->orWhere('id', (int)str_replace('session-', '', $channel));
+            })->first();
+
+        $isInstant = !$booking && str_starts_with((string)$channel, 'zaya-');
         
         \Log::info("User joining session:", [
             'user' => $user->id,
             'channel' => $channel,
             'provider' => $provider,
+            'isInstant' => $isInstant,
             'appId_length' => strlen($appId)
         ]);
 
         if ($provider === 'daily') {
             return view('conference.daily', compact(
-                'user', 'channel', 'dailyUrl', 'dailyToken', 'dailyError', 'booking'
+                'user', 'channel', 'dailyUrl', 'dailyToken', 'dailyError', 'booking', 'isInstant'
             ));
         }
 
@@ -1317,7 +1366,8 @@ class ProfileController extends Controller
             'dailyUrl',
             'dailyToken',
             'dailyError',
-            'booking'
+            'booking',
+            'isInstant'
         ));
     }
 
@@ -1924,11 +1974,13 @@ class ProfileController extends Controller
             })->first();
 
         if (!$promo) {
+            if ($request->ajax()) return response()->json(['success' => false, 'message' => 'Invalid or expired promo code.'], 422);
             return back()->with('error', 'Invalid or expired promo code.');
         }
 
         // 2. Check usage limit
         if ($promo->usage_limit !== null && $promo->used_count >= $promo->usage_limit) {
+            if ($request->ajax()) return response()->json(['success' => false, 'message' => 'This promo code has reached its usage limit.'], 422);
             return back()->with('error', 'This promo code has reached its usage limit.');
         }
 
@@ -1938,6 +1990,7 @@ class ProfileController extends Controller
             ->exists();
 
         if ($exists) {
+            if ($request->ajax()) return response()->json(['success' => false, 'message' => 'This promo code is already in your list.'], 422);
             return back()->with('info', 'This promo code is already in your list.');
         }
 
@@ -1947,6 +2000,7 @@ class ProfileController extends Controller
             'promo_code' => $code
         ]);
 
+        if ($request->ajax()) return response()->json(['success' => true, 'message' => 'Promo code added to your exclusive offers!']);
         return back()->with('success', 'Promo code added to your exclusive offers!');
     }
 

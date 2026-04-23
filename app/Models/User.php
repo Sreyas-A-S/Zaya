@@ -118,6 +118,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(YogaTherapist::class);
     }
 
+    public function gallery()
+    {
+        return $this->hasMany(\App\Models\PractitionerGallery::class, 'user_id');
+    }
+
     public function userServices()
     {
         return $this->hasMany(UserService::class);

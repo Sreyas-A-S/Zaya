@@ -318,8 +318,8 @@
 
             <!-- Action Buttons -->
             <div class="space-y-3">
-                @if($booking->status === 'confirmed' && $booking->mode === 'online')
-                    <a href="{{ route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']) }}" class="w-full py-5 bg-secondary text-white rounded-[1.5rem] font-black text-sm hover:bg-primary transition-all shadow-2xl shadow-secondary/30 uppercase tracking-[0.2em] flex items-center justify-center gap-3">
+                @if(in_array($booking->status, ['pending', 'confirmed', 'paid']) && $booking->mode === 'online')
+                    <a href="{{ route('conference.join', ['channel' => $booking->invoice_no ?? 'session-' . $booking->id, 'provider' => 'jaas']) }}" class="w-full py-5 bg-secondary text-white rounded-[1.5rem] font-black text-sm hover:bg-primary transition-all shadow-2xl shadow-secondary/30 uppercase tracking-[0.2em] flex items-center justify-center gap-3">
                         <i class="ri-vidicon-line text-lg"></i>
                         Join Session
                     </a>

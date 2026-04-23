@@ -289,6 +289,7 @@
                        
 
                         <!-- Coin -->
+                        @if(in_array($user->role, ['client', 'patient']))
                         <div class="relative">
                             <div onclick="toggleBalance('mobile')"
                                 class="w-10 h-10 rounded-full bg-[#FFD166] flex items-center justify-center text-white relative shadow-sm cursor-pointer hover:bg-yellow-400 transition-colors">
@@ -297,35 +298,21 @@
                             </div>
                             
                             <div id="balance-dropdown-mobile" class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 hidden overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                                <div class="p-5 border-b border-gray-50 bg-[#F9FBF9]">
-                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Your Total Balance</p>
-                                    <h4 class="text-2xl font-black text-secondary tracking-tight">INR {{ number_format($user_balance, 2) }}</h4>
+                                <div class="p-5 border-b border-gray-50 bg-[#FDFEF3]">
+                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Your Wellness Tokens</p>
+                                    <h4 class="text-2xl font-black text-secondary tracking-tight">{{ number_format($user->coins ?? 0) }} <span class="text-xs uppercase">Zaya Coins</span></h4>
                                 </div>
                                 <div class="p-2">
-                                    @php
-                                        $earned = \App\Models\Transaction::where('practitioner_id', $user->id)->sum('practitioner_share');
-                                        $referralEarned = \App\Models\Transaction::where('referrer_id', $user->id)->sum('referrer_share');
-                                    @endphp
-                                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="ri-calendar-check-line"></i></div>
-                                            <span class="text-xs font-bold text-gray-600">Session Earnings</span>
-                                        </div>
-                                        <span class="text-xs font-black text-secondary">₹{{ number_format($earned, 2) }}</span>
-                                    </div>
-                                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center"><i class="ri-user-shared-line"></i></div>
-                                            <span class="text-xs font-bold text-gray-600">Referral Shares</span>
-                                        </div>
-                                        <span class="text-xs font-black text-secondary">₹{{ number_format($referralEarned, 2) }}</span>
+                                    <div class="p-3">
+                                        <p class="text-xs text-gray-500 leading-relaxed">Use these coins during booking to get exclusive discounts on your wellness sessions.</p>
                                     </div>
                                 </div>
-                                <div class="p-3 bg-gray-50 text-center">
-                                    <a href="{{ route('transactions.index') }}" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View Transaction Vault</a>
+                                <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
+                                    <a href="{{ route('rewards.index') }}" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View Rewards</a>
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         <!-- Notification -->
                         <div class="relative">
@@ -374,64 +361,31 @@
                     @endphp
 
                     <!-- Coin / Balance -->
+                    @if($isClient)
                     <div class="relative hidden lg:block">
                         <div onclick="toggleBalance('desktop')"
-                            class="w-10 h-10 rounded-full {{ $isClient ? 'bg-[#FFD166]' : 'bg-secondary' }} flex items-center justify-center text-white relative shadow-sm cursor-pointer hover:opacity-90 transition-all ring-4 ring-white">
-                            @if($isClient)
-                                <i class="ri-coins-line text-xl"></i>
-                            @else
-                                <span class="font-bold text-lg">€</span>
-                            @endif
+                            class="w-10 h-10 rounded-full bg-[#FFD166] flex items-center justify-center text-white relative shadow-sm cursor-pointer hover:opacity-90 transition-all ring-4 ring-white">
+                            <i class="ri-coins-line text-xl"></i>
                             <div class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></div>
                         </div>
                         
                         <div id="balance-dropdown-desktop" class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 hidden overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                            @if($isClient)
-                                <!-- Client: Zaya Coins -->
-                                <div class="p-5 border-b border-gray-50 bg-[#FDFEF3]">
-                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Your Wellness Tokens</p>
-                                    <h4 class="text-2xl font-black text-secondary tracking-tight">{{ number_format($user->coins ?? 0) }} <span class="text-xs uppercase">Zaya Coins</span></h4>
+                            <!-- Client: Zaya Coins -->
+                            <div class="p-5 border-b border-gray-50 bg-[#FDFEF3]">
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Your Wellness Tokens</p>
+                                <h4 class="text-2xl font-black text-secondary tracking-tight">{{ number_format($user->coins ?? 0) }} <span class="text-xs uppercase">Zaya Coins</span></h4>
+                            </div>
+                            <div class="p-2">
+                                <div class="p-3">
+                                    <p class="text-xs text-gray-500 leading-relaxed">Use these coins during booking to get exclusive discounts on your wellness sessions.</p>
                                 </div>
-                                <div class="p-2">
-                                    <div class="p-3">
-                                        <p class="text-xs text-gray-500 leading-relaxed">Use these coins during booking to get exclusive discounts on your wellness sessions.</p>
-                                    </div>
-                                </div>
-                                <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
-                                    <a href="{{ route('rewards.index') }}" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View Rewards</a>
-                                </div>
-                            @else
-                                <!-- Professional: Earnings Balance -->
-                                <div class="p-5 border-b border-gray-50 bg-[#F9FBF9]">
-                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Your Total Balance</p>
-                                    <h4 class="text-2xl font-black text-secondary tracking-tight">INR {{ number_format($user_balance, 2) }}</h4>
-                                </div>
-                                <div class="p-2">
-                                    @php
-                                        $earned = \App\Models\Transaction::where('practitioner_id', $user->id)->sum('practitioner_share');
-                                        $referralEarned = \App\Models\Transaction::where('referrer_id', $user->id)->sum('referrer_share');
-                                    @endphp
-                                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="ri-calendar-check-line"></i></div>
-                                            <span class="text-xs font-bold text-gray-600">Session Earnings</span>
-                                        </div>
-                                        <span class="text-xs font-black text-secondary">₹{{ number_format($earned, 2) }}</span>
-                                    </div>
-                                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center"><i class="ri-user-shared-line"></i></div>
-                                            <span class="text-xs font-bold text-gray-600">Referral Shares</span>
-                                        </div>
-                                        <span class="text-xs font-black text-secondary">₹{{ number_format($referralEarned, 2) }}</span>
-                                    </div>
-                                </div>
-                                <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
-                                    <a href="{{ route('transactions.index') }}" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View Transaction Vault</a>
-                                </div>
-                            @endif
+                            </div>
+                            <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
+                                <a href="{{ route('rewards.index') }}" class="text-[10px] font-black text-secondary uppercase tracking-[0.2em] hover:underline">View Rewards</a>
+                            </div>
                         </div>
                     </div>
+                    @endif
 
                   
 

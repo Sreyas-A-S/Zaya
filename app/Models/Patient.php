@@ -26,16 +26,26 @@ class Patient extends Model
         if (empty($value)) return [];
 
         try {
-            // Laravel's encrypted:json cast essentially does this:
+            // Try decrypting with serialization (default)
             $decrypted = decrypt($value);
             return is_string($decrypted) ? json_decode($decrypted, true) : $decrypted;
-        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            // Fallback: If it's already a JSON string (not encrypted), try to decode it
-            $decoded = json_decode($value, true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                return $decoded;
+        } catch (\Throwable $e) {
+            try {
+                // Fallback: Try decrypting WITHOUT serialization
+                $decrypted = decrypt($value, false);
+                $decoded = json_decode($decrypted, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    return $decoded;
+                }
+                return is_array($decrypted) ? $decrypted : [];
+            } catch (\Throwable $e2) {
+                // Fallback: If it's already a JSON string (not encrypted), try to decode it
+                $decoded = json_decode($value, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    return $decoded;
+                }
+                return [];
             }
-            return [];
         }
     }
 

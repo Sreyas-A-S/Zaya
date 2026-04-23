@@ -319,8 +319,8 @@
     </div>
 </div>
 
-@if(!in_array($consultationFormRole, ['doctor', 'practitioner'], true))
-@include('consultation-forms.' . $consultationFormRole, [
+@if(!in_array($roleForSchema, ['doctor', 'practitioner'], true))
+@include('consultation-forms.' . $roleForSchema, [
     'user' => $user,
     'booking' => $booking,
     'payload' => $payload,

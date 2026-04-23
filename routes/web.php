@@ -109,6 +109,7 @@ Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-s
 Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
 Route::get('/gallery', [WebController::class, 'gallery'])->name('gallery');
+Route::get('/practitioner/{slug}/gallery', [WebController::class, 'practitionerGallery'])->name('practitioner.gallery');
 Route::get('/find-practitioner', [WebController::class, 'findPractitioner'])->name('find-practitioner');
 Route::post('/find-practitioner', [WebController::class, 'findPractitionerPost'])->name('find-practitioner.post');
 Route::get('/zipcode/conditions', [WebController::class, 'zipcodeConditions'])->name('zipcode.conditions');

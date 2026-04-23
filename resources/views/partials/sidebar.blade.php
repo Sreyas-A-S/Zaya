@@ -130,7 +130,7 @@
             </li>
             @endif
 
-            @if(auth()->user()->hasPermission('packages-view') || auth()->user()->hasPermission('other-fees-view'))
+            @if(auth()->user()->hasPermission('packages-view') || auth()->user()->hasPermission('other-fees-view') || auth()->user()->hasPermission('promo-codes-view') || auth()->user()->hasPermission('financial-view') || auth()->user()->hasPermission('coins-management-view') || auth()->user()->hasPermission('referral-commissions-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Wallet') }}"></use>
@@ -146,8 +146,14 @@
                     @endif
                     @if(auth()->user()->hasPermission('other-fees-view'))
                     <li> <a href="{{ route('admin.other-fees.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_other_fees'] ?? 'Other Fees' }}</a></li>
+                    @endif
+                    @if(auth()->user()->hasPermission('referral-commissions-view'))
                     <li> <a href="{{ route('admin.referral-commissions.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_referral_commissions'] ?? 'Commissions' }}</a></li>
+                    @endif
+                    @if(auth()->user()->hasPermission('coins-management-view'))
                     <li> <a href="{{ route('admin.coins') }}">{{ $adminPanelSettings['admin_panel_sidebar_coins_management'] ?? 'Coins Management' }}</a></li>
+                    @endif
+                    @if(auth()->user()->hasPermission('financial-view'))
                     <li> <a href="{{ route('admin.financial.index') }}">Transactions</a></li>
                     <li> <a href="{{ route('admin.financial.practitioners') }}">Practitioner Balances</a></li>
                     @endif
@@ -269,7 +275,7 @@
             </li>
             @endif
 
-            @if(auth()->user()->hasPermission('home-page-view') || auth()->user()->hasPermission('about-page-view') || auth()->user()->hasPermission('services-page-view') || auth()->user()->hasPermission('settings-view'))
+            @if(auth()->user()->hasPermission('home-page-view') || auth()->user()->hasPermission('about-page-view') || auth()->user()->hasPermission('services-page-view') || auth()->user()->hasPermission('settings-view') || auth()->user()->hasPermission('gallery-page-view') || auth()->user()->hasPermission('footer-page-view') || auth()->user()->hasPermission('admin-panel-settings-view') || auth()->user()->hasPermission('client-panel-settings-view') || auth()->user()->hasPermission('invoice-settings-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Document') }}"></use>
@@ -296,13 +302,22 @@
                     @if(auth()->user()->hasPermission('settings-view'))
                     <li> <a href="{{ route('admin.contact-us.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_contact_us_settings'] ?? 'Contact Us Settings' }}</a></li>
                     @endif
+
+                    @if(auth()->user()->hasPermission('admin-panel-settings-view'))
                     <li> <a href="{{ route('admin.admin-panel-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_admin_panel_settings'] ?? 'Admin Panel Settings' }}</a></li>
+                    @endif
                     
+                    @if(auth()->user()->hasPermission('footer-page-view'))
                     <li> <a href="{{ route('admin.footer-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_footer_settings'] ?? 'Footer Page Settings' }}</a></li>
+                    @endif
                     
+                    @if(auth()->user()->hasPermission('client-panel-settings-view'))
                     <li> <a href="{{ route('admin.client-pannel-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_client_pannel_settings'] ?? 'Client Pannel Settings' }}</a></li>
+                    @endif
                     
+                    @if(auth()->user()->hasPermission('invoice-settings-view'))
                     <li> <a href="{{ route('admin.invoice-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_invoice_settings'] ?? 'Invoice Settings' }}</a></li>
+                    @endif
 
                 </ul>
 
@@ -310,24 +325,26 @@
             </li>
             @endif
            
-            @if(auth()->user()->hasPermission('contact-messages-view'))
             <li class="sidebar-list">
+                @if(auth()->user()->hasPermission('contact-messages-view'))
                 <a class="sidebar-link" href="{{ route('admin.contact-us.messages') }}">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Message') }}"></use>
                     </svg>
                     <h6 class="f-w-600">{{ $adminPanelSettings['admin_panel_sidebar_contact_messages'] ?? 'Contact Messages' }}</h6>
                 </a>
+                @endif
             </li>
             <li class="sidebar-list">
+                @if(auth()->user()->hasPermission('newsletters-view'))
                 <a class="sidebar-link" href="{{ route('admin.newsletters.index') }}">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Message') }}"></use>
                     </svg>
                     <h6 class="f-w-600">{{ $adminPanelSettings['admin_panel_sidebar_newsletters'] ?? 'Newsletters' }}</h6>
                 </a>
+                @endif
             </li>
-            @endif
             
         </ul>
     </div>
