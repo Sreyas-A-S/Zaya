@@ -173,7 +173,7 @@
                                                 <input type="text" class="form-control" name="referrer_name">
                                             </div>
 
-                                            <div id="registration-fee-field-wrapper" class="card bg-info-light border-0 mb-4 {{ ($registrationFee <= 0) ? 'd-none' : '' }}">
+                                            <div id="registration-fee-field-wrapper" class="card bg-info-light border-0 mb-4 {{ (!$registrationFeeEnabled || $registrationFee <= 0) ? 'd-none' : '' }}">
                                                 <div class="card-body p-3">
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <div>
@@ -377,6 +377,7 @@
                     const data = await response.json();
                     const feeValue = parseFloat(data.fee || 0);
                     const currency = data.currency || 'EUR';
+                    const isEnabled = data.enabled !== undefined ? data.enabled : true;
                     const symbol = currencySymbols[currency] || currency;
 
                     if (feeInput) feeInput.value = feeValue.toFixed(2);
@@ -387,7 +388,7 @@
                         feeDisplay.textContent = `${symbol} ${feeValue.toFixed(2)}`;
                     }
 
-                    if (feeValue <= 0) {
+                    if (!isEnabled || feeValue <= 0) {
                         feeWrapper?.classList.add('d-none');
                     } else {
                         feeWrapper?.classList.remove('d-none');
