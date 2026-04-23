@@ -104,6 +104,9 @@
                         <li id="rule-number" class="flex items-center gap-1.5">
                             <i class="ri-close-circle-line text-gray-300 text-sm"></i> {{ __('One number') }}
                         </li>
+                        <li id="rule-match" class="flex items-center gap-1.5">
+                            <i class="ri-close-circle-line text-gray-300 text-sm"></i> {{ __('Passwords match') }}
+                        </li>
                     </ul>
                 </div>
 
@@ -138,11 +141,13 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const pw = document.getElementById('new-password');
+            const confirmPw = document.getElementById('confirm-password');
             const rules = {
                 length: document.getElementById('rule-length'),
                 upper: document.getElementById('rule-upper'),
                 lower: document.getElementById('rule-lower'),
                 number: document.getElementById('rule-number'),
+                match: document.getElementById('rule-match'),
             };
 
             function checkRule(el, passed) {
@@ -160,13 +165,18 @@
                 }
             }
 
-            pw.addEventListener('input', function() {
-                const v = this.value;
+            function validate() {
+                const v = pw.value;
+                const v2 = confirmPw.value;
                 checkRule(rules.length, v.length >= 8);
                 checkRule(rules.upper, /[A-Z]/.test(v));
                 checkRule(rules.lower, /[a-z]/.test(v));
                 checkRule(rules.number, /[0-9]/.test(v));
-            });
+                checkRule(rules.match, v === v2 && v.length > 0);
+            }
+
+            pw.addEventListener('input', validate);
+            confirmPw.addEventListener('input', validate);
         });
     </script>
 </body>

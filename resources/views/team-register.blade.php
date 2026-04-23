@@ -444,8 +444,7 @@
                             $currencySymbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
                         @endphp
 
-                        @if($feeEnabled && $feeValue > 0)
-                            <div class="mb-10 p-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                        <div id="payment-section-container" class="mb-10 p-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200 {{ (!$feeEnabled || $feeValue <= 0) ? 'hidden' : 'block' }}">
                                 <h3 class="text-lg font-medium text-gray-900 mb-6">{{ __('Registration Fee & Special Offers') }}</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
                                     <div>
@@ -499,8 +498,7 @@
                                     </div>
                                 </div>
                                 <p class="text-gray-400 text-xs mt-4"><i class="ri-information-line mr-1"></i> {{ __('After clicking complete, you will be redirected to the payment gateway.') }}</p>
-                            </div>
-                        @endif
+                        </div>
 
                         <div class="mb-10">
                             <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Captcha Verification') }} <span class="text-red-500">*</span></label>
@@ -980,7 +978,19 @@
                         const data = await response.json();
                         const feeValue = parseFloat(data.fee || 0);
                         const currency = data.currency || 'EUR';
+                        const isEnabled = data.enabled !== undefined ? data.enabled : true;
                         const symbol = currencySymbols[currency] || currency;
+
+                        const paymentContainer = document.getElementById('payment-section-container');
+                        if (paymentContainer) {
+                            if (!isEnabled || feeValue <= 0) {
+                                paymentContainer.classList.add('hidden');
+                                paymentContainer.classList.remove('block');
+                            } else {
+                                paymentContainer.classList.remove('hidden');
+                                paymentContainer.classList.add('block');
+                            }
+                        }
 
                         feeActualInput.value = feeValue.toFixed(2);
                         feeInput.value = feeValue.toFixed(2);

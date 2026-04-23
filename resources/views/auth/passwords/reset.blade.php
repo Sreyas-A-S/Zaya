@@ -44,6 +44,9 @@
                     <li id="req-number" class="text-muted d-flex align-items-center gap-1">
                       <i class="fa fa-circle-o"></i> One number
                     </li>
+                    <li id="req-match" class="text-muted d-flex align-items-center gap-1">
+                      <i class="fa fa-circle-o"></i> Passwords match
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -118,11 +121,13 @@
 <script>
   $(document).ready(function() {
     const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('password_confirmation');
     const requirements = {
       length: document.getElementById('req-length'),
       upper: document.getElementById('req-upper'),
       lower: document.getElementById('req-lower'),
-      number: document.getElementById('req-number')
+      number: document.getElementById('req-number'),
+      match: document.getElementById('req-match')
     };
 
     function updateRequirement(el, met) {
@@ -135,14 +140,21 @@
       }
     }
 
+    function validate() {
+      const val = password.value;
+      const val2 = confirmPassword.value;
+      updateRequirement(requirements.length, val.length >= 8);
+      updateRequirement(requirements.upper, /[A-Z]/.test(val));
+      updateRequirement(requirements.lower, /[a-z]/.test(val));
+      updateRequirement(requirements.number, /[0-9]/.test(val));
+      updateRequirement(requirements.match, val === val2 && val.length > 0);
+    }
+
     if (password) {
-      password.addEventListener('input', function() {
-        const val = this.value;
-        updateRequirement(requirements.length, val.length >= 8);
-        updateRequirement(requirements.upper, /[A-Z]/.test(val));
-        updateRequirement(requirements.lower, /[a-z]/.test(val));
-        updateRequirement(requirements.number, /[0-9]/.test(val));
-      });
+      password.addEventListener('input', validate);
+    }
+    if (confirmPassword) {
+      confirmPassword.addEventListener('input', validate);
     }
 
     $('.theme-form').on('submit', function() {

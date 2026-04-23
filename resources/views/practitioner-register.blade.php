@@ -622,10 +622,9 @@
                     </div>
 
                     <!-- Payment & Captcha Section -->
-                    @if($practitionerRegistrationFeeEnabled)
-                        <div class='mb-12 border-t border-[#E5E5E5] pt-12'>
+                    <div class='mb-12 border-t border-[#E5E5E5] pt-12 {{ (!$practitionerRegistrationFeeEnabled || $practitionerRegistrationFee <= 0) ? 'hidden' : 'block' }}' id="registration-fee-field-wrapper">
                             <div class='grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12'>
-                                <div id="registration-fee-field-wrapper">
+                                <div>
                                     <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Registration Fee Amount') }}</label>
                                     <div class='relative w-full'>
                                         <div class='w-full h-[58px] bg-[#F5F5F5] rounded-full flex items-center pl-8 pr-2' data-registration-fee-container>
@@ -701,7 +700,6 @@
                                 @enderror
                             </div>
                         </div>
-                    @endif
                 </div>
             </form>
         </div>
@@ -794,7 +792,7 @@
             const feeInput = document.querySelector('input[name="registration_fee"]');
             const feeActualInput = document.querySelector('input[name="registration_fee_actual"]');
 
-            function renderRegistrationFee() {
+            function renderRegistrationFee(isEnabled = true) {
                 const feeContainer = document.querySelector('[data-registration-fee-container]');
                 const feeWrapper = document.getElementById('registration-fee-field-wrapper');
                 if (!feeContainer) return;
@@ -803,10 +801,16 @@
                 if (!feeInput || !feeText) return;
 
                 const feeValue = parseFloat(feeInput.value || 0);
-                if (feeValue <= 0) {
-                    if (feeWrapper) feeWrapper.classList.add('hidden');
+                if (!isEnabled || feeValue <= 0) {
+                    if (feeWrapper) {
+                        feeWrapper.classList.add('hidden');
+                        feeWrapper.classList.remove('block');
+                    }
                 } else {
-                    if (feeWrapper) feeWrapper.classList.remove('hidden');
+                    if (feeWrapper) {
+                        feeWrapper.classList.remove('hidden');
+                        feeWrapper.classList.add('block');
+                    }
                     feeText.textContent = `${registrationCurrencySymbol} ${feeValue.toFixed(2)}`;
                 }
             }
@@ -852,6 +856,7 @@
                             const data = await response.json();
                             const feeValue = parseFloat(data.fee || 0);
                             const currency = data.currency || 'EUR';
+                            const isEnabled = data.enabled !== undefined ? data.enabled : true;
                             
                             if (feeInput && feeActualInput) {
                                 feeActualInput.value = feeValue.toFixed(2);
@@ -871,7 +876,7 @@
                                 registrationCurrencySymbol = currency;
                             }
                             
-                            renderRegistrationFee();
+                            renderRegistrationFee(isEnabled);
                         }
                     } catch (error) {
                         console.error('Error fetching country-specific fee:', error);

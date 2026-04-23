@@ -798,6 +798,18 @@
             const modal = document.getElementById('logoutConfirmModal');
             if (event.target == modal) closeLogoutModal();
         });
+
+        function handleLogout(btn) {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            const originalText = btn.innerText;
+            btn.innerHTML = `<div class="flex items-center justify-center gap-2">
+                <i class="ri-loader-4-line animate-spin text-xl"></i>
+                <span>${originalText}</span>
+            </div>`;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+            document.getElementById('logout-form').submit();
+        }
     </script>
 
     <!-- Logout Confirmation Modal -->
@@ -811,7 +823,7 @@
                 <p class="text-gray-500 mb-8 leading-relaxed font-medium text-base">Are you sure you want to end your session and logout of the portal?</p>
                 
                 <div class="flex flex-col gap-3">
-                    <button type="button" onclick="document.getElementById('logout-form').submit();" class="w-full py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 transition-all text-lg shadow-xl shadow-red-200">Yes, Logout</button>
+                    <button type="button" onclick="handleLogout(this);" class="w-full py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 transition-all text-lg shadow-xl shadow-red-200">Yes, Logout</button>
                     <button type="button" onclick="closeLogoutModal()" class="w-full py-4 bg-gray-50 text-gray-500 font-black rounded-2xl hover:bg-gray-100 transition-all text-lg">Cancel</button>
                 </div>
             </div>
