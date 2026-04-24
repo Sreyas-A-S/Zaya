@@ -89,21 +89,47 @@ if (! function_exists('get_timezone_from_country')) {
     /**
      * Get primary timezone from country code.
      */
-    function get_timezone_from_country(?string $countryCode): string
+    function get_timezone_from_country(?string $country): string
     {
-        if (!$countryCode) return config('app.timezone', 'UTC');
+        if (!$country) return config('app.timezone', 'UTC');
 
-        $countryCode = strtoupper(trim($countryCode));
-        $tzs = DateTimeZone::listIdentifiers(DateTimeZone::PER_COUNTRY, $countryCode);
+        $country = trim($country);
+        $code = null;
 
-        if (!empty($tzs)) {
-            // Special cases for some countries if needed
-            if ($countryCode === 'IN') return 'Asia/Kolkata';
-            if ($countryCode === 'AE') return 'Asia/Dubai';
-            if ($countryCode === 'GB') return 'Europe/London';
-            if ($countryCode === 'US') return 'America/New_York'; // Default to East Coast for US
+        if (strlen($country) === 2) {
+            $code = strtoupper($country);
+        } else {
+            // Try to find code from name if the input is a full name (e.g. "India")
+            try {
+                $countryModel = \App\Models\Country::where('name', $country)
+                    ->orWhere('code', $country)
+                    ->first();
+                
+                if ($countryModel && strlen(trim($countryModel->code)) === 2) {
+                    $code = strtoupper(trim($countryModel->code));
+                }
+            } catch (\Throwable $e) {
+                $code = null;
+            }
+        }
 
-            return $tzs[0];
+        if ($code && strlen($code) === 2) {
+            try {
+                // Argument #2 must be a two-letter ISO 3166-1 compatible country code
+                $tzs = @DateTimeZone::listIdentifiers(DateTimeZone::PER_COUNTRY, $code);
+
+                if (!empty($tzs)) {
+                    // Special cases for some countries if needed
+                    if ($code === 'IN') return 'Asia/Kolkata';
+                    if ($code === 'AE') return 'Asia/Dubai';
+                    if ($code === 'GB') return 'Europe/London';
+                    if ($code === 'US') return 'America/New_York'; // Default to East Coast for US
+
+                    return $tzs[0];
+                }
+            } catch (\Throwable $e) {
+                // Fallback to default on any error
+            }
         }
 
         return config('app.timezone', 'UTC');

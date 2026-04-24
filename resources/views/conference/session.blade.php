@@ -469,11 +469,32 @@
                 }, 1000);
             }
 
-            // Prevent Accidental Reload
+            // Prevent Accidental Reload / Navigation
             let allowExit = false;
             window.addEventListener('beforeunload', function (e) {
-                if (meetingStartedAt && !allowExit) { e.preventDefault(); e.returnValue = ''; }
+                if (meetingStartedAt && !allowExit) { 
+                    const msg = "You are currently in a live session. Leaving this page will disconnect your call and end the session.";
+                    e.preventDefault(); 
+                    e.returnValue = msg; 
+                    return msg;
+                }
             });
+
+            // Intercept internal link clicks to show a cleaner confirmation
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (!link || !meetingStartedAt || allowExit) return;
+                
+                // Only intercept internal links or links that would navigate away from the meeting
+                const url = new URL(link.href, window.location.origin);
+                if (url.origin === window.location.origin && url.pathname !== window.location.pathname) {
+                    e.preventDefault();
+                    if (confirm("Are you sure you want to leave the live session? This will disconnect your call.")) {
+                        allowExit = true;
+                        window.location.href = link.href;
+                    }
+                }
+            }, true);
 
             window.switchProvider = (nextProvider) => {
                 allowExit = true;
@@ -616,7 +637,8 @@
                            'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
                            'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
                            'videoquality', 'filmstrip', 'feedback', 'stats', 'shortcuts',
-                           'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security'
+                           'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security',
+                           'whiteboard'
                         ],
                         disabledNotifications: ['moderator', 'notify.moderator', 'notify.connected-as-moderator', 'connection.connected-as-moderator'],
                         disableModeratorIndicator: true
