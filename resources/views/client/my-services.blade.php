@@ -578,19 +578,27 @@ async function fetchAvailableServices() {
             .filter(s => !selectedIds.includes(String(s.id)) || String(s.id) === String(el.value))
             .map(s => ({ id: s.id, text: s.title }));
 
+        // Clear existing options so Select2 can build from data array correctly
+        // Append an empty option first as required by Select2 placeholders
+        const currentValue = $(el).val();
+        $(el).empty();
+        $(el).append(new Option('', '', true, true));
+
         select2Instances[elementId] = $(el).select2({
-            data,
+            data: data,
             placeholder: 'Choose a service...',
             width: '100%',
-            dropdownParent: $('#addServiceModal'),
+            dropdownParent: $('#addServiceModal')
         });
         
-        // Remove old listeners to prevent recursive loops and duplicate calls
-        $(el).off('change').on('change', function(e) {
-            // Only refresh if it was a user interaction, not a programmatic set
-            if (e.originalEvent) {
-                refreshAllSelects(elementId);
-            }
+        // Restore previous value if it was a valid selection
+        if (currentValue && data.some(d => String(d.id) === String(currentValue))) {
+            $(el).val(currentValue).trigger('change.select2');
+        }
+        
+        // Use select2 specific event for user selection
+        $(el).off('select2:select').on('select2:select', function(e) {
+            refreshAllSelects(elementId);
         });
         
         toggleSelectLoader(el, false);
@@ -601,7 +609,9 @@ async function fetchAvailableServices() {
         const selects = document.querySelectorAll('.service-selector');
         for (const sel of selects) {
             const id = sel.id;
-            await initSelect2(id);
+            if (id !== changedId) { // Never refresh the one that was just selected
+                await initSelect2(id);
+            }
         }
     }
 
