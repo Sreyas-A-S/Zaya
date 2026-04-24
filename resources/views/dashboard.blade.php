@@ -882,7 +882,7 @@
                 dot.classList.remove('translate-x-5');
             }
 
-            fetch("{{ route('profile.updateConsent') }}", {
+            fetch("{{ route('profile.update_consent') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

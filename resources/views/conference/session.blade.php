@@ -73,11 +73,13 @@
                             <i class="ri-external-link-line text-xl"></i>
                         </button>
 
+                        {{-- 
                         <button onclick="togglePiP()"
                             class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer"
                             title="Compact View">
                             <i class="ri-picture-in-picture-2-fill text-xl"></i>
                         </button>
+                        --}}
                         @if($provider === 'agora')
                             <button onclick="toggleSettings()"
                                 class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer"
@@ -328,6 +330,19 @@
             @endif
         </div>
 
+        @if(!$booking)
+        <!-- PiP Placeholder for non-bookings (shown only when video is in PiP) -->
+        <div id="pip-placeholder" class="hidden flex-1 bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)] flex-col">
+            <div class="p-8 flex flex-col items-center justify-center h-full text-center">
+                <div class="w-20 h-20 bg-secondary/5 rounded-3xl flex items-center justify-center mb-6">
+                    <i class="ri-vidicon-fill text-secondary text-4xl animate-pulse"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-secondary mb-2">Live Session in Pop-out</h2>
+                <p class="text-gray-400 max-w-sm">The video window is currently floating. You can continue using this dashboard as normal.</p>
+            </div>
+        </div>
+        @endif
+
         <!-- Clinical Records Sidebar -->
         @if($booking)
         <div id="clinical-sidebar" class="sidebar-collapsed w-full lg:w-[450px] bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)] flex flex-col mb-6 lg:mb-0">
@@ -443,6 +458,34 @@
             left: 0;
         }
 
+        #session-wrapper.pip-mode-active #clinical-sidebar {
+            width: 100% !important;
+            max-width: none !important;
+            flex: 1 !important;
+            margin: 0 !important;
+            border-radius: 32px !important;
+            display: flex !important;
+            opacity: 1 !important;
+            transform: none !important;
+            pointer-events: auto !important;
+        }
+
+        #session-wrapper.pip-mode-active #clinical-sidebar.sidebar-collapsed {
+            width: 100% !important;
+            margin-left: 0 !important;
+        }
+
+        #session-wrapper.pip-mode-active #pip-placeholder {
+            display: flex !important;
+        }
+
+        #video-container.in-popout #conference-meeting-header,
+        #video-container.in-popout #conference-mobile-nav,
+        #session-wrapper.pip-mode-active #conference-meeting-header,
+        #session-wrapper.pip-mode-active #conference-mobile-nav {
+            display: none !important;
+        }
+
         #session-wrapper.pip-active #video-container {
             position: fixed;
             bottom: 2rem;
@@ -487,11 +530,6 @@
             z-index: 160;
             justify-content: space-between;
             align-items: center;
-        }
-
-        #video-container.in-popout #conference-meeting-header,
-        #video-container.in-popout #conference-mobile-nav {
-            display: none !important;
         }
 
         #session-wrapper.pip-active #conference-meeting-header,
@@ -669,6 +707,23 @@
                         // Move the video container to the PiP window
                         videoContainer.classList.add('in-popout');
                         pipWindow.document.body.append(videoContainer);
+                        wrapper.classList.add('pip-mode-active');
+
+                        // If meeting is ongoing, re-init the SDK in the new document context to bypass pre-join
+                        if (meetingStartedAt) {
+                            if (provider === 'jaas') {
+                                if (jitsiApi) jitsiApi.dispose();
+                                initJitsi(true);
+                            } else if (provider === 'daily') {
+                                if (dailyCall) { 
+                                    const oldCall = dailyCall;
+                                    dailyCall = null;
+                                    oldCall.leave().then(() => oldCall.destroy()).then(() => initDaily(true));
+                                } else {
+                                    initDaily(true);
+                                }
+                            }
+                        }
                         
                         // Automatically expand clinical notes in main window if it's a booking
                         if (sidebar && sidebar.classList.contains('sidebar-collapsed')) {
@@ -679,20 +734,29 @@
                         pipWindow.addEventListener('pagehide', (event) => {
                             videoContainer.classList.remove('in-popout');
                             wrapper.prepend(videoContainer);
-                            
-                            // Optionally restore layout
-                            if (sidebar && !sidebar.classList.contains('sidebar-collapsed')) {
-                                // Keep it open or close based on preference, 
-                                // here we just ensure the video container is back in place
+                            wrapper.classList.remove('pip-mode-active');
+
+                            if (meetingStartedAt) {
+                                if (provider === 'jaas') {
+                                    if (jitsiApi) jitsiApi.dispose();
+                                    initJitsi(true);
+                                } else if (provider === 'daily') {
+                                    if (dailyCall) {
+                                        const oldCall = dailyCall;
+                                        dailyCall = null;
+                                        oldCall.leave().then(() => oldCall.destroy()).then(() => initDaily(true));
+                                    } else {
+                                        initDaily(true);
+                                    }
+                                }
                             }
                         });
                     } catch (err) {
                         console.error('Failed to enter Document PiP:', err);
-                        // Fallback to separate window
                         openPopoutMeeting(channel, provider);
                     }
                 } else {
-                    // Fallback to window.open
+                    // Fallback to window.open if DPiP is not supported
                     openPopoutMeeting(channel, provider);
                 }
             };
@@ -910,19 +974,24 @@
                 else if (provider === 'agora') initAgora(isResume);
             };
 
-            // Check if session is already active (e.g., after popout or reload)
+            // Check if session is already active (e.g., after reload)
             if (localStorage.getItem('meeting_active_' + channel) === 'true') {
                 console.log('Session is already active, auto-joining...');
-                hideOverlay(true); // Hide immediately to avoid flicker
-                
-                // Allow some time for SDKs to be ready if needed
+                hideOverlay(true);
                 setTimeout(() => {
                     window.startSession(true);
                 }, 100);
             }
 
             function initJitsi(isResume = false) {
-                const container = document.getElementById('jitsi-meet-container');
+                let container = document.getElementById('jitsi-meet-container');
+                
+                // If container not in main document, check PiP window
+                if (!container && window.documentPictureInPicture?.window) {
+                    container = window.documentPictureInPicture.window.document.getElementById('jitsi-meet-container');
+                }
+
+                if (!container) return console.error('Jitsi container not found');
                 
                 jitsiApi = new JitsiMeetExternalAPI(jitsiDomain, {
                     roomName: jitsiRoom,
@@ -972,7 +1041,14 @@
             }
 
             async function initDaily(isResume = false) {
-                const container = document.getElementById('daily-meet-container');
+                let container = document.getElementById('daily-meet-container');
+
+                if (!container && window.documentPictureInPicture?.window) {
+                    container = window.documentPictureInPicture.window.document.getElementById('daily-meet-container');
+                }
+
+                if (!container) return console.error('Daily container not found');
+
                 dailyCall = DailyIframe.createFrame(container, {
                     showLeaveButton: true,
                     iframeStyle: { width: '100%', height: '100%', border: '0' }

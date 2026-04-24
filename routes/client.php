@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/dashboard', [ProfileController::class, 'index'])->name('dashboard');
     Route::get('/health-journey', [ProfileController::class, 'healthJourney'])->name('health-journey.index');
-    Route::post('/update-consent', [ProfileController::class, 'updateConsent'])->name('consent.update');
+    Route::post('/update-consent', [ProfileController::class, 'updateConsent'])->name('profile.update_consent');
     Route::get('/consultations', [ProfileController::class, 'bookings'])->name('consultations.index');
     Route::get('/bookings', [ProfileController::class, 'bookings'])->name('bookings.index');
     Route::get('/transactions', [ProfileController::class, 'transactions'])->name('transactions.index');

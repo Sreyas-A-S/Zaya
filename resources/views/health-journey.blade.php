@@ -546,7 +546,7 @@ function toggleGlobalConsent(btn) {
         btn.setAttribute('data-consent', '0');
     }
 
-    fetch("{{ route('consent.update') }}", {
+    fetch("{{ route('profile.updateConsent') }}", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
