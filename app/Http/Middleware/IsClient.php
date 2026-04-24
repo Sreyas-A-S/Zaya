@@ -17,7 +17,7 @@ class IsClient
     {
         if (auth()->check()) {
             $user = auth()->user();
-            $clientRoles = ['client', 'patient'];
+            $clientRoles = ['client', 'patient', 'doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist', 'translator'];
             
             if (!in_array(strtolower($user->role), $clientRoles)) {
                 $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
