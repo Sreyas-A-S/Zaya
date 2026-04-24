@@ -100,30 +100,10 @@
                 });
             });
 
-            // Re-bind dropdowns
-            bindDropdowns();
+            // (Removed redundant manual binding, layout uses event delegation on document)
         }
 
-        function bindDropdowns() {
-            document.querySelectorAll('.dropdown-trigger').forEach(trigger => {
-                trigger.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const menu = this.nextElementSibling;
-                    const isHidden = menu.classList.contains('hidden');
-                    
-                    document.querySelectorAll('.action-dropdown .dropdown-menu').forEach(m => m.classList.add('hidden'));
-                    
-                    if (isHidden) {
-                        menu.classList.remove('hidden');
-                    }
-                });
-            });
-        }
 
-        // Global click to close dropdowns
-        document.addEventListener('click', () => {
-            document.querySelectorAll('.action-dropdown .dropdown-menu').forEach(m => m.classList.add('hidden'));
-        });
 
         // Initialize
         rebindSearch();
@@ -220,7 +200,7 @@
                     }
                 }
                 e.stopPropagation();
-            } else {
+            } else if (!e.target.closest('.dropdown-menu')) {
                 closeAllMenus();
             }
         });

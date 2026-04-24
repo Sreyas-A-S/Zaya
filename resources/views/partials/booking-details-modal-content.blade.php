@@ -90,15 +90,70 @@
     </div>
 
     <!-- Payment -->
-    <div class="bg-[#2E4B3D] p-4 rounded-xl flex justify-between items-center text-white mt-6">
-        <div>
-            <p class="text-[10px] uppercase tracking-widest opacity-70 font-bold">Total Amount</p>
-            @if($booking->razorpay_payment_id)
-            <p class="text-[10px] opacity-50">Ref: {{ $booking->razorpay_payment_id }}</p>
+    @php
+        $transaction = $booking->transactions->first();
+        $isPractitioner = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner->user_id === $user->id;
+        $isTranslator = ($booking->translator && $booking->translator->user_id === $user->id);
+    @endphp
+
+    <div class="bg-[#2E4B3D] p-5 rounded-[2rem] text-white mt-6 shadow-xl shadow-secondary/10">
+        <div class="flex justify-between items-center">
+            <div>
+                @if($isPractitioner)
+                    <p class="text-[10px] uppercase tracking-[0.2em] opacity-70 font-black mb-1">Your Earned Share</p>
+                    <p class="text-2xl font-black">€ {{ number_format($transaction ? $transaction->practitioner_share : 0, 2) }}</p>
+                @elseif($isTranslator)
+                    <p class="text-[10px] uppercase tracking-[0.2em] opacity-70 font-black mb-1">Total Amount</p>
+                    <p class="text-2xl font-black">€ {{ number_format($booking->total_price, 2) }}</p>
+                @else
+                    <p class="text-[10px] uppercase tracking-[0.2em] opacity-70 font-black mb-1">Total Amount Paid</p>
+                    <p class="text-2xl font-black">€ {{ number_format($booking->total_price, 2) }}</p>
+                @endif
+                
+                @if($booking->razorpay_payment_id)
+                <p class="text-[9px] opacity-40 font-bold mt-2 uppercase tracking-tighter">Ref: {{ $booking->razorpay_payment_id }}</p>
+                @endif
+            </div>
+            
+            @if($isPractitioner && $transaction)
+            <button onclick="toggleDistribution()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all border border-white/10">
+                <i class="ri-information-line text-xl"></i>
+            </button>
             @endif
         </div>
-        <p class="text-xl font-bold">€ {{ number_format($booking->total_price, 2) }}</p>
+
+        @if($isPractitioner && $transaction)
+        <div id="distribution-info" class="hidden mt-6 pt-6 border-t border-white/10 space-y-4 transition-all">
+            <div class="flex justify-between items-center text-[11px]">
+                <span class="opacity-60 font-bold uppercase tracking-widest">Gross Booking Amount</span>
+                <span class="font-black">€ {{ number_format($transaction->total_amount, 2) }}</span>
+            </div>
+            <div class="flex justify-between items-center text-[11px]">
+                <span class="opacity-60 font-bold uppercase tracking-widest">Platform Fee ({{ number_format($transaction->company_commission_percent, 1) }}%)</span>
+                <span class="font-black text-red-300">- € {{ number_format($transaction->company_share, 2) }}</span>
+            </div>
+            @if($transaction->referrer_share > 0)
+            <div class="flex justify-between items-center text-[11px]">
+                <span class="opacity-60 font-bold uppercase tracking-widest">Referral Fee ({{ number_format($transaction->referrer_commission_percent, 1) }}%)</span>
+                <span class="font-black text-orange-300">- € {{ number_format($transaction->referrer_share, 2) }}</span>
+            </div>
+            @endif
+            <div class="flex justify-between items-center pt-2 border-t border-white/5 text-sm font-black">
+                <span class="uppercase tracking-widest text-[10px]">Net Earnings</span>
+                <span class="text-emerald-300">€ {{ number_format($transaction->practitioner_share, 2) }}</span>
+            </div>
+        </div>
+        @endif
     </div>
+
+    <script>
+        function toggleDistribution() {
+            const info = document.getElementById('distribution-info');
+            if (info) {
+                info.classList.toggle('hidden');
+            }
+        }
+    </script>
 
     <!-- Referral Option (Practitioner Only) -->
     @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner->user_id === $user->id)

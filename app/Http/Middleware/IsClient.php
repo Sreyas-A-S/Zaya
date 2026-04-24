@@ -23,7 +23,18 @@ class IsClient
                 $adminRoles = ['Admin', 'Super Admin', 'Country Admin', 'Financial Manager', 'Content Manager', 'User Manager', 'admin', 'super-admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
                 
                 if (in_array(strtolower($user->role), $adminRoles)) {
-                    return redirect()->route('admin.dashboard')->with('warning', 'Admins cannot access the client panel.');
+                    // Only redirect if NOT already on admin dashboard to avoid loop
+                    if (!$request->routeIs('admin.dashboard')) {
+                        return redirect()->route('admin.dashboard')->with('warning', 'Admins cannot access the client panel.');
+                    }
+                    return $next($request);
+                }
+
+                // For practitioners, doctors, etc. 
+                // They share the dashboard route with clients but the middleware is applied to it.
+                // We must allow them to view the dashboard itself.
+                if ($request->routeIs('dashboard')) {
+                    return $next($request);
                 }
 
                 // If they are on a booking related route, give a specific message
