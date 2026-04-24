@@ -1332,6 +1332,17 @@ class ProfileController extends Controller
             })->first();
 
         $isInstant = !$booking && str_starts_with((string)$channel, 'zaya-');
+
+        // For instant meetings, we fetch the latest booking to "demo" the consultation form as requested
+        if ($isInstant && $user->id > 0) {
+            $booking = \App\Models\Booking::with(['user', 'practitioner.user'])
+                ->where(function($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                      ->orWhereHas('practitioner', fn($p) => $p->where('user_id', $user->id));
+                })
+                ->latest()
+                ->first();
+        }
         
         \Log::info("User joining session:", [
             'user' => $user->id,
