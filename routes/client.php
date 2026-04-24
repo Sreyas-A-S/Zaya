@@ -23,6 +23,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/conference/zego/{channel}', [ZegoController::class, 'join'])->name('zego.join');
     Route::get('/bookings/{id}/consultation-form', [ProfileController::class, 'showConsultationForm'])->name('bookings.consultation-form.show');
     Route::post('/bookings/{id}/consultation-form', [ProfileController::class, 'storeConsultationForm'])->name('bookings.consultation-form.store');
+    Route::delete('/bookings/{id}/consultation-form/{form_id}', [ProfileController::class, 'deleteConsultationForm'])->name('bookings.consultation-form.destroy');
     Route::get('/agora/token', [ProfileController::class, 'generateToken'])->name('agora.token');
     Route::get('/bookings/{id}/details', [ProfileController::class, 'showDetails'])->name('bookings.details');
     Route::get('/bookings/{id}/details-view', [ProfileController::class, 'showDetailsView'])->name('bookings.details-view');

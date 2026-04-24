@@ -285,19 +285,39 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @forelse($booking->consultationForms as $form)
-                    <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $form->id]) }}" 
-                       class="flex items-center justify-between p-5 rounded-2xl border border-gray-50 bg-[#F9FBF9] hover:border-secondary/20 hover:bg-white transition-all group shadow-sm">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
-                                <i class="ri-file-list-3-line"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-black text-secondary">{{ $form->title ?: 'Consultation Form' }}</p>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{{ $form->created_at->format('M d, Y') }}</p>
+                    <div class="flex flex-col p-5 rounded-2xl border border-gray-50 bg-[#F9FBF9] hover:border-secondary/20 hover:bg-white transition-all group shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
+                                    <i class="ri-file-list-3-line"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-secondary">{{ $form->title ?: 'Consultation Form' }}</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{{ $form->created_at->format('M d, Y') }}</p>
+                                </div>
                             </div>
                         </div>
-                        <i class="ri-arrow-right-s-line text-gray-300 group-hover:text-secondary transition-colors"></i>
-                    </a>
+                        
+                        <div class="flex items-center gap-2 mt-auto">
+                            <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $form->id, 'view' => 1]) }}" 
+                               class="flex-1 py-2 px-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">
+                                <i class="ri-eye-line mr-1"></i> View
+                            </a>
+                            @if($isPractitioner)
+                            <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $form->id]) }}" 
+                               class="flex-1 py-2 px-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">
+                                <i class="ri-edit-line mr-1"></i> Edit
+                            </a>
+                            <form action="{{ route('bookings.consultation-form.destroy', ['id' => $booking->id, 'form_id' => $form->id]) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this record?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="p-2 text-red-400 hover:text-red-600 transition-colors">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </form>
+                            @endif
+                        </div>
+                    </div>
                     @empty
                     <div class="col-span-full py-8 text-center bg-gray-50/50 rounded-3xl border border-dashed border-gray-200">
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">No consultation forms recorded yet</p>
@@ -326,7 +346,12 @@
                     <div class="p-4 bg-white rounded-2xl border border-[#2E4B3D]/5 shadow-sm">
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Languages</p>
                         <div class="flex flex-wrap gap-1 mt-2">
-                            @php $langs = is_array($booking->user->languages) ? $booking->user->languages : []; @endphp
+                            @php 
+                                $langs = is_array($booking->user->languages) ? $booking->user->languages : [];
+                                if (empty($langs) && $booking->user->patient) {
+                                    $langs = is_array($booking->user->patient->languages_spoken) ? $booking->user->patient->languages_spoken : [];
+                                }
+                            @endphp
                             @forelse($langs as $langId)
                                 @php $l = \App\Models\Language::find($langId); @endphp
                                 @if($l)
