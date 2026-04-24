@@ -63,6 +63,16 @@
                             <i class="ri-external-link-line text-xl"></i>
                         </button>
 
+                        @if($booking && in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+                            @if($booking->need_translator && !$booking->translator_id)
+                            <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language }}', '{{ $booking->to_language }}')"
+                                class="p-3 text-blue-600 hover:text-blue-700 transition-colors cursor-pointer"
+                                title="Assign Translator">
+                                <i class="ri-translate text-xl"></i>
+                            </button>
+                            @endif
+                        @endif
+
                         @if($provider === 'agora')
                             <button onclick="toggleSettings()"
                                 class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer"
@@ -272,6 +282,20 @@
                 </div>
                 <h2 class="text-2xl font-bold text-secondary mb-2">Live Session in Pop-out</h2>
                 <p class="text-gray-400 max-w-sm">The video window is currently floating. You can continue using this dashboard as normal.</p>
+                
+                @if($booking && $booking->translator_id)
+                <div class="mt-8 p-6 bg-blue-50/50 rounded-[2rem] border border-blue-100 flex items-center gap-4 text-left">
+                    <img src="{{ $booking->translator->user->profile_pic ? (str_starts_with($booking->translator->user->profile_pic, 'http') ? $booking->translator->user->profile_pic : asset('storage/' . $booking->translator->user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" 
+                         class="w-12 h-12 rounded-xl object-cover border border-white shadow-sm">
+                    <div>
+                        <p class="text-[9px] text-blue-600 font-black uppercase tracking-widest mb-1">Assigned Translator</p>
+                        <p class="text-sm font-black text-secondary">{{ $booking->translator->full_name }}</p>
+                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+                        <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language }}', '{{ $booking->to_language }}')" class="mt-2 text-[9px] font-black text-blue-600 uppercase tracking-widest hover:underline">Change Translator →</button>
+                        @endif
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
         @endif
@@ -289,6 +313,16 @@
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Client: {{ $booking->user->name ?? 'Guest' }}</p>
                     </div>
                 </div>
+                
+                @if($booking->translator_id)
+                <div class="hidden md:flex items-center gap-3 px-4 py-2 bg-blue-50 rounded-full border border-blue-100">
+                    <i class="ri-translate text-blue-600"></i>
+                    <span class="text-[10px] font-black text-secondary uppercase tracking-widest">Translator: {{ $booking->translator->full_name }}</span>
+                    @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+                    <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language }}', '{{ $booking->to_language }}')" class="ml-2 text-[9px] font-black text-blue-600 uppercase hover:underline">Change</button>
+                    @endif
+                </div>
+                @endif
             </div>
             <div class="flex-1 relative bg-gray-50/50 p-4 md:p-8">
                 <iframe src="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'minimal' => 1]) }}" 
@@ -298,6 +332,8 @@
         </div>
         @endif
     </div>
+
+    @include('partials.refer-modal-scripts')
 
     @if($provider === 'agora')
         <!-- Settings Modal -->
