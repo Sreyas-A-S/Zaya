@@ -84,3 +84,56 @@ if (! function_exists('derive_currency_from_user')) {
         return strtoupper($fallback);
     }
 }
+
+if (! function_exists('get_timezone_from_country')) {
+    /**
+     * Get primary timezone from country code.
+     */
+    function get_timezone_from_country(?string $countryCode): string
+    {
+        if (!$countryCode) return config('app.timezone', 'UTC');
+
+        $countryCode = strtoupper(trim($countryCode));
+        $tzs = DateTimeZone::listIdentifiers(DateTimeZone::PER_COUNTRY, $countryCode);
+
+        if (!empty($tzs)) {
+            // Special cases for some countries if needed
+            if ($countryCode === 'IN') return 'Asia/Kolkata';
+            if ($countryCode === 'AE') return 'Asia/Dubai';
+            if ($countryCode === 'GB') return 'Europe/London';
+            if ($countryCode === 'US') return 'America/New_York'; // Default to East Coast for US
+
+            return $tzs[0];
+        }
+
+        return config('app.timezone', 'UTC');
+    }
+}
+
+if (! function_exists('derive_timezone_from_user')) {
+    /**
+     * Derive timezone from user/profile country.
+     */
+    function derive_timezone_from_user($user): string
+    {
+        $country = null;
+
+        try {
+            if (isset($user->country)) {
+                $country = $user->country;
+            } elseif (isset($user->patient) && $user->patient) {
+                $country = $user->patient->country ?? null;
+            } elseif (isset($user->practitioner) && $user->practitioner) {
+                $country = $user->practitioner->country ?? null;
+            } elseif (isset($user->doctor) && $user->doctor) {
+                $country = $user->doctor->country ?? null;
+            } elseif (isset($user->profile) && $user->profile) {
+                $country = $user->profile->country ?? null;
+            }
+        } catch (\Throwable $e) {
+            $country = null;
+        }
+
+        return get_timezone_from_country($country);
+    }
+}

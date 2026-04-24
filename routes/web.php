@@ -109,6 +109,7 @@ Route::get('/coming-soon', [WebController::class, 'comingSoon'])->name('coming-s
 Route::get('/about-us', [WebController::class, 'aboutUs'])->name('about-us');
 Route::get('/services', [WebController::class, 'services'])->name('services');
 Route::get('/gallery', [WebController::class, 'gallery'])->name('gallery');
+Route::get('/practitioner/{slug}/gallery', [WebController::class, 'practitionerGallery'])->name('practitioner.gallery');
 Route::get('/find-practitioner', [WebController::class, 'findPractitioner'])->name('find-practitioner');
 Route::post('/find-practitioner', [WebController::class, 'findPractitionerPost'])->name('find-practitioner.post');
 Route::get('/zipcode/conditions', [WebController::class, 'zipcodeConditions'])->name('zipcode.conditions');
@@ -152,6 +153,7 @@ Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->na
 Route::get('/captcha', [CaptchaController::class, 'generate'])->name('captcha');
 Route::get('/geoip/country', [GeoIpController::class, 'country'])->name('geoip.country');
 Route::get('/magic-login', [\App\Http\Controllers\Auth\MagicLoginController::class, 'login'])->name('magic.login');
+Route::get('/invoice/{invoice_no}', [InvoiceController::class, 'show'])->name('invoice.show')->middleware('auth');
 Route::post('/validate-promo-code', [WebController::class, 'validatePromoCode'])->name('promo.validate')->middleware('throttle:5,1');
 Route::post('/get-registration-fee', [WebController::class, 'getRegistrationFee'])->name('registration-fee.get');
 

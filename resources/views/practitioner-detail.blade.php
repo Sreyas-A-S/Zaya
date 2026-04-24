@@ -2,6 +2,9 @@
 
 @push('styles')
 <style>
+    html {
+        scroll-behavior: smooth;
+    }
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -137,11 +140,11 @@
         <div class="container mx-auto text-center">
             <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <div class="bg-white rounded-2xl shadow-[0_0px_72px_rgba(186,186,186,0.45)] border border-gray-100 px-16 py-10 text-center w-full xl:w-auto xl:min-w-[500px]">
-                    <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">100+</h3>
+                    <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">{{ $totalSessions }}+</h3>
                     <p class="text-gray-500 text-xl">{{ $site_settings['practitioner_total_sessions'] ?? 'Total No.of Sessions' }}</p>
                 </div>
                 <div class="bg-white rounded-2xl shadow-[0_0px_72px_rgba(186,186,186,0.45)] border border-gray-100 px-16 py-10 text-center w-full xl:w-auto xl:min-w-[500px]">
-                    <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">80+</h3>
+                    <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">{{ $totalClients }}+</h3>
                     <p class="text-gray-500 text-xl">{{ $site_settings['practitioner_total_clients'] ?? 'Total No.of Clients' }}</p>
                 </div>
             </div>
@@ -156,7 +159,7 @@
                 <h3 class="text-2xl md:text-3xl font-serif text-[#4A7060]">{{ $site_settings['practitioner_legacy_subtitle'] ?? 'Precision and Passion Across Every Field' }}</h3>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-center md:text-left">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
                 <!-- Column 1: Specialities -->
                 <div class="flex flex-col items-center md:items-start pl-0 md:pl-10">
                     <div class="flex items-center gap-4 mb-6">
@@ -164,7 +167,7 @@
                         <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_consultations_title'] ?? 'Specialities' }}</h4>
                     </div>
                     <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
-                        @foreach($practitioner->specialization ?? $practitioner->practitioner_type ?? $practitioner->yoga_therapist_type ?? [] as $item) 
+                        @foreach($consultations as $item) 
                             <li>{{ $item }}</li> 
                         @endforeach
                     </ul>
@@ -177,6 +180,18 @@
                     </div>
                     <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
                         @foreach($practitioner->conditions_list as $item) 
+                            <li>{{ $item }}</li> 
+                        @endforeach
+                    </ul>
+                </div>
+                <!-- Column 3: Other Modalities -->
+                <div class="flex flex-col items-center md:items-start pl-0 md:pl-10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 rounded-full bg-[#56B280] flex items-center justify-center text-white text-3xl shadow-md"><i class="ri-pulse-line"></i></div>
+                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_modalities_title'] ?? 'Other Modalities' }}</h4>
+                    </div>
+                    <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
+                        @foreach($modalities as $item) 
                             <li>{{ $item }}</li> 
                         @endforeach
                     </ul>
@@ -205,11 +220,19 @@
 
                 <!-- Right: Action Button -->
                 <div class="md:w-1/3 flex justify-center md:justify-end">
-                    <a href="{{ route('gallery') }}"
-                       class="bg-secondary text-white px-8 py-3 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-base flex items-center gap-2">
-                        {{ $site_settings['practitioner_explore_gallery_btn'] ?? 'Explore Our Gallery' }}
-                        <i class="ri-arrow-right-line"></i>
-                    </a>
+                    @if($practitioner->user)
+                        <a href="{{ route('practitioner.gallery', $practitioner->slug) }}"
+                           class="bg-secondary text-white px-8 py-3 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-base flex items-center gap-2">
+                            {{ $site_settings['practitioner_explore_gallery_btn'] ?? 'Explore Our Gallery' }}
+                            <i class="ri-arrow-right-line"></i>
+                        </a>
+                    @else
+                        <a href="{{ route('gallery') }}"
+                           class="bg-secondary text-white px-8 py-3 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-base flex items-center gap-2">
+                            {{ $site_settings['practitioner_explore_gallery_btn'] ?? 'Explore Our Gallery' }}
+                            <i class="ri-arrow-right-line"></i>
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>

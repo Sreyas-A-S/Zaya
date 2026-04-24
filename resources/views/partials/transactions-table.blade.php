@@ -32,7 +32,15 @@
                             </span>
                         </td>
                         <td class="px-6 py-5">
-                            <span class="text-sm font-black text-secondary">₹ {{ number_format($trx->total_amount, 2) }}</span>
+                            @php
+                                $displayAmount = $trx->total_amount;
+                                if ($trx->practitioner_id == auth()->id()) {
+                                    $displayAmount = $trx->practitioner_share;
+                                } elseif ($trx->referrer_id == auth()->id()) {
+                                    $displayAmount = $trx->referrer_share;
+                                }
+                            @endphp
+                            <span class="text-sm font-black text-secondary">₹ {{ number_format($displayAmount, 2) }}</span>
                         </td>
                         <td class="px-6 py-5">
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100">

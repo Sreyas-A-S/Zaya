@@ -259,9 +259,45 @@
                     @endif
                 </div>
                 <div class="px-4 py-2 rounded-xl bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-wide">
-                    Auto email sends 60 min before
+                    Auto email sends {{ $reminderLeadTime }} min before
                 </div>
             </div>
+
+            @if($nextOnlineBooking && $reminderLogs->isNotEmpty())
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                <p class="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em] mb-4">Reminder Delivery Status</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach($reminderLogs as $log)
+                    <div class="flex items-center justify-between p-4 {{ $log->status === 'success' ? 'bg-emerald-50/50 border-emerald-100' : 'bg-red-50/50 border-red-100' }} border rounded-2xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full {{ $log->status === 'success' ? 'bg-emerald-500' : 'bg-red-500' }} flex items-center justify-center text-white">
+                                <i class="{{ $log->status === 'success' ? 'ri-check-line' : 'ri-error-warning-line' }}"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-secondary">{{ $log->to }}</p>
+                                <p class="text-[9px] text-gray-500 font-medium">{{ $log->created_at->format('M d, H:i') }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[9px] font-black uppercase tracking-widest {{ $log->status === 'success' ? 'text-emerald-600' : 'text-red-600' }}">
+                                {{ strtoupper($log->status) }}
+                            </span>
+                            @if($log->status === 'error')
+                            <p class="text-[9px] text-red-400 font-bold max-w-[120px] truncate" title="{{ $log->error_message }}">{{ $log->error_message }}</p>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @elseif($nextOnlineBooking && $nextOnlineBooking->reminder_sent)
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                 <p class="text-xs font-bold text-emerald-600 flex items-center gap-2">
+                    <i class="ri-checkbox-circle-line"></i>
+                    Reminders have been dispatched for this session.
+                 </p>
+            </div>
+            @endif
         </div>
 
         <div class="bg-white rounded-[28px] border border-[#2E4B3D]/12 shadow-sm p-6">

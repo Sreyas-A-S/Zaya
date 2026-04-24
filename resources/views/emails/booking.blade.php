@@ -45,14 +45,14 @@
                 </div>
                 <div class="detail-row">
                     <span class="label">Time:</span>
-                    <span class="value">{{ $booking->booking_time }}</span>
+                    <span class="value">{{ $booking->booking_time }} ({{ $timezone ?? 'UTC' }})</span>
                 </div>
                 <div class="detail-row">
                     <span class="label">Mode:</span>
                     <span class="value">{{ strtoupper($booking->mode) }}</span>
                 </div>
 
-                @if($booking->mode === 'online')
+                @if($booking->mode === 'online' && $booking->invoice_no)
                 <div class="detail-row">
                     <span class="label">Meeting Link:</span>
                     <span class="value"><a href="{{ route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']) }}" style="color: #2E4B3C;">Click here to join</a></span>
@@ -91,9 +91,9 @@
             </div>
 
             <div style="text-align: center;">
-                @if($type === 'client')
+                @if($type === 'client' && $booking->invoice_no)
                     <a href="{{ route('invoice.show', $booking->invoice_no) }}" class="button">View Online Invoice</a>
-                @else
+                @elseif($type !== 'client')
                     <a href="{{ route('admin.invoices.index') }}" class="button">View Invoices List</a>
                 @endif
             </div>

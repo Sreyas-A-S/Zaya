@@ -74,14 +74,7 @@
         fetchConferences(window.location.href);
     });
 
-    async function startInstantMeeting(provider = 'choose') {
-        if (provider === 'choose') {
-            // If provider not selected yet, just show modal
-            // (The modal buttons will now need to call this function with a provider)
-            openPlatformModal();
-            return;
-        }
-
+    async function startInstantMeeting(provider = 'jaas') {
         const btn = document.getElementById('instant-meet-text').parentElement;
         const icon = document.getElementById('instant-meet-icon');
         const text = document.getElementById('instant-meet-text');
@@ -106,18 +99,10 @@
             const data = await response.json();
             
             if (data.success) {
-                if (provider === 'google_meet' && data.redirect_url) {
-                    window.open(data.redirect_url, '_blank');
-                    closePlatformModal();
-                } else if (data.channel) {
-                    // Open the platform selection modal logic or redirect directly
-                    // Since we already HAVE the provider now, we can redirect directly
-                    const url = provider === 'zegocloud'
-                        ? "{{ route('zego.join', ['channel' => ':channel']) }}".replace(':channel', data.channel)
-                        : "{{ route('conference.join', ['channel' => ':channel']) }}".replace(':channel', data.channel);
-
+                if (data.channel) {
+                    // Redirect to Jitsi (jaas)
+                    const url = "{{ route('conference.join', ['channel' => ':channel']) }}".replace(':channel', data.channel);
                     window.open(url + '?provider=' + provider, '_blank');
-                    closePlatformModal();
                 }
             } else {
                 alert(data.message || 'Failed to initialize meeting. Please try again.');

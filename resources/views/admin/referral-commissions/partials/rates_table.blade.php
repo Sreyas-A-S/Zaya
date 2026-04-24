@@ -24,6 +24,7 @@
             <tbody>
                 @php $directIdx = 0; @endphp
                 @foreach($roles as $roleKey => $roleLabel)
+                    @if($roleKey !== 'practitioner') @continue @endif
                     @php
                         $rate = $directRates[$roleKey] ?? null;
                         $zayaVal = $rate ? $rate->company_commission_percent : 0;

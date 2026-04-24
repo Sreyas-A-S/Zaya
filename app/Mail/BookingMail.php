@@ -39,6 +39,8 @@ class BookingMail extends Mailable
 
     public function content(): Content
     {
+        $timezone = derive_timezone_from_user($this->booking->user);
+
         $title = match($this->type) {
             'client' => 'Your session is confirmed!',
             'practitioner' => 'You have a new booking!',
@@ -60,6 +62,7 @@ class BookingMail extends Mailable
                 'intro' => $intro,
                 'booking' => $this->booking,
                 'type' => $this->type,
+                'timezone' => $timezone,
             ],
         );
     }

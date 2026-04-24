@@ -14,21 +14,33 @@
         </div>
     @endif
 
-    <div class="max-w-7xl mx-auto {{ $isMeetingPopout ? 'h-full max-w-none' : '' }} flex flex-col lg:flex-row gap-6 transition-all duration-500" id="session-wrapper">
+    <div class="max-w-none mx-auto {{ $isMeetingPopout ? 'h-full' : 'lg:h-[calc(100vh-2rem)]' }} flex flex-col lg:flex-row gap-6 transition-all duration-500" id="session-wrapper">
         <!-- Meeting Portal Card -->
         <div id="video-container"
-            class="flex-1 transition-all duration-500 {{ $isMeetingPopout ? 'h-full overflow-hidden rounded-none border-0 shadow-none bg-[#07110B]' : 'bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)]' }}">
+            class="flex flex-col flex-1 min-w-0 transition-all duration-500 {{ $isMeetingPopout ? 'h-full overflow-hidden rounded-none border-0 shadow-none bg-[#07110B]' : 'bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)]' }}">
+
+            <!-- PiP Controls Overlay (visible only in PiP mode) -->
+            <div id="pip-controls" class="select-none">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="text-[9px] font-black text-white/80 uppercase tracking-[0.2em]">Live Session</span>
+                </div>
+                <button onclick="togglePiP()" class="px-3 py-1.5 bg-white text-secondary rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-all shadow-lg flex items-center gap-2 cursor-pointer pointer-events-auto">
+                    <i class="ri-picture-in-picture-exit-fill"></i>
+                    Restore
+                </button>
+            </div>
 
             @if(!$isMeetingPopout)
                 <!-- Meeting Header -->
                 <div id="conference-meeting-header"
-                    class="p-6 border-b border-[#2E4B3D]/12 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#FDFDFD]">
+                    class="p-6 border-b border-[#2E4B3D]/12 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#FDFDFD] {{ $isMeetingPopout ? 'hidden' : '' }}">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 bg-secondary/5 rounded-2xl flex items-center justify-center">
                             <i class="ri-vidicon-fill text-secondary text-2xl animate-pulse"></i>
                         </div>
                         <div>
-                            <h2 class="text-xl font-bold text-secondary font-sans! leading-none mb-1">Consultation Room</h2>
+                            <h2 class="text-xl font-bold text-secondary font-sans! leading-none mb-1">{{ $isInstant ? 'Instant Meeting' : 'Consultation Room' }}</h2>
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Channel:</span>
                                 <span class="text-[10px] text-secondary font-bold">{{ $channel }}</span>
@@ -55,11 +67,19 @@
                         
 
 
+                        <button onclick="togglePopout()"
+                            class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer"
+                            title="Pop-out Window">
+                            <i class="ri-external-link-line text-xl"></i>
+                        </button>
+
+                        {{-- 
                         <button onclick="togglePiP()"
                             class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer"
                             title="Compact View">
                             <i class="ri-picture-in-picture-2-fill text-xl"></i>
                         </button>
+                        --}}
                         @if($provider === 'agora')
                             <button onclick="toggleSettings()"
                                 class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer"
@@ -76,7 +96,7 @@
             @endif
 
             <!-- Video Area -->
-            <div class="relative {{ $isMeetingPopout ? 'h-full bg-[#07110B]' : 'h-[75vh] min-h-[450px] md:h-auto md:aspect-video bg-[#0A1209]' }} group flex flex-col"
+            <div class="relative flex-1 min-h-[60vh] lg:min-h-0 {{ $isMeetingPopout ? 'bg-[#07110B]' : 'bg-[#0A1209]' }} group flex flex-col"
                 id="meeting-stage">
                 
                 @if($provider === 'jaas' && !empty($jaasError))
@@ -310,9 +330,22 @@
             @endif
         </div>
 
+        @if(!$booking)
+        <!-- PiP Placeholder for non-bookings (shown only when video is in PiP) -->
+        <div id="pip-placeholder" class="hidden flex-1 bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)] flex-col">
+            <div class="p-8 flex flex-col items-center justify-center h-full text-center">
+                <div class="w-20 h-20 bg-secondary/5 rounded-3xl flex items-center justify-center mb-6">
+                    <i class="ri-vidicon-fill text-secondary text-4xl animate-pulse"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-secondary mb-2">Live Session in Pop-out</h2>
+                <p class="text-gray-400 max-w-sm">The video window is currently floating. You can continue using this dashboard as normal.</p>
+            </div>
+        </div>
+        @endif
+
         <!-- Clinical Records Sidebar -->
         @if($booking)
-        <div id="clinical-sidebar" class="hidden w-full lg:w-[450px] bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)] flex flex-col transition-all duration-500">
+        <div id="clinical-sidebar" class="sidebar-collapsed w-full lg:w-[450px] bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)] flex flex-col mb-6 lg:mb-0">
             <div class="p-6 border-b border-[#2E4B3D]/12 flex items-center justify-between bg-[#FDFDFD]">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-secondary/5 rounded-xl flex items-center justify-center">
@@ -323,9 +356,14 @@
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Client: {{ $booking->user->name }}</p>
                     </div>
                 </div>
-                <button onclick="toggleClinicalNotes()" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-all cursor-pointer">
-                    <i class="ri-close-line text-xl"></i>
-                </button>
+                <div class="flex items-center gap-1 md:gap-2">
+                    <button onclick="expandClinicalNotes()" id="expand-clinical-btn" class="w-8 h-8 rounded-full hover:bg-gray-100 hidden lg:flex items-center justify-center text-gray-400 transition-all cursor-pointer" title="Full Screen">
+                        <i class="ri-expand-diagonal-s-line text-xl" id="expand-icon"></i>
+                    </button>
+                    <button onclick="toggleClinicalNotes()" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-all cursor-pointer">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
+                </div>
             </div>
             <div class="flex-1 relative bg-gray-50/50">
                 <iframe src="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'minimal' => 1]) }}" 
@@ -369,6 +407,149 @@
         #local-player video { transform: rotateY(180deg); }
         .remote-video-container { position: relative; flex: 1; min-width: 300px; height: 100%; border-radius: inherit; overflow: hidden; background: #000; }
         #jitsi-meet-container iframe, #daily-meet-container iframe { width: 100%; height: 100%; border: 0; }
+        
+        #clinical-sidebar {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: translateX(0);
+            z-index: 40;
+        }
+
+        #clinical-sidebar.full-screen {
+            position: fixed;
+            inset: 1rem;
+            width: auto !important;
+            height: auto !important;
+            z-index: 100;
+            margin: 0 !important;
+        }
+
+        @media (max-width: 1024px) {
+            #clinical-sidebar.sidebar-active-mobile {
+                position: fixed;
+                inset: 0;
+                z-index: 100;
+                border-radius: 0;
+                display: flex !important;
+            }
+        }
+
+        #clinical-sidebar.sidebar-collapsed {
+            width: 0 !important;
+            margin-left: -24px;
+            opacity: 0;
+            transform: translateX(40px);
+            pointer-events: none;
+            border-width: 0;
+        }
+
+        #video-container {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #video-container.in-popout {
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        #session-wrapper.pip-mode-active #clinical-sidebar {
+            width: 100% !important;
+            max-width: none !important;
+            flex: 1 !important;
+            margin: 0 !important;
+            border-radius: 32px !important;
+            display: flex !important;
+            opacity: 1 !important;
+            transform: none !important;
+            pointer-events: auto !important;
+        }
+
+        #session-wrapper.pip-mode-active #clinical-sidebar.sidebar-collapsed {
+            width: 100% !important;
+            margin-left: 0 !important;
+        }
+
+        #session-wrapper.pip-mode-active #pip-placeholder {
+            display: flex !important;
+        }
+
+        #video-container.in-popout #conference-meeting-header,
+        #video-container.in-popout #conference-mobile-nav,
+        #session-wrapper.pip-mode-active #conference-meeting-header,
+        #session-wrapper.pip-mode-active #conference-mobile-nav {
+            display: none !important;
+        }
+
+        #session-wrapper.pip-active #video-container {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            width: 340px !important;
+            height: 220px !important;
+            z-index: 150;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
+            max-width: none !important;
+            flex: none !important;
+            border-radius: 24px;
+            overflow: hidden;
+            cursor: grab;
+            display: flex;
+            flex-direction: column;
+            background: #000;
+            will-change: transform;
+            transition: box-shadow 0.3s ease, transform 0.1s ease-out;
+        }
+
+        #session-wrapper.pip-active #video-container.is-dragging {
+            cursor: grabbing;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            transform: scale(1.02);
+            transition: none; /* No transition while dragging for instant response */
+        }
+
+        #pip-controls {
+            display: none;
+            user-select: none;
+        }
+
+        #session-wrapper.pip-active #pip-controls {
+            display: flex;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 16px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+            z-index: 160;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #session-wrapper.pip-active #conference-meeting-header,
+        #session-wrapper.pip-active #conference-mobile-nav {
+            display: none !important;
+        }
+
+        @media (min-width: 1024px) {
+            #session-wrapper.sidebar-active #video-container {
+                max-width: calc(100% - 474px);
+            }
+            
+            #session-wrapper.pip-active #clinical-sidebar {
+                width: 100% !important;
+                max-width: none !important;
+                flex: 1;
+                display: flex !important;
+                margin: 0 !important;
+            }
+        }
     </style>
 @endpush
 
@@ -415,7 +596,14 @@
             function startTimer() {
                 if (timerInterval) clearInterval(timerInterval);
                 
-                let timerStartTime = Date.now();
+                let timerStartTime = sessionStorage.getItem('meeting_timer_start') 
+                    ? parseInt(sessionStorage.getItem('meeting_timer_start'))
+                    : Date.now();
+                
+                if (!sessionStorage.getItem('meeting_timer_start')) {
+                    sessionStorage.setItem('meeting_timer_start', timerStartTime);
+                }
+
                 const timerEl = document.getElementById('timer');
                 if (timerEl) timerEl.innerText = "00:00:00";
 
@@ -459,36 +647,285 @@
                 });
             };
 
+            window.togglePiP = () => {
+                const wrapper = document.getElementById('session-wrapper');
+                const sidebar = document.getElementById('clinical-sidebar');
+                if (!wrapper) return;
+
+                const isPiP = wrapper.classList.contains('pip-active');
+                
+                if (!isPiP) {
+                    wrapper.classList.add('pip-active');
+                    // Automatically open sidebar if closed when entering PiP
+                    if (sidebar && sidebar.classList.contains('sidebar-collapsed')) {
+                        toggleClinicalNotes();
+                    }
+                } else {
+                    wrapper.classList.remove('pip-active');
+                }
+            };
+
+            window.togglePopout = async () => {
+                const videoContainer = document.getElementById('video-container');
+                const wrapper = document.getElementById('session-wrapper');
+                const sidebar = document.getElementById('clinical-sidebar');
+
+                if (!videoContainer || !wrapper) return;
+
+                // Check for Document Picture-in-Picture API support
+                if ('documentPictureInPicture' in window) {
+                    try {
+                        // If already in PiP, close it
+                        if (window.documentPictureInPicture.window) {
+                            window.documentPictureInPicture.window.close();
+                            return;
+                        }
+
+                        // Open PiP window
+                        const pipWindow = await window.documentPictureInPicture.requestWindow({
+                            width: 640,
+                            height: 480,
+                        });
+
+                        // Copy all style sheets to the new window
+                        [...document.styleSheets].forEach((styleSheet) => {
+                            try {
+                                const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
+                                const style = document.createElement('style');
+                                style.textContent = cssRules;
+                                pipWindow.document.head.appendChild(style);
+                            } catch (e) {
+                                const link = document.createElement('link');
+                                link.rel = 'stylesheet';
+                                link.type = styleSheet.type;
+                                link.media = styleSheet.media;
+                                link.href = styleSheet.href;
+                                pipWindow.document.head.appendChild(link);
+                            }
+                        });
+
+                        // Move the video container to the PiP window
+                        videoContainer.classList.add('in-popout');
+                        pipWindow.document.body.append(videoContainer);
+                        wrapper.classList.add('pip-mode-active');
+
+                        // If meeting is ongoing, re-init the SDK in the new document context to bypass pre-join
+                        if (meetingStartedAt) {
+                            if (provider === 'jaas') {
+                                if (jitsiApi) jitsiApi.dispose();
+                                initJitsi(true);
+                            } else if (provider === 'daily') {
+                                if (dailyCall) { 
+                                    const oldCall = dailyCall;
+                                    dailyCall = null;
+                                    oldCall.leave().then(() => oldCall.destroy()).then(() => initDaily(true));
+                                } else {
+                                    initDaily(true);
+                                }
+                            }
+                        }
+                        
+                        // Automatically expand clinical notes in main window if it's a booking
+                        if (sidebar && sidebar.classList.contains('sidebar-collapsed')) {
+                            toggleClinicalNotes();
+                        }
+
+                        // When the PiP window is closed, move the video container back
+                        pipWindow.addEventListener('pagehide', (event) => {
+                            videoContainer.classList.remove('in-popout');
+                            wrapper.prepend(videoContainer);
+                            wrapper.classList.remove('pip-mode-active');
+
+                            if (meetingStartedAt) {
+                                if (provider === 'jaas') {
+                                    if (jitsiApi) jitsiApi.dispose();
+                                    initJitsi(true);
+                                } else if (provider === 'daily') {
+                                    if (dailyCall) {
+                                        const oldCall = dailyCall;
+                                        dailyCall = null;
+                                        oldCall.leave().then(() => oldCall.destroy()).then(() => initDaily(true));
+                                    } else {
+                                        initDaily(true);
+                                    }
+                                }
+                            }
+                        });
+                    } catch (err) {
+                        console.error('Failed to enter Document PiP:', err);
+                        openPopoutMeeting(channel, provider);
+                    }
+                } else {
+                    // Fallback to window.open if DPiP is not supported
+                    openPopoutMeeting(channel, provider);
+                }
+            };
+
             window.toggleClinicalNotes = () => {
                 const sidebar = document.getElementById('clinical-sidebar');
                 const btn = document.getElementById('clinical-notes-btn');
-                const container = document.getElementById('session-wrapper');
-                
+                const wrapper = document.getElementById('session-wrapper');
+
                 if (!sidebar) return;
 
-                const isHidden = sidebar.classList.contains('hidden');
-                
-                if (isHidden) {
-                    sidebar.classList.remove('hidden');
+                const isOpening = sidebar.classList.contains('sidebar-collapsed');
+
+                if (isOpening) {
+                    sidebar.classList.remove('sidebar-collapsed');
+                    if (window.innerWidth <= 1024) {
+                        sidebar.classList.add('sidebar-active-mobile');
+                    } else if (wrapper && !wrapper.classList.contains('pip-active')) {
+                        wrapper.classList.add('sidebar-active');
+                    }
                     if (btn) btn.classList.add('bg-primary');
                     localStorage.setItem('clinical_sidebar_open', 'true');
                 } else {
-                    sidebar.classList.add('hidden');
+                    sidebar.classList.add('sidebar-collapsed');
+                    sidebar.classList.remove('sidebar-active-mobile', 'full-screen');
+                    if (wrapper) {
+                        wrapper.classList.remove('sidebar-active', 'pip-active');
+                    }
                     if (btn) btn.classList.remove('bg-primary');
+                    
+                    const icon = document.getElementById('expand-icon');
+                    if (icon) icon.className = 'ri-expand-diagonal-s-line text-xl';
+                    
                     localStorage.setItem('clinical_sidebar_open', 'false');
                 }
             };
 
+            window.expandClinicalNotes = () => {
+                const sidebar = document.getElementById('clinical-sidebar');
+                const icon = document.getElementById('expand-icon');
+                const wrapper = document.getElementById('session-wrapper');
+                
+                if (!sidebar) return;
+
+                const isFullScreen = sidebar.classList.contains('full-screen');
+                
+                if (!isFullScreen) {
+                    sidebar.classList.add('full-screen');
+                    if (icon) icon.className = 'ri-contract-diagonal-s-line text-xl';
+                    if (wrapper) wrapper.classList.remove('sidebar-active', 'pip-active');
+                } else {
+                    sidebar.classList.remove('full-screen');
+                    if (icon) icon.className = 'ri-expand-diagonal-s-line text-xl';
+                    if (wrapper) wrapper.classList.add('sidebar-active');
+                }
+            };
+
+            // Exceptionally User-Friendly PiP Draggability Engine
+            (function() {
+                const pip = document.getElementById('video-container');
+                const wrapper = document.getElementById('session-wrapper');
+                
+                let isDragging = false;
+                let startX, startY;
+                let currentTranslateX = 0;
+                let currentTranslateY = 0;
+                let lastTranslateX = 0;
+                let lastTranslateY = 0;
+
+                // Reset position when toggling PiP
+                const originalTogglePiP = window.togglePiP;
+                window.togglePiP = () => {
+                    const wasPiP = wrapper.classList.contains('pip-active');
+                    originalTogglePiP();
+                    if (wasPiP) {
+                        // Returning to normal: reset transforms
+                        resetPipPosition();
+                    }
+                };
+
+                function resetPipPosition() {
+                    currentTranslateX = 0;
+                    currentTranslateY = 0;
+                    lastTranslateX = 0;
+                    lastTranslateY = 0;
+                    pip.style.transform = '';
+                    pip.style.top = '';
+                    pip.style.left = '';
+                    pip.style.bottom = '2rem';
+                    pip.style.right = 'auto';
+                }
+
+                function onMouseDown(e) {
+                    if (!wrapper.classList.contains('pip-active')) return;
+                    if (e.target.closest('button') || e.target.closest('a')) return;
+                    
+                    isDragging = true;
+                    pip.classList.add('is-dragging');
+                    
+                    startX = e.clientX - lastTranslateX;
+                    startY = e.clientY - lastTranslateY;
+                    
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                }
+
+                function onMouseMove(e) {
+                    if (!isDragging) return;
+
+                    currentTranslateX = e.clientX - startX;
+                    currentTranslateY = e.clientY - startY;
+
+                    // Bounds Checking (Keep window inside viewport with 10px margin)
+                    const rect = pip.getBoundingClientRect();
+                    const padding = 10;
+                    
+                    // Simple boundary logic
+                    const minX = -rect.left + padding + lastTranslateX;
+                    const maxX = window.innerWidth - rect.right - padding + lastTranslateX;
+                    const minY = -rect.top + padding + lastTranslateY;
+                    const maxY = window.innerHeight - rect.bottom - padding + lastTranslateY;
+
+                    // Apply Hardware Accelerated Transform
+                    pip.style.transform = `translate3d(${currentTranslateX}px, ${currentTranslateY}px, 0)`;
+                }
+
+                function onMouseUp() {
+                    isDragging = false;
+                    pip.classList.remove('is-dragging');
+                    lastTranslateX = currentTranslateX;
+                    lastTranslateY = currentTranslateY;
+                    
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+
+                // Support for Touch Devices
+                function onTouchStart(e) {
+                    if (e.touches.length > 1) return;
+                    onMouseDown(e.touches[0]);
+                }
+                function onTouchMove(e) {
+                    if (e.touches.length > 1) return;
+                    onMouseMove(e.touches[0]);
+                }
+
+                pip.addEventListener('mousedown', onMouseDown);
+                pip.addEventListener('touchstart', onTouchStart, { passive: true });
+                window.addEventListener('resize', resetPipPosition);
+            })();
             // Restore Clinical Sidebar State
             if (localStorage.getItem('clinical_sidebar_open') === 'true') {
                 const sidebar = document.getElementById('clinical-sidebar');
                 const btn = document.getElementById('clinical-notes-btn');
-                if (sidebar) sidebar.classList.remove('hidden');
-                if (btn) btn.classList.add('bg-primary');
+                const wrapper = document.getElementById('session-wrapper');
+                
+                if (sidebar) {
+                    sidebar.classList.remove('sidebar-collapsed');
+                    if (wrapper) wrapper.classList.add('sidebar-active');
+                    if (btn) btn.classList.add('bg-primary');
+                }
             }
 
             window.showSummary = () => {
                 allowExit = true;
+                localStorage.removeItem('meeting_active_' + channel);
+                localStorage.removeItem('meeting_started_at_' + channel);
+                sessionStorage.removeItem('meeting_timer_start');
+                
                 const modal = document.getElementById('summary-modal');
                 const content = document.getElementById('summary-content');
                 if (modal && content) {
@@ -514,39 +951,84 @@
                 window.showSummary();
             };
 
-            window.startSession = async () => {
+            window.startSession = async (isResume = false) => {
                 const btn = document.getElementById('start-btn');
                 const feedback = document.getElementById('setup-feedback');
-                if (btn) btn.disabled = true;
-                if (feedback) feedback.classList.remove('hidden');
-                meetingStartedAt = new Date().toISOString();
+                
+                if (!isResume) {
+                    if (btn) btn.disabled = true;
+                    if (feedback) feedback.classList.remove('hidden');
+                    meetingStartedAt = new Date().toISOString();
+                    localStorage.setItem('meeting_active_' + channel, 'true');
+                    localStorage.setItem('meeting_started_at_' + channel, meetingStartedAt);
+                    await beginRecording(true);
+                } else {
+                    meetingStartedAt = localStorage.getItem('meeting_started_at_' + channel) || new Date().toISOString();
+                    hideOverlay(true);
+                }
                 
                 startTimer();
-                await beginRecording(true);
 
-                if (provider === 'jaas') initJitsi();
-                else if (provider === 'daily') initDaily();
-                else if (provider === 'agora') initAgora();
+                if (provider === 'jaas') initJitsi(isResume);
+                else if (provider === 'daily') initDaily(isResume);
+                else if (provider === 'agora') initAgora(isResume);
             };
 
-            function initJitsi() {
-                const container = document.getElementById('jitsi-meet-container');
+            // Check if session is already active (e.g., after reload)
+            if (localStorage.getItem('meeting_active_' + channel) === 'true') {
+                console.log('Session is already active, auto-joining...');
+                hideOverlay(true);
+                setTimeout(() => {
+                    window.startSession(true);
+                }, 100);
+            }
+
+            function initJitsi(isResume = false) {
+                let container = document.getElementById('jitsi-meet-container');
+                
+                // If container not in main document, check PiP window
+                if (!container && window.documentPictureInPicture?.window) {
+                    container = window.documentPictureInPicture.window.document.getElementById('jitsi-meet-container');
+                }
+
+                if (!container) return console.error('Jitsi container not found');
+                
                 jitsiApi = new JitsiMeetExternalAPI(jitsiDomain, {
                     roomName: jitsiRoom,
                     parentNode: container,
                     jwt: jitsiJwt,
                     configOverwrite: { 
-                        prejoinPageEnabled: true,
+                        prejoinPageEnabled: !isResume,
                         prejoinConfig: { 
-                            enabled: true,
+                            enabled: !isResume,
                             hideDisplayName: true
                         },
                         readOnlyName: true,
-                        disableProfile: true
+                        disableProfile: true,
+                        toolbarButtons: [
+                           'microphone', 'camera', 'closedcaptions', 'desktop', 'embedmeeting', 'fullscreen',
+                           'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+                           'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                           'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
+                           'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security'
+                        ],
+                        toolbarConfig: {
+                            alwaysVisible: true
+                        },
+                        disabledNotifications: ['moderator', 'notify.moderator', 'notify.connected-as-moderator', 'connection.connected-as-moderator'],
+                        disableModeratorIndicator: true
                     },
                     interfaceConfigOverwrite: { 
                         SHOW_JITSI_WATERMARK: false,
-                        DISABLE_PROFILE: true
+                        DISABLE_PROFILE: true,
+                        TOOLBAR_ALWAYS_VISIBLE: true,
+                        TOOLBAR_BUTTONS: [
+                           'microphone', 'camera', 'closedcaptions', 'desktop', 'embedmeeting', 'fullscreen',
+                           'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+                           'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                           'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
+                           'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security'
+                        ]
                     },
                     userInfo: { displayName: "{{ addslashes($user->name ?? 'Guest') }}" }
                 });
@@ -558,8 +1040,15 @@
                 hideOverlay();
             }
 
-            async function initDaily() {
-                const container = document.getElementById('daily-meet-container');
+            async function initDaily(isResume = false) {
+                let container = document.getElementById('daily-meet-container');
+
+                if (!container && window.documentPictureInPicture?.window) {
+                    container = window.documentPictureInPicture.window.document.getElementById('daily-meet-container');
+                }
+
+                if (!container) return console.error('Daily container not found');
+
                 dailyCall = DailyIframe.createFrame(container, {
                     showLeaveButton: true,
                     iframeStyle: { width: '100%', height: '100%', border: '0' }
@@ -593,9 +1082,13 @@
                 if (document.getElementById('vid-icon-mobile')) document.getElementById('vid-icon-mobile').className = vidIcon;
             }
 
-            function hideOverlay() {
+            function hideOverlay(immediate = false) {
                 const overlay = document.getElementById('join-overlay');
                 if (overlay) {
+                    if (immediate) {
+                        overlay.remove();
+                        return;
+                    }
                     overlay.style.opacity = '0';
                     overlay.style.pointerEvents = 'none';
                     setTimeout(() => overlay.remove(), 500);
@@ -630,7 +1123,7 @@
 
             // --- Agora Logic (Simplified for brevity) ---
             let client, localTracks = { videoTrack: null, audioTrack: null };
-            async function initAgora() {
+            async function initAgora(isResume = false) {
                 // (Existing Agora Logic goes here - kept as is from previous version)
                 // Note: I will wrap the existing agora logic back in if needed, 
                 // but since the user asked for Daily.co I'm focusing on that.

@@ -105,27 +105,33 @@
     // Specialities & Conditions
     $specialities = [];
     $conditions = [];
+    $modalities = [];
 
     switch($user->role) {
         case 'practitioner':
             $specialities = (array)($profile->specialization ?? []);
             $conditions = (array)($profile->health_conditions_treated ?? []);
+            $modalities = (array)($profile->other_modalities ?? []);
             break;
         case 'doctor':
             $specialities = (array)($profile->specialization ?? []);
             $conditions = (array)($profile->health_conditions_treated ?? []);
+            $modalities = (array)($profile->other_modalities ?? []);
             break;
         case 'mindfulness_practitioner':
             $specialities = (array)($profile->practitioner_type ?? []);
             $conditions = (array)($profile->client_concerns ?? []);
+            $modalities = (array)($profile->other_modalities ?? []);
             break;
         case 'yoga_therapist':
             $specialities = (array)($profile->yoga_therapist_type ?? []);
             $conditions = (array)($profile->areas_of_expertise ?? []);
+            $modalities = (array)($profile->other_modalities ?? []);
             break;
         case 'translator':
             $specialities = (array)($profile->fields_of_specialization ?? []);
             $conditions = (array)($profile->services_offered ?? []);
+            $modalities = (array)($profile->other_modalities ?? []);
             break;
     }
 
@@ -291,6 +297,24 @@
                         <span class="px-6 py-2 bg-[#F6F6F6] text-gray-700 text-lg rounded-full">{{ is_array($condition) ? implode(', ', $condition) : $condition }}</span>
                     @empty
                         <span class="text-gray-400 text-lg no-items-msg">No conditions listed.</span>
+                    @endforelse
+                </div>
+            </div>
+
+            <hr class="border-[#C5C5C5] my-8">
+
+            <!-- Other Modalities -->
+            <div class="relative">
+                <button onclick="openModalitiesModal()" class="absolute top-0 right-0 text-gray-400 hover:text-[#2B4C3B] transition-colors">
+                    <i class="ri-pencil-line text-2xl"></i>
+                </button>
+
+                <h2 class="text-2xl font-medium font-sans! text-secondary mb-8">Other Modalities</h2>
+                <div class="flex flex-wrap gap-2.5" id="modalities-display-container">
+                    @forelse($modalities as $modality)
+                        <span class="px-6 py-2 bg-[#F6F6F6] text-gray-700 text-lg rounded-full">{{ is_array($modality) ? implode(', ', $modality) : $modality }}</span>
+                    @empty
+                        <span class="text-gray-400 text-lg no-items-msg">No modalities listed.</span>
                     @endforelse
                 </div>
             </div>
@@ -590,6 +614,39 @@
             <div class="flex gap-4 pt-4">
                 <button type="button" onclick="closeConditionsModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
                 <button type="submit" class="flex-1 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all shadow-lg">Save Conditions</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Other Modalities Modal -->
+<div id="modalitiesModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide shadow-2xl">
+        <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="text-2xl font-bold text-secondary">Edit Other Modalities</h3>
+            <button onclick="closeModalitiesModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="ri-close-line text-3xl"></i>
+            </button>
+        </div>
+        <form id="modalitiesForm" action="{{ route('profile.updateProfessional') }}" method="POST" class="px-8 py-8 space-y-6">
+            @csrf
+            <input type="hidden" name="update_type" value="modalities">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Select Modalities</label>
+                <select id="modalities-select" name="modalities[]" multiple placeholder="Select or type modalities...">
+                    @foreach($allModalities as $item)
+                        <option value="{{ $item }}" {{ in_array($item, $modalities) ? 'selected' : '' }}>{{ $item }}</option>
+                    @endforeach
+                    @foreach($modalities as $item)
+                        @if(!$allModalities->contains($item))
+                            <option value="{{ $item }}" selected>{{ $item }}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="closeModalitiesModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all shadow-lg">Save Modalities</button>
             </div>
         </form>
     </div>
@@ -941,7 +998,7 @@
     const categoryNameSpan = document.getElementById('target-category-name');
 
     // Multi-Select Instances
-    let specialitiesSelect, conditionsSelect;
+    let specialitiesSelect, conditionsSelect, modalitiesSelect;
 
     document.addEventListener('DOMContentLoaded', function() {
         // Common Tom Select config
@@ -971,6 +1028,15 @@
                 placeholder: 'Select or type conditions...',
             });
         }
+
+        // Initialize Tom Select for Modalities
+        const modEl = document.getElementById('modalities-select');
+        if (modEl) {
+            modalitiesSelect = new TomSelect('#modalities-select', {
+                ...commonConfig,
+                placeholder: 'Select or type modalities...',
+            });
+        }
     });
 
     function openSpecialitiesModal() {
@@ -990,6 +1056,16 @@
 
     function closeConditionsModal() {
         document.getElementById('conditionsModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    function openModalitiesModal() {
+        document.getElementById('modalitiesModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModalitiesModal() {
+        document.getElementById('modalitiesModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
 
@@ -1036,24 +1112,29 @@
                         } else {
                             const emptySpan = document.createElement('span');
                             emptySpan.className = 'text-gray-400 text-lg no-items-msg';
-                            emptySpan.innerText = formId === 'specialitiesForm' ? 'No specialities listed.' : 'No conditions listed.';
+                            if (formId === 'specialitiesForm') emptySpan.innerText = 'No specialities listed.';
+                            else if (formId === 'conditionsForm') emptySpan.innerText = 'No conditions listed.';
+                            else emptySpan.innerText = 'No modalities listed.';
                             container.appendChild(emptySpan);
                         }
                     }
                     
                     if (modalId === 'specialitiesModal') closeSpecialitiesModal();
-                    else closeConditionsModal();
+                    else if (modalId === 'conditionsModal') closeConditionsModal();
+                    else closeModalitiesModal();
 
                     // Dynamic Warning Check
                     const warning = document.getElementById('profile-visibility-warning');
                     if (warning) {
                         const specContainer = document.getElementById('specialities-display-container');
                         const condContainer = document.getElementById('conditions-display-container');
+                        const modContainer = document.getElementById('modalities-display-container');
                         
                         const hasSpecs = specContainer && specContainer.querySelectorAll('span:not(.no-items-msg)').length > 0;
                         const hasConds = condContainer && condContainer.querySelectorAll('span:not(.no-items-msg)').length > 0;
+                        const hasMods = modContainer && modContainer.querySelectorAll('span:not(.no-items-msg)').length > 0;
 
-                        if (hasSpecs || hasConds) {
+                        if (hasSpecs || hasConds || hasMods) {
                             warning.classList.add('hidden');
                         } else {
                             warning.classList.remove('hidden');
@@ -1076,6 +1157,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         handleProfessionalFormSubmit('specialitiesForm', 'specialitiesModal', 'specialities-display-container');
         handleProfessionalFormSubmit('conditionsForm', 'conditionsModal', 'conditions-display-container');
+        handleProfessionalFormSubmit('modalitiesForm', 'modalitiesModal', 'modalities-display-container');
 
         // Auto-open based on redirect from banner
         const urlParams = new URLSearchParams(window.location.search);

@@ -41,7 +41,7 @@
                 </div>
                 <div class="info-row">
                     <span class="label">Time:</span>
-                    <span class="value">{{ $booking->booking_time }} (Today)</span>
+                    <span class="value">{{ $booking->booking_time }} ({{ $timezone ?? 'UTC' }}) - Today</span>
                 </div>
                 <div class="info-row">
                     <span class="label">Participants:</span>

@@ -43,6 +43,8 @@ class SessionReminderMail extends Mailable
      */
     public function content(): Content
     {
+        $timezone = derive_timezone_from_user($this->booking->user);
+
         $title = 'Time to join your session!';
         $intro = 'Your online session is about to start. Please use the button below to join the video conference.';
 
@@ -54,6 +56,7 @@ class SessionReminderMail extends Mailable
                 'booking' => $this->booking,
                 'type' => $this->type,
                 'videoLink' => $this->videoLink,
+                'timezone' => $timezone,
             ],
         );
     }

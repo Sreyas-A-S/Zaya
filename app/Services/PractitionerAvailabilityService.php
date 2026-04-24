@@ -36,14 +36,15 @@ class PractitionerAvailabilityService
      */
     public function getAvailableSlotsForProvider($provider, $date)
     {
-        $dateObj = Carbon::parse($date);
+        $timezone = derive_timezone_from_user($provider);
+        $dateObj = Carbon::parse($date, $timezone);
 
         $providerId = $provider->id;
         $providerType = $provider->getMorphClass();
-        \Log::info("Fetching slots for provider $providerId ($providerType) on $date");
+        \Log::info("Fetching slots for provider $providerId ($providerType) on $date in timezone $timezone");
 
         if (isset($provider->booking_window_days) && $provider->booking_window_days) {
-            $maxDate = Carbon::today()->addDays((int) $provider->booking_window_days);
+            $maxDate = Carbon::today($timezone)->addDays((int) $provider->booking_window_days);
             if ($dateObj->gt($maxDate)) {
                 return [];
             }
@@ -83,8 +84,8 @@ class PractitionerAvailabilityService
         $providerNotice = $provider->min_notice_hours ?? 1;
 
         foreach ($availableBlocks as $block) {
-            $start = Carbon::parse($block->start_time);
-            $end = Carbon::parse($block->end_time);
+            $start = Carbon::parse($block->start_time, $timezone);
+            $end = Carbon::parse($block->end_time, $timezone);
             $duration = $block->slot_duration ?? 60;
 
             $current = clone $start;
@@ -100,11 +101,11 @@ class PractitionerAvailabilityService
         }
 
         // 5. Filter out blocked time ranges
-        $availableSlots = array_filter($generatedSlots, function($slot) use ($blockedRanges) {
-            $slotStart = Carbon::parse($slot['start_raw']);
+        $availableSlots = array_filter($generatedSlots, function($slot) use ($blockedRanges, $timezone) {
+            $slotStart = Carbon::parse($slot['start_raw'], $timezone);
             foreach ($blockedRanges as $range) {
-                $blockStart = Carbon::parse($range->start_time);
-                $blockEnd = Carbon::parse($range->end_time);
+                $blockStart = Carbon::parse($range->start_time, $timezone);
+                $blockEnd = Carbon::parse($range->end_time, $timezone);
                 if ($slotStart->gte($blockStart) && $slotStart->lt($blockEnd)) return false;
             }
             return true;
@@ -134,9 +135,9 @@ class PractitionerAvailabilityService
 
         // 7. Notice period filtering
         if ($dateObj->isToday()) {
-            $now = Carbon::now();
-            $availableSlots = array_filter($availableSlots, function($slot) use ($now) {
-                $slotTime = Carbon::parse($slot['start_raw']);
+            $now = Carbon::now($timezone);
+            $availableSlots = array_filter($availableSlots, function($slot) use ($now, $timezone) {
+                $slotTime = Carbon::parse($slot['start_raw'], $timezone);
                 $noticeHours = $slot['notice'] ?? 0;
                 return $now->copy()->addHours($noticeHours)->lte($slotTime);
             });

@@ -135,8 +135,8 @@
             </div>
 
             <div class="text-center text-[10px] md:text-sm text-[#252525] cursor-default lg:border-t border-[#252525]/80 py-4"> 
-                <p id="footer-all-rights" data-i18n="{{ $site_settings['copyright_text'] ?? 'All rights reserved.' }}">
-                    {{ __($site_settings['copyright_text'] ?? 'All rights reserved.') }} &copy; {{ date('Y') }} Zaya Wellness
+                <p>
+                    <span id="copyright_text">{{ __($site_settings['copyright_text'] ?? 'All rights reserved.') }}</span> &copy; {{ date('Y') }} Zaya Wellness
                 </p>
             </div>
         </div>

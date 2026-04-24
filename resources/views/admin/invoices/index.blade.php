@@ -63,9 +63,11 @@
                                         </span>
                                     </td>
                                     <td>
+                                        @if($booking->invoice_no)
                                         <a href="{{ route('invoice.show', $booking->invoice_no) }}" target="_blank" class="btn btn-primary btn-sm">
                                             <i class="fa-solid fa-file-invoice"></i> View
                                         </a>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach

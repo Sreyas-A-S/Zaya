@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\OpenRegisterLink;
+use App\Models\Booking;
 use App\Models\BlogLike;
 use App\Models\ContactUs;
 use App\Models\Country;
@@ -32,6 +33,7 @@ use App\Mail\ContactUsMail;
 use App\Models\Doctor;
 use App\Models\MindfulnessPractitioner;
 use App\Models\YogaTherapist;
+use App\Models\PractitionerGallery;
 use App\Services\WordPressBlogService;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
@@ -285,6 +287,31 @@ class WebController extends Controller
         $settings = HomepageSetting::getAllSettings($language);
 
         return view('gallery', compact('settings'));
+    }
+
+    public function practitionerGallery($slug)
+    {
+        $language = App::getLocale();
+        $settings = HomepageSetting::getAllSettings($language);
+
+        // Try lookup by slug across all professional profile models
+        $practitioner = Practitioner::with(['user.gallery'])->where('slug', $slug)->first();
+
+        if (!$practitioner) {
+            $practitioner = Doctor::with(['user.gallery'])->where('slug', $slug)->first();
+        }
+        if (!$practitioner) {
+            $practitioner = MindfulnessPractitioner::with(['user.gallery'])->where('slug', $slug)->first();
+        }
+        if (!$practitioner) {
+            $practitioner = YogaTherapist::with(['user.gallery'])->where('slug', $slug)->first();
+        }
+
+        if (!$practitioner || !$practitioner->user) {
+            abort(404);
+        }
+
+        return view('practitioner-gallery', compact('settings', 'practitioner'));
     }
 
     public function findPractitioner(Request $request)
@@ -662,24 +689,24 @@ class WebController extends Controller
         $settings = HomepageSetting::getAllSettings($language);
 
         // Try lookup by slug across all professional profile models
-        $practitioner = Practitioner::with(['user', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
+        $practitioner = Practitioner::with(['user.gallery', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
 
         if (!$practitioner) {
-            $practitioner = Doctor::with(['user', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
+            $practitioner = Doctor::with(['user.gallery', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
         }
         if (!$practitioner) {
-            $practitioner = MindfulnessPractitioner::with(['user', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
+            $practitioner = MindfulnessPractitioner::with(['user.gallery', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
         }
         if (!$practitioner) {
-            $practitioner = YogaTherapist::with(['user', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
+            $practitioner = YogaTherapist::with(['user.gallery', 'reviews', 'userServices.service'])->where('slug', $slug)->first();
         }
 
         // Fallback to ID-based lookup if slug didn't match and it's numeric
         if (!$practitioner && is_numeric($slug)) {
-            $practitioner = Practitioner::with(['user', 'reviews', 'userServices.service'])->find($slug)
-                ?? Doctor::with(['user', 'reviews', 'userServices.service'])->find($slug)
-                ?? MindfulnessPractitioner::with(['user', 'reviews', 'userServices.service'])->find($slug)
-                ?? YogaTherapist::with(['user', 'reviews', 'userServices.service'])->find($slug);
+            $practitioner = Practitioner::with(['user.gallery', 'reviews', 'userServices.service'])->find($slug)
+                ?? Doctor::with(['user.gallery', 'reviews', 'userServices.service'])->find($slug)
+                ?? MindfulnessPractitioner::with(['user.gallery', 'reviews', 'userServices.service'])->find($slug)
+                ?? YogaTherapist::with(['user.gallery', 'reviews', 'userServices.service'])->find($slug);
         }
         if (!$practitioner) {
             abort(404);
@@ -699,10 +726,20 @@ class WebController extends Controller
             }
         }
 
-        // Add a helper attribute for easy access to bio and name across different models if needed
-        // but for now we'll rely on the blade handling it or common naming conventions
+        // Calculate real stats
+        $practitionerType = get_class($practitioner);
+        $totalSessions = Booking::where('profile_id', $practitioner->id)
+            ->where('practitioner_type', $practitionerType)
+            ->where('status', 'completed')
+            ->count();
         
-        return view('practitioner-detail', compact('practitioner', 'settings', 'selectedService'));
+        $totalClients = Booking::where('profile_id', $practitioner->id)
+            ->where('practitioner_type', $practitionerType)
+            ->where('status', 'completed')
+            ->distinct('user_id')
+            ->count('user_id');
+
+        return view('practitioner-detail', compact('practitioner', 'settings', 'selectedService', 'totalSessions', 'totalClients'));
     }
 
     public function filterPractitioners(Request $request)
@@ -1130,6 +1167,14 @@ class WebController extends Controller
 
     public function bookSession(Request $request, $practitioner = null)
     {
+        if (auth()->check()) {
+            $user = auth()->user();
+            $clientRoles = ['client', 'patient'];
+            if (!in_array(strtolower($user->role), $clientRoles)) {
+                return redirect()->route('dashboard')->with('warning', 'Booking a session requires a client account. Your current account type does not support this action.');
+            }
+        }
+
         if ($request->has('service') && trim((string) $request->query('service')) === '') {
             $queryParams = $request->query();
             unset($queryParams['service']);

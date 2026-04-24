@@ -32,7 +32,7 @@
 <div id="tab-content-promo-codes" class="tab-content">
     <!-- Add Promo Code Section -->
     <div class="mb-12 max-w-lg">
-        <form action="{{ route('rewards.store') }}" method="POST">
+        <form id="add-promo-form" action="{{ route('rewards.store') }}" method="POST">
             @csrf
             <div class="group bg-white p-2 rounded-full border border-[#2E4B3D]/12 flex items-center shadow-sm focus-within:border-secondary focus-within:shadow-md transition-all duration-300">
                 <div class="flex-1 px-5 flex items-center gap-3">
@@ -41,90 +41,23 @@
                         class="w-full bg-transparent border-none outline-none text-base font-bold text-secondary placeholder:text-gray-400 placeholder:font-medium uppercase"
                         required>
                 </div>
-                <button type="submit" class="bg-secondary text-white px-8 py-3.5 rounded-full font-black text-xs uppercase tracking-[0.15em] hover:bg-primary transition-all shadow-lg shadow-secondary/10 active:scale-95">
-                    {{ __('Add Code') }}
+                <button type="submit" id="add-promo-btn" class="bg-secondary text-white px-8 py-3.5 rounded-full font-black text-xs uppercase tracking-[0.15em] hover:bg-primary transition-all shadow-lg shadow-secondary/10 active:scale-95 flex items-center gap-2">
+                    <span id="add-promo-text">{{ __('Add Code') }}</span>
+                    <i id="add-promo-loader" class="ri-loader-4-line animate-spin hidden"></i>
                 </button>
             </div>
         </form>
-        @if(session('info'))
-            <div class="mt-4 ml-6 flex items-center gap-2 animate-fade-in">
-                <i class="ri-information-line text-amber-500 text-base"></i>
-                <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">{{ session('info') }}</span>
+        <div id="promo-message" class="mt-4 ml-6 hidden animate-fade-in">
+            <div class="flex items-center gap-2">
+                <i id="promo-message-icon" class="text-base"></i>
+                <span id="promo-message-text" class="text-xs font-bold uppercase tracking-wider"></span>
             </div>
-        @endif
-        @if(session('success'))
-            <div class="mt-4 ml-6 flex items-center gap-2 animate-fade-in">
-                <i class="ri-checkbox-circle-line text-emerald-500 text-base"></i>
-                <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">{{ session('success') }}</span>
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="mt-4 ml-6 flex items-center gap-2 animate-fade-in">
-                <i class="ri-error-warning-line text-red-500 text-base"></i>
-                <span class="text-xs font-bold text-red-600 uppercase tracking-wider">{{ session('error') }}</span>
-            </div>
-        @endif
+        </div>
     </div>
 
     <!-- Promo Codes Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @forelse($activePromoCodes as $promo)
-            @php
-                $isUsed = in_array($promo->code, $usedPromoCodes);
-            @endphp
-            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden group">
-                <!-- Used Overlay -->
-                @if($isUsed)
-                    <div class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
-                        <div class="bg-gray-800 text-white px-8 py-3 rounded-full font-black text-xs uppercase tracking-[0.2em] shadow-lg transform -rotate-12">
-                            Already Redeemed
-                        </div>
-                    </div>
-                @endif
-
-                <div class="relative z-10">
-                    <div class="flex justify-between items-start mb-6">
-                        <span class="px-5 py-2 bg-secondary text-white text-xs font-black rounded-xl uppercase tracking-wider shadow-sm">
-                            {{ $promo->code }}
-                        </span>
-                        <span class="text-xs font-black text-emerald-600 bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-100">
-                            {{ $promo->type == 'percentage' ? $promo->reward . '%' : ($coinSetting->currency_symbol ?? '$') . $promo->reward }} OFF
-                        </span>
-                    </div>
-
-                    <h3 class="text-xl font-black text-secondary mb-3 group-hover:text-primary transition-colors">{{ $promo->description }}</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed mb-6 font-medium">Use this code at the checkout page to avail your discount on any wellness session.</p>
-
-                    <div class="flex items-center justify-between pt-6 border-t border-gray-50">
-                        <div class="flex flex-col">
-                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Validity</span>
-                            @if($promo->expiry_date)
-                                <span class="text-xs text-gray-600 font-bold flex items-center"><i class="ri-calendar-line mr-1.5 text-secondary text-base"></i> {{ $promo->expiry_date->format('M d, Y') }}</span>
-                            @else
-                                <span class="text-xs text-gray-600 font-bold flex items-center"><i class="ri-infinity-line mr-1.5 text-secondary text-base"></i> Forever Active</span>
-                            @endif
-                        </div>
-                        
-                        @if(!$isUsed)
-                            <button onclick="copyToClipboard('{{ $promo->code }}')" class="w-12 h-12 bg-[#F9FBF9] border border-[#2E4B3D]/5 rounded-xl flex items-center justify-center text-secondary hover:bg-secondary hover:text-white transition-all duration-300 group/btn">
-                                <i class="ri-file-copy-line text-xl group-hover/btn:scale-110"></i>
-                            </button>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Decorative element -->
-                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-[#F9FBF9] rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700"></div>
-            </div>
-        @empty
-            <div class="col-span-full py-20 text-center bg-white rounded-[3rem] border border-dashed border-gray-200">
-                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="ri-ticket-line text-4xl text-gray-300"></i>
-                </div>
-                <h3 class="text-xl font-black text-secondary mb-2">No active offers found</h3>
-                <p class="text-gray-400 text-base font-medium">Stay tuned! We'll notify you when new promo codes are available.</p>
-            </div>
-        @endforelse
+    <div id="promo-grid-wrapper">
+        @include('partials.promo-codes-grid')
     </div>
 </div>
 
@@ -168,18 +101,36 @@
                         <button onclick="openReferralModal()" class="bg-white text-secondary py-3 rounded-xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">
                             Share Link
                         </button>
-                        <form action="{{ route('rewards.regenerate') }}" method="POST" onsubmit="return confirm('Wait! If you regenerate your link, old links shared with friends will stop working. Continue?')">
-                            @csrf
-                            <button type="submit" class="w-full h-full border border-white/20 hover:bg-white/10 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">
-                                Refresh Link
-                            </button>
-                        </form>
+                        <button type="button" onclick="openRegenerateModal()" class="w-full h-full border border-white/20 hover:bg-white/10 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">
+                            Refresh Link
+                        </button>
                     </div>
                 </div>
 
                 <!-- Decorative Circles -->
                 <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/5 rounded-full"></div>
                 <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-white/5 rounded-full group-hover:scale-110 transition-transform duration-700"></div>
+            </div>
+        </div>
+
+        <!-- Regenerate Confirmation Modal -->
+        <div id="regenerate-modal" class="fixed inset-0 bg-[#1A1A1A]/40 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+            <div class="bg-white rounded-[40px] w-full max-w-[400px] overflow-hidden shadow-2xl scale-95 opacity-0 transition-all duration-200" id="regenerate-modal-content">
+                <div class="p-10 text-center">
+                    <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-amber-100">
+                        <i class="ri-refresh-line text-4xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-secondary mb-3 tracking-tight">Regenerate Link?</h3>
+                    <p class="text-gray-500 mb-8 leading-relaxed font-medium text-base">Wait! If you regenerate your link, old links shared with friends will stop working. Continue?</p>
+                    
+                    <div class="flex flex-col gap-3">
+                        <form action="{{ route('rewards.regenerate') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full py-4 bg-secondary text-white font-black rounded-2xl hover:bg-opacity-95 transition-all text-lg shadow-xl shadow-secondary/20">Yes, Regenerate</button>
+                        </form>
+                        <button type="button" onclick="closeRegenerateModal()" class="w-full py-4 bg-gray-50 text-gray-500 font-black rounded-2xl hover:bg-gray-100 transition-all text-lg">Cancel</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -325,5 +276,93 @@
         document.getElementById('referral-modal').classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
+
+    function openRegenerateModal() {
+        const modal = document.getElementById('regenerate-modal');
+        const content = document.getElementById('regenerate-modal-content');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeRegenerateModal() {
+        const modal = document.getElementById('regenerate-modal');
+        const content = document.getElementById('regenerate-modal-content');
+        content.classList.add('scale-95', 'opacity-0');
+        content.classList.remove('scale-100', 'opacity-100');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }, 200);
+    }
+
+    // AJAX Promo Code Submission
+    document.getElementById('add-promo-form')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const btn = document.getElementById('add-promo-btn');
+        const text = document.getElementById('add-promo-text');
+        const loader = document.getElementById('add-promo-loader');
+        const messageDiv = document.getElementById('promo-message');
+        const messageIcon = document.getElementById('promo-message-icon');
+        const messageText = document.getElementById('promo-message-text');
+        const gridWrapper = document.getElementById('promo-grid-wrapper');
+
+        // Reset & Loading state
+        btn.disabled = true;
+        loader.classList.remove('hidden');
+        messageDiv.classList.add('hidden');
+
+        try {
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Success
+                messageDiv.classList.remove('hidden');
+                messageIcon.className = 'ri-checkbox-circle-line text-emerald-500 text-base';
+                messageText.className = 'text-xs font-bold text-emerald-600 uppercase tracking-wider';
+                messageText.textContent = data.message;
+                
+                form.reset();
+
+                // Refresh the grid
+                const gridResponse = await fetch(window.location.href, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const gridHtml = await gridResponse.text();
+                gridWrapper.innerHTML = gridHtml;
+
+            } else {
+                // Error (Validation or Business Logic)
+                messageDiv.classList.remove('hidden');
+                messageIcon.className = 'ri-error-warning-line text-red-500 text-base';
+                messageText.className = 'text-xs font-bold text-red-600 uppercase tracking-wider';
+                messageText.textContent = data.message || 'Something went wrong.';
+            }
+        } catch (error) {
+            console.error('Promo submission error:', error);
+            messageDiv.classList.remove('hidden');
+            messageIcon.className = 'ri-error-warning-line text-red-500 text-base';
+            messageText.className = 'text-xs font-bold text-red-600 uppercase tracking-wider';
+            messageText.textContent = 'A connection error occurred.';
+        } finally {
+            btn.disabled = false;
+            loader.classList.add('hidden');
+        }
+    });
 </script>
 @endsection

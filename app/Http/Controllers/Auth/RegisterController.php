@@ -56,7 +56,7 @@ class RegisterController extends Controller
         // Middleware removed for now
     }
 
-    public function showRegistrationForm($type)
+    public function showRegistrationForm(Request $request, $type)
     {
         if (request()->has('ref')) {
             session(['referral_code' => request('ref')]);
@@ -72,6 +72,7 @@ class RegisterController extends Controller
         $financeSettings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
 
         $countries = \App\Models\Country::all();
+        $currencies = config('currencies.symbols');
         $countryToCurrency = config('currencies.country_to_currency', []);
 
         if ($type === 'practitioner') {

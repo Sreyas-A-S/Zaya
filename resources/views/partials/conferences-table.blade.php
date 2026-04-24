@@ -97,5 +97,3 @@
         @endif
     </div>
 </div>
-
-@include('partials.conference-provider-modal')

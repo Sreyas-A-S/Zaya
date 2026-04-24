@@ -25,16 +25,20 @@ class InvoiceController extends Controller
      */
     public function show($invoice_no)
     {
-        $booking = Booking::with(['user.patient', 'practitioner', 'translator'])
+        $booking = Booking::with(['user.patient', 'practitioner.user', 'translator.user'])
             ->where('invoice_no', $invoice_no)
             ->firstOrFail();
         
-        // Ensure the current user can view this invoice if they are the client who booked it or an admin
+        // Ensure the current user can view this invoice
         $user = auth()->user();
-        $isAuthorized = $user->hasPermission('dashboard-view') || $booking->user_id === $user->id;
+        
+        $isAuthorized = $user->hasPermission('dashboard-view') || // Admin
+                        $booking->user_id === $user->id || // Client
+                        ($booking->practitioner && $booking->practitioner->user_id === $user->id) || // Practitioner
+                        ($booking->translator && $booking->translator->user_id === $user->id); // Translator
 
         if (!$isAuthorized) {
-            abort(403);
+            abort(403, 'You are not authorized to view this invoice.');
         }
 
         return view('invoice.index', compact('booking'));

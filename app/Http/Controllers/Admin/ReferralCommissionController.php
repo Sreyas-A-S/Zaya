@@ -12,8 +12,8 @@ class ReferralCommissionController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:other-fees-view')->only('index');
-        $this->middleware('permission:other-fees-edit')->only('update', 'setCountry');
+        $this->middleware('permission:referral-commissions-view')->only('index');
+        $this->middleware('permission:referral-commissions-edit')->only('update', 'setCountry');
     }
 
     public function index(Request $request)
@@ -73,6 +73,11 @@ class ReferralCommissionController extends Controller
      */
     public function setCountry(Request $request)
     {
+        $isSuperAdmin = auth()->user()->role === 'super-admin';
+        if (!$isSuperAdmin && !auth()->user()->hasPermission('referral-commissions-edit')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $validated = $request->validate([
             'country_id' => 'required' // Can be 0 for Global
         ]);
@@ -107,6 +112,16 @@ class ReferralCommissionController extends Controller
 
     public function update(Request $request)
     {
+        $isSuperAdmin = auth()->user()->role === 'super-admin';
+        
+        // Ensure only authorized users can update
+        if (!$isSuperAdmin && !auth()->user()->hasPermission('referral-commissions-edit')) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+            }
+            abort(403);
+        }
+
         $validated = $request->validate([
             'country_id' => 'required',
             'direct_rates' => 'required|array',

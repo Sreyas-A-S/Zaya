@@ -136,7 +136,7 @@ class BookingController extends Controller
                 'situation' => $request->situation ?? null,
                 'booking_date' => $request->booking_date,
                 'booking_time' => $request->booking_time,
-                'total_price' => $subtotal,
+                'total_price' => 0,
                 'promo_code' => $promoCode,
                 'discount_amount' => $promoDiscount,
                 'coins_used' => $coinsUsed,
@@ -172,6 +172,18 @@ class BookingController extends Controller
                 'coin_discount' => $coinDiscount,
             ]);
 
+            try {
+                \Illuminate\Support\Facades\Mail::to($booking->user->email)->send(new \App\Mail\BookingMail($booking, 'client'));
+                if ($booking->practitioner && $booking->practitioner->user) {
+                    \Illuminate\Support\Facades\Mail::to($booking->practitioner->user->email)->send(new \App\Mail\BookingMail($booking, 'practitioner'));
+                }
+                if ($booking->translator && $booking->translator->user) {
+                    \Illuminate\Support\Facades\Mail::to($booking->translator->user->email)->send(new \App\Mail\BookingMail($booking, 'translator'));
+                }
+            } catch (\Exception $e) {
+                \Log::error('Zero-Pay Booking Confirmation Email Error: ' . $e->getMessage());
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Booking confirmed! (Discount applied)',
@@ -197,7 +209,7 @@ class BookingController extends Controller
                 'mode' => $request->mode,
                 'conditions' => $request->conditions,
                 'situation' => $request->situation,
-                'total_price' => $subtotal,
+                'total_price' => max(0, $subtotal - $promoDiscount - $coinDiscount),
                 'promo_code' => $promoCode,
                 'discount_amount' => $promoDiscount,
                 'coins_used' => $coinsUsed,
@@ -373,6 +385,18 @@ class BookingController extends Controller
                 'coins_used' => $booking->coins_used,
                 'coin_discount' => $booking->coin_discount,
             ]);
+
+            try {
+                \Illuminate\Support\Facades\Mail::to($booking->user->email)->send(new \App\Mail\BookingMail($booking, 'client'));
+                if ($booking->practitioner && $booking->practitioner->user) {
+                    \Illuminate\Support\Facades\Mail::to($booking->practitioner->user->email)->send(new \App\Mail\BookingMail($booking, 'practitioner'));
+                }
+                if ($booking->translator && $booking->translator->user) {
+                    \Illuminate\Support\Facades\Mail::to($booking->translator->user->email)->send(new \App\Mail\BookingMail($booking, 'translator'));
+                }
+            } catch (\Exception $e) {
+                \Log::error('Booking Confirmation Email Error: ' . $e->getMessage());
+            }
 
             return redirect()->route('invoice.show', $booking->invoice_no)->with('success', 'Booking confirmed!');
         } else {

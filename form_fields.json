@@ -1,0 +1,722 @@
+[
+  {
+    "part": 1,
+    "sections": [
+      {
+        "section": "SECTION 1: PATIENT IDENTIFICATION DETAILS",
+        "fields": [
+          { "question": "Name:", "type": "text", "answer": "" },
+          { "question": "Age:", "type": "number", "answer": null },
+          { "question": "Gender:", "type": "text", "answer": "" },
+          { "question": "Profession:", "type": "text", "answer": "" },
+          { "question": "Address:", "type": "text", "answer": "" },
+          { "question": "Email:", "type": "text", "answer": "" },
+          { "question": "Phone:", "type": "text", "answer": "" },
+          { "question": "Date:", "type": "date", "answer": "" }
+        ],
+        "subsections": [
+          {
+            "title": "Physical Parameters",
+            "fields": [
+              { "question": "Height:", "type": "text", "answer": "" },
+              { "question": "Weight:", "type": "text", "answer": "" },
+              { "question": "BMI:", "type": "text", "answer": "" },
+              { "question": "Blood Pressure:", "type": "text", "answer": "" }
+            ]
+          }
+        ]
+      },
+      {
+        "section": "SECTION 2: FAMILY HISTORY",
+        "instruction": "Please specify your relationship with the person in the family who is presenting any of the following issues or any other (not mentioned here) that could be hereditary:",
+        "fields": [
+          {
+            "question": "Cardiac Problems",
+            "type": "relation",
+            "answer": { "present": false, "relation": "" }
+          },
+          {
+            "question": "Arthritis",
+            "type": "relation",
+            "answer": { "present": false, "relation": "" }
+          },
+          {
+            "question": "Diabetes",
+            "type": "relation",
+            "answer": { "present": false, "relation": "" }
+          },
+          {
+            "question": "Hypertension",
+            "type": "relation",
+            "answer": { "present": false, "relation": "" }
+          },
+          {
+            "question": "Obesity",
+            "type": "relation",
+            "answer": { "present": false, "relation": "" }
+          },
+          {
+            "question": "Asthma",
+            "type": "relation",
+            "answer": { "present": false, "relation": "" }
+          },
+          {
+            "question": "Cholesterol",
+            "type": "relation",
+            "answer": { "present": false, "relation": "" }
+          },
+          {
+            "question": "Thyroid",
+            "type": "relation",
+            "answer": { "present": false, "relation": "" }
+          }
+        ]
+      },
+      {
+        "section": "SECTION 3: PRESENTING CONDITION",
+        "fields": [
+          {
+            "question": "Present Problem :…………..",
+            "type": "textarea",
+            "answer": ""
+          },
+          {
+            "question": "History of the Present Problem – Onset & treatments taken :……………",
+            "type": "textarea",
+            "answer": ""
+          },
+          {
+            "question": "Past Disorders:…….",
+            "type": "textarea",
+            "answer": ""
+          },
+          {
+            "question": "Any Surgeries or Procedures in Recent Past :…………..",
+            "type": "textarea",
+            "answer": ""
+          }
+        ]
+      },
+      {
+        "section": "SECTION 4: PERSONAL DETAILS & DAILY RHYTHM",
+        "subsections": [
+          {
+            "title": "Bowel",
+            "fields": [
+              {
+                "question": "Bowel",
+                "type": "checkbox-group",
+                "options": [
+                  "Regular",
+                  "Irregular",
+                  "Constipated"
+                ],
+                "answer": []
+              },
+              {
+                "question": "If you feel a sense of incomplete void after bowel:",
+                "type": "text",
+                "answer": ""
+              },
+              {
+                "question": "If it is sometimes loose stools but sometimes hard:",
+                "type": "text",
+                "answer": ""
+              },
+              {
+                "question": "If bowel is dependent on something – a cup of tea or some such thing:",
+                "type": "text",
+                "answer": ""
+              }
+            ]
+          },
+          {
+            "title": "Urination",
+            "fields": [
+              {
+                "question": "Colour:",
+                "type": "text",
+                "answer": ""
+              },
+              {
+                "question": "Frequency:",
+                "type": "text",
+                "answer": ""
+              },
+              {
+                "question": "Burning:",
+                "type": "text",
+                "answer": ""
+              }
+            ]
+          },
+          {
+            "title": "Sleep Cycle",
+            "fields": [
+              {
+                "question": "Sleep Cycle",
+                "type": "checkbox-group",
+                "options": [
+                  "Regular",
+                  "Broken",
+                  "Difficulty in falling asleep"
+                ],
+                "answer": []
+              },
+              {
+                "question": "Average no. of hours of sleep per day:",
+                "type": "number",
+                "answer": null
+              }
+            ]
+          },
+          {
+            "title": "Gastric Distress",
+            "fields": [
+              {
+                "question": "Gastric Distress",
+                "type": "checkbox-group",
+                "options": [
+                  "Abdominal Pain",
+                  "Bloating",
+                  "Nausea",
+                  "Acidity"
+                ],
+                "answer": []
+              },
+              {
+                "question": "Any Comments:",
+                "type": "text",
+                "answer": ""
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "part": 2,
+    "sections": [
+      {
+        "section": "SECTION 5: HABITS & ADDICTIONS",
+        "fields": [
+          {
+            "question": "Any addictions or habitual eating/drinking of something specific?",
+            "type": "textarea",
+            "answer": ""
+          },
+          {
+            "question": "Mention the frequency of the same:",
+            "type": "text",
+            "answer": ""
+          },
+          {
+            "question": "Please specify the frequency & variety of Non-vegetarian diet (if consumed):",
+            "type": "text",
+            "answer": ""
+          },
+          {
+            "question": "Please specify the frequency of alcohol (if consumed):",
+            "type": "text",
+            "answer": ""
+          },
+          {
+            "question": "Any other addictions:",
+            "type": "text",
+            "answer": ""
+          },
+          {
+            "question": "Precautions to be taken with the patient:",
+            "type": "textarea",
+            "answer": ""
+          }
+        ]
+      },
+      {
+        "section": "SECTION 6: FEMALE HEALTH (If Applicable)",
+        "fields": [
+          {
+            "question": "Menstrual cycle:",
+            "type": "checkbox-group",
+            "options": [
+              "Regular",
+              "Irregular",
+              "Stopped"
+            ],
+            "answer": []
+          },
+          {
+            "question": "Problems pre or during menses (e.g., body ache, mood swings etc.):",
+            "type": "textarea",
+            "answer": ""
+          },
+          {
+            "question": "Any associated disorder like endometriosis, fibroid, PCOD/PCOS etc.:",
+            "type": "textarea",
+            "answer": ""
+          }
+        ]
+      },
+      {
+        "section": "SECTION 7: DIETARY PATTERN",
+        "subsections": [
+          {
+            "title": "Water Intake",
+            "fields": [
+              {
+                "question": "Average quantity per day:",
+                "type": "text",
+                "answer": ""
+              }
+            ]
+          },
+          {
+            "title": "Appetite",
+            "fields": [
+              {
+                "question": "Appetite",
+                "type": "checkbox-group",
+                "options": [
+                  "Excessive",
+                  "Good",
+                  "Moderate",
+                  "Poor"
+                ],
+                "answer": []
+              }
+            ]
+          },
+          {
+            "title": "Additional Dietary Questions",
+            "fields": [
+              {
+                "question": "Do you think you do stress eating or if your appetite is mood related?",
+                "type": "textarea",
+                "answer": ""
+              },
+              {
+                "question": "Choice of food (sweet, sour, spicy etc):",
+                "type": "text",
+                "answer": ""
+              }
+            ]
+          },
+          {
+            "title": "Diet Schedule",
+            "instruction": "Below, please fill the diet schedule that you mostly follow.",
+            "table": {
+              "structure": "two-row-grid",
+              "headers": [
+                "Time",
+                "Early Morning",
+                "Breakfast",
+                "In-between Snacking",
+                "Lunch",
+                "Evening",
+                "Dinner"
+              ],
+              "rows": [
+                {
+                  "label": "Time",
+                  "values": ["", "", "", "", "", ""]
+                },
+                {
+                  "label": "Diet",
+                  "values": ["", "", "", "", "", ""]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "section": "SECTION 8: TRIDOSHA ANALYSIS (PRAKRITI)",
+        "instruction": "Please highlight the traits that you relate to.",
+        "table": [
+          {
+            "feature": "Body Frame",
+            "options": {
+              "Vata": "Thin, bony",
+              "Pitta": "Moderate, muscular",
+              "Kapha": "Large, well developed"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Skin Lustre",
+            "options": {
+              "Vata": "Dull/dusky & dry",
+              "Pitta": "Ruddy/reddish, lustrous",
+              "Kapha": "White/pale, oily"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Eyes",
+            "options": {
+              "Vata": "Small",
+              "Pitta": "Moderate (sometimes reddish)",
+              "Kapha": "Large, white"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Hair",
+            "options": {
+              "Vata": "Dry, thin",
+              "Pitta": "Thin, oily",
+              "Kapha": "Thick, oily, wavy"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Teeth",
+            "options": {
+              "Vata": "Crooked, poorly formed",
+              "Pitta": "Moderate, bleeding gums",
+              "Kapha": "Large, well formed"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Nails",
+            "options": {
+              "Vata": "Rough, brittle",
+              "Pitta": "Soft pink",
+              "Kapha": "Soft white"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Joints",
+            "options": {
+              "Vata": "Stiff",
+              "Pitta": "Moderate",
+              "Kapha": "Flexible"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Thirst",
+            "options": {
+              "Vata": "Less",
+              "Pitta": "High",
+              "Kapha": "Moderate"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Sweating",
+            "options": {
+              "Vata": "Scanty",
+              "Pitta": "Profuse but short",
+              "Kapha": "Slow start, profuse"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Sensitive to",
+            "options": {
+              "Vata": "Dryness, wind",
+              "Pitta": "Heat, sunlight",
+              "Kapha": "Cold, damp, dust"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Disease Tendency",
+            "options": {
+              "Vata": "Body pain, muscle pulls, sprains, constipation, low BP, anxiety",
+              "Pitta": "Fever, acidity, indigestion, lack of sleep, anger, high BP",
+              "Kapha": "Congestion, cold/cough, sinusitis, lethargy, oversleep"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Activity & Stamina",
+            "options": {
+              "Vata": "Restless, easily exhausted",
+              "Pitta": "Moderate to high stamina",
+              "Kapha": "Low activity, high stamina"
+            },
+            "answer": ""
+          },
+          {
+            "feature": "Speech",
+            "options": {
+              "Vata": "Fast",
+              "Pitta": "Moderate, sometimes aggressive & loud",
+              "Kapha": "Soft, slow & calm"
+            },
+            "answer": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "part": 3,
+    "sections": [
+      {
+        "section": "SECTION 9: PERSONAL SVABHAVA (MENTAL NATURE)",
+        "instruction": "Personal svabhava/ nature. Please highlight the traits that you relate to",
+        "categories": {
+          "Sattvic traits": [
+            "Modest",
+            "never depressed",
+            "universal love",
+            "never violent",
+            "little monetary attachment",
+            "usual content",
+            "forgives & forgets",
+            "good concentration",
+            "good memory",
+            "strong memory",
+            "always truthful",
+            "usually at peace",
+            "loves fresh, raw foods, vegetarian",
+            "absolutely clean",
+            "never scared",
+            "basic desires",
+            "rarely angry",
+            "regular at all spiritual practices",
+            "regularly meditative"
+          ],
+          "Rajasic traits": [
+            "Egoist (at times)",
+            "sometimes depressed",
+            "loves oneself",
+            "sometimes violent",
+            "some monetary attachment",
+            "content with somethings",
+            "forgives after effortful thinking",
+            "decent concentration power",
+            "moderate memory",
+            "variable will power",
+            "try to be truthful most of the times",
+            "not much at peace",
+            "loves spicy, pungent foods",
+            "fairly clean",
+            "scared of loosing respect",
+            "desire money, luxuries, good looks etc",
+            "frequently anger",
+            "occasionally spiritual (based on logic)",
+            "variably meditative"
+          ],
+          "Tamasic traits": [
+            "Vain",
+            "frequently depressed",
+            "doesn’t love without condition",
+            "frequent violent behavior",
+            "lots of monetary attachment",
+            "never content",
+            "never forgives",
+            "poor concentration",
+            "poor memory",
+            "weak will power",
+            "rarely truthful",
+            "rarely at peace",
+            "non-veg diet (loves greasy, heavy food)",
+            "not that fond of cleanliness",
+            "scared of loosing in life – fear of failure",
+            "desires power & authority",
+            "usually irritated",
+            "not spiritual",
+            "non meditative"
+          ]
+        },
+        "answer": []
+      },
+      {
+        "section": "SECTION 10: Detailed dosha assessment",
+        "instruction": "Please highlight the traits that you relate to",
+        "doshaMatrix": [
+          {
+            "dosha": "Vata",
+            "subtype": "Prana",
+            "associatedProblems": [
+              "Eye problems",
+              "Breathlessness/ difficulty breathing",
+              "Sinusitis",
+              "Frequent headaches",
+              "Ear aches"
+            ]
+          },
+          {
+            "dosha": "Vata",
+            "subtype": "Udana",
+            "associatedProblems": [
+              "Loss of memory",
+              "Speech related issues",
+              "Spiritually distressed",
+              "Loss of will power",
+              "Over-expressive/ lack of expression"
+            ]
+          },
+          {
+            "dosha": "Vata",
+            "subtype": "Samana",
+            "associatedProblems": [
+              "Indigestion",
+              "Belching",
+              "Flatulence",
+              "Gastritis"
+            ]
+          },
+          {
+            "dosha": "Vata",
+            "subtype": "Vyana",
+            "associatedProblems": [
+              "Body aches and pains",
+              "Irregular heartbeat",
+              "Cardiac issues",
+              "Palpitations",
+              "Feeling dizzy on getting up",
+              "Difficulty in bending forward/ backward"
+            ]
+          },
+          {
+            "dosha": "Vata",
+            "subtype": "Apana",
+            "associatedProblems": [
+              "Constipation",
+              "Fissures/ piles",
+              "Urinary Tract infections",
+              "Menstrual irregularities",
+              "Miscarriage",
+              "Sexual organ issues – ED, loss of libido, vaginal itching"
+            ]
+          },
+          {
+            "dosha": "Pitta",
+            "subtype": "Pachaka",
+            "associatedProblems": [
+              "Acidity",
+              "Indigestion",
+              "Belching",
+              "Ulcers, excessive hunger/ thirst"
+            ]
+          },
+          {
+            "dosha": "Pitta",
+            "subtype": "Ranjaka",
+            "associatedProblems": [
+              "Alterations in Hb",
+              "Anemia",
+              "Jaundice",
+              "Burning sensation in skin & eyes"
+            ]
+          },
+          {
+            "dosha": "Pitta",
+            "subtype": "Sadhaka",
+            "associatedProblems": [
+              "Poor memory",
+              "Emotional instability",
+              "Bouts of anger",
+              "Mental disturbance – irritability, jealousy",
+              "Disturbed sleep"
+            ]
+          },
+          {
+            "dosha": "Pitta",
+            "subtype": "Alochaka",
+            "associatedProblems": [
+              "Burning or itching in eyes",
+              "Conjunctivitis, impaired vision",
+              "sensitivity to light",
+              "Unclear vision"
+            ]
+          },
+          {
+            "dosha": "Pitta",
+            "subtype": "Bhrajaka",
+            "associatedProblems": [
+              "Frequent skin infections",
+              "Urticaria/ skin rashes/ acne",
+              "Sweating of hands & feet"
+            ]
+          },
+          {
+            "dosha": "Kapha",
+            "subtype": "Avalambaka",
+            "associatedProblems": [
+              "Weakness of cardiac function",
+              "Congestion, Bronchitis, Asthma"
+            ]
+          },
+          {
+            "dosha": "Kapha",
+            "subtype": "Kledaka",
+            "associatedProblems": [
+              "Poor digestion",
+              "Nausea",
+              "Excessive mucus in esophagus & digestive tract",
+              "Loss of appetite"
+            ]
+          },
+          {
+            "dosha": "Kapha",
+            "subtype": "Bodhaka",
+            "associatedProblems": [
+              "Loss of taste",
+              "Excessive salivation",
+              "Whitish coating on the tongue"
+            ]
+          },
+          {
+            "dosha": "Kapha",
+            "subtype": "Tarpaka",
+            "associatedProblems": [
+              "Anxiety, restlessness",
+              "Brain fog",
+              "Dullness, depression",
+              "Weak sensations/ limb weakness"
+            ]
+          },
+          {
+            "dosha": "Kapha",
+            "subtype": "Shleshaka",
+            "associatedProblems": [
+              "Arthirits",
+              "Joint inflammation/ stiffness",
+              "Edema",
+              "Water retention"
+            ]
+          }
+        ],
+        "answer": []
+      },
+      {
+        "section": "SECTION 11: Assessment of Vikritis",
+        "instruction": "Please mark/tick the symptoms below that match with your present living style",
+        "questions": [
+          "Are you constantly worried, anxious and overwhelmed?",
+          "Do you feel tired but find yourself unable to slow down and relax?",
+          "Do you find it difficult to settle down and fall asleep at night? Is your sleep restless when you do manage to fall asleep?",
+          "Is your skin feeling dryer than usual, stretched taut or flaking?",
+          "Is your hair more brittle, with split ends happening oftener?",
+          "Are your lips raw and chapped? Is your throat constantly dry?",
+          "Is your digestion irregular? Do you experience problems with abdominal gas?",
+          "Do you feel like you cannot sit still, that you need to be constantly moving?",
+          "Do you feel \"spaced out\"? Is it harder to remember things for more than a short period of time?",
+          "Do your bowel movements occur less than once daily?",
+          "Is your attention span shorter than usual? Is it harder to focus?",
+          "Do you tend to be demanding or critical?",
+          "Are you often frustrated, angry or intense?",
+          "Is your skin ruddy and prone to rashes and eruptions?",
+          "Are you often irritable or impatient?",
+          "Is your hair prematurely gray or thinning?",
+          "Do you wake up in the early hours and find it difficult to fall asleep again?",
+          "Do you feel uncomfortable in hot weather?",
+          "Are you a perfectionist?",
+          "Do you experience hot flashes?",
+          "Do you have excess stomach acid?",
+          "Do you experience loose bowel movements?"
+        ],
+        "answers": []
+      }
+    ]
+  }
+]

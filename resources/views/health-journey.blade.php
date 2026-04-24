@@ -12,6 +12,49 @@
         </div>
     </div>
 
+    <!-- Data Overview Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-6 rounded-[2rem] border border-[#2E4B3D]/12 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500">
+                <i class="ri-file-list-3-line text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-xs font-black uppercase tracking-widest text-gray-400">Total Records</p>
+                <p class="text-xl font-bold text-secondary">{{ count($clinicalDocuments) }}</p>
+            </div>
+        </div>
+        <div class="bg-white p-6 rounded-[2rem] border border-[#2E4B3D]/12 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 bg-[#FDF6E9] rounded-2xl flex items-center justify-center text-[#FABD4D]">
+                <i class="ri-stethoscope-line text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-xs font-black uppercase tracking-widest text-gray-400">Consultations</p>
+                <p class="text-xl font-bold text-secondary">{{ count($consultations) }}</p>
+            </div>
+        </div>
+        <div class="bg-white p-6 rounded-[2rem] border border-[#2E4B3D]/12 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500">
+                <i class="ri-shield-check-line text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-xs font-black uppercase tracking-widest text-gray-400">Active Access</p>
+                <p class="text-xl font-bold text-secondary">{{ $dataAccessRequests->where('status', 'approved')->count() }}</p>
+            </div>
+        </div>
+        <div class="bg-[#F8FBF9] p-6 rounded-[2rem] border border-[#2E4B3D]/12 shadow-sm flex flex-col justify-center">
+            <div class="flex items-center justify-between w-full mb-1">
+                <p class="text-xs font-black uppercase tracking-widest text-[#2B4C3B]">Global Sharing</p>
+                <button onclick="toggleGlobalConsent(this)" 
+                        id="global-consent-toggle"
+                        data-consent="{{ $user->patient->data_sharing_consent ? '1' : '0' }}"
+                        class="w-10 h-5 {{ $user->patient->data_sharing_consent ? 'bg-secondary' : 'bg-gray-300' }} rounded-full relative flex items-center transition-colors cursor-pointer">
+                    <div class="w-4 h-4 bg-white rounded-full absolute left-0.5 shadow-sm transition-transform duration-300 {{ $user->patient->data_sharing_consent ? 'translate-x-5' : '' }}"></div>
+                </button>
+            </div>
+            <p class="text-[10px] text-gray-500 leading-tight">Master switch to enable or disable all data sharing with practitioners.</p>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <!-- Left: Clinical Documents -->
         <div class="lg:col-span-7 space-y-8">
@@ -481,6 +524,59 @@ function toggleProfessionalAccess(btn, requestId) {
             label.classList.remove('text-emerald-600');
             label.classList.add('text-gray-400');
             btn.setAttribute('data-status', 'revoked');
+        }
+    });
+}
+
+function toggleGlobalConsent(btn) {
+    const dot = btn.querySelector('div');
+    const isCurrentlyActive = btn.getAttribute('data-consent') === '1';
+    const newState = !isCurrentlyActive;
+
+    // Optimistic UI update
+    if (newState) {
+        btn.classList.remove('bg-gray-300');
+        btn.classList.add('bg-secondary');
+        dot.classList.add('translate-x-5');
+        btn.setAttribute('data-consent', '1');
+    } else {
+        btn.classList.remove('bg-secondary');
+        btn.classList.add('bg-gray-300');
+        dot.classList.remove('translate-x-5');
+        btn.setAttribute('data-consent', '0');
+    }
+
+    fetch("{{ route('profile.updateConsent') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            consent: newState ? 1 : 0
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (window.showZayaToast) {
+            showZayaToast(data.message, 'Global Privacy Settings');
+        }
+        // Optionally reload to update all individual toggles in the UI
+        setTimeout(() => location.reload(), 1000);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        // Revert UI on error
+        if (isCurrentlyActive) {
+            btn.classList.remove('bg-gray-300');
+            btn.classList.add('bg-secondary');
+            dot.classList.add('translate-x-5');
+            btn.setAttribute('data-consent', '1');
+        } else {
+            btn.classList.remove('bg-secondary');
+            btn.classList.add('bg-gray-300');
+            dot.classList.remove('translate-x-5');
+            btn.setAttribute('data-consent', '0');
         }
     });
 }

@@ -6,7 +6,7 @@
 @php 
     $isGlobalView = ($countryCode === 'all'); 
     $canEditGlobal = $isSuperAdmin;
-    $canEditCountry = auth()->user()->can('other-fees-edit');
+    $canEditCountry = $isSuperAdmin || auth()->user()->hasPermission('referral-commissions-edit');
 @endphp
 <div class="container-fluid">
     <div class="page-title">

@@ -1,11 +1,26 @@
 <div id="bookings-container">
     <div class="bg-white rounded-3xl border border-[#2E4B3D]/12 mb-8 overflow-hidden">
-        <div class="p-4 md:p-6 border-b border-[#2E4B3D]/12">
-            @if($user->role === 'client' || $user->role === 'patient' || $user->role === 'translator')
-            <h2 class="text-xl font-medium text-secondary">{{ $user->role === 'translator' ? 'Translation Sessions' : 'My Bookings' }}</h2>
-            @else
-            <h2 class="text-xl font-medium text-secondary">Sessions</h2>
-            @endif
+        <div class="p-4 md:p-6 border-b border-[#2E4B3D]/12 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                @if($user->role === 'client' || $user->role === 'patient' || $user->role === 'translator')
+                <h2 class="text-xl font-medium text-secondary">{{ $user->role === 'translator' ? 'Translation Sessions' : 'My Bookings' }}</h2>
+                @else
+                <h2 class="text-xl font-medium text-secondary">Sessions</h2>
+                @endif
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative w-full md:w-80 group">
+                <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-colors"></i>
+                <input type="text" id="bookings-search" 
+                    value="{{ $search ?? '' }}"
+                    placeholder="Search by ID, Practitioner or Client..." 
+                    class="w-full pl-11 pr-12 py-3 bg-[#F9FBF9] border border-[#2E4B3D]/12 rounded-2xl text-sm outline-none focus:border-secondary focus:bg-white transition-all shadow-sm"
+                    autocomplete="off">
+                <div id="search-loader" class="absolute right-4 top-1/2 -translate-y-1/2 hidden">
+                    <div class="animate-spin rounded-full h-4 w-4 border-2 border-secondary/20 border-b-secondary"></div>
+                </div>
+            </div>
         </div>
 
         <div class="overflow-x-auto scrollbar-hide">
@@ -42,7 +57,11 @@
                                             {{ $booking->practitioner->user->name ?? 'Practitioner' }}
                                         </div>
                                         <div class="text-xs text-gray-400">
-                                            {{ $booking->practitioner->specialization ?? 'Specialist' }}
+                                            @if(is_array($booking->practitioner->specialization))
+                                                {{ implode(', ', array_map(fn($s) => str_replace('_', ' ', ucfirst($s)), $booking->practitioner->specialization)) }}
+                                            @else
+                                                {{ $booking->practitioner->specialization ?? 'Specialist' }}
+                                            @endif
                                         </div>
                                     </div>
                                 @else
@@ -107,6 +126,13 @@
 
                                 <div class="dropdown-menu absolute right-0 mt-2 w-56 rounded-xl shadow-xl bg-white border border-[#2E4B3D]/12 divide-y divide-gray-50 focus:outline-none z-[999] hidden">
                                     <div class="py-1">
+                                        @if(in_array($booking->status, ['pending', 'confirmed', 'paid']) && $booking->mode === 'online')
+                                        <a href="{{ route('conference.join', ['channel' => $booking->invoice_no ?? 'session-' . $booking->id, 'provider' => 'jaas']) }}" class="group flex items-center w-full px-4 py-3 text-sm text-blue-700 hover:bg-blue-50 transition-colors text-left font-bold">
+                                            <i class="ri-vidicon-line mr-3 text-lg text-blue-600"></i>
+                                            Join Session
+                                        </a>
+                                        @endif
+
                                         @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
                                         <a href="{{ route('bookings.consultation-form.show', $booking->id) }}" class="group flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                                             <i class="ri-file-list-3-line mr-3 text-lg text-emerald-600"></i>

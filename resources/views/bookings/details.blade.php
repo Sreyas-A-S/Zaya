@@ -72,7 +72,9 @@
                                     <div class="w-2 h-2 rounded-full bg-secondary"></div>
                                     <span class="text-sm font-bold text-secondary">{{ $service->title }}</span>
                                 </div>
+                                @if(in_array($user->role, ['client', 'patient']))
                                 <span class="text-[11px] font-black text-secondary/60">€{{ number_format($service->price ?? 0, 2) }}</span>
+                                @endif
                             </div>
                             @empty
                             <p class="text-sm text-gray-400 italic">No specific services listed.</p>
@@ -81,6 +83,58 @@
                     </div>
                 </div>
             </div>
+
+            @php
+                $transaction = $booking->transactions->first();
+                $isPractitioner = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner->user_id === $user->id;
+            @endphp
+
+            @if($isPractitioner && $transaction)
+            <!-- Earnings Summary for Practitioner -->
+            <div class="bg-secondary rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-2xl shadow-secondary/20 text-white p-8 relative group">
+                <div class="flex justify-between items-center relative z-10">
+                    <div>
+                        <p class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2">Your Earned Share</p>
+                        <p class="text-4xl font-black tracking-tight">€ {{ number_format($transaction->practitioner_share, 2) }}</p>
+                    </div>
+                    <button onclick="togglePageDistribution()" class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all border border-white/10 group-hover:scale-110 duration-500">
+                        <i class="ri-information-line text-2xl"></i>
+                    </button>
+                </div>
+
+                <div id="page-distribution-info" class="hidden mt-8 pt-8 border-t border-white/10 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500 relative z-10">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Gross Booking</p>
+                            <p class="text-lg font-black">€ {{ number_format($transaction->total_amount, 2) }}</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Platform Fee ({{ number_format($transaction->company_commission_percent, 1) }}%)</p>
+                            <p class="text-lg font-black text-red-300">- € {{ number_format($transaction->company_share, 2) }}</p>
+                        </div>
+                        @if($transaction->referrer_share > 0)
+                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Referral Fee ({{ number_format($transaction->referrer_commission_percent, 1) }}%)</p>
+                            <p class="text-lg font-black text-orange-300">- € {{ number_format($transaction->referrer_share, 2) }}</p>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Decorative elements -->
+                <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors duration-700"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+            </div>
+
+            <script>
+                function togglePageDistribution() {
+                    const info = document.getElementById('page-distribution-info');
+                    if (info) {
+                        info.classList.toggle('hidden');
+                    }
+                }
+            </script>
+            @endif
 
             <!-- Referral History -->
             <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm p-5 md:p-8">
@@ -318,8 +372,8 @@
 
             <!-- Action Buttons -->
             <div class="space-y-3">
-                @if($booking->status === 'confirmed' && $booking->mode === 'online')
-                    <a href="{{ route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']) }}" class="w-full py-5 bg-secondary text-white rounded-[1.5rem] font-black text-sm hover:bg-primary transition-all shadow-2xl shadow-secondary/30 uppercase tracking-[0.2em] flex items-center justify-center gap-3">
+                @if(in_array($booking->status, ['pending', 'confirmed', 'paid']) && $booking->mode === 'online')
+                    <a href="{{ route('conference.join', ['channel' => $booking->invoice_no ?? 'session-' . $booking->id, 'provider' => 'jaas']) }}" class="w-full py-5 bg-secondary text-white rounded-[1.5rem] font-black text-sm hover:bg-primary transition-all shadow-2xl shadow-secondary/30 uppercase tracking-[0.2em] flex items-center justify-center gap-3">
                         <i class="ri-vidicon-line text-lg"></i>
                         Join Session
                     </a>

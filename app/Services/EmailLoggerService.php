@@ -15,12 +15,14 @@ class EmailLoggerService
      * @param string|null $body
      * @param string $status 'success' or 'error'
      * @param string|null $errorMessage
+     * @param int|null $bookingId
      * @return EmailLog
      */
-    public static function log($to, $subject, $body, $status, $errorMessage = null, $duration = null)
+    public static function log($to, $subject, $body, $status, $errorMessage = null, $duration = null, $bookingId = null)
     {
         try {
             return EmailLog::create([
+                'booking_id' => $bookingId,
                 'to' => $to,
                 'subject' => $subject,
                 'body' => $body,

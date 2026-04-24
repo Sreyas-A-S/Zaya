@@ -45,10 +45,75 @@
 
 @section('scripts')
 <script>
+    // Search & AJAX logic
+    (function() {
+        let searchTimer;
+        const searchInput = document.getElementById('bookings-search');
+        const loader = document.getElementById('search-loader');
+        const container = document.getElementById('bookings-wrapper');
+
+        function fetchBookings(url) {
+            if (loader) loader.classList.remove('hidden');
+            
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.text())
+            .then(html => {
+                container.innerHTML = html;
+                // Re-bind search input after table replacement
+                rebindSearch();
+            })
+            .finally(() => {
+                if (loader) loader.classList.add('hidden');
+            });
+        }
+
+        function rebindSearch() {
+            const newSearch = document.getElementById('bookings-search');
+            if (newSearch) {
+                newSearch.addEventListener('input', function() {
+                    clearTimeout(searchTimer);
+                    searchTimer = setTimeout(() => {
+                        const val = this.value;
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('search', val);
+                        url.searchParams.delete('page'); // Reset to page 1
+                        
+                        window.history.pushState({}, '', url);
+                        fetchBookings(url.toString());
+                    }, 500);
+                });
+                // Focus at end of text
+                newSearch.focus();
+                const val = newSearch.value;
+                newSearch.value = '';
+                newSearch.value = val;
+            }
+            
+            // Handle pagination clicks
+            document.querySelectorAll('.pagination-links a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.history.pushState({}, '', this.href);
+                    fetchBookings(this.href);
+                });
+            });
+
+            // (Removed redundant manual binding, layout uses event delegation on document)
+        }
+
+
+
+        // Initialize
+        rebindSearch();
+    })();
+
     function openBookingModal() {
         document.getElementById('booking-modal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     }
+    
 
     function closeBookingModal() {
         document.getElementById('booking-modal').classList.add('hidden');
@@ -135,7 +200,7 @@
                     }
                 }
                 e.stopPropagation();
-            } else {
+            } else if (!e.target.closest('.dropdown-menu')) {
                 closeAllMenus();
             }
         });

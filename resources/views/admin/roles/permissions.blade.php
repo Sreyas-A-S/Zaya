@@ -53,6 +53,9 @@
                                     <th class="text-center align-middle">Status Toggle</th>
                                     <th class="text-center align-middle">Status</th>
                                     <th class="text-center align-middle">Assign</th>
+                                    <th class="text-center align-middle">Show</th>
+                                    <th class="text-center align-middle">Download</th>
+                                    <th class="text-center align-middle">Preview</th>
                                     <th class="text-center align-middle" style="width: 80px;">
                                         <i class="fa fa-check-double" title="Toggle Row"></i>
                                     </th>
@@ -61,12 +64,20 @@
                             <tbody>
                                 @php
                                 $standardActions = ['view', 'create', 'edit', 'delete'];
-                                $extraActions = ['update-status', 'status-toggle', 'status', 'assign-engineer'];
+                                $extraActions = ['update-status', 'status-toggle', 'status', 'assign-engineer', 'show', 'download', 'preview'];
                                 $actions = array_merge($standardActions, $extraActions);
                                 @endphp
-                                @foreach($permissions as $group => $groupPermissions)
+                                @foreach($permissions as $category => $categoryGroups)
+                                <tr class="bg-secondary-subtle">
+                                    <td colspan="{{ count($actions) + 2 }}" class="fw-bold py-3 ps-3 text-uppercase" style="background-color: #f1f3f5; color: #495057;">
+                                        <i class="fa-solid fa-layer-group me-2"></i> {{ $category ?: 'Other' }}
+                                    </td>
+                                </tr>
+                                @foreach($categoryGroups as $group => $groupPermissions)
                                 <tr>
-                                    <td class="fw-bold text-dark bg-light-primary">{{ ucwords(str_replace(['_', '-'], ' ', $group)) }}</td>
+                                    <td class="fw-bold text-dark bg-light-primary ps-4">
+                                        {{ ucwords(str_replace(['_', '-'], ' ', $group)) }}
+                                    </td>
 
                                     @foreach($actions as $action)
                                     <td class="text-center">
@@ -98,11 +109,12 @@
                                     <td class="text-center bg-light">
                                         <div class="form-check checkbox-solid-dark d-flex justify-content-center mb-0">
                                             <input type="checkbox" class="form-check-input group-row-select"
-                                                id="row_select_{{ $loop->index }}"
+                                                id="row_select_{{ $category }}_{{ $loop->index }}"
                                                 title="Select All in {{ $group }}">
                                         </div>
                                     </td>
                                 </tr>
+                                @endforeach
                                 @endforeach
                             </tbody>
                         </table>
