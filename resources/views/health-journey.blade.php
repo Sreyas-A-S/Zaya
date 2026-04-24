@@ -227,6 +227,33 @@
 </div>
 
 <!-- Modals from Dashboard -->
+<!-- Global Privacy Confirmation Modal -->
+<div id="consent-modal" class="fixed inset-0 z-[100002] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeConsentModal()"></div>
+    <div class="relative bg-white rounded-[32px] p-8 md:p-10 max-w-[480px] w-[90%] text-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] transform transition-all duration-300 scale-90">
+        <button onclick="closeConsentModal()" class="absolute top-6 right-8 text-gray-300 hover:text-gray-500 transition-colors">
+            <i class="ri-close-line text-2xl"></i>
+        </button>
+        <div class="mb-6">
+            <div id="consent-modal-icon-bg" class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i id="consent-modal-icon" class="ri-shield-flash-line text-orange-500 text-3xl"></i>
+            </div>
+            <h3 id="consent-modal-title" class="text-xl font-bold text-secondary mb-2">Update Privacy Settings?</h3>
+            <p id="consent-modal-message" class="text-gray-500 text-sm leading-relaxed px-4">
+                This will change how practitioners can access your health records. Are you sure you want to proceed?
+            </p>
+        </div>
+        <div class="flex gap-4">
+            <button onclick="closeConsentModal()" class="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-full font-medium hover:bg-gray-50 transition-colors">
+                Cancel
+            </button>
+            <button id="confirm-consent-btn" class="flex-1 px-6 py-3 bg-secondary text-white rounded-full font-medium hover:bg-opacity-90 transition-all shadow-lg shadow-secondary/20">
+                Yes, Update
+            </button>
+        </div>
+    </div>
+</div>
+
 @if($user->role === 'client' || $user->role === 'patient')
 <!-- Delete Confirmation Modal -->
 <div id="delete-modal" class="fixed inset-0 z-[100002] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
@@ -529,56 +556,112 @@ function toggleProfessionalAccess(btn, requestId) {
 }
 
 function toggleGlobalConsent(btn) {
-    const dot = btn.querySelector('div');
     const isCurrentlyActive = btn.getAttribute('data-consent') === '1';
     const newState = !isCurrentlyActive;
+    const modal = document.getElementById('consent-modal');
+    const content = modal.querySelector('.relative.bg-white');
+    const confirmBtn = document.getElementById('confirm-consent-btn');
+    const messageEl = document.getElementById('consent-modal-message');
+    const titleEl = document.getElementById('consent-modal-title');
+    const iconEl = document.getElementById('consent-modal-icon');
+    const iconBgEl = document.getElementById('consent-modal-icon-bg');
 
-    // Optimistic UI update
+    // Configure modal for specific action
     if (newState) {
-        btn.classList.remove('bg-gray-300');
-        btn.classList.add('bg-secondary');
-        dot.classList.add('translate-x-5');
-        btn.setAttribute('data-consent', '1');
+        titleEl.innerText = "Enable Global Sharing?";
+        messageEl.innerText = "This will allow authorized practitioners to access your clinical records and health history during consultations.";
+        iconEl.className = "ri-shield-check-line text-emerald-500 text-3xl";
+        iconBgEl.className = "w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4";
+        confirmBtn.className = "flex-1 px-6 py-3 bg-secondary text-white rounded-full font-medium hover:bg-opacity-90 transition-all shadow-lg shadow-secondary/20";
     } else {
-        btn.classList.remove('bg-secondary');
-        btn.classList.add('bg-gray-300');
-        dot.classList.remove('translate-x-5');
-        btn.setAttribute('data-consent', '0');
+        titleEl.innerText = "Disable Global Sharing?";
+        messageEl.innerText = "All data access for practitioners will be suspended. They will not be able to view your history or records until you re-enable this.";
+        iconEl.className = "ri-shield-keyhole-line text-red-500 text-3xl";
+        iconBgEl.className = "w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4";
+        confirmBtn.className = "flex-1 px-6 py-3 bg-red-500 text-white rounded-full font-medium hover:bg-opacity-90 transition-all shadow-lg shadow-red-200";
     }
 
-    fetch("{{ route('profile.updateConsent') }}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            consent: newState ? 1 : 0
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+    modal.classList.add('opacity-100');
+    setTimeout(() => content.classList.replace('scale-90', 'scale-100'), 10);
+
+    confirmBtn.onclick = function() {
+        const dot = btn.querySelector('div');
+        
+        // Disable interaction
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i>';
+
+        fetch("{{ route('profile.update_consent') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                consent: newState ? 1 : 0
+            })
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (window.showZayaToast) {
-            showZayaToast(data.message, 'Global Privacy Settings');
-        }
-        // Optionally reload to update all individual toggles in the UI
-        setTimeout(() => location.reload(), 1000);
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        // Revert UI on error
-        if (isCurrentlyActive) {
-            btn.classList.remove('bg-gray-300');
-            btn.classList.add('bg-secondary');
-            dot.classList.add('translate-x-5');
-            btn.setAttribute('data-consent', '1');
-        } else {
-            btn.classList.remove('bg-secondary');
-            btn.classList.add('bg-gray-300');
-            dot.classList.remove('translate-x-5');
-            btn.setAttribute('data-consent', '0');
-        }
-    });
+        .then(response => response.json())
+        .then(data => {
+            // Update Toggle UI
+            if (newState) {
+                btn.classList.remove('bg-gray-300');
+                btn.classList.add('bg-secondary');
+                dot.classList.add('translate-x-5');
+                btn.setAttribute('data-consent', '1');
+            } else {
+                btn.classList.remove('bg-secondary');
+                btn.classList.add('bg-gray-300');
+                dot.classList.remove('translate-x-5');
+                btn.setAttribute('data-consent', '0');
+            }
+
+            // Update all individual professional toggles too
+            const professionalToggles = document.querySelectorAll('#section-access button[data-status]');
+            professionalToggles.forEach(pBtn => {
+                const pDot = pBtn.querySelector('div');
+                const pLabel = pBtn.previousElementSibling;
+                if (newState) {
+                    pBtn.classList.remove('bg-gray-300');
+                    pBtn.classList.add('bg-secondary');
+                    pDot.classList.add('translate-x-5');
+                    if (pLabel) pLabel.innerText = 'Access Enabled';
+                    pBtn.setAttribute('data-status', 'approved');
+                } else {
+                    pBtn.classList.remove('bg-secondary');
+                    pBtn.classList.add('bg-gray-300');
+                    pDot.classList.remove('translate-x-5');
+                    if (pLabel) pLabel.innerText = 'Access Revoked';
+                    pBtn.setAttribute('data-status', 'revoked');
+                }
+            });
+
+            if (window.showZayaToast) {
+                showZayaToast(data.message, 'Privacy Management');
+            }
+            closeConsentModal();
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            if (window.showZayaToast) showZayaToast('An error occurred. Please try again.', 'Error', 'error');
+            closeConsentModal();
+        })
+        .finally(() => {
+            confirmBtn.disabled = false;
+            confirmBtn.innerText = "Yes, Update";
+        });
+    };
 }
+
+window.closeConsentModal = function() {
+    const modal = document.getElementById('consent-modal');
+    const content = modal.querySelector('.relative.bg-white');
+    content.classList.replace('scale-100', 'scale-90');
+    setTimeout(() => {
+        modal.classList.replace('opacity-100', 'opacity-0');
+        modal.classList.add('pointer-events-none');
+    }, 300);
+};
 </script>
 @endsection

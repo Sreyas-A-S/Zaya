@@ -47,26 +47,49 @@ class BookingController extends Controller
 
         // 1. Calculate Subtotal on Server (Security: Don't trust request total_price)
         $subtotal = 0;
-        $userServices = \App\Models\UserService::where('user_id', $practitioner->user_id)
-            ->whereIn('service_id', $request->service_ids)
-            ->where('status', 'active')
-            ->get();
-        
-        \Log::info('Booking Calculation Debug:', [
-            'practitioner_user_id' => $practitioner->user_id,
-            'service_ids' => $request->service_ids,
-            'services_found_count' => $userServices->count()
-        ]);
+        $sessions = $request->input('additional_info.sessions', []);
 
-        foreach ($userServices as $us) {
-            $subtotal += (float) $us->rate;
-            \Log::info("Adding service rate: {$us->rate} for service ID: {$us->service_id}");
+        if (!empty($sessions) && is_array($sessions)) {
+            foreach ($sessions as $session) {
+                $serviceId = $session['service_id'] ?? null;
+                $duration = $session['duration'] ?? null;
+
+                if ($serviceId && $duration) {
+                    $us = \App\Models\UserService::where('user_id', $practitioner->user_id)
+                        ->where('service_id', $serviceId)
+                        ->where('duration', $duration)
+                        ->where('status', 'active')
+                        ->first();
+                    
+                    if ($us) {
+                        $rate = (float) $us->rate;
+                        $subtotal += $rate;
+                        \Log::info("Correctly added rate: {$rate} for Service ID: {$serviceId}, Duration: {$duration}");
+                    } else {
+                        \Log::warning("UserService record not found for Service ID: {$serviceId}, Duration: {$duration}");
+                    }
+                }
+            }
+        }
+
+        // Fallback for edge cases or if sessions info is somehow missing
+        if ($subtotal <= 0) {
+            $userServices = \App\Models\UserService::where('user_id', $practitioner->user_id)
+                ->whereIn('service_id', $request->service_ids)
+                ->where('status', 'active')
+                ->get()
+                ->unique('service_id'); // Take only one rate per service ID as a safety measure
+            
+            foreach ($userServices as $us) {
+                $subtotal += (float) $us->rate;
+                \Log::info("Fallback: Adding service rate: {$us->rate} for service ID: {$us->service_id}");
+            }
         }
         
-        // Fallback to request price if no specific rates found
+        // Final fallback to request price if still 0 (only if reasonable)
         if ($subtotal <= 0) {
             $subtotal = (float) $request->total_price;
-            \Log::info("Fallback subtotal from request: {$subtotal}");
+            \Log::info("Critical Fallback subtotal from request: {$subtotal}");
         }
 
         // 2. Validate Promo Code

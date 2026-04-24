@@ -319,7 +319,7 @@
     </div>
 </div>
 
-@if(!in_array($roleForSchema, ['doctor', 'practitioner'], true))
+@if(!in_array($roleForSchema, ['doctor', 'practitioner', 'yoga_therapist'], true))
 @include('consultation-forms.' . $roleForSchema, [
     'user' => $user,
     'booking' => $booking,
