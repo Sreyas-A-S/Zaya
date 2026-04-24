@@ -352,10 +352,20 @@
                                     $langs = is_array($booking->user->patient->languages_spoken) ? $booking->user->patient->languages_spoken : [];
                                 }
                             @endphp
-                            @forelse($langs as $langId)
-                                @php $l = \App\Models\Language::find($langId); @endphp
-                                @if($l)
-                                <span class="px-2 py-0.5 bg-gray-50 text-gray-600 text-[9px] font-black uppercase tracking-tighter rounded-full border border-gray-100">{{ $l->name }}</span>
+                            @forelse($langs as $lang)
+                                @php 
+                                    $displayValue = null;
+                                    if (is_numeric($lang)) {
+                                        $l = \App\Models\Language::find($lang);
+                                        $displayValue = $l ? $l->name : null;
+                                    } elseif (is_string($lang)) {
+                                        $displayValue = $lang;
+                                    } elseif (is_array($lang)) {
+                                        $displayValue = $lang['name'] ?? $lang['title'] ?? null;
+                                    }
+                                @endphp
+                                @if($displayValue)
+                                    <span class="px-2 py-0.5 bg-gray-50 text-gray-600 text-[9px] font-black uppercase tracking-tighter rounded-full border border-gray-100">{{ $displayValue }}</span>
                                 @endif
                             @empty
                                 <span class="text-xs text-gray-400">Not specified</span>
