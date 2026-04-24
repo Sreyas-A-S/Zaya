@@ -418,6 +418,98 @@ document.addEventListener('DOMContentLoaded', () => {
         : tabButtons[0].getAttribute('data-tab');
     
     switchTab(initialTab);
+
+    // --- AUTO-SAVE LOGIC ---
+    const form = document.querySelector('.consultation-form-root');
+    if (form) {
+        const bookingId = "{{ $booking->id }}";
+        const formId = "{{ $existingForm->id ?? 'new' }}";
+        const storageKey = `consultation_draft_${bookingId}_${formId}`;
+
+        // Clear if successful submission just happened
+        @if(session('status'))
+            localStorage.removeItem(storageKey);
+        @endif
+
+        const saveDraft = () => {
+            const formData = new FormData(form);
+            const data = {};
+            for (const [key, value] of formData.entries()) {
+                if (['_token', 'form_id', 'form_title'].includes(key)) continue;
+                if (data[key]) {
+                    if (!Array.isArray(data[key])) data[key] = [data[key]];
+                    data[key].push(value);
+                } else {
+                    data[key] = value;
+                }
+            }
+            localStorage.setItem(storageKey, JSON.stringify(data));
+        };
+
+        const restoreDraft = () => {
+            const saved = localStorage.getItem(storageKey);
+            if (!saved) return;
+            const data = JSON.parse(saved);
+
+            // Reconstruct dynamic rows first
+            const sectionCounts = {};
+            Object.keys(data).forEach(key => {
+                const match = key.match(/^(.+)\[(\d+)\]\[(.+)\]$/);
+                if (match) {
+                    const section = match[1];
+                    const index = parseInt(match[2]);
+                    if (!sectionCounts[section] || index > sectionCounts[section]) {
+                        sectionCounts[section] = index;
+                    }
+                }
+            });
+
+            Object.entries(sectionCounts).forEach(([section, maxIndex]) => {
+                const body = form.querySelector(`[data-repeat-body="${section}"]`);
+                if (!body) return;
+                let currentRows = body.querySelectorAll('[data-repeat-row]').length;
+                while (currentRows <= maxIndex) {
+                    const addBtn = form.querySelector(`[data-repeat-add="${section}"]`);
+                    if (addBtn) addBtn.click();
+                    currentRows++;
+                }
+            });
+
+            // Set values
+            Object.entries(data).forEach(([name, value]) => {
+                const inputs = form.querySelectorAll(`[name="${name}"]`);
+                inputs.forEach(input => {
+                    if (input.type === 'checkbox' || input.type === 'radio') {
+                        if (Array.isArray(value)) input.checked = value.includes(input.value);
+                        else input.checked = (input.value === value);
+                    } else {
+                        input.value = value;
+                    }
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+            });
+
+            if (window.showZayaToast) {
+                showZayaToast('Restored unsaved draft.', 'Consultation Form');
+            }
+        };
+
+        form.addEventListener('input', debounce(saveDraft, 1000));
+        form.addEventListener('change', saveDraft);
+        
+        // Restore only if we are NOT viewing an existing record with database data, 
+        // OR if the draft exists and might be newer. 
+        // For simplicity: restore if it exists.
+        setTimeout(restoreDraft, 500); 
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
 });
 
 function toggleTitleEdit() {

@@ -289,6 +289,10 @@
                 const matchingChips = (p.matched_expertises || []).map(exp => 
                     `<span class="text-[8px] bg-white border border-secondary/10 text-secondary/60 px-1.5 py-0.5 rounded mt-1">${exp}</span>`
                 ).join(' ');
+
+                const missingServicesLabel = (!p.handles_service && p.missing_services && p.missing_services.length > 0)
+                    ? `<div class="mt-1"><span class="text-[8px] bg-red-50 text-red-500 px-1.5 py-0.5 rounded border border-red-100 font-bold uppercase tracking-tighter">Missing: ${p.missing_services.join(', ')}</span></div>`
+                    : '';
                 
                 item.innerHTML = `
                     <div class="flex items-center gap-4">
@@ -308,6 +312,7 @@
                                     </span>
                                 ` : ''}
                             </div>
+                            ${missingServicesLabel}
                             <div class="flex flex-wrap gap-1 mt-1">${matchingChips}</div>
                         </div>
                     </div>

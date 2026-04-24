@@ -405,12 +405,37 @@
                 @endif
 
                 @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+                    @if($booking->need_translator && !$booking->translator_id)
+                        <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language }}', '{{ $booking->to_language }}')" class="w-full py-5 bg-blue-600 text-white rounded-[1.5rem] font-black text-sm hover:bg-blue-700 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-lg shadow-blue-200">
+                            <i class="ri-translate text-lg"></i>
+                            Assign Translator
+                        </button>
+                    @endif
+                    
                     <button onclick="openReferModal({{ $booking->id }}, {{ $booking->user_id }})" class="w-full py-5 bg-white text-secondary border border-[#2E4B3D]/12 rounded-[1.5rem] font-black text-sm hover:bg-[#F9FBF9] transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-sm">
                         <i class="ri-user-shared-line text-lg text-orange-500"></i>
                         Refer to Peer
                     </button>
                 @endif
             </div>
+
+            <!-- Translator Info Card -->
+            @if($booking->translator_id)
+            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm">
+                <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Assigned Translator</h3>
+                <div class="flex items-center gap-4">
+                    <img src="{{ $booking->translator->user->profile_pic ? (str_starts_with($booking->translator->user->profile_pic, 'http') ? $booking->translator->user->profile_pic : asset('storage/' . $booking->translator->user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" 
+                         class="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm">
+                    <div>
+                        <p class="font-black text-secondary leading-tight">{{ $booking->translator->full_name }}</p>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Experience: {{ $booking->translator->years_of_experience }} Years</p>
+                    </div>
+                </div>
+                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+                <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language }}', '{{ $booking->to_language }}')" class="mt-6 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">Change Translator →</button>
+                @endif
+            </div>
+            @endif
         </div>
     </div>
 </div>

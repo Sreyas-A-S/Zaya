@@ -480,17 +480,29 @@ class BookingController extends Controller
         $users = $usersQuery->get(); // Fetch all for sorting, or we can use a more complex query
 
         $results = $users->map(function ($u) use ($booking, $matchCriteria) {
-            $handlesService = false;
+            $handlesAllServices = false;
             $serviceFee = 0;
             $isRecommended = false;
             $matchedExpertises = [];
+            $missingServices = [];
 
             if ($booking && in_array($u->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'])) {
                 // 1. Check if they handle the EXACT services requested
-                $userServices = \App\Models\UserService::where('user_id', $u->id)->whereIn('service_id', $booking->service_ids ?? [])->get();
-                if ($userServices->isNotEmpty()) {
-                    $handlesService = true;
-                    $serviceFee = $userServices->sum('rate');
+                $requiredServiceIds = $booking->service_ids ?? [];
+                $userServices = \App\Models\UserService::where('user_id', $u->id)
+                    ->whereIn('service_id', $requiredServiceIds)
+                    ->get();
+                
+                $handledServiceIds = $userServices->pluck('service_id')->toArray();
+                
+                if (count($requiredServiceIds) > 0) {
+                    $missingServiceIds = array_diff($requiredServiceIds, $handledServiceIds);
+                    if (empty($missingServiceIds)) {
+                        $handlesAllServices = true;
+                        $serviceFee = $userServices->sum('rate');
+                    } else {
+                        $missingServices = \App\Models\Service::whereIn('id', $missingServiceIds)->pluck('title')->toArray();
+                    }
                 }
 
                 // 2. Check for Recommendation (Service overlap or Condition match)
@@ -517,7 +529,8 @@ class BookingController extends Controller
                 'name' => $u->name,
                 'role' => $u->role,
                 'role_label' => str_replace('_', ' ', ucfirst($u->role)),
-                'handles_service' => $handlesService,
+                'handles_service' => $handlesAllServices,
+                'missing_services' => $missingServices,
                 'service_fee' => $serviceFee,
                 'is_recommended' => $isRecommended,
                 'matched_expertises' => $matchedExpertises,

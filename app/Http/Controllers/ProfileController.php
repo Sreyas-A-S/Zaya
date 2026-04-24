@@ -1349,6 +1349,17 @@ class ProfileController extends Controller
             })->first();
 
         $isInstant = !$booking && str_starts_with((string)$channel, 'zaya-');
+
+        // For instant meetings, we fetch the latest booking to "demo" the consultation form as requested
+        if ($isInstant && $user->id > 0) {
+            $booking = \App\Models\Booking::with(['user', 'practitioner.user'])
+                ->where(function($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                      ->orWhereHas('practitioner', fn($p) => $p->where('user_id', $user->id));
+                })
+                ->latest()
+                ->first();
+        }
         
         \Log::info("User joining session:", [
             'user' => $user->id,
@@ -1460,7 +1471,7 @@ class ProfileController extends Controller
         $apiKey = trim((string) config('services.daily.api_key'));
         if ($apiKey === '') return null;
 
-        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'], true);
+        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist', 'translator'], true);
 
         try {
             $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
@@ -1516,7 +1527,7 @@ class ProfileController extends Controller
         }
 
         $now = now()->getTimestamp();
-        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'], true);
+        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist', 'translator'], true);
 
         $payload = [
             'aud' => 'jitsi',
