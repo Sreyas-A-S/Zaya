@@ -301,8 +301,8 @@ class ProfileController extends Controller
         $isReferrer = Referral::where('booking_id', $booking->id)->where('referred_by_id', $user->id)->exists();
         $isReferredTo = Referral::where('referral_no', $booking->invoice_no)->where('referred_to_id', $user->id)->exists();
 
-        $canEdit = $isPractitioner || $isTranslator;
-        $canView = $canEdit || $isClient || $isReferrer || $isReferredTo;
+        $canEdit = ($isPractitioner || $isTranslator) && $request->query('view') != '1';
+        $canView = $canEdit || $isClient || $isReferrer || $isReferredTo || $request->query('view') == '1';
 
         if (!$canView) {
             abort(403, 'You do not have permission to access this consultation form.');
@@ -405,6 +405,23 @@ class ProfileController extends Controller
         return redirect()
             ->route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $form->id])
             ->with('status', $msg);
+    }
+
+    public function deleteConsultationForm($id, $form_id)
+    {
+        $user = Auth::user();
+        $booking = Booking::findOrFail($id);
+
+        $isPractitioner = ($booking->practitioner && $booking->practitioner->user_id === $user->id);
+        
+        if (!$isPractitioner) {
+            abort(403, 'You do not have permission to delete this consultation record.');
+        }
+
+        $form = ConsultationForm::where('booking_id', $booking->id)->findOrFail($form_id);
+        $form->delete();
+
+        return back()->with('status', 'Consultation record deleted successfully.');
     }
 
     public function transactions(Request $request)

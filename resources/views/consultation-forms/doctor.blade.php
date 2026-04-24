@@ -273,12 +273,30 @@
                                 @endforeach
                             </div>
                         </div>
-                        <input class="border rounded px-3 py-2" type="time" name="personal_history[sleep][bedtime]" value="{{ $oldOrPayload('personal_history.sleep.bedtime') }}" placeholder="Bedtime" @readonly(!$canEdit)>
-                        <input class="border rounded px-3 py-2" type="text" name="personal_history[sleep][time_to_fall_asleep]" value="{{ $oldOrPayload('personal_history.sleep.time_to_fall_asleep') }}" placeholder="Time to fall asleep" @readonly(!$canEdit)>
-                        <input class="border rounded px-3 py-2" type="text" name="personal_history[sleep][night_awakenings]" value="{{ $oldOrPayload('personal_history.sleep.night_awakenings') }}" placeholder="Night awakenings" @readonly(!$canEdit)>
-                        <input class="border rounded px-3 py-2" type="text" name="personal_history[sleep][time_to_get_back_to_sleep]" value="{{ $oldOrPayload('personal_history.sleep.time_to_get_back_to_sleep') }}" placeholder="Time to get back to sleep" @readonly(!$canEdit)>
-                        <input class="border rounded px-3 py-2" type="time" name="personal_history[sleep][wake_up_time]" value="{{ $oldOrPayload('personal_history.sleep.wake_up_time') }}" placeholder="Wake up time" @readonly(!$canEdit)>
-                        <input class="border rounded px-3 py-2" type="time" name="personal_history[sleep][getting_out_of_bed]" value="{{ $oldOrPayload('personal_history.sleep.getting_out_of_bed') }}" placeholder="Getting out of bed" @readonly(!$canEdit)>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Bedtime</label>
+                            <input class="border rounded px-3 py-2 w-full" type="time" name="personal_history[sleep][bedtime]" value="{{ $oldOrPayload('personal_history.sleep.bedtime') }}" @readonly(!$canEdit)>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Time to fall asleep</label>
+                            <input class="border rounded px-3 py-2 w-full" type="text" name="personal_history[sleep][time_to_fall_asleep]" value="{{ $oldOrPayload('personal_history.sleep.time_to_fall_asleep') }}" placeholder="Time to fall asleep" @readonly(!$canEdit)>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Night awakenings</label>
+                            <input class="border rounded px-3 py-2 w-full" type="text" name="personal_history[sleep][night_awakenings]" value="{{ $oldOrPayload('personal_history.sleep.night_awakenings') }}" placeholder="Night awakenings" @readonly(!$canEdit)>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Time to get back to sleep</label>
+                            <input class="border rounded px-3 py-2 w-full" type="text" name="personal_history[sleep][time_to_get_back_to_sleep]" value="{{ $oldOrPayload('personal_history.sleep.time_to_get_back_to_sleep') }}" placeholder="Time to get back to sleep" @readonly(!$canEdit)>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Wake up time</label>
+                            <input class="border rounded px-3 py-2 w-full" type="time" name="personal_history[sleep][wake_up_time]" value="{{ $oldOrPayload('personal_history.sleep.wake_up_time') }}" @readonly(!$canEdit)>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Getting out of bed</label>
+                            <input class="border rounded px-3 py-2 w-full" type="time" name="personal_history[sleep][getting_out_of_bed]" value="{{ $oldOrPayload('personal_history.sleep.getting_out_of_bed') }}" @readonly(!$canEdit)>
+                        </div>
                         <label><input type="checkbox" name="personal_history[sleep][dreams]" value="1" @checked((bool) $oldOrPayload('personal_history.sleep.dreams')) @disabled(!$canEdit)> Dreams</label>
                         <label><input type="checkbox" name="personal_history[sleep][nightmares]" value="1" @checked((bool) $oldOrPayload('personal_history.sleep.nightmares')) @disabled(!$canEdit)> Nightmares</label>
                         <textarea class="border rounded px-3 py-2 md:col-span-2" rows="2" name="personal_history[sleep][comments]" placeholder="Comments" @readonly(!$canEdit)>{{ $oldOrPayload('personal_history.sleep.comments') }}</textarea>
@@ -443,20 +461,32 @@
             <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 overflow-x-auto">
             <h2 class="text-lg font-semibold text-secondary mb-3">Anthropometrics</h2>
             <div class="grid md:grid-cols-3 gap-3">
-                <input class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[height_cm]" value="{{ $oldOrPayload('anthropometrics.height_cm') }}" placeholder="Height (cm)" @readonly(!$canEdit)>
-                <input class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[weight_kg]" value="{{ $oldOrPayload('anthropometrics.weight_kg') }}" placeholder="Weight (kg)" @readonly(!$canEdit)>
-                <input class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[bmi]" value="{{ $oldOrPayload('anthropometrics.bmi') }}" placeholder="BMI" readonly @readonly(!$canEdit)>
+                <input id="anthro-height" class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[height_cm]" value="{{ $oldOrPayload('anthropometrics.height_cm') }}" placeholder="Height (cm)" @readonly(!$canEdit)>
+                <input id="anthro-weight" class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[weight_kg]" value="{{ $oldOrPayload('anthropometrics.weight_kg') }}" placeholder="Weight (kg)" @readonly(!$canEdit)>
+                <input id="anthro-bmi" class="border rounded px-3 py-2" type="number" step="0.1" name="anthropometrics[bmi]" value="{{ $oldOrPayload('anthropometrics.bmi') }}" placeholder="BMI" readonly @readonly(!$canEdit)>
             </div>
             <textarea class="border rounded px-3 py-2 w-full mt-3" rows="2" name="anthropometrics[comments]" placeholder="Comments" @readonly(!$canEdit)>{{ $oldOrPayload('anthropometrics.comments') }}</textarea>
         </section>
 
             <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 overflow-x-auto">
             <h2 class="text-lg font-semibold text-secondary mb-3">Menstrual / Reproductive History</h2>
-            <div class="grid md:grid-cols-2 gap-3">
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[age_of_menarche]" value="{{ $oldOrPayload('menstrual_reproductive_history.age_of_menarche') }}" placeholder="Age of menarche" @readonly(!$canEdit)>
-                <input class="border rounded px-3 py-2" type="date" name="menstrual_reproductive_history[lmp]" value="{{ $oldOrPayload('menstrual_reproductive_history.lmp') }}" placeholder="LMP" @readonly(!$canEdit)>
-                <input class="border rounded px-3 py-2" type="text" name="menstrual_reproductive_history[interval]" value="{{ $oldOrPayload('menstrual_reproductive_history.interval') }}" placeholder="Interval" @readonly(!$canEdit)>
-                <input class="border rounded px-3 py-2" type="text" name="menstrual_reproductive_history[duration]" value="{{ $oldOrPayload('menstrual_reproductive_history.duration') }}" placeholder="Duration" @readonly(!$canEdit)>
+            <div class="grid md:grid-cols-2 gap-3 text-sm">
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Age of menarche</label>
+                    <input class="border rounded px-3 py-2 w-full" type="number" name="menstrual_reproductive_history[age_of_menarche]" value="{{ $oldOrPayload('menstrual_reproductive_history.age_of_menarche') }}" placeholder="Age of menarche" @readonly(!$canEdit)>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Last Menstrual Period (LMP)</label>
+                    <input class="border rounded px-3 py-2 w-full" type="date" name="menstrual_reproductive_history[lmp]" value="{{ $oldOrPayload('menstrual_reproductive_history.lmp') }}" @readonly(!$canEdit)>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Interval</label>
+                    <input class="border rounded px-3 py-2 w-full" type="text" name="menstrual_reproductive_history[interval]" value="{{ $oldOrPayload('menstrual_reproductive_history.interval') }}" placeholder="Interval" @readonly(!$canEdit)>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Duration</label>
+                    <input class="border rounded px-3 py-2 w-full" type="text" name="menstrual_reproductive_history[duration]" value="{{ $oldOrPayload('menstrual_reproductive_history.duration') }}" placeholder="Duration" @readonly(!$canEdit)>
+                </div>
                 <div>
                     <label class="block text-sm font-medium mb-1">Cycles</label>
                     <div class="flex gap-4">
@@ -497,11 +527,26 @@
                         @endforeach
                     </div>
                 </div>
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][number_of_pregnancies]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.number_of_pregnancies') }}" placeholder="Number of pregnancies" @readonly(!$canEdit)>
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][number_of_labours]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.number_of_labours') }}" placeholder="Number of labours" @readonly(!$canEdit)>
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][stillbirths]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.stillbirths') }}" placeholder="Stillbirths" @readonly(!$canEdit)>
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][abortions]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.abortions') }}" placeholder="Abortions" @readonly(!$canEdit)>
-                <input class="border rounded px-3 py-2" type="number" name="menstrual_reproductive_history[obstetric_history][year_of_last_childbirth]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.year_of_last_childbirth') }}" placeholder="Year of last childbirth" @readonly(!$canEdit)>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Number of pregnancies</label>
+                    <input class="border rounded px-3 py-2 w-full" type="number" name="menstrual_reproductive_history[obstetric_history][number_of_pregnancies]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.number_of_pregnancies') }}" placeholder="Number of pregnancies" @readonly(!$canEdit)>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Number of labours</label>
+                    <input class="border rounded px-3 py-2 w-full" type="number" name="menstrual_reproductive_history[obstetric_history][number_of_labours]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.number_of_labours') }}" placeholder="Number of labours" @readonly(!$canEdit)>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Stillbirths</label>
+                    <input class="border rounded px-3 py-2 w-full" type="number" name="menstrual_reproductive_history[obstetric_history][stillbirths]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.stillbirths') }}" placeholder="Stillbirths" @readonly(!$canEdit)>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Abortions</label>
+                    <input class="border rounded px-3 py-2 w-full" type="number" name="menstrual_reproductive_history[obstetric_history][abortions]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.abortions') }}" placeholder="Abortions" @readonly(!$canEdit)>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Year of last childbirth</label>
+                    <input class="border rounded px-3 py-2 w-full" type="number" name="menstrual_reproductive_history[obstetric_history][year_of_last_childbirth]" value="{{ $oldOrPayload('menstrual_reproductive_history.obstetric_history.year_of_last_childbirth') }}" placeholder="Year of last childbirth" @readonly(!$canEdit)>
+                </div>
                 <div>
                     <label class="block text-sm font-medium mb-1">Nature of labour</label>
                     <div class="flex flex-wrap gap-4">
@@ -510,16 +555,28 @@
                         @endforeach
                     </div>
                 </div>
-                <textarea class="border rounded px-3 py-2 md:col-span-2" rows="2" name="menstrual_reproductive_history[history_of_infections]" placeholder="History of infections" @readonly(!$canEdit)>{{ $oldOrPayload('menstrual_reproductive_history.history_of_infections') }}</textarea>
-                <textarea class="border rounded px-3 py-2 md:col-span-2" rows="2" name="menstrual_reproductive_history[contraception_history]" placeholder="Contraception history" @readonly(!$canEdit)>{{ $oldOrPayload('menstrual_reproductive_history.contraception_history') }}</textarea>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">History of infections</label>
+                    <textarea class="border rounded px-3 py-2 w-full" rows="2" name="menstrual_reproductive_history[history_of_infections]" placeholder="History of infections" @readonly(!$canEdit)>{{ $oldOrPayload('menstrual_reproductive_history.history_of_infections') }}</textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Contraception history</label>
+                    <textarea class="border rounded px-3 py-2 w-full" rows="2" name="menstrual_reproductive_history[contraception_history]" placeholder="Contraception history" @readonly(!$canEdit)>{{ $oldOrPayload('menstrual_reproductive_history.contraception_history') }}</textarea>
+                </div>
             </div>
         </section>
 
             <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 overflow-x-auto">
             <h2 class="text-lg font-semibold text-secondary mb-3">Musculoskeletal and Edema</h2>
             <div class="grid md:grid-cols-2 gap-3">
-                <textarea class="border rounded px-3 py-2" rows="3" name="musculoskeletal_edema[musculoskeletal_pain]" placeholder="Musculoskeletal pain" @readonly(!$canEdit)>{{ $oldOrPayload('musculoskeletal_edema.musculoskeletal_pain') }}</textarea>
-                <textarea class="border rounded px-3 py-2" rows="3" name="musculoskeletal_edema[edema]" placeholder="Edema" @readonly(!$canEdit)>{{ $oldOrPayload('musculoskeletal_edema.edema') }}</textarea>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Musculoskeletal Pain</label>
+                    <textarea class="border rounded px-3 py-2 w-full" rows="3" name="musculoskeletal_edema[musculoskeletal_pain]" placeholder="eg: ROM, pain, inflammation, swelling grades" @readonly(!$canEdit)>{{ $oldOrPayload('musculoskeletal_edema.musculoskeletal_pain') }}</textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Edema</label>
+                    <textarea class="border rounded px-3 py-2 w-full" rows="3" name="musculoskeletal_edema[edema]" placeholder="e.g., water retention" @readonly(!$canEdit)>{{ $oldOrPayload('musculoskeletal_edema.edema') }}</textarea>
+                </div>
             </div>
         </section>
                 </div>
@@ -810,12 +867,12 @@
                     <button type="button" id="consultation-prev-tab" class="hidden px-6 py-3 rounded-full border border-gray-200 text-sm font-bold text-secondary hover:bg-gray-50 transition-all">
                         <i class="ri-arrow-left-line mr-2"></i> Previous
                     </button>
-                    <button type="button" id="consultation-next-tab" class="px-6 py-3 rounded-full bg-secondary text-white text-sm font-bold hover:bg-primary transition-all">
-                        Next Section <i class="ri-arrow-right-line ml-2"></i>
-                    </button>
                 </div>
 
                 <div class="flex gap-3">
+                    <button type="button" id="consultation-next-tab" class="px-6 py-3 rounded-full bg-secondary text-white text-sm font-bold hover:bg-primary transition-all">
+                        Next Section <i class="ri-arrow-right-line ml-2"></i>
+                    </button>
                     @if($canEdit)
                     <button type="submit" class="px-8 py-3 rounded-full bg-secondary text-white text-sm font-bold hover:shadow-lg transition-all">
                         <i class="ri-save-line mr-2"></i> Save Form
@@ -876,6 +933,27 @@
             }
         }
     });
+
+    const heightInput = document.getElementById('anthro-height');
+    const weightInput = document.getElementById('anthro-weight');
+    const bmiInput = document.getElementById('anthro-bmi');
+
+    const calculateBMI = () => {
+        const height = parseFloat(heightInput.value);
+        const weight = parseFloat(weightInput.value);
+        if (!isNaN(height) && !isNaN(weight) && height > 0) {
+            const heightInMeters = height / 100;
+            const bmi = weight / (heightInMeters * heightInMeters);
+            bmiInput.value = bmi.toFixed(1);
+        } else {
+            bmiInput.value = '';
+        }
+    };
+
+    if (heightInput && weightInput && bmiInput) {
+        heightInput.addEventListener('input', calculateBMI);
+        weightInput.addEventListener('input', calculateBMI);
+    }
 })();
 </script>
 @endpush
