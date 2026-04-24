@@ -190,35 +190,35 @@
                 </div>
 
                 <!-- Post-Session Summary Modal -->
-                <div id="summary-modal" class="absolute inset-0 z-[110] bg-[#111] flex items-center justify-center hidden px-4">
-                    <div class="max-w-lg w-full bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform scale-95 opacity-0 transition-all duration-500" id="summary-content">
-                        <div class="p-8 md:p-10 text-center">
-                            <div class="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                                <i class="ri-checkbox-circle-line text-4xl"></i>
+                <div id="summary-modal" class="absolute inset-0 z-[110] bg-[#111] flex items-center justify-center hidden px-4 py-6">
+                    <div class="max-w-lg w-full bg-white rounded-3xl md:rounded-[2.5rem] overflow-y-auto max-h-full shadow-2xl transform scale-95 opacity-0 transition-all duration-500 scrollbar-hide" id="summary-content">
+                        <div class="p-6 md:p-10 text-center">
+                            <div class="w-14 h-14 md:w-16 md:h-16 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6">
+                                <i class="ri-checkbox-circle-line text-3xl md:text-4xl"></i>
                             </div>
                             
-                            <h2 class="text-2xl font-black text-secondary tracking-tight mb-2">Session Completed</h2>
-                            <p class="text-sm text-gray-500 mb-8 leading-relaxed">
+                            <h2 class="text-xl md:text-2xl font-black text-secondary tracking-tight mb-2">Session Completed</h2>
+                            <p class="text-xs md:text-sm text-gray-500 mb-6 md:mb-8 leading-relaxed">
                                 Thank you for your time. Your session {{ $booking ? '#' . $booking->invoice_no : 'Ref: ' . $channel }} has been successfully completed.
                             </p>
 
-                            <div class="grid grid-cols-2 gap-3 mb-8">
-                                <a href="{{ route('conferences.index') }}" class="flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
-                                    <i class="ri-history-line text-xl text-gray-400 group-hover:text-secondary"></i>
+                            <div class="grid grid-cols-2 gap-3 mb-6 md:mb-8">
+                                <a href="{{ route('conferences.index') }}" class="flex flex-col items-center gap-2 p-3 md:p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
+                                    <i class="ri-history-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
                                     <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">History</span>
                                 </a>
-                                <a href="{{ route('book-session') }}" class="flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
-                                    <i class="ri-calendar-check-line text-xl text-gray-400 group-hover:text-secondary"></i>
+                                <a href="{{ route('book-session') }}" class="flex flex-col items-center gap-2 p-3 md:p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
+                                    <i class="ri-calendar-check-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
                                     <span class="text-[10px] font-black uppercase tracking-widest text-gray-600">Follow-up</span>
                                 </a>
                             </div>
 
-                            <div class="space-y-3">
-                                <a href="{{ route('dashboard') }}" class="w-full py-4 bg-secondary text-white rounded-2xl font-black text-xs hover:bg-primary transition-all shadow-lg shadow-secondary/20 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+                            <div class="flex flex-col gap-3">
+                                <a href="{{ route('dashboard') }}" class="w-full py-3 md:py-4 bg-secondary text-white rounded-2xl font-black text-xs hover:bg-primary transition-all shadow-lg shadow-secondary/20 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
                                     Back to Dashboard
                                     <i class="ri-arrow-right-line"></i>
                                 </a>
-                                <button onclick="window.location.href='mailto:support@zayawellness.com?subject=Session Feedback #{{ $booking?->invoice_no ?? $channel }}'" class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] hover:text-secondary transition-colors">
+                                <button onclick="window.location.href='mailto:support@zayawellness.com?subject=Session Feedback #{{ $booking?->invoice_no ?? $channel }}'" class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] hover:text-secondary transition-colors py-2 block w-full text-center">
                                     Need help? Report an issue
                                 </button>
                             </div>
@@ -667,7 +667,7 @@
                     roomName: jitsiRoom, parentNode: container, jwt: jitsiJwt,
                     configOverwrite: { 
                         prejoinPageEnabled: !isResume, prejoinConfig: { enabled: !isResume, hideDisplayName: true },
-                        readOnlyName: true, disableProfile: true,
+                        readOnlyName: true, disableProfile: true, disableReactions: true,
                         toolbarButtons: [
                            'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
                            'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',

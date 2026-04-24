@@ -14,9 +14,15 @@
         <div class="consultation-tab-controls">
             <div class="consultation-tabs" role="tablist">
                 @foreach($parts as $index => $part)
+                @php
+                    $sectionCount = count($part['sections']);
+                    $startSection = 1;
+                    for($i=0; $i<$index; $i++) $startSection += count($parts[$i]['sections']);
+                    $endSection = $startSection + $sectionCount - 1;
+                @endphp
                 <button type="button" class="consultation-tab-button {{ $index === 0 ? 'is-active' : '' }}" data-tab="part-{{ $part['part'] }}" aria-controls="tab-part-{{ $part['part'] }}" aria-selected="{{ $index === 0 ? 'true' : 'false' }}">
                     <span class="consultation-tab-title">Part {{ $part['part'] }}</span>
-                    <span class="consultation-tab-subtitle">Section {{ ($index * 4) + 1 }} - {{ ($index * 4) + 4 }}</span>
+                    <span class="consultation-tab-subtitle">Sections {{ $startSection }} - {{ $endSection }}</span>
                 </button>
                 @endforeach
             </div>
@@ -124,7 +130,7 @@
                                                     <thead>
                                                         <tr class="bg-gray-50">
                                                             <th class="border border-gray-100 p-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">Time / Meal</th>
-                                                            @foreach(['Early Morning', 'Breakfast', 'Mid-morning', 'Lunch', 'Evening', 'Dinner'] as $meal)
+                                                            @foreach(['Early Morning', 'Breakfast', 'In-between Snacking', 'Lunch', 'Evening', 'Dinner'] as $meal)
                                                                 <th class="border border-gray-100 p-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">{{ $meal }}</th>
                                                             @endforeach
                                                         </tr>
