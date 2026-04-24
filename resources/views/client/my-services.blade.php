@@ -263,55 +263,91 @@
                 </div>
             </div>
 
-            @if($nextOnlineBooking && $reminderLogs->isNotEmpty())
             <div class="mt-6 pt-6 border-t border-gray-100">
                 <div class="flex items-center justify-between mb-4">
                     <p class="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">Reminder Delivery Status</p>
-                    <a href="#" class="text-[10px] font-black text-secondary hover:text-primary uppercase tracking-widest transition-all">View All History</a>
+                    @if($nextOnlineBooking && $reminderLogs->isNotEmpty())
+                        <a href="{{ route('admin.email-logs.index') }}" class="text-[10px] font-black text-secondary hover:text-primary uppercase tracking-widest transition-all">View System Logs</a>
+                    @endif
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @foreach($reminderLogs as $log)
-                    <div class="flex items-center justify-between p-4 {{ $log->status === 'success' ? 'bg-emerald-50/50 border-emerald-100' : 'bg-red-50/50 border-red-100' }} border rounded-2xl transition-all hover:shadow-md group relative">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full {{ $log->status === 'success' ? 'bg-emerald-500' : 'bg-red-500' }} flex items-center justify-center text-white shadow-sm">
-                                <i class="{{ $log->status === 'success' ? 'ri-check-line' : 'ri-error-warning-line' }}"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs font-bold text-secondary">{{ $log->to }}</p>
-                                <p class="text-[9px] text-gray-500 font-medium">{{ $log->created_at->format('M d, H:i') }}</p>
-                            </div>
+
+                @php
+                    $startTime = null;
+                    $scheduledTime = null;
+                    if ($nextOnlineBooking) {
+                        try {
+                            $startTime = \Carbon\Carbon::parse($nextOnlineBooking->booking_date->format('Y-m-d') . ' ' . $nextOnlineBooking->booking_time);
+                            $scheduledTime = $startTime->copy()->subMinutes($reminderLeadTime);
+                        } catch (\Exception $e) {}
+                    }
+                @endphp
+
+                @if($nextOnlineBooking && $reminderLogs->isEmpty())
+                    <div class="p-6 bg-[#F8FAF9] border border-[#2E4B3D]/10 rounded-2xl flex items-center gap-5 shadow-sm border-dashed">
+                        <div class="w-12 h-12 bg-secondary/5 rounded-full flex items-center justify-center text-secondary">
+                            <i class="ri-time-line text-2xl animate-pulse"></i>
                         </div>
-                        <div class="text-right flex flex-col items-end">
-                            <span class="text-[9px] font-black uppercase tracking-widest {{ $log->status === 'success' ? 'text-emerald-600' : 'text-red-600' }}">
-                                {{ strtoupper($log->status) }}
-                            </span>
-                            @if($log->status === 'error')
-                                <div class="flex items-center gap-1 mt-0.5">
-                                    <p class="text-[9px] text-red-400 font-bold max-w-[80px] truncate">{{ $log->error_message }}</p>
-                                    <button type="button" class="text-red-400 hover:text-red-600" title="{{ $log->error_message }}">
-                                        <i class="ri-information-line text-xs"></i>
-                                    </button>
-                                </div>
-                                <!-- Custom Tooltip for Error -->
-                                <div class="absolute bottom-full right-0 mb-2 w-64 p-3 bg-red-600 text-white text-[10px] rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 shadow-xl font-medium leading-relaxed">
-                                    <div class="font-black uppercase tracking-widest mb-1 text-[8px] opacity-80">Reason for Failure:</div>
-                                    {{ $log->error_message }}
-                                    <div class="absolute top-full right-4 w-2 h-2 bg-red-600 rotate-45 -translate-y-1"></div>
-                                </div>
-                            @endif
+                        <div>
+                            <p class="text-xs font-black text-secondary uppercase tracking-tight mb-0.5">Scheduled for Dispatch</p>
+                            <p class="text-sm font-bold text-gray-500">
+                                @if($scheduledTime)
+                                    Estimated: {{ $scheduledTime->format('M d, h:i A') }}
+                                @else
+                                    Calculating based on lead time...
+                                @endif
+                            </p>
+                            <p class="text-[9px] text-gray-400 font-medium mt-1">Participants will receive the secure link automatically at this time.</p>
                         </div>
                     </div>
-                    @endforeach
-                </div>
+                @elseif($nextOnlineBooking)
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @foreach($reminderLogs as $log)
+                        @php
+                            $recipientType = 'Participant';
+                            if ($log->to === ($nextOnlineBooking->user->email ?? '')) $recipientType = 'Client';
+                            elseif ($log->to === (auth()->user()->email)) $recipientType = 'You (Practitioner)';
+                            elseif ($nextOnlineBooking->translator && $log->to === ($nextOnlineBooking->translator->user->email ?? '')) $recipientType = 'Translator';
+                        @endphp
+                        <div class="flex items-center justify-between p-4 {{ $log->status === 'success' ? 'bg-emerald-50/30 border-emerald-100' : 'bg-red-50/50 border-red-100' }} border rounded-2xl transition-all hover:shadow-md group relative">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl {{ $log->status === 'success' ? 'bg-emerald-500' : 'bg-red-500' }} flex items-center justify-center text-white shadow-sm">
+                                    <i class="{{ $log->status === 'success' ? 'ri-check-double-line text-lg' : 'ri-error-warning-line text-lg' }}"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-xs font-black text-secondary leading-none">{{ $recipientType }}</p>
+                                        <span class="text-[8px] px-1.5 py-0.5 rounded bg-white/50 text-gray-500 border border-gray-100 font-bold uppercase">{{ $log->status }}</span>
+                                    </div>
+                                    <p class="text-[10px] text-gray-400 font-bold mt-1">{{ $log->to }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right flex flex-col items-end">
+                                <p class="text-[9px] text-gray-500 font-black uppercase tracking-tighter">{{ $log->created_at->format('h:i A') }}</p>
+                                @if($log->status === 'error')
+                                    <button type="button" class="mt-1 text-red-600 flex items-center gap-1">
+                                        <i class="ri-information-fill text-sm"></i>
+                                        <span class="text-[8px] font-black uppercase tracking-widest">Why?</span>
+                                    </button>
+                                    
+                                    <!-- Custom Tooltip for Error -->
+                                    <div class="absolute bottom-full right-0 mb-3 w-72 p-4 bg-[#1A1A1A] text-white text-[10px] rounded-[1.5rem] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 shadow-2xl font-medium leading-relaxed border border-white/10">
+                                        <div class="flex items-center gap-2 mb-2 text-red-400">
+                                            <i class="ri-error-warning-fill"></i>
+                                            <span class="font-black uppercase tracking-widest text-[8px]">Delivery Failure Report</span>
+                                        </div>
+                                        <div class="bg-white/5 p-2 rounded-xl border border-white/5 mb-2 font-mono text-[9px]">
+                                            {{ $log->error_message }}
+                                        </div>
+                                        <p class="text-[9px] text-white/40 italic">This usually happens due to an invalid email address or temporary mail server issues.</p>
+                                        <div class="absolute top-full right-6 w-3 h-3 bg-[#1A1A1A] rotate-45 -translate-y-1.5 border-r border-b border-white/10"></div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
-            @elseif($nextOnlineBooking && $nextOnlineBooking->reminder_sent)
-            <div class="mt-6 pt-6 border-t border-gray-100">
-                 <p class="text-xs font-bold text-emerald-600 flex items-center gap-2">
-                    <i class="ri-checkbox-circle-line"></i>
-                    Reminders have been dispatched for this session.
-                 </p>
-            </div>
-            @endif
         </div>
 
         <div class="bg-white rounded-[28px] border border-[#2E4B3D]/12 shadow-sm p-6">
