@@ -375,35 +375,71 @@
                 </div>
             </div>
 
-            <!-- Consent Status -->
+            <!-- GDPR Data Sharing Access -->
+            @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
             <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Consent & Security</h3>
+                    <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">GDPR Control Center</h3>
                     @if($hasConsent)
                         <div class="w-8 h-8 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center">
-                            <i class="ri-checkbox-circle-line text-lg"></i>
+                            <i class="ri-shield-check-line text-lg"></i>
                         </div>
                     @else
-                        <div class="w-8 h-8 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center">
-                            <i class="ri-time-line text-lg"></i>
+                        <div class="w-8 h-8 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center animate-pulse">
+                            <i class="ri-shield-flash-line text-lg"></i>
                         </div>
                     @endif
                 </div>
                 
-                <div class="p-5 {{ $hasConsent ? 'bg-emerald-50/30 border-emerald-100' : 'bg-gray-50 border-gray-100' }} border rounded-[2rem]">
-                    <div class="flex gap-3 mb-3">
-                        <i class="ri-shield-keyhole-line {{ $hasConsent ? 'text-emerald-600' : 'text-gray-400' }} text-xl"></i>
-                        <p class="text-xs font-black text-secondary uppercase tracking-tight">Data Sharing</p>
+                <div class="space-y-4">
+                    <div class="p-5 {{ $hasConsent ? 'bg-emerald-50/30 border-emerald-100' : 'bg-gray-50 border-gray-100' }} border rounded-[2rem] transition-all duration-500">
+                        <div class="flex gap-3 mb-3">
+                            <i class="ri-shield-keyhole-line {{ $hasConsent ? 'text-emerald-600' : 'text-gray-400' }} text-xl"></i>
+                            <p class="text-xs font-black text-secondary uppercase tracking-tight">Data Sharing Access</p>
+                        </div>
+                        <p class="text-[11px] leading-relaxed {{ $hasConsent ? 'text-emerald-700' : 'text-gray-500' }} font-medium">
+                            @if($hasConsent)
+                                Access Verified. You can now view the client's comprehensive health journey, including history and recordings.
+                            @else
+                                Data Sharing is currently restricted. You need the client's explicit OTP consent to view their clinical history.
+                            @endif
+                        </p>
                     </div>
-                    <p class="text-[11px] leading-relaxed {{ $hasConsent ? 'text-emerald-700' : 'text-gray-500' }} font-medium">
-                        @if($hasConsent)
-                            The client has granted explicit consent via OTP to share their health data and profile details with you.
-                        @else
-                            Consent for data sharing has not been verified yet. Data access may be restricted.
-                        @endif
-                    </p>
+
+                    @if($hasConsent)
+                        <a href="{{ route('practitioner.client-profile', $booking->user_id) }}" class="w-full py-4 bg-[#F9FBF9] text-secondary border border-[#2E4B3D]/12 rounded-2xl font-black text-[10px] hover:bg-secondary hover:text-white transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2 group">
+                            View Health Journey
+                            <i class="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    @else
+                        <button onclick="requestDataAccess({{ $booking->user_id }})" class="w-full py-4 bg-orange-500 text-white rounded-2xl font-black text-[10px] hover:bg-orange-600 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg shadow-orange-200">
+                            <i class="ri-lock-unlock-line"></i>
+                            Unlock Data Access
+                        </button>
+                    @endif
                 </div>
             </div>
+            @endif
+
+            <!-- Consent Status (Client View) -->
+            @if(Auth::id() === $booking->user_id)
+            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Privacy Settings</h3>
+                    <div class="w-8 h-8 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
+                        <i class="ri-user-settings-line text-lg"></i>
+                    </div>
+                </div>
+                <div class="p-5 bg-blue-50/30 border border-blue-100 rounded-[2rem]">
+                    <p class="text-[11px] leading-relaxed text-blue-700 font-medium mb-4">
+                        Manage how your health data is shared with the practitioner for this consultation.
+                    </p>
+                    <a href="{{ route('health.journey') }}" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1">
+                        Go to Privacy Dashboard <i class="ri-arrow-right-line"></i>
+                    </a>
+                </div>
+            </div>
+            @endif
 
             <!-- Action Buttons -->
             <div class="space-y-3">
@@ -451,5 +487,64 @@
 </div>
 
 @include('partials.refer-modal-scripts')
+
+<script>
+    async function requestDataAccess(clientId) {
+        if (!confirm('This will send a secure OTP to the client to authorize your access to their health journey and historical records. Proceed?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch("{{ route('data-access.request') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ client_id: clientId })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                // Assuming there's a modal or prompt for OTP
+                const otp = prompt(data.success + "\n\nPlease enter the 6-digit OTP provided by the client:");
+                if (otp) {
+                    verifyDataAccessOTP(clientId, otp);
+                }
+            } else {
+                alert(data.error || 'Failed to send OTP.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An unexpected error occurred.');
+        }
+    }
+
+    async function verifyDataAccessOTP(clientId, otp) {
+        try {
+            const response = await fetch("{{ route('data-access.verify') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ client_id: clientId, otp: otp })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert('Access granted! Refreshing page...');
+                window.location.reload();
+            } else {
+                alert(data.error || 'Invalid OTP.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An unexpected error occurred.');
+        }
+    }
+</script>
 
 @endsection

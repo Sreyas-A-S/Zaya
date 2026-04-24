@@ -138,6 +138,7 @@ trait FinancialTrait
             'referral_id' => $data['referral_id'] ?? null,
             'country_id' => $countryId,
             'total_amount' => $amount,
+            'subtotal' => $data['subtotal'] ?? $amount,
             'currency' => $data['currency'] ?? 'INR',
             'company_share' => $companyShare,
             'practitioner_share' => $practitionerShare,

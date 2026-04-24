@@ -11,14 +11,14 @@
         .header { padding: 40px 20px; text-align: center; }
         .logo { height: 60px; }
         .content { padding: 0 40px 40px; text-align: left; }
-        h1 { color: #2E4B3C; font-size: 24px; margin-bottom: 16px; font-weight: 700; }
-        p { font-size: 16px; line-height: 1.6; margin-bottom: 24px; color: #4B5563; }
-        .details-card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; margin-bottom: 32px; }
-        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #edf2f7; }
+        h1 { color: #2E4B3C; font-size: 20px; margin-bottom: 12px; font-weight: 700; }
+        p { font-size: 14px; line-height: 1.6; margin-bottom: 20px; color: #4B5563; }
+        .details-card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-bottom: 28px; }
+        .detail-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #edf2f7; }
         .detail-row:last-child { border-bottom: none; }
-        .label { font-weight: 600; color: #64748b; font-size: 14px; }
-        .value { color: #1e293b; font-size: 14px; font-weight: 700; }
-        .footer { background-color: #2E4B3C; color: #ffffff; padding: 30px 20px; text-align: center; font-size: 14px; }
+        .label { font-weight: 600; color: #64748b; font-size: 12px; }
+        .value { color: #1e293b; font-size: 13px; font-weight: 700; }
+        .footer { background-color: #2E4B3C; color: #ffffff; padding: 30px 20px; text-align: center; font-size: 13px; }
         .footer a { color: #F8E0BB; text-decoration: none; }
         .button { display: inline-block; padding: 12px 24px; background-color: #97563D; color: #ffffff !important; border-radius: 99px; text-decoration: none; font-weight: 600; margin-top: 10px; }
     </style>
@@ -86,7 +86,7 @@
                 @endif
                 <div class="detail-row">
                     <span class="label">Total Amount:</span>
-                    <span class="value">€ {{ number_format($booking->total_price, 2) }}</span>
+                    <span class="value">{{ $currencySymbol }} {{ number_format($booking->total_price, 2) }}</span>
                 </div>
             </div>
 

@@ -291,7 +291,7 @@
                 ).join(' ');
 
                 const missingServicesLabel = (!p.handles_service && p.missing_services && p.missing_services.length > 0)
-                    ? `<div class="mt-1"><span class="text-[8px] bg-red-50 text-red-500 px-1.5 py-0.5 rounded border border-red-100 font-bold uppercase tracking-tighter">Missing: ${p.missing_services.join(', ')}</span></div>`
+                    ? `<div class="mt-1"><span class="text-[8px] bg-red-50 text-red-500 px-1.5 py-0.5 rounded border border-red-100 uppercase tracking-tighter">Missing: ${p.missing_services.join(', ')}</span></div>`
                     : '';
                 
                 item.innerHTML = `

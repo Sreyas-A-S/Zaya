@@ -40,6 +40,7 @@ class BookingMail extends Mailable
     public function content(): Content
     {
         $timezone = derive_timezone_from_user($this->booking->user);
+        $currencySymbol = get_currency_symbol($this->booking->currency ?? 'INR');
 
         $title = match($this->type) {
             'client' => 'Your session is confirmed!',
@@ -63,6 +64,7 @@ class BookingMail extends Mailable
                 'booking' => $this->booking,
                 'type' => $this->type,
                 'timezone' => $timezone,
+                'currencySymbol' => $currencySymbol,
             ],
         );
     }

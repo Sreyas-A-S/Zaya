@@ -47,26 +47,49 @@ class BookingController extends Controller
 
         // 1. Calculate Subtotal on Server (Security: Don't trust request total_price)
         $subtotal = 0;
-        $userServices = \App\Models\UserService::where('user_id', $practitioner->user_id)
-            ->whereIn('service_id', $request->service_ids)
-            ->where('status', 'active')
-            ->get();
-        
-        \Log::info('Booking Calculation Debug:', [
-            'practitioner_user_id' => $practitioner->user_id,
-            'service_ids' => $request->service_ids,
-            'services_found_count' => $userServices->count()
-        ]);
+        $sessions = $request->input('additional_info.sessions', []);
 
-        foreach ($userServices as $us) {
-            $subtotal += (float) $us->rate;
-            \Log::info("Adding service rate: {$us->rate} for service ID: {$us->service_id}");
+        if (!empty($sessions) && is_array($sessions)) {
+            foreach ($sessions as $session) {
+                $serviceId = $session['service_id'] ?? null;
+                $duration = $session['duration'] ?? null;
+
+                if ($serviceId && $duration) {
+                    $us = \App\Models\UserService::where('user_id', $practitioner->user_id)
+                        ->where('service_id', $serviceId)
+                        ->where('duration', $duration)
+                        ->where('status', 'active')
+                        ->first();
+                    
+                    if ($us) {
+                        $rate = (float) $us->rate;
+                        $subtotal += $rate;
+                        \Log::info("Correctly added rate: {$rate} for Service ID: {$serviceId}, Duration: {$duration}");
+                    } else {
+                        \Log::warning("UserService record not found for Service ID: {$serviceId}, Duration: {$duration}");
+                    }
+                }
+            }
+        }
+
+        // Fallback for edge cases or if sessions info is somehow missing
+        if ($subtotal <= 0) {
+            $userServices = \App\Models\UserService::where('user_id', $practitioner->user_id)
+                ->whereIn('service_id', $request->service_ids)
+                ->where('status', 'active')
+                ->get()
+                ->unique('service_id'); // Take only one rate per service ID as a safety measure
+            
+            foreach ($userServices as $us) {
+                $subtotal += (float) $us->rate;
+                \Log::info("Fallback: Adding service rate: {$us->rate} for service ID: {$us->service_id}");
+            }
         }
         
-        // Fallback to request price if no specific rates found
+        // Final fallback to request price if still 0 (only if reasonable)
         if ($subtotal <= 0) {
             $subtotal = (float) $request->total_price;
-            \Log::info("Fallback subtotal from request: {$subtotal}");
+            \Log::info("Critical Fallback subtotal from request: {$subtotal}");
         }
 
         // 2. Validate Promo Code
@@ -109,13 +132,17 @@ class BookingController extends Controller
         }
 
         // Final amount to be paid
-        $finalPayable = $request->test_mode ? 1.00 : max(0, $subtotal - $promoDiscount - $coinDiscount);
+        $isTestMode = $request->has('test_mode') && $request->test_mode;
+        $realPayable = max(0, $subtotal - $promoDiscount - $coinDiscount);
+        $finalPayable = $isTestMode ? 1.00 : $realPayable;
         
         \Log::info('Final Totals:', [
             'subtotal' => $subtotal,
             'promo_discount' => $promoDiscount,
             'coin_discount' => $coinDiscount,
-            'final_payable' => $finalPayable
+            'real_payable' => $realPayable,
+            'final_payable' => $finalPayable,
+            'is_test' => $isTestMode
         ]);
 
         // 4. Availability Check
@@ -136,6 +163,7 @@ class BookingController extends Controller
                 'situation' => $request->situation ?? null,
                 'booking_date' => $request->booking_date,
                 'booking_time' => $request->booking_time,
+                'subtotal' => $subtotal,
                 'total_price' => 0,
                 'promo_code' => $promoCode,
                 'discount_amount' => $promoDiscount,
@@ -163,6 +191,7 @@ class BookingController extends Controller
             $this->recordTransaction([
                 'type' => 'booking',
                 'amount' => $booking->total_price,
+                'subtotal' => $booking->subtotal,
                 'user_id' => $booking->user_id,
                 'practitioner_id' => $practitioner->user_id,
                 'booking_id' => $booking->id,
@@ -209,12 +238,14 @@ class BookingController extends Controller
                 'mode' => $request->mode,
                 'conditions' => $request->conditions,
                 'situation' => $request->situation,
-                'total_price' => max(0, $subtotal - $promoDiscount - $coinDiscount),
+                'subtotal' => $subtotal,
+                'total_price' => $realPayable,
                 'promo_code' => $promoCode,
                 'discount_amount' => $promoDiscount,
                 'coins_used' => $coinsUsed,
                 'coin_discount' => $coinDiscount,
                 'currency' => $currency,
+                'is_test' => $isTestMode,
                 'additional_info' => $request->additional_info,
             ]
         ]);
@@ -227,8 +258,8 @@ class BookingController extends Controller
         if ($razorpayKey && $razorpaySecret) {
             $verifySsl = config('services.razorpay.verify_ssl');
             
-            $gatewayAmount = $request->test_mode ? 1.00 : $finalPayable;
-            $gatewayCurrency = $request->test_mode ? 'INR' : $currency;
+            $gatewayAmount = $finalPayable;
+            $gatewayCurrency = $isTestMode ? 'INR' : $currency;
 
             try {
                 $payload = [
@@ -340,6 +371,7 @@ class BookingController extends Controller
             'situation' => $bookingData['situation'] ?? null,
             'booking_date' => $reservation->booking_date,
             'booking_time' => $reservation->booking_time,
+            'subtotal' => $bookingData['subtotal'] ?? $bookingData['total_price'],
             'total_price' => $bookingData['total_price'],
             'promo_code' => $bookingData['promo_code'] ?? null,
             'discount_amount' => $bookingData['discount_amount'] ?? 0.00,
@@ -347,6 +379,7 @@ class BookingController extends Controller
             'coin_discount' => $bookingData['coin_discount'] ?? 0.00,
             'currency' => $bookingData['currency'],
             'status' => 'confirmed',
+            'is_test' => $bookingData['is_test'] ?? false,
             'razorpay_order_id' => $paymentLinkId,
             'razorpay_payment_id' => $paymentId,
             'additional_info' => $bookingData['additional_info'] ?? null,
@@ -377,6 +410,7 @@ class BookingController extends Controller
             $this->recordTransaction([
                 'type' => 'booking',
                 'amount' => $booking->total_price,
+                'subtotal' => $booking->subtotal,
                 'user_id' => $booking->user_id,
                 'practitioner_id' => $practitioner->user_id ?? null,
                 'booking_id' => $booking->id,
@@ -414,11 +448,13 @@ class BookingController extends Controller
                 'situation' => $bookingData['situation'] ?? null,
                 'booking_date' => $reservation->booking_date,
                 'booking_time' => $reservation->booking_time,
+                'subtotal' => $bookingData['subtotal'] ?? $bookingData['total_price'],
                 'total_price' => $bookingData['total_price'],
                 'promo_code' => $bookingData['promo_code'] ?? null,
                 'discount_amount' => $bookingData['discount_amount'] ?? 0.00,
                 'currency' => $bookingData['currency'],
                 'status' => 'pending_reschedule', // Special status
+                'is_test' => $bookingData['is_test'] ?? false,
                 'razorpay_order_id' => $paymentLinkId,
                 'razorpay_payment_id' => $paymentId,
                 'additional_info' => $bookingData['additional_info'] ?? null,
