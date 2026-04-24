@@ -18,6 +18,7 @@ class Transaction extends Model
         'referral_id',
         'country_id',
         'total_amount',
+        'subtotal',
         'currency',
         'company_share',
         'practitioner_share',

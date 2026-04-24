@@ -152,17 +152,45 @@
 
         <hr class="border-gray-100 mb-6">
 
-        <!-- Total Amount -->
-        <div class="flex justify-between items-center mb-6 px-1">
-            <div>
-                <span class="text-[13px] text-gray-400 block mb-0.5">{{ __($site_settings['invoice_total_amount'] ?? 'Total Amount') }}</span>
-                @if($booking->razorpay_payment_id)
-                <span class="text-[10px] text-gray-400 font-medium">Ref: {{ $booking->razorpay_payment_id }}</span>
+        <!-- Total Amount & Breakdown -->
+        <div class="px-1 mb-6">
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-gray-400">{{ __($site_settings['invoice_subtotal'] ?? 'Subtotal') }}</span>
+                    <span class="font-semibold text-gray-700">{{ $currencySymbol }} {{ number_format($booking->subtotal ?? $booking->total_price, 2) }}</span>
+                </div>
+                
+                @if($booking->discount_amount > 0)
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-gray-400">{{ __($site_settings['invoice_promo_discount'] ?? 'Promo Discount') }} ({{ $booking->promo_code }})</span>
+                    <span class="font-semibold text-green-600">- {{ $currencySymbol }} {{ number_format($booking->discount_amount, 2) }}</span>
+                </div>
+                @endif
+
+                @if($booking->coin_discount > 0)
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-gray-400">{{ __($site_settings['invoice_coin_discount'] ?? 'Coin Discount') }} ({{ $booking->coins_used }} {{ __('coins') }})</span>
+                    <span class="font-semibold text-green-600">- {{ $currencySymbol }} {{ number_format($booking->coin_discount, 2) }}</span>
+                </div>
                 @endif
             </div>
-            <div class="flex items-center gap-4">
-                <span class="bg-[#eef1f6] text-gray-600 text-[11px] font-medium px-3 py-1 rounded-full">{{ ucfirst($booking->status ?? 'Paid') }}</span>
-                <span class="text-[22px] font-bold text-gray-800">{{ $currencySymbol }} {{ number_format($booking->total_price, 2) }}</span>
+
+            <hr class="border-gray-50 border-dashed mb-4">
+
+            <div class="flex justify-between items-center">
+                <div>
+                    <span class="text-[13px] text-gray-400 block mb-0.5">{{ __($site_settings['invoice_total_amount'] ?? 'Total Paid') }}</span>
+                    @if($booking->razorpay_payment_id)
+                    <span class="text-[10px] text-gray-400 font-medium">Ref: {{ $booking->razorpay_payment_id }}</span>
+                    @endif
+                </div>
+                <div class="flex items-center gap-4">
+                    @if($booking->is_test)
+                    <span class="bg-red-50 text-red-600 text-[9px] font-black px-2 py-1 rounded border border-red-100 uppercase tracking-tighter">Test Payment</span>
+                    @endif
+                    <span class="bg-[#eef1f6] text-gray-600 text-[11px] font-medium px-3 py-1 rounded-full">{{ ucfirst($booking->status ?? 'Paid') }}</span>
+                    <span class="text-[22px] font-bold text-gray-800">{{ $currencySymbol }} {{ number_format($booking->total_price, 2) }}</span>
+                </div>
             </div>
         </div>
 
