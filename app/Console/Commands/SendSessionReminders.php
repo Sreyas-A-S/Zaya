@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Booking;
 use App\Mail\SessionReminderMail;
+use App\Services\EmailLoggerService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
@@ -61,17 +62,28 @@ class SendSessionReminders extends Command
                     // Generate the secure video link using invoice_no as channel name
                     $videoLink = route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']);
 
-                    // Send to Client
-                    Mail::to($booking->user->email)->send(new SessionReminderMail($booking, 'client', $videoLink));
+                    $recipients = [];
+                    $recipients[] = ['email' => $booking->user->email, 'type' => 'client'];
                     
-                    // Send to Practitioner
                     if ($booking->practitioner && $booking->practitioner->user) {
-                        Mail::to($booking->practitioner->user->email)->send(new SessionReminderMail($booking, 'practitioner', $videoLink));
+                        $recipients[] = ['email' => $booking->practitioner->user->email, 'type' => 'practitioner'];
                     }
                     
-                    // Send to Translator
                     if ($booking->need_translator && $booking->translator && $booking->translator->user) {
-                        Mail::to($booking->translator->user->email)->send(new SessionReminderMail($booking, 'translator', $videoLink));
+                        $recipients[] = ['email' => $booking->translator->user->email, 'type' => 'translator'];
+                    }
+
+                    foreach ($recipients as $recipient) {
+                        $start = microtime(true);
+                        try {
+                            Mail::to($recipient['email'])->send(new SessionReminderMail($booking, $recipient['type'], $videoLink));
+                            $duration = microtime(true) - $start;
+                            EmailLoggerService::log($recipient['email'], "Session Reminder: #{$booking->invoice_no}", null, 'success', null, $duration, $booking->id);
+                        } catch (\Exception $e) {
+                            $duration = microtime(true) - $start;
+                            EmailLoggerService::log($recipient['email'], "Session Reminder: #{$booking->invoice_no}", null, 'error', $e->getMessage(), $duration, $booking->id);
+                            Log::error("Failed to send reminder to {$recipient['email']} for booking #{$booking->id}: " . $e->getMessage());
+                        }
                     }
 
                     $booking->reminder_sent = true;

@@ -17,7 +17,7 @@
     <div class="max-w-none mx-auto {{ $isMeetingPopout ? 'h-full' : 'lg:h-[calc(100vh-2rem)]' }} flex flex-col lg:flex-row gap-6 transition-all duration-500" id="session-wrapper">
         <!-- Meeting Portal Card -->
         <div id="video-container"
-            class="flex-1 min-w-0 transition-all duration-500 {{ $isMeetingPopout ? 'h-full overflow-hidden rounded-none border-0 shadow-none bg-[#07110B]' : 'bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)]' }}">
+            class="flex flex-col flex-1 min-w-0 transition-all duration-500 {{ $isMeetingPopout ? 'h-full overflow-hidden rounded-none border-0 shadow-none bg-[#07110B]' : 'bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)]' }}">
 
             <!-- PiP Controls Overlay (visible only in PiP mode) -->
             <div id="pip-controls" class="select-none">
@@ -34,7 +34,7 @@
             @if(!$isMeetingPopout)
                 <!-- Meeting Header -->
                 <div id="conference-meeting-header"
-                    class="p-6 border-b border-[#2E4B3D]/12 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#FDFDFD]">
+                    class="p-6 border-b border-[#2E4B3D]/12 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#FDFDFD] {{ $isMeetingPopout ? 'hidden' : '' }}">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 bg-secondary/5 rounded-2xl flex items-center justify-center">
                             <i class="ri-vidicon-fill text-secondary text-2xl animate-pulse"></i>
@@ -94,7 +94,7 @@
             @endif
 
             <!-- Video Area -->
-            <div class="relative {{ $isMeetingPopout ? 'h-full bg-[#07110B]' : 'h-[75vh] min-h-[450px] md:h-auto md:aspect-video bg-[#0A1209]' }} group flex flex-col"
+            <div class="relative flex-1 min-h-[60vh] lg:min-h-0 {{ $isMeetingPopout ? 'bg-[#07110B]' : 'bg-[#0A1209]' }} group flex flex-col"
                 id="meeting-stage">
                 
                 @if($provider === 'jaas' && !empty($jaasError))
@@ -489,6 +489,11 @@
             align-items: center;
         }
 
+        #video-container.in-popout #conference-meeting-header,
+        #video-container.in-popout #conference-mobile-nav {
+            display: none !important;
+        }
+
         #session-wrapper.pip-active #conference-meeting-header,
         #session-wrapper.pip-active #conference-mobile-nav {
             display: none !important;
@@ -853,8 +858,8 @@
 
             window.showSummary = () => {
                 allowExit = true;
-                sessionStorage.removeItem('meeting_active_' + channel);
-                sessionStorage.removeItem('meeting_started_at_' + channel);
+                localStorage.removeItem('meeting_active_' + channel);
+                localStorage.removeItem('meeting_started_at_' + channel);
                 sessionStorage.removeItem('meeting_timer_start');
                 
                 const modal = document.getElementById('summary-modal');
@@ -882,44 +887,79 @@
                 window.showSummary();
             };
 
-            window.startSession = async () => {
+            window.startSession = async (isResume = false) => {
                 const btn = document.getElementById('start-btn');
                 const feedback = document.getElementById('setup-feedback');
-                if (btn) btn.disabled = true;
-                if (feedback) feedback.classList.remove('hidden');
                 
-                meetingStartedAt = new Date().toISOString();
-                sessionStorage.setItem('meeting_active_' + channel, 'true');
-                sessionStorage.setItem('meeting_started_at_' + channel, meetingStartedAt);
+                if (!isResume) {
+                    if (btn) btn.disabled = true;
+                    if (feedback) feedback.classList.remove('hidden');
+                    meetingStartedAt = new Date().toISOString();
+                    localStorage.setItem('meeting_active_' + channel, 'true');
+                    localStorage.setItem('meeting_started_at_' + channel, meetingStartedAt);
+                    await beginRecording(true);
+                } else {
+                    meetingStartedAt = localStorage.getItem('meeting_started_at_' + channel) || new Date().toISOString();
+                    hideOverlay(true);
+                }
                 
                 startTimer();
-                await beginRecording(true);
 
-                if (provider === 'jaas') initJitsi();
-                else if (provider === 'daily') initDaily();
-                else if (provider === 'agora') initAgora();
+                if (provider === 'jaas') initJitsi(isResume);
+                else if (provider === 'daily') initDaily(isResume);
+                else if (provider === 'agora') initAgora(isResume);
             };
 
-            function initJitsi() {
+            // Check if session is already active (e.g., after popout or reload)
+            if (localStorage.getItem('meeting_active_' + channel) === 'true') {
+                console.log('Session is already active, auto-joining...');
+                hideOverlay(true); // Hide immediately to avoid flicker
+                
+                // Allow some time for SDKs to be ready if needed
+                setTimeout(() => {
+                    window.startSession(true);
+                }, 100);
+            }
+
+            function initJitsi(isResume = false) {
                 const container = document.getElementById('jitsi-meet-container');
-                const isRejoin = sessionStorage.getItem('meeting_active_' + channel) === 'true';
                 
                 jitsiApi = new JitsiMeetExternalAPI(jitsiDomain, {
                     roomName: jitsiRoom,
                     parentNode: container,
                     jwt: jitsiJwt,
                     configOverwrite: { 
-                        prejoinPageEnabled: !isRejoin, // Skip prejoin if we are just reloading/popping out
+                        prejoinPageEnabled: !isResume,
                         prejoinConfig: { 
-                            enabled: !isRejoin,
+                            enabled: !isResume,
                             hideDisplayName: true
                         },
                         readOnlyName: true,
-                        disableProfile: true
+                        disableProfile: true,
+                        toolbarButtons: [
+                           'microphone', 'camera', 'closedcaptions', 'desktop', 'embedmeeting', 'fullscreen',
+                           'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+                           'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                           'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
+                           'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security'
+                        ],
+                        toolbarConfig: {
+                            alwaysVisible: true
+                        },
+                        disabledNotifications: ['moderator', 'notify.moderator', 'notify.connected-as-moderator', 'connection.connected-as-moderator'],
+                        disableModeratorIndicator: true
                     },
                     interfaceConfigOverwrite: { 
                         SHOW_JITSI_WATERMARK: false,
-                        DISABLE_PROFILE: true
+                        DISABLE_PROFILE: true,
+                        TOOLBAR_ALWAYS_VISIBLE: true,
+                        TOOLBAR_BUTTONS: [
+                           'microphone', 'camera', 'closedcaptions', 'desktop', 'embedmeeting', 'fullscreen',
+                           'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+                           'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                           'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
+                           'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security'
+                        ]
                     },
                     userInfo: { displayName: "{{ addslashes($user->name ?? 'Guest') }}" }
                 });
@@ -931,7 +971,7 @@
                 hideOverlay();
             }
 
-            async function initDaily() {
+            async function initDaily(isResume = false) {
                 const container = document.getElementById('daily-meet-container');
                 dailyCall = DailyIframe.createFrame(container, {
                     showLeaveButton: true,
@@ -1007,7 +1047,7 @@
 
             // --- Agora Logic (Simplified for brevity) ---
             let client, localTracks = { videoTrack: null, audioTrack: null };
-            async function initAgora() {
+            async function initAgora(isResume = false) {
                 // (Existing Agora Logic goes here - kept as is from previous version)
                 // Note: I will wrap the existing agora logic back in if needed, 
                 // but since the user asked for Daily.co I'm focusing on that.

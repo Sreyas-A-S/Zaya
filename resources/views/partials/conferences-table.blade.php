@@ -3,7 +3,7 @@
         <div class="p-6 border-b border-[#2E4B3D]/12 flex flex-col sm:flex-row justify-between items-center gap-4">
             <h2 class="text-xl font-medium text-secondary">{{ $user->role === 'translator' ? 'Assigned Conferences' : 'Conference History' }}</h2>
             <div class="flex flex-wrap gap-3">
-                <button onclick="startInstantMeeting('choose')" 
+                <button onclick="startInstantMeeting('jaas')" 
                    class="px-5 py-3 bg-secondary text-white rounded-full font-medium flex items-center gap-2 hover:bg-opacity-90 transition-all border border-secondary cursor-pointer shadow-lg shadow-secondary/20">
                     <i id="instant-meet-icon" class="ri-vidicon-line text-lg"></i>
                     <span id="instant-meet-text">Start Session</span>
@@ -97,5 +97,3 @@
         @endif
     </div>
 </div>
-
-@include('partials.conference-provider-modal')

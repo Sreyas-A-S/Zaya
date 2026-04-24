@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class EmailLog extends Model
 {
     protected $fillable = [
+        'booking_id',
         'to',
         'subject',
         'body',
@@ -14,4 +15,9 @@ class EmailLog extends Model
         'duration',
         'error_message',
     ];
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
+    }
 }

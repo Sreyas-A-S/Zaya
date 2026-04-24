@@ -492,6 +492,7 @@ class ProfileController extends Controller
     public function healthJourney()
     {
         $user = Auth::user();
+        $user->load('patient');
         $clinicalDocuments = $user->clinicalDocuments()->latest()->get();
         
         // Only show bookings that have a consultation form attached
@@ -718,7 +719,8 @@ class ProfileController extends Controller
         $profile = $user->practitioner ?? $user->doctor ?? $user->mindfulnessPractitioner ?? $user->yogaTherapist ?? null;
         $reminderLeadTime = $profile->reminder_lead_time ?? 60;
 
-        $nextOnlineBooking = Booking::where('profile_id', $user->profile_id)
+        $nextOnlineBooking = Booking::with('transactions')
+            ->where('profile_id', $user->profile_id)
             ->where('practitioner_type', $user->getMorphClass())
             ->where('mode', 'online')
             ->where('status', 'confirmed')
@@ -727,7 +729,15 @@ class ProfileController extends Controller
             ->orderBy('booking_time')
             ->first();
 
-        return view('client.my-services', compact('user', 'myServices', 'defaultCurrency', 'reminderLeadTime', 'nextOnlineBooking'));
+        $reminderLogs = collect();
+        if ($nextOnlineBooking) {
+            $reminderLogs = \App\Models\EmailLog::where('booking_id', $nextOnlineBooking->id)
+                ->where('subject', 'LIKE', '%Session Reminder%')
+                ->latest()
+                ->get();
+        }
+
+        return view('client.my-services', compact('user', 'myServices', 'defaultCurrency', 'reminderLeadTime', 'nextOnlineBooking', 'reminderLogs'));
     }
 
     public function updateReminderSettings(Request $request)
