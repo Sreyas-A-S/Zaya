@@ -146,6 +146,8 @@ trait FinancialTrait
             'company_commission_percent' => $companyPercent,
             'referrer_commission_percent' => $referrerPercent,
             'payment_id' => $data['payment_id'] ?? null,
+            'coins_used' => $data['coins_used'] ?? 0,
+            'coin_discount' => $data['coin_discount'] ?? 0,
             'status' => 'completed',
             'type' => $type,
         ]);

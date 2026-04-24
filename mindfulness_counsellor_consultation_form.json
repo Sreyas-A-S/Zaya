@@ -1,0 +1,1383 @@
+{
+  "form_meta": {
+    "form_id": "yogic_counselling_case_history_v1",
+    "form_name": "YOGIC COUNSELLING CASE HISTORY",
+    "source_document": "Counselling (1).docx",
+    "version": "1.0",
+    "part": 1,
+    "part_title": "Intake, Consent, Presenting Concern, Medical & Risk Screening",
+    "coverage": [
+      "SECTION 1: PATIENT IDENTIFICATION (ROM Standard)",
+      "SECTION 2: INFORMED CONSENT (MANDATORY)",
+      "SECTION 3: PRESENTING CONCERN",
+      "SECTION 4: MEDICAL & RISK SCREENING"
+    ],
+    "notes": [
+      "This is a loss-minimized structured extraction of Part 1.",
+      "Original wording preserved as closely as possible.",
+      "Risk Screening restored using provided embedded image."
+    ]
+  },
+  "sections": [
+    {
+      "section_id": 1,
+      "section_title": "PATIENT IDENTIFICATION",
+      "subtitle": "ROM Standard",
+      "fields": [
+        { "key": "uhid_case_id", "label": "UHID / Case ID", "type": "text" },
+        { "key": "name", "label": "Name", "type": "text" },
+        { "key": "age_gender", "label": "Age / Gender", "type": "text" },
+        { "key": "occupation", "label": "Occupation", "type": "text" },
+        { "key": "marital_status", "label": "Marital Status", "type": "text" },
+        { "key": "contact_details", "label": "Contact Details", "type": "text" },
+        { "key": "address", "label": "Address", "type": "textarea" },
+        { "key": "emergency_contact", "label": "Emergency Contact", "type": "text" },
+        { "key": "referring_department", "label": "Referring Department", "type": "text" },
+        { "key": "date_of_registration", "label": "Date of Registration", "type": "date" },
+        { "key": "date_of_first_consultation", "label": "Date of First Consultation", "type": "date" },
+        { "key": "medical_diagnosis_if_any", "label": "Medical Diagnosis (if any)", "type": "textarea" },
+        { "key": "current_medication", "label": "Current Medication", "type": "textarea" },
+        { "key": "previous_therapy_counselling", "label": "Previous Therapy / Counselling", "type": "textarea" }
+      ]
+    },
+    {
+      "section_id": 2,
+      "section_title": "INFORMED CONSENT",
+      "mandatory": true,
+      "fields": [
+        {
+          "key": "consent_items",
+          "label": "Checklist",
+          "type": "checkbox_group",
+          "options": [
+            "Informed consent obtained",
+            "Scope & limitations explained",
+            "Confidentiality explained",
+            "Referral protocol explained"
+          ]
+        },
+        { "key": "patient_signature", "label": "Patient Signature", "type": "signature" },
+        { "key": "practitioner_signature", "label": "Practitioner Signature", "type": "signature" },
+        { "key": "date", "label": "Date", "type": "date" }
+      ]
+    },
+    {
+      "section_id": 3,
+      "section_title": "PRESENTING CONCERN",
+      "subsections": [
+        {
+          "subsection_id": "3.1",
+          "title": "Chief Complaint",
+          "fields": [
+            {
+              "key": "chief_complaint",
+              "label": "In patient’s own words",
+              "type": "textarea"
+            }
+          ]
+        },
+        {
+          "subsection_id": "3.2",
+          "title": "Onset",
+          "fields": [
+            {
+              "key": "onset",
+              "label": "Onset",
+              "type": "radio",
+              "options": [
+                "Sudden",
+                "Gradual",
+                "Cannot recall"
+              ]
+            },
+            {
+              "key": "duration",
+              "label": "Duration",
+              "type": "radio",
+              "options": [
+                "<3 months",
+                "3–12 months",
+                ">1 year"
+              ]
+            }
+          ]
+        },
+        {
+          "subsection_id": "3.3",
+          "title": "Root Cause / Trigger (if known)",
+          "fields": [
+            {
+              "key": "root_cause_trigger",
+              "label": "Root Cause / Trigger (if known)",
+              "type": "textarea"
+            }
+          ]
+        },
+        {
+          "subsection_id": "3.4",
+          "title": "Stress Level (0–10)",
+          "fields": [
+            {
+              "key": "stress_level",
+              "label": "Score",
+              "type": "number",
+              "min": 0,
+              "max": 10,
+              "display_format": "___ /10",
+              "scale_guide": {
+                "0": "Completely calm",
+                "10": "Extremely overwhelmed"
+              }
+            }
+          ]
+        },
+        {
+          "subsection_id": "3.5",
+          "title": "Coping Mechanisms",
+          "fields": [
+            {
+              "key": "coping_mechanisms",
+              "label": "Select all applicable",
+              "type": "checkbox_group",
+              "options": [
+                "Avoidance",
+                "Overworking",
+                "Emotional eating",
+                "Withdrawal",
+                "Spiritual practice",
+                "Talking to someone",
+                "Substance use",
+                "Other"
+              ]
+            },
+            {
+              "key": "coping_mechanisms_other",
+              "label": "Other",
+              "type": "text",
+              "conditional_on": "coping_mechanisms includes Other"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_id": 4,
+      "section_title": "MEDICAL & RISK SCREENING",
+      "subsections": [
+        {
+          "subsection_id": "4.1",
+          "title": "Medical History",
+          "fields": [
+            {
+              "key": "co_morbidities",
+              "label": "Co-morbidities – Hypertension, obesity, cardiac issues, diabetes, thyroid",
+              "type": "multi_select_with_other",
+              "options": [
+                "Hypertension",
+                "Obesity",
+                "Cardiac issues",
+                "Diabetes",
+                "Thyroid"
+              ]
+            },
+            {
+              "key": "psychiatric_history_personal_family",
+              "label": "Psychiatric history (personal & family)",
+              "type": "textarea"
+            },
+            {
+              "key": "substance_history",
+              "label": "Substance history",
+              "type": "textarea"
+            },
+            {
+              "key": "sleep_pattern",
+              "label": "Sleep pattern",
+              "type": "textarea"
+            },
+            {
+              "key": "appetite",
+              "label": "Appetite",
+              "type": "textarea"
+            }
+          ]
+        },
+        {
+          "subsection_id": "4.2",
+          "title": "Risk Screening",
+          "mandatory": true,
+          "tool_reference": "ASQ-style Suicide Risk Screening",
+          "fields": [
+            {
+              "key": "q1",
+              "label": "In the past few weeks, have you wished you were dead?",
+              "type": "radio",
+              "options": ["Yes", "No"]
+            },
+            {
+              "key": "q2",
+              "label": "In the past few weeks, have you felt that you or your family would be better off if you were dead?",
+              "type": "radio",
+              "options": ["Yes", "No"]
+            },
+            {
+              "key": "q3",
+              "label": "In the past week, have you been having thoughts about killing yourself?",
+              "type": "radio",
+              "options": ["Yes", "No"]
+            },
+            {
+              "key": "q4",
+              "label": "Have you ever tried to kill yourself?",
+              "type": "radio",
+              "options": ["Yes", "No"]
+            },
+            {
+              "key": "q4_recent_attempt",
+              "label": "If yes, when was the most recent attempt?",
+              "type": "radio",
+              "options": [
+                "Within last 12 months",
+                "Over 1 year ago"
+              ],
+              "conditional_on": "q4 = Yes"
+            },
+            {
+              "key": "q5",
+              "label": "Are you having thoughts of killing yourself right now?",
+              "type": "radio",
+              "options": ["Yes", "No"],
+              "conditional_rule": "Ask if patient answers Yes to any of Questions #1 through #4"
+            },
+            {
+              "key": "q5_if_yes_describe",
+              "label": "If yes, describe briefly",
+              "type": "textarea",
+              "conditional_on": "q5 = Yes"
+            },
+            {
+              "key": "screening_result",
+              "label": "Screening result and next steps",
+              "type": "computed",
+              "logic": [
+                {
+                  "if": "No to all Questions #1-#4",
+                  "result": "Negative screen",
+                  "next_step": "No intervention is necessary at this time. NOTE: Clinical judgment can always override a negative screen."
+                },
+                {
+                  "if": "Yes to any of Questions #1-#4 AND Yes to Question #5",
+                  "result": "Acute positive screen (imminent/acute risk identified)",
+                  "next_step": [
+                    "Patient requires a STAT/urgent safety/full mental health evaluation.",
+                    "Patient cannot leave until evaluated for safety.",
+                    "Keep patient in sight.",
+                    "Remove dangerous objects from room (if possible).",
+                    "Alert clinician responsible for patient’s care."
+                  ]
+                },
+                {
+                  "if": "Yes to any of Questions #1-#4 AND No to Question #5",
+                  "result": "Non-acute positive screen (potential risk identified)",
+                  "next_step": [
+                    "Patient needs a brief suicide safety assessment to determine if a full mental health evaluation is needed (and when).",
+                    "Non-acute positive status does NOT require 1-to-1 observation while patient is awaiting further assessment (unless there are other safety concerns).",
+                    "Alert clinician responsible for patient’s care."
+                  ]
+                }
+              ]
+            },
+            {
+              "key": "refused_to_answer",
+              "label": "If patient refuses to answer screening questions",
+              "type": "checkbox"
+            },
+            {
+              "key": "refusal_guidance",
+              "label": "Refusal Guidance",
+              "type": "info",
+              "value": [
+                "For youth, refusal is considered a non-acute positive screen.",
+                "For adults, refusal is NOT considered a positive screen unless there are other safety concerns.",
+                "Document the refusal."
+              ]
+            },
+            {
+              "key": "resources_given",
+              "label": "Provide resources to all patients",
+              "type": "checkbox"
+            },
+            {
+              "key": "resources_list",
+              "label": "Resources",
+              "type": "info",
+              "value": [
+                "988 Suicide and Crisis Lifeline",
+                "Crisis Text Line"
+              ]
+            },
+            {
+              "key": "risk_notes",
+              "label": "Referral Notes / Safety Notes / Clinician Notes",
+              "type": "textarea"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+{
+  "form_meta": {
+    "form_id": "yogic_counselling_case_history_v1",
+    "form_name": "YOGIC COUNSELLING CASE HISTORY",
+    "version": "1.0",
+    "part": 2,
+    "part_title": "SECTION 5: ANTARAYAS & CITTA VIKSHEPA ASSESSMENT",
+    "coverage": [
+      "SECTION 5: ANTARAYAS & CITTA VIKSHEPA ASSESSMENT"
+    ],
+    "notes": [
+      "Score 0–10 | 0 = Absent | 10 = Severe Interference",
+      "Rows preserved in source order.",
+      "This part includes associated disturbances, severity index, and dominant obstacles."
+    ]
+  },
+  "sections": [
+    {
+      "section_id": 5,
+      "section_title": "ANTARAYAS & CITTA VIKSHEPA ASSESSMENT",
+      "instructions": {
+        "score_scale": {
+          "min": 0,
+          "max": 10,
+          "0_meaning": "Absent",
+          "10_meaning": "Severe Interference"
+        }
+      },
+      "table_columns": [
+        "Antaraya / Obstacle",
+        "Score",
+        "Clinical Remarks"
+      ],
+      "obstacles": [
+        {
+          "key": "vyadhi",
+          "label": "Vyadhi",
+          "meaning": "Disease or health issue of oneself or someone close, causing stress",
+          "score": null,
+          "clinical_remarks": ""
+        },
+        {
+          "key": "styana",
+          "label": "Styana",
+          "meaning": "Mental lethargy / stagnation (A feeling of dullness and not able to evolve ideas)",
+          "score": null,
+          "clinical_remarks": ""
+        },
+        {
+          "key": "samsaya",
+          "label": "Samsaya",
+          "meaning": "Doubt. Unable to trust the established doctrines and the remedies therein",
+          "score": null,
+          "clinical_remarks": ""
+        },
+        {
+          "key": "pramada",
+          "label": "Pramada",
+          "meaning": "Lack of enthusiasm. Inability to see things through despite starting at a high note",
+          "score": null,
+          "clinical_remarks": ""
+        },
+        {
+          "key": "alasya",
+          "label": "Alasya",
+          "meaning": "Lethargy / Laziness. Inability to stick to a plan of action; being indisciplined",
+          "score": null,
+          "clinical_remarks": ""
+        },
+        {
+          "key": "avirati",
+          "label": "Avirati",
+          "meaning": "Clinging to sensory pleasures. Finding meaning in sensory pleasures like looking good, sexual indulgence, social media addiction",
+          "score": null,
+          "clinical_remarks": ""
+        },
+        {
+          "key": "bhranti_darshana",
+          "label": "Bhranti Darshana",
+          "meaning": "False perception, over-thinking, jumping to conclusions",
+          "score": null,
+          "clinical_remarks": ""
+        },
+        {
+          "key": "alabdha_bhumikatva",
+          "label": "Alabdha Bhumikatva",
+          "meaning": "Inability to concentrate / focus. Repeatedly failing in attempts to concentrate on a task in hand; being easily swayed while working",
+          "score": null,
+          "clinical_remarks": ""
+        },
+        {
+          "key": "anavasthitatva",
+          "label": "Anavasthitatva",
+          "meaning": "Falling from an attained state. Inability to sustain a state of calm or a state of clarity",
+          "score": null,
+          "clinical_remarks": ""
+        }
+      ],
+      "associated_disturbances": {
+        "title": "Associated Disturbances or indications",
+        "table_columns": [
+          "Indications",
+          "Score"
+        ],
+        "items": [
+          {
+            "key": "dukha",
+            "label": "Dukha",
+            "meaning": "Sorrow, sadness, immense / intense sorrow",
+            "score": null
+          },
+          {
+            "key": "daurmanasya",
+            "label": "Daurmanasya",
+            "meaning": "Mentally depressed, feeling low",
+            "score": null
+          },
+          {
+            "key": "angamejayatva",
+            "label": "Angamejayatva",
+            "meaning": "Trembling / shivering of the body",
+            "score": null
+          },
+          {
+            "key": "svasa_prasvasa",
+            "label": "Svasa-Prasvasa",
+            "meaning": "Unstable / irregular breathing pattern",
+            "score": null
+          }
+        ]
+      },
+      "severity_index": {
+        "title": "Antarayas Severity Index",
+        "rules": [
+          {
+            "range": "0–20",
+            "severity": "Mild"
+          },
+          {
+            "range": "21–45",
+            "severity": "Moderate"
+          },
+          {
+            "range": "46+",
+            "severity": "Severe"
+          }
+        ],
+        "computed_from": "Sum of obstacle scores"
+      },
+      "top_3_dominant_obstacles": [
+        {
+          "rank": 1,
+          "value": ""
+        },
+        {
+          "rank": 2,
+          "value": ""
+        },
+        {
+          "rank": 3,
+          "value": ""
+        }
+      ]
+    }
+  ]
+}
+{
+  "form_meta": {
+    "form_id": "yogic_counselling_case_history_v1",
+    "form_name": "YOGIC COUNSELLING CASE HISTORY",
+    "version": "1.0",
+    "part": 3,
+    "part_title": "PANCHAKOSHA ASSESSMENT + SUMMARY SCORING PROFILE + GUNA & DOSHA OBSERVATION",
+    "coverage": [
+      "SECTION 6: PANCHAKOSHA ASSESSMENT",
+      "SECTION 7: SUMMARY SCORING PROFILE",
+      "SECTION 8: GUNA & DOSHA OBSERVATION (Therapist Use)"
+    ],
+    "accuracy_note": "Built directly from the provided source text with source order preserved and no intentional omissions."
+  },
+  "sections": [
+    {
+      "section_id": 6,
+      "section_title": "PANCHAKOSHA ASSESSMENT",
+      "instructions": {
+        "text": "Score 0–10 with the traits as you relate to them. 0 – no relation; 10 – absolutely agree"
+      },
+      "layers": [
+        {
+          "subsection_id": "6.1",
+          "layer_name": "Annamaya Kosha",
+          "layer_type": "Physical Layer",
+          "table_columns": ["Concern", "Score"],
+          "items": [
+            "Daily hassles or struggles giving fatigue / strain",
+            "Any significant illness or an accident related stress",
+            "A quarrel/ difference of opinion with someone is or can be a source of your stress",
+            "Pressure / competition",
+            "More reliance on look and appearance of oneself & others"
+          ],
+          "severity": ""
+        },
+        {
+          "subsection_id": "6.2",
+          "layer_name": "Pranamaya Kosha",
+          "layer_type": "Energy Layer",
+          "table_columns": ["Concern", "Score"],
+          "items": [
+            "Difficulty in calming oneself down or relaxing",
+            "Breathing related problems or irregular breathing (short breath, breathlessness etc)",
+            "Digestive system disturbances",
+            "Issues of pain / inflammation in the body",
+            "Disturbed sleep – insomnia, broken sleeping patterns, irregular sleeping pattern, stress impact on the sleep pattern"
+          ],
+          "severity": ""
+        },
+        {
+          "subsection_id": "6.3",
+          "layer_name": "Manomaya Kosha",
+          "layer_type": "Emotional Layer",
+          "table_columns": ["Concern", "Score"],
+          "items": [
+            "Non – creative aptitude/ reduced or sudden loss of creativity",
+            "Easily perturbed emotionally",
+            "Difficulty focusing/ concentrating. Easily swayed by thoughts",
+            "Tend to be too ambitious, competitive; tendency to be jealous",
+            "Difficulty in initiating friendships/ sustaining relationships in general; having issues in relationships"
+          ],
+          "severity": ""
+        },
+        {
+          "subsection_id": "6.4",
+          "layer_name": "Vijnanamaya Kosha",
+          "layer_type": "Wisdom Layer",
+          "table_columns": ["Concern", "Score"],
+          "items": [
+            "Lack of purpose or meaning in life. The point where the material earned is not giving the contentment you assumed it to; dwelling on the “what next”",
+            "Low self-worth, low self esteem",
+            "Dealing with trauma – trying to make sense of death, personal grudges etc.",
+            "Going through Moral dilemma – weighing the right and the wrong",
+            "Loss of enthusiasm"
+          ],
+          "severity": ""
+        },
+        {
+          "subsection_id": "6.5",
+          "layer_name": "Anandamaya Kosha",
+          "layer_type": "Bliss Layer",
+          "table_columns": ["Concern", "Score"],
+          "items": [
+            "Inability to feel joy or meaning in life.",
+            "Sense of void which is hard to fill. Not understanding sudden gust of sorrow.",
+            "Emotional numbness – not able to sense the feelings of oneself & other close ones.",
+            "Feeling disconnected within",
+            "Feeling unloved despite close connections/ family"
+          ],
+          "severity": ""
+        }
+      ]
+    },
+    {
+      "section_id": 7,
+      "section_title": "SUMMARY SCORING PROFILE",
+      "table_columns": [
+        "Kosha",
+        "Average Score",
+        "Severity"
+      ],
+      "rows": [
+        { "kosha": "Annamaya", "average_score": "", "severity": "" },
+        { "kosha": "Pranamaya", "average_score": "", "severity": "" },
+        { "kosha": "Manomaya", "average_score": "", "severity": "" },
+        { "kosha": "Vijnanamaya", "average_score": "", "severity": "" },
+        { "kosha": "Anandamaya", "average_score": "", "severity": "" }
+      ],
+      "severity_guide": [
+        { "range": "0–3", "severity": "Mild" },
+        { "range": "4–6", "severity": "Moderate" },
+        { "range": "7–10", "severity": "Severe" }
+      ],
+      "dominant_affected_layer": ""
+    },
+    {
+      "section_id": 8,
+      "section_title": "GUNA & DOSHA OBSERVATION",
+      "subtitle": "Therapist Use",
+      "fields": [
+        {
+          "key": "dominant_guna",
+          "label": "Dominant Guna",
+          "type": "checkbox_group",
+          "options": [
+            "Rajas",
+            "Tamas",
+            "Sattva Low"
+          ]
+        },
+        {
+          "key": "suspected_dosha_aggravation",
+          "label": "Suspected Dosha Aggravation",
+          "type": "checkbox_group",
+          "options": [
+            "Vata",
+            "Pitta",
+            "Kapha"
+          ]
+        },
+        {
+          "key": "primary_psycho_physiological_pattern",
+          "label": "Primary Psycho-Physiological Pattern",
+          "type": "textarea"
+        }
+      ]
+    }
+  ]
+}
+{
+  "form_meta": {
+    "form_id": "yogic_counselling_case_history_v1",
+    "form_name": "YOGIC COUNSELLING CASE HISTORY",
+    "version": "1.0",
+    "part": 4,
+    "part_title": "SECTION 9: VRITTI ASSESSMENT",
+    "coverage": [
+      "SECTION 9: VRITTI ASSESSMENT"
+    ],
+    "accuracy_note": "Structured directly from fully visible source text with all sections, statements, scales, and scoring interpretation preserved."
+  },
+  "sections": [
+    {
+      "section_id": 9,
+      "section_title": "VRITTI ASSESSMENT",
+      "instructions": {
+        "intro": "For each statement, rate how often it reflects your usual mental experience.",
+        "scale": [
+          { "score": 1, "label": "Never" },
+          { "score": 2, "label": "Rarely" },
+          { "score": 3, "label": "Sometimes" },
+          { "score": 4, "label": "Often" },
+          { "score": 5, "label": "Very Often" }
+        ]
+      },
+      "categories": [
+        {
+          "section_name": "Pramāṇa",
+          "subtitle": "Valid Cognition",
+          "description": "Knowledge derived from direct perception, inference, or reliable testimony.",
+          "items": [
+            "I tend to evaluate situations carefully before arriving at conclusions.",
+            "I am good at reading between the lines.",
+            "I prefer evidence and observation rather than assumptions.",
+            "I believe and rely upon in what I see/ experience as opposed to someone else’s descriptions.",
+            "When faced with a problem, I analyze facts logically.",
+            "I often rely on proper trusted sources or teachers for guidance.",
+            "I verify information before accepting it as true.",
+            "I trust old philosophy/ principles and believe them to be reliable.",
+            "I like to follow family traditions diligently."
+          ]
+        },
+        {
+          "section_name": "Viparyaya",
+          "subtitle": "Misperception",
+          "description": "Incorrect knowledge or misunderstanding of reality.",
+          "items": [
+            "I often realise later that my initial understanding of a situation was wrong.",
+            "I sometimes misinterpret others’ intentions or behaviour.",
+            "My fears or assumptions sometimes distort how I see reality.",
+            "I occasionally react emotionally before fully understanding a situation.",
+            "I often worry about things that later turn out not to be true.",
+            "I am often told that I tend to downplay or underestimate the situation.",
+            "I often fail to understand the greater hidden meaning."
+          ]
+        },
+        {
+          "section_name": "Vikalpa",
+          "subtitle": "Conceptual Construction / Imagination",
+          "description": "Thoughts based purely on words or imagination without actual referent.",
+          "items": [
+            "My mind frequently imagines hypothetical scenarios.",
+            "I tend to hastily add things to arrive at a conclusion.",
+            "I spend time thinking about possibilities that may never happen.",
+            "I often create mental stories about situations without verifying them.",
+            "I enjoy conceptual thinking, philosophy, or abstract ideas.",
+            "My thoughts sometimes wander into fantasies or speculation.",
+            "I like and apply metaphors in my conversations."
+          ]
+        },
+        {
+          "section_name": "Nidra",
+          "subtitle": "Sleep State",
+          "description": "A mental state characterized by absence of content yet still a mental modification.",
+          "items": [
+            "My sleep is deep and restorative.",
+            "I often feel mentally dull or heavy after waking up.",
+            "I sometimes drift into a semi-sleepy state during the day.",
+            "My mind tends to shut down when overwhelmed or stressed.",
+            "I experience difficulty staying mentally alert.",
+            "I rely on my dreams – feeling that they are messages from my subconscious self",
+            "I feel telepathic and tend to have premonitions"
+          ]
+        },
+        {
+          "section_name": "Smṛti",
+          "subtitle": "Memory",
+          "description": "Retention and recall of past experiences.",
+          "items": [
+            "Past experiences frequently influence my present reactions.",
+            "I often replay past events in my mind.",
+            "Pleasant memories frequently come to mind.",
+            "Unpleasant memories sometimes disturb my peace.",
+            "I rely on past experiences (good & bad) to guide my decisions of the present & future.",
+            "I feel stuck in some old event/ trauma/ times.",
+            "I carry the burden of old lost relationships",
+            "I am often found dwelling in old memories – good & bad",
+            "I like to reminisce and am often nostalgic."
+          ]
+        }
+      ],
+      "scoring_method": {
+        "instruction": "Add the scores for each section separately.",
+        "table_columns": [
+          "Vritti",
+          "Score Range",
+          "Interpretation"
+        ],
+        "rows": [
+          {
+            "vritti": "Pramana",
+            "score_range": "5–25",
+            "interpretation": "Higher score = rational, evidence-based cognition"
+          },
+          {
+            "vritti": "Viparyaya",
+            "score_range": "5–25",
+            "interpretation": "Higher score = tendency toward misperception"
+          },
+          {
+            "vritti": "Vikalpa",
+            "score_range": "5–25",
+            "interpretation": "Higher score = imaginative or speculative mind"
+          },
+          {
+            "vritti": "Nidra",
+            "score_range": "5–25",
+            "interpretation": "Higher score = strong influence of dullness/sleep patterns"
+          },
+          {
+            "vritti": "Smriti",
+            "score_range": "5–25",
+            "interpretation": "Higher score = memory-driven mental patterns"
+          }
+        ]
+      },
+      "case_formulation": {
+        "title": "CASE FORMULATION",
+        "fields": [
+          {
+            "key": "interconnection_between_antarayas_and_kosha_imbalance",
+            "label": "Interconnection between Antarayas & Kosha Imbalance",
+            "type": "textarea"
+          },
+          {
+            "key": "integrated_clinical_impression",
+            "label": "Integrated Clinical Impression",
+            "type": "textarea"
+          }
+        ]
+      },
+      "vritti_assessment_interpretation": [
+        "Dominant Pramāṇa → Analytical, grounded mind",
+        "Dominant Viparyaya → Cognitive distortions, anxiety tendencies",
+        "Dominant Vikalpa → Creative but distracted mind",
+        "Dominant Nidra → Tamas predominance, lethargy or mental dullness",
+        "Dominant Smṛti → Past conditioning strongly influencing behaviour"
+      ]
+    }
+  ]
+}
+{
+  "form_meta": {
+    "form_id": "yogic_counselling_case_history_v1",
+    "form_name": "YOGIC COUNSELLING CASE HISTORY",
+    "version": "1.0",
+    "part": 5,
+    "part_title": "SECTION 10: INTEGRATED TREATMENT PLAN",
+    "coverage": [
+      "SECTION 10: INTEGRATED TREATMENT PLAN"
+    ],
+    "accuracy_note": "Structured from the provided source text in original order. Includes all visible fields, tables, checklists, and protocol subsections."
+  },
+  "sections": [
+    {
+      "section_id": 10,
+      "section_title": "INTEGRATED TREATMENT PLAN",
+      "fields": [
+        {
+          "key": "therapy_goals_short_term",
+          "label": "Therapy Goals - Short-Term (2–4 weeks)",
+          "type": "textarea"
+        },
+        {
+          "key": "therapy_goals_long_term",
+          "label": "Therapy Goals - Long-Term (8–12 weeks)",
+          "type": "textarea"
+        }
+      ],
+      "subsections": [
+        {
+          "subsection_id": "10.1",
+          "title": "Mitahara (Appropriate suggested diet)",
+          "table_columns": [
+            "Time for the meal",
+            "Food content"
+          ],
+          "rows": [
+            { "time": "Early Morning", "food_content": "" },
+            { "time": "Breakfast", "food_content": "" },
+            { "time": "Mid morning", "food_content": "" },
+            { "time": "Lunch", "food_content": "" },
+            { "time": "Evening snack", "food_content": "" },
+            { "time": "Dinner", "food_content": "" }
+          ]
+        },
+        {
+          "subsection_id": "10.2",
+          "title": "Yamas & Niyamas to be applied",
+          "table_columns": [
+            "YAMAS: Means to apply the same",
+            "NIYAMAS: Means to apply the same"
+          ],
+          "rows": [
+            {
+              "yama": "Ahimsa/ Non – Violence",
+              "niyama": "Sauca/Cleanliness"
+            },
+            {
+              "yama": "Satya/ Truthfulness",
+              "niyama": "Santosha/Contentment"
+            },
+            {
+              "yama": "Asteya/ Non-stealing",
+              "niyama": "Tapas/Mortification"
+            },
+            {
+              "yama": "Brahmacharya/ Celibacy",
+              "niyama": "Svadhyaya/ Self-study"
+            },
+            {
+              "yama": "Aparigraha/ Non-receiving",
+              "niyama": "Isvara Pranidhanani/ Surrender"
+            }
+          ]
+        },
+        {
+          "subsection_id": "10.3",
+          "title": "Mental Discipline Planning",
+          "fields": [
+            {
+              "key": "identifying_dominant_vrittis",
+              "label": "Identifying the dominant Vritti(s)",
+              "type": "textarea"
+            },
+            {
+              "key": "drafting_course_of_abhyasa",
+              "label": "Drafting the course of Abhyasa",
+              "type": "textarea"
+            },
+            {
+              "key": "ek_tattva_abhyasa",
+              "label": "Ek Tattva Abhyasa – Single task to be assigned to practice consistently",
+              "type": "textarea"
+            },
+            {
+              "key": "citta_vikshepa",
+              "label": "Citta vikshepa – Cultivation of contrary thoughts",
+              "type": "textarea"
+            },
+            {
+              "key": "prescribed_protocol",
+              "label": "Prescribed Protocol",
+              "type": "textarea"
+            }
+          ]
+        },
+        {
+          "subsection_id": "10.4",
+          "title": "Lifestyle Prescription",
+          "fields": [
+            {
+              "key": "dinacharya",
+              "label": "Dinacharya – adapting a new routine",
+              "type": "textarea"
+            },
+            {
+              "key": "identification_of_triggers_patterns",
+              "label": "Identification of triggers/ patterns",
+              "type": "textarea"
+            },
+            {
+              "key": "self_education",
+              "label": "Self – education; understanding the concepts of the Self from Yoga philosophy",
+              "type": "textarea"
+            },
+            {
+              "key": "changing_narrative",
+              "label": "Changing the narrative of the situation",
+              "type": "textarea"
+            },
+            {
+              "key": "alternative_views",
+              "label": "Discussion on the alternative views – an out-of-the-box perspective of the problem",
+              "type": "textarea"
+            },
+            {
+              "key": "recognising_trauma",
+              "label": "Recognising the trauma from the past, the reasons for carrying the same & steps to dissociate from the same",
+              "type": "textarea"
+            },
+            {
+              "key": "cultivation_of_activities_habits",
+              "label": "Cultivation of activities/ habits",
+              "type": "textarea"
+            },
+            {
+              "key": "course_correction",
+              "label": "Course correction",
+              "type": "textarea"
+            },
+            {
+              "key": "session_frequency",
+              "label": "Session Frequency",
+              "type": "checkbox_group",
+              "options": [
+                "Weekly",
+                "Biweekly",
+                "Monthly"
+              ]
+            },
+            {
+              "key": "review_date",
+              "label": "Review Date",
+              "type": "date"
+            }
+          ]
+        },
+        {
+          "subsection_id": "10.5",
+          "title": "Practice protocol - SHAT KARMA Protocol",
+          "table_columns": [
+            "Shat karma",
+            "Duration & frequency"
+          ],
+          "rows": [
+            {
+              "practice": "Neti – Jal Neti, Sutra Neti",
+              "duration_frequency": ""
+            },
+            {
+              "practice": "Nauli/ Agnisara",
+              "duration_frequency": ""
+            },
+            {
+              "practice": "Dhauti",
+              "duration_frequency": ""
+            },
+            {
+              "practice": "Trataka",
+              "duration_frequency": ""
+            },
+            {
+              "practice": "Kapalabhati",
+              "duration_frequency": ""
+            },
+            {
+              "practice": "Basti",
+              "duration_frequency": ""
+            }
+          ]
+        },
+        {
+          "subsection_id": "10.6",
+          "title": "ASANA PROTOCOL",
+          "fields": [
+            {
+              "key": "warm_up_sequence",
+              "label": "Warm Up sequence",
+              "type": "textarea"
+            },
+            {
+              "key": "surya_namaskaar",
+              "label": "Surya Namaskaar: Duration & frequency",
+              "type": "textarea"
+            },
+            {
+              "key": "suksma_vyayama",
+              "label": "Suksma Vyayama: Joint mobility practices",
+              "type": "textarea"
+            },
+            {
+              "key": "sthula_vyayama",
+              "label": "Sthula Vyayama: Warm up practice",
+              "type": "textarea"
+            }
+          ],
+          "asana_table_columns": [
+            "Suggested Asanas",
+            "Breathing pattern",
+            "Benefits to be achieved"
+          ],
+          "asana_rows": [
+            {
+              "suggested_asanas": "",
+              "breathing_pattern": "",
+              "benefits_to_be_achieved": ""
+            },
+            {
+              "suggested_asanas": "",
+              "breathing_pattern": "",
+              "benefits_to_be_achieved": ""
+            },
+            {
+              "suggested_asanas": "",
+              "breathing_pattern": "",
+              "benefits_to_be_achieved": ""
+            }
+          ]
+        },
+        {
+          "subsection_id": "10.7",
+          "title": "CHECKLIST BEFORE STARTING ASANAS",
+          "items": [
+            "The yogic practices should be performed in the morning or in the evening.",
+            "In the morning it is better to do asanas after bathing but before breakfast, in any case.",
+            "Women should never do asanas or vigorous practices during the menstrual phase. Only a few pranayamas & dhyana can be done around this time.",
+            "Women should take care, that during pregnancy only specialized Prenatal – Yoga practice is done by them.",
+            "It is best to practice under the guidance of a trained instructor/ therapist.",
+            "If you wish to practice the yogic practices in the evening, the best time is atleast 45 minutes before the evening meal.",
+            "Before you begin, it is better to wash the mouth and attend to your body functions.",
+            "Bathing is not recommended immediately after yogic practices. It is preferred to being the practice after a shower.",
+            "Pranayama should follow the asanas and meditation should follow the pranayama.",
+            "Usually asanas are practised only once a day.",
+            "Dress should be loose to allow free movement of the limbs.",
+            "The ideal way to start yogic practice is to spread a blanket on the floor, sit facing east or north in the morning, west or north in the evening",
+            "Start with a minute of silent prayer, open your eyes and start the yogic practices in the sequence.",
+            "Movements leading to Yoga postures should be slow in every case. Sudden movements should be avoided.",
+            "Make sure that you mention explicitly about any surgeries that you’ve been through before beginning the practices",
+            "Ulcers, cervical spondylolysis patients should take care during forward bends.",
+            "If you feel that you can’t bend a particular part of the body, then do not force yourself. Bend to the extent you can and when you begin to feel the strain, remain in that position, without trying to bend any further.",
+            "After drinking any liquid, wait for half an hour before beginning the asanas.",
+            "If light breakfast is taken then wait for 2 hours.",
+            "If a full meal is taken then wait for atleast 4 hours.",
+            "During the time period you are learning yoga, try & follow a sattvic diet, or a diet prescribed by your respective therapist, based on your body type."
+          ]
+        },
+        {
+          "subsection_id": "10.8",
+          "title": "PRANAYAMA PROTOCOL",
+          "table_columns": [
+            "Prescribed Pranayama Practice",
+            "Ratio of Inhalation & Exhalation & retention",
+            "Duration of each Pranayama & Frequency of the Practice"
+          ],
+          "rows": [
+            {
+              "prescribed_pranayama_practice": "",
+              "ratio": "",
+              "duration_frequency": ""
+            },
+            {
+              "prescribed_pranayama_practice": "",
+              "ratio": "",
+              "duration_frequency": ""
+            },
+            {
+              "prescribed_pranayama_practice": "",
+              "ratio": "",
+              "duration_frequency": ""
+            },
+            {
+              "prescribed_pranayama_practice": "",
+              "ratio": "",
+              "duration_frequency": ""
+            }
+          ]
+        },
+        {
+          "subsection_id": "10.9",
+          "title": "MUDRAS & BANDHAS",
+          "table_columns": [
+            "Mudras for therapy",
+            "Bandhas"
+          ],
+          "rows": [
+            {
+              "mudras_for_therapy": [
+                "Viparit Karni Mudra",
+                "Mahamudra",
+                "Ashwini Mudra",
+                "Vajroli mudra",
+                "Shanmukhi Mudra"
+              ],
+              "bandhas": [
+                "Moola bandha",
+                "Uddiyana bandha",
+                "Jalandhara bandha",
+                "Mahabandha"
+              ]
+            }
+          ]
+        },
+        {
+          "subsection_id": "10.10",
+          "title": "RELAXATION",
+          "fields": [
+            {
+              "key": "relaxation_methods",
+              "label": "Methods",
+              "type": "checkbox_group",
+              "options": [
+                "Shavasana",
+                "Yoga Nidra",
+                "Guided Relaxation"
+              ]
+            },
+            {
+              "key": "relaxation_duration",
+              "label": "Duration",
+              "type": "text"
+            }
+          ]
+        },
+        {
+          "subsection_id": "10.11",
+          "title": "MEDITATION",
+          "fields": [
+            {
+              "key": "meditation_techniques",
+              "label": "Technique(s) to be used",
+              "type": "textarea"
+            },
+            {
+              "key": "meditation_duration",
+              "label": "Duration",
+              "type": "text"
+            }
+          ]
+        },
+        {
+          "subsection_id": "10.12",
+          "title": "SESSION PROGRESS REPORT",
+          "table_columns": [
+            "Date",
+            "Session No.",
+            "Issues/ Complaints",
+            "Practices Taught & Effect"
+          ],
+          "rows": [
+            {
+              "date": "",
+              "session_no": "",
+              "issues_complaints": "",
+              "practices_taught_effect": ""
+            },
+            {
+              "date": "",
+              "session_no": "",
+              "issues_complaints": "",
+              "practices_taught_effect": ""
+            },
+            {
+              "date": "",
+              "session_no": "",
+              "issues_complaints": "",
+              "practices_taught_effect": ""
+            },
+            {
+              "date": "",
+              "session_no": "",
+              "issues_complaints": "",
+              "practices_taught_effect": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+{
+  "form_meta": {
+    "form_id": "yogic_counselling_case_history_v1",
+    "form_name": "YOGIC COUNSELLING CASE HISTORY",
+    "version": "1.0",
+    "part": 6,
+    "part_title": "SECTION 11–13: PROGRESS NOTES, OUTCOME MEASURES, DISCHARGE / CONTINUATION SUMMARY",
+    "coverage": [
+      "SECTION 11: SESSION-WISE PROGRESS NOTES (SOAP FORMAT)",
+      "SECTION 12: OUTCOME MEASURES",
+      "SECTION 13: DISCHARGE / CONTINUATION SUMMARY"
+    ],
+    "accuracy_note": "Built directly from fully visible source text. All fields preserved in source order."
+  },
+  "sections": [
+    {
+      "section_id": 11,
+      "section_title": "SESSION-WISE PROGRESS NOTES",
+      "subtitle": "SOAP FORMAT",
+      "subsections": [
+        {
+          "key": "subjective",
+          "label": "S – Subjective",
+          "fields": [
+            {
+              "key": "patient_reports",
+              "label": "Patient reports",
+              "type": "textarea"
+            }
+          ]
+        },
+        {
+          "key": "objective",
+          "label": "O – Objective",
+          "fields": [
+            {
+              "key": "observed_posture_breath_affect",
+              "label": "Observed posture, breath, affect",
+              "type": "textarea"
+            }
+          ]
+        },
+        {
+          "key": "assessment",
+          "label": "A – Assessment",
+          "fields": [
+            {
+              "key": "change_in_stress_score",
+              "label": "Change in stress score",
+              "type": "text"
+            },
+            {
+              "key": "change_in_kosha_dominance",
+              "label": "Change in kosha dominance",
+              "type": "text"
+            },
+            {
+              "key": "clarity_of_purpose",
+              "label": "Clarity of purpose",
+              "type": "checkbox_group",
+              "options": [
+                "Improved",
+                "Same",
+                "Reduced"
+              ]
+            }
+          ]
+        },
+        {
+          "key": "plan",
+          "label": "P – Plan",
+          "fields": [
+            {
+              "key": "next_session_modification",
+              "label": "Next session modification",
+              "type": "textarea"
+            }
+          ]
+        }
+      ],
+      "signoff": [
+        {
+          "key": "practitioner_signature",
+          "label": "Practitioner Signature",
+          "type": "signature"
+        },
+        {
+          "key": "date",
+          "label": "Date",
+          "type": "date"
+        }
+      ]
+    },
+    {
+      "section_id": 12,
+      "section_title": "OUTCOME MEASURES",
+      "fields": [
+        {
+          "key": "initial_stress_score",
+          "label": "Initial Stress Score",
+          "type": "text"
+        },
+        {
+          "key": "current_stress_score",
+          "label": "Current Stress Score",
+          "type": "text"
+        },
+        {
+          "key": "improvement",
+          "label": "Improvement",
+          "type": "checkbox_group",
+          "options": [
+            ">50%",
+            "25–50%",
+            "<25%",
+            "No change"
+          ]
+        },
+        {
+          "key": "kosha_improvement",
+          "label": "Kosha Improvement",
+          "type": "checkbox_group",
+          "options": [
+            "Annamaya",
+            "Pranamaya",
+            "Manomaya",
+            "Vijnanamaya",
+            "Anandamaya",
+            "Clarity of purpose improved"
+          ]
+        }
+      ]
+    },
+    {
+      "section_id": 13,
+      "section_title": "DISCHARGE / CONTINUATION SUMMARY",
+      "fields": [
+        {
+          "key": "reason",
+          "label": "Reason",
+          "type": "checkbox_group",
+          "options": [
+            "Goals achieved",
+            "Referred",
+            "Discontinued",
+            "Non-compliance"
+          ]
+        },
+        {
+          "key": "final_clinical_summary",
+          "label": "Final Clinical Summary",
+          "type": "textarea"
+        },
+        {
+          "key": "practitioner_signature",
+          "label": "Practitioner Signature",
+          "type": "signature"
+        },
+        {
+          "key": "date",
+          "label": "Date",
+          "type": "date"
+        }
+      ]
+    }
+  ]
+}

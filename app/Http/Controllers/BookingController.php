@@ -179,6 +179,14 @@ class BookingController extends Controller
             if ($coinsUsed > 0) {
                 $user->coins = max(0, $user->coins - $coinsUsed);
                 $user->save();
+
+                \App\Models\CoinTransaction::create([
+                    'user_id' => $user->id,
+                    'amount' => -$coinsUsed,
+                    'type' => 'debit',
+                    'description' => 'Used for booking ' . $booking->invoice_no,
+                    'metadata' => ['booking_id' => $booking->id, 'invoice_no' => $booking->invoice_no]
+                ]);
             }
 
             // Increment Promo Usage
@@ -394,6 +402,14 @@ class BookingController extends Controller
             if ($user) {
                 $user->coins = max(0, $user->coins - $booking->coins_used);
                 $user->save();
+
+                \App\Models\CoinTransaction::create([
+                    'user_id' => $user->id,
+                    'amount' => -$booking->coins_used,
+                    'type' => 'debit',
+                    'description' => 'Used for booking ' . $booking->invoice_no,
+                    'metadata' => ['booking_id' => $booking->id, 'invoice_no' => $booking->invoice_no]
+                ]);
             }
         }
 
