@@ -57,7 +57,11 @@
                                             {{ $booking->practitioner->user->name ?? 'Practitioner' }}
                                         </div>
                                         <div class="text-xs text-gray-400">
-                                            {{ $booking->practitioner->specialization ?? 'Specialist' }}
+                                            @if(is_array($booking->practitioner->specialization))
+                                                {{ implode(', ', array_map(fn($s) => str_replace('_', ' ', ucfirst($s)), $booking->practitioner->specialization)) }}
+                                            @else
+                                                {{ $booking->practitioner->specialization ?? 'Specialist' }}
+                                            @endif
                                         </div>
                                     </div>
                                 @else

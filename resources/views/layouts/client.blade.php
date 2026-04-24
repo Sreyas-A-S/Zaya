@@ -293,11 +293,11 @@
                         <div class="relative">
                             <div onclick="toggleBalance('mobile')"
                                 class="w-10 h-10 rounded-full bg-[#FFD166] flex items-center justify-center text-white relative shadow-sm cursor-pointer hover:bg-yellow-400 transition-colors">
-                                <span class="font-bold text-lg text-yellow-100">€</span>
+                                <span class="font-bold text-lg text-yellow-100">{{ get_currency_symbol(derive_currency_from_user($user)) }}</span>
                                 <div class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></div>
                             </div>
                             
-                            <div id="balance-dropdown-mobile" class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 hidden overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                            <div id="balance-dropdown-mobile" class="fixed top-[70px] left-[16px] w-[calc(100vw-32px)] z-[100] bg-white rounded-2xl shadow-2xl border border-gray-100 hidden overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                                 <div class="p-5 border-b border-gray-50 bg-[#FDFEF3]">
                                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Your Wellness Tokens</p>
                                     <h4 class="text-2xl font-black text-secondary tracking-tight">{{ number_format($user->coins ?? 0) }} <span class="text-xs uppercase">Zaya Coins</span></h4>
