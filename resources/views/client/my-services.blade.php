@@ -265,12 +265,15 @@
 
             @if($nextOnlineBooking && $reminderLogs->isNotEmpty())
             <div class="mt-6 pt-6 border-t border-gray-100">
-                <p class="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em] mb-4">Reminder Delivery Status</p>
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-[10px] font-black text-secondary/40 uppercase tracking-[0.2em]">Reminder Delivery Status</p>
+                    <a href="#" class="text-[10px] font-black text-secondary hover:text-primary uppercase tracking-widest transition-all">View All History</a>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @foreach($reminderLogs as $log)
-                    <div class="flex items-center justify-between p-4 {{ $log->status === 'success' ? 'bg-emerald-50/50 border-emerald-100' : 'bg-red-50/50 border-red-100' }} border rounded-2xl">
+                    <div class="flex items-center justify-between p-4 {{ $log->status === 'success' ? 'bg-emerald-50/50 border-emerald-100' : 'bg-red-50/50 border-red-100' }} border rounded-2xl transition-all hover:shadow-md group relative">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full {{ $log->status === 'success' ? 'bg-emerald-500' : 'bg-red-500' }} flex items-center justify-center text-white">
+                            <div class="w-8 h-8 rounded-full {{ $log->status === 'success' ? 'bg-emerald-500' : 'bg-red-500' }} flex items-center justify-center text-white shadow-sm">
                                 <i class="{{ $log->status === 'success' ? 'ri-check-line' : 'ri-error-warning-line' }}"></i>
                             </div>
                             <div>
@@ -278,12 +281,23 @@
                                 <p class="text-[9px] text-gray-500 font-medium">{{ $log->created_at->format('M d, H:i') }}</p>
                             </div>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right flex flex-col items-end">
                             <span class="text-[9px] font-black uppercase tracking-widest {{ $log->status === 'success' ? 'text-emerald-600' : 'text-red-600' }}">
                                 {{ strtoupper($log->status) }}
                             </span>
                             @if($log->status === 'error')
-                            <p class="text-[9px] text-red-400 font-bold max-w-[120px] truncate" title="{{ $log->error_message }}">{{ $log->error_message }}</p>
+                                <div class="flex items-center gap-1 mt-0.5">
+                                    <p class="text-[9px] text-red-400 font-bold max-w-[80px] truncate">{{ $log->error_message }}</p>
+                                    <button type="button" class="text-red-400 hover:text-red-600" title="{{ $log->error_message }}">
+                                        <i class="ri-information-line text-xs"></i>
+                                    </button>
+                                </div>
+                                <!-- Custom Tooltip for Error -->
+                                <div class="absolute bottom-full right-0 mb-2 w-64 p-3 bg-red-600 text-white text-[10px] rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 shadow-xl font-medium leading-relaxed">
+                                    <div class="font-black uppercase tracking-widest mb-1 text-[8px] opacity-80">Reason for Failure:</div>
+                                    {{ $log->error_message }}
+                                    <div class="absolute top-full right-4 w-2 h-2 bg-red-600 rotate-45 -translate-y-1"></div>
+                                </div>
                             @endif
                         </div>
                     </div>

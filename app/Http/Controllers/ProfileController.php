@@ -1454,7 +1454,7 @@ class ProfileController extends Controller
         $apiKey = trim((string) config('services.daily.api_key'));
         if ($apiKey === '') return null;
 
-        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'], true);
+        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist', 'translator'], true);
 
         try {
             $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
@@ -1510,7 +1510,7 @@ class ProfileController extends Controller
         }
 
         $now = now()->getTimestamp();
-        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'], true);
+        $isModerator = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist', 'translator'], true);
 
         $payload = [
             'aud' => 'jitsi',
