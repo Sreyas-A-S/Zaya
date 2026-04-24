@@ -75,7 +75,25 @@ class PromoCodeController extends Controller
                     return ($symbol ?: '$') . ' ' . $row->reward;
                 })
                 ->editColumn('expiry_date', function($row) {
-                    return $row->expiry_date ? $row->expiry_date->format('Y-m-d') : 'N/A';
+                    if (!$row->expiry_date) {
+                        return 'N/A';
+                    }
+
+                    $expiryDate = $row->expiry_date->startOfDay();
+                    $today = now()->startOfDay();
+                    $tomorrow = now()->addDay()->startOfDay();
+
+                    $dateStr = $row->expiry_date->format('Y-m-d');
+
+                    if ($expiryDate->lt($today)) {
+                        return '<span class="badge bg-light-danger text-danger">' . $dateStr . ' (Expired)</span>';
+                    } elseif ($expiryDate->eq($today)) {
+                        return '<span class="badge bg-light-warning text-warning">' . $dateStr . ' (Today)</span>';
+                    } elseif ($expiryDate->eq($tomorrow)) {
+                        return '<span class="badge bg-light-info text-info">' . $dateStr . ' (Tomorrow)</span>';
+                    }
+
+                    return $dateStr;
                 })
                 ->editColumn('created_at', function($row) {
                     return $row->created_at ? $row->created_at->format('Y-m-d') : 'N/A';
@@ -92,7 +110,7 @@ class PromoCodeController extends Controller
                     
                     return '<span class="badge ' . $badgeClass . ' cursor-pointer" onclick="updateStatus('.$row->id.', '.($row->status ? 0 : 1).')" style="cursor: pointer;">' . $statusText . '</span>';
                 })
-                ->rawColumns(['action', 'status', 'reward'])
+                ->rawColumns(['action', 'status', 'reward', 'expiry_date'])
                 ->make(true);
         }
 

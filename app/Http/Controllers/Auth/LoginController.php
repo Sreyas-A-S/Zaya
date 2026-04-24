@@ -164,7 +164,17 @@ class LoginController extends Controller
         }
 
         if ($request->has('redirect')) {
-            return redirect($request->redirect);
+            $redirectUrl = $request->redirect;
+            
+            // Check if redirecting to booking page
+            if (str_contains($redirectUrl, '/book-session')) {
+                $clientRoles = ['client', 'patient'];
+                if (!in_array(strtolower($user->role), $clientRoles)) {
+                    return redirect()->route('dashboard')->with('warning', 'Booking a session requires a client account. Your current account type does not support this action.');
+                }
+            }
+
+            return redirect($redirectUrl);
         }
 
         return redirect()->route('dashboard');

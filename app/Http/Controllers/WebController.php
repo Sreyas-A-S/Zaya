@@ -1167,6 +1167,14 @@ class WebController extends Controller
 
     public function bookSession(Request $request, $practitioner = null)
     {
+        if (auth()->check()) {
+            $user = auth()->user();
+            $clientRoles = ['client', 'patient'];
+            if (!in_array(strtolower($user->role), $clientRoles)) {
+                return redirect()->route('dashboard')->with('warning', 'Booking a session requires a client account. Your current account type does not support this action.');
+            }
+        }
+
         if ($request->has('service') && trim((string) $request->query('service')) === '') {
             $queryParams = $request->query();
             unset($queryParams['service']);

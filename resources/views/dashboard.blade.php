@@ -184,8 +184,10 @@
                         <p class="text-sm font-normal text-gray-800 mb-0.5">{{ __($site_settings['client_panel_invoice_hash'] ?? 'Invoice #') }}{{ $invoice->invoice_no }}</p>
                         <p class="text-xs text-gray-400">{{ $invoice->created_at->format('M d, Y') }}</p>
                     </div>
+                    @if($invoice->invoice_no)
                     <a href="{{ route('invoice.show', $invoice->invoice_no) }}" target="_blank"
                         class="px-3 py-1 bg-[#EEF2EF] text-[#2B4C3B] text-sm font-normal rounded-full" data-i18n="{{ $site_settings['client_panel_open_invoice'] ?? 'Open' }}">{{ __($site_settings['client_panel_open_invoice'] ?? 'Open') }}</a>
+                    @endif
                 </div>
                 @empty
                 <p id="client_panel_no_recent_invoices" class="text-center text-gray-500 text-xs py-4" data-i18n="{{ $site_settings['client_panel_no_recent_invoices'] ?? 'No recent invoices.' }}">{{ __($site_settings['client_panel_no_recent_invoices'] ?? 'No recent invoices.') }}</p>

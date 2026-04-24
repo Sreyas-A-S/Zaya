@@ -24,7 +24,6 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/bookings/{id}/consultation-form', [ProfileController::class, 'showConsultationForm'])->name('bookings.consultation-form.show');
     Route::post('/bookings/{id}/consultation-form', [ProfileController::class, 'storeConsultationForm'])->name('bookings.consultation-form.store');
     Route::get('/agora/token', [ProfileController::class, 'generateToken'])->name('agora.token');
-    Route::get('/invoice/{invoice_no}', [InvoiceController::class, 'show'])->name('invoice.show');
     Route::get('/bookings/{id}/details', [ProfileController::class, 'showDetails'])->name('bookings.details');
     Route::get('/bookings/{id}/details-view', [ProfileController::class, 'showDetailsView'])->name('bookings.details-view');
 
