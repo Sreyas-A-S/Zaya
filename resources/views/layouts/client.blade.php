@@ -348,7 +348,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-wrap gap-y-4 justify-center lg:justify-start text-center lg:text-left items-center gap-8">
+                <div class="flex flex-wrap gap-y-4 justify-center lg:justify-start text-center lg:text-left items-center gap-8 {{ request()->routeIs('profile') ? 'hidden lg:flex' : '' }}">
                     <img src="{{ $user->profile_pic_url }}" alt="Profile"
                         class="w-25 lg:w-20 h-25 lg:h-20 rounded-full object-cover p-1 bg-white">
                     <div>
@@ -368,7 +368,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-center lg:justify-end items-center flex-wrap gap-y-4 space-x-4">
+                <div class="flex justify-center lg:justify-end items-center flex-wrap gap-y-4 space-x-4 {{ request()->routeIs('profile') ? 'hidden lg:flex' : '' }}">
                     @php
                         $isClient = $user->role === 'client' || $user->role === 'patient';
                     @endphp
