@@ -72,7 +72,7 @@
             </div>
         </div>
             <div data-tab-panel="complaints" class="consultation-tab-panel space-y-6 is-active" id="tab-complaints">
-                <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 overflow-x-auto">
+                <section data-repeat-section="presenting_complaints" class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 overflow-x-auto">
                     <h2 class="text-lg font-semibold text-secondary mb-3">Presenting Complaints</h2>
                     <table class="w-full text-sm">
                         <thead>
@@ -80,18 +80,39 @@
                                 <th class="text-left p-2">Complaint</th>
                                 <th class="text-left p-2">Duration</th>
                                 <th class="text-left p-2">Detailed History</th>
+                                <th class="text-left p-2"></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody data-repeat-body="presenting_complaints">
                             @foreach($presentingComplaints as $index => $row)
-                            <tr>
+                            <tr data-repeat-row data-row-index="{{ $index }}">
                                 <td class="p-2"><input class="w-full border rounded px-3 py-2" name="presenting_complaints[{{ $index }}][complaint]" value="{{ $row['complaint'] }}" placeholder="Complaint" @readonly(!$canEdit)></td>
                                 <td class="p-2"><input class="w-full border rounded px-3 py-2" name="presenting_complaints[{{ $index }}][duration]" value="{{ $row['duration'] }}" placeholder="Duration" @readonly(!$canEdit)></td>
                                 <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="presenting_complaints[{{ $index }}][detailed_history]" placeholder="Onset, progression, previous treatments" @readonly(!$canEdit)>{{ $row['detailed_history'] }}</textarea></td>
+                                <td class="p-2">
+                                    @if($canEdit)
+                                    <button type="button" class="text-xs font-semibold text-red-600" data-repeat-remove="presenting_complaints">Remove</button>
+                                    @endif
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
+                    @if($canEdit)
+                    <button type="button" data-repeat-add="presenting_complaints" class="text-sm font-semibold text-secondary hover:text-primary">
+                        <i class="ri-add-line"></i> Add complaint
+                    </button>
+                    @endif
+                    <template data-repeat-template="presenting_complaints">
+                        <tr data-repeat-row data-row-index="__INDEX__">
+                            <td class="p-2"><input class="w-full border rounded px-3 py-2" name="presenting_complaints[__INDEX__][complaint]" placeholder="Complaint"></td>
+                            <td class="p-2"><input class="w-full border rounded px-3 py-2" name="presenting_complaints[__INDEX__][duration]" placeholder="Duration"></td>
+                            <td class="p-2"><textarea class="w-full border rounded px-3 py-2" rows="2" name="presenting_complaints[__INDEX__][detailed_history]" placeholder="Onset, progression, previous treatments"></textarea></td>
+                            <td class="p-2">
+                                <button type="button" class="text-xs font-semibold text-red-600" data-repeat-remove="presenting_complaints">Remove</button>
+                            </td>
+                        </tr>
+                    </template>
                 </section>
 
                 <section data-repeat-section="past_medical_history" class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3 overflow-x-auto">
