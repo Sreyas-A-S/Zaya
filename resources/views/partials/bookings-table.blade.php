@@ -80,8 +80,19 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                                $sessions = $booking->additional_info['sessions'] ?? [];
+                                $uniqueTimes = collect($sessions)->pluck('time')->unique()->filter(fn($t) => !empty($t) && $t !== 'Time');
+                                $uniqueDates = collect($sessions)->pluck('day')->unique()->filter(fn($d) => !empty($d) && $d !== 'Day');
+                                $hasMultiple = $uniqueTimes->count() > 1 || $uniqueDates->count() > 1;
+                            @endphp
                             <div class="text-sm text-secondary">{{ $booking->booking_date->format('M d, Y') }}</div>
-                            <div class="text-xs text-gray-400">{{ $booking->booking_time }}</div>
+                            <div class="text-xs text-gray-400 flex items-center gap-1">
+                                {{ $booking->booking_time }}
+                                @if($hasMultiple)
+                                    <span class="bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded text-[9px] font-bold border border-amber-100">+ More</span>
+                                @endif
+                            </div>
                         </td>
                         <td class="px-6 py-4">
                             <span class="px-3 py-1 inline-flex text-[10px] leading-5 font-bold rounded-full uppercase {{ $booking->mode === 'online' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600' }}">
