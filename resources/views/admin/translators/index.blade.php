@@ -246,12 +246,11 @@
                                             <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">State <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control validate-char-limit validate-format" name="state" required placeholder="State" maxlength="100" data-max="100" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed">
+                                            <label class="form-label">State</label>
+                                            <input type="text" class="form-control validate-char-limit validate-format" name="state" placeholder="State" maxlength="100" data-max="100" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                             <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
-                                        </div>
-                                        <div class="col-md-6">
+                                        </div>                                        <div class="col-md-6">
                                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control validate-char-limit" name="zip_code" required placeholder="Enter Zipcode"
                                                 maxlength="10" data-max="10" pattern="^[0-9]{5,10}$" title="Enter valid zip code (5-10 digits)"
@@ -471,13 +470,13 @@
                                             <div id="current-gov_id_upload" class="mt-1 d-none small"></div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">PAN Number</label>
+                                            <label class="form-label">PAN Number (Optional)</label>
                                             <input class="form-control" type="text" name="pan_number"
                                                 pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
                                                 title="Enter valid PAN Number (Example: ABCDE1234F)"
                                                 maxlength="10"
                                                 style="text-transform:uppercase;"
-                                                oninput="this.value = this.value.toUpperCase()" required>
+                                                oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Bank Holder Name <span class="text-danger">*</span></label>

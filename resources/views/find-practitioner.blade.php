@@ -43,14 +43,14 @@
                         maxlength="6"
                         oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
                         placeholder="{{ $settings['find_practitioner_pincode_placeholder'] ?? 'Enter Zipcode' }}"
-                        value="{{ session('global_zipcode', session('global_pincode')) }}"
-                        {{ session('global_zipcode', session('global_pincode')) ? 'readonly' : '' }}
+                        value="{{ session('global_zipcode') }}"
+                        {{ session('global_zipcode') ? 'readonly' : '' }}
                         class="w-full border border-[#db8871] rounded-full px-6 py-3.5 pr-12 text-base md:text-lg text-[#db8871] placeholder-[#db8871] focus:outline-none bg-white transition-colors">
-                    <button id="find-practitioner-zipcode-btn" style="{{ session('global_zipcode', session('global_pincode')) ? 'display:none;' : '' }}"
+                    <button id="find-practitioner-zipcode-btn" style="{{ session('global_zipcode') ? 'display:none;' : '' }}"
                         class="absolute right-[10px] top-1/2 -translate-y-1/2 w-10 h-10 bg-[#F39551] rounded-full flex items-center justify-center hover:opacity-90 transition-all cursor-pointer border-none outline-none">
                         <i class="ri-search-line text-white text-lg"></i>
                     </button>
-                    <button id="find-practitioner-zipcode-delete" style="{{ session('global_zipcode', session('global_pincode')) ? '' : 'display:none;' }}"
+                    <button id="find-practitioner-zipcode-delete" style="{{ session('global_zipcode') ? '' : 'display:none;' }}"
                         class="absolute right-[10px] top-1/2 -translate-y-1/2 w-10 h-10 bg-[#F39551] rounded-full flex items-center justify-center hover:opacity-90 transition-all cursor-pointer border-none outline-none">
                         <i class="ri-delete-bin-line text-white text-lg"></i>
                     </button>

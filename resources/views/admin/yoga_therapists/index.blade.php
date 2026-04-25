@@ -270,18 +270,16 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
                                 <!-- State -->
                                 <div class="col-md-6">
-                                <label class="form-label">State <span class="text-danger">*</span></label>
+                                <label class="form-label">State</label>
                                 <input type="text"
                                 class="form-control validate-char-limit"
                                 name="state"
-                                required
                                 maxlength="100"
                                 data-max="100"
                                 pattern="^[A-Za-z\s]{2,100}$"
                                 title="State should contain only letters">
                                 <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                 </div>
-
                                 <!-- Zip Code -->
                                 <div class="col-md-6">
                                 <label class="form-label">Zip Code <span class="text-danger">*</span></label>
@@ -538,7 +536,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         <div id="current-gov_id_upload" class="mt-1 d-none small"></div>
                     </div>
                     <div class="col-md-12">
-                        <label class="form-label">PAN Number</label>
+                        <label class="form-label">PAN Number (Optional)</label>
                         <input class="form-control" type="text" name="pan_number" 
                             pattern="^[A-Z]{5}[0-9]{4}[A-Z]{1}$" 
                             title="Enter valid PAN (Example: ABCDE1234F)"

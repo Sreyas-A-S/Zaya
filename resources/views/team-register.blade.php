@@ -373,10 +373,9 @@
                                 <input type="text" name="city" value="{{ old('city') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid city name" class="reg-input">
                             </div>
                             <div>
-                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State') }} <span class="text-red-500">*</span></label>
-                                <input type="text" name="state" value="{{ old('state') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid state name" class="reg-input">
-                            </div>
-                            <div>
+                                <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State (Optional)') }}</label>
+                                <input type="text" name="state" value="{{ old('state') }}" pattern="^[a-zA-Z\s\-]+$" title="Enter a valid state name" class="reg-input">
+                            </div>                            <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Zip Code') }} <span class="text-red-500">*</span></label>
                                 <input type="text" name="zip_code" value="{{ old('zip_code') }}" required pattern="^[a-zA-Z0-9\s\-]{3,20}$" title="Enter a valid zip code" class="reg-input">
                             </div>

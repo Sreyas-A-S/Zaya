@@ -319,7 +319,7 @@ class WebController extends Controller
         $language = App::getLocale();
         $settings = HomepageSetting::getAllSettings($language);
 
-        $zipcode = trim((string) $request->query('zipcode', $request->query('pincode', session('global_zipcode', session('global_pincode', '')))));
+        $zipcode = trim((string) $request->query('zipcode', $request->query('pincode', session('global_zipcode', ''))));
         $searchQuery = trim((string) $request->query('query', ''));
 
         $practitionerQuery = Practitioner::with(['user', 'reviews', 'userServices.service'])
@@ -442,7 +442,7 @@ class WebController extends Controller
 
     public function zipcodeConditions(Request $request)
     {
-        $raw = trim((string) $request->query('zipcode', $request->query('pincode', session('global_zipcode', session('global_pincode', '')))));
+        $raw = trim((string) $request->query('zipcode', $request->query('pincode', session('global_zipcode', ''))));
         $zipcode = substr(preg_replace('/[^0-9]/', '', $raw), 0, 6);
 
         $conditions = [];

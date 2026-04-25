@@ -276,18 +276,16 @@
 
                                         <!-- State -->
                                         <div class="col-md-6">
-                                            <label class="form-label">State <span class="text-danger">*</span></label>
+                                            <label class="form-label">State</label>
                                             <input type="text"
                                                 class="form-control validate-char-limit"
                                                 name="state"
-                                                required
                                                 maxlength="100"
                                                 data-max="100"
                                                 pattern="^[A-Za-z\s]{2,100}$"
                                                 title="State should contain only letters">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                         </div>
-
                                         <!-- Zip Code -->
                                         <div class="col-md-6">
                                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
@@ -616,7 +614,7 @@
                                         </div>
 
                                         <div class="col-md-6">
-                                            <label class="form-label">PAN Number</label>
+                                            <label class="form-label">PAN Number (Optional)</label>
                                             <input class="form-control" type="text" name="pan_number" maxlength="20" placeholder="ABCDE1234F"
                                                 oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')">
                                         </div>
@@ -2098,7 +2096,7 @@
                     if (!el.val()) return true;
                     return /^[0-9]{5,10}$/.test(el.val());
                 },
-                message: 'Invalid Zip/Pincode'
+                message: 'Invalid Zipcode'
             }
         ];
 

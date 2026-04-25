@@ -194,10 +194,10 @@ class DoctorController extends Controller
             'profile_photo' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // B. Medical Registration
-            'ayush_reg_no' => 'required|string|max:255',
-            'state_council' => 'required|string|max:255',
-            'reg_certificate' => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
-            'digital_signature' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
+            'ayush_reg_no' => 'nullable|string|max:255',
+            'state_council' => 'nullable|string|max:255',
+            'reg_certificate' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'digital_signature' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
 
             // C. Qualifications & Experience
             'primary_qualification' => ['required', 'string', 'max:255'],
@@ -217,7 +217,7 @@ class DoctorController extends Controller
             'address_line_1' => 'required|string|max:500',
             'address_line_2' => 'nullable|string|max:500',
             'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
-            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'nullable|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
             'nationality' => 'nullable|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
@@ -244,8 +244,8 @@ class DoctorController extends Controller
             'languages_spoken.*' => 'nullable|array',
 
             // H. KYC & Payment Details
-            'pan_number' => 'required|string|max:10',
-            'pan_upload' => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
+            'pan_number' => 'nullable|string|max:10',
+            'pan_upload' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
             'aadhaar_upload' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
             'bank_account_holder' => 'required|string|max:255',
             'bank_name' => 'required|string|max:255',
@@ -268,12 +268,12 @@ class DoctorController extends Controller
             'linkedin' => 'nullable|url|max:255',
 
             // J. Declaration & Consent
-            'ayush_confirmation' => 'accepted',
-            'guidelines_agreement' => 'accepted',
-            'document_consent' => 'accepted',
-            'policies_agreement' => 'accepted',
-            'prescription_understanding' => 'accepted',
-            'confidentiality_consent' => 'accepted',
+            'ayush_confirmation' => 'nullable',
+            'guidelines_agreement' => 'nullable',
+            'document_consent' => 'nullable',
+            'policies_agreement' => 'nullable',
+            'prescription_understanding' => 'nullable',
+            'confidentiality_consent' => 'nullable',
 
             // K. Payment & Promocode (Optional)
             'promocode' => 'nullable|string|max:50',
@@ -449,10 +449,10 @@ class DoctorController extends Controller
             'profile_photo' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // B. Medical Registration
-            'ayush_reg_no' => 'required|string|max:255',
-            'state_council' => 'required|string|max:255',
+            'ayush_reg_no' => 'nullable|string|max:255',
+            'state_council' => 'nullable|string|max:255',
             'reg_certificate' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
-            'digital_signature' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
+            'digital_signature' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
 
             // C. Qualifications & Experience
             'primary_qualification' => ['required', 'string', 'max:255'],
@@ -472,7 +472,7 @@ class DoctorController extends Controller
             'address_line_1' => 'required|string|max:500',
             'address_line_2' => 'nullable|string|max:500',
             'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
-            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'nullable|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
             'nationality' => 'nullable|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',

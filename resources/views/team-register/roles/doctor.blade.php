@@ -2,14 +2,14 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
     <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('AYUSH Registration Number') }} <span class="text-red-500">*</span></label>
-        <input type="text" name="ayush_reg_no" value="{{ old('ayush_reg_no') }}" required
+        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('AYUSH / Medical Registration Number (Optional)') }}</label>
+        <input type="text" name="ayush_reg_no" value="{{ old('ayush_reg_no') }}"
             class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-            placeholder="{{ __('Enter AYUSH Registration Number') }}">
+            placeholder="{{ __('Enter registration number') }}">
     </div>
     <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State Ayurveda Council') }} <span class="text-red-500">*</span></label>
-        <input type="text" name="state_council" value="{{ old('state_council') }}" required
+        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State Ayurveda Council (Optional)') }}</label>
+        <input type="text" name="state_council" value="{{ old('state_council') }}"
             class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
             placeholder="{{ __('Enter Council Name') }}">
     </div>
@@ -17,14 +17,14 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
     <div>
-        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Registration Certificate') }} <span class="text-red-500">*</span></label>
+        <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Registration Certificate (Optional)') }}</label>
         <div class="upload-box rounded-xl p-5 text-center cursor-pointer transition-all duration-300 bg-white hover:bg-[#FFECC8]">
             <div class="inline-flex justify-center items-center gap-2 border border-[#D8D8D8] rounded-[6px] px-4 py-2 mb-3">
                 <i class="ri-upload-2-line text-gray-400 text-sm leading-none"></i>
                 <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
             </div>
             <p class="text-gray-400 text-sm file-name-display">{{ __('PDF/JPG/PNG (Max 2MB)') }}</p>
-            <input type="file" name="reg_certificate" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
+            <input type="file" name="reg_certificate" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
         </div>
     </div>
     <div>
@@ -277,27 +277,27 @@
         <span>{{ __('Check All Declaration & Consent') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="ayush_confirmation" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('ayush_confirmation'))>
+        <input type="checkbox" name="ayush_confirmation" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" @checked(old('ayush_confirmation'))>
         <span>{{ __('I confirm I am a registered AYUSH Practitioner.') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="guidelines_agreement" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('guidelines_agreement'))>
+        <input type="checkbox" name="guidelines_agreement" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" @checked(old('guidelines_agreement'))>
         <span>{{ __('I agree to follow AYUSH and platform guidelines.') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="document_consent" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('document_consent'))>
+        <input type="checkbox" name="document_consent" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" @checked(old('document_consent'))>
         <span>{{ __('I consent to document verification for onboarding.') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="policies_agreement" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('policies_agreement'))>
+        <input type="checkbox" name="policies_agreement" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" @checked(old('policies_agreement'))>
         <span>{{ __('I agree to platform policies and terms.') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="prescription_understanding" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('prescription_understanding'))>
+        <input type="checkbox" name="prescription_understanding" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" @checked(old('prescription_understanding'))>
         <span>{{ __('I understand prescription and consultation responsibilities.') }}</span>
     </label>
     <label class="flex items-start gap-3 text-gray-700">
-        <input type="checkbox" name="confidentiality_consent" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" required @checked(old('confidentiality_consent'))>
+        <input type="checkbox" name="confidentiality_consent" value="1" class="consent-checkbox mt-1 h-5 w-5 rounded border-gray-300" @checked(old('confidentiality_consent'))>
         <span>{{ __('I agree to maintain client confidentiality.') }}</span>
     </label>
 </div>
