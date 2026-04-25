@@ -54,11 +54,30 @@
                         <td class="value">{{ strtoupper($booking->mode) }}</td>
                     </tr>
 
-                    @if($booking->mode === 'online' && $booking->invoice_no)
-                    <tr>
-                        <td class="label">Meeting Link:</td>
-                        <td class="value"><a href="{{ route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']) }}" style="color: #2E4B3C;">Click here to join</a></td>
-                    </tr>
+                    @php
+                        $sessions = $booking->additional_info['sessions'] ?? [];
+                        $hasMultipleSessions = count($sessions) > 1;
+                    @endphp
+
+                    @if($booking->mode === 'online')
+                        @if($hasMultipleSessions)
+                            @foreach($sessions as $session)
+                                @php
+                                    $serviceName = \App\Models\Service::find($session['service_id'])->title ?? 'Session ' . ($loop->iteration);
+                                    $sessionTime = $session['time'] ?? $booking->booking_time;
+                                    $sessionDate = !empty($session['day']) && $session['day'] !== 'Day' ? $session['day'] : $booking->booking_date->format('M d, Y');
+                                @endphp
+                                <tr>
+                                    <td class="label">{{ $serviceName }} ({{ $sessionTime }}):</td>
+                                    <td class="value"><a href="{{ route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']) }}" style="color: #2E4B3C;">Join Session</a></td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td class="label">Meeting Link:</td>
+                                <td class="value"><a href="{{ route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']) }}" style="color: #2E4B3C;">Click here to join</a></td>
+                            </tr>
+                        @endif
                     @endif
                     
                     @if($booking->referral && $booking->referral->referredBy)

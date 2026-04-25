@@ -127,13 +127,13 @@
             <div>
                 @if($isPractitioner)
                     <p class="text-[10px] uppercase tracking-[0.2em] opacity-70 font-black mb-1">Your Earned Share</p>
-                    <p class="text-2xl font-black">€ {{ number_format($transaction ? $transaction->practitioner_share : 0, 2) }}</p>
+                    <p class="text-2xl font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction ? $transaction->practitioner_share : 0, 2) }}</p>
                 @elseif($isTranslator)
                     <p class="text-[10px] uppercase tracking-[0.2em] opacity-70 font-black mb-1">Total Amount</p>
-                    <p class="text-2xl font-black">€ {{ number_format($booking->total_price, 2) }}</p>
+                    <p class="text-2xl font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}</p>
                 @else
                     <p class="text-[10px] uppercase tracking-[0.2em] opacity-70 font-black mb-1">Total Amount Paid</p>
-                    <p class="text-2xl font-black">€ {{ number_format($booking->total_price, 2) }}</p>
+                    <p class="text-2xl font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}</p>
                 @endif
                 
                 @if($booking->razorpay_payment_id)
@@ -152,21 +152,21 @@
         <div id="distribution-info" class="hidden mt-6 pt-6 border-t border-white/10 space-y-4 transition-all">
             <div class="flex justify-between items-center text-[11px]">
                 <span class="opacity-60 font-bold uppercase tracking-widest">Gross Booking Amount</span>
-                <span class="font-black">€ {{ number_format($transaction->total_amount, 2) }}</span>
+                <span class="font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->total_amount, 2) }}</span>
             </div>
             <div class="flex justify-between items-center text-[11px]">
                 <span class="opacity-60 font-bold uppercase tracking-widest">Platform Fee ({{ number_format($transaction->company_commission_percent, 1) }}%)</span>
-                <span class="font-black text-red-300">- € {{ number_format($transaction->company_share, 2) }}</span>
+                <span class="font-black text-red-300">- {{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->company_share, 2) }}</span>
             </div>
             @if($transaction->referrer_share > 0)
             <div class="flex justify-between items-center text-[11px]">
                 <span class="opacity-60 font-bold uppercase tracking-widest">Referral Fee ({{ number_format($transaction->referrer_commission_percent, 1) }}%)</span>
-                <span class="font-black text-orange-300">- € {{ number_format($transaction->referrer_share, 2) }}</span>
+                <span class="font-black text-orange-300">- {{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->referrer_share, 2) }}</span>
             </div>
             @endif
             <div class="flex justify-between items-center pt-2 border-t border-white/5 text-sm font-black">
                 <span class="uppercase tracking-widest text-[10px]">Net Earnings</span>
-                <span class="text-emerald-300">€ {{ number_format($transaction->practitioner_share, 2) }}</span>
+                <span class="text-emerald-300">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->practitioner_share, 2) }}</span>
             </div>
         </div>
         @endif
