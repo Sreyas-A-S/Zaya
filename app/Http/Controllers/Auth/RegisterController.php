@@ -265,6 +265,9 @@ class RegisterController extends Controller
             if (in_array($user->role, $teamRoles, true)) {
                 Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail(ucwords(str_replace('_', ' ', $user->role))));
 
+                // Important: Load profile relations so FeeService can find the country
+                $user->load(['practitioner', 'doctor', 'mindfulnessPractitioner', 'yoga_therapist', 'translator']);
+
                 if ($feeOverride !== null && $feeOverride <= 0) {
                     $paymentLink = null;
                 } else {
@@ -295,6 +298,9 @@ class RegisterController extends Controller
             // For Clients/Patients
             Mail::to($user->email)->send(new WelcomeUserMail($user->email, $request->password, url('/zaya-login'), $user->role));
             
+            // Load patient relation for country detection
+            $user->load('patient');
+
             if ($feeOverride !== null && $feeOverride <= 0) {
                 $paymentLink = null;
             } else {
