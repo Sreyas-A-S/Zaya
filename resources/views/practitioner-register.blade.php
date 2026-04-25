@@ -1331,20 +1331,27 @@
 
                      if (response.ok) {
                          const data = await response.json().catch(() => ({}));
+                         const paymentUrl = data && data.redirect_url ? data.redirect_url : (data && data.payment_url ? data.payment_url : null);
+                         
+                         if (paymentUrl) {
+                             // Redirect to Payment Gateway immediately or with a tiny delay
+                             btnText.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Redirecting to Payment...';
+                             setTimeout(() => {
+                                 window.location.href = paymentUrl;
+                             }, 800);
+                             return;
+                         }
+
+                         // Success without payment
                          const popup = document.getElementById('thank-you-popup');
                          if (popup) {
                              popup.classList.remove('hidden');
                              popup.classList.add('flex');
                          }
 
-                         const paymentUrl = data && data.payment_url ? data.payment_url : null;
                          setTimeout(() => {
-                             if (paymentUrl) {
-                                 window.location.href = paymentUrl;
-                                 return;
-                             }
                              closeThankYouPopup();
-                         }, 1500);
+                         }, 3000);
                      } else {
                          const data = await response.json();
                          
