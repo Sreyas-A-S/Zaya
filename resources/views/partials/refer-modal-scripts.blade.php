@@ -273,6 +273,13 @@
                 return;
             }
 
+            // Sort so recommended appear on top, others chronological
+            professionals.sort((a, b) => {
+                if(b.is_recommended && !a.is_recommended) return 1;
+                if(!b.is_recommended && a.is_recommended) return -1;
+                return 0;
+            });
+
             list.innerHTML = '';
             professionals.forEach(p => {
                 const isSelected = selectedProfessionals[role] && selectedProfessionals[role].id === p.id;
@@ -291,7 +298,7 @@
                 ).join(' ');
 
                 const missingServicesLabel = (!p.handles_service && p.missing_services && p.missing_services.length > 0)
-                    ? `<div class="mt-1"><span class="text-[8px] bg-red-50 text-red-500 px-1.5 py-0.5 rounded border border-red-100 uppercase tracking-tighter">Missing: ${p.missing_services.join(', ')}</span></div>`
+                    ? `<div class="mt-2"><span class="text-[10px] bg-red-50 text-red-600 px-2 font-bold py-1 rounded-md border border-red-200 uppercase tracking-wider inline-block leading-snug">Missing: ${p.missing_services.join(', ')}</span></div>`
                     : '';
                 
                 item.innerHTML = `

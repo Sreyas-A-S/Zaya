@@ -113,7 +113,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-sm text-secondary font-medium">
-                            € {{ number_format($booking->total_price, 2) }}
+                            {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}
                         </td>
                         <td class="px-6 py-4">
                             @php
