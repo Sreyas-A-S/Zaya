@@ -117,7 +117,37 @@ class WebController extends Controller
         $settings = HomepageSetting::getAllSettings($language);
         $latestAnnouncement = $this->getLatestAnnouncement();
 
-        return view('index', compact('practitioners', 'testimonials', 'services', 'settings', 'language', 'languages', 'latestAnnouncement'));
+        // Fetch Latest 3 Blogs
+        $latestBlogs = [];
+        try {
+            $response = $this->fetchFromWordPress('posts', [
+                'per_page' => 3,
+                '_embed' => 1,
+                'lang' => $language
+            ]);
+            
+            if (!empty($response) && is_array($response)) {
+                foreach ($response as $post) {
+                    $content = $post->content->rendered ?? '';
+                    $wordCount = str_word_count(strip_tags($content));
+                    $readTime = ceil(max(1, $wordCount) / 200);
+                    
+                    $imageData = $this->extractOptimizedImage($post);
+                    $image = $imageData['url'] ?? null;
+                    
+                    $latestBlogs[] = (object) [
+                        'title' => html_entity_decode($post->title->rendered ?? ''),
+                        'link' => isset($post->slug) ? route('blog-detail', $post->slug) : route('blogs'),
+                        'image' => $image,
+                        'read_time' => $readTime . ' min Read'
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error fetching latest blogs: ' . $e->getMessage());
+        }
+
+        return view('index', compact('practitioners', 'testimonials', 'services', 'settings', 'language', 'languages', 'latestAnnouncement', 'latestBlogs'));
     }
 
     /**
