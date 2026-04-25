@@ -117,7 +117,37 @@ class WebController extends Controller
         $settings = HomepageSetting::getAllSettings($language);
         $latestAnnouncement = $this->getLatestAnnouncement();
 
-        return view('index', compact('practitioners', 'testimonials', 'services', 'settings', 'language', 'languages', 'latestAnnouncement'));
+        // Fetch Latest 3 Blogs
+        $latestBlogs = [];
+        try {
+            $response = $this->fetchFromWordPress('posts', [
+                'per_page' => 3,
+                '_embed' => 1,
+                'lang' => $language
+            ]);
+            
+            if (!empty($response) && is_array($response)) {
+                foreach ($response as $post) {
+                    $content = $post->content->rendered ?? '';
+                    $wordCount = str_word_count(strip_tags($content));
+                    $readTime = ceil(max(1, $wordCount) / 200);
+                    
+                    $imageData = $this->extractOptimizedImage($post);
+                    $image = $imageData['url'] ?? null;
+                    
+                    $latestBlogs[] = (object) [
+                        'title' => html_entity_decode($post->title->rendered ?? ''),
+                        'link' => isset($post->slug) ? route('blog-detail', $post->slug) : route('blogs'),
+                        'image' => $image,
+                        'read_time' => $readTime . ' min Read'
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error fetching latest blogs: ' . $e->getMessage());
+        }
+
+        return view('index', compact('practitioners', 'testimonials', 'services', 'settings', 'language', 'languages', 'latestAnnouncement', 'latestBlogs'));
     }
 
     /**
@@ -870,7 +900,17 @@ class WebController extends Controller
         $languages = \App\Models\Language::where('status', 'active')->get();
 
         $language = session('locale', 'en');
-        $financeSettings = HomepageSetting::getSectionValues('finance', $language);
+
+        // Detect country from IP for initial fee loading
+        $countryCode = 'all';
+        try {
+            $geoIpResponse = app(GeoIpController::class)->country(request());
+            $countryCode = $geoIpResponse->getData()->country_code ?? 'all';
+        } catch (\Exception $e) {
+            \Log::error('GeoIP Detection Error in clientRegister: ' . $e->getMessage());
+        }
+
+        $financeSettings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
         $clientRegistrationFee = $financeSettings['client_registration_fee'] ?? '0';
         $clientRegistrationFee = is_numeric($clientRegistrationFee) ? (float) $clientRegistrationFee : 0.0;
         $clientRegistrationFeeEnabled = filter_var($financeSettings['client_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
@@ -889,7 +929,17 @@ class WebController extends Controller
         $otherModalities = \App\Models\PractitionerModality::where('status', true)->get();
 
         $language = session('locale', 'en');
-        $financeSettings = HomepageSetting::getSectionValues('finance', $language);
+
+        // Detect country from IP for initial fee loading
+        $countryCode = 'all';
+        try {
+            $geoIpResponse = app(GeoIpController::class)->country(request());
+            $countryCode = $geoIpResponse->getData()->country_code ?? 'all';
+        } catch (\Exception $e) {
+            \Log::error('GeoIP Detection Error in practitionerRegister: ' . $e->getMessage());
+        }
+
+        $financeSettings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
         $practitionerRegistrationFee = $financeSettings['practitioner_registration_fee'] ?? '0';
         $practitionerRegistrationFee = is_numeric($practitionerRegistrationFee) ? (float) $practitionerRegistrationFee : 0.0;
         $practitionerRegistrationFeeEnabled = filter_var($financeSettings['practitioner_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
@@ -897,6 +947,7 @@ class WebController extends Controller
         $practitionerRegistrationCurrencySymbol = config('currencies.symbols')[$practitionerRegistrationCurrency] ?? $practitionerRegistrationCurrency;
 
         $languages = \App\Models\Language::where('status', 'active')->orderBy('name')->get();
+        $countryNameToCode = \App\Models\Country::pluck('code', 'name')->map(fn($c) => strtoupper($c));
 
         return view('practitioner-register', compact(
             'wellnessConsultations',
@@ -906,7 +957,8 @@ class WebController extends Controller
             'practitionerRegistrationFeeEnabled',
             'practitionerRegistrationCurrency',
             'practitionerRegistrationCurrencySymbol',
-            'languages'
+            'languages',
+            'countryNameToCode'
         ));
     }
 

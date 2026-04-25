@@ -72,7 +72,10 @@ class RegistrationFeeController extends Controller
                             
                             Log::info("Transaction and Registration Invoice recorded for user $userId.");
 
-                            return redirect()->route('invoice.show', $invoiceNo)->with('success', 'Payment successful! Here is your registration invoice.');
+                            // Auto-login the user so they can view the invoice (protected by auth middleware)
+                            \Illuminate\Support\Facades\Auth::login($user);
+
+                            return redirect()->route('invoice.show', $invoiceNo)->with('success', 'Payment successful! Welcome to Zaya Wellness.');
                         }
                     }
                 }

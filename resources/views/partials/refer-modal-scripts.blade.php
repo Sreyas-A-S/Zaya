@@ -321,7 +321,7 @@
                 if (window.showZayaToast) showZayaToast('Access Granted!', 'Success');
                 closeDataAccessOTPModal();
                 setTimeout(() => {
-                    window.location.href = `/client-profile/${currentDataAccessClientId}`;
+                    window.location.href = "{{ route('client.profile.view', ['id' => ':id']) }}".replace(':id', currentDataAccessClientId);
                 }, 1000);
             } else {
                 alert(data.error || 'Invalid OTP.');

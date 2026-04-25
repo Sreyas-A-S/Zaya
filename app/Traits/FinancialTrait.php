@@ -21,24 +21,30 @@ trait FinancialTrait
         
         $companyPercent = 0;
         $referrerPercent = 0;
-        $countryId = $data['country_id'] ?? null;
+        $countryId = null; // We will resolve this strictly from the practitioner/expert
         $referrerRole = $data['referrer_role'] ?? null;
         $referrerId = $data['referrer_id'] ?? null;
 
-        // Try to get country ID from practitioner first (where service is delivered)
-        if (!$countryId && !empty($data['practitioner_id'])) {
+        // Resolve Country ID strictly from the Expert (Practitioner/Doctor/etc.)
+        // Commission rates are based on the provider's location.
+        if (!empty($data['practitioner_id'])) {
             $practitionerUser = User::find($data['practitioner_id']);
             if ($practitionerUser) {
-                $countryId = $this->resolveCountryIdFromUser($practitionerUser);
+                $countryId = $this->resolveCountryIdFromProfile($practitionerUser);
             }
         }
 
-        $payerUser = isset($data['user_id']) ? User::find($data['user_id']) : null;
-        if (!$countryId && $payerUser) {
-            $countryId = $this->resolveCountryIdFromUser($payerUser);
+        // If no practitioner (e.g. registration fee), use the user's own country
+        if (!$countryId) {
+            $payerUser = isset($data['user_id']) ? User::find($data['user_id']) : null;
+            if ($payerUser) {
+                $countryId = $this->resolveCountryIdFromUser($payerUser);
+            }
         }
 
-        // Persistent Referrer Check: If no explicit referrer, check if user was referred during registration
+        $payerUser = $payerUser ?? (isset($data['user_id']) ? User::find($data['user_id']) : null);
+        
+        // Persistent Referrer Check
         if (!$referrerId && $payerUser && $payerUser->open_register_link_id) {
             $link = OpenRegisterLink::find($payerUser->open_register_link_id);
             if ($link && $link->created_by) {
@@ -173,6 +179,29 @@ trait FinancialTrait
             'status' => 'completed',
             'type' => $type,
         ]);
+    }
+
+    private function resolveCountryIdFromProfile(User $user): ?int
+    {
+        $countryName = null;
+        $profile = $user->profile;
+        
+        if ($profile) {
+            $countryName = $profile->country ?? null;
+        }
+
+        if ($countryName) {
+            $dbCountry = \App\Models\Country::where('name', $countryName)
+                ->orWhere('code', strtoupper($countryName))
+                ->first();
+            
+            if ($dbCountry) {
+                return $dbCountry->id;
+            }
+        }
+
+        // Fallback to user-level national_id if profile country is missing or unmapped
+        return $this->resolveCountryIdFromUser($user);
     }
 
     private function resolveCountryIdFromUser(User $user): ?int

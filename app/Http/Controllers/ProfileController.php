@@ -312,8 +312,11 @@ class ProfileController extends Controller
         $isReferrer = Referral::where('booking_id', $booking->id)->where('referred_by_id', $user->id)->exists();
         $isReferredTo = Referral::where('referral_no', $booking->invoice_no)->where('referred_to_id', $user->id)->exists();
 
+        // Check for OTP-verified data access
+        $hasOTPAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
+
         $canEdit = ($isPractitioner || $isTranslator) && $request->query('view') != '1';
-        $canView = $canEdit || $isClient || $isReferrer || $isReferredTo || $request->query('view') == '1';
+        $canView = $canEdit || $isClient || $isReferrer || $isReferredTo || $hasOTPAccess || $request->query('view') == '1';
 
         if (!$canView) {
             abort(403, 'You do not have permission to access this consultation form.');
@@ -640,10 +643,10 @@ class ProfileController extends Controller
                          ($booking->practitioner && $booking->practitioner->user_id === $user->id) ||
                          ($booking->translator && $booking->translator->user_id === $user->id);
 
-        if (!$isParticipant && !in_array($user->role, ['admin', 'super-admin'])) {
+        if (!$isParticipant) {
             $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
             if (!$hasAccess) {
-                return redirect()->route('bookings.index')->with('error', 'Unauthorized access.');
+                return redirect()->route('bookings.index')->with('error', 'Unauthorized access. Please verify via OTP.');
             }
         }
 
@@ -693,8 +696,8 @@ class ProfileController extends Controller
             ];
         }
 
-        // Consent Status
-        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($booking->practitioner->user_id ?? 0, $booking->user_id);
+        // Consent Status (Checked against the CURRENT viewer)
+        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
 
         $firstPractitioner = $referralChain[0]['practitioner'] ?? 'Unknown';
 
@@ -719,19 +722,35 @@ class ProfileController extends Controller
     {
         $practitioner = Auth::user();
         
-        // Ensure only practitioners/doctors can access this
-        if (in_array($practitioner->role, ['client', 'patient'])) {
-            abort(403);
+        // Strictly restrict to Expert roles (Admins cannot view clinical data)
+        $allowedExpertRoles = ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'];
+        if (!in_array($practitioner->role, $allowedExpertRoles)) {
+            return redirect()->route('dashboard')->with('error', 'Access denied. Only treating experts can view clinical data.');
         }
 
-        // Check for OTP-verified access
+        // Check for OTP-verified access (Strictly for practitioners only)
         $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($practitioner->id, $id);
-        
+
         if (!$hasAccess) {
             return redirect()->route('bookings.index')->with('error', 'You do not have permission to view this client\'s profile. Please verify via OTP first.');
         }
-
         $client = \App\Models\User::with(['patient'])->findOrFail($id);
+        
+        // Get all clinical documents for this client
+        $documents = \App\Models\ClinicalDocument::where('user_id', $client->id)
+            ->latest()
+            ->get();
+
+        // Get consultation forms for this client
+        $consultationForms = \App\Models\ConsultationForm::where('user_id', $client->id)
+            ->with(['booking'])
+            ->latest()
+            ->get();
+
+        // Get client concerns
+        $concerns = \App\Models\ClientConcern::where('user_id', $client->id)
+            ->latest()
+            ->get();
         
         // Get all recordings for this client
         $recordings = Booking::where('user_id', $client->id)
@@ -747,7 +766,7 @@ class ProfileController extends Controller
 
         $user = Auth::user();
 
-        return view('practitioner.client-profile', compact('user', 'client', 'recordings', 'bookings'));
+        return view('practitioner.client-profile', compact('user', 'client', 'recordings', 'bookings', 'documents', 'consultationForms', 'concerns'));
     }
 
     public function myServices()

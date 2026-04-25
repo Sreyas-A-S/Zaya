@@ -44,7 +44,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::post('/data-access/request', [\App\Http\Controllers\DataAccessController::class, 'requestAccess'])->name('data-access.request');
     Route::post('/data-access/verify', [\App\Http\Controllers\DataAccessController::class, 'verifyOTP'])->name('data-access.verify');
     Route::post('/data-access/toggle', [\App\Http\Controllers\DataAccessController::class, 'toggleAccess'])->name('data-access.toggle');
-    Route::get('/client-profile/{id}', [ProfileController::class, 'viewClientProfile'])->name('practitioner.client-profile');
+    Route::get('/client-profile/{id}', [ProfileController::class, 'viewClientProfile'])->name('client.profile.view');
     Route::get('/profile', [ProfileController::class, 'profile'])->name('profile');
     Route::get('/complete-profile', [ProfileController::class, 'completeProfile'])->name('profile.complete');
     Route::post('/complete-profile', [ProfileController::class, 'storeCompleteProfile'])->name('profile.complete.store');

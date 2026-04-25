@@ -57,25 +57,25 @@
             <div class="sticky top-0 z-50 bg-white flex justify-center pb-6 pt-8 mb-20 border-b border-[#D0D0D0]">
                 <div class="flex items-start justify-center gap-0" id="step-indicator">
                     <div class="flex flex-col items-center relative z-[2] cursor-pointer group" onclick="showTab(1)">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#60E48C] text-white group-hover:scale-110"
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-xs lg:text-base transition-all duration-300 bg-[#60E48C] text-white group-hover:scale-110"
                             id="step-circle-1">1</div>
-                        <span class="text-sm lg:text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap group-hover:text-primary"
+                        <span class="text-xs lg:text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap group-hover:text-primary"
                             id="step-label-1">{{ __('Basic Details') }}</span>
                     </div>
-                    <div class="w-[60px] md:w-[100px] xl:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative"
+                    <div class="w-[30px] md:w-[100px] xl:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative"
                         id="step-line-1"></div>
                     <div class="flex flex-col items-center relative z-[2] cursor-pointer group" onclick="showTab(2)">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B] group-hover:scale-110"
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-xs lg:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B] group-hover:scale-110"
                             id="step-circle-2">2</div>
-                        <span class="text-sm lg:text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap group-hover:text-primary"
+                        <span class="text-xs lg:text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap group-hover:text-primary"
                             id="step-label-2">{{ __('Qualifications') }}</span>
                     </div>
-                    <div class="w-[60px] md:w-[100px] xl:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative"
+                    <div class="w-[30px] md:w-[100px] xl:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative"
                         id="step-line-2"></div>
                     <div class="flex flex-col items-center relative z-[2] cursor-pointer group" onclick="showTab(3)">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm lg:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B] group-hover:scale-110"
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-xs lg:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B] group-hover:scale-110"
                             id="step-circle-3">3</div>
-                        <span class="text-sm lg:text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap group-hover:text-primary"
+                        <span class="text-xs lg:text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap group-hover:text-primary"
                             id="step-label-3">{{ __('Verification') }}</span>
                     </div>
                 </div>
@@ -783,6 +783,9 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <script>
+        window.countryNameToCode = @json($countryNameToCode ?? []);
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             let registrationCurrencySymbol = @json($practitionerRegistrationCurrencySymbol ?? '€');
             const currencySymbols = @json(config('currencies.symbols', []));
@@ -1035,7 +1038,15 @@
                     // Update Country Select (TomSelect)
                     const countrySelect = document.querySelector('#country-select');
                     if (countrySelect && countrySelect.tomselect && !countrySelect.value && countryName) {
-                        countrySelect.tomselect.setValue(countryName);
+                        let targetValue = countryName;
+                        if (window.countryNameToCode && window.countryNameToCode[countryName]) {
+                            targetValue = window.countryNameToCode[countryName];
+                        }
+                        countrySelect.tomselect.setValue(targetValue);
+                        // Trigger updateFee manually since TomSelect setValue might be silent
+                        if (typeof updateFee === 'function') {
+                            updateFee(targetValue);
+                        }
                     }
                 }
 
@@ -1157,27 +1168,27 @@
 
                 if (i < currentTab) {
                     // Completed step
-                    circle.className = 'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-base transition-all duration-300 bg-[#22C55E] text-white';
+                    circle.className = 'w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-xs lg:text-base transition-all duration-300 bg-[#22C55E] text-white';
                     circle.innerHTML = '<i class="ri-check-line"></i>';
-                    label.className = 'text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap';
+                    label.className = 'text-xs lg:text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap';
                     if (line) {
-                        line.className = 'w-[140px] h-0 border-t-2 border-dashed border-[#22C55E] self-center -mt-7 relative';
+                        line.className = 'w-[30px] md:w-[100px] xl:w-[140px] h-0 border-t-2 border-dashed border-[#22C55E] self-center -mt-7 relative';
                     }
                 } else if (i === currentTab) {
                     // Active step
-                    circle.className = 'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-base transition-all duration-300 bg-[#60E48C] text-white';
+                    circle.className = 'w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-xs lg:text-base transition-all duration-300 bg-[#60E48C] text-white';
                     circle.textContent = i;
-                    label.className = 'text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap';
+                    label.className = 'text-xs lg:text-base text-gray-700 mt-2.5 font-normal whitespace-nowrap';
                     if (line) {
-                        line.className = 'w-[140px] h-0 border-t-2 border-dashed border-[#60E48C] self-center -mt-7 relative';
+                        line.className = 'w-[30px] md:w-[100px] xl:w-[140px] h-0 border-t-2 border-dashed border-[#60E48C] self-center -mt-7 relative';
                     }
                 } else {
                     // Inactive step
-                    circle.className = 'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]';
+                    circle.className = 'w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-semibold text-xs lg:text-base transition-all duration-300 bg-[#E6E6E6] text-[#8B8B8B]';
                     circle.textContent = i;
-                    label.className = 'text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap';
+                    label.className = 'text-xs lg:text-base text-gray-400 mt-2.5 font-normal whitespace-nowrap';
                     if (line) {
-                        line.className = 'w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative';
+                        line.className = 'w-[30px] md:w-[100px] xl:w-[140px] h-0 border-t-2 border-dashed border-[#C0C0C0] self-center -mt-7 relative';
                     }
                 }
             }
@@ -1194,7 +1205,11 @@
 
             const isMobile = window.innerWidth < 768;
             if (currentTab === totalTabs) {
+<<<<<<< HEAD
                 nextBtnText.textContent = isMobile ? '{{ __('Submit') }}' : '{{ __('Complete & Proceed to Payment') }}';
+=======
+                nextBtnText.textContent = '{!! __('Complete & Proceed to Payment') !!}';
+>>>>>>> d32b6fa2a6a653d1dfb438602f8d0074aa078717
             } else {
                 nextBtnText.textContent = '{!! __('Save & Continue') !!}';
             }

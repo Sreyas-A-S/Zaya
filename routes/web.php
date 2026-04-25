@@ -154,7 +154,7 @@ Route::get('/blog/comments/{postId}', [WebController::class, 'getComments'])->na
 Route::get('/captcha', [CaptchaController::class, 'generate'])->name('captcha');
 Route::get('/geoip/country', [GeoIpController::class, 'country'])->name('geoip.country');
 Route::get('/magic-login', [\App\Http\Controllers\Auth\MagicLoginController::class, 'login'])->name('magic.login');
-Route::get('/invoice/{invoice_no}', [InvoiceController::class, 'show'])->name('invoice.show')->middleware('auth');
+Route::get('/invoice/{invoice_no}', [InvoiceController::class, 'show'])->name('invoice.show');
 Route::post('/validate-promo-code', [WebController::class, 'validatePromoCode'])->name('promo.validate')->middleware('throttle:5,1');
 Route::post('/get-registration-fee', [WebController::class, 'getRegistrationFee'])->name('registration-fee.get');
 
@@ -233,11 +233,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('financial/coins/update-user', [\App\Http\Controllers\Admin\CoinManagementController::class, 'updateUsersCoins'])->name('coins.update-user');
 
     // System Utilities
-    Route::get('run-scheduler', function() {
-        \Illuminate\Support\Facades\Artisan::call('schedule:run');
-        return "Scheduler executed successfully. Output: " . \Illuminate\Support\Facades\Artisan::output();
-    })->name('scheduler.run');
-
     Route::get('credentials', [\App\Http\Controllers\Admin\CredentialController::class, 'index'])->name('credentials.index');
     Route::post('credentials/{id}/password', [\App\Http\Controllers\Admin\CredentialController::class, 'updatePassword'])->name('credentials.update-password');
     Route::post('credentials/{id}/generate-link', [\App\Http\Controllers\Admin\CredentialController::class, 'generateLoginLink'])->name('credentials.generate-link');
@@ -395,7 +390,14 @@ Route::get('/seed', function () {
     return '<pre>' . Artisan::output() . '</pre>';
 });
 
-Route::get('/schedule-run', function () {
+Route::get('/schedule-run', function (Request $request) {
+    $token = $request->query('token');
+    $expectedToken = config('services.scheduler.token');
+
+    if (!$token || $token !== $expectedToken) {
+        abort(403, 'Unauthorized: Invalid Scheduler Token');
+    }
+
     set_time_limit(300);
     Artisan::call('schedule:run');
     return '<pre>' . Artisan::output() . '</pre>';
