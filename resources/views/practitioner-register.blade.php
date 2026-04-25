@@ -783,6 +783,9 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
     <script>
+        window.countryNameToCode = @json($countryNameToCode ?? []);
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             let registrationCurrencySymbol = @json($practitionerRegistrationCurrencySymbol ?? '€');
             const currencySymbols = @json(config('currencies.symbols', []));
@@ -1035,7 +1038,15 @@
                     // Update Country Select (TomSelect)
                     const countrySelect = document.querySelector('#country-select');
                     if (countrySelect && countrySelect.tomselect && !countrySelect.value && countryName) {
-                        countrySelect.tomselect.setValue(countryName);
+                        let targetValue = countryName;
+                        if (window.countryNameToCode && window.countryNameToCode[countryName]) {
+                            targetValue = window.countryNameToCode[countryName];
+                        }
+                        countrySelect.tomselect.setValue(targetValue);
+                        // Trigger updateFee manually since TomSelect setValue might be silent
+                        if (typeof updateFee === 'function') {
+                            updateFee(targetValue);
+                        }
                     }
                 }
 
