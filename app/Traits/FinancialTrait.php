@@ -92,6 +92,10 @@ trait FinancialTrait
                 $companyPercent = (float) ($settings['company_booking_commission'] ?? 10);
             }
             $referrerPercent = 0;
+        } elseif ($type === 'registration') {
+            // Registration Fee
+            $companyPercent = 100;
+            $referrerPercent = 0;
         } else {
             // Referral Booking
             // The admin UI currently configures referral commissions primarily for referrer_role='practitioner'.

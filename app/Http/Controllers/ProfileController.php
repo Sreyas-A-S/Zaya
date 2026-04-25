@@ -35,7 +35,7 @@ class ProfileController extends Controller
     {
         $role = $user->role;
         $profileId = $user->profile_id;
-        $query = Booking::with(['practitioner.user', 'user']);
+        $query = Booking::with(['practitioner.user', 'user', 'transactions']);
 
         if ($forceClientView || $role === 'client' || $role === 'patient') {
             $query->where('user_id', $user->id);
@@ -622,7 +622,7 @@ class ProfileController extends Controller
     public function showDetailsView($id)
     {
         $user = Auth::user();
-        $booking = Booking::with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo'])
+        $booking = Booking::with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo', 'transactions'])
             ->findOrFail($id);
 
         // Permissions check

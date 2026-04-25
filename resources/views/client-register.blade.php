@@ -836,32 +836,30 @@
                     </div>
                 </div>
 
+                <!-- Form Footer: Already have account & Submit -->
+                <div class="flex flex-col md:flex-row items-center justify-between gap-8 pt-10 border-t border-gray-100 mt-10">
+                    <div class="flex flex-col gap-1 text-center md:text-left">
+                        <p class="text-[#423131] text-base font-medium">{{ __('Already have an account?') }}</p>
+                        <a href="{{ route('zaya-login') }}" class="text-[#97563D] text-sm font-bold hover:underline">
+                            {{ __('Login to your dashboard') }}
+                        </a>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                        <a href="{{ route('index') }}" class="w-full sm:w-auto text-gray-500 py-3.5 px-8 rounded-full font-medium transition-all hover:bg-gray-50 text-center">
+                            {{ __('Cancel') }}
+                        </a>
+
+                        <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-black text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-xl shadow-[#FABC41]/20">
+                            <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
+                            {{ __('Complete & Proceed to Payment') }}
+                        </button>
+                    </div>
+                </div>
+
             </form>
         </div>
     </div>
-
-    <!-- Footer with Buttons -->
-    <footer class="bg-[#FFF3D4] py-6 mt-auto">
-        <div class="max-w-[1200px] mx-auto px-6">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
-                <div class="flex flex-col gap-1 text-center sm:text-left">
-                    <p class="text-[#423131] text-base font-medium">{{ __('Already have an account?') }}</p>
-                    <p class="text-[#97563D] text-sm opacity-80">{{ __('Login to access your personalized dashboard.') }}</p>
-                </div>
-
-                <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                    <a href="{{ route('zaya-login') }}" class="w-full sm:w-auto text-[#423131] py-3.5 px-8 rounded-full font-medium border border-[#423131]/20 transition-all hover:bg-[#423131]/5 text-center">
-                        {{ __('Login Instead') }}
-                    </a>
-
-                    <button type="submit" id="submit-btn" form="registration-form" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-3.5 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">
-                        <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
-                        {{ __('Complete & Proceed to Payment') }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </footer>
 
     <script>
         // Custom Select Logic (Generic)

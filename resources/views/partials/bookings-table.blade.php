@@ -33,6 +33,9 @@
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Date & Time</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Mode</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Amount</th>
+                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Your Share</th>
+                        @endif
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Status</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right whitespace-nowrap">Actions</th>
                     </tr>
@@ -115,6 +118,18 @@
                         <td class="px-6 py-4 text-sm text-secondary font-medium">
                             {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}
                         </td>
+                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
+                        <td class="px-6 py-4 text-sm font-bold text-emerald-600">
+                            @php
+                                $transaction = $booking->transactions->first();
+                            @endphp
+                            @if($transaction)
+                                {{ get_currency_symbol($transaction->currency) }} {{ number_format($transaction->practitioner_share, 2) }}
+                            @else
+                                <span class="text-gray-300 font-normal">--</span>
+                            @endif
+                        </td>
+                        @endif
                         <td class="px-6 py-4">
                             @php
                                 $statusClasses = [
