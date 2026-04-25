@@ -421,7 +421,7 @@
                     </div>
 
                     @if($hasConsent)
-                        <a href="{{ route('practitioner.client-profile', $booking->user_id) }}" class="w-full py-4 bg-[#F9FBF9] text-secondary border border-[#2E4B3D]/12 rounded-2xl font-black text-[10px] hover:bg-secondary hover:text-white transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2 group">
+                        <a href="{{ route('client.profile.view', $booking->user_id) }}" class="w-full py-4 bg-[#F9FBF9] text-secondary border border-[#2E4B3D]/12 rounded-2xl font-black text-[10px] hover:bg-secondary hover:text-white transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2 group">
                             View Health Journey
                             <i class="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
                         </a>

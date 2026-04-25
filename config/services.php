@@ -120,4 +120,8 @@ return [
         'service_account_json' => env('GOOGLE_MEET_SERVICE_ACCOUNT_JSON_PATH'),
     ],
 
+    'scheduler' => [
+        'token' => env('SCHEDULER_TOKEN', 'zaya-secret-scheduler-key-2024'),
+    ],
+
 ];
