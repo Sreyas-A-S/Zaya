@@ -2007,17 +2007,22 @@ class WebController extends Controller
                 'author_name' => $request->input('author_name'),
                 'author_email' => $request->input('author_email'),
                 'content' => $request->input('content'),
-                'parent' => $request->input('parent', 0),
-                'author_ip' => $request->ip(),
-                'author_user_agent' => $request->userAgent(),
             ];
+
+            if ($request->input('parent') > 0) {
+                $data['parent'] = $request->input('parent');
+            }
 
             // We are using anonymous comments (no auth).
             // Let WordPress moderation handle spam.
             $headers = [
-                'User-Agent' => 'ZayaWellness/1.0',
                 'Accept' => 'application/json',
+                'User-Agent' => $request->userAgent() ?: 'ZayaWellness/1.0',
             ];
+
+            if ($request->ip()) {
+                $headers['X-Forwarded-For'] = $request->ip();
+            }
 
             $response = Http::withHeaders($headers);
 
