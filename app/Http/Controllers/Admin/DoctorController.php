@@ -188,7 +188,7 @@ class DoctorController extends Controller
             'last_name' => 'required|string|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
-            'mobile_number' => 'required|string|max:15|regex:/^[0-9\s\-\+\(\)]+$/',
+            'mobile_number' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'string', 'confirmed', RulesPassword::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
@@ -435,15 +435,15 @@ class DoctorController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $profile = Doctor::where('user_id', $id)->firstOrFail();
+        $profile = Doctor::where('user_id', $id)->firstOrCreate(['user_id' => $id]);
 
         $validatedData = $request->validate([
             // A. Personal Details
-            'first_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
-            'last_name' => 'required|string|max:50|regex:/^[a-zA-Z\s\-]+$/u',
+            'first_name' => 'required|string|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[\p{L}\s\-\'.]+$/u',
             'gender' => ['required', Rule::in(['male', 'female', 'other'])],
             'dob' => 'required|date',
-            'mobile_number' => 'required|string|max:15|regex:/^[0-9\s\-\+\(\)]+$/',
+            'mobile_number' => 'required|string|max:20|regex:/^[0-9\s\-\+\(\)]+$/',
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'confirmed', RulesPassword::min(8)->mixedCase()->numbers()->symbols()],
             'profile_photo' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
@@ -471,11 +471,11 @@ class DoctorController extends Controller
             'current_workplace' => 'required|string|max:255',
             'address_line_1' => 'required|string|max:500',
             'address_line_2' => 'nullable|string|max:500',
-            'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
-            'state' => 'nullable|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'city' => 'required|string|max:100|regex:/^[\p{L}\s\-\.]+$/u',
+            'state' => 'nullable|string|max:100|regex:/^[\p{L}\s\-\.]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
-            'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
-            'nationality' => 'nullable|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
+            'country' => 'required|string|max:255|regex:/^[\p{L}\s\-\.]+$/u',
+            'nationality' => 'nullable|string|max:255|regex:/^[\p{L}\s\-\.]+$/u',
 
             // D. Ayurveda Consultation Expertise
             'consultation_expertise' => 'nullable|array',
@@ -499,7 +499,7 @@ class DoctorController extends Controller
             'languages_spoken.*' => 'nullable|array',
 
             // H. KYC & Payment Details
-            'pan_number' => 'required|string|max:10',
+            'pan_number' => 'nullable|string|max:10',
             'pan_upload' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
             'aadhaar_upload' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
             'bank_account_holder' => 'required|string|max:255',
@@ -557,7 +557,7 @@ class DoctorController extends Controller
             'linkedin' => $validatedData['linkedin'] ?? null,
         ];
 
-        $languagesSpoken = $request->input('languages_spoken', []);
+        $languagesSpoken = $validatedData['languages_spoken'] ?? [];
 
         $profile->update([
             'first_name' => $validatedData['first_name'],
@@ -642,7 +642,10 @@ class DoctorController extends Controller
             return response()->json(['error' => 'Invalid status.'], 422);
         }
 
-        $doctor = Doctor::where('user_id', $id)->firstOrFail();
+        $doctor = Doctor::where('user_id', $id)->first();
+        if (!$doctor) {
+            return response()->json(['error' => 'Doctor profile not found.'], 404);
+        }
         $previousStatus = $doctor->status;
         $doctor->update([
             'status' => $status
@@ -666,7 +669,10 @@ class DoctorController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $profile = Doctor::where('user_id', $id)->firstOrFail();
+        $profile = Doctor::where('user_id', $id)->first();
+        if (!$profile) {
+            return response()->json(['error' => 'Doctor profile not found.'], 404);
+        }
         $path = $request->path;
 
         $certificates = $profile->degree_certificates_path ?? [];

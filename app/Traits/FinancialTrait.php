@@ -25,6 +25,14 @@ trait FinancialTrait
         $referrerRole = $data['referrer_role'] ?? null;
         $referrerId = $data['referrer_id'] ?? null;
 
+        // Try to get country ID from practitioner first (where service is delivered)
+        if (!$countryId && !empty($data['practitioner_id'])) {
+            $practitionerUser = User::find($data['practitioner_id']);
+            if ($practitionerUser) {
+                $countryId = $this->resolveCountryIdFromUser($practitionerUser);
+            }
+        }
+
         $payerUser = isset($data['user_id']) ? User::find($data['user_id']) : null;
         if (!$countryId && $payerUser) {
             $countryId = $this->resolveCountryIdFromUser($payerUser);
@@ -47,6 +55,16 @@ trait FinancialTrait
         if (!$practitionerRole && !empty($data['practitioner_id'])) {
             $practitionerRole = User::whereKey($data['practitioner_id'])->value('role');
         }
+        
+        // Map user roles to commission roles if needed
+        $roleMap = [
+            'doctor' => 'doctor',
+            'practitioner' => 'practitioner',
+            'mindfulness_practitioner' => 'mindfulness_practitioner',
+            'yoga_therapist' => 'yoga_therapist',
+            'translator' => 'translator'
+        ];
+        $practitionerRole = $roleMap[$practitionerRole] ?? $practitionerRole;
 
         if ($type === 'booking') {
             // Direct Booking

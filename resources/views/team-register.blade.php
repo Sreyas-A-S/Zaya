@@ -1038,7 +1038,12 @@
                             'X-Requested-With': 'XMLHttpRequest',
                             'X-CSRF-TOKEN': getCsrfToken()
                         },
-                        body: JSON.stringify({ code, role: "{{ $joinRole }}", usage_type: 'registration' })
+                        body: JSON.stringify({ 
+                            code, 
+                            role: "{{ $joinRole }}", 
+                            usage_type: 'registration',
+                            country: countrySelect ? countrySelect.value : ''
+                        })
                     });
 
                     const data = await response.json();
