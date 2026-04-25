@@ -858,8 +858,9 @@
                             </a>
 
                             <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-black text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-xl shadow-[#FABC41]/20">
-                                <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
-                                {{ __('Complete & Proceed to Payment') }}
+                                <i class="ri-loader-4-line ri-spin btn-loader mr-2"></i>
+                                <span class="hidden md:inline">{{ __('Complete & Proceed to Payment') }}</span>
+                                <span class="md:hidden">{{ __('Submit') }}</span>
                             </button>
                         </div>
                     </div>

@@ -1192,8 +1192,9 @@
                 backBtnText.textContent = '{{ __('Back') }}';
             }
 
+            const isMobile = window.innerWidth < 768;
             if (currentTab === totalTabs) {
-                nextBtnText.textContent = '{{ __('Complete & Proceed to Payment') }}';
+                nextBtnText.textContent = isMobile ? '{{ __('Submit') }}' : '{{ __('Complete & Proceed to Payment') }}';
             } else {
                 nextBtnText.textContent = '{!! __('Save & Continue') !!}';
             }
@@ -1321,7 +1322,9 @@
                 const btnText = document.getElementById('next-btn-text');
 
                 const originalText = btnText.textContent;
-                btnText.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Submitting...';
+                const isMobile = window.innerWidth < 768;
+                const submittingText = isMobile ? '{{ __('Submitting...') }}' : '{{ __('Submitting...') }}'; // Keep consistent for now
+                btnText.innerHTML = '<i class="ri-loader-4-line ri-spin mr-2"></i> ' + (isMobile ? '{{ __('Submit') }}' : '{{ __('Submitting...') }}');
                 nextBtn.disabled = true;
 
                 try {
