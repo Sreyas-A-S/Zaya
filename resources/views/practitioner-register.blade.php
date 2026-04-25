@@ -622,8 +622,7 @@
                     </div>
 
                     <!-- Payment & Captcha Section -->
-                    <div class='mb-12 border-t border-[#E5E5E5] pt-12 {{ (!$practitionerRegistrationFeeEnabled || $practitionerRegistrationFee <= 0) ? 'hidden' : 'block' }}' id="registration-fee-field-wrapper">
-                            <div class='grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12'>
+                            <div class='grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12 {{ (!$practitionerRegistrationFeeEnabled || $practitionerRegistrationFee <= 0) ? 'hidden' : 'block' }}' id="registration-fee-field-wrapper">
                                 <div>
                                     <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Registration Fee Amount') }}</label>
                                     <div class='relative w-full'>
@@ -633,21 +632,6 @@
                                             <input type='hidden' name='registration_fee_actual' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
                                             <button type='button' class='absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer'>{{ __('Pay') }}</button>
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Payout Currency') }}</label>
-                                    <div class='relative w-full'>
-                                        <select id="payout-currency-select" name="payout_currency" 
-                                            data-default="{{ $practitionerRegistrationCurrency ?? 'EUR' }}" required>
-                                            <option value="">{{ __('Select Currency') }}</option>
-                                            @foreach(config('currencies.symbols') as $code => $symbol)
-                                                <option value="{{ $code }}">
-                                                    {{ $code }} ({{ $symbol }})
-                                                </option>
-                                            @endforeach
-                                        </select>
                                     </div>
                                 </div>
 
@@ -684,21 +668,37 @@
                                 </div>
                             </div>
 
-                            <div class='bg-gradient-to-r from-[#FFFFFF] via-[#F0F0F0] to-[#FFFFFF] p-12 flex flex-col items-center justify-center'>
-                                <h3 class='text-xl font-medium text-gray-800 mb-6'>{{ __('Captcha Verification') }}</h3>
-                                <div class='flex items-center justify-center gap-3'>
-                                    <div class='bg-white border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1'>
-                                        <img src='{{ route('captcha') }}' id='captcha-img' alt='Captcha' class='w-full h-full object-contain filter contrast-125 mix-blend-multiply'>
+                            <div class='grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12'>
+                                <div>
+                                    <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Payout Currency') }} <span class="text-red-500">*</span></label>
+                                    <div class='relative w-full'>
+                                        <select id="payout-currency-select" name="payout_currency" 
+                                            data-default="{{ $practitionerRegistrationCurrency ?? 'EUR' }}" required>
+                                            <option value="">{{ __('Select Currency') }}</option>
+                                            @foreach(config('currencies.symbols') as $code => $symbol)
+                                                <option value="{{ $code }}">
+                                                    {{ $code }} ({{ $symbol }})
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <button type='button' onclick='refreshCaptcha()' class='w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white transition-all hover:bg-[#154a96] border-none cursor-pointer shadow-sm'>
-                                        <i class='ri-refresh-line text-2xl'></i>
-                                    </button>
-                                    <input type='text' name='captcha' placeholder='{{ __('Enter Code') }}' class='h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#1B5CB8] focus:shadow-[0_0_0_3px_rgba(27,92,184,0.1)]' required>
                                 </div>
-                                @error('captcha')
-                                    <span class='text-red-500 text-xs mt-1 pl-4 block'>{{ $message }}</span>
-                                @enderror
                             </div>
+
+                        <div class='bg-gradient-to-r from-[#FFFFFF] via-[#F0F0F0] to-[#FFFFFF] p-12 flex flex-col items-center justify-center border-t border-[#E5E5E5]'>
+                            <h3 class='text-xl font-medium text-gray-800 mb-6'>{{ __('Captcha Verification') }} <span class="text-red-500">*</span></h3>
+                            <div class='flex items-center justify-center gap-3'>
+                                <div class='bg-white border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1'>
+                                    <img src='{{ route('captcha') }}' id='captcha-img' alt='Captcha' class='w-full h-full object-contain filter contrast-125 mix-blend-multiply'>
+                                </div>
+                                <button type='button' onclick='refreshCaptcha()' class='w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white transition-all hover:bg-[#154a96] border-none cursor-pointer shadow-sm'>
+                                    <i class='ri-refresh-line text-2xl'></i>
+                                </button>
+                                <input type='text' name='captcha' placeholder='{{ __('Enter Code') }}' class='h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#1B5CB8] focus:shadow-[0_0_0_3px_rgba(27,92,184,0.1)]' required>
+                            </div>
+                            @error('captcha')
+                                <span class='text-red-500 text-xs mt-1 pl-4 block'>{{ $message }}</span>
+                            @enderror
                         </div>
                 </div>
             </form>

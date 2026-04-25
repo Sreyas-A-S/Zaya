@@ -721,9 +721,8 @@
                     </div>
                 </div>
 
-                @if($clientRegistrationFeeEnabled)
                 <!-- Payment & Promocode (from Admin > Other Fees) -->
-                <div class="mb-10 border-t border-gray-200 pt-10" id="registration-fee-field-wrapper">
+                <div class="mb-10 border-t border-gray-200 pt-10 {{ (!$clientRegistrationFeeEnabled || $clientRegistrationFee <= 0) ? 'hidden' : '' }}" id="registration-fee-field-wrapper">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 items-end">
                         <div>
                             <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Registration Fee Amount') }}</label>
@@ -784,8 +783,7 @@
                         </div>
                     </div>
                 </div>
-
-                @endif
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div class="md:col-span-2">
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }}</label>
@@ -865,7 +863,7 @@
         <div class="container mx-auto px-4">
             <div class="max-w-5xl mx-auto flex items-center justify-end gap-4 md:gap-8">
                 <a href="{{ route('zaya-login') }}" class="btn-cancel">{{ __('Cancel') }}</a>
-                <button type="submit" id="submit-btn" form="registration-form" class="btn-create">
+                <button type="submit" id="submit-btn" form="registration-form" class="btn-create {{ ($clientRegistrationFeeEnabled && $clientRegistrationFee > 0) ? 'hidden' : '' }}">
                     <i class="ri-loader-4-line ri-spin btn-loader"></i>{{ __('Create Account') }}
                 </button>
             </div>
@@ -1457,7 +1455,9 @@
                         currencySymbol = symbol;
                         if (feeCurrencyInput) feeCurrencyInput.value = currency;
                         
-                        renderFee(feeValue);
+                        const isEnabled = data.enabled !== undefined ? data.enabled : true;
+                        
+                        renderFee(feeValue, isEnabled);
                         return;
                     }
                 } catch (error) {
@@ -1472,18 +1472,21 @@
                 // ... (rest of old logic for fallback)
             }
 
-            function renderFee(value) {
+            function renderFee(value, isEnabled = true) {
                 const feeDisplay = document.getElementById('registration-fee-display');
                 const feeWrapper = document.getElementById('registration-fee-field-wrapper');
+                const submitBtn = document.getElementById('submit-btn');
                 const displayValue = value !== undefined ? value : feeInput?.value;
                 const currCode = feeCurrencyInput?.value || '';
 
                 const numericValue = parseFloat(displayValue || 0);
 
-                if (numericValue <= 0) {
+                if (!isEnabled || numericValue <= 0) {
                     if (feeWrapper) feeWrapper.classList.add('hidden');
+                    if (submitBtn) submitBtn.classList.remove('hidden');
                 } else {
                     if (feeWrapper) feeWrapper.classList.remove('hidden');
+                    if (submitBtn) submitBtn.classList.add('hidden');
                     if (feeDisplay) {
                         feeDisplay.textContent = `${currencySymbol} ${numericValue.toFixed(2)}${currCode ? ' ('+currCode+')' : ''}`;
                     }
