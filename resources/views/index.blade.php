@@ -51,7 +51,7 @@
                         <input id="hero_search_placeholder_2" type="text"
                             name="zipcode"
                             value="{{ session('global_zipcode') }}"
-                            placeholder="{{ $settings['hero_search_placeholder_2'] ?? 'City, Postal code...' }}"
+                            placeholder="{{ $settings['hero_search_placeholder_2'] ?? 'City, Zip code...' }}"
                             maxlength="6"
                             pattern="[0-9]{6}"
                             inputmode="numeric"
