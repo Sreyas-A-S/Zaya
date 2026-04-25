@@ -807,7 +807,7 @@
                 </div>
 
                 <!-- Password Fields -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
+                <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
                         <div class="relative">
@@ -836,7 +836,7 @@
                         </div>
                     </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Form Footer: Already have account & Submit -->
                 <div class="bg-[#FDEBCA] -mx-8 md:-mx-14 -mb-8 md:-mb-14 p-8 md:p-10 lg:p-14 rounded-b-[32px] border-t border-[#97563D]/10 mt-12">

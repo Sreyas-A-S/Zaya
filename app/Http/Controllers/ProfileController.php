@@ -762,12 +762,15 @@ class ProfileController extends Controller
             ->groupBy('service_id');
 
         $defaultCurrency = $this->deriveCurrency($user);
-        $profile = $user->practitioner ?? $user->doctor ?? $user->mindfulnessPractitioner ?? $user->yogaTherapist ?? null;
+        $profile = $user->profile;
+        if (!$profile) {
+            return view('client.my-services', compact('user', 'myServices', 'defaultCurrency'))->with('error', 'Profile not found.');
+        }
         $reminderLeadTime = $profile->reminder_lead_time ?? 60;
 
         $nextOnlineBooking = Booking::with('transactions')
             ->where('profile_id', $user->profile_id)
-            ->where('practitioner_type', $user->getMorphClass())
+            ->where('practitioner_type', $profile->getMorphClass())
             ->where('mode', 'online')
             ->where('status', 'confirmed')
             ->whereDate('booking_date', '>=', now()->toDateString())
@@ -872,11 +875,14 @@ class ProfileController extends Controller
         ]);
 
         $user = Auth::user();
+        $profile = $user->profile;
         $booking = Booking::findOrFail($id);
 
         // Security check: Only the practitioner assigned to the booking can assign a translator
-        if (($booking->profile_id !== $user->profile_id || $booking->practitioner_type !== $user->getMorphClass()) && !in_array($user->role, ['admin', 'super-admin'])) {
-            return response()->json(['error' => 'Unauthorized action.'], 403);
+        if (!$profile || ($booking->profile_id !== $profile->id || $booking->practitioner_type !== $profile->getMorphClass())) {
+            if (!in_array($user->role, ['admin', 'super-admin'])) {
+                return response()->json(['error' => 'Unauthorized action.'], 403);
+            }
         }
 
         $booking->update([
