@@ -687,17 +687,18 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="mb-12">
                                 <h3 class="text-xl font-medium text-gray-900 mb-6">{{ __('Captcha Verification') }} <span class="text-red-500">*</span></h3>
-                                <div class="flex flex-wrap items-center gap-4">
-                                    <div class="bg-white border border-[#D1D5DB] rounded-full overflow-hidden h-[58px] w-[160px] flex items-center justify-center p-1 shadow-sm">
-                                        <img src="{{ route('captcha') }}" id="captcha-img" alt="Captcha" class="w-full h-full object-contain filter contrast-125 mix-blend-multiply">
+                                <div class="flex flex-col md:flex-row md:items-center gap-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="bg-white border border-[#D1D5DB] rounded-full overflow-hidden h-[58px] w-[160px] flex items-center justify-center p-1 shadow-sm">
+                                            <img src="{{ route('captcha') }}" id="captcha-img" alt="Captcha" class="w-full h-full object-contain filter contrast-125 mix-blend-multiply">
+                                        </div>
+                                        <button type="button" onclick="refreshCaptcha()" class="w-[48px] h-[48px] bg-[#1B5CB8] rounded-full flex items-center justify-center text-white transition-all hover:bg-[#154a96] border-none cursor-pointer shadow-sm">
+                                            <i class="ri-refresh-line text-2xl"></i>
+                                        </button>
                                     </div>
-                                    <button type="button" onclick="refreshCaptcha()" class="w-[48px] h-[48px] bg-[#1B5CB8] rounded-full flex items-center justify-center text-white transition-all hover:bg-[#154a96] border-none cursor-pointer shadow-sm">
-                                        <i class="ri-refresh-line text-2xl"></i>
-                                    </button>
-                                    <div class="flex-1 min-w-[200px]">
+                                    <div class="w-full md:flex-1">
                                         <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}" 
                                             class="w-full h-[58px] px-8 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#1B5CB8] focus:shadow-[0_0_0_3px_rgba(27,92,184,0.1)]" 
                                             required>

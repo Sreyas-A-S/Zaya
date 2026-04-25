@@ -790,14 +790,18 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div class="md:col-span-2">
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }} <span class="text-red-500">*</span></label>
-                        <div class="flex items-center gap-4">
-                            <div class="bg-white rounded-full flex items-center justify-center h-[52px] w-[150px] overflow-hidden relative shrink-0 border border-gray-200">
-                                <img src="{{ route('captcha') }}" id="captcha-img" alt="captcha" class="w-full h-full object-cover">
+                        <div class="flex flex-col md:flex-row md:items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-white rounded-full flex items-center justify-center h-[52px] w-[150px] overflow-hidden relative shrink-0 border border-gray-200">
+                                    <img src="{{ route('captcha') }}" id="captcha-img" alt="captcha" class="w-full h-full object-cover">
+                                </div>
+                                <button type="button" onclick="refreshCaptcha()" class="text-[#1052CE] hover:text-blue-800 transition-colors cursor-pointer shrink-0">
+                                    <i class="ri-restart-line text-[28px]"></i>
+                                </button>
                             </div>
-                            <button type="button" onclick="refreshCaptcha()" class="text-[#1052CE] hover:text-blue-800 transition-colors cursor-pointer shrink-0">
-                                <i class="ri-restart-line text-[28px]"></i>
-                            </button>
-                            <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}" class="reg-input flex-1 @error('captcha') border-red-500! @enderror">
+                            <div class="w-full md:flex-1">
+                                <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}" class="reg-input w-full @error('captcha') border-red-500! @enderror">
+                            </div>
                         </div>
                         @error('captcha')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
