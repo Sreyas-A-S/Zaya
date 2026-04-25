@@ -50,6 +50,9 @@ class Doctor extends Model
         'policies_agreed' => 'boolean',
         'prescription_understanding_agreed' => 'boolean',
         'confidentiality_consented' => 'boolean',
+        'booking_window_days' => 'integer',
+        'default_slot_duration' => 'integer',
+        'reminder_lead_time' => 'integer',
     ];
 
     public function user()

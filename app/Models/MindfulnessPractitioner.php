@@ -74,6 +74,9 @@ class MindfulnessPractitioner extends Model
         'ifsc_code',
         'upi_id',
         'cancelled_cheque_path',
+        'booking_window_days',
+        'default_slot_duration',
+        'reminder_lead_time',
         'status',
     ];
 
@@ -86,6 +89,9 @@ class MindfulnessPractitioner extends Model
         'consultation_modes' => 'array',
         'languages_spoken' => 'array',
         'practitioner_type' => 'array',
+        'booking_window_days' => 'integer',
+        'default_slot_duration' => 'integer',
+        'reminder_lead_time' => 'integer',
     ];
 
     public function user()
