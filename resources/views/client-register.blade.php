@@ -793,8 +793,8 @@
                     </div>
                 </div>
 
-                <!-- Password Fields (Hidden but required for registration) -->
-                <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
+                <!-- Password Fields -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
                         <div class="relative">
@@ -818,19 +818,43 @@
                                 placeholder="Confirm Password" required>
                             <button type="button" onclick="togglePassword('password_confirmation')"
                                 class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="ri-eye-line" id="password_confirmation-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </form>
         </div>
     </div>
-    </div>
 
+    <!-- Footer with Buttons -->
+    <footer class="bg-[#FFF3D4] py-6 mt-auto">
+        <div class="max-w-[1200px] mx-auto px-6">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="flex flex-col gap-1 text-center sm:text-left">
+                    <p class="text-[#423131] text-base font-medium">{{ __('Already have an account?') }}</p>
+                    <p class="text-[#97563D] text-sm opacity-80">{{ __('Login to access your personalized dashboard.') }}</p>
+                </div>
 
+                <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                    <a href="{{ route('zaya-login') }}" class="w-full sm:w-auto text-[#423131] py-3.5 px-8 rounded-full font-medium border border-[#423131]/20 transition-all hover:bg-[#423131]/5 text-center">
+                        {{ __('Login Instead') }}
+                    </a>
 
+                    @php
+                        $clientRegistrationFeeEnabled = \App\Models\CoinSetting::where('payout_currency', 'INR')->first()->is_active ?? false;
+                        $clientRegistrationFee = 0; // Default or fetched from config
+                    @endphp
 
-
-            
-
-
-
+                    <button type="submit" id="submit-btn" form="registration-form" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-3.5 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">
+                        <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
+                        {{ __('Create Account') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
         // Custom Select Logic (Generic)
