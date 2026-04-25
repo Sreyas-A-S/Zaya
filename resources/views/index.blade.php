@@ -49,8 +49,10 @@
                         <i class="ri-map-pin-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg"></i>
                         <input id="hero_search_placeholder_2" type="text" name="zipcode"
                             value="{{ session('global_zipcode') }}"
-                            placeholder="{{ $settings['hero_search_placeholder_2'] ?? 'City, Postal code...' }}"
-                            maxlength="6" pattern="[0-9]{6}" inputmode="numeric"
+                            placeholder="{{ $settings['hero_search_placeholder_2'] ?? 'City, Zip code...' }}"
+                            maxlength="6"
+                            pattern="[0-9]{6}"
+                            inputmode="numeric"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,6);"
                             class="bg-transparent border-none outline-none text-[#FDE2D8] placeholder-[#FDE2D8]/80 w-full text-base font-normal">
                     </div>

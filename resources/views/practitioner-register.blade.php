@@ -626,13 +626,16 @@
                                 <div>
                                     <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Registration Fee Amount') }}</label>
                                     <div class='relative w-full'>
-                                        <div class='w-full h-[58px] bg-[#F5F5F5] rounded-full flex items-center pl-8 pr-2' data-registration-fee-container>
+                                        <div class='w-full h-[58px] bg-[#F5F5F5] rounded-full flex items-center px-8' data-registration-fee-container>
                                             <span class='text-gray-900 text-[1.05rem] font-medium'>{{ $practitionerRegistrationCurrencySymbol ?? '€' }} {{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}</span>
                                             <input type='hidden' name='registration_fee' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
                                             <input type='hidden' name='registration_fee_actual' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
-                                            <button type='submit' class='absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer'>{{ __('Pay') }}</button>
                                         </div>
                                     </div>
+                                    <p class="text-xs text-gray-500 mt-3 px-4 leading-relaxed">
+                                        <i class="ri-information-line mr-1"></i>
+                                        {{ __('A secure payment link will be sent to your email after you submit this application.') }}
+                                    </p>
                                 </div>
 
                                 <div>
@@ -1184,7 +1187,7 @@
             }
 
             if (currentTab === totalTabs) {
-                nextBtnText.textContent = '{{ __('Complete Application') }}';
+                nextBtnText.textContent = '{{ __('Complete & Proceed to Payment') }}';
             } else {
                 nextBtnText.textContent = '{!! __('Save & Continue') !!}';
             }

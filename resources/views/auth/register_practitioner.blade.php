@@ -117,7 +117,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label">ZIP / Postal Code</label>
+                                                    <label class="form-label">ZIP / Zip Code</label>
                                                     <input type="text" class="form-control" name="zip_code" placeholder="ZIP Code">
                                                 </div>
                                                 <div class="col-md-6">
