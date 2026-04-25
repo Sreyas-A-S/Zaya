@@ -27,20 +27,31 @@ class FinancialController extends Controller
                     return $row->user->name ?? 'N/A';
                 })
                 ->addColumn('practitioner_name', function ($row) {
+                    if ($row->type === 'registration') return 'Zaya Wellness (Reg Fee)';
                     return $row->practitioner->name ?? 'N/A';
+                })
+                ->editColumn('type', function($row) {
+                    $class = match($row->type) {
+                        'booking' => 'primary',
+                        'referral' => 'success',
+                        'registration' => 'info',
+                        default => 'dark'
+                    };
+                    return '<span class="badge badge-'.$class.'">'.ucfirst($row->type).'</span>';
                 })
                 ->editColumn('total_amount', function ($row) {
                     return $row->currency . ' ' . number_format($row->total_amount, 2);
                 })
                 ->editColumn('company_share', function ($row) {
-                    return $row->currency . ' ' . number_format($row->company_share, 2) . ' (' . $row->company_commission_percent . '%)';
+                    return $row->currency . ' ' . number_format($row->company_share, 2) . ' (' . (float)$row->company_commission_percent . '%)';
                 })
                 ->editColumn('practitioner_share', function ($row) {
+                    if ($row->type === 'registration') return 'N/A';
                     return $row->currency . ' ' . number_format($row->practitioner_share, 2);
                 })
                 ->editColumn('referrer_share', function ($row) {
-                    if ($row->type === 'referral' || $row->referrer_id) {
-                        return $row->currency . ' ' . number_format($row->referrer_share, 2) . ' (' . $row->referrer_commission_percent . '%)';
+                    if ($row->type === 'referral' || ($row->referrer_id && $row->referrer_share > 0)) {
+                        return $row->currency . ' ' . number_format($row->referrer_share, 2) . ' (' . (float)$row->referrer_commission_percent . '%)';
                     }
                     return 'N/A';
                 })
@@ -58,7 +69,7 @@ class FinancialController extends Controller
                     $btns .= '</div>';
                     return $btns;
                 })
-                ->rawColumns(['action'])
+                ->rawColumns(['action', 'type'])
                 ->make(true);
         }
 

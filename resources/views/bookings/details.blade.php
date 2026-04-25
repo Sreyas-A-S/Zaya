@@ -85,17 +85,18 @@
             </div>
 
             @php
-                $transaction = $booking->transactions->first();
-                $isPractitioner = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->practitioner->user_id === $user->id;
+                $isPractitioner = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']);
             @endphp
 
-            @if($isPractitioner && $transaction)
-            <!-- Earnings Summary for Practitioner -->
+            @if($isPractitioner && $userTransaction)
+            <!-- Earnings Summary for Expert -->
             <div class="bg-secondary rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-2xl shadow-secondary/20 text-white p-8 relative group">
                 <div class="flex justify-between items-center relative z-10">
                     <div>
-                        <p class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2">Your Earned Share</p>
-                        <p class="text-4xl font-black tracking-tight">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->practitioner_share, 2) }}</p>
+                        <p class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2">
+                            {{ $userTransaction->referrer_id === $user->id ? 'Your Referral Share' : 'Your Earned Share' }}
+                        </p>
+                        <p class="text-4xl font-black tracking-tight">{{ get_currency_symbol($userTransaction->currency) }} {{ number_format($shareAmount, 2) }}</p>
                     </div>
                     <button onclick="togglePageDistribution()" class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all border border-white/10 group-hover:scale-110 duration-500">
                         <i class="ri-information-line text-2xl"></i>
@@ -106,17 +107,30 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
                             <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Gross Booking</p>
-                            <p class="text-lg font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->total_amount, 2) }}</p>
+                            <p class="text-lg font-black">{{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->total_amount, 2) }}</p>
                         </div>
-                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                            <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Platform Fee ({{ number_format($transaction->company_commission_percent, 1) }}%)</p>
-                            <p class="text-lg font-black text-red-300">- {{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->company_share, 2) }}</p>
-                        </div>
-                        @if($transaction->referrer_share > 0)
-                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                            <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Referral Fee ({{ number_format($transaction->referrer_commission_percent, 1) }}%)</p>
-                            <p class="text-lg font-black text-orange-300">- {{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->referrer_share, 2) }}</p>
-                        </div>
+                        
+                        @if($userTransaction->practitioner_id === $user->id)
+                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                                <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Platform Fee ({{ number_format($userTransaction->company_commission_percent, 1) }}%)</p>
+                                <p class="text-lg font-black text-red-300">- {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->company_share, 2) }}</p>
+                            </div>
+                            @if($userTransaction->referrer_share > 0)
+                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                                <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Referral Fee ({{ number_format($userTransaction->referrer_commission_percent, 1) }}%)</p>
+                                <p class="text-lg font-black text-orange-300">- {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->referrer_share, 2) }}</p>
+                            </div>
+                            @endif
+                        @else
+                            {{-- Current user is the referrer --}}
+                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                                <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Referral Commission</p>
+                                <p class="text-lg font-black text-emerald-300">{{ number_format($userTransaction->referrer_commission_percent, 1) }}%</p>
+                            </div>
+                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                                <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Status</p>
+                                <p class="text-lg font-black uppercase">{{ $userTransaction->status }}</p>
+                            </div>
                         @endif
                     </div>
                 </div>

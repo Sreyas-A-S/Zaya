@@ -35,7 +35,7 @@ class ProfileController extends Controller
     {
         $role = $user->role;
         $profileId = $user->profile_id;
-        $query = Booking::with(['practitioner.user', 'user']);
+        $query = Booking::with(['practitioner.user', 'user', 'transactions']);
 
         if ($forceClientView || $role === 'client' || $role === 'patient') {
             $query->where('user_id', $user->id);
@@ -44,8 +44,18 @@ class ProfileController extends Controller
         } else {
             // Practitioners, Doctors, Mindfulness, Yoga
             $morphClass = $user->profile ? $user->profile->getMorphClass() : $role;
-            $query->where('profile_id', $profileId)
-                  ->where('practitioner_type', $morphClass);
+            $query->where(function($q) use ($profileId, $morphClass, $user) {
+                // 1. Direct bookings
+                $q->where(function($sq) use ($profileId, $morphClass) {
+                    $sq->where('profile_id', $profileId)
+                       ->where('practitioner_type', $morphClass);
+                });
+
+                // 2. Referred bookings
+                $q->orWhereHas('referralsFromThisSession', function($sq) use ($user) {
+                    $sq->where('referred_to_id', $user->id);
+                });
+            });
         }
 
         return $query;
@@ -622,7 +632,7 @@ class ProfileController extends Controller
     public function showDetailsView($id)
     {
         $user = Auth::user();
-        $booking = Booking::with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo'])
+        $booking = Booking::with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo', 'transactions'])
             ->findOrFail($id);
 
         // Permissions check
@@ -688,7 +698,21 @@ class ProfileController extends Controller
 
         $firstPractitioner = $referralChain[0]['practitioner'] ?? 'Unknown';
 
-        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner'));
+        // Financial visibility logic
+        $userTransaction = $booking->transactions->first(function($t) use ($user) {
+            return $t->practitioner_id === $user->id || $t->referrer_id === $user->id;
+        });
+
+        $shareAmount = 0;
+        if ($userTransaction) {
+            if ($userTransaction->practitioner_id === $user->id) {
+                $shareAmount = $userTransaction->practitioner_share;
+            } elseif ($userTransaction->referrer_id === $user->id) {
+                $shareAmount = $userTransaction->referrer_share;
+            }
+        }
+
+        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount'));
     }
 
     public function viewClientProfile($id)
@@ -738,12 +762,15 @@ class ProfileController extends Controller
             ->groupBy('service_id');
 
         $defaultCurrency = $this->deriveCurrency($user);
-        $profile = $user->practitioner ?? $user->doctor ?? $user->mindfulnessPractitioner ?? $user->yogaTherapist ?? null;
+        $profile = $user->profile;
+        if (!$profile) {
+            return view('client.my-services', compact('user', 'myServices', 'defaultCurrency'))->with('error', 'Profile not found.');
+        }
         $reminderLeadTime = $profile->reminder_lead_time ?? 60;
 
         $nextOnlineBooking = Booking::with('transactions')
             ->where('profile_id', $user->profile_id)
-            ->where('practitioner_type', $user->getMorphClass())
+            ->where('practitioner_type', $profile->getMorphClass())
             ->where('mode', 'online')
             ->where('status', 'confirmed')
             ->whereDate('booking_date', '>=', now()->toDateString())
@@ -848,11 +875,14 @@ class ProfileController extends Controller
         ]);
 
         $user = Auth::user();
+        $profile = $user->profile;
         $booking = Booking::findOrFail($id);
 
         // Security check: Only the practitioner assigned to the booking can assign a translator
-        if (($booking->profile_id !== $user->profile_id || $booking->practitioner_type !== $user->getMorphClass()) && !in_array($user->role, ['admin', 'super-admin'])) {
-            return response()->json(['error' => 'Unauthorized action.'], 403);
+        if (!$profile || ($booking->profile_id !== $profile->id || $booking->practitioner_type !== $profile->getMorphClass())) {
+            if (!in_array($user->role, ['admin', 'super-admin'])) {
+                return response()->json(['error' => 'Unauthorized action.'], 403);
+            }
         }
 
         $booking->update([

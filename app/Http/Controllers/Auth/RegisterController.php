@@ -272,10 +272,6 @@ class RegisterController extends Controller
                 }
 
                 if ($paymentLink) {
-                    Mail::to($user->email)->send(
-                        new RegistrationFeePaymentLinkMail($paymentLink['role_label'], $paymentLink['amount'], $paymentLink['currency'], $paymentLink['payment_url'])
-                    );
-                    
                     // Redirect to payment immediately
                     if ($request->wantsJson()) {
                         return response()->json([
@@ -306,9 +302,6 @@ class RegisterController extends Controller
             }
 
             if ($paymentLink) {
-                Mail::to($user->email)->send(
-                    new RegistrationFeePaymentLinkMail($paymentLink['role_label'], $paymentLink['amount'], $paymentLink['currency'], $paymentLink['payment_url'])
-                );
                 // Prefer directing the user to pay immediately if possible
                 $this->guard()->login($user);
                 return redirect()->away($paymentLink['payment_url']);

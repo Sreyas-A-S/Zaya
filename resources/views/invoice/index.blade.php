@@ -58,6 +58,7 @@
         $currencyCode = strtoupper($booking->currency ?? config('app.currency', 'INR'));
         $symbols = config('currencies.symbols', []);
         $currencySymbol = $symbols[$currencyCode] ?? $currencyCode;
+        $isRegistration = $booking->practitioner_type === 'registration_fee';
     @endphp
 
     <!-- Top Status Icon & Header -->
@@ -69,9 +70,19 @@
                 </svg>
             </div>
         </div>
-        <h1 class="text-[20px] text-gray-800 font-semibold mb-2">{{ __($site_settings['invoice_main_title'] ?? 'Your Session has been Booked!') }}</h1>
+        <h1 class="text-[20px] text-gray-800 font-semibold mb-2">
+            @if($isRegistration)
+                {{ __('Registration Fee Paid') }}
+            @else
+                {{ __($site_settings['invoice_main_title'] ?? 'Your Session has been Booked!') }}
+            @endif
+        </h1>
         <p class="text-[13px] text-gray-500 max-w-[260px] mx-auto leading-relaxed">
-            {{ __($site_settings['invoice_subtitle'] ?? 'Please check your email for confirmation and further instruction.') }}
+            @if($isRegistration)
+                {{ __('Thank you for joining Zaya Wellness. Your account registration is now complete.') }}
+            @else
+                {{ __($site_settings['invoice_subtitle'] ?? 'Please check your email for confirmation and further instruction.') }}
+            @endif
         </p>
     </div>
 
@@ -109,11 +120,13 @@
                 <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_client_id'] ?? 'Client ID') }}</p>
                 <p class="text-[14px] font-semibold text-gray-800">Z-{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }}</p>
             </div>
+            @if(!$isRegistration)
             <div class="w-full md:w-1/3 mb-4 md:mb-0">
                 <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_client_dob'] ?? 'DOB') }}</p>
                 <p class="text-[14px] font-semibold text-gray-800">{{ $patient && $patient->dob ? $patient->dob->format('M d, Y') : 'N/A' }}</p>
             </div>
-            <div class="w-full md:w-1/3 text-right">
+            @endif
+            <div class="w-full md:{{ $isRegistration ? 'w-2/3' : 'w-1/3' }} text-right">
                 <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_client_location'] ?? 'Location') }}</p>
                 <p class="text-[14px] font-semibold text-gray-800">{{ $patient ? $patient->city_state : 'N/A' }}</p>
             </div>
@@ -121,52 +134,68 @@
 
         <hr class="border-gray-100 mb-6">
 
-        <!-- Sessions List -->
-        <h2 class="text-[15px] font-bold text-gray-800 mb-4">{{ __($site_settings['invoice_sessions_title'] ?? 'Sessions') }}</h2>
-
-        <div class="flex flex-col gap-3 mb-6">
-            @php
-                $serviceIds = is_array($booking->service_ids) ? $booking->service_ids : [];
-                $services = \App\Models\Service::whereIn('id', $serviceIds)->get();
-            @endphp
-            
-            @forelse($services as $service)
-            @php
-                // Try to find matching session info in metadata
-                $sessions = $booking->additional_info['sessions'] ?? [];
-                $sessionInfo = collect($sessions)->firstWhere('service_id', (string)$service->id) 
-                               ?? collect($sessions)->firstWhere('service_id', (int)$service->id);
-                
-                $displayDate = $booking->booking_date ? $booking->booking_date->format('M d, Y') : 'N/A';
-                $displayTime = $booking->booking_time ?? 'N/A';
-
-                if ($sessionInfo) {
-                    if (!empty($sessionInfo['day']) && $sessionInfo['day'] !== 'Day') {
-                        $displayDate = $sessionInfo['day'];
-                    }
-                    if (!empty($sessionInfo['time']) && $sessionInfo['time'] !== 'Time') {
-                        $displayTime = $sessionInfo['time'];
-                    }
-                }
-            @endphp
-            <div class="bg-[#f5f6f8] rounded-2xl p-4 flex justify-between items-center text-center md:text-left">
-                <div class="w-1/3">
-                    <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_service_col'] ?? 'Service') }}</p>
-                    <p class="text-[14px] font-semibold text-gray-800">{{ $service->title ?? ($service->name ?? 'N/A') }}</p>
-                </div>
-                <div class="w-1/3">
-                    <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_date_col'] ?? 'Date') }}</p>
-                    <p class="text-[14px] font-semibold text-gray-800">{{ $displayDate }}</p>
-                </div>
-                <div class="w-1/3 text-right">
-                    <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_time_col'] ?? 'Time') }}</p>
-                    <p class="text-[14px] font-semibold text-gray-800">{{ $displayTime }}</p>
+        @if($isRegistration)
+            <!-- Registration Details -->
+            <div class="mb-8">
+                <h2 class="text-[15px] font-bold text-gray-800 mb-4">{{ __('Fee Breakdown') }}</h2>
+                <div class="bg-[#f5f6f8] rounded-2xl p-5 flex justify-between items-center">
+                    <div>
+                        <p class="text-[14px] font-semibold text-gray-800">{{ __('Account Registration') }}</p>
+                        <p class="text-[11px] text-gray-400 uppercase tracking-widest mt-1">{{ __('One-time platform fee') }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[16px] font-black text-secondary">{{ $currencySymbol }} {{ number_format($booking->total_price, 2) }}</p>
+                    </div>
                 </div>
             </div>
-            @empty
-            <p class="text-sm text-gray-500 italic">{{ __($site_settings['invoice_no_services'] ?? 'No services listed.') }}</p>
-            @endforelse
-        </div>
+        @else
+            <!-- Sessions List -->
+            <h2 class="text-[15px] font-bold text-gray-800 mb-4">{{ __($site_settings['invoice_sessions_title'] ?? 'Sessions') }}</h2>
+
+            <div class="flex flex-col gap-3 mb-6">
+                @php
+                    $serviceIds = is_array($booking->service_ids) ? $booking->service_ids : [];
+                    $services = \App\Models\Service::whereIn('id', $serviceIds)->get();
+                @endphp
+                
+                @forelse($services as $service)
+                @php
+                    // Try to find matching session info in metadata
+                    $sessions = $booking->additional_info['sessions'] ?? [];
+                    $sessionInfo = collect($sessions)->firstWhere('service_id', (string)$service->id) 
+                                ?? collect($sessions)->firstWhere('service_id', (int)$service->id);
+                    
+                    $displayDate = $booking->booking_date ? $booking->booking_date->format('M d, Y') : 'N/A';
+                    $displayTime = $booking->booking_time ?? 'N/A';
+
+                    if ($sessionInfo) {
+                        if (!empty($sessionInfo['day']) && $sessionInfo['day'] !== 'Day') {
+                            $displayDate = $sessionInfo['day'];
+                        }
+                        if (!empty($sessionInfo['time']) && $sessionInfo['time'] !== 'Time') {
+                            $displayTime = $sessionInfo['time'];
+                        }
+                    }
+                @endphp
+                <div class="bg-[#f5f6f8] rounded-2xl p-4 flex justify-between items-center text-center md:text-left">
+                    <div class="w-1/3">
+                        <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_service_col'] ?? 'Service') }}</p>
+                        <p class="text-[14px] font-semibold text-gray-800">{{ $service->title ?? ($service->name ?? 'N/A') }}</p>
+                    </div>
+                    <div class="w-1/3">
+                        <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_date_col'] ?? 'Date') }}</p>
+                        <p class="text-[14px] font-semibold text-gray-800">{{ $displayDate }}</p>
+                    </div>
+                    <div class="w-1/3 text-right">
+                        <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_time_col'] ?? 'Time') }}</p>
+                        <p class="text-[14px] font-semibold text-gray-800">{{ $displayTime }}</p>
+                    </div>
+                </div>
+                @empty
+                <p class="text-sm text-gray-500 italic">{{ __($site_settings['invoice_no_services'] ?? 'No services listed.') }}</p>
+                @endforelse
+            </div>
+        @endif
 
         <hr class="border-gray-100 mb-6">
 
@@ -212,6 +241,7 @@
             </div>
         </div>
 
+        @if(!$isRegistration)
         <hr class="border-gray-100 mb-6">
 
         <!-- Practitioners & Options List -->
@@ -270,7 +300,8 @@
                     @endphp
                     <img src="{{ $tImage }}" alt="{{ $tName }}" crossorigin="anonymous" 
                         onerror="this.src='{{ asset('frontend/assets/profile-dummy-img.png') }}'"
-                        class="w-[36px] h-[36px] rounded-full object-cover grayscale opacity-70">                    <div>
+                        class="w-[36px] h-[36px] rounded-full object-cover grayscale opacity-70">
+                    <div>
                         <p class="text-[13px] font-medium text-gray-700 leading-tight mb-0.5">{{ $tName }}</p>
                         <p class="text-[11px] text-gray-400 uppercase tracking-tighter">{{ __('Assigned Translator') }}</p>
                     </div>
@@ -281,26 +312,37 @@
             </div>
             @endif
         </div>
+        @endif
 
         <hr class="border-gray-100 mb-6">
 
         <!-- Footer -->
         <div class="text-center pt-1 mb-2">
-            <p class="text-[16px] font-semibold text-gray-800 mb-1.5">{{ __($site_settings['invoice_footer_thanks'] ?? 'Thanks for Booking!') }}</p>
+            <p class="text-[16px] font-semibold text-gray-800 mb-1.5">{{ __($isRegistration ? 'Thanks for Joining!' : ($site_settings['invoice_footer_thanks'] ?? 'Thanks for Booking!')) }}</p>
             <p class="text-[11px] text-gray-500 font-medium">{{ __($site_settings['invoice_footer_queries'] ?? 'For more queries') }} &middot; <a href="https://www.zayawellness.com"
                     class="text-blue-500 hover:underline">www.zayawellness.com</a></p>
         </div>
     </div>
 
-    <!-- Book Another Session CTA -->
+    <!-- Actions CTA -->
     <div class="mb-6 no-print mt-6">
-        <a href="{{ route('book-session', ['practitioner' => $booking->practitioner->slug]) }}" 
+        @if($isRegistration)
+        <a href="{{ route('dashboard') }}" 
+           class="inline-flex items-center gap-2 px-8 py-3 bg-[#1e3a2f] text-white font-semibold text-[15px] rounded-full hover:bg-[#16261f] transition-all shadow-md">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 001 1h3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            {{ __('Go to Dashboard') }}
+        </a>
+        @else
+        <a href="{{ route('book-session', ['practitioner' => $booking->practitioner->slug ?? '']) }}" 
            class="inline-flex items-center gap-2 px-8 py-3 bg-[#1e3a2f] text-white font-semibold text-[15px] rounded-full hover:bg-[#16261f] transition-all shadow-md">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
             {{ __('Book Another Session') }}
         </a>
+        @endif
     </div>
 
     <!-- Bottom Action Buttons -->

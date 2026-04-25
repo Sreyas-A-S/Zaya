@@ -33,6 +33,9 @@
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Date & Time</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Mode</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Amount</th>
+                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Your Share</th>
+                        @endif
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Status</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right whitespace-nowrap">Actions</th>
                     </tr>
@@ -44,7 +47,12 @@
                             {{ $loop->iteration + ($bookings->currentPage() - 1) * $bookings->perPage() }}
                         </td>
                         <td class="px-6 py-4 text-sm font-medium text-secondary">
-                            {{ $booking->invoice_no }}
+                            <div class="flex items-center gap-2">
+                                {{ $booking->invoice_no }}
+                                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id !== $user->profile_id)
+                                    <span class="px-1.5 py-0.5 bg-orange-50 text-orange-600 text-[9px] font-black uppercase tracking-tighter rounded border border-orange-100">Referred</span>
+                                @endif
+                            </div>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center">
@@ -115,6 +123,33 @@
                         <td class="px-6 py-4 text-sm text-secondary font-medium">
                             {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}
                         </td>
+                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
+                        <td class="px-6 py-4 text-sm font-bold text-emerald-600">
+                            @php
+                                // Find if user is practitioner or referrer in any transaction linked to this booking
+                                $userTransaction = $booking->transactions->first(function($t) use ($user) {
+                                    return $t->practitioner_id === $user->id || $t->referrer_id === $user->id;
+                                });
+
+                                $shareAmount = 0;
+                                if ($userTransaction) {
+                                    if ($userTransaction->practitioner_id === $user->id) {
+                                        $shareAmount = $userTransaction->practitioner_share;
+                                    } elseif ($userTransaction->referrer_id === $user->id) {
+                                        $shareAmount = $userTransaction->referrer_share;
+                                    }
+                                }
+                            @endphp
+                            @if($userTransaction && $shareAmount > 0)
+                                {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($shareAmount, 2) }}
+                                @if($userTransaction->referrer_id === $user->id)
+                                    <div class="text-[9px] font-normal text-gray-400 mt-0.5">Referral Fee</div>
+                                @endif
+                            @else
+                                <span class="text-gray-300 font-normal">--</span>
+                            @endif
+                        </td>
+                        @endif
                         <td class="px-6 py-4">
                             @php
                                 $statusClasses = [
