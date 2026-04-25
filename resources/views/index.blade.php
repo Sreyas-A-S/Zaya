@@ -39,8 +39,7 @@
                     <div
                         class="w-full md:flex-1 flex items-center border-b md:border-b-0 md:border-r border-white/30 pb-3 md:pb-0 md:pr-2">
                         <i class="ri-search-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg search-icon"></i>
-                        <input id="hero_search_input" type="text"
-                            name="query"
+                        <input id="hero_search_input" type="text" name="query"
                             placeholder="{{ $settings['hero_search_placeholder_1'] ?? 'Practitioners, Treatments...' }}"
                             autocomplete="off"
                             class="bg-transparent border-none outline-none text-[#FDE2D8] placeholder-[#FDE2D8]/80 w-full text-base font-normal">
@@ -48,8 +47,7 @@
                     <!-- Section 2 -->
                     <div class="w-full md:flex-1 flex items-center md:pl-3 pb-2 md:pb-0 md:pr-2">
                         <i class="ri-map-pin-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg"></i>
-                        <input id="hero_search_placeholder_2" type="text"
-                            name="zipcode"
+                        <input id="hero_search_placeholder_2" type="text" name="zipcode"
                             value="{{ session('global_zipcode') }}"
                             placeholder="{{ $settings['hero_search_placeholder_2'] ?? 'City, Zip code...' }}"
                             maxlength="6"
@@ -66,7 +64,8 @@
                     </button>
 
                     <!-- Search Results Dropdown -->
-                    <div id="hero-search-results" class="dropdown-menu absolute z-50 left-0 right-0 top-[calc(100%+16px)] bg-white border border-gray-100 rounded-2xl shadow-[0_5px_30px_rgba(0,0,0,0.1)] py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px] overflow-hidden text-left">
+                    <div id="hero-search-results"
+                        class="dropdown-menu absolute z-50 left-0 right-0 top-[calc(100%+16px)] bg-white border border-gray-100 rounded-2xl shadow-[0_5px_30px_rgba(0,0,0,0.1)] py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px] overflow-hidden text-left">
                         <div class="max-h-[360px] overflow-y-auto px-1 custom-scrollbar flex flex-col gap-0.5">
                             <!-- Results will be injected here -->
                         </div>
@@ -75,7 +74,7 @@
 
 
 
-                
+
 
                 <h1 id="hero_title" class="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-white mb-4 lg:mb-6">
                     {{ $settings['hero_title'] ?? 'Where Indian Wisdom Meets Modern Wellness' }}
@@ -99,8 +98,8 @@
         <img src="{{ asset('frontend/assets/holy-basil.png') }}" alt="Thulasi Image"
             class="absolute -top-10 sm:top-0 md:top-20 xl:top-16 right-0 z-2 w-[80px] md:w-[120px] lg:w-[163px] pointer-events-none">
 
-        <img src="{{ asset('frontend/assets/circle-outlines.png') }}" alt="Circle Outlines Image"
-            class="absolute top-40 lg:top-30 xl:top-26 right-0 z-0 w-[120px] md:w-[200px] pointer-events-none">
+        <!-- <img src="{{ asset('frontend/assets/circle-outlines.png') }}" alt="Circle Outlines Image"
+                class="absolute top-40 lg:top-30 xl:top-26 right-0 z-0 w-[120px] md:w-[200px] pointer-events-none"> -->
 
         <div class="container mx-auto">
             <div class="text-center mb-16 animate-on-scroll px-4">
@@ -120,7 +119,7 @@
                 @foreach($services as $index => $service)
                     <!-- Service {{ $index + 1 }} -->
                     <a href="{{ $service->slug ? route('service-detail', $service->slug) : '#' }}"
-                        class="group cursor-pointer animate-on-scroll hover:-translate-y-2 transition-transform duration-500"
+                        class="group cursor-pointer hover:-translate-y-2 transition-transform duration-500"
                         style="transition-delay: {{ $index * 100 }}ms;">
                         <div class="h-64 overflow-hidden mb-4 relative">
                             @php
@@ -300,7 +299,8 @@
                 <!-- Girl Image -->
                 <div class="flex-1 relative overflow-hidden group min-h-[320px] animate-on-scroll"
                     style="transition-delay: 200ms;">
-                    <img src="{{ isset($settings['blog_post_3_image']) ? (Str::startsWith($settings['blog_post_3_image'], 'frontend/') ? asset($settings['blog_post_3_image']) : asset('storage/' . $settings['blog_post_3_image'])) : asset('frontend/assets/yoga-dress-girl.png') }}" alt="Wellness Lifestyle"
+                    <img src="{{ isset($settings['blog_post_3_image']) ? (Str::startsWith($settings['blog_post_3_image'], 'frontend/') ? asset($settings['blog_post_3_image']) : asset('storage/' . $settings['blog_post_3_image'])) : asset('frontend/assets/yoga-dress-girl.png') }}"
+                        alt="Wellness Lifestyle"
                         class="w-full h-full object-cover transition-transform duration-700 scale-110 group-hover:scale-105">
 
                     <!-- Play Button (Always Visible) -->
@@ -392,8 +392,10 @@
                                         @endfor
                                     </div>
                                     <div class="flex items-center gap-4 text-gray-400">
-                                        <div class="flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors testimonial-like-btn {{ $testimonial->is_liked ? 'text-primary' : '' }}" data-id="{{ $testimonial->id }}">
-                                            <i class="{{ $testimonial->is_liked ? 'ri-thumb-up-fill' : 'ri-thumb-up-line' }} text-lg"></i>
+                                        <div class="flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors testimonial-like-btn {{ $testimonial->is_liked ? 'text-primary' : '' }}"
+                                            data-id="{{ $testimonial->id }}">
+                                            <i
+                                                class="{{ $testimonial->is_liked ? 'ri-thumb-up-fill' : 'ri-thumb-up-line' }} text-lg"></i>
                                             <span class="text-xs font-medium">{{ $testimonial->likes_count }}</span>
                                         </div>
                                         <div class="flex items-center gap-1.5">
@@ -423,39 +425,51 @@
     </section>
 
     <!-- Announcement Card -->
-    <div id="announcement-card" class="fixed bottom-0 right-0 z-[999] opacity-0 pointer-events-none transition-all duration-500 transform translate-y-10">
-        <div class="relative bg-white border-t border-l border-gray-200 shadow-[-15px_-15px_40px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-stretch max-w-[450px] transition-transform duration-300 hover:-translate-y-2">
+    <div id="announcement-card"
+        class="fixed bottom-0 right-0 z-[999] opacity-0 pointer-events-none transition-all duration-500 transform translate-y-10">
+        <div
+            class="relative bg-white border-t border-l border-gray-200 shadow-[-15px_-15px_40px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-stretch max-w-[450px] transition-transform duration-300 hover:-translate-y-2">
             <!-- Close Button Inside -->
-            <button onclick="closeAnnouncementCard()" 
-                    class="absolute top-2 right-2 w-6 h-6 bg-gray-100 text-gray-400 hover:bg-red-500 hover:text-white flex items-center justify-center z-[1001] transition-all">
+            <button onclick="closeAnnouncementCard()"
+                class="absolute top-2 right-2 w-6 h-6 bg-gray-100 text-gray-400 hover:bg-red-500 hover:text-white flex items-center justify-center z-[1001] transition-all">
                 <i class="ri-close-line"></i>
             </button>
 
             @if($latestAnnouncement)
                 @if($latestAnnouncement['image'])
-                <div class="w-auto md:w-40 h-40 md:h-auto shrink-0 overflow-hidden bg-gray-100 m-3 border border-gray-100">
-                    <img src="{{ $latestAnnouncement['image'] }}" alt="Announcement" class="w-full h-full object-cover">
-                </div>
+                    <div class="w-auto md:w-40 h-40 md:h-auto shrink-0 overflow-hidden bg-gray-100 m-3 border border-gray-100">
+                        <img src="{{ $latestAnnouncement['image'] }}" alt="Announcement" class="w-full h-full object-cover">
+                    </div>
                 @endif
                 <div class="p-6 md:p-8 md:pl-2 pr-12 flex flex-col justify-center gap-2">
-                    <span class="text-[10px] font-black text-primary uppercase tracking-widest leading-none" data-i18n="New Announcement">New Announcement</span>
-                    <h4 class="text-lg md:text-xl font-bold text-gray-800 line-clamp-1 leading-tight">{{ $latestAnnouncement['title'] }}</h4>
-                    <p class="text-sm text-gray-500 line-clamp-2 leading-snug">{{ \Illuminate\Support\Str::limit($latestAnnouncement['excerpt'], 100) }}</p>
-                    <a href="{{ $latestAnnouncement['link'] }}" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1">
+                    <span class="text-[10px] font-black text-primary uppercase tracking-widest leading-none"
+                        data-i18n="New Announcement">New Announcement</span>
+                    <h4 class="text-lg md:text-xl font-bold text-gray-800 line-clamp-1 leading-tight">
+                        {{ $latestAnnouncement['title'] }}
+                    </h4>
+                    <p class="text-sm text-gray-500 line-clamp-2 leading-snug">
+                        {{ \Illuminate\Support\Str::limit($latestAnnouncement['excerpt'], 100) }}
+                    </p>
+                    <a href="{{ $latestAnnouncement['link'] }}"
+                        class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1">
                         <span data-i18n="Read More">Read More</span> <i class="ri-arrow-right-s-line"></i>
                     </a>
                 </div>
             @else
-                <a href="{{ route('announcements') }}" class="flex items-center gap-6 p-8 pr-16 hover:bg-gray-50 transition-colors group w-full min-h-[120px]">
+                <a href="{{ route('announcements') }}"
+                    class="flex items-center gap-6 p-8 pr-16 hover:bg-gray-50 transition-colors group w-full min-h-[120px]">
                     <div class="w-14 h-14 bg-primary flex items-center justify-center text-white shrink-0">
                         <i class="ri-notification-3-line text-3xl"></i>
                     </div>
                     <div class="flex flex-col gap-1">
-                        <span class="text-[11px] font-black text-primary uppercase tracking-widest leading-none" data-i18n="Announcements">Announcements</span>
-                        <span class="text-lg font-bold text-gray-800 whitespace-nowrap leading-none" data-i18n="Latest Updates & News">Latest Updates & News</span>
+                        <span class="text-[11px] font-black text-primary uppercase tracking-widest leading-none"
+                            data-i18n="Announcements">Announcements</span>
+                        <span class="text-lg font-bold text-gray-800 whitespace-nowrap leading-none"
+                            data-i18n="Latest Updates & News">Latest Updates & News</span>
                     </div>
                     <div class="absolute right-6 top-1/2 -translate-y-1/2">
-                        <i class="ri-arrow-right-line text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all text-2xl"></i>
+                        <i
+                            class="ri-arrow-right-line text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all text-2xl"></i>
                     </div>
                 </a>
             @endif
@@ -472,7 +486,7 @@
             }
         }
 
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             setTimeout(() => {
                 const card = document.getElementById('announcement-card');
                 if (card) {
@@ -489,13 +503,16 @@
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background-color: #E5E7EB;
             border-radius: 20px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background-color: #D1D5DB;
         }
@@ -508,204 +525,204 @@
         }
     </style>
 
-@push('scripts')
-<script>
-$(document).ready(function() {
-    function setupHeroSearch() {
-        const searchInput = $('#hero_search_input');
-        const resultsDropdown = $('#hero-search-results');
-        const resultsContainer = resultsDropdown.find('.custom-scrollbar');
-        const container = searchInput.closest('.search-container');
-        const icon = container.find('.search-icon');
+    @push('scripts')
+        <script>
+            $(document).ready(function () {
+                function setupHeroSearch() {
+                    const searchInput = $('#hero_search_input');
+                    const resultsDropdown = $('#hero-search-results');
+                    const resultsContainer = resultsDropdown.find('.custom-scrollbar');
+                    const container = searchInput.closest('.search-container');
+                    const icon = container.find('.search-icon');
 
-        let currentRequest = null;
-        let searchTimeout = null;
+                    let currentRequest = null;
+                    let searchTimeout = null;
 
-        searchInput.on('input', function() {
-            const query = $(this).val();
+                    searchInput.on('input', function () {
+                        const query = $(this).val();
 
-            if (searchTimeout) clearTimeout(searchTimeout);
+                        if (searchTimeout) clearTimeout(searchTimeout);
 
-            if (query.length < 1) {
-                container.removeClass('dropdown-open');
-                setTimeout(() => { if(!container.hasClass('dropdown-open')) resultsContainer.empty(); }, 300);
-                if (currentRequest) currentRequest.abort();
-                return;
-            }
-
-            searchTimeout = setTimeout(() => {
-                if (currentRequest) currentRequest.abort();
-                
-                // Show loader inside dropdown
-                resultsContainer.html(`
-                    <div class="flex flex-col items-center justify-center py-12 gap-3">
-                        <i class="ri-loader-4-line animate-spin text-primary text-4xl"></i>
-                        <span class="text-gray-400 text-sm font-medium">Searching for results...</span>
-                    </div>
-                `);
-                container.addClass('dropdown-open');
-
-                currentRequest = $.ajax({
-                url: "{{ route('search') }}",
-                type: "GET",
-                data: { query: query },
-                success: function(data) {
-                    resultsContainer.empty();
-
-                    const hasPractitioners = data.practitioners && data.practitioners.length > 0;
-                    const hasTreatments = data.treatments && data.treatments.length > 0;
-
-                    if (hasPractitioners || hasTreatments) {
-                        if (hasPractitioners) {
-                            resultsContainer.append('<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Practitioners</div>');
-                            data.practitioners.forEach(function(item) {
-                            const resultItem = `
-                                <a href="/practitioner/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
-                                    <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">                                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                        </div>
-                                        <div class="flex flex-col text-left">
-                                            <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
-                                            <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
-                                        </div>
-                                    </a>
-                                `;
-                                resultsContainer.append(resultItem);
-                            });
+                        if (query.length < 1) {
+                            container.removeClass('dropdown-open');
+                            setTimeout(() => { if (!container.hasClass('dropdown-open')) resultsContainer.empty(); }, 300);
+                            if (currentRequest) currentRequest.abort();
+                            return;
                         }
 
-                        if (hasTreatments) {
-                            resultsContainer.append('<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Treatments</div>');
-                            data.treatments.forEach(function(item) {
-                                const resultItem = `
-                                    <a href="/service/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
-                                        <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
-                                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                        </div>
-                                        <div class="flex flex-col text-left">
-                                            <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
-                                            <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
-                                        </div>
-                                    </a>
-                                `;
-                                resultsContainer.append(resultItem);
+                        searchTimeout = setTimeout(() => {
+                            if (currentRequest) currentRequest.abort();
+
+                            // Show loader inside dropdown
+                            resultsContainer.html(`
+                                    <div class="flex flex-col items-center justify-center py-12 gap-3">
+                                        <i class="ri-loader-4-line animate-spin text-primary text-4xl"></i>
+                                        <span class="text-gray-400 text-sm font-medium">Searching for results...</span>
+                                    </div>
+                                `);
+                            container.addClass('dropdown-open');
+
+                            currentRequest = $.ajax({
+                                url: "{{ route('search') }}",
+                                type: "GET",
+                                data: { query: query },
+                                success: function (data) {
+                                    resultsContainer.empty();
+
+                                    const hasPractitioners = data.practitioners && data.practitioners.length > 0;
+                                    const hasTreatments = data.treatments && data.treatments.length > 0;
+
+                                    if (hasPractitioners || hasTreatments) {
+                                        if (hasPractitioners) {
+                                            resultsContainer.append('<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Practitioners</div>');
+                                            data.practitioners.forEach(function (item) {
+                                                const resultItem = `
+                                                <a href="/practitioner/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                                    <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">                                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                                        </div>
+                                                        <div class="flex flex-col text-left">
+                                                            <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
+                                                            <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
+                                                        </div>
+                                                    </a>
+                                                `;
+                                                resultsContainer.append(resultItem);
+                                            });
+                                        }
+
+                                        if (hasTreatments) {
+                                            resultsContainer.append('<div class="px-5 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">Treatments</div>');
+                                            data.treatments.forEach(function (item) {
+                                                const resultItem = `
+                                                    <a href="/service/${item.slug}" class="dropdown-item w-full flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 text-gray-800 hover:text-[#db8871] rounded-lg transition-colors group">
+                                                        <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-gray-100">
+                                                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                                        </div>
+                                                        <div class="flex flex-col text-left">
+                                                            <span class="font-sans! text-base md:text-lg font-medium leading-tight">${item.name}</span>
+                                                            <span class="text-xs text-gray-400 mt-0.5 font-normal">${item.subtitle}</span>
+                                                        </div>
+                                                    </a>
+                                                `;
+                                                resultsContainer.append(resultItem);
+                                            });
+                                        }
+                                    } else {
+                                        resultsContainer.html('<div class="px-5 py-8 text-gray-500 italic text-center">No results found for "' + query + '"</div>');
+                                    }
+                                },
+                                error: function () {
+                                    resultsContainer.html('<div class="px-5 py-8 text-red-400 text-center">Something went wrong. Please try again.</div>');
+                                }
                             });
+                        }, 300);
+                    });
+
+                    // Close dropdown when clicking outside
+                    $(document).on('click', function (e) {
+                        if (!$(e.target).closest('.search-container').length) {
+                            $('.search-container').removeClass('dropdown-open');
                         }
-                    } else {
-                        resultsContainer.html('<div class="px-5 py-8 text-gray-500 italic text-center">No results found for "'+query+'"</div>');
-                    }
-                },
-                error: function() {
-                    resultsContainer.html('<div class="px-5 py-8 text-red-400 text-center">Something went wrong. Please try again.</div>');
-                }
-            });
-            }, 300);
-        });
-
-        // Close dropdown when clicking outside
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('.search-container').length) {
-                $('.search-container').removeClass('dropdown-open');
-            }
-        });
-    }
-
-    setupHeroSearch();
-
-    let practitionerSwiper = null;
-
-    function initPractitionerSwiper() {
-        if (practitionerSwiper) {
-            practitionerSwiper.destroy(true, true);
-        }
-
-        const slidesCount = document.querySelectorAll('.practitioner-slider .swiper-slide').length;
-        if (slidesCount > 0) {
-            practitionerSwiper = new SwiperLib('.practitioner-slider', {
-                slidesPerView: 1.5,
-                spaceBetween: 20,
-                loop: slidesCount >= 6,
-                centeredSlides: true,
-                autoplay: {
-                    delay: 3500,
-                    pauseOnMouseEnter: true,
-                    pauseOnFocus: true,
-                },
-                navigation: {
-                    nextEl: '.next-practitioner',
-                    prevEl: '.prev-practitioner',
-                },
-                breakpoints: {
-                    512: { slidesPerView: 2.3, centeredSlides: true, loop: slidesCount >= 6 },
-                    768: { slidesPerView: 3, centeredSlides: false, loop: slidesCount >= 6 },
-                    1152: { slidesPerView: 4, centeredSlides: false, loop: slidesCount >= 8 },
-                    1440: { slidesPerView: 4.4, spaceBetween: 40, centeredSlides: false, loop: slidesCount >= 10 },
-                    1920: { slidesPerView: 5, spaceBetween: 80, centeredSlides: false, loop: slidesCount >= 10 },
-                },
-            });
-        }
-    }
-
-    function setupPractitionerFilter() {
-        const searchInput = $('#practitioners_search_placeholder');
-        const resultsContainer = $('#practitioner-results-container');
-        let searchTimeout = null;
-        let currentRequest = null;
-
-        searchInput.on('input', function() {
-            const query = $(this).val();
-
-            if (searchTimeout) clearTimeout(searchTimeout);
-
-            searchTimeout = setTimeout(() => {
-                if (currentRequest) currentRequest.abort();
-
-                // Show loading state in swiper
-                resultsContainer.html(`
-                    <div class="swiper-slide w-full flex items-center justify-center py-20">
-                        <div class="flex flex-col items-center gap-4">
-                            <i class="ri-loader-4-line animate-spin text-primary text-5xl"></i>
-                            <span class="text-gray-400 font-medium">Filtering practitioners...</span>
-                        </div>
-                    </div>
-                `);
-                
-                if (practitionerSwiper) {
-                    practitionerSwiper.update();
+                    });
                 }
 
-                currentRequest = $.ajax({
-                    url: "{{ route('filter-practitioners') }}",
-                    type: "GET",
-                    data: { query: query },
-                    success: function(html) {
-                        resultsContainer.html(html);
-                        initPractitionerSwiper();
-                        if (query.length > 0 && resultsContainer.find('.swiper-slide').length === 0) {
-                             resultsContainer.html(`
-                                <div class="swiper-slide w-full flex items-center justify-center py-20">
-                                    <div class="text-gray-400 font-medium">No practitioners found for "${query}"</div>
-                                </div>
-                            `);
-                        }
-                    },
-                    error: function() {
-                        resultsContainer.html(`
-                            <div class="swiper-slide w-full flex items-center justify-center py-20">
-                                <div class="text-red-400 font-medium">Error loading practitioners.</div>
-                            </div>
-                        `);
-                    }
-                });
-            }, 400);
-        });
-    }
+                setupHeroSearch();
 
-    // Initial Swiper setup is handled by script.js, but we might need to take control
-    // if we want to ensure we have the instance. Since script.js runs on DOMContentLoaded,
-    // we can re-init here after a small delay or just wait.
-    setTimeout(initPractitionerSwiper, 500);
-    setupPractitionerFilter();
-});
-</script>
-@endpush
+                let practitionerSwiper = null;
+
+                function initPractitionerSwiper() {
+                    if (practitionerSwiper) {
+                        practitionerSwiper.destroy(true, true);
+                    }
+
+                    const slidesCount = document.querySelectorAll('.practitioner-slider .swiper-slide').length;
+                    if (slidesCount > 0) {
+                        practitionerSwiper = new SwiperLib('.practitioner-slider', {
+                            slidesPerView: 1.5,
+                            spaceBetween: 20,
+                            loop: slidesCount >= 6,
+                            centeredSlides: true,
+                            autoplay: {
+                                delay: 3500,
+                                pauseOnMouseEnter: true,
+                                pauseOnFocus: true,
+                            },
+                            navigation: {
+                                nextEl: '.next-practitioner',
+                                prevEl: '.prev-practitioner',
+                            },
+                            breakpoints: {
+                                512: { slidesPerView: 2.3, centeredSlides: true, loop: slidesCount >= 6 },
+                                768: { slidesPerView: 3, centeredSlides: false, loop: slidesCount >= 6 },
+                                1152: { slidesPerView: 4, centeredSlides: false, loop: slidesCount >= 8 },
+                                1440: { slidesPerView: 4.4, spaceBetween: 40, centeredSlides: false, loop: slidesCount >= 10 },
+                                1920: { slidesPerView: 5, spaceBetween: 80, centeredSlides: false, loop: slidesCount >= 10 },
+                            },
+                        });
+                    }
+                }
+
+                function setupPractitionerFilter() {
+                    const searchInput = $('#practitioners_search_placeholder');
+                    const resultsContainer = $('#practitioner-results-container');
+                    let searchTimeout = null;
+                    let currentRequest = null;
+
+                    searchInput.on('input', function () {
+                        const query = $(this).val();
+
+                        if (searchTimeout) clearTimeout(searchTimeout);
+
+                        searchTimeout = setTimeout(() => {
+                            if (currentRequest) currentRequest.abort();
+
+                            // Show loading state in swiper
+                            resultsContainer.html(`
+                                    <div class="swiper-slide w-full flex items-center justify-center py-20">
+                                        <div class="flex flex-col items-center gap-4">
+                                            <i class="ri-loader-4-line animate-spin text-primary text-5xl"></i>
+                                            <span class="text-gray-400 font-medium">Filtering practitioners...</span>
+                                        </div>
+                                    </div>
+                                `);
+
+                            if (practitionerSwiper) {
+                                practitionerSwiper.update();
+                            }
+
+                            currentRequest = $.ajax({
+                                url: "{{ route('filter-practitioners') }}",
+                                type: "GET",
+                                data: { query: query },
+                                success: function (html) {
+                                    resultsContainer.html(html);
+                                    initPractitionerSwiper();
+                                    if (query.length > 0 && resultsContainer.find('.swiper-slide').length === 0) {
+                                        resultsContainer.html(`
+                                                <div class="swiper-slide w-full flex items-center justify-center py-20">
+                                                    <div class="text-gray-400 font-medium">No practitioners found for "${query}"</div>
+                                                </div>
+                                            `);
+                                    }
+                                },
+                                error: function () {
+                                    resultsContainer.html(`
+                                            <div class="swiper-slide w-full flex items-center justify-center py-20">
+                                                <div class="text-red-400 font-medium">Error loading practitioners.</div>
+                                            </div>
+                                        `);
+                                }
+                            });
+                        }, 400);
+                    });
+                }
+
+                // Initial Swiper setup is handled by script.js, but we might need to take control
+                // if we want to ensure we have the instance. Since script.js runs on DOMContentLoaded,
+                // we can re-init here after a small delay or just wait.
+                setTimeout(initPractitionerSwiper, 500);
+                setupPractitionerFilter();
+            });
+        </script>
+    @endpush
 @endsection
