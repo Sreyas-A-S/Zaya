@@ -19,8 +19,8 @@
 
         <!-- Main Footer Content -->
         <div class="bg-[linear-gradient(120deg,#FFE7CF,#DFAF7F)] relative">
-            <img src="{{ asset('frontend/assets/MinimalistGreenLeaves.png') }}" alt="Mobile Footer Leaves Image" class="block lg:hidden absolute bottom-0 left-0 h-11 md:h-18 z-0 pointer-events-none">
-            <img src="{{ asset('frontend/assets/MinimalistGreenLeaves.png') }}" alt="Mobile Footer Leaves Image" class="block lg:hidden scale-x-[-1] absolute bottom-0 right-0 h-11 md:h-18 z-0 pointer-events-none">
+            <img src="{{ asset('frontend/assets/MinimalistGreenLeaves.png') }}" alt="Mobile Footer Leaves Image" class="block lg:hidden absolute bottom-0 left-0 h-8 md:h-18 z-0 pointer-events-none">
+            <img src="{{ asset('frontend/assets/MinimalistGreenLeaves.png') }}" alt="Mobile Footer Leaves Image" class="block lg:hidden scale-x-[-1] absolute bottom-0 right-0 h-8 md:h-18 z-0 pointer-events-none">
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-10 px-8 pt-6 xl:pt-15 pb-4 lg:pb-40 xl:pb-18 sm:px-12 md:px-12 relative">
                 <img src="{{ asset('frontend/assets/MinimalistGreenLeaves.png') }}" alt="Desktop Footer Leaves Image" class="hidden lg:block absolute bottom-0 left-0 w-100 z-0 pointer-events-none">
@@ -125,18 +125,18 @@
 
                     <div class="flex lg:flex-col justify-center lg:justify-start text-xs md:text-sm text-[#252525] gap-6 md:gap-8 lg:gap-6 mt-6">
                         <a id="footer-privacy" href="{{ route('privacy-policy') }}"
-                            class="hover:text-[#79584B] transition-colors" data-i18n="Privacy Policy">{{ __('Privacy Policy') }}</a>
+                            class="hover:text-[#79584B] transition-colors text-center" data-i18n="Privacy Policy">{{ __('Privacy Policy') }}</a>
                         <a id="footer-cookie" href="{{ route('cookie-policy') }}"
-                            class="hover:text-[#79584B] transition-colors" data-i18n="Cookie Policy">{{ __('Cookie Policy') }}</a>
+                            class="hover:text-[#79584B] transition-colors text-center" data-i18n="Cookie Policy">{{ __('Cookie Policy') }}</a>
                         <a id="footer-terms" href="{{ route('terms-and-conditions') }}"
-                            class="hover:text-[#79584B] transition-colors" data-i18n="Terms & Conditions">{{ __('Terms & Conditions') }}</a>
+                            class="hover:text-[#79584B] transition-colors text-center" data-i18n="Terms & Conditions">{{ __('Terms & Conditions') }}</a>
                     </div>
                 </div>
             </div>
 
             <div class="text-center text-[10px] md:text-sm text-[#252525] cursor-default lg:border-t border-[#252525]/80 py-4"> 
                 <p>
-                    <span id="copyright_text">{{ __($site_settings['copyright_text'] ?? 'All rights reserved.') }}</span> &copy; {{ date('Y') }} Zaya Wellness
+                    <span id="copyright_text">{{ __($site_settings['copyright_text'] ?? 'All rights reserved.') }}</span>
                 </p>
             </div>
         </div>
