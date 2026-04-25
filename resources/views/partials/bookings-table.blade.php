@@ -162,10 +162,10 @@
                                             Refer
                                         </button>
 
-                                        @if($booking->need_translator && !$booking->translator_id)
-                                        <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language }}', '{{ $booking->to_language }}')" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left">
+                                        @if(!$booking->translator_id)
+                                        <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language ?: 'English' }}', '{{ $booking->to_language ?: 'Any' }}')" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left">
                                             <i class="ri-translate mr-3 text-lg text-blue-500"></i>
-                                            Assign Translator
+                                            {{ $booking->need_translator ? 'Assign Translator' : 'Request Translator' }}
                                         </button>
                                         @endif
                                         @endif
