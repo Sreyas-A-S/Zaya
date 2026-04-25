@@ -609,10 +609,9 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('State') }}</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('State (Optional)') }}</label>
                         <input type="text" name="state" value="{{ old('state') }}"
-                            class="reg-input @error('state') border-red-500! @enderror" placeholder="{{ __('Enter State') }}"
-                            required>
+                            class="reg-input @error('state') border-red-500! @enderror" placeholder="{{ __('Enter State') }}">
                         @error('state')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror

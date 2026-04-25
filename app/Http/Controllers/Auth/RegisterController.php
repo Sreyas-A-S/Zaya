@@ -965,9 +965,9 @@ class RegisterController extends Controller
             $rules['profile_photo'] = ['nullable', 'image', 'max:2048'];
             $rules['nationality'] = ['nullable', 'string', 'max:255'];
 
-            $rules['ayush_reg_no'] = ['required', 'string', 'max:255'];
-            $rules['state_council'] = ['required', 'string', 'max:255'];
-            $rules['reg_certificate'] = ['required', 'file', 'max:2048'];
+            $rules['ayush_reg_no'] = ['nullable', 'string', 'max:255'];
+            $rules['state_council'] = ['nullable', 'string', 'max:255'];
+            $rules['reg_certificate'] = ['nullable', 'file', 'max:2048'];
             $rules['digital_signature'] = ['nullable', 'file', 'max:2048'];
 
             $rules['primary_qualification'] = ['required', 'string', 'max:255'];
@@ -990,12 +990,12 @@ class RegisterController extends Controller
             $rules['key_expertise'] = ['required', 'string'];
             $rules['services_offered'] = ['required', 'string'];
 
-            $rules['ayush_confirmation'] = ['accepted'];
-            $rules['guidelines_agreement'] = ['accepted'];
-            $rules['document_consent'] = ['accepted'];
-            $rules['policies_agreement'] = ['accepted'];
-            $rules['prescription_understanding'] = ['accepted'];
-            $rules['confidentiality_consent'] = ['accepted'];
+            $rules['ayush_confirmation'] = ['nullable'];
+            $rules['guidelines_agreement'] = ['nullable'];
+            $rules['document_consent'] = ['nullable'];
+            $rules['policies_agreement'] = ['nullable'];
+            $rules['prescription_understanding'] = ['nullable'];
+            $rules['confidentiality_consent'] = ['nullable'];
         }
 
         if (isset($data['role']) && $data['role'] === 'mindfulness_practitioner') {
@@ -1005,7 +1005,7 @@ class RegisterController extends Controller
 
             $rules['address_line_1'] = ['required', 'string', 'max:500'];
             $rules['city'] = ['required', 'string', 'max:255'];
-            $rules['state'] = ['required', 'string', 'max:255'];
+            $rules['state'] = ['nullable', 'string', 'max:255'];
             $rules['zip_code'] = ['required', 'string', 'max:20'];
             $rules['country'] = ['required', 'string', 'max:255'];
 
@@ -1027,7 +1027,7 @@ class RegisterController extends Controller
 
             $rules['address_line_1'] = ['required', 'string', 'max:500'];
             $rules['city'] = ['required', 'string', 'max:255'];
-            $rules['state'] = ['required', 'string', 'max:255'];
+            $rules['state'] = ['nullable', 'string', 'max:255'];
             $rules['zip_code'] = ['required', 'string', 'max:20'];
             $rules['country'] = ['required', 'string', 'max:255'];
 
@@ -1049,7 +1049,7 @@ class RegisterController extends Controller
 
             $rules['address_line_1'] = ['required', 'string', 'max:500'];
             $rules['city'] = ['required', 'string', 'max:255'];
-            $rules['state'] = ['required', 'string', 'max:255'];
+            $rules['state'] = ['nullable', 'string', 'max:255'];
             $rules['zip_code'] = ['required', 'string', 'max:20'];
             $rules['country'] = ['required', 'string', 'max:255'];
 
