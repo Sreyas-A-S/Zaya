@@ -28,7 +28,7 @@
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Current Workplace / Organization (Optional)') }}</label>
         <input type="text" name="current_workplace" value="{{ old('current_workplace') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Website (Optional)') }}</label>
@@ -67,12 +67,12 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Highest Education') }} <span class="text-red-500">*</span></label>
         <input type="text" name="highest_education" value="{{ old('highest_education') }}" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Institute/University') }} <span class="text-red-500">*</span></label>
         <input type="text" name="institute_university" value="{{ old('institute_university') }}" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Year of Passing') }} <span class="text-red-500">*</span></label>
@@ -90,12 +90,12 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Mindfulness Training Details') }}</label>
         <input type="text" name="mindfulness_training_details" value="{{ old('mindfulness_training_details') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Additional Certifications (Optional)') }}</label>
         <input type="text" name="additional_certifications" value="{{ old('additional_certifications') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Upload Certificates') }}</label>

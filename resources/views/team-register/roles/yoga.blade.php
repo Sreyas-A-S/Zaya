@@ -22,12 +22,12 @@
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Current Organization (Optional)') }}</label>
         <input type="text" name="current_organization" value="{{ old('current_organization') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Workplace Address (Optional)') }}</label>
         <input type="text" name="workplace_address" value="{{ old('workplace_address') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Website (Optional)') }}</label>
@@ -68,12 +68,12 @@
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Highest Education') }} <span class="text-red-500">*</span></label>
         <input type="text" name="highest_education" value="{{ old('highest_education') }}" required
             class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700"
-            placeholder="{{ __('e.g. Masters in Yoga') }}">
+            placeholder="{{ __('e.g. Masters in Yoga') }}" autocomplete="off">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Institute/University') }} <span class="text-red-500">*</span></label>
         <input type="text" name="institute_university" value="{{ old('institute_university') }}" required
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Year of Passing') }} <span class="text-red-500">*</span></label>
@@ -91,12 +91,12 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Certification Details') }}</label>
         <input type="text" name="certification_details" value="{{ old('certification_details') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Additional Certifications (Optional)') }}</label>
         <input type="text" name="additional_certifications" value="{{ old('additional_certifications') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Upload Certificates (Degree/Diploma)') }}</label>
@@ -117,12 +117,12 @@
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Registration Number (Optional)') }}</label>
         <input type="text" name="registration_number" value="{{ old('registration_number') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div>
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Affiliated Body (Optional)') }}</label>
         <input type="text" name="affiliated_body" value="{{ old('affiliated_body') }}"
-            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
+            class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700" autocomplete="off">
     </div>
     <div class="md:col-span-2">
         <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Registration Proof (Optional)') }}</label>

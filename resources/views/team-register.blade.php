@@ -271,7 +271,7 @@
                                     maxlength="40"
                                     title="{{ __('First letter must be capital. Only letters and spaces allowed. Max 40 characters.') }}"
                                     class="reg-input"
-                                    placeholder="{{ __('Enter First Name') }}">
+                                    placeholder="{{ __('Enter First Name') }}" autocomplete="off">
                             </div>
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Middle Name') }}</label>
@@ -280,7 +280,7 @@
                                     maxlength="40"
                                     title="{{ __('Middle name can start with a small or capital letter and must contain only alphabets') }}"
                                     class="reg-input"
-                                    placeholder="{{ __('Enter Middle Name') }}">
+                                    placeholder="{{ __('Enter Middle Name') }}" autocomplete="off">
                             </div>
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Last Name') }} <span class="text-red-500">*</span></label>
@@ -289,7 +289,7 @@
                                     maxlength="40"
                                     title="{{ __('Last name must start with a capital letter and contain only alphabets') }}"
                                     class="reg-input"
-                                    placeholder="{{ __('Enter Last Name') }}">
+                                    placeholder="{{ __('Enter Last Name') }}" autocomplete="off">
                             </div>
                         </div>
 
@@ -298,7 +298,7 @@
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Email') }} <span class="text-red-500">*</span></label>
                                 <input type="email" name="email" value="{{ old('email') }}" required
                                     class="reg-input"
-                                    placeholder="{{ __('Enter Email') }}">
+                                    placeholder="{{ __('Enter Email') }}" autocomplete="off">
                             </div>
                             <div>
                                 @if(($joinRole ?? '') === 'doctor')
@@ -307,14 +307,14 @@
                                         pattern="^[0-9\s\-\+\(\)]{7,20}$"
                                         title="Enter a valid mobile number"
                                         class="reg-input"
-                                        placeholder="{{ __('Enter Mobile Number') }}">
+                                        placeholder="{{ __('Enter Mobile Number') }}" autocomplete="off">
                                 @else
                                     <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Phone') }} @if(($joinRole ?? '') === 'mindfulness_practitioner')<span class="text-red-500">*</span>@endif</label>
                                     <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" {{ ($joinRole ?? '') === 'mindfulness_practitioner' ? 'required' : '' }}
                                         pattern="^[0-9\s\-\+\(\)]{7,20}$"
                                         title="Enter a valid phone number"
                                         class="reg-input"
-                                        placeholder="{{ __('Enter Phone Number') }}">
+                                        placeholder="{{ __('Enter Phone Number') }}" autocomplete="off">
                                 @endif
                             </div>
                         </div>
@@ -359,25 +359,25 @@
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Address Line 1') }} <span class="text-red-500">*</span></label>
                                 <input type="text" name="address_line_1" value="{{ old('address_line_1') }}" required
-                                    class="reg-input">
+                                    class="reg-input" autocomplete="off">
                             </div>
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Address Line 2') }}</label>
                                 <input type="text" name="address_line_2" value="{{ old('address_line_2') }}"
-                                    class="reg-input">
+                                    class="reg-input" autocomplete="off">
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('City') }} <span class="text-red-500">*</span></label>
-                                <input type="text" name="city" value="{{ old('city') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid city name" class="reg-input">
+                                <input type="text" name="city" value="{{ old('city') }}" required pattern="^[a-zA-Z\s\-]+$" title="Enter a valid city name" class="reg-input" autocomplete="off">
                             </div>
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State (Optional)') }}</label>
-                                <input type="text" name="state" value="{{ old('state') }}" pattern="^[a-zA-Z\s\-]+$" title="Enter a valid state name" class="reg-input">
+                                <input type="text" name="state" value="{{ old('state') }}" pattern="^[a-zA-Z\s\-]+$" title="Enter a valid state name" class="reg-input" autocomplete="off">
                             </div>                            <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Zip Code') }} <span class="text-red-500">*</span></label>
-                                <input type="text" name="zip_code" value="{{ old('zip_code') }}" required pattern="^[a-zA-Z0-9\s\-]{3,20}$" title="Enter a valid zip code" class="reg-input">
+                                <input type="text" name="zip_code" value="{{ old('zip_code') }}" required pattern="^[a-zA-Z0-9\s\-]{3,20}$" title="Enter a valid zip code" class="reg-input" autocomplete="off">
                             </div>
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Country') }} <span class="text-red-500">*</span></label>
