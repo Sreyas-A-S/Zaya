@@ -14,6 +14,7 @@
     
     <title>{{ __('Invoice') }} - {{ $booking->invoice_no ?? $booking->id }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -59,6 +60,11 @@
         $symbols = config('currencies.symbols', []);
         $currencySymbol = $symbols[$currencyCode] ?? $currencyCode;
         $isRegistration = $booking->practitioner_type === 'registration_fee';
+        
+        $user = $booking->user;
+        $patient = $user->patient ?? null;
+        $clientName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+        if ($clientName === '') $clientName = $user->name ?? 'Client';
     @endphp
 
     <!-- Top Status Icon & Header -->
@@ -346,26 +352,31 @@
     </div>
 
     <!-- Bottom Action Buttons -->
-    <div class="flex justify-between items-center w-full max-w-[420px] px-2 mb-10 no-print">
-        <!-- Print Button -->
-        <button onclick="window.print()"
-            class="w-10 h-10 rounded-full border border-red-200 bg-white flex items-center justify-center text-red-400 hover:bg-red-50 transition-colors shadow-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
-                </path>
-            </svg>
-        </button>
+    <div class="flex flex-col sm:flex-row justify-between items-center w-full max-w-[560px] gap-4 mb-10 no-print">
+        <!-- Left: Auth/Dashboard Button -->
+        <div>
+            @auth
+                <a href="{{ route('dashboard') }}" 
+                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-50 text-gray-700 font-medium text-[14px] rounded-full border border-gray-100 hover:bg-gray-100 transition-colors">
+                   <i class="ri-dashboard-line"></i> {{ __('Dashboard') }}
+                </a>
+            @else
+                <a href="{{ route('zaya-login') }}" 
+                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1e3a2f] text-white font-medium text-[14px] rounded-full hover:bg-[#16261f] transition-all shadow-md">
+                   <i class="ri-login-circle-line"></i> {{ __('Login to Dashboard') }}
+                </a>
+            @endauth
+        </div>
 
         <!-- Right Buttons -->
         <div class="flex gap-3">
             <button onclick="shareInvoice()"
                 class="px-[26px] py-2.5 bg-[#daf1fe] text-[#0ea5e9] font-medium text-[14px] rounded-full hover:bg-blue-100 transition-colors shadow-sm">
-                {{ __($site_settings['invoice_btn_share'] ?? 'Share') }}
+                <i class="ri-share-line mr-1"></i> {{ __($site_settings['invoice_btn_share'] ?? 'Share') }}
             </button>
             <button id="download-btn"
                 class="px-[26px] py-2.5 bg-[#1e2024] text-white font-medium text-[14px] rounded-full hover:bg-black transition-colors shadow-sm">
-                {{ __($site_settings['invoice_btn_download'] ?? 'Download') }}
+                <i class="ri-download-line mr-1"></i> {{ __($site_settings['invoice_btn_download'] ?? 'Download') }}
             </button>
         </div>
     </div>
