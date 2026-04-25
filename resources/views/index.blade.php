@@ -254,21 +254,21 @@
                         {{ $settings['blog_description'] ?? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod te' }}
                     </p>
                 </div>
-                <!-- Bed Image Box -->
+                <!-- Blog Latest One -->
                 <div class="bg-[#DFA6A9] relative group overflow-hidden flex items-center justify-center flex-4 md:flex-2 animate-on-scroll"
                     style="transition-delay: 100ms;">
-                    <img src="{{ isset($settings['blog_post_1_image']) ? (Str::startsWith($settings['blog_post_1_image'], 'frontend/') ? asset($settings['blog_post_1_image']) : asset('storage/' . $settings['blog_post_1_image'])) : asset('frontend/assets/bed-air.png') }}"
-                        alt="Relaxing Bed"
+                    <img src="{{ isset($latestBlogs[0]->image) ? $latestBlogs[0]->image : (isset($settings['blog_post_1_image']) ? (Str::startsWith($settings['blog_post_1_image'], 'frontend/') ? asset($settings['blog_post_1_image']) : asset('storage/' . $settings['blog_post_1_image'])) : asset('frontend/assets/bed-air.png')) }}"
+                        alt="{{ $latestBlogs[0]->title ?? 'Relaxing Bed' }}"
                         class="w-full h-full object-cover drop-shadow-xl scale-110 group-hover:scale-105 transition-transform duration-700">
                     <div
                         class="absolute inset-0 bg-black/40 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-between">
                         <div class="flex justify-end">
                             <span id="blog_post_1_read_time"
-                                class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ $settings['blog_post_1_read_time'] ?? '7 min Read' }}</span>
+                                class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ isset($latestBlogs[0]) ? $latestBlogs[0]->read_time : ($settings['blog_post_1_read_time'] ?? '7 min Read') }}</span>
                         </div>
                         <h3 id="blog_post_1_title" class="text-white font-sans! text-base font-normal">
-                            <a href="{{ $settings['blog_post_1_link'] ?? route('blogs') }}" target="_blank">
-                                {{ $settings['blog_post_1_title'] ?? 'The Art of Resfull Sleep' }}
+                            <a href="{{ isset($latestBlogs[0]) ? $latestBlogs[0]->link : ($settings['blog_post_1_link'] ?? route('blogs')) }}">
+                                {{ isset($latestBlogs[0]) ? $latestBlogs[0]->title : ($settings['blog_post_1_title'] ?? 'The Art of Resfull Sleep') }}
                             </a>
                         </h3>
                     </div>
@@ -277,30 +277,30 @@
 
             <!-- Column 3 (Right) -->
             <div class="col-span-1 md:col-span-1 lg:col-span-2 flex flex-col h-full">
-                <!-- Medicine Image -->
+                <!-- Blog Latest Two -->
                 <div class="h-64 lg:h-[30%] overflow-hidden relative group  animate-on-scroll"
                     style="transition-delay: 100ms;">
-                    <img src="{{ isset($settings['blog_post_2_image']) ? (Str::startsWith($settings['blog_post_2_image'], 'frontend/') ? asset($settings['blog_post_2_image']) : asset('storage/' . $settings['blog_post_2_image'])) : asset('frontend/assets/ayurvedha-medicine.png') }}"
-                        alt="Ayurveda Medicine"
+                    <img src="{{ isset($latestBlogs[1]->image) ? $latestBlogs[1]->image : (isset($settings['blog_post_2_image']) ? (Str::startsWith($settings['blog_post_2_image'], 'frontend/') ? asset($settings['blog_post_2_image']) : asset('storage/' . $settings['blog_post_2_image'])) : asset('frontend/assets/ayurvedha-medicine.png')) }}"
+                        alt="{{ $latestBlogs[1]->title ?? 'Ayurveda Medicine' }}"
                         class="w-full h-full object-cover transition-transform duration-700  scale-110 group-hover:scale-105">
                     <div
                         class="absolute inset-0 bg-black/40 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-between">
                         <div class="flex justify-end">
                             <span id="blog_post_2_read_time"
-                                class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ $settings['blog_post_2_read_time'] ?? '15 min Read' }}</span>
+                                class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ isset($latestBlogs[1]) ? $latestBlogs[1]->read_time : ($settings['blog_post_2_read_time'] ?? '15 min Read') }}</span>
                         </div>
                         <h3 id="blog_post_2_title" class="text-white font-sans! text-base font-normal">
-                            <a href="{{ $settings['blog_post_2_link'] ?? route('blogs') }}" target="_blank">
-                                {{ $settings['blog_post_2_title'] ?? 'Balancing in Summer' }}
+                            <a href="{{ isset($latestBlogs[1]) ? $latestBlogs[1]->link : ($settings['blog_post_2_link'] ?? route('blogs')) }}">
+                                {{ isset($latestBlogs[1]) ? $latestBlogs[1]->title : ($settings['blog_post_2_title'] ?? 'Balancing in Summer') }}
                             </a>
                         </h3>
                     </div>
                 </div>
-                <!-- Girl Image -->
+                <!-- Blog Latest Three -->
                 <div class="flex-1 relative overflow-hidden group min-h-[320px] animate-on-scroll"
                     style="transition-delay: 200ms;">
-                    <img src="{{ isset($settings['blog_post_3_image']) ? (Str::startsWith($settings['blog_post_3_image'], 'frontend/') ? asset($settings['blog_post_3_image']) : asset('storage/' . $settings['blog_post_3_image'])) : asset('frontend/assets/yoga-dress-girl.png') }}"
-                        alt="Wellness Lifestyle"
+                    <img src="{{ isset($latestBlogs[2]->image) ? $latestBlogs[2]->image : (isset($settings['blog_post_3_image']) ? (Str::startsWith($settings['blog_post_3_image'], 'frontend/') ? asset($settings['blog_post_3_image']) : asset('storage/' . $settings['blog_post_3_image'])) : asset('frontend/assets/yoga-dress-girl.png')) }}"
+                        alt="{{ $latestBlogs[2]->title ?? 'Wellness Lifestyle' }}"
                         class="w-full h-full object-cover transition-transform duration-700 scale-110 group-hover:scale-105">
 
                     <!-- Play Button (Always Visible) -->
@@ -314,11 +314,11 @@
                         class="absolute inset-0 bg-black/40 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 p-6 flex flex-col justify-between z-10">
                         <div class="flex justify-end">
                             <span id="blog_post_3_read_time"
-                                class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ $settings['blog_post_3_read_time'] ?? '15 min Read' }}</span>
+                                class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ isset($latestBlogs[2]) ? $latestBlogs[2]->read_time : ($settings['blog_post_3_read_time'] ?? '15 min Read') }}</span>
                         </div>
                         <h3 id="blog_post_3_title" class="text-white font-sans! text-base font-normal">
-                            <a href="{{ $settings['blog_post_3_link'] ?? route('blogs') }}" target="_blank">
-                                {{ $settings['blog_post_3_title'] ?? 'Morning Rituals for Energy' }}
+                            <a href="{{ isset($latestBlogs[2]) ? $latestBlogs[2]->link : ($settings['blog_post_3_link'] ?? route('blogs')) }}">
+                                {{ isset($latestBlogs[2]) ? $latestBlogs[2]->title : ($settings['blog_post_3_title'] ?? 'Morning Rituals for Energy') }}
                             </a>
                         </h3>
                     </div>
