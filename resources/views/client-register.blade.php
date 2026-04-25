@@ -859,7 +859,7 @@
 
                             <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-black text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-xl shadow-[#FABC41]/20">
                                 <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
-                                {{ __('Complete & Proceed to Payment') }}
+                                {!! __('Complete & Proceed to Payment') !!}
                             </button>
                         </div>
                     </div>

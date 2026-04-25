@@ -1204,7 +1204,7 @@
             }
 
             if (currentTab === totalTabs) {
-                nextBtnText.textContent = '{{ __('Complete & Proceed to Payment') }}';
+                nextBtnText.textContent = '{!! __('Complete & Proceed to Payment') !!}';
             } else {
                 nextBtnText.textContent = '{!! __('Save & Continue') !!}';
             }
