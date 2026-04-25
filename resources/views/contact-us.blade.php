@@ -51,9 +51,9 @@
     <div
         class="container mx-auto relative h-[280px] md:h-[484px] rounded-[30px] overflow-hidden flex items-center justify-center">
         <!-- Background Image -->
-        <img src="{{ !empty($settings['contact_banner_image']) ? asset('storage/' . $settings['contact_banner_image']) : asset('frontend/assets/contact-us-bg.jpg') }}" alt="Contact Us Banner"
-            class="absolute inset-0 w-full h-full object-cover scale-110">
-        <!-- Overlay -->
+        <img src="{{ !empty($settings['contact_banner_image']) ? asset('storage/' . $settings['contact_banner_image']) : asset('frontend/assets/contact-us-bg.jpg') }}" alt=""
+            onerror="this.style.display='none'"
+            class="absolute inset-0 w-full h-full object-cover scale-110">        <!-- Overlay -->
         <div class="absolute inset-0 bg-black/50 z-10"></div>
         <!-- Content -->
         <div class="relative z-20 text-center px-4">
