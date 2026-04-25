@@ -14,6 +14,7 @@ use App\Models\PractitionerReview;
 use App\Models\PractitionerGallery;
 use App\Models\PromoCode;
 use App\Models\UserPromoCode;
+use App\Mail\BookingMail;
 use App\Traits\ImageUploadTrait;
 use Carbon\Carbon;
 use App\Models\Specialization;
@@ -856,8 +857,20 @@ class ProfileController extends Controller
 
         $booking->update([
             'translator_id' => $request->translator_id,
+            'need_translator' => true,
             'status' => 'confirmed' // Optional: move from pending to confirmed if needed
         ]);
+
+        // Reload booking with translator info to send mail
+        $booking->load('translator.user');
+        
+        if ($booking->translator && $booking->translator->user) {
+            try {
+                Mail::to($booking->translator->user->email)->send(new BookingMail($booking, 'translator'));
+            } catch (\Exception $e) {
+                \Log::error('Failed to send translator assignment email: ' . $e->getMessage());
+            }
+        }
 
         return response()->json(['success' => 'Translator assigned successfully!']);
     }
