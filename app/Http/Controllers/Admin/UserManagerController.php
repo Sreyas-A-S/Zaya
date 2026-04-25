@@ -20,6 +20,14 @@ class UserManagerController extends Controller
 {
     use AdminFilterTrait;
 
+    public function __construct()
+    {
+        $this->middleware('permission:user-managers-view')->only(['index', 'edit']);
+        $this->middleware('permission:user-managers-create')->only(['create', 'store']);
+        $this->middleware('permission:user-managers-edit')->only(['update', 'updateStatus', 'assignCountries']);
+        $this->middleware('permission:user-managers-delete')->only('destroy');
+    }
+
     /**
      * Display listing (DataTable)
      */

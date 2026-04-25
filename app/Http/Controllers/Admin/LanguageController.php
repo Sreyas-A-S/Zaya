@@ -11,6 +11,14 @@ use Yajra\DataTables\Facades\DataTables;
 
 class LanguageController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:languages-view')->only(['index', 'show']);
+        $this->middleware('permission:languages-create')->only(['create', 'store']);
+        $this->middleware('permission:languages-edit')->only(['edit', 'update', 'updateStatus']);
+        $this->middleware('permission:languages-delete')->only('destroy');
+    }
+
     /**
      * Display listing (DataTables)
      */

@@ -782,7 +782,6 @@
                         </div>
                     </div>
                 </div>
-                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div class="md:col-span-2">
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }}</label>
@@ -801,33 +800,9 @@
                     </div>
                 </div>
 
-                <!-- Password Fields (Hidden but required for registration) -->
-                <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
-                    <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
-                        <div class="relative">
-                            <input type="password" name="password" id="password"
-                                class="reg-input @error('password') border-red-500! @enderror"
-                                placeholder="Enter Password" required>
-                            <button type="button" onclick="togglePassword('password')"
-                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                <i class="ri-eye-line" id="password-icon"></i>
-                            </button>
-                        </div>
-                        @error('password')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Confirm Password</label>
-                        <div class="relative">
-                            <input type="password" name="password_confirmation" id="password_confirmation"
-                                class="reg-input"
-                                placeholder="Confirm Password" required>
-                            <button type="button" onclick="togglePassword('password_confirmation')"
-                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
             </form>
         </div>
+    </div>
     </div>
 
     <!-- Client Thank You Popup Modal -->
@@ -1603,26 +1578,6 @@
             });
         });
     </script>
-    <!-- Thank You Popup -->
-    <div id="thank-you-popup" class="fixed inset-0 bg-black/40 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
-        <div class="bg-white rounded-[40px] p-8 md:p-12 max-w-[550px] w-full text-center relative animate-pop-in shadow-2xl">
-            <button onclick="closeThankYouPopup()" class="absolute top-6 right-8 text-gray-300 hover:text-gray-500 transition-colors">
-                <i class="ri-close-line text-2xl"></i>
-            </button>
-            <div class="mb-8 flex justify-center">
-                <div class="w-20 h-20 rounded-full bg-[#E8F5E9] flex items-center justify-center">
-                    <i class="ri-checkbox-circle-fill text-[#4CAF50] text-5xl"></i>
-                </div>
-            </div>
-            <h3 class="text-2xl md:text-3xl font-serif font-bold text-secondary mb-4">{{ __('Thank You!') }}</h3>
-            <p class="text-gray-600 text-base md:text-lg mb-8 leading-relaxed">
-                {{ __('Your registration has been submitted successfully. Our team will review your application and get back to you shortly.') }}
-            </p>
-            <button onclick="closeThankYouPopup()" class="bg-secondary text-white px-8 py-3 rounded-full hover:bg-opacity-90 transition-all font-medium">
-                {{ __('Got it, thanks!') }}
-            </button>
-        </div>
-    </div>
 </body>
 
 </html>

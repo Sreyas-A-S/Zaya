@@ -20,6 +20,14 @@ class ContentManagerController extends Controller
 {
     use AdminFilterTrait;
 
+    public function __construct()
+    {
+        $this->middleware('permission:content-managers-view')->only(['index', 'edit']);
+        $this->middleware('permission:content-managers-create')->only(['create', 'store']);
+        $this->middleware('permission:content-managers-edit')->only(['update', 'updateStatus', 'assignCountries']);
+        $this->middleware('permission:content-managers-delete')->only('destroy');
+    }
+
     /**
      * Display listing (DataTable)
      */

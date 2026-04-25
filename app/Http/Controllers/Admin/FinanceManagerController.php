@@ -20,6 +20,14 @@ class FinanceManagerController extends Controller
 {
     use AdminFilterTrait;
 
+    public function __construct()
+    {
+        $this->middleware('permission:finance-managers-view')->only(['index', 'edit']);
+        $this->middleware('permission:finance-managers-create')->only(['create', 'store']);
+        $this->middleware('permission:finance-managers-edit')->only(['update', 'updateStatus', 'assignCountries']);
+        $this->middleware('permission:finance-managers-delete')->only('destroy');
+    }
+
     /**
      * Display listing (DataTable)
      */
