@@ -105,10 +105,16 @@
                                 let checked = dd.querySelector('input[type=radio]:checked');
                                 if(checked) {
                                     let val = checked.value;
+                                    let trigger = dd.previousElementSibling.previousElementSibling;
                                     dd.previousElementSibling.value = val;
-                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').innerText = val;
-                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-gray-600');
-                                    dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.add('text-[#252525]', 'font-medium');
+                                    trigger.querySelector('.duration-label').innerText = val;
+                                    trigger.querySelector('.duration-label').classList.remove('text-gray-600');
+                                    trigger.querySelector('.duration-label').classList.add('text-[#252525]', 'font-medium');
+                                    
+                                    // Update trigger dataset for price calculation
+                                    trigger.dataset.rate = checked.dataset.rate;
+                                    trigger.dataset.currency = checked.dataset.currency;
+                                    trigger.dataset.symbol = checked.dataset.symbol;
                                 }
                                 dd.classList.add('hidden');
                                 dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
