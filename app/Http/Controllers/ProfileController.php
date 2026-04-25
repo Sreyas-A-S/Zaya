@@ -44,8 +44,18 @@ class ProfileController extends Controller
         } else {
             // Practitioners, Doctors, Mindfulness, Yoga
             $morphClass = $user->profile ? $user->profile->getMorphClass() : $role;
-            $query->where('profile_id', $profileId)
-                  ->where('practitioner_type', $morphClass);
+            $query->where(function($q) use ($profileId, $morphClass, $user) {
+                // 1. Direct bookings
+                $q->where(function($sq) use ($profileId, $morphClass) {
+                    $sq->where('profile_id', $profileId)
+                       ->where('practitioner_type', $morphClass);
+                });
+
+                // 2. Referred bookings
+                $q->orWhereHas('referralsFromThisSession', function($sq) use ($user) {
+                    $sq->where('referred_to_id', $user->id);
+                });
+            });
         }
 
         return $query;

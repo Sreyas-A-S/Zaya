@@ -482,15 +482,16 @@
             <!-- Toast Container -->
             <div id="toast-container"></div>
 
-            <form action="{{ route('register') }}" method="POST" id="registration-form" class="max-w-5xl mx-auto">
+            <form action="{{ route('register') }}" method="POST" id="registration-form" class="w-full">
                 @csrf
                 <input type="hidden" name="role" value="client">
                 @if(isset($redirect))
                     <input type="hidden" name="redirect" value="{{ $redirect }}">
                 @endif
 
-                <!-- Row 1: Name Fields -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
+                <div class="max-w-5xl mx-auto">
+                    <!-- Row 1: Name Fields -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('First Name') }}</label>
                         <input type="text" name="first_name" value="{{ old('first_name') }}"
@@ -834,26 +835,29 @@
                             </button>
                         </div>
                     </div>
+                    </div>
                 </div>
 
                 <!-- Form Footer: Already have account & Submit -->
-                <div class="flex flex-col md:flex-row items-center justify-between gap-8 pt-10 border-t border-gray-100 mt-10">
-                    <div class="flex flex-col gap-1 text-center md:text-left">
-                        <p class="text-[#423131] text-base font-medium">{{ __('Already have an account?') }}</p>
-                        <a href="{{ route('zaya-login') }}" class="text-[#97563D] text-sm font-bold hover:underline">
-                            {{ __('Login to your dashboard') }}
-                        </a>
-                    </div>
+                <div class="bg-[#FDEBCA] -mx-8 md:-mx-14 -mb-8 md:-mb-14 p-8 md:p-10 lg:p-14 rounded-b-[32px] border-t border-[#97563D]/10 mt-12">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div class="flex flex-col gap-1 text-center md:text-left">
+                            <p class="text-[#423131] text-base font-medium">{{ __('Already have an account?') }}</p>
+                            <a href="{{ route('zaya-login') }}" class="text-[#97563D] text-sm font-bold hover:underline flex items-center justify-center md:justify-start gap-1">
+                                {{ __('Login to your dashboard') }} <i class="ri-arrow-right-line"></i>
+                            </a>
+                        </div>
 
-                    <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-                        <a href="{{ route('index') }}" class="w-full sm:w-auto text-gray-500 py-3.5 px-8 rounded-full font-medium transition-all hover:bg-gray-50 text-center">
-                            {{ __('Cancel') }}
-                        </a>
+                        <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                            <a href="{{ route('index') }}" class="w-full sm:w-auto text-gray-500 py-3.5 px-8 rounded-full font-medium transition-all hover:bg-white/50 text-center">
+                                {{ __('Cancel') }}
+                            </a>
 
-                        <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-black text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-xl shadow-[#FABC41]/20">
-                            <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
-                            {{ __('Complete & Proceed to Payment') }}
-                        </button>
+                            <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-black text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-xl shadow-[#FABC41]/20">
+                                <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
+                                {{ __('Complete & Proceed to Payment') }}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
