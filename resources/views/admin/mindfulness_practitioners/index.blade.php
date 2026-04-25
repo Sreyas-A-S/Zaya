@@ -643,6 +643,12 @@
                                         </div>
 
                                         <div class="col-md-6">
+                                            <label class="form-label">SWIFT Code</label>
+                                            <input class="form-control" type="text" name="swift_code" maxlength="20" placeholder="Enter SWIFT code"
+                                                oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')">
+                                        </div>
+
+                                        <div class="col-md-6">
                                             <label class="form-label">UPI ID</label>
                                             <input class="form-control" type="text" name="upi_id" placeholder="username@bank" maxlength="100"
                                                 pattern="^[a-zA-Z0-9.\\-_]{2,}@[a-zA-Z]{2,}$" title="Enter valid UPI ID">
@@ -1557,6 +1563,7 @@
             $('input[name="bank_name"]').val(p.bank_name || '');
             $('input[name="account_number"]').val(p.account_number || '');
             $('input[name="ifsc_code"]').val(p.ifsc_code || '');
+            $('input[name="swift_code"]').val(p.swift_code || '');
             $('input[name="upi_id"]').val(p.upi_id || '');
             $('#mindfulness_payout_currency').val(p.payout_currency || 'INR').css({'pointer-events': 'none', 'background-color': '#e9ecef'}).attr('tabindex', '-1');
 
@@ -1806,6 +1813,7 @@
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Holder</label><p class="f-w-600">${p.bank_holder_name || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Number</label><p class="f-w-600 font-monospace">${p.account_number || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">IFSC Code</label><p class="f-w-600 font-monospace">${p.ifsc_code || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">SWIFT Code</label><p class="f-w-600 font-monospace">${p.swift_code || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">UPI ID</label><p class="f-w-600">${p.upi_id || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Payout Currency</label><p class="f-w-600">${p.payout_currency || 'N/A'}</p></div>
                                     

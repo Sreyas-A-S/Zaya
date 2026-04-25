@@ -198,6 +198,7 @@ class YogaTherapistController extends Controller
             'bank_name' => 'nullable|string|max:255',
             'account_number' => 'nullable|string|max:255',
             'ifsc_code' => 'nullable|string|max:20',
+            'swift_code' => 'nullable|string|max:20',
             'upi_id' => 'nullable|string|max:255',
             'cancelled_cheque' => 'nullable|file|max:2048',
 
@@ -367,6 +368,7 @@ class YogaTherapistController extends Controller
             'bank_name' => 'nullable|string|max:255',
             'account_number' => 'nullable|string|max:255',
             'ifsc_code' => 'nullable|string|max:20',
+            'swift_code' => 'nullable|string|max:20',
             'upi_id' => 'nullable|string|max:255',
             'cancelled_cheque' => 'nullable|file|max:2048',
 

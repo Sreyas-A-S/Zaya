@@ -73,6 +73,13 @@ class Practitioner extends Model
         'doc_ethics',
         'doc_contract',
         'doc_id_proof',
+        'bank_name',
+        'account_number',
+        'ifsc_code',
+        'swift_code',
+        'cancelled_cheque_path',
+        'bank_account_holder_name',
+        'upi_id',
     ];
 
     protected $casts = [

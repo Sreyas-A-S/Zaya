@@ -538,6 +538,9 @@
                         <input type="text" name="ifsc_code" value="{{ $profile->ifsc_code ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
                     </div>
                     <div>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('SWIFT Code') }}</label>
+                        <input type="text" name="swift_code" value="{{ $profile->swift_code ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
+                    </div>                    <div>
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Payout Currency') }}</label>
                         @php
                             $selectedCurrency = $profile->payout_currency ?? 'INR';

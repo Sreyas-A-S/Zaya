@@ -619,8 +619,12 @@
                                             <input type="text" class="form-control" name="account_number" required maxlength="50" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter account number">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control text-uppercase" name="ifsc_code" required maxlength="11" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" placeholder="ABCD0123456">
+                                            <label class="form-label">IFSC Code</label>
+                                            <input type="text" class="form-control text-uppercase" name="ifsc_code" maxlength="11" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" placeholder="ABCD0123456">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">SWIFT Code</label>
+                                            <input type="text" class="form-control text-uppercase" name="swift_code" maxlength="20" placeholder="Enter SWIFT code">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Upload Cancelled Cheque/Passbook <span class="file-keep-note d-none text-muted">(Leave blank to keep)</span></label>
@@ -1870,6 +1874,7 @@
             $('[name="bank_name"]').val(profile.bank_name);
             $('[name="account_number"]').val(profile.account_number);
             $('[name="ifsc_code"]').val(profile.ifsc_code);
+            $('[name="swift_code"]').val(profile.swift_code || '');
             $('[name="upi_id"]').val(profile.upi_id);
             $('#doctor_payout_currency').val(profile.payout_currency || 'INR').css({'pointer-events': 'none', 'background-color': '#e9ecef'}).attr('tabindex', '-1');
             $('[name="short_bio"]').val(profile.short_doctor_bio);
@@ -2190,6 +2195,7 @@
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Bank Name</label><p class="f-w-600">${p.bank_name || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Number</label><p class="f-w-600">${p.account_number || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">IFSC Code</label><p class="f-w-600">${p.ifsc_code || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">SWIFT Code</label><p class="f-w-600">${p.swift_code || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Payout Currency</label><p class="f-w-600">${p.payout_currency || 'N/A'}</p></div>
 
                                     

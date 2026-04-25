@@ -563,9 +563,15 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                             oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
-                        <input class="form-control" type="text" name="ifsc_code" required 
+                        <label class="form-label">IFSC Code</label>
+                        <input class="form-control" type="text" name="ifsc_code"
                             pattern="^[A-Z]{4}0[A-Z0-9]{6}$" title="Enter valid IFSC (Example: SBIN0123456)"
+                            oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">SWIFT Code</label>
+                        <input class="form-control" type="text" name="swift_code"
+                            maxlength="20" placeholder="Enter SWIFT code"
                             oninput="this.value = this.value.toUpperCase()">
                     </div>
 
@@ -1658,8 +1664,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     $('input[name="bank_name"]').val(t.bank_name);
                     $('input[name="account_number"]').val(t.account_number);
                     $('input[name="ifsc_code"]').val(t.ifsc_code);
-                    $('#yoga_payout_currency').val(t.payout_currency || 'INR').css({'pointer-events': 'none', 'background-color': '#e9ecef'}).attr('tabindex', '-1');
                     $('input[name="swift_code"]').val(t.swift_code || '');
+                    $('#yoga_payout_currency').val(t.payout_currency || 'INR').css({'pointer-events': 'none', 'background-color': '#e9ecef'}).attr('tabindex', '-1');
                     $('input[name="upi_id"]').val(t.upi_id);
 
                     if (t.cancelled_cheque_path) {
@@ -1902,6 +1908,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Holder</label><p class="f-w-600">${t.bank_holder_name || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Number</label><p class="f-w-600 font-monospace">${t.account_number || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">IFSC Code</label><p class="f-w-600 font-monospace">${t.ifsc_code || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">SWIFT Code</label><p class="f-w-600 font-monospace">${t.swift_code || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">UPI ID</label><p class="f-w-600">${t.upi_id || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Payout Currency</label><p class="f-w-600">${t.payout_currency || 'N/A'}</p></div>
                                     

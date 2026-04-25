@@ -494,12 +494,11 @@
                                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="ifsc_code" required
+                                            <label class="form-label">IFSC Code</label>
+                                            <input class="form-control" type="text" name="ifsc_code"
                                                 pattern="^[A-Z]{4}0[A-Z0-9]{6}$" title="Enter valid IFSC (Example: SBIN0123456)"
                                                 oninput="this.value = this.value.toUpperCase()">
-                                        </div>
-                                        <div class="col-md-6">
+                                        </div>                                        <div class="col-md-6">
                                             <label class="form-label">SWIFT Code</label>
                                             <input class="form-control" type="text" name="swift_code" pattern="^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$" maxlength="11" oninput="this.value=this.value.toUpperCase()" title="Enter valid SWIFT Code (Example: HDFCINBBXXX)" required>
                                         </div>
@@ -1798,7 +1797,7 @@ function openCreateModal() {
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Holder</label><p class="f-w-600">${t.bank_holder_name || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Number</label><p class="f-w-600 font-monospace">${t.account_number || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">IFSC Code</label><p class="f-w-600 font-monospace">${t.ifsc_code || 'N/A'}</p></div>
-                                    <div class="col-sm-6"><label class="small text-muted mb-0">SWIFT Code</label><p class="f-w-600">${t.swift_code || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">SWIFT Code</label><p class="f-w-600 font-monospace">${t.swift_code || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">UPI ID</label><p class="f-w-600">${t.upi_id || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Payout Currency</label><p class="f-w-600">${t.payout_currency || 'N/A'}</p></div>
                                     

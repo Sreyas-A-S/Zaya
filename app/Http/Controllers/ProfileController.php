@@ -1781,6 +1781,7 @@ class ProfileController extends Controller
             'bank_name' => 'nullable|string|max:255',
             'account_number' => 'nullable|string|max:50',
             'ifsc_code' => 'nullable|string|max:20',
+            'swift_code' => 'nullable|string|max:20',
             'bank_holder_name' => 'nullable|string|max:255',
             'bank_account_holder_name' => 'nullable|string|max:255',
             'state_ayurveda_council_name' => 'nullable|string|max:255',

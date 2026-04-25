@@ -19,7 +19,7 @@ class ProfileCompletionService
                         'ayush_registration_number', 'state_council_name', 'reg_certificate_path', 
                         'digital_signature_path', 'primary_qualification', 'years_of_experience', 'current_workplace', 
                         'address_line_1', 'pan_number', 'pan_upload_path', 'bank_holder_name', 'bank_name', 
-                        'account_number', 'ifsc_code', 'cancelled_cheque_path', 'short_bio'
+                        'account_number', 'swift_code', 'cancelled_cheque_path', 'short_bio'
                     ],
                     'consents' => [
                         'ayush_registration_confirmed', 'ayush_guidelines_agreed', 'document_verification_consented', 
@@ -43,7 +43,7 @@ class ProfileCompletionService
                         'profile_photo_path', 'phone', 'gender', 'dob', 'address_line_1', 'city', 'state', 'zip_code', 'country', 
                         'practitioner_type', 'highest_education', 'mindfulness_training_details', 'certificates_path', 
                         'services_offered', 'client_concerns', 'consultation_modes', 'languages_spoken', 'short_bio',
-                        'pan_number', 'bank_holder_name', 'bank_name', 'account_number', 'ifsc_code', 'gov_id_upload_path'
+                        'pan_number', 'bank_holder_name', 'bank_name', 'account_number', 'swift_code', 'gov_id_upload_path'
                     ]
                 ];
             case 'translator':
@@ -53,7 +53,7 @@ class ProfileCompletionService
                         'profile_photo_path', 'phone', 'gender', 'dob', 'address_line_1', 'city', 'state', 'zip_code', 'country', 
                         'native_language', 'source_languages', 'target_languages', 'years_of_experience', 'fields_of_specialization', 
                         'services_offered', 'gov_id_upload_path', 'pan_number', 'bank_holder_name', 'bank_name', 
-                        'account_number', 'ifsc_code', 'swift_code', 'cancelled_cheque_path'
+                        'account_number', 'swift_code', 'cancelled_cheque_path'
                     ]
                 ];
             case 'yoga_therapist':
@@ -65,7 +65,7 @@ class ProfileCompletionService
                         'yoga_therapist_type', 'years_of_experience', 'current_organization', 'registration_number', 
                         'registration_proof_path', 'certification_details', 'certificates_path', 'areas_of_expertise', 
                         'consultation_modes', 'languages_spoken', 'short_bio', 'gov_id_upload_path', 'bank_holder_name', 
-                        'bank_name', 'account_number', 'ifsc_code'
+                        'bank_name', 'account_number', 'swift_code'
                     ]
                 ];
             case 'client':
@@ -206,6 +206,7 @@ class ProfileCompletionService
             'ayush_guidelines_agreed' => 'Guidelines Agreement',
             'document_verification_consented' => 'Document Verification Consent',
             'ifsc_code' => 'IFSC Code',
+            'swift_code' => 'SWIFT Code',
             'gov_id_upload_path' => 'ID Proof Upload',
             'doc_id_proof' => 'ID Proof',
             'doc_certificates' => 'Educational Certificates',
