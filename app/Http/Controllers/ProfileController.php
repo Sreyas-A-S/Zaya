@@ -312,8 +312,11 @@ class ProfileController extends Controller
         $isReferrer = Referral::where('booking_id', $booking->id)->where('referred_by_id', $user->id)->exists();
         $isReferredTo = Referral::where('referral_no', $booking->invoice_no)->where('referred_to_id', $user->id)->exists();
 
+        // Check for OTP-verified data access
+        $hasOTPAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
+
         $canEdit = ($isPractitioner || $isTranslator) && $request->query('view') != '1';
-        $canView = $canEdit || $isClient || $isReferrer || $isReferredTo || $request->query('view') == '1';
+        $canView = $canEdit || $isClient || $isReferrer || $isReferredTo || $hasOTPAccess || $request->query('view') == '1';
 
         if (!$canView) {
             abort(403, 'You do not have permission to access this consultation form.');
@@ -733,6 +736,22 @@ class ProfileController extends Controller
         }
         $client = \App\Models\User::with(['patient'])->findOrFail($id);
         
+        // Get all clinical documents for this client
+        $documents = \App\Models\ClinicalDocument::where('user_id', $client->id)
+            ->latest()
+            ->get();
+
+        // Get consultation forms for this client
+        $consultationForms = \App\Models\ConsultationForm::where('user_id', $client->id)
+            ->with(['booking'])
+            ->latest()
+            ->get();
+
+        // Get client concerns
+        $concerns = \App\Models\ClientConcern::where('user_id', $client->id)
+            ->latest()
+            ->get();
+        
         // Get all recordings for this client
         $recordings = Booking::where('user_id', $client->id)
             ->whereNotNull('recording_url')
@@ -747,7 +766,7 @@ class ProfileController extends Controller
 
         $user = Auth::user();
 
-        return view('practitioner.client-profile', compact('user', 'client', 'recordings', 'bookings'));
+        return view('practitioner.client-profile', compact('user', 'client', 'recordings', 'bookings', 'documents', 'consultationForms', 'concerns'));
     }
 
     public function myServices()

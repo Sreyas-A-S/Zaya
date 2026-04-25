@@ -37,7 +37,9 @@ class ReferralController extends Controller
 
         $booking = Booking::with('user')->findOrFail($id);
         
-        if ($booking->practitioner->user_id !== $user->id) {
+        // Security check: Only the expert assigned to this session can refer it.
+        // We compare profile_id to ensure it's the same professional entity.
+        if ($booking->profile_id !== $user->profile_id) {
             return response()->json(['error' => 'You can only refer your own bookings.'], 403);
         }
 

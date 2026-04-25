@@ -56,13 +56,17 @@
                     <div>
                         <span class="text-gray-400 text-xs font-bold uppercase block mb-2">Conditions History</span>
                         <div class="bg-white p-4 rounded-2xl border border-gray-100">
-                            <p class="text-sm text-gray-600 italic">No specific conditions recorded by client.</p>
+                            @if($client->patient->conditions)
+                                <p class="text-sm text-secondary font-medium">{{ $client->patient->conditions }}</p>
+                            @else
+                                <p class="text-sm text-gray-600 italic">No specific conditions recorded.</p>
+                            @endif
                         </div>
                     </div>
                     <div>
                         <span class="text-gray-400 text-xs font-bold uppercase block mb-2">Preferences</span>
                         <div class="flex flex-wrap gap-2">
-                            @if(isset($client->patient->consultation_preferences))
+                            @if(isset($client->patient->consultation_preferences) && is_array($client->patient->consultation_preferences))
                                 @foreach($client->patient->consultation_preferences as $pref)
                                     <span class="px-3 py-1 bg-white text-secondary text-[10px] font-bold rounded-full border border-gray-100 uppercase">{{ $pref }}</span>
                                 @endforeach
@@ -71,6 +75,34 @@
                             @endif
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Clinical Documents -->
+            <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
+                <h3 class="text-lg font-bold text-secondary mb-6 flex items-center gap-2">
+                    <i class="ri-file-list-3-line text-primary"></i>
+                    Clinical Documents
+                </h3>
+                <div class="space-y-3">
+                    @forelse($documents as $doc)
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <i class="ri-file-text-line text-xl text-gray-400"></i>
+                            <div class="overflow-hidden">
+                                <p class="text-xs font-bold text-secondary truncate">{{ $doc->file_name }}</p>
+                                <p class="text-[10px] text-gray-400 uppercase font-black">{{ $doc->file_type }} • {{ round($doc->file_size / 1024, 1) }} KB</p>
+                            </div>
+                        </div>
+                        <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-secondary shadow-sm hover:text-primary transition-all">
+                            <i class="ri-download-line"></i>
+                        </a>
+                    </div>
+                    @empty
+                    <div class="text-center py-4">
+                        <p class="text-xs text-gray-400 italic">No documents uploaded.</p>
+                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -118,7 +150,7 @@
                 @endif
             </div>
 
-            <!-- Booking History -->
+            <!-- Session History -->
             <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
                 <h3 class="text-xl font-bold text-secondary mb-6 flex items-center gap-2">
                     <i class="ri-history-line text-primary"></i>
@@ -139,7 +171,7 @@
                             @foreach($bookings as $hist)
                             <tr class="group hover:bg-gray-50 transition-all">
                                 <td class="py-4 text-sm font-bold text-secondary">{{ $hist->invoice_no }}</td>
-                                <td class="py-4 text-sm text-gray-600">{{ $hist->practitioner->user->name }}</td>
+                                <td class="py-4 text-sm text-gray-600">{{ $hist->practitioner->user->name ?? 'N/A' }}</td>
                                 <td class="py-4 text-sm text-gray-500">{{ $hist->booking_date->format('M d, Y') }}</td>
                                 <td class="py-4">
                                     <span class="px-3 py-1 text-[10px] font-bold rounded-full uppercase {{ $hist->status === 'confirmed' || $hist->status === 'paid' ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-400' }}">
@@ -150,6 +182,54 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Client Concerns & Forms -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Concerns -->
+                <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
+                    <h3 class="text-lg font-bold text-secondary mb-6 flex items-center gap-2">
+                        <i class="ri-question-answer-line text-primary"></i>
+                        Concerns & Goals
+                    </h3>
+                    <div class="space-y-4">
+                        @forelse($concerns as $concern)
+                        <div class="p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
+                            <p class="text-xs font-black text-primary uppercase tracking-widest mb-1">{{ $concern->category ?? 'General' }}</p>
+                            <p class="text-sm text-secondary font-medium leading-relaxed">{{ $concern->concern }}</p>
+                        </div>
+                        @empty
+                        <div class="text-center py-6">
+                            <p class="text-xs text-gray-400 italic">No specific concerns listed.</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Forms -->
+                <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
+                    <h3 class="text-lg font-bold text-secondary mb-6 flex items-center gap-2">
+                        <i class="ri-survey-line text-primary"></i>
+                        Consultation Forms
+                    </h3>
+                    <div class="space-y-3">
+                        @forelse($consultationForms as $form)
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
+                            <div class="overflow-hidden">
+                                <p class="text-xs font-bold text-secondary truncate">{{ $form->booking->invoice_no ?? 'Z-FORM' }}</p>
+                                <p class="text-[10px] text-gray-400 uppercase font-black">{{ $form->created_at->format('M d, Y') }}</p>
+                            </div>
+                            <a href="{{ route('bookings.consultation-form.show', $form->booking_id) }}" class="px-3 py-1 bg-white text-primary text-[10px] font-black rounded-lg shadow-sm uppercase tracking-wider hover:bg-primary hover:text-white transition-all">
+                                View
+                            </a>
+                        </div>
+                        @empty
+                        <div class="text-center py-6">
+                            <p class="text-xs text-gray-400 italic">No consultation forms submitted.</p>
+                        </div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
