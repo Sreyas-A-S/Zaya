@@ -497,14 +497,18 @@
 
                         <div class="mb-10">
                             <label class="block text-gray-800 text-lg font-medium mb-4">{{ __('Captcha Verification') }} <span class="text-red-500">*</span></label>
-                            <div class="flex items-center gap-3">
-                                <div class="bg-gray-50 border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1">
-                                    <img src="{{ route('captcha') }}" id="captcha-img" alt="Captcha" class="w-full h-full object-contain filter contrast-125 mix-blend-multiply">
+                            <div class="flex flex-col md:flex-row md:items-center gap-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-gray-50 border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1">
+                                        <img src="{{ route('captcha') }}" id="captcha-img" alt="Captcha" class="w-full h-full object-contain filter contrast-125 mix-blend-multiply">
+                                    </div>
+                                    <button type="button" onclick="refreshCaptcha()" class="w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white hover:bg-[#154a96] border-none cursor-pointer shadow-sm transition-colors">
+                                        <i class="ri-refresh-line text-2xl"></i>
+                                    </button>
                                 </div>
-                                <button type="button" onclick="refreshCaptcha()" class="w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white hover:bg-[#154a96] border-none cursor-pointer shadow-sm transition-colors">
-                                    <i class="ri-refresh-line text-2xl"></i>
-                                </button>
-                                <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}" required class="h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 focus:border-[#1B5CB8] transition-colors">
+                                <div class="w-full md:flex-1">
+                                    <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}" required class="h-[48px] w-full px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 focus:border-[#1B5CB8] transition-colors">
+                                </div>
                             </div>
                         </div>
 
