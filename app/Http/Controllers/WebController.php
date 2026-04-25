@@ -551,13 +551,17 @@ class WebController extends Controller
         };
 
         $practitioners = Practitioner::where(function ($q) use ($applySearchFilter, $query) {
-            $applySearchFilter($q, 'practitioner', $query); })->with('user')->take(5)->get();
+            $applySearchFilter($q, 'practitioner', $query);
+        })->with('user')->take(5)->get();
         $doctors = Doctor::where(function ($q) use ($applySearchFilter, $query) {
-            $applySearchFilter($q, 'doctor', $query); })->with('user')->take(5)->get();
+            $applySearchFilter($q, 'doctor', $query);
+        })->with('user')->take(5)->get();
         $mindfulness = MindfulnessPractitioner::where(function ($q) use ($applySearchFilter, $query) {
-            $applySearchFilter($q, 'mindfulness', $query); })->with('user')->take(5)->get();
+            $applySearchFilter($q, 'mindfulness', $query);
+        })->with('user')->take(5)->get();
         $yoga = YogaTherapist::where(function ($q) use ($applySearchFilter, $query) {
-            $applySearchFilter($q, 'yoga', $query); })->with('user')->take(5)->get();
+            $applySearchFilter($q, 'yoga', $query);
+        })->with('user')->take(5)->get();
 
         $allPractitioners = $practitioners->concat($doctors)->concat($mindfulness)->concat($yoga)->take(10);
 
@@ -2033,7 +2037,7 @@ class WebController extends Controller
                 return response()->json(['success' => true, 'message' => $message]);
             } else {
                 $errorBody = $result->json();
-                Log::error('WP Comment Post Error: ', $errorBody);
+                Log::error('WP Comment Post Error: ', $errorBody ?? []);
 
                 $message = 'Unable to post comment.';
                 if (isset($errorBody['code'])) {
@@ -2043,7 +2047,12 @@ class WebController extends Controller
                         $message = 'Invalid comment data provided.';
                     } elseif ($errorBody['code'] === 'comment_duplicate') {
                         $message = 'You have already submitted this comment.';
+                    } else {
+                        // Expose the exact WP error message for debugging
+                        $message = 'Unable to post comment: ' . ($errorBody['message'] ?? $errorBody['code']);
                     }
+                } elseif (isset($errorBody['message'])) {
+                    $message = 'Unable to post comment: ' . $errorBody['message'];
                 }
 
                 return response()->json(['success' => false, 'message' => $message], 400);
