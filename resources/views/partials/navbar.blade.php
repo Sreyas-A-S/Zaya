@@ -173,113 +173,121 @@
                         }
 
                         $currentCountry = $userCountries->where('code', strtoupper($currentCountryCode))->first();
+
+                        $showLanguageDropdown = ($languages->count() > 1) || (in_array($userRoleSlug, $adminRoleSlugs) && $languages->count() > 0 && !( $languages->count() == 1 && strtolower($languages->first()->code) == 'en' ));
+                        $showCountryDropdown = $userCountries->count() > 1;
                         @endphp
 
-                        <a class="lang lang-dropdown-trigger" href="javascript:void(0)" style="min-width: 100px; display: flex; align-items: center; text-decoration: none; padding: 10px 0; gap: 6px; background: none !important; border-radius: 0 !important;">
-                            <i class="fa-solid fa-language text-muted" style="font-size: 14px;"></i>
-                            @if($currentLocale !== 'all')
-                            <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentLanguage ? getCountryCode($currentLanguage) : 'us') . '.svg') }}" style="width: 20px; height: 14px; border: 1px solid #eee; border-radius: 2px;" alt="flag">
-                            @endif
-                            <h6 class="lang-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentLocale === 'all' ? 'EN' : ($currentLanguage ? strtoupper($currentLanguage->code) : 'EN') }}</h6>
-                        </a>
+                        @if($showLanguageDropdown)
+                        <li class="custom-dropdown">
+                            <a class="lang lang-dropdown-trigger" href="javascript:void(0)" style="min-width: 100px; display: flex; align-items: center; text-decoration: none; padding: 10px 0; gap: 6px; background: none !important; border-radius: 0 !important;">
+                                <i class="fa-solid fa-language text-muted" style="font-size: 14px;"></i>
+                                @if($currentLocale !== 'all')
+                                <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentLanguage ? getCountryCode($currentLanguage) : 'us') . '.svg') }}" style="width: 20px; height: 14px; border: 1px solid #eee; border-radius: 2px;" alt="flag">
+                                @endif
+                                <h6 class="lang-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentLocale === 'all' ? 'EN' : ($currentLanguage ? strtoupper($currentLanguage->code) : 'EN') }}</h6>
+                            </a>
 
-                        <div class="custom-menu overflow-hidden">
-                            <div class="dropdown-header py-2 px-3 border-bottom bg-light">
-                                <span class="f-w-700 text-dark small">{{ __('SELECT LANGUAGE') }}</span>
+                            <div class="custom-menu overflow-hidden">
+                                <div class="dropdown-header py-2 px-3 border-bottom bg-light">
+                                    <span class="f-w-700 text-dark small">{{ __('SELECT LANGUAGE') }}</span>
+                                </div>
+                                <ul class="profile-body language-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
+                                    @if(in_array($userRoleSlug, $adminRoleSlugs))
+                                    <li class="d-flex align-items-center last-0" style="cursor: pointer;">
+                                        <a href="javascript:void(0)"
+                                            class="lang d-flex align-items-center w-100 {{ $currentLocale == 'all' ? 'active text-primary' : '' }}"
+                                            data-value="all"
+                                            data-flag=""
+                                            onclick="changeLanguage(this)"
+                                            style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
+                                            <i class="fa fa-language ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
+                                            <span class="f-w-600 small">{{ __('Default Language (En)') }}</span>
+                                            @if($currentLocale == 'all')
+                                            <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                                            @endif
+                                        </a>
+                                    </li>
+                                    @endif
+
+                                    @if($languages->isEmpty() && !in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
+                                    <li class="p-3 text-center text-muted small">{{ __('No assigned languages') }}</li>
+                                    @endif
+                                    @foreach($languages as $lang)
+                                    <li class="d-flex align-items-center last-0" style="cursor: pointer;">
+                                        <a href="javascript:void(0)"
+                                            class="lang d-flex align-items-center w-100 {{ $currentLocale == $lang->code ? 'active text-primary' : '' }}"
+                                            data-value="{{ $lang->code }}"
+                                            data-flag="{{ asset('admiro/assets/fonts/flag-icon/' . getCountryCode($lang) . '.svg') }}"
+                                            onclick="changeLanguage(this)"
+                                            style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
+                                            <img src="{{ asset('admiro/assets/fonts/flag-icon/' . getCountryCode($lang) . '.svg') }}" style="width: 18px; height: 13px; margin-right: 10px; border: 1px solid #f0f0f0; border-radius: 1px;" alt="flag">
+                                            <span class="f-w-600 small">{{ strtoupper($lang->name) }}</span>
+                                            @if($currentLocale == $lang->code)
+                                            <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                                            @endif
+                                        </a>
+                                    </li>
+                                    @endforeach
+                                </ul>
                             </div>
-                            <ul class="profile-body language-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
-                                @if(in_array($userRoleSlug, $adminRoleSlugs))
-                                <li class="d-flex align-items-center last-0" style="cursor: pointer;">
-                                    <a href="javascript:void(0)"
-                                        class="lang d-flex align-items-center w-100 {{ $currentLocale == 'all' ? 'active text-primary' : '' }}"
-                                        data-value="all"
-                                        data-flag=""
-                                        onclick="changeLanguage(this)"
-                                        style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
-                                        <i class="fa fa-language ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
-                                        <span class="f-w-600 small">{{ __('Default Language (En)') }}</span>
-                                        @if($currentLocale == 'all')
-                                        <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
-                                        @endif
-                                    </a>
-                                </li>
-                                @endif
-
-                                @if($languages->isEmpty() && !in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
-                                <li class="p-3 text-center text-muted small">{{ __('No assigned languages') }}</li>
-                                @endif
-                                @foreach($languages as $lang)
-                                <li class="d-flex align-items-center last-0" style="cursor: pointer;">
-                                    <a href="javascript:void(0)"
-                                        class="lang d-flex align-items-center w-100 {{ $currentLocale == $lang->code ? 'active text-primary' : '' }}"
-                                        data-value="{{ $lang->code }}"
-                                        data-flag="{{ asset('admiro/assets/fonts/flag-icon/' . getCountryCode($lang) . '.svg') }}"
-                                        onclick="changeLanguage(this)"
-                                        style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
-                                        <img src="{{ asset('admiro/assets/fonts/flag-icon/' . getCountryCode($lang) . '.svg') }}" style="width: 18px; height: 13px; margin-right: 10px; border: 1px solid #f0f0f0; border-radius: 1px;" alt="flag">
-                                        <span class="f-w-600 small">{{ strtoupper($lang->name) }}</span>
-                                        @if($currentLocale == $lang->code)
-                                        <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
-                                        @endif
-                                    </a>
-                                </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                </li>
-
-                <li class="custom-dropdown">
-                    <a class="lang country-dropdown-trigger" href="javascript:void(0)" style="min-width: 100px; display: flex; align-items: center; text-decoration: none; padding: 10px 0; gap: 6px; background: none !important; border-radius: 0 !important;">
-                        <i class="fa-solid fa-earth-americas text-muted" style="font-size: 14px;"></i>
-                        @if($currentCountryCode !== 'all')
-                        <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentCountry ? strtolower($currentCountry->code) : 'us') . '.svg') }}" style="width: 20px; height: 14px; border: 1px solid #eee; border-radius: 2px;" alt="flag">
+                        </li>
                         @endif
-                        <h6 class="country-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentCountryCode === 'all' ? 'ALL' : ($currentCountry ? strtoupper($currentCountry->code) : 'US') }}</h6>
-                    </a>
 
-                    <div class="custom-menu overflow-hidden">
-                        <div class="dropdown-header py-2 px-3 border-bottom bg-light">
-                            <span class="f-w-700 text-dark small">{{ __('SELECT REGION') }}</span>
-                        </div>
-                        <ul class="profile-body country-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
-                            @if(in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
-                            <li class="d-flex align-items-center last-0" style="cursor: pointer;">
-                                <a href="javascript:void(0)"
-                                    class="lang d-flex align-items-center w-100 {{ $currentCountryCode == 'all' ? 'active text-primary' : '' }}"
-                                    data-value="all"
-                                    data-flag="{{ asset('admiro/assets/images/dashboard/all-countries.png') }}"
-                                    onclick="changeCountry(this)"
-                                    style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
-                                    <i class="fa fa-earth-americas ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
-                                    <span class="f-w-600 small">{{ __('ALL') }}</span>
-                                    @if($currentCountryCode == 'all')
-                                    <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                        @if($showCountryDropdown)
+                        <li class="custom-dropdown">
+                            <a class="lang country-dropdown-trigger" href="javascript:void(0)" style="min-width: 100px; display: flex; align-items: center; text-decoration: none; padding: 10px 0; gap: 6px; background: none !important; border-radius: 0 !important;">
+                                <i class="fa-solid fa-earth-americas text-muted" style="font-size: 14px;"></i>
+                                @if($currentCountryCode !== 'all')
+                                <img src="{{ asset('admiro/assets/fonts/flag-icon/' . ($currentCountry ? strtolower($currentCountry->code) : 'us') . '.svg') }}" style="width: 20px; height: 14px; border: 1px solid #eee; border-radius: 2px;" alt="flag">
+                                @endif
+                                <h6 class="country-txt f-w-700 mb-0" style="color: #2b2b2b; font-size: 13px;">{{ $currentCountryCode === 'all' ? 'ALL' : ($currentCountry ? strtoupper($currentCountry->code) : 'US') }}</h6>
+                            </a>
+
+                            <div class="custom-menu overflow-hidden">
+                                <div class="dropdown-header py-2 px-3 border-bottom bg-light">
+                                    <span class="f-w-700 text-dark small">{{ __('SELECT REGION') }}</span>
+                                </div>
+                                <ul class="profile-body country-menu-list" style="max-height: 350px; overflow-y: auto; padding: 5px;">
+                                    @if(in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
+                                    <li class="d-flex align-items-center last-0" style="cursor: pointer;">
+                                        <a href="javascript:void(0)"
+                                            class="lang d-flex align-items-center w-100 {{ $currentCountryCode == 'all' ? 'active text-primary' : '' }}"
+                                            data-value="all"
+                                            data-flag="{{ asset('admiro/assets/images/dashboard/all-countries.png') }}"
+                                            onclick="changeCountry(this)"
+                                            style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
+                                            <i class="fa fa-earth-americas ms-1 me-2 text-muted" style="width: 18px; font-size: 14px;"></i>
+                                            <span class="f-w-600 small">{{ __('ALL') }}</span>
+                                            @if($currentCountryCode == 'all')
+                                            <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                                            @endif
+                                        </a>
+                                    </li>
                                     @endif
-                                </a>
-                            </li>
-                            @endif
-                            @if($userCountries->isEmpty() && !in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
-                            <li class="p-3 text-center text-muted small">{{ __('No assigned regions') }}</li>
-                            @endif
-                            @foreach($userCountries as $country)
-                            <li class="d-flex align-items-center last-0" style="cursor: pointer;">
-                                <a href="javascript:void(0)"
-                                    class="lang d-flex align-items-center w-100 {{ strtoupper($currentCountryCode) == $country->code ? 'active text-primary' : '' }}"
-                                    data-value="{{ $country->code }}"
-                                    data-flag="{{ asset('admiro/assets/fonts/flag-icon/' . strtolower($country->code) . '.svg') }}"
-                                    onclick="changeCountry(this)"
-                                    style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
-                                    <img src="{{ asset('admiro/assets/fonts/flag-icon/' . strtolower($country->code) . '.svg') }}" style="width: 18px; height: 13px; margin-right: 10px; border: 1px solid #f0f0f0; border-radius: 1px;" alt="flag">
-                                    <span class="f-w-600 small">{{ strtoupper($country->name) }}</span>
-                                    @if(strtoupper($currentCountryCode) == $country->code)
-                                    <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                                    @if($userCountries->isEmpty() && !in_array($user?->role, ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager']))
+                                    <li class="p-3 text-center text-muted small">{{ __('No assigned regions') }}</li>
                                     @endif
-                                </a>
-                            </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </li>
+                                    @foreach($userCountries as $country)
+                                    <li class="d-flex align-items-center last-0" style="cursor: pointer;">
+                                        <a href="javascript:void(0)"
+                                            class="lang d-flex align-items-center w-100 {{ strtoupper($currentCountryCode) == $country->code ? 'active text-primary' : '' }}"
+                                            data-value="{{ $country->code }}"
+                                            data-flag="{{ asset('admiro/assets/fonts/flag-icon/' . strtolower($country->code) . '.svg') }}"
+                                            onclick="changeCountry(this)"
+                                            style="text-decoration: none; color: inherit; padding: 8px 12px !important;">
+                                            <img src="{{ asset('admiro/assets/fonts/flag-icon/' . strtolower($country->code) . '.svg') }}" style="width: 18px; height: 13px; margin-right: 10px; border: 1px solid #f0f0f0; border-radius: 1px;" alt="flag">
+                                            <span class="f-w-600 small">{{ strtoupper($country->name) }}</span>
+                                            @if(strtoupper($currentCountryCode) == $country->code)
+                                            <i class="fa fa-check ms-auto text-primary" style="font-size: 10px;"></i>
+                                            @endif
+                                        </a>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </li>
+                        @endif
                 <li class="profile-nav custom-dropdown">
                     <div class="user-wrap">
                         <div class="user-img"><img src="{{ $user?->profile_pic_url ?? asset('admiro/assets/images/user/user.png') }}" alt="user" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" /></div>

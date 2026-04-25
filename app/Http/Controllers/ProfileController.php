@@ -319,7 +319,11 @@ class ProfileController extends Controller
             $roleForSchema = $user->role;
         } else {
             // Fallback to the booking's actual practitioner role
-            $roleForSchema = $booking->practitioner->user->role ?? 'practitioner';
+            if ($booking->practitioner && $booking->practitioner->user) {
+                $roleForSchema = $booking->practitioner->user->role;
+            } else {
+                $roleForSchema = 'practitioner';
+            }
         }
 
         $consultationSchema = [];
