@@ -496,7 +496,7 @@
                         <input type="text" name="first_name" value="{{ old('first_name') }}"
                             class="reg-input @error('first_name') border-red-500! @enderror"
                             placeholder="{{ __('Enter First Name') }}" required  pattern="^[A-Z][a-zA-Z\s]{0,39}$"
-                            maxlength="40" title="{{ __('First letter must be capital. Only letters and spaces allowed. Max 40 characters.') }}">
+                            maxlength="40" title="{{ __('First letter must be capital. Only letters and spaces allowed. Max 40 characters.') }}" autocomplete="off">
                         @error('first_name')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
@@ -504,13 +504,13 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Middle Name') }}</label>
                         <input type="text" name="middle_name" value="{{ old('middle_name') }}" class="reg-input"
-                            placeholder="{{ __('Enter Middle Name') }}" pattern="^[a-zA-Z][a-zA-Z\s]{0,39}$"  maxlength="40"  title="{{ __('Middle name can start with a small or capital letter and must contain only alphabets') }}">
+                            placeholder="{{ __('Enter Middle Name') }}" pattern="^[a-zA-Z][a-zA-Z\s]{0,39}$"  maxlength="40"  title="{{ __('Middle name can start with a small or capital letter and must contain only alphabets') }}" autocomplete="off">
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Last Name') }}</label>
                         <input type="text" name="last_name" value="{{ old('last_name') }}"
                             class="reg-input @error('last_name') border-red-500! @enderror"
-                            placeholder="{{ __('Enter Last Name') }}" required pattern="^[A-Z][a-zA-Z\s]{0,39}$"  maxlength="40" title="{{ __('Last name must start with a capital letter and contain only alphabets') }}">
+                            placeholder="{{ __('Enter Last Name') }}" required pattern="^[A-Z][a-zA-Z\s]{0,39}$"  maxlength="40" title="{{ __('Last name must start with a capital letter and contain only alphabets') }}" autocomplete="off">
                         @error('last_name')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
@@ -562,7 +562,7 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Email') }}</label>
                         <input type="email" name="email" value="{{ old('email') }}"
-                            class="reg-input @error('email') border-red-500! @enderror" placeholder="{{ __('Enter Email') }}"
+                            class="reg-input @error('email') border-red-500! @enderror" autocomplete="off" placeholder="{{ __('Enter Email') }}"
                             required>
                         @error('email')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
@@ -572,7 +572,7 @@
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Mobile No.') }}</label>
                         <input type="tel" name="mobile" value="{{ old('mobile') }}"
                             class="reg-input @error('mobile') border-red-500! @enderror" placeholder="{{ __('Enter Mobile No.') }}"
-                            required>
+                            required autocomplete="off">
                         @error('mobile')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
@@ -585,7 +585,7 @@
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Address Line 1') }}</label>
                         <input type="text" name="address_line_1" value="{{ old('address_line_1') }}"
                             class="reg-input @error('address_line_1') border-red-500! @enderror"
-                            placeholder="{{ __('Enter Address Line 1') }}" required>
+                            placeholder="{{ __('Enter Address Line 1') }}" required autocomplete="off">
                         @error('address_line_1')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
@@ -593,7 +593,7 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Address Line 2') }}</label>
                         <input type="text" name="address_line_2" value="{{ old('address_line_2') }}" class="reg-input"
-                            placeholder="{{ __('Enter Address Line 2') }}">
+                            placeholder="{{ __('Enter Address Line 2') }}" autocomplete="off">
                     </div>
                 </div>
 
@@ -602,7 +602,7 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('City') }}</label>
                         <input type="text" name="city" value="{{ old('city') }}"
-                            class="reg-input @error('city') border-red-500! @enderror" placeholder="{{ __('Enter City') }}"
+                            class="reg-input @error('city') border-red-500! @enderror" autocomplete="off" placeholder="{{ __('Enter City') }}"
                             required>
                         @error('city')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
@@ -612,7 +612,7 @@
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('State') }}</label>
                         <input type="text" name="state" value="{{ old('state') }}"
                             class="reg-input @error('state') border-red-500! @enderror" placeholder="{{ __('Enter State') }}"
-                            required>
+                            required autocomplete="off">
                         @error('state')
                             <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                         @enderror
@@ -636,7 +636,7 @@
                         <input type="text" name="zip_code" value="{{ old('zip_code') }}" class="reg-input h-[52px]"
                             placeholder="{{ __('Enter Zip Code') }}" required maxlength="8" pattern="\d*"
                             title="{{ __('Maximum 8 numerical values allowed') }}"
-                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)" autocomplete="off">
                     </div>
                 </div>
 
@@ -655,14 +655,7 @@
                                 <span class="text-gray-700 group-hover:text-primary transition-colors">{{ $pref->name }}</span>
                             </label>
                         @endforeach
-                        <div class="col-span-1 sm:col-span-2 lg:col-span-3 mt-4 pt-4 border-t border-gray-200">
-                            <div class="flex items-center gap-3">
-                                <input type="text" id="new-preference" placeholder="{{ __('Add New Preference') }}" class="reg-input flex-1 max-w-xs">
-                                <button type="button" onclick="addNewPreference()" class="bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-90 transition-all">
-                                    <i class="ri-add-line text-xl"></i>
-                                </button>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
 
@@ -734,8 +727,7 @@
                                     <input type="hidden" name="registration_fee" id="registration_fee" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
                                     <input type="hidden" name="registration_fee_actual" id="registration_fee_actual" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
                                     <input type="hidden" name="registration_fee_currency" id="registration-fee-currency" value="{{ $registrationCurrencyCode }}">
-                                    <button type="submit"
-                                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-sm font-medium hover:bg-[#e0a932] transition-colors shadow-sm">
+                                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer">
                                         {{ __('Pay & Register') }}
                                     </button>
                                 </div>
@@ -783,10 +775,10 @@
                         </div>
                     </div>
                 </div>
-                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div class="md:col-span-2">
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }}</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }} <span class="text-red-500">*</span></label>
                         <div class="flex items-center gap-4">
                             <div class="bg-white rounded-full flex items-center justify-center h-[52px] w-[150px] overflow-hidden relative shrink-0 border border-gray-200">
                                 <img src="{{ route('captcha') }}" id="captcha-img" alt="captcha" class="w-full h-full object-cover">
@@ -802,73 +794,25 @@
                     </div>
                 </div>
 
-                <!-- Password Fields (Hidden but required for registration) -->
-                <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
-                    <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
-                        <div class="relative">
-                            <input type="password" name="password" id="password"
-                                class="reg-input @error('password') border-red-500! @enderror"
-                                placeholder="Enter Password" required>
-                            <button type="button" onclick="togglePassword('password')"
-                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                <i class="ri-eye-line" id="password-icon"></i>
-                            </button>
-                        </div>
-                        @error('password')
-                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Confirm Password</label>
-                        <div class="relative">
-                            <input type="password" name="password_confirmation" id="password_confirmation"
-                                class="reg-input"
-                                placeholder="Confirm Password" required>
-                            <button type="button" onclick="togglePassword('password_confirmation')"
-                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <div class="flex items-center justify-end gap-6 mt-12 pt-8 border-t border-gray-100">
+                    <a href="{{ route('zaya-login') }}" class="btn-cancel">{{ __('Cancel') }}</a>
+                    <button type="submit" id="submit-btn" class="btn-create">
+                        <i class="ri-loader-4-line ri-spin btn-loader"></i>
+                        {{ __('Create Account') }}
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- Client Thank You Popup Modal -->
-    <div id="thank-you-popup" class="fixed inset-0 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
-        <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-[450px] p-10 text-center relative animate-pop-in">
-            <!-- Success Icon -->
-            <div class="w-24 h-24 bg-[#60E48C] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#60E48C]/30">
-                <i class="ri-check-line text-white text-5xl"></i>
-            </div>
 
-            <!-- Text Content -->
-            <h3 class="text-[#209F59] text-3xl font-medium mb-4">{{ __('Thank you!') }}</h3>
-            <h4 class="text-gray-800 text-xl font-semibold mb-3">{{ __('Registration Successful!') }}</h4>
-            <p class="text-gray-500 text-base leading-relaxed mb-8">
-                {{ __('Your account has been created successfully.') }}<br>
-                {{ __('Please login to access your portal.') }}
-            </p>
+
+
+
             
-            <div class="flex flex-col gap-3">
-                <a href="{{ route('zaya-login') }}" class="bg-[#FABC41] text-[#423131] py-3.5 px-8 rounded-full font-medium transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5">
-                    {{ __('Login Now') }}
-                </a>
-                <button onclick="closeThankYouPopup()" class="text-gray-400 hover:text-gray-600 text-sm py-2">
-                    {{ __('Close') }}
-                </button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Footer with Buttons -->
-    <footer class="bg-[#FFF3D4] py-6 mt-auto">
-        <div class="container mx-auto px-4">
-            <div class="max-w-5xl mx-auto flex items-center justify-end gap-4 md:gap-8">
-                <a href="{{ route('zaya-login') }}" class="btn-cancel">{{ __('Cancel') }}</a>
-                <button type="submit" id="submit-btn" form="registration-form" class="btn-create {{ ($clientRegistrationFeeEnabled && $clientRegistrationFee > 0) ? 'hidden' : '' }}">
-                    <i class="ri-loader-4-line ri-spin btn-loader"></i>{{ __('Create Account') }}
-                </button>
-            </div>
-        </div>
-    </footer>
+
+
 
     <script>
         // Custom Select Logic (Generic)
@@ -1483,10 +1427,8 @@
 
                 if (!isEnabled || numericValue <= 0) {
                     if (feeWrapper) feeWrapper.classList.add('hidden');
-                    if (submitBtn) submitBtn.classList.remove('hidden');
                 } else {
                     if (feeWrapper) feeWrapper.classList.remove('hidden');
-                    if (submitBtn) submitBtn.classList.add('hidden');
                     if (feeDisplay) {
                         feeDisplay.textContent = `${currencySymbol} ${numericValue.toFixed(2)}${currCode ? ' ('+currCode+')' : ''}`;
                     }

@@ -105,7 +105,7 @@
                                     title="First name must start with a capital letter and contain only alphabets maximum character 40"
                                     class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                     placeholder="{{ __('Enter First Name') }}"
-                                    required>
+                                    required autocomplete="off">
                             </div>
                             <div>
                                 <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Last Name') }}</label>
@@ -117,7 +117,7 @@
                                     title="Last name must start with a capital letter and contain only alphabets"
                                     class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                     placeholder="{{ __('Enter Last Name') }}"
-                                    required>
+                                    required autocomplete="off">
                             </div>
                         </div>
                         <div class="flex flex-col items-center order-first md:order-last">
@@ -158,14 +158,14 @@
                                 pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
                                 title="Please enter a valid email address"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="{{ __('Enter Email') }}" required>
+                                placeholder="{{ __('Enter Email') }}" required autocomplete="off">
                         </div>
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Phone No.') }}</label>
                             <input type="tel" name="phone" id="phone" value="{{ old('phone') }}"
                                 maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="{{ __('Enter Phone No.') }}" required>
+                                placeholder="{{ __('Enter Phone No.') }}" required autocomplete="off">
                         </div>
                     </div>
 
@@ -179,7 +179,7 @@
                                     title="Must contain at least 8 characters, including NUMBER, UPPERCASE, LOWERCASE and SYMBOL"
                                     class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                     placeholder="{{ __('Enter Password') }}"
-                                    required>
+                                    required autocomplete="new-password">
                                 <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
                             </div>
                         </div>
@@ -188,7 +188,7 @@
                             <div class="relative">
                                 <input type="password" name="password_confirmation"
                                     class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="{{ __('Confirm Password') }}" required>
+                                    placeholder="{{ __('Confirm Password') }}" required autocomplete="new-password">
                                 <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
                             </div>
                         </div>
@@ -219,7 +219,7 @@
                             <input type="text" name="address_line_1" value="{{ old('address_line_1') }}"
                                 maxlength="500"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="{{ __('Enter Address Line 1') }}" required>
+                                placeholder="{{ __('Enter Address Line 1') }}" required autocomplete="off">
                         </div>
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Website') }} <span class="text-gray-400 italic">{{ __('(if any)') }}</span></label>
@@ -236,21 +236,21 @@
                             <input type="text" name="city" value="{{ old('city') }}"
                                 pattern="^[A-Za-z\s]+$" title="Only alphabets and spaces are allowed"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="{{ __('Enter City') }}" required>
+                                placeholder="{{ __('Enter City') }}" required autocomplete="off">
                         </div>
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State') }}</label>
                             <input type="text" name="state" value="{{ old('state') }}"
                                 pattern="^[A-Za-z\s]+$" title="Only alphabets and spaces are allowed"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="{{ __('Enter State') }}" required>
+                                placeholder="{{ __('Enter State') }}" required autocomplete="off">
                         </div>
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Zip Code') }}</label>
                             <input type="text" name="zip_code" value="{{ old('zip_code') }}"
                                 pattern="^[A-Za-z0-9\s\-]{4,10}$" title="Enter a valid zip code (4-10 characters)"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="{{ __('Enter Zip Code') }}" required>
+                                placeholder="{{ __('Enter Zip Code') }}" required autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -630,7 +630,7 @@
                                             <span class='text-gray-900 text-[1.05rem] font-medium'>{{ $practitionerRegistrationCurrencySymbol ?? '€' }} {{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}</span>
                                             <input type='hidden' name='registration_fee' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
                                             <input type='hidden' name='registration_fee_actual' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
-                                            <button type='button' class='absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer'>{{ __('Pay') }}</button>
+                                            <button type='submit' class='absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer'>{{ __('Pay') }}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -685,43 +685,43 @@
                                 </div>
                             </div>
 
-                        <div class='bg-gradient-to-r from-[#FFFFFF] via-[#F0F0F0] to-[#FFFFFF] p-12 flex flex-col items-center justify-center border-t border-[#E5E5E5]'>
-                            <h3 class='text-xl font-medium text-gray-800 mb-6'>{{ __('Captcha Verification') }} <span class="text-red-500">*</span></h3>
-                            <div class='flex items-center justify-center gap-3'>
-                                <div class='bg-white border border-[#D1D5DB] rounded-lg overflow-hidden h-[48px] w-[140px] flex items-center justify-center p-1'>
-                                    <img src='{{ route('captcha') }}' id='captcha-img' alt='Captcha' class='w-full h-full object-contain filter contrast-125 mix-blend-multiply'>
+                            <div class="mb-12">
+                                <h3 class="text-xl font-medium text-gray-900 mb-6">{{ __('Captcha Verification') }} <span class="text-red-500">*</span></h3>
+                                <div class="flex flex-wrap items-center gap-4">
+                                    <div class="bg-white border border-[#D1D5DB] rounded-full overflow-hidden h-[58px] w-[160px] flex items-center justify-center p-1 shadow-sm">
+                                        <img src="{{ route('captcha') }}" id="captcha-img" alt="Captcha" class="w-full h-full object-contain filter contrast-125 mix-blend-multiply">
+                                    </div>
+                                    <button type="button" onclick="refreshCaptcha()" class="w-[48px] h-[48px] bg-[#1B5CB8] rounded-full flex items-center justify-center text-white transition-all hover:bg-[#154a96] border-none cursor-pointer shadow-sm">
+                                        <i class="ri-refresh-line text-2xl"></i>
+                                    </button>
+                                    <div class="flex-1 min-w-[200px]">
+                                        <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}" 
+                                            class="w-full h-[58px] px-8 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#1B5CB8] focus:shadow-[0_0_0_3px_rgba(27,92,184,0.1)]" 
+                                            required>
+                                    </div>
                                 </div>
-                                <button type='button' onclick='refreshCaptcha()' class='w-[48px] h-[48px] bg-[#1B5CB8] rounded-lg flex items-center justify-center text-white transition-all hover:bg-[#154a96] border-none cursor-pointer shadow-sm'>
-                                    <i class='ri-refresh-line text-2xl'></i>
-                                </button>
-                                <input type='text' name='captcha' placeholder='{{ __('Enter Code') }}' class='h-[48px] w-[140px] px-4 bg-white rounded-lg border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-[#A3A3A3] focus:border-[#1B5CB8] focus:shadow-[0_0_0_3px_rgba(27,92,184,0.1)]' required>
+                                @error('captcha')
+                                    <span class="text-red-500 text-xs mt-2 pl-6 block">{{ $message }}</span>
+                                @enderror
                             </div>
-                            @error('captcha')
-                                <span class='text-red-500 text-xs mt-1 pl-4 block'>{{ $message }}</span>
-                            @enderror
-                        </div>
+                </div>
+                <div class="flex items-center justify-end gap-4 md:gap-8 mt-12 pt-8 border-t border-gray-100">
+                    <button type="button"
+                        class="text-[#594B4B] font-normal text-base transition-all duration-200 cursor-pointer bg-transparent border-none py-3.5 px-6 hover:text-gray-700"
+                        id="back-btn" onclick="previousTab()">
+                        <span id="back-btn-text">{{ __('← Back to Website') }}</span>
+                    </button>
+                    <button type="button"
+                        class="bg-[#F5A623] text-[#423131] py-3.5 px-8 rounded-full font-normal text-base transition-all duration-300 cursor-pointer border-none hover:bg-[#A87139] hover:text-white hover:-translate-y-0.5 shadow-lg shadow-[#F5A623]/20"
+                        id="next-btn" onclick="nextTab()">
+                        <span id="next-btn-text">{!! __('Save & Continue') !!}</span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Footer with Buttons -->
-    <footer class="bg-[#FFF3D4] py-6 mt-auto">
-        <div class="container mx-auto px-4">
-            <div class="max-w-5xl mx-auto flex items-center justify-end gap-4 md:gap-8">
-                <button type="button"
-                    class="text-[#594B4B] font-normal text-base transition-all duration-200 cursor-pointer bg-transparent border-none py-3.5 px-6 hover:text-gray-700"
-                    id="back-btn" onclick="previousTab()">
-                    <span id="back-btn-text">{{ __('← Back to Website') }}</span>
-                </button>
-                <button type="button"
-                    class="bg-[#F5A623] text-[#423131] py-3.5 px-8 rounded-full font-normal text-base transition-all duration-300 cursor-pointer border-none hover:bg-[#A87139] hover:text-white hover:-translate-y-0.5"
-                    id="next-btn" onclick="nextTab()">
-                    <span id="next-btn-text">{!! __('Save & Continue') !!}</span>
-                </button>
-            </div>
-        </div>
-    </footer>
+
     <!-- Thank You Popup Modal -->
     <div id="thank-you-popup" class="fixed inset-0 bg-black/40 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
         <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-[450px] p-10 text-center relative animate-[popIn_0.3s_ease-out_forwards]">
