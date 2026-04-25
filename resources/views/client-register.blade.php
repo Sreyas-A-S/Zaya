@@ -854,11 +854,6 @@
                         {{ __('Login Instead') }}
                     </a>
 
-                    @php
-                        $clientRegistrationFeeEnabled = \App\Models\CoinSetting::where('payout_currency', 'INR')->first()->is_active ?? false;
-                        $clientRegistrationFee = 0; // Default or fetched from config
-                    @endphp
-
                     <button type="submit" id="submit-btn" form="registration-form" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-3.5 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">
                         <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
                         {{ __('Complete & Proceed to Payment') }}
