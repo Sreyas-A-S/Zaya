@@ -640,10 +640,10 @@ class ProfileController extends Controller
                          ($booking->practitioner && $booking->practitioner->user_id === $user->id) ||
                          ($booking->translator && $booking->translator->user_id === $user->id);
 
-        if (!$isParticipant && !in_array($user->role, ['admin', 'super-admin'])) {
+        if (!$isParticipant) {
             $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
             if (!$hasAccess) {
-                return redirect()->route('bookings.index')->with('error', 'Unauthorized access.');
+                return redirect()->route('bookings.index')->with('error', 'Unauthorized access. Please verify via OTP.');
             }
         }
 
@@ -693,8 +693,8 @@ class ProfileController extends Controller
             ];
         }
 
-        // Consent Status
-        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($booking->practitioner->user_id ?? 0, $booking->user_id);
+        // Consent Status (Checked against the CURRENT viewer)
+        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
 
         $firstPractitioner = $referralChain[0]['practitioner'] ?? 'Unknown';
 
@@ -719,18 +719,18 @@ class ProfileController extends Controller
     {
         $practitioner = Auth::user();
         
-        // Ensure only practitioners/doctors can access this
-        if (in_array($practitioner->role, ['client', 'patient'])) {
-            abort(403);
+        // Strictly restrict to Expert roles (Admins cannot view clinical data)
+        $allowedExpertRoles = ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'];
+        if (!in_array($practitioner->role, $allowedExpertRoles)) {
+            return redirect()->route('dashboard')->with('error', 'Access denied. Only treating experts can view clinical data.');
         }
 
-        // Check for OTP-verified access
+        // Check for OTP-verified access (Strictly for practitioners only)
         $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($practitioner->id, $id);
-        
+
         if (!$hasAccess) {
             return redirect()->route('bookings.index')->with('error', 'You do not have permission to view this client\'s profile. Please verify via OTP first.');
         }
-
         $client = \App\Models\User::with(['patient'])->findOrFail($id);
         
         // Get all recordings for this client

@@ -145,19 +145,36 @@ class DataAccessController extends Controller
     /**
      * Check if practitioner has access to client data.
      */
-    public static function hasAccess($practitionerId, $clientId, $type = 'access')
+    public static function hasAccess($practitionerId, $clientId, $type = null)
     {
+        // 1. Check for specific approved request first (Overrides global switch if explicitly granted via OTP)
+        $accessQuery = DataAccessRequest::where('requester_id', $practitionerId)
+            ->where('client_id', $clientId)
+            ->where('status', 'approved');
+            
+        if ($type) {
+            $accessQuery->where('type', $type);
+        }
+
+        if ($accessQuery->exists()) {
+            return true;
+        }
+
+        // 2. Global master switch check (if patient profile exists)
         $client = User::find($clientId);
-        
-        // Global master switch check (if patient profile exists)
         if ($client && $client->patient && !$client->patient->data_sharing_consent) {
             return false;
         }
 
-        return DataAccessRequest::where('requester_id', $practitionerId)
-            ->where('client_id', $clientId)
-            ->where('type', $type)
-            ->where('status', 'approved')
-            ->exists();
+        // 3. Fallback: If we were looking for a specific type, check if ANY approved access exists
+        // This ensures that once verified for one thing (e.g. referral), they have general access.
+        if ($type) {
+            return DataAccessRequest::where('requester_id', $practitionerId)
+                ->where('client_id', $clientId)
+                ->where('status', 'approved')
+                ->exists();
+        }
+
+        return false;
     }
 }
