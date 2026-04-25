@@ -11,12 +11,14 @@
         .header { padding: 40px 20px; text-align: center; }
         .logo { height: 60px; }
         .content { padding: 0 40px 40px; text-align: center; }
-        h1 { color: #2E4B3C; font-size: 24px; margin-bottom: 16px; font-weight: 700; }
-        p { font-size: 16px; line-height: 1.6; margin-bottom: 24px; color: #4B5563; }
+        h1 { color: #2E4B3C; font-size: 20px; margin-bottom: 16px; font-weight: 700; }
+        p { font-size: 15px; line-height: 1.6; margin-bottom: 24px; color: #4B5563; }
         .session-info { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-bottom: 32px; text-align: left; }
-        .info-row { margin-bottom: 8px; font-size: 14px; }
-        .label { font-weight: 600; color: #64748b; }
-        .value { color: #1e293b; font-weight: 700; }
+        .session-table { width: 100%; border-collapse: collapse; }
+        .session-table td { padding: 8px 0; border-bottom: 1px solid #edf2f7; vertical-align: top; word-break: break-word; }
+        .session-table tr:last-child td { border-bottom: none; }
+        .label { font-weight: 600; color: #64748b; font-size: 12px; width: 35%; }
+        .value { color: #1e293b; font-weight: 700; font-size: 13px; text-align: right; width: 65%; }
         .join-button { display: inline-block; padding: 16px 40px; background-color: #2FA749; color: #ffffff !important; border-radius: 99px; text-decoration: none; font-weight: 700; font-size: 18px; box-shadow: 0 4px 6px -1px rgba(47, 167, 73, 0.2); transition: all 0.3s ease; }
         .footer { background-color: #2E4B3C; color: #ffffff; padding: 30px 20px; text-align: center; font-size: 14px; }
         .footer a { color: #F8E0BB; text-decoration: none; }
@@ -35,24 +37,26 @@
             <p>{{ $intro }}</p>
 
             <div class="session-info">
-                <div class="info-row">
-                    <span class="label">Session ID:</span>
-                    <span class="value">{{ $booking->invoice_no }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Time:</span>
-                    <span class="value">{{ $booking->booking_time }} ({{ $timezone ?? 'UTC' }}) - Today</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Participants:</span>
-                    <span class="value">{{ $booking->user->name }} & {{ $booking->practitioner->user->name }}</span>
-                </div>
-                @if($booking->need_translator)
-                <div class="info-row">
-                    <span class="label">Translator:</span>
-                    <span class="value">{{ $booking->translator->user->name ?? 'Assigned' }}</span>
-                </div>
-                @endif
+                <table class="session-table">
+                    <tr>
+                        <td class="label">Session ID:</td>
+                        <td class="value">{{ $booking->invoice_no }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Time:</td>
+                        <td class="value">{{ $booking->booking_time }} ({{ $timezone ?? 'UTC' }}) - Today</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Participants:</td>
+                        <td class="value">{{ $booking->user->name }} & {{ $booking->practitioner->user->name }}</td>
+                    </tr>
+                    @if($booking->need_translator)
+                    <tr>
+                        <td class="label">Translator:</td>
+                        <td class="value">{{ $booking->translator->user->name ?? 'Assigned' }}</td>
+                    </tr>
+                    @endif
+                </table>
             </div>
 
             <div style="margin: 40px 0;">

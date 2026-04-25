@@ -715,58 +715,70 @@
 
                 <!-- Payment & Promocode (from Admin > Other Fees) -->
                 <div class="mb-10 border-t border-gray-200 pt-10 {{ (!$clientRegistrationFeeEnabled || $clientRegistrationFee <= 0) ? 'hidden' : '' }}" id="registration-fee-field-wrapper">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 items-end">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-12 rounded-2xl bg-secondary/5 flex items-center justify-center">
+                            <i class="ri-coupon-3-line text-secondary text-2xl"></i>
+                        </div>
                         <div>
-                            <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Registration Fee Amount') }}</label>
-                            <div class="relative w-full">
-                                <div class="w-full h-[52px] bg-[#F5F5F5] rounded-full flex items-center pl-6 pr-2" data-registration-fee-container>
-                                    <span class="text-gray-900 text-[0.95rem] font-medium" id="registration-fee-display">
-                                        {{ $registrationCurrencySymbol }} {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
-                                    </span>
-                                    <input type="hidden" name="registration_fee" id="registration_fee" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
-                                    <input type="hidden" name="registration_fee_actual" id="registration_fee_actual" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
-                                    <input type="hidden" name="registration_fee_currency" id="registration-fee-currency" value="{{ $registrationCurrencyCode }}">
-                                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer">
-                                        {{ __('Pay & Register') }}
+                            <h3 class="text-xl font-black text-secondary">{{ __('Payment & Promocode') }}</h3>
+                            <p class="text-gray-400 text-sm">{{ __('Registration fee and discounts') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                        <!-- Left: Promo Input & Summary -->
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{{ __('Promocode') }}</label>
+                                <div class="relative w-full">
+                                    <input type="text" name="promocode" id="promocode-input" placeholder="CODE1234"
+                                        class="w-full h-[52px] pl-6 pr-28 bg-white rounded-full border border-dashed border-gray-300 outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#FABC41] focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)] uppercase">
+                                    <button type="button" id="promo-apply-btn"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full transition-colors text-sm font-medium hover:bg-[#e0a932]">
+                                        {{ __('Apply') }}
                                     </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-secondary/5 rounded-[24px] p-6 space-y-4">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-gray-500 font-medium">{{ __('Registration Fee') }}</span>
+                                    <span id="registration-fee-display" class="font-bold text-secondary">
+                                        {{ config('currencies.symbols')[$clientRegistrationCurrency] ?? $clientRegistrationCurrency }} {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
+                                    </span>
+                                </div>
+                                <div id="promo-breakdown" class="hidden space-y-4 pt-4 border-t border-secondary/10">
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-gray-500 font-medium">{{ __('Discount') }}</span>
+                                        <span id="promo-discount-amount-display" class="font-bold text-green-600"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center pt-4 border-t border-secondary/10">
+                                        <span class="font-bold text-secondary">{{ __('Total Payable') }}</span>
+                                        <span id="promo-total-fee-display" class="text-lg font-black text-secondary"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Promocode') }}</label>
-                            <div class="relative w-full">
-                                <input type="text" name="promocode" id="promocode-input" placeholder="CODE1234"
-                                    class="w-full h-[52px] pl-6 pr-28 bg-white rounded-full border border-dashed border-gray-300 outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#FABC41] focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)]">
-                                <button type="button" id="promo-apply-btn"
-                                    class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full transition-colors text-sm font-medium hover:bg-[#e0a932]">
-                                    {{ __('Apply') }}
-                                </button>
-                            </div>
+                        <!-- Right: Action Info -->
+                        <div class="bg-gray-50 rounded-[24px] p-6 border border-gray-100">
+                             <div class="flex gap-4">
+                                <div class="w-10 h-10 rounded-full bg-[#60E48C]/10 flex items-center justify-center shrink-0">
+                                    <i class="ri-shield-check-line text-[#60E48C] text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-secondary mb-1">{{ __('Secure Payment') }}</p>
+                                    <p class="text-xs text-gray-500 leading-relaxed">{{ __('Your registration will be processed immediately after successful payment through our secure Razorpay gateway.') }}</p>
+                                </div>
+                             </div>
                         </div>
 
-                        <div id="promo-breakdown" class="hidden mt-6 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                            <div>
-                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Actual Registration Fee') }}</label>
-                                <input type="text" id="promo-actual-fee" readonly
-                                    class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Discount Percentage') }}</label>
-                                <input type="text" id="promo-discount-percentage" readonly
-                                    class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Total Discount Amount') }}</label>
-                                <input type="text" id="promo-discount-amount" readonly
-                                    class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-normal mb-3 text-base">{{ __('Total Payable Fee') }}</label>
-                                <input type="text" id="promo-total-fee" readonly
-                                    class="w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700">
-                            </div>
-
+                        <!-- Hidden Data Storage -->
+                        <div class="hidden">
+                            <input type="hidden" name="registration_fee" id="registration_fee" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
+                            <input type="hidden" name="registration_fee_actual" id="registration_fee_actual" value="{{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}">
+                            <input type="hidden" name="registration_fee_currency" id="registration-fee-currency" value="{{ $clientRegistrationCurrency }}">
+                            
                             <input type="hidden" name="promo_code" id="promo-code-hidden" value="">
                             <input type="hidden" name="promo_discount_percentage" id="promo-discount-percentage-hidden" value="">
                             <input type="hidden" name="promo_discount_amount" id="promo-discount-amount-hidden" value="">
@@ -793,25 +805,63 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-end gap-6 mt-12 pt-8 border-t border-gray-100">
-                    <a href="{{ route('zaya-login') }}" class="btn-cancel">{{ __('Cancel') }}</a>
-                    <button type="submit" id="submit-btn" class="btn-create">
-                        <i class="ri-loader-4-line ri-spin btn-loader"></i>
-                        {{ __('Create Account') }}
-                    </button>
+                <!-- Password Fields -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
+                        <div class="relative">
+                            <input type="password" name="password" id="password"
+                                class="reg-input @error('password') border-red-500! @enderror"
+                                placeholder="Enter Password" required>
+                            <button type="button" onclick="togglePassword('password')"
+                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="ri-eye-line" id="password-icon"></i>
+                            </button>
+                        </div>
+                        @error('password')
+                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Confirm Password</label>
+                        <div class="relative">
+                            <input type="password" name="password_confirmation" id="password_confirmation"
+                                class="reg-input"
+                                placeholder="Confirm Password" required>
+                            <button type="button" onclick="togglePassword('password_confirmation')"
+                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="ri-eye-line" id="password_confirmation-icon"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
+
             </form>
         </div>
     </div>
 
+    <!-- Footer with Buttons -->
+    <footer class="bg-[#FFF3D4] py-6 mt-auto">
+        <div class="max-w-[1200px] mx-auto px-6">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="flex flex-col gap-1 text-center sm:text-left">
+                    <p class="text-[#423131] text-base font-medium">{{ __('Already have an account?') }}</p>
+                    <p class="text-[#97563D] text-sm opacity-80">{{ __('Login to access your personalized dashboard.') }}</p>
+                </div>
 
+                <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                    <a href="{{ route('zaya-login') }}" class="w-full sm:w-auto text-[#423131] py-3.5 px-8 rounded-full font-medium border border-[#423131]/20 transition-all hover:bg-[#423131]/5 text-center">
+                        {{ __('Login Instead') }}
+                    </a>
 
-
-
-            
-
-
-
+                    <button type="submit" id="submit-btn" form="registration-form" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-3.5 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">
+                        <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
+                        {{ __('Complete & Proceed to Payment') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
         // Custom Select Logic (Generic)
@@ -1325,15 +1375,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const currencySymbols = @json(config('currencies.symbols', []));
-            let currencySymbol = @json($registrationCurrencySymbol);
+            let currencySymbol = @json(config('currencies.symbols')[$clientRegistrationCurrency] ?? $clientRegistrationCurrency);
             const promoInput = document.getElementById('promocode-input');
             const promoApplyBtn = document.getElementById('promo-apply-btn');
             const promoBreakdown = document.getElementById('promo-breakdown');
 
-            const promoActualFee = document.getElementById('promo-actual-fee');
-            const promoDiscountPercentage = document.getElementById('promo-discount-percentage');
-            const promoDiscountAmount = document.getElementById('promo-discount-amount');
-            const promoTotalFee = document.getElementById('promo-total-fee');
+            const promoDiscountAmountDisplay = document.getElementById('promo-discount-amount-display');
+            const promoTotalFeeDisplay = document.getElementById('promo-total-fee-display');
 
             const promoCodeHidden = document.getElementById('promo-code-hidden');
             const promoDiscountPercentageHidden = document.getElementById('promo-discount-percentage-hidden');
@@ -1343,15 +1391,7 @@
             const feeInput = document.getElementById('registration_fee');
             const feeActualInput = document.getElementById('registration_fee_actual');
             const feeCurrencyInput = document.getElementById('registration-fee-currency');
-            const countryToCurrency = @json(config('currencies.country_to_currency', []));  
             const countrySelect = document.getElementById('nationality-select');
-            const fallbackRates = {
-                'EUR': { 'USD': 1.1, 'INR': 89, 'GBP': 0.85, 'AED': 4.04 },
-                'USD': { 'EUR': 0.91, 'INR': 81, 'GBP': 0.77, 'AED': 3.67 },
-                'INR': { 'EUR': 0.0112, 'USD': 0.0123, 'GBP': 0.0095, 'AED': 0.045 },
-                'GBP': { 'EUR': 1.18, 'USD': 1.30, 'INR': 104, 'AED': 4.77 },
-                'AED': { 'EUR': 0.25, 'USD': 0.27, 'INR': 22, 'GBP': 0.21 },
-            };
 
             const roleInput = document.querySelector('input[name="role"]');
             const roleValue = roleInput ? roleInput.value : 'client';
@@ -1365,7 +1405,6 @@
             async function convertFee(targetCountryCode) {
                 if (!feeInput || !feeActualInput) return;
                 
-                // Get the country name or code
                 let countryIdentifier = targetCountryCode;
                 if (Array.isArray(targetCountryCode)) countryIdentifier = targetCountryCode[0];
                 
@@ -1389,11 +1428,9 @@
                         const feeValue = parseFloat(data.fee || 0);
                         const currency = data.currency || 'EUR';
                         
-                        // Update the ACTUAL base fee so that promo codes apply on top of the correct country fee
                         feeActualInput.value = feeValue.toFixed(2);
                         feeInput.value = feeValue.toFixed(2);
                         
-                        // Update currency symbol
                         const symbol = currencySymbols[currency] || currency;
                         currencySymbol = symbol;
                         if (feeCurrencyInput) feeCurrencyInput.value = currency;
@@ -1401,24 +1438,17 @@
                         const isEnabled = data.enabled !== undefined ? data.enabled : true;
                         
                         renderFee(feeValue, isEnabled);
+                        if (promoCodeHidden.value) clearPromo();
                         return;
                     }
                 } catch (error) {
                     console.error('Error fetching country-specific fee:', error);
                 }
-
-                // Fallback to old conversion logic if backend call fails or is not configured for this country
-                const baseCurrency = @json($registrationCurrencyCode);
-                const baseAmount = parseFloat(feeActualInput.value || feeInput.value || 0);
-                if (!baseAmount) return;
-
-                // ... (rest of old logic for fallback)
             }
 
             function renderFee(value, isEnabled = true) {
                 const feeDisplay = document.getElementById('registration-fee-display');
                 const feeWrapper = document.getElementById('registration-fee-field-wrapper');
-                const submitBtn = document.getElementById('submit-btn');
                 const displayValue = value !== undefined ? value : feeInput?.value;
                 const currCode = feeCurrencyInput?.value || '';
 
@@ -1429,7 +1459,7 @@
                 } else {
                     if (feeWrapper) feeWrapper.classList.remove('hidden');
                     if (feeDisplay) {
-                        feeDisplay.textContent = `${currencySymbol} ${numericValue.toFixed(2)}${currCode ? ' ('+currCode+')' : ''}`;
+                        feeDisplay.textContent = `${currencySymbol} ${numericValue.toFixed(2)}`;
                     }
                 }
             }
@@ -1439,26 +1469,16 @@
             }
 
             if (countrySelect) {
-                const initial = countrySelect.value || countrySelect.dataset.default || '';
-                convertFee(initial);
-                
-                // Use a small delay to ensure TomSelect is initialized
                 setTimeout(() => {
                     if (countrySelect.tomselect) {
                         countrySelect.tomselect.on('change', (val) => convertFee(val));
-                    } else {
-                        countrySelect.addEventListener('change', (e) => convertFee(e.target.value));
                     }
                 }, 100);
             }
 
             function clearPromo() {
                 promoBreakdown?.classList.add('hidden');
-                if (promoActualFee) promoActualFee.value = '';
-                if (promoDiscountPercentage) promoDiscountPercentage.value = '';
-                if (promoDiscountAmount) promoDiscountAmount.value = '';
-                if (promoTotalFee) promoTotalFee.value = '';
-
+                
                 promoCodeHidden && (promoCodeHidden.value = '');
                 promoDiscountPercentageHidden && (promoDiscountPercentageHidden.value = '');
                 promoDiscountAmountHidden && (promoDiscountAmountHidden.value = '');
@@ -1487,7 +1507,7 @@
 
                 const originalText = promoApplyBtn.textContent;
                 promoApplyBtn.disabled = true;
-                promoApplyBtn.textContent = 'Applying...';
+                promoApplyBtn.textContent = '...';
 
                 try {
                     const response = await fetch("{{ route('promo.validate') }}", {
@@ -1499,7 +1519,13 @@
                             'X-Requested-With': 'XMLHttpRequest',
                             'X-CSRF-TOKEN': getCsrfToken()
                         },
-                        body: JSON.stringify({ code, role: roleValue, usage_type: 'registration' })
+                        body: JSON.stringify({ 
+                            code, 
+                            role: roleValue, 
+                            usage_type: 'registration',
+                            currency: feeCurrencyInput.value,
+                            amount: feeActualInput.value
+                        })
                     });
 
                     const data = await response.json().catch(() => ({}));
@@ -1513,17 +1539,15 @@
                         return;
                     }
 
-                    promoActualFee && (promoActualFee.value = `${currencySymbol} ${data.base_fee}`);
-                    promoDiscountPercentage && (promoDiscountPercentage.value = `${data.discount_percentage}%`);
-                    promoDiscountAmount && (promoDiscountAmount.value = `${currencySymbol} ${data.discount_amount}`);
-                    promoTotalFee && (promoTotalFee.value = `${currencySymbol} ${data.total_fee}`);
+                    if (promoDiscountAmountDisplay) promoDiscountAmountDisplay.textContent = `- ${currencySymbol} ${parseFloat(data.discount_amount).toFixed(2)}`;
+                    if (promoTotalFeeDisplay) promoTotalFeeDisplay.textContent = `${currencySymbol} ${parseFloat(data.total_fee).toFixed(2)}`;
 
                     promoCodeHidden && (promoCodeHidden.value = data.code || code);
                     promoDiscountPercentageHidden && (promoDiscountPercentageHidden.value = data.discount_percentage || '');
                     promoDiscountAmountHidden && (promoDiscountAmountHidden.value = data.discount_amount || '');
                     promoTotalFeeHidden && (promoTotalFeeHidden.value = data.total_fee || '');
 
-                    if (feeInput && data.total_fee) {
+                    if (feeInput && data.total_fee !== undefined) {
                         feeInput.value = data.total_fee;
                         renderFee(data.total_fee);
                     }
@@ -1545,26 +1569,6 @@
             });
         });
     </script>
-    <!-- Thank You Popup -->
-    <div id="thank-you-popup" class="fixed inset-0 bg-black/40 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
-        <div class="bg-white rounded-[40px] p-8 md:p-12 max-w-[550px] w-full text-center relative animate-pop-in shadow-2xl">
-            <button onclick="closeThankYouPopup()" class="absolute top-6 right-8 text-gray-300 hover:text-gray-500 transition-colors">
-                <i class="ri-close-line text-2xl"></i>
-            </button>
-            <div class="mb-8 flex justify-center">
-                <div class="w-20 h-20 rounded-full bg-[#E8F5E9] flex items-center justify-center">
-                    <i class="ri-checkbox-circle-fill text-[#4CAF50] text-5xl"></i>
-                </div>
-            </div>
-            <h3 class="text-2xl md:text-3xl font-serif font-bold text-secondary mb-4">{{ __('Thank You!') }}</h3>
-            <p class="text-gray-600 text-base md:text-lg mb-8 leading-relaxed">
-                {{ __('Your registration has been submitted successfully. Our team will review your application and get back to you shortly.') }}
-            </p>
-            <button onclick="closeThankYouPopup()" class="bg-secondary text-white px-8 py-3 rounded-full hover:bg-opacity-90 transition-all font-medium">
-                {{ __('Got it, thanks!') }}
-            </button>
-        </div>
-    </div>
 </body>
 
 </html>

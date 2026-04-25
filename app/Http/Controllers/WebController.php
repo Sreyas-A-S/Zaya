@@ -71,30 +71,30 @@ class WebController extends Controller
         $languages = Language::where('status', 'active')->get();
 
         $p1 = Practitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0');
-                })->orWhere(function($sq) {
+                })->orWhere(function ($sq) {
                     $sq->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
                 });
             })
             ->latest()->take(5)->get();
-        
+
         $p2 = Doctor::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0');
-                })->orWhere(function($sq) {
+                })->orWhere(function ($sq) {
                     $sq->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
                 });
             })
             ->latest()->take(5)->get();
 
         $p3 = MindfulnessPractitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('practitioner_type')->whereRaw('JSON_LENGTH(practitioner_type) > 0');
-                })->orWhere(function($sq) {
+                })->orWhere(function ($sq) {
                     $sq->whereNotNull('client_concerns')->whereRaw('JSON_LENGTH(client_concerns) > 0');
                 });
             })
@@ -128,7 +128,7 @@ class WebController extends Controller
         try {
             $language = App::getLocale();
             $params = [
-                'per_page' => 1, 
+                'per_page' => 1,
                 '_embed' => 1,
                 'lang' => $language
             ];
@@ -238,7 +238,7 @@ class WebController extends Controller
 
                 return $package;
             })->filter(function ($package) use ($request) {
-                if (! $request->filled('search')) {
+                if (!$request->filled('search')) {
                     return true;
                 }
 
@@ -259,7 +259,7 @@ class WebController extends Controller
                     $q->whereHas('categories', function ($sq) use ($categoryName) {
                         $sq->where('name', 'like', "%$categoryName%");
                     })
-                    ->orWhere('title', 'like', "%$categoryName%");
+                        ->orWhere('title', 'like', "%$categoryName%");
                 });
             }
 
@@ -324,10 +324,10 @@ class WebController extends Controller
 
         $practitionerQuery = Practitioner::with(['user', 'reviews', 'userServices.service'])
             ->whereIn('status', ['active', 'approved'])
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0');
-                })->orWhere(function($sq) {
+                })->orWhere(function ($sq) {
                     $sq->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
                 });
             });
@@ -359,26 +359,26 @@ class WebController extends Controller
         $serviceTitle = $selectedService ? $selectedService->title : null;
 
         if ($selectedService || $searchQuery !== '') {
-            $applyFilters = function($query, $modelType, $searchQuery, $serviceForFilter, $serviceTitle) {
-                $query->where(function($q) use ($modelType, $searchQuery, $serviceForFilter, $serviceTitle) {
+            $applyFilters = function ($query, $modelType, $searchQuery, $serviceForFilter, $serviceTitle) {
+                $query->where(function ($q) use ($modelType, $searchQuery, $serviceForFilter, $serviceTitle) {
                     // 1. Service Filter
                     if ($serviceForFilter) {
-                        $q->where(function($sq) use ($modelType, $serviceForFilter, $serviceTitle) {
+                        $q->where(function ($sq) use ($modelType, $serviceForFilter, $serviceTitle) {
                             $sq->whereHas('userServices', function ($usq) use ($serviceForFilter) {
                                 if (is_numeric($serviceForFilter)) {
                                     $usq->where('service_id', $serviceForFilter);
                                 } else {
                                     $usq->whereHas('service', function ($tsq) use ($serviceForFilter) {
                                         $tsq->where('slug', $serviceForFilter)
-                                           ->orWhereHas('categories', function ($cq) use ($serviceForFilter) {
-                                               $cq->where('slug', $serviceForFilter);
-                                           });
+                                            ->orWhereHas('categories', function ($cq) use ($serviceForFilter) {
+                                                $cq->where('slug', $serviceForFilter);
+                                            });
                                     });
                                 }
                             });
 
                             if ($serviceTitle) {
-                                $sq->orWhere(function($ssq) use ($modelType, $serviceTitle) {
+                                $sq->orWhere(function ($ssq) use ($modelType, $serviceTitle) {
                                     $like = "%{$serviceTitle}%";
                                     if ($modelType === 'practitioner') {
                                         $ssq->where('body_therapies', 'LIKE', $like)->orWhere('other_modalities', 'LIKE', $like)->orWhere('consultations', 'LIKE', $like);
@@ -390,13 +390,13 @@ class WebController extends Controller
 
                     // 2. Query Filter
                     if ($searchQuery !== '') {
-                        $q->where(function($qq) use ($modelType, $searchQuery) {
+                        $q->where(function ($qq) use ($modelType, $searchQuery) {
                             $like = "%{$searchQuery}%";
                             $qq->where('first_name', 'LIKE', $like)
-                               ->orWhere('last_name', 'LIKE', $like)
-                               ->orWhereHas('userServices.service', function($usq) use ($like) {
-                                   $usq->where('title', 'LIKE', $like);
-                               });
+                                ->orWhere('last_name', 'LIKE', $like)
+                                ->orWhereHas('userServices.service', function ($usq) use ($like) {
+                                    $usq->where('title', 'LIKE', $like);
+                                });
 
                             if ($modelType === 'practitioner') {
                                 $qq->orWhere('body_therapies', 'LIKE', $like)->orWhere('other_modalities', 'LIKE', $like)->orWhere('consultations', 'LIKE', $like);
@@ -463,16 +463,19 @@ class WebController extends Controller
 
         foreach ($rows as $p) {
             $arr = $p->health_conditions_treated ?? [];
-            if (!is_array($arr)) $arr = [$arr];
+            if (!is_array($arr))
+                $arr = [$arr];
 
             foreach ($arr as $v) {
                 $v = trim((string) $v);
-                if ($v === '') continue;
+                if ($v === '')
+                    continue;
                 $conditions[$v] = true;
                 if ($zipProvided) {
                     $isLocal = true; // We found a condition specifically in the provided zip
                 }
-                if (count($conditions) >= 6) break 2;
+                if (count($conditions) >= 6)
+                    break 2;
             }
         }
 
@@ -481,7 +484,8 @@ class WebController extends Controller
             $globalConditions = \App\Models\HealthCondition::where('status', true)->pluck('name');
             foreach ($globalConditions as $gc) {
                 $conditions[$gc] = true;
-                if (count($conditions) >= 6) break;
+                if (count($conditions) >= 6)
+                    break;
             }
         }
 
@@ -507,18 +511,18 @@ class WebController extends Controller
 
             // Apply completeness filter (AT LEAST ONE)
             if ($modelType === 'practitioner' || $modelType === 'doctor') {
-                $q->where(function($qq) {
-                    $qq->where(function($sq) {
+                $q->where(function ($qq) {
+                    $qq->where(function ($sq) {
                         $sq->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0');
-                    })->orWhere(function($sq) {
+                    })->orWhere(function ($sq) {
                         $sq->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
                     });
                 });
             } elseif ($modelType === 'mindfulness') {
-                $q->where(function($qq) {
-                    $qq->where(function($sq) {
+                $q->where(function ($qq) {
+                    $qq->where(function ($sq) {
                         $sq->whereNotNull('practitioner_type')->whereRaw('JSON_LENGTH(practitioner_type) > 0');
-                    })->orWhere(function($sq) {
+                    })->orWhere(function ($sq) {
                         $sq->whereNotNull('client_concerns')->whereRaw('JSON_LENGTH(client_concerns) > 0');
                     });
                 });
@@ -527,29 +531,37 @@ class WebController extends Controller
             }
 
             $q->where(function ($sq) use ($modelType, $query) {
-                  $like = "%{$query}%";
-                  $sq->where('first_name', 'LIKE', $like)
+                $like = "%{$query}%";
+                $sq->where('first_name', 'LIKE', $like)
                     ->orWhere('last_name', 'LIKE', $like)
-                    ->orWhereHas('userServices.service', function($usq) use ($like) {
+                    ->orWhereHas('userServices.service', function ($usq) use ($like) {
                         $usq->where('title', 'LIKE', $like);
                     });
 
-                  if ($modelType === 'practitioner') {
-                      $sq->orWhere('body_therapies', 'LIKE', $like)->orWhere('other_modalities', 'LIKE', $like)->orWhere('consultations', 'LIKE', $like);
-                  } elseif ($modelType === 'doctor') {
-                      $sq->orWhere('specialization', 'LIKE', $like)->orWhere('consultation_expertise', 'LIKE', $like)->orWhere('health_conditions_treated', 'LIKE', $like)->orWhere('panchakarma_procedures', 'LIKE', $like)->orWhere('external_therapies', 'LIKE', $like);
-                  } elseif ($modelType === 'mindfulness') {
-                      $sq->orWhere('practitioner_type', 'LIKE', $like)->orWhere('services_offered', 'LIKE', $like)->orWhere('client_concerns', 'LIKE', $like);
-                  } elseif ($modelType === 'yoga') {
-                      $sq->orWhere('yoga_therapist_type', 'LIKE', $like)->orWhere('areas_of_expertise', 'LIKE', $like);
-                  }
-              });
+                if ($modelType === 'practitioner') {
+                    $sq->orWhere('body_therapies', 'LIKE', $like)->orWhere('other_modalities', 'LIKE', $like)->orWhere('consultations', 'LIKE', $like);
+                } elseif ($modelType === 'doctor') {
+                    $sq->orWhere('specialization', 'LIKE', $like)->orWhere('consultation_expertise', 'LIKE', $like)->orWhere('health_conditions_treated', 'LIKE', $like)->orWhere('panchakarma_procedures', 'LIKE', $like)->orWhere('external_therapies', 'LIKE', $like);
+                } elseif ($modelType === 'mindfulness') {
+                    $sq->orWhere('practitioner_type', 'LIKE', $like)->orWhere('services_offered', 'LIKE', $like)->orWhere('client_concerns', 'LIKE', $like);
+                } elseif ($modelType === 'yoga') {
+                    $sq->orWhere('yoga_therapist_type', 'LIKE', $like)->orWhere('areas_of_expertise', 'LIKE', $like);
+                }
+            });
         };
 
-        $practitioners = Practitioner::where(function($q) use ($applySearchFilter, $query) { $applySearchFilter($q, 'practitioner', $query); })->with('user')->take(5)->get();
-        $doctors = Doctor::where(function($q) use ($applySearchFilter, $query) { $applySearchFilter($q, 'doctor', $query); })->with('user')->take(5)->get();
-        $mindfulness = MindfulnessPractitioner::where(function($q) use ($applySearchFilter, $query) { $applySearchFilter($q, 'mindfulness', $query); })->with('user')->take(5)->get();
-        $yoga = YogaTherapist::where(function($q) use ($applySearchFilter, $query) { $applySearchFilter($q, 'yoga', $query); })->with('user')->take(5)->get();
+        $practitioners = Practitioner::where(function ($q) use ($applySearchFilter, $query) {
+            $applySearchFilter($q, 'practitioner', $query);
+        })->with('user')->take(5)->get();
+        $doctors = Doctor::where(function ($q) use ($applySearchFilter, $query) {
+            $applySearchFilter($q, 'doctor', $query);
+        })->with('user')->take(5)->get();
+        $mindfulness = MindfulnessPractitioner::where(function ($q) use ($applySearchFilter, $query) {
+            $applySearchFilter($q, 'mindfulness', $query);
+        })->with('user')->take(5)->get();
+        $yoga = YogaTherapist::where(function ($q) use ($applySearchFilter, $query) {
+            $applySearchFilter($q, 'yoga', $query);
+        })->with('user')->take(5)->get();
 
         $allPractitioners = $practitioners->concat($doctors)->concat($mindfulness)->concat($yoga)->take(10);
 
@@ -574,7 +586,7 @@ class WebController extends Controller
             if ($p->user && $p->user->userServices->first()) {
                 $specialty = $p->user->userServices->first()->service->title;
             } else {
-                $specialties = array_merge((array)($p->body_therapies ?? []), (array)($p->consultations ?? []), (array)($p->other_modalities ?? []));
+                $specialties = array_merge((array) ($p->body_therapies ?? []), (array) ($p->consultations ?? []), (array) ($p->other_modalities ?? []));
                 if (!empty($specialties)) {
                     $specialty = $specialties[0];
                 }
@@ -603,7 +615,8 @@ class WebController extends Controller
     public function searchLocations(Request $request)
     {
         $query = $request->get('query');
-        if (empty($query)) return response()->json([]);
+        if (empty($query))
+            return response()->json([]);
 
         $cities = Practitioner::whereIn('status', ['active', 'approved'])
             ->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0')
@@ -632,24 +645,24 @@ class WebController extends Controller
     {
         $query = $request->get('query');
         $practitionerId = $request->get('practitioner_id');
-        
+
         $servicesQuery = Service::where('status', true);
-        
+
         if ($practitionerId) {
             $practitioner = Practitioner::find($practitionerId);
             if ($practitioner && $practitioner->user_id) {
-                $servicesQuery->whereHas('userServices', function($q) use ($practitioner) {
+                $servicesQuery->whereHas('userServices', function ($q) use ($practitioner) {
                     $q->where('user_id', $practitioner->user_id);
                 });
             }
         }
-        
+
         if (!empty($query)) {
             $servicesQuery->where('title', 'LIKE', "%{$query}%");
         }
-        
+
         $services = $servicesQuery->limit(10)->get();
-        
+
         return response()->json($services);
     }
 
@@ -672,11 +685,22 @@ class WebController extends Controller
 
         $practitionerCountry = $activePractitioner->country ?? $activePractitioner->user->country ?? null;
         $countryCurrencyMap = [
-            'IN' => 'INR','IND' => 'INR','INDIA' => 'INR',
-            'US' => 'USD','USA' => 'USD','UNITED STATES' => 'USD',
-            'GB' => 'GBP','UK' => 'GBP','UNITED KINGDOM' => 'GBP',
-            'AE' => 'AED','UAE' => 'AED',
-            'EU' => 'EUR','FR' => 'EUR','DE' => 'EUR','ES' => 'EUR','IT' => 'EUR',
+            'IN' => 'INR',
+            'IND' => 'INR',
+            'INDIA' => 'INR',
+            'US' => 'USD',
+            'USA' => 'USD',
+            'UNITED STATES' => 'USD',
+            'GB' => 'GBP',
+            'UK' => 'GBP',
+            'UNITED KINGDOM' => 'GBP',
+            'AE' => 'AED',
+            'UAE' => 'AED',
+            'EU' => 'EUR',
+            'FR' => 'EUR',
+            'DE' => 'EUR',
+            'ES' => 'EUR',
+            'IT' => 'EUR',
         ];
         $derivedCurrency = $practitionerCountry ? ($countryCurrencyMap[strtoupper($practitionerCountry)] ?? config('app.currency', 'INR')) : config('app.currency', 'INR');
 
@@ -732,7 +756,7 @@ class WebController extends Controller
             ->where('practitioner_type', $practitionerType)
             ->where('status', 'completed')
             ->count();
-        
+
         $totalClients = Booking::where('profile_id', $practitioner->id)
             ->where('practitioner_type', $practitionerType)
             ->where('status', 'completed')
@@ -749,32 +773,32 @@ class WebController extends Controller
         $settings = HomepageSetting::getAllSettings($language);
 
         $pQuery = Practitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0');
-                })->orWhere(function($sq) {
+                })->orWhere(function ($sq) {
                     $sq->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
                 });
             });
-        
+
         $dQuery = Doctor::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0');
-                })->orWhere(function($sq) {
+                })->orWhere(function ($sq) {
                     $sq->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
                 });
             });
-        
+
         $mQuery = MindfulnessPractitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('practitioner_type')->whereRaw('JSON_LENGTH(practitioner_type) > 0');
-                })->orWhere(function($sq) {
+                })->orWhere(function ($sq) {
                     $sq->whereNotNull('client_concerns')->whereRaw('JSON_LENGTH(client_concerns) > 0');
                 });
             });
-        
+
         $yQuery = YogaTherapist::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
             ->whereNotNull('areas_of_expertise')->whereRaw('JSON_LENGTH(areas_of_expertise) > 0');
 
@@ -938,7 +962,7 @@ class WebController extends Controller
         $role = $request->input('role', 'client');
         $countryName = $request->input('country');
         $token = $request->input('token');
-        
+
         $countryCode = 'all';
         if ($countryName) {
             $dbCountry = \App\Models\Country::where('name', $countryName)
@@ -968,10 +992,10 @@ class WebController extends Controller
         $currencyKey = $feeKey . '_currency';
 
         $fee = (float) ($settings[$feeKey] ?? 0);
-        
+
         // Accurate currency fetching logic
         $currency = $settings[$currencyKey] ?? null;
-        
+
         if (!$currency && $countryCode !== 'all') {
             $countryToCurrency = config('currencies.country_to_currency', []);
             $currency = $countryToCurrency[$countryCode] ?? 'EUR';
@@ -991,7 +1015,7 @@ class WebController extends Controller
                 // In our system, fees are set PER COUNTRY (which maps to a currency).
                 // If a link is generated with a specific currency, we should probably find a country that uses that currency to get the fee.
                 // Or if the fee is already set for that currency globally.
-                
+
                 // Let's check if there's a country setting for this currency
                 $countryToCurrency = config('currencies.country_to_currency', []);
                 $revMap = array_flip($countryToCurrency);
@@ -1204,32 +1228,32 @@ class WebController extends Controller
         }
 
         $pQuery = Practitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0');
-                })->orWhere(function($sq) {
+                })->orWhere(function ($sq) {
                     $sq->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
                 });
             });
-        
+
         $dQuery = Doctor::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0');
-                })->orWhere(function($sq) {
+                })->orWhere(function ($sq) {
                     $sq->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
                 });
             });
-        
+
         $mQuery = MindfulnessPractitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('practitioner_type')->whereRaw('JSON_LENGTH(practitioner_type) > 0');
-                })->orWhere(function($sq) {
+                })->orWhere(function ($sq) {
                     $sq->whereNotNull('client_concerns')->whereRaw('JSON_LENGTH(client_concerns) > 0');
                 });
             });
-        
+
         $yQuery = YogaTherapist::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
             ->whereNotNull('areas_of_expertise')->whereRaw('JSON_LENGTH(areas_of_expertise) > 0');
 
@@ -1280,7 +1304,7 @@ class WebController extends Controller
         // Filter services based on selected practitioner using the new user_services table
         if ($selectedPractitioner && $selectedPractitioner->user) {
             $services = Service::where('status', true)
-                ->whereHas('userServices', function($q) use ($selectedPractitioner) {
+                ->whereHas('userServices', function ($q) use ($selectedPractitioner) {
                     $q->where('user_id', $selectedPractitioner->user_id);
                 })
                 ->limit(15)
@@ -1988,22 +2012,14 @@ class WebController extends Controller
                 'author_user_agent' => $request->userAgent(),
             ];
 
-            // Some WP setups STRICTLY require Auth for REST API comments, even if "Users must be registered" is unchecked.
-            // We can try to use Application Passwords if available, or just rely on public access.
-            // If you have an Application Password set up in .env, utilize it here.
-            $username = config('services.wordpress.username');
-            $appPassword = config('services.wordpress.application_password');
-
+            // We are using anonymous comments (no auth).
+            // Let WordPress moderation handle spam.
             $headers = [
                 'User-Agent' => 'ZayaWellness/1.0',
                 'Accept' => 'application/json',
             ];
 
             $response = Http::withHeaders($headers);
-
-            if ($username && $appPassword) {
-                $response->withBasicAuth($username, $appPassword);
-            }
 
             if (!$verifySsl) {
                 $response->withoutVerifying();
@@ -2021,17 +2037,22 @@ class WebController extends Controller
                 return response()->json(['success' => true, 'message' => $message]);
             } else {
                 $errorBody = $result->json();
-                Log::error('WP Comment Post Error: ', $errorBody);
+                Log::error('WP Comment Post Error: ', $errorBody ?? []);
 
                 $message = 'Unable to post comment.';
                 if (isset($errorBody['code'])) {
                     if ($errorBody['code'] === 'rest_comment_login_required') {
-                        $message = 'WordPress blocked this comment. If you are using an email address associated with an Admin or Registered User, please try a different email address.';
+                        $message = 'Blocked this comment! Please try using a different email address.';
                     } elseif ($errorBody['code'] === 'rest_invalid_param') {
                         $message = 'Invalid comment data provided.';
                     } elseif ($errorBody['code'] === 'comment_duplicate') {
                         $message = 'You have already submitted this comment.';
+                    } else {
+                        // Expose the exact WP error message for debugging
+                        $message = 'Unable to post comment: ' . ($errorBody['message'] ?? $errorBody['code']);
                     }
+                } elseif (isset($errorBody['message'])) {
+                    $message = 'Unable to post comment: ' . $errorBody['message'];
                 }
 
                 return response()->json(['success' => false, 'message' => $message], 400);

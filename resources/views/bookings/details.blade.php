@@ -73,7 +73,7 @@
                                     <span class="text-sm font-bold text-secondary">{{ $service->title }}</span>
                                 </div>
                                 @if(in_array($user->role, ['client', 'patient']))
-                                <span class="text-[11px] font-black text-secondary/60">€{{ number_format($service->price ?? 0, 2) }}</span>
+                                <span class="text-[11px] font-black text-secondary/60">{{ get_currency_symbol($booking->currency) }}{{ number_format($service->price ?? 0, 2) }}</span>
                                 @endif
                             </div>
                             @empty
@@ -95,7 +95,7 @@
                 <div class="flex justify-between items-center relative z-10">
                     <div>
                         <p class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2">Your Earned Share</p>
-                        <p class="text-4xl font-black tracking-tight">€ {{ number_format($transaction->practitioner_share, 2) }}</p>
+                        <p class="text-4xl font-black tracking-tight">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->practitioner_share, 2) }}</p>
                     </div>
                     <button onclick="togglePageDistribution()" class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all border border-white/10 group-hover:scale-110 duration-500">
                         <i class="ri-information-line text-2xl"></i>
@@ -106,16 +106,16 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
                             <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Gross Booking</p>
-                            <p class="text-lg font-black">€ {{ number_format($transaction->total_amount, 2) }}</p>
+                            <p class="text-lg font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->total_amount, 2) }}</p>
                         </div>
                         <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
                             <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Platform Fee ({{ number_format($transaction->company_commission_percent, 1) }}%)</p>
-                            <p class="text-lg font-black text-red-300">- € {{ number_format($transaction->company_share, 2) }}</p>
+                            <p class="text-lg font-black text-red-300">- {{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->company_share, 2) }}</p>
                         </div>
                         @if($transaction->referrer_share > 0)
                         <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
                             <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Referral Fee ({{ number_format($transaction->referrer_commission_percent, 1) }}%)</p>
-                            <p class="text-lg font-black text-orange-300">- € {{ number_format($transaction->referrer_share, 2) }}</p>
+                            <p class="text-lg font-black text-orange-300">- {{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->referrer_share, 2) }}</p>
                         </div>
                         @endif
                     </div>
@@ -451,10 +451,10 @@
                 @endif
 
                 @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
-                    @if($booking->need_translator && !$booking->translator_id)
-                        <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language }}', '{{ $booking->to_language }}')" class="w-full py-5 bg-blue-600 text-white rounded-[1.5rem] font-black text-sm hover:bg-blue-700 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-lg shadow-blue-200">
+                    @if(!$booking->translator_id)
+                        <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language ?: 'English' }}', '{{ $booking->to_language ?: 'Any' }}')" class="w-full py-5 bg-blue-600 text-white rounded-[1.5rem] font-black text-sm hover:bg-blue-700 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-lg shadow-blue-200">
                             <i class="ri-translate text-lg"></i>
-                            Assign Translator
+                            {{ $booking->need_translator ? 'Assign Translator' : 'Request Translator' }}
                         </button>
                     @endif
                     
@@ -489,61 +489,8 @@
 @include('partials.refer-modal-scripts')
 
 <script>
-    async function requestDataAccess(clientId) {
-        if (!confirm('This will send a secure OTP to the client to authorize your access to their health journey and historical records. Proceed?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch("{{ route('data-access.request') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ client_id: clientId })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                // Assuming there's a modal or prompt for OTP
-                const otp = prompt(data.success + "\n\nPlease enter the 6-digit OTP provided by the client:");
-                if (otp) {
-                    verifyDataAccessOTP(clientId, otp);
-                }
-            } else {
-                alert(data.error || 'Failed to send OTP.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An unexpected error occurred.');
-        }
-    }
-
-    async function verifyDataAccessOTP(clientId, otp) {
-        try {
-            const response = await fetch("{{ route('data-access.verify') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ client_id: clientId, otp: otp })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                alert('Access granted! Refreshing page...');
-                window.location.reload();
-            } else {
-                alert(data.error || 'Invalid OTP.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An unexpected error occurred.');
-        }
+    function requestDataAccess(clientId) {
+        openDataAccessRequestModal(clientId);
     }
 </script>
 

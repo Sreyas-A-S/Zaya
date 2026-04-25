@@ -131,6 +131,24 @@
             @endphp
             
             @forelse($services as $service)
+            @php
+                // Try to find matching session info in metadata
+                $sessions = $booking->additional_info['sessions'] ?? [];
+                $sessionInfo = collect($sessions)->firstWhere('service_id', (string)$service->id) 
+                               ?? collect($sessions)->firstWhere('service_id', (int)$service->id);
+                
+                $displayDate = $booking->booking_date ? $booking->booking_date->format('M d, Y') : 'N/A';
+                $displayTime = $booking->booking_time ?? 'N/A';
+
+                if ($sessionInfo) {
+                    if (!empty($sessionInfo['day']) && $sessionInfo['day'] !== 'Day') {
+                        $displayDate = $sessionInfo['day'];
+                    }
+                    if (!empty($sessionInfo['time']) && $sessionInfo['time'] !== 'Time') {
+                        $displayTime = $sessionInfo['time'];
+                    }
+                }
+            @endphp
             <div class="bg-[#f5f6f8] rounded-2xl p-4 flex justify-between items-center text-center md:text-left">
                 <div class="w-1/3">
                     <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_service_col'] ?? 'Service') }}</p>
@@ -138,11 +156,11 @@
                 </div>
                 <div class="w-1/3">
                     <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_date_col'] ?? 'Date') }}</p>
-                    <p class="text-[14px] font-semibold text-gray-800">{{ $booking->booking_date ? $booking->booking_date->format('M d, Y') : 'N/A' }}</p>
+                    <p class="text-[14px] font-semibold text-gray-800">{{ $displayDate }}</p>
                 </div>
                 <div class="w-1/3 text-right">
                     <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_time_col'] ?? 'Time') }}</p>
-                    <p class="text-[14px] font-semibold text-gray-800">{{ $booking->booking_time ?? 'N/A' }}</p>
+                    <p class="text-[14px] font-semibold text-gray-800">{{ $displayTime }}</p>
                 </div>
             </div>
             @empty

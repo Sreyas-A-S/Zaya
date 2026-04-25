@@ -17,7 +17,8 @@ class FormController extends Controller
     public function __construct()
     {
         $this->middleware('permission:forms-view')->only(['index', 'show']);
-        $this->middleware('permission:forms-update-status')->only('updateStatus');
+        $this->middleware('permission:forms-create')->only(['generateLink', 'shareEmail']);
+        $this->middleware('permission:forms-edit')->only(['updateStatus']);
         $this->middleware('permission:forms-delete')->only('destroy');
     }
 

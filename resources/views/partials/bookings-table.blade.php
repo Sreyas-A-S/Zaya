@@ -80,8 +80,19 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                                $sessions = $booking->additional_info['sessions'] ?? [];
+                                $uniqueTimes = collect($sessions)->pluck('time')->unique()->filter(fn($t) => !empty($t) && $t !== 'Time');
+                                $uniqueDates = collect($sessions)->pluck('day')->unique()->filter(fn($d) => !empty($d) && $d !== 'Day');
+                                $hasMultiple = $uniqueTimes->count() > 1 || $uniqueDates->count() > 1;
+                            @endphp
                             <div class="text-sm text-secondary">{{ $booking->booking_date->format('M d, Y') }}</div>
-                            <div class="text-xs text-gray-400">{{ $booking->booking_time }}</div>
+                            <div class="text-xs text-gray-400 flex items-center gap-1">
+                                {{ $booking->booking_time }}
+                                @if($hasMultiple)
+                                    <span class="bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded text-[9px] font-bold border border-amber-100">+ More</span>
+                                @endif
+                            </div>
                         </td>
                         <td class="px-6 py-4">
                             <span class="px-3 py-1 inline-flex text-[10px] leading-5 font-bold rounded-full uppercase {{ $booking->mode === 'online' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600' }}">
@@ -102,7 +113,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-sm text-secondary font-medium">
-                            € {{ number_format($booking->total_price, 2) }}
+                            {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}
                         </td>
                         <td class="px-6 py-4">
                             @php
@@ -151,10 +162,10 @@
                                             Refer
                                         </button>
 
-                                        @if($booking->need_translator && !$booking->translator_id)
-                                        <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language }}', '{{ $booking->to_language }}')" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left">
+                                        @if(!$booking->translator_id)
+                                        <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language ?: 'English' }}', '{{ $booking->to_language ?: 'Any' }}')" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left">
                                             <i class="ri-translate mr-3 text-lg text-blue-500"></i>
-                                            Assign Translator
+                                            {{ $booking->need_translator ? 'Assign Translator' : 'Request Translator' }}
                                         </button>
                                         @endif
                                         @endif

@@ -52,9 +52,35 @@
         <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-3">Services Booked</p>
         <div class="space-y-2">
             @foreach($services as $service)
-            <div class="flex justify-between items-center bg-white border border-gray-100 p-3 rounded-lg">
-                <span class="text-sm font-medium text-gray-700">{{ $service->title }}</span>
-                <span class="text-xs text-gray-400 uppercase font-bold">{{ $booking->mode }}</span>
+            @php
+                $sessions = $booking->additional_info['sessions'] ?? [];
+                $sessionInfo = collect($sessions)->firstWhere('service_id', (string)$service->id) 
+                               ?? collect($sessions)->firstWhere('service_id', (int)$service->id);
+                
+                $displayDate = $booking->booking_date ? $booking->booking_date->format('M d, Y') : 'N/A';
+                $displayTime = $booking->booking_time ?? 'N/A';
+
+                if ($sessionInfo) {
+                    if (!empty($sessionInfo['day']) && $sessionInfo['day'] !== 'Day') {
+                        $displayDate = $sessionInfo['day'];
+                    }
+                    if (!empty($sessionInfo['time']) && $sessionInfo['time'] !== 'Time') {
+                        $displayTime = $sessionInfo['time'];
+                    }
+                }
+            @endphp
+            <div class="bg-white border border-gray-100 p-3 rounded-lg">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm font-bold text-gray-700">{{ $service->title }}</span>
+                    <span class="text-[10px] text-gray-400 uppercase font-black tracking-widest">{{ $booking->mode }}</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-secondary font-medium">
+                    <i class="ri-calendar-line opacity-50"></i>
+                    <span>{{ $displayDate }}</span>
+                    <span class="opacity-20">|</span>
+                    <i class="ri-time-line opacity-50"></i>
+                    <span>{{ $displayTime }}</span>
+                </div>
             </div>
             @endforeach
         </div>
@@ -101,13 +127,13 @@
             <div>
                 @if($isPractitioner)
                     <p class="text-[10px] uppercase tracking-[0.2em] opacity-70 font-black mb-1">Your Earned Share</p>
-                    <p class="text-2xl font-black">€ {{ number_format($transaction ? $transaction->practitioner_share : 0, 2) }}</p>
+                    <p class="text-2xl font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction ? $transaction->practitioner_share : 0, 2) }}</p>
                 @elseif($isTranslator)
                     <p class="text-[10px] uppercase tracking-[0.2em] opacity-70 font-black mb-1">Total Amount</p>
-                    <p class="text-2xl font-black">€ {{ number_format($booking->total_price, 2) }}</p>
+                    <p class="text-2xl font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}</p>
                 @else
                     <p class="text-[10px] uppercase tracking-[0.2em] opacity-70 font-black mb-1">Total Amount Paid</p>
-                    <p class="text-2xl font-black">€ {{ number_format($booking->total_price, 2) }}</p>
+                    <p class="text-2xl font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}</p>
                 @endif
                 
                 @if($booking->razorpay_payment_id)
@@ -126,21 +152,21 @@
         <div id="distribution-info" class="hidden mt-6 pt-6 border-t border-white/10 space-y-4 transition-all">
             <div class="flex justify-between items-center text-[11px]">
                 <span class="opacity-60 font-bold uppercase tracking-widest">Gross Booking Amount</span>
-                <span class="font-black">€ {{ number_format($transaction->total_amount, 2) }}</span>
+                <span class="font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->total_amount, 2) }}</span>
             </div>
             <div class="flex justify-between items-center text-[11px]">
                 <span class="opacity-60 font-bold uppercase tracking-widest">Platform Fee ({{ number_format($transaction->company_commission_percent, 1) }}%)</span>
-                <span class="font-black text-red-300">- € {{ number_format($transaction->company_share, 2) }}</span>
+                <span class="font-black text-red-300">- {{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->company_share, 2) }}</span>
             </div>
             @if($transaction->referrer_share > 0)
             <div class="flex justify-between items-center text-[11px]">
                 <span class="opacity-60 font-bold uppercase tracking-widest">Referral Fee ({{ number_format($transaction->referrer_commission_percent, 1) }}%)</span>
-                <span class="font-black text-orange-300">- € {{ number_format($transaction->referrer_share, 2) }}</span>
+                <span class="font-black text-orange-300">- {{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->referrer_share, 2) }}</span>
             </div>
             @endif
             <div class="flex justify-between items-center pt-2 border-t border-white/5 text-sm font-black">
                 <span class="uppercase tracking-widest text-[10px]">Net Earnings</span>
-                <span class="text-emerald-300">€ {{ number_format($transaction->practitioner_share, 2) }}</span>
+                <span class="text-emerald-300">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->practitioner_share, 2) }}</span>
             </div>
         </div>
         @endif

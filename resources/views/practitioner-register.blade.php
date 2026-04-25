@@ -626,13 +626,16 @@
                                 <div>
                                     <label class='block text-gray-800 text-lg font-medium mb-4'>{{ __('Registration Fee Amount') }}</label>
                                     <div class='relative w-full'>
-                                        <div class='w-full h-[58px] bg-[#F5F5F5] rounded-full flex items-center pl-8 pr-2' data-registration-fee-container>
+                                        <div class='w-full h-[58px] bg-[#F5F5F5] rounded-full flex items-center px-8' data-registration-fee-container>
                                             <span class='text-gray-900 text-[1.05rem] font-medium'>{{ $practitionerRegistrationCurrencySymbol ?? '€' }} {{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}</span>
                                             <input type='hidden' name='registration_fee' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
                                             <input type='hidden' name='registration_fee_actual' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
-                                            <button type='submit' class='absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-[0.95rem] transition-all duration-300 hover:bg-[#E8AA32] border-none cursor-pointer'>{{ __('Pay') }}</button>
                                         </div>
                                     </div>
+                                    <p class="text-xs text-gray-500 mt-3 px-4 leading-relaxed">
+                                        <i class="ri-information-line mr-1"></i>
+                                        {{ __('A secure payment link will be sent to your email after you submit this application.') }}
+                                    </p>
                                 </div>
 
                                 <div>
@@ -959,7 +962,12 @@
                                 'X-Requested-With': 'XMLHttpRequest',
                                 'X-CSRF-TOKEN': getCsrfToken()
                             },
-                            body: JSON.stringify({ code, role: roleValue, usage_type: 'registration' })
+                            body: JSON.stringify({ 
+                                code, 
+                                role: roleValue, 
+                                usage_type: 'registration',
+                                country: document.querySelector('#country-select') ? document.querySelector('#country-select').value : ''
+                            })
                         });
 
                         const data = await response.json().catch(() => ({}));
@@ -1184,7 +1192,7 @@
             }
 
             if (currentTab === totalTabs) {
-                nextBtnText.textContent = '{{ __('Complete Application') }}';
+                nextBtnText.textContent = '{{ __('Complete & Proceed to Payment') }}';
             } else {
                 nextBtnText.textContent = '{!! __('Save & Continue') !!}';
             }
@@ -1328,20 +1336,27 @@
 
                      if (response.ok) {
                          const data = await response.json().catch(() => ({}));
+                         const paymentUrl = data && data.redirect_url ? data.redirect_url : (data && data.payment_url ? data.payment_url : null);
+                         
+                         if (paymentUrl) {
+                             // Redirect to Payment Gateway immediately or with a tiny delay
+                             btnText.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Redirecting to Payment...';
+                             setTimeout(() => {
+                                 window.location.href = paymentUrl;
+                             }, 800);
+                             return;
+                         }
+
+                         // Success without payment
                          const popup = document.getElementById('thank-you-popup');
                          if (popup) {
                              popup.classList.remove('hidden');
                              popup.classList.add('flex');
                          }
 
-                         const paymentUrl = data && data.payment_url ? data.payment_url : null;
                          setTimeout(() => {
-                             if (paymentUrl) {
-                                 window.location.href = paymentUrl;
-                                 return;
-                             }
                              closeThankYouPopup();
-                         }, 1500);
+                         }, 3000);
                      } else {
                          const data = await response.json();
                          

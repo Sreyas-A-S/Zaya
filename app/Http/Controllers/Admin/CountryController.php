@@ -10,6 +10,14 @@ use Yajra\DataTables\DataTables;
 
 class CountryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:countries-view')->only(['index', 'show']);
+        $this->middleware('permission:countries-create')->only(['create', 'store']);
+        $this->middleware('permission:countries-edit')->only(['edit', 'update', 'updateStatus']);
+        $this->middleware('permission:countries-delete')->only('destroy');
+    }
+
     /**
      * Display a listing of countries.
      */

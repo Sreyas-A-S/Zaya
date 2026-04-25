@@ -17,21 +17,26 @@ class RolePermissionSeeder extends Seeder
         $modules = [
             'Dashboard' => ['actions' => ['view'], 'category' => 'General'],
             'Users' => ['actions' => ['view', 'create', 'edit', 'delete'], 'category' => 'Users'],
-            'Admins' => ['actions' => ['view', 'create', 'edit', 'delete'], 'category' => 'Backend Users'],
+            'Admins' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Backend Users'],
+            'Finance Managers' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Backend Users'],
+            'Content Managers' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Backend Users'],
+            'User Managers' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Backend Users'],
             'Doctors' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Users'],
             'Practitioners' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Users'],
             'Mindfulness Practitioners' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Users'],
             'Yoga Therapists' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Users'],
             'Translators' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Users'],
             'Clients' => ['actions' => ['view', 'create', 'edit', 'delete', 'status-toggle'], 'category' => 'Users'],
-            'Forms' => ['actions' => ['view', 'delete', 'update-status'], 'category' => 'Users'],
+            'Forms' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Users'],
             'Roles' => ['actions' => ['view', 'create', 'edit', 'delete'], 'category' => 'Backend Users'],
             'Services' => ['actions' => ['view', 'create', 'edit', 'delete', 'assign-engineer'], 'category' => 'Services'],
             'Packages' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Finance'],
             'Promo Codes' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Finance'],
             'Other Fees' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Finance'],
             'Credentials' => ['actions' => ['view', 'edit'], 'category' => 'Backend Users'],
-            'Master Data' => ['actions' => ['view', 'create', 'edit', 'delete'], 'category' => 'Services'],
+            'Countries' => ['actions' => ['view', 'create', 'edit', 'delete', 'status'], 'category' => 'General'],
+            'Languages' => ['actions' => ['view', 'create', 'edit', 'delete', 'status'], 'category' => 'General'],
+            'Master Data' => ['actions' => ['view', 'create', 'edit', 'delete', 'status'], 'category' => 'Services'],
             'Testimonials' => ['actions' => ['view', 'create', 'edit', 'delete'], 'category' => 'Public Site'],
             'Practitioner Reviews' => ['actions' => ['view', 'delete', 'status'], 'category' => 'Users'],
             'Settings' => ['actions' => ['view', 'edit'], 'category' => 'Page Settings'],
@@ -50,6 +55,7 @@ class RolePermissionSeeder extends Seeder
             'Invoice Settings' => ['actions' => ['view', 'edit'], 'category' => 'Finance'],
             'Invoices' => ['actions' => ['view', 'preview'], 'category' => 'Finance'],
             'Email Logs' => ['actions' => ['view', 'delete'], 'category' => 'Public Site'],
+            'Bookings' => ['actions' => ['view', 'create', 'edit', 'delete', 'update-status'], 'category' => 'Users'],
         ];
 
         foreach ($modules as $module => $data) {
@@ -84,10 +90,10 @@ class RolePermissionSeeder extends Seeder
         $adminRole = Role::updateOrCreate(['name' => 'Admin']);
         $adminRole->permissions()->sync(
             Permission::whereIn('group', [
-                'Dashboard', 'Users', 'Services', 'Admins',
-                'Doctors', 'Practitioners', 'Mindfulness Practitioners', 'Yoga Therapists', 'Translators',
-                'Newsletters', 'Financial', 'Invoices', 'Email Logs', 'Gallery Page', 'Footer Page',
-                'Admin Panel Settings', 'Client Panel Settings', 'Invoice Settings'
+                'Dashboard', 'Users', 'Services', 'Admins', 'Finance Managers', 'Content Managers', 'User Managers',
+                'Doctors', 'Practitioners', 'Mindfulness Practitioners', 'Yoga Therapists', 'Translators', 'Clients',
+                'Forms', 'Newsletters', 'Financial', 'Invoices', 'Email Logs', 'Gallery Page', 'Footer Page',
+                'Admin Panel Settings', 'Client Panel Settings', 'Invoice Settings', 'Countries', 'Languages', 'Bookings'
             ])->get()
         );
 
@@ -103,7 +109,7 @@ class RolePermissionSeeder extends Seeder
             Permission::whereIn('group', [
                 'Dashboard', 'Packages', 'Promo Codes', 'Other Fees',
                 'Doctors', 'Practitioners', 'Mindfulness Practitioners', 'Yoga Therapists', 'Translators',
-                'Financial', 'Invoices', 'Coins Management', 'Referral Commissions', 'Invoice Settings'
+                'Financial', 'Invoices', 'Coins Management', 'Referral Commissions', 'Invoice Settings', 'Bookings', 'Finance Managers'
             ])->get()
         );
 
@@ -114,7 +120,7 @@ class RolePermissionSeeder extends Seeder
                 'Dashboard', 'Services', 'Master Data', 'Testimonials', 
                 'Home Page', 'About Page', 'Services Page',
                 'Doctors', 'Practitioners', 'Mindfulness Practitioners', 'Yoga Therapists', 'Translators',
-                'Gallery Page', 'Footer Page', 'Admin Panel Settings'
+                'Gallery Page', 'Footer Page', 'Admin Panel Settings', 'Content Managers', 'Countries', 'Languages'
             ])->get()
         );
 
@@ -125,7 +131,7 @@ class RolePermissionSeeder extends Seeder
                 'Dashboard', 'Users', 'Doctors', 'Practitioners', 
                 'Mindfulness Practitioners', 'Yoga Therapists', 
                 'Translators', 'Clients', 'Forms', 'Credentials', 'Practitioner Reviews', 'Admins', 'Contact Messages',
-                'Newsletters', 'Email Logs'
+                'Newsletters', 'Email Logs', 'User Managers', 'Bookings'
             ])->get()
         );
     }

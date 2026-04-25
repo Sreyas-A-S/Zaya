@@ -25,10 +25,12 @@ class RegistrationFeeService
         $language = session('locale', 'en');
         $countryCode = $this->deriveCountryCodeFromUser($user);
         $settings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
+        
         $fee = (float) ($settings[$map[$role]['fee']] ?? 0);
         if (is_numeric($amountOverride)) {
             $fee = max(0.0, (float) $amountOverride);
         }
+
         $currencyKey = $map[$role]['fee'] . '_currency';
         $feeCurrency = strtoupper($settings[$currencyKey] ?? config('currencies.default', 'EUR'));
         $enabled = filter_var($settings[$map[$role]['enabled']] ?? '1', FILTER_VALIDATE_BOOLEAN);
@@ -52,12 +54,14 @@ class RegistrationFeeService
         $orderId = 'mock_plink_' . uniqid();
         $paymentUrl = null;
 
-        $currency = $feeCurrency ?? $this->deriveCurrencyFromUser($user);
+        // Use fee currency if available, otherwise derive from user country
+        $currency = $feeCurrency;
 
         $notes = array_merge([
             'user_id' => $user->id,
             'role' => $role,
-            'source' => 'admin_registration',
+            'source' => 'registration',
+            'payout_currency' => (string) ($user->payout_currency ?? $user->currency ?? $currency),
         ], $extraNotes);
 
         try {
@@ -106,18 +110,28 @@ class RegistrationFeeService
 
     private function deriveCountryCodeFromUser($user): string
     {
-        $country = null;
-        if (isset($user->country)) {
-            $country = $user->country;
-        } elseif (isset($user->patient) && $user->patient) {
-            $country = $user->patient->country;
-        } elseif (isset($user->practitioner) && $user->practitioner) {
-            $country = $user->practitioner->country;
+        // Try to get country name from user or their related profile
+        $countryName = $user->country;
+
+        if (!$countryName) {
+            if ($user->role === 'practitioner' && $user->practitioner) {
+                $countryName = $user->practitioner->country;
+            } elseif ($user->role === 'doctor' && $user->doctor) {
+                $countryName = $user->doctor->country;
+            } elseif ($user->role === 'mindfulness_practitioner' && $user->mindfulnessPractitioner) {
+                $countryName = $user->mindfulnessPractitioner->country;
+            } elseif ($user->role === 'yoga_therapist' && $user->yogaTherapist) {
+                $countryName = $user->yogaTherapist->country;
+            } elseif ($user->role === 'translator' && $user->translator) {
+                $countryName = $user->translator->country;
+            } elseif (($user->role === 'client' || $user->role === 'patient') && $user->patient) {
+                $countryName = $user->patient->country;
+            }
         }
 
-        if ($country) {
-            $dbCountry = \App\Models\Country::where('name', $country)
-                ->orWhere('code', strtoupper($country))
+        if ($countryName) {
+            $dbCountry = \App\Models\Country::where('name', $countryName)
+                ->orWhere('code', strtoupper($countryName))
                 ->first();
             if ($dbCountry) {
                 return strtoupper($dbCountry->code);

@@ -44,7 +44,7 @@ class HomepageSettingSeeder extends Seeder
             ],
             [
                 'key' => 'hero_search_placeholder_2',
-                'value' => 'City, Postal code...',
+                'value' => 'City, Zip code...',
                 'type' => 'text',
                 'section' => 'hero',
                 'max_length' => 40

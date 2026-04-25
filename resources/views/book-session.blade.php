@@ -2031,6 +2031,21 @@
             const slots = await loadSlotsForDate(dateValue);
             const bookedSlots = await fetchBookedSlotsForDate(dateValue);
 
+            // Cross-service exclusion: find slots selected for OTHER services on the SAME date
+            const otherSelectedSlots = [];
+            const allScheduleItems = document.querySelectorAll('.service-schedule-item');
+            const currentServiceId = wrapper.closest('.service-schedule-item')?.dataset.serviceId;
+
+            allScheduleItems.forEach(item => {
+                if (item.dataset.serviceId !== currentServiceId) {
+                    const otherDate = item.querySelector('.day-value')?.value;
+                    const otherTime = item.querySelector('.time-value')?.value;
+                    if (otherDate === dateValue && otherTime) {
+                        otherSelectedSlots.push(otherTime);
+                    }
+                }
+            });
+
             // If no slots available, show message and don't display the header/grid
             if (!slots || slots.length === 0) {
                 const isTodaySelected = new Date(dateValue).toDateString() === new Date().toDateString();
@@ -2053,11 +2068,14 @@
                 const slotMinutes = parseTimeToMinutes(slot);
                 const isPast = isToday && (slotMinutes < currentMinutes);
                 const isBooked = bookedSlots.includes(slot);
+                const isSelectedElsewhere = otherSelectedSlots.includes(slot);
 
                 if (isPast) {
                     html += `<div class="time-slot disabled" title="Time has passed" style="opacity: 0.3; cursor: not-allowed; pointer-events: none;">${slot}</div>`;
                 } else if (isBooked) {
                     html += `<div class="time-slot booked" title="Already booked" style="opacity: 0.4; cursor: not-allowed; pointer-events: none; background-color: #fee2e2; border-color: #dc2626; color: #991b1b;">${slot}</div>`;
+                } else if (isSelectedElsewhere) {
+                    html += `<div class="time-slot selected-elsewhere" title="Selected for another service" style="opacity: 0.5; cursor: not-allowed; pointer-events: none; background-color: #fef3c7; border-color: #f59e0b; color: #92400e;">${slot}</div>`;
                 } else {
                     const isSel = (slot === selectedTime) ? 'selected' : '';
                     html += `<div class="time-slot ${isSel}" onclick="selectTimeSlot(this)">${slot}</div>`;
