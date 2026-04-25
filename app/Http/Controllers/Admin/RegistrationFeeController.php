@@ -40,6 +40,9 @@ class RegistrationFeeController extends Controller
                     if ($userId) {
                         $user = User::find($userId);
                         if ($user) {
+                            // Generate Invoice No for Registration
+                            $invoiceNo = 'ZAYA-REG-' . date('Ymd') . '-' . strtoupper(\Illuminate\Support\Str::random(4));
+
                             // Record the transaction
                             $this->recordTransaction([
                                 'type' => 'registration',
@@ -50,8 +53,26 @@ class RegistrationFeeController extends Controller
                                 'payment_id' => $paymentId,
                                 'status' => 'completed'
                             ]);
+
+                            // Create a dummy booking record to serve as an invoice
+                            $booking = \App\Models\Booking::create([
+                                'invoice_no' => $invoiceNo,
+                                'user_id' => $user->id,
+                                'profile_id' => 0,
+                                'practitioner_type' => 'registration_fee',
+                                'service_ids' => [],
+                                'mode' => 'online',
+                                'booking_date' => now(),
+                                'booking_time' => now()->format('H:i'),
+                                'total_price' => $linkData['amount'] / 100,
+                                'currency' => $linkData['currency'],
+                                'status' => 'paid',
+                                'razorpay_payment_id' => $paymentId
+                            ]);
                             
-                            Log::info("Transaction recorded for user $userId via registration fee.");
+                            Log::info("Transaction and Registration Invoice recorded for user $userId.");
+
+                            return redirect()->route('invoice.show', $invoiceNo)->with('success', 'Payment successful! Here is your registration invoice.');
                         }
                     }
                 }
