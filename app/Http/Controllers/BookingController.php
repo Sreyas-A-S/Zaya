@@ -478,6 +478,22 @@ class BookingController extends Controller
 
             \Log::warning("OVERBOOKING DETECTED for Booking ID #{$booking->id}. Payment received but slot was taken.");
 
+            // Record Financial Transaction even for overbooked (payment was made)
+            $practitioner = $booking->practitioner;
+
+            $this->recordTransaction([
+                'type' => 'booking',
+                'amount' => $booking->total_price,
+                'subtotal' => $booking->subtotal,
+                'user_id' => $booking->user_id,
+                'practitioner_id' => $practitioner->user_id ?? null,
+                'booking_id' => $booking->id,
+                'payment_id' => $paymentId,
+                'currency' => $booking->currency ?? 'INR',
+                'coins_used' => $booking->coins_used ?? 0,
+                'coin_discount' => $booking->coin_discount ?? 0,
+            ]);
+
             return redirect()->route('dashboard')->with('warning', 'Payment received, but this slot was just booked by someone else. Our team will contact you to reschedule or provide a full refund.');
         }
     }
