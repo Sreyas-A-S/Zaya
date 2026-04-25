@@ -698,7 +698,21 @@ class ProfileController extends Controller
 
         $firstPractitioner = $referralChain[0]['practitioner'] ?? 'Unknown';
 
-        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner'));
+        // Financial visibility logic
+        $userTransaction = $booking->transactions->first(function($t) use ($user) {
+            return $t->practitioner_id === $user->id || $t->referrer_id === $user->id;
+        });
+
+        $shareAmount = 0;
+        if ($userTransaction) {
+            if ($userTransaction->practitioner_id === $user->id) {
+                $shareAmount = $userTransaction->practitioner_share;
+            } elseif ($userTransaction->referrer_id === $user->id) {
+                $shareAmount = $userTransaction->referrer_share;
+            }
+        }
+
+        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount'));
     }
 
     public function viewClientProfile($id)
