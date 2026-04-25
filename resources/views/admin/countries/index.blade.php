@@ -801,6 +801,7 @@ $(document).on('submit', '#editCountryForm', function (e) {
             $('[name="bank_name"]').val(profile.bank_name);
             $('[name="account_number"]').val(profile.account_number);
             $('[name="ifsc_code"]').val(profile.ifsc_code);
+            $('[name="swift_code"]').val(profile.swift_code || '');
             $('[name="upi_id"]').val(profile.upi_id);
             $('[name="short_bio"]').val(profile.short_doctor_bio);
             $('[name="key_expertise"]').val(profile.key_expertise);
@@ -1028,7 +1029,7 @@ $(document).on('submit', '#editCountryForm', function (e) {
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Bank Name</label><p class="f-w-600">${p.bank_name || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Number</label><p class="f-w-600">${p.account_number || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">IFSC Code</label><p class="f-w-600">${p.ifsc_code || 'N/A'}</p></div>
-                                    
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">SWIFT Code</label><p class="f-w-600">${p.swift_code || 'N/A'}</p></div>                                    
                                     <div class="col-12 mt-2"><h6 class="text-primary border-bottom pb-2">Documents Status</h6>
                                         <div class="d-flex flex-wrap gap-2 pt-1">
                                             ${p.reg_certificate_path ? `<span class="badge badge-light-primary"><i class="fa-solid fa-check me-1"></i> Reg Certificate</span>` : '<span class="badge badge-light-danger">Missing Reg Cert</span>'}

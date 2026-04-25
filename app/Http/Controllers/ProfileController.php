@@ -319,7 +319,11 @@ class ProfileController extends Controller
             $roleForSchema = $user->role;
         } else {
             // Fallback to the booking's actual practitioner role
-            $roleForSchema = $booking->practitioner->user->role ?? 'practitioner';
+            if ($booking->practitioner && $booking->practitioner->user) {
+                $roleForSchema = $booking->practitioner->user->role;
+            } else {
+                $roleForSchema = 'practitioner';
+            }
         }
 
         $consultationSchema = [];
@@ -1008,8 +1012,8 @@ class ProfileController extends Controller
             'nationality' => 'nullable|string|max:255|exists:countries,name',
             'address_line_1' => 'nullable|string|max:500',
             'address_line_2' => 'nullable|string|max:500',
-            'city' => 'nullable|string|max:255',
-            'state' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
             'zip_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:255',
         ]);
@@ -1768,8 +1772,8 @@ class ProfileController extends Controller
             'gender' => 'nullable|in:male,female,transgender,other',
             'dob' => 'nullable|date|before:today',
             'address_line_1' => 'nullable|string|max:500',
-            'city' => 'nullable|string|max:255',
-            'state' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
             'zip_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:255',
             'payout_currency' => 'nullable|string|max:10',
@@ -1777,6 +1781,7 @@ class ProfileController extends Controller
             'bank_name' => 'nullable|string|max:255',
             'account_number' => 'nullable|string|max:50',
             'ifsc_code' => 'nullable|string|max:20',
+            'swift_code' => 'nullable|string|max:20',
             'bank_holder_name' => 'nullable|string|max:255',
             'bank_account_holder_name' => 'nullable|string|max:255',
             'state_ayurveda_council_name' => 'nullable|string|max:255',

@@ -81,7 +81,7 @@
                     <form class="flex gap-2 mb-2 items-center">
                         <div class="relative flex-1">
                             @php
-                                $savedZipcode = session('global_zipcode', session('global_pincode'));
+                                $savedZipcode = session('global_zipcode');
                                 $displayValue = $savedZipcode ? __('Your Zipcode') . ': ' . $savedZipcode : '';
                             @endphp
                             <input id="footer-zipcode-input" type="text" placeholder="{{ __('Enter Zipcode') }}" data-i18n="Enter Zipcode"
@@ -92,11 +92,11 @@
                                 value="{{ $displayValue }}"
                                 class="{{ $savedZipcode ? 'bg-[#4DB286] border-green-200' : 'bg-[#F9F9F9] border-gray-200' }} placeholder-gray-400 text-gray-800 rounded px-4 h-11 w-full text-sm focus:outline-none focus:border-[#79584B] transition-all border">
                         </div>
-                        <button id="footer-zipcode-save" type="button" style="{{ session('global_zipcode', session('global_pincode')) ? 'display:none;' : '' }}"
+                        <button id="footer-zipcode-save" type="button" style="{{ session('global_zipcode') ? 'display:none;' : '' }}"
                             class="bg-primary h-11 text-white font-medium rounded px-6 text-sm hover:bg-[#5e4339] transition-all shadow-sm flex items-center justify-center gap-2 whitespace-nowrap min-w-[90px]" data-i18n="Save">
                             <span>{{ __('Save') }}</span>
                         </button>
-                        <button id="footer-zipcode-delete" type="button" style="{{ session('global_zipcode', session('global_pincode')) ? '' : 'display:none;' }}"
+                        <button id="footer-zipcode-delete" type="button" style="{{ session('global_zipcode') ? '' : 'display:none;' }}"
                             class="bg-primary h-11 text-white font-medium rounded px-4 text-lg hover:bg-[#5e4339] transition-all shadow-sm flex items-center justify-center whitespace-nowrap" title="{{ __('Delete') }}">
                             <i class="ri-delete-bin-line"></i>
                         </button>

@@ -246,12 +246,11 @@
                                             <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">State <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control validate-char-limit validate-format" name="state" required placeholder="State" maxlength="100" data-max="100" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed">
+                                            <label class="form-label">State</label>
+                                            <input type="text" class="form-control validate-char-limit validate-format" name="state" placeholder="State" maxlength="100" data-max="100" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                             <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
-                                        </div>
-                                        <div class="col-md-6">
+                                        </div>                                        <div class="col-md-6">
                                             <label class="form-label">Zip Code <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control validate-char-limit" name="zip_code" required placeholder="Enter Zipcode"
                                                 maxlength="10" data-max="10" pattern="^[0-9]{5,10}$" title="Enter valid zip code (5-10 digits)"
@@ -471,13 +470,13 @@
                                             <div id="current-gov_id_upload" class="mt-1 d-none small"></div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">PAN Number</label>
+                                            <label class="form-label">PAN Number (Optional)</label>
                                             <input class="form-control" type="text" name="pan_number"
                                                 pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
                                                 title="Enter valid PAN Number (Example: ABCDE1234F)"
                                                 maxlength="10"
                                                 style="text-transform:uppercase;"
-                                                oninput="this.value = this.value.toUpperCase()" required>
+                                                oninput="this.value = this.value.toUpperCase()">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Bank Holder Name <span class="text-danger">*</span></label>
@@ -494,12 +493,11 @@
                                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
-                                            <input class="form-control" type="text" name="ifsc_code" required
+                                            <label class="form-label">IFSC Code</label>
+                                            <input class="form-control" type="text" name="ifsc_code"
                                                 pattern="^[A-Z]{4}0[A-Z0-9]{6}$" title="Enter valid IFSC (Example: SBIN0123456)"
                                                 oninput="this.value = this.value.toUpperCase()">
-                                        </div>
-                                        <div class="col-md-6">
+                                        </div>                                        <div class="col-md-6">
                                             <label class="form-label">SWIFT Code</label>
                                             <input class="form-control" type="text" name="swift_code" pattern="^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$" maxlength="11" oninput="this.value=this.value.toUpperCase()" title="Enter valid SWIFT Code (Example: HDFCINBBXXX)" required>
                                         </div>
@@ -1798,7 +1796,7 @@ function openCreateModal() {
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Holder</label><p class="f-w-600">${t.bank_holder_name || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Number</label><p class="f-w-600 font-monospace">${t.account_number || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">IFSC Code</label><p class="f-w-600 font-monospace">${t.ifsc_code || 'N/A'}</p></div>
-                                    <div class="col-sm-6"><label class="small text-muted mb-0">SWIFT Code</label><p class="f-w-600">${t.swift_code || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">SWIFT Code</label><p class="f-w-600 font-monospace">${t.swift_code || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">UPI ID</label><p class="f-w-600">${t.upi_id || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Payout Currency</label><p class="f-w-600">${t.payout_currency || 'N/A'}</p></div>
                                     

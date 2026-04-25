@@ -239,11 +239,11 @@
                                 placeholder="{{ __('Enter City') }}" required autocomplete="off">
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State') }}</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State (Optional)') }}</label>
                             <input type="text" name="state" value="{{ old('state') }}"
                                 pattern="^[A-Za-z\s]+$" title="Only alphabets and spaces are allowed"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="{{ __('Enter State') }}" required autocomplete="off">
+                                placeholder="{{ __('Enter State') }}" autocomplete="off">
                         </div>
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Zip Code') }}</label>

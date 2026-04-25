@@ -319,8 +319,15 @@
     </div>
 </div>
 
-@if(!in_array($roleForSchema, ['doctor', 'practitioner', 'yoga_therapist'], true))
+@if(!in_array($roleForSchema, ['doctor', 'practitioner', 'yoga_therapist', 'mindfulness_practitioner'], true))
 @include('consultation-forms.' . $roleForSchema, [
+    'user' => $user,
+    'booking' => $booking,
+    'payload' => $payload,
+    'consultationSchema' => $consultationSchema,
+])
+@elseif($roleForSchema === 'mindfulness_practitioner')
+@include('consultation-forms.mindfulness_counsellor', [
     'user' => $user,
     'booking' => $booking,
     'payload' => $payload,

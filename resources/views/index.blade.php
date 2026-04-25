@@ -50,7 +50,7 @@
                         <i class="ri-map-pin-line text-[#FDE2D8] ml-2 md:ml-3 mr-2 text-lg"></i>
                         <input id="hero_search_placeholder_2" type="text"
                             name="zipcode"
-                            value="{{ session('global_zipcode', session('global_pincode')) }}"
+                            value="{{ session('global_zipcode') }}"
                             placeholder="{{ $settings['hero_search_placeholder_2'] ?? 'City, Postal code...' }}"
                             maxlength="6"
                             pattern="[0-9]{6}"

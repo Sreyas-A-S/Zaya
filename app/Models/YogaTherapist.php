@@ -68,6 +68,7 @@ class YogaTherapist extends Model
         'bank_name',
         'account_number',
         'ifsc_code',
+        'swift_code',
         'upi_id',
         'cancelled_cheque_path',
         'booking_window_days',

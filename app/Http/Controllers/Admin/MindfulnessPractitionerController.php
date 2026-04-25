@@ -159,7 +159,7 @@ class MindfulnessPractitionerController extends Controller
             'address_line_1' => 'required|string|max:500',
             'address_line_2' => 'nullable|string|max:500',
             'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
-            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'nullable|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
             'payout_currency' => 'required|string|max:10',
@@ -192,6 +192,7 @@ class MindfulnessPractitionerController extends Controller
             'bank_name' => 'nullable|string|max:255',
             'account_number' => 'nullable|string|max:255',
             'ifsc_code' => 'nullable|string|max:20',
+            'swift_code' => 'nullable|string|max:20',
             'upi_id' => 'nullable|string|max:255',
             'cancelled_cheque' => 'nullable|file|max:2048',
 
@@ -316,7 +317,7 @@ class MindfulnessPractitionerController extends Controller
             'address_line_1' => 'required|string|max:500',
             'address_line_2' => 'nullable|string|max:500',
             'city' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
-            'state' => 'required|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
+            'state' => 'nullable|string|max:100|regex:/^[a-zA-Z\s\-]+$/u',
             'zip_code' => 'required|string|max:10|regex:/^[a-zA-Z0-9\s\-]+$/',
             'country' => 'required|string|max:255|regex:/^[a-zA-Z\s\-]+$/u',
             'payout_currency' => 'required|string|max:10',
@@ -348,6 +349,7 @@ class MindfulnessPractitionerController extends Controller
             'bank_name' => 'nullable|string|max:255',
             'account_number' => 'nullable|string|max:255',
             'ifsc_code' => 'nullable|string|max:20',
+            'swift_code' => 'nullable|string|max:20',
             'upi_id' => 'nullable|string|max:255',
             'cancelled_cheque' => 'nullable|file|max:2048',
 

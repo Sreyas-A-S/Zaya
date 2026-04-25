@@ -64,33 +64,6 @@ trait AdminFilterTrait
                 $query->whereRaw('1 = 0');
                 return $query;
             }
-
-            if (!empty($user->languages)) {
-                $assignedLangIds = is_array($user->languages) ? $user->languages : json_decode($user->languages, true);
-                if (!empty($assignedLangIds) && is_array($assignedLangIds)) {
-                    $query->where(function ($q) use ($assignedLangIds, $type, $effectiveTable) {
-                        if ($effectiveTable === 'users' && $type === 'user') {
-                            $q->where(function ($sq) use ($assignedLangIds) {
-                                foreach ($assignedLangIds as $id) {
-                                    $sq->orWhereJsonContains('users.languages', (string)$id)
-                                      ->orWhereJsonContains('users.languages', (int)$id)
-                                      ->orWhere('users.languages', $id);
-                                }
-                            });
-                        } elseif (in_array($effectiveTable, ['doctors', 'yoga_therapists', 'mindfulness_practitioners', 'practitioners', 'patients', 'clients'])) {
-                            $assignedLangNames = \App\Models\Language::whereIn('id', $assignedLangIds)->pluck('name')->toArray();
-                            $q->where(function($sq) use ($effectiveTable, $assignedLangNames) {
-                                foreach ($assignedLangNames as $name) {
-                                    $sq->orWhereNotNull($effectiveTable . '.languages_spoken->' . $name);
-                                }
-                            });
-                        }
-                    });
-                }
-            } else {
-                 // If not Super Admin and has NO assigned languages, they should see NO data if language filtering is applicable
-                 // But typically country is the primary filter. Let's stick with country for now to avoid being too restrictive if languages aren't set.
-            }
         }
 
         // 2. OPTIONAL: Apply navbar filters (only if not 'all')

@@ -518,7 +518,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('PAN Number') }}</label>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('PAN Number (Optional)') }}</label>
                         <input type="text" name="pan_number" value="{{ $profile->pan_number ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
                     </div>
                     <div>
@@ -538,6 +538,9 @@
                         <input type="text" name="ifsc_code" value="{{ $profile->ifsc_code ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
                     </div>
                     <div>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('SWIFT Code') }}</label>
+                        <input type="text" name="swift_code" value="{{ $profile->swift_code ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
+                    </div>                    <div>
                         <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Payout Currency') }}</label>
                         @php
                             $selectedCurrency = $profile->payout_currency ?? 'INR';
@@ -584,13 +587,13 @@
                         $roleDocs = [
                             'doctor' => [
                                 'registration_certificate_path' => 'Registration Certificate',
-                                'aadhaar_card_path' => 'Aadhaar Card Copy',
+                                'aadhaar_card_path' => 'Aadhar / Govt ID Copy',
                                 'signature_path' => 'Digital Signature',
-                                'pan_card_path' => 'PAN Card Copy',
+                                'pan_card_path' => 'PAN Card Copy (Optional)',
                                 'cancelled_cheque_path' => 'Cancelled Cheque',
                             ],
                             'practitioner' => [
-                                'doc_id_proof' => 'ID Proof (Passport/Aadhar)',
+                                'doc_id_proof' => 'ID Proof (Passport/Aadhar/Govt ID)',
                                 'doc_certificates' => 'Educational Certificates',
                                 'doc_experience' => 'Experience Certificate',
                                 'doc_cover_letter' => 'Cover Letter',

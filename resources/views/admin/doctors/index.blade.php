@@ -242,13 +242,13 @@
                                             <h5 class="f-w-600 mb-3">B. Medical Registration</h5>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">AYUSH Registration Number <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control validate-char-limit" name="ayush_reg_no" required maxlength="50" data-max="50" placeholder="Enter registration number">
+                                            <label class="form-label">AYUSH / Medical Registration Number (Optional)</label>
+                                            <input type="text" class="form-control validate-char-limit" name="ayush_reg_no" maxlength="50" data-max="50" placeholder="Enter registration number">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 50 characters allowed.</div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">State Ayurveda Council Name <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control validate-char-limit" name="state_council" required maxlength="100" data-max="100" placeholder="Enter council name">
+                                            <label class="form-label">State Council Name (Optional)</label>
+                                            <input type="text" class="form-control validate-char-limit" name="state_council" maxlength="100" data-max="100" placeholder="Enter council name">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                         </div>
                                         <div class="col-md-6">
@@ -376,8 +376,8 @@
                                             <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">State <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control validate-char-limit validate-format" name="state" required maxlength="100" data-max="100" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed" placeholder="State">
+                                            <label class="form-label">State</label>
+                                            <input type="text" class="form-control validate-char-limit validate-format" name="state" maxlength="100" data-max="100" pattern="^[a-zA-Z\s\-]+$" title="Only letters, spaces, and hyphens allowed" placeholder="State">
                                             <div class="text-danger small mt-1 char-limit-msg d-none">Maximum 100 characters allowed.</div>
                                             <div class="text-danger small mt-1 format-error d-none">Numbers and special characters are not allowed.</div>
                                         </div>
@@ -593,8 +593,8 @@
                                             <h5 class="f-w-600 mb-3">H. KYC & Payment Details</h5>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">PAN Card Number <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control text-uppercase" name="pan_number" required maxlength="10" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" placeholder="ABCDE1234F">
+                                            <label class="form-label">PAN Card Number (Optional)</label>
+                                            <input type="text" class="form-control text-uppercase" name="pan_number" maxlength="10" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" placeholder="ABCDE1234F">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Upload PAN Card <span class="file-keep-note d-none text-muted">(Leave blank to keep)</span></label>
@@ -602,7 +602,7 @@
                                             <div id="current-pan" class="mt-2 d-none"></div>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Upload Aadhaar (Optional)</label>
+                                            <label class="form-label">Aadhar / Government ID (Optional)</label>
                                             <input type="file" class="form-control" name="aadhaar_upload" accept=".pdf,.jpg,.jpeg,.png">
                                             <div id="current-aadhaar" class="mt-2 d-none"></div>
                                         </div>
@@ -619,8 +619,12 @@
                                             <input type="text" class="form-control" name="account_number" required maxlength="50" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter account number">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control text-uppercase" name="ifsc_code" required maxlength="11" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" placeholder="ABCD0123456">
+                                            <label class="form-label">IFSC Code</label>
+                                            <input type="text" class="form-control text-uppercase" name="ifsc_code" maxlength="11" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" placeholder="ABCD0123456">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">SWIFT Code</label>
+                                            <input type="text" class="form-control text-uppercase" name="swift_code" maxlength="20" placeholder="Enter SWIFT code">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Upload Cancelled Cheque/Passbook <span class="file-keep-note d-none text-muted">(Leave blank to keep)</span></label>
@@ -694,27 +698,27 @@
                                         </div>
                                         <div class="col-12">
                                             <div class="form-check checkbox-primary mb-2">
-                                                <input class="form-check-input" type="checkbox" name="ayush_confirmation" value="1" required id="ayush_confirmation">
+                                                <input class="form-check-input" type="checkbox" name="ayush_confirmation" value="1" id="ayush_confirmation">
                                                 <label class="form-check-label" for="ayush_confirmation">I confirm I am a registered AYUSH Doctor.</label>
                                             </div>
                                             <div class="form-check checkbox-primary mb-2">
-                                                <input class="form-check-input" type="checkbox" name="guidelines_agreement" value="1" required id="guidelines_agreement">
+                                                <input class="form-check-input" type="checkbox" name="guidelines_agreement" value="1" id="guidelines_agreement">
                                                 <label class="form-check-label" for="guidelines_agreement">I agree to follow ZAYA Wellness Consultation Guidelines.</label>
                                             </div>
                                             <div class="form-check checkbox-primary mb-2">
-                                                <input class="form-check-input" type="checkbox" name="document_consent" value="1" required id="document_consent">
+                                                <input class="form-check-input" type="checkbox" name="document_consent" value="1" id="document_consent">
                                                 <label class="form-check-label" for="document_consent">I consent to the verification of my documents.</label>
                                             </div>
                                             <div class="form-check checkbox-primary mb-2">
-                                                <input class="form-check-input" type="checkbox" name="policies_agreement" value="1" required id="policies_agreement">
+                                                <input class="form-check-input" type="checkbox" name="policies_agreement" value="1" id="policies_agreement">
                                                 <label class="form-check-label" for="policies_agreement">I agree to the Platform Policies & Terms.</label>
                                             </div>
                                             <div class="form-check checkbox-primary mb-2">
-                                                <input class="form-check-input" type="checkbox" name="prescription_understanding" value="1" required id="prescription_understanding">
+                                                <input class="form-check-input" type="checkbox" name="prescription_understanding" value="1" id="prescription_understanding">
                                                 <label class="form-check-label" for="prescription_understanding">I understand I am responsible for my prescriptions.</label>
                                             </div>
                                             <div class="form-check checkbox-primary mb-2">
-                                                <input class="form-check-input" type="checkbox" name="confidentiality_consent" value="1" required id="confidentiality_consent">
+                                                <input class="form-check-input" type="checkbox" name="confidentiality_consent" value="1" id="confidentiality_consent">
                                                 <label class="form-check-label" for="confidentiality_consent">I agree to maintain patient data confidentiality.</label>
                                             </div>
                                             <div class="form-check checkbox-secondary mt-3 pt-2 border-top">
@@ -1870,6 +1874,7 @@
             $('[name="bank_name"]').val(profile.bank_name);
             $('[name="account_number"]').val(profile.account_number);
             $('[name="ifsc_code"]').val(profile.ifsc_code);
+            $('[name="swift_code"]').val(profile.swift_code || '');
             $('[name="upi_id"]').val(profile.upi_id);
             $('#doctor_payout_currency').val(profile.payout_currency || 'INR').css({'pointer-events': 'none', 'background-color': '#e9ecef'}).attr('tabindex', '-1');
             $('[name="short_bio"]').val(profile.short_doctor_bio);
@@ -1965,7 +1970,7 @@
                 $('#current-pan').removeClass('d-none').html(`<a href="/storage/${profile.pan_upload_path}" target="_blank" class="badge bg-light-secondary text-secondary border border-secondary text-decoration-none p-2"><i class="fa fa-id-card-o me-1"></i> View Current PAN</a>`);
             }
             if (profile.aadhaar_upload_path) {
-                $('#current-aadhaar').removeClass('d-none').html(`<a href="/storage/${profile.aadhaar_upload_path}" target="_blank" class="badge bg-light-warning text-warning border border-warning text-decoration-none p-2"><i class="fa fa-id-card-o me-1"></i> View Current Aadhaar</a>`);
+                $('#current-aadhaar').removeClass('d-none').html(`<a href="/storage/${profile.aadhaar_upload_path}" target="_blank" class="badge bg-light-warning text-warning border border-warning text-decoration-none p-2"><i class="fa fa-id-card-o me-1"></i> View Current Aadhar / Govt ID</a>`);
             }
             if (profile.cancelled_cheque_path) {
                 $('#current-cheque').removeClass('d-none').html(`<a href="/storage/${profile.cancelled_cheque_path}" target="_blank" class="badge bg-light-dark text-dark border border-dark text-decoration-none p-2"><i class="fa fa-bank me-1"></i> View Current Cheque/Passbook</a>`);
@@ -2190,6 +2195,7 @@
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Bank Name</label><p class="f-w-600">${p.bank_name || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Account Number</label><p class="f-w-600">${p.account_number || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">IFSC Code</label><p class="f-w-600">${p.ifsc_code || 'N/A'}</p></div>
+                                    <div class="col-sm-6"><label class="small text-muted mb-0">SWIFT Code</label><p class="f-w-600">${p.swift_code || 'N/A'}</p></div>
                                     <div class="col-sm-6"><label class="small text-muted mb-0">Payout Currency</label><p class="f-w-600">${p.payout_currency || 'N/A'}</p></div>
 
                                     
@@ -2368,7 +2374,7 @@
                     if (!el.val()) return true;
                     return /^[0-9]{5,10}$/.test(el.val());
                 },
-                message: 'Invalid Zip/Pincode'
+                message: 'Invalid Zipcode'
             }
         ];
 
