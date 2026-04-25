@@ -489,61 +489,8 @@
 @include('partials.refer-modal-scripts')
 
 <script>
-    async function requestDataAccess(clientId) {
-        if (!confirm('This will send a secure OTP to the client to authorize your access to their health journey and historical records. Proceed?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch("{{ route('data-access.request') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ client_id: clientId })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                // Assuming there's a modal or prompt for OTP
-                const otp = prompt(data.success + "\n\nPlease enter the 6-digit OTP provided by the client:");
-                if (otp) {
-                    verifyDataAccessOTP(clientId, otp);
-                }
-            } else {
-                alert(data.error || 'Failed to send OTP.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An unexpected error occurred.');
-        }
-    }
-
-    async function verifyDataAccessOTP(clientId, otp) {
-        try {
-            const response = await fetch("{{ route('data-access.verify') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ client_id: clientId, otp: otp })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                alert('Access granted! Refreshing page...');
-                window.location.reload();
-            } else {
-                alert(data.error || 'Invalid OTP.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An unexpected error occurred.');
-        }
+    function requestDataAccess(clientId) {
+        openDataAccessRequestModal(clientId);
     }
 </script>
 

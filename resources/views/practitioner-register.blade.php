@@ -962,7 +962,12 @@
                                 'X-Requested-With': 'XMLHttpRequest',
                                 'X-CSRF-TOKEN': getCsrfToken()
                             },
-                            body: JSON.stringify({ code, role: roleValue, usage_type: 'registration' })
+                            body: JSON.stringify({ 
+                                code, 
+                                role: roleValue, 
+                                usage_type: 'registration',
+                                country: document.querySelector('#country-select') ? document.querySelector('#country-select').value : ''
+                            })
                         });
 
                         const data = await response.json().catch(() => ({}));
