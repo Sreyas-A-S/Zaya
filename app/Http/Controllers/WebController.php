@@ -2078,7 +2078,8 @@ class WebController extends Controller
             $comments = $this->fetchFromWordPress('comments', [
                 'post' => $postId,
                 'order' => 'asc',
-                'status' => 'approve'
+                'status' => 'approve',
+                '_t' => time() // Cache buster
             ]);
 
             // Ensure we have an array
