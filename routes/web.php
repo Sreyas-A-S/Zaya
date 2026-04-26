@@ -155,6 +155,7 @@ Route::get('/captcha', [CaptchaController::class, 'generate'])->name('captcha');
 Route::get('/geoip/country', [GeoIpController::class, 'country'])->name('geoip.country');
 Route::get('/magic-login', [\App\Http\Controllers\Auth\MagicLoginController::class, 'login'])->name('magic.login');
 Route::get('/invoice/{invoice_no}', [InvoiceController::class, 'show'])->name('invoice.show');
+Route::get('/invoice/{invoice_no}/download', [InvoiceController::class, 'download'])->name('invoice.download');
 Route::post('/validate-promo-code', [WebController::class, 'validatePromoCode'])->name('promo.validate')->middleware('throttle:5,1');
 Route::post('/get-registration-fee', [WebController::class, 'getRegistrationFee'])->name('registration-fee.get');
 

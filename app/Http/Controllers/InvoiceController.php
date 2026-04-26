@@ -25,11 +25,35 @@ class InvoiceController extends Controller
      */
     public function show($invoice_no)
     {
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Please login to view your invoice.');
+        }
+
         $booking = Booking::with(['user.patient', 'practitioner.user', 'translator.user'])
             ->where('invoice_no', $invoice_no)
             ->firstOrFail();
         
+        // Ensure user can only see their own invoice unless admin
+        if (auth()->user()->role !== 'admin' && $booking->user_id !== auth()->id()) {
+            abort(403);
+        }
+        
         return view('invoice.index', compact('booking'));
+    }
+
+    /**
+     * Download the invoice without auth using a token.
+     */
+    public function download(Request $request, $invoice_no)
+    {
+        $token = $request->query('token');
+        
+        $booking = Booking::with(['user.patient', 'practitioner.user', 'translator.user'])
+            ->where('invoice_no', $invoice_no)
+            ->where('download_token', $token)
+            ->firstOrFail();
+
+        return view('invoice.download', compact('booking'));
     }
 
     /**
