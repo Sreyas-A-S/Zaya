@@ -173,31 +173,44 @@
         </div>
         @endif
 
-        <!-- Transaction Vault Snippet (Only for Clients) -->
-        @if($user->role === 'client' || $user->role === 'patient')
+        <!-- Transaction Vault Snippet -->
         <div id="section-transactions" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
             <h2 id="client_panel_transaction_vault_title" class="text-xl font-sans! font-medium text-secondary mb-6" data-i18n="{{ $site_settings['client_panel_transaction_vault_title'] ?? 'Transaction Vault' }}">{{ __($site_settings['client_panel_transaction_vault_title'] ?? 'Transaction Vault') }}</h2>
             <div class="space-y-5">
                 @forelse($invoices as $invoice)
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-sm font-normal text-gray-800 mb-0.5">{{ __($site_settings['client_panel_invoice_hash'] ?? 'Invoice #') }}{{ $invoice->invoice_no }}</p>
+                        <p class="text-sm font-normal text-gray-800 mb-0.5">
+                            {{ $invoice->transaction_no }}
+                        </p>
                         <p class="text-xs text-gray-400">{{ $invoice->created_at->format('M d, Y') }}</p>
                     </div>
-                    @if($invoice->invoice_no)
-                    <a href="{{ route('invoice.show', $invoice->invoice_no) }}" target="_blank"
-                        class="px-3 py-1 bg-[#EEF2EF] text-[#2B4C3B] text-sm font-normal rounded-full" data-i18n="{{ $site_settings['client_panel_open_invoice'] ?? 'Open' }}">{{ __($site_settings['client_panel_open_invoice'] ?? 'Open') }}</a>
-                    @endif
+                    @php
+                        $displayAmount = $invoice->total_amount;
+                        if ($invoice->practitioner_id == $user->id) {
+                            $displayAmount = $invoice->practitioner_share;
+                        } elseif ($invoice->referrer_id == $user->id) {
+                            $displayAmount = $invoice->referrer_share;
+                        }
+                    @endphp
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-secondary">
+                            {{ get_currency_symbol($invoice->currency) }} {{ number_format($displayAmount, 2) }}
+                        </p>
+                        @if($invoice->transaction_no && ($invoice->user_id === $user->id))
+                        <a href="{{ route('invoice.show', $invoice->transaction_no) }}" target="_blank"
+                            class="text-[10px] text-secondary hover:underline font-bold uppercase tracking-tighter" data-i18n="{{ $site_settings['client_panel_open_invoice'] ?? 'Open' }}">{{ __($site_settings['client_panel_open_invoice'] ?? 'Open') }}</a>
+                        @endif
+                    </div>
                 </div>
                 @empty
-                <p id="client_panel_no_recent_invoices" class="text-center text-gray-500 text-xs py-4" data-i18n="{{ $site_settings['client_panel_no_recent_invoices'] ?? 'No recent invoices.' }}">{{ __($site_settings['client_panel_no_recent_invoices'] ?? 'No recent invoices.') }}</p>
+                <p id="client_panel_no_recent_invoices" class="text-center text-gray-500 text-xs py-4" data-i18n="{{ $site_settings['client_panel_no_recent_invoices'] ?? 'No recent transactions.' }}">{{ __($site_settings['client_panel_no_recent_invoices'] ?? 'No recent transactions.') }}</p>
                 @endforelse
             </div>
             <div class="mt-6 text-center">
                 <a id="client_panel_see_all" href="{{ route('transactions.index') }}" class="text-xs text-gray-400 hover:text-gray-800 font-normal tracking-wide" data-i18n="{{ $site_settings['client_panel_see_all'] ?? 'See all' }}">{{ __($site_settings['client_panel_see_all'] ?? 'See all') }}</a>
             </div>
         </div>
-        @endif
 
         @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']))
         <!-- Practitioner Referrals -->

@@ -108,9 +108,13 @@ class ProfileController extends Controller
             ->latest()
             ->get();
 
-        // Invoices are usually client-centric (payments they made)
-        $invoices = \App\Models\Booking::where('user_id', $user->id)
-            ->whereNotNull('razorpay_payment_id')
+        // Transactions / Invoices
+        $invoices = \App\Models\Transaction::with(['user', 'practitioner', 'booking', 'referral'])
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhere('practitioner_id', $user->id)
+                  ->orWhere('referrer_id', $user->id);
+            })
             ->latest()
             ->take(5)
             ->get();
@@ -537,6 +541,9 @@ class ProfileController extends Controller
             ->latest()
             ->get();
 
+        $allServiceIds = $consultations->pluck('service_ids')->flatten()->unique()->filter()->toArray();
+        $allServices = \App\Models\Service::whereIn('id', $allServiceIds)->get()->keyBy('id');
+
         $dataAccessRequests = \App\Models\DataAccessRequest::with('requester')
             ->where('client_id', $user->id)
             ->whereIn('status', ['approved', 'revoked'])
@@ -544,7 +551,7 @@ class ProfileController extends Controller
             ->get()
             ->unique('requester_id');
 
-        return view('health-journey', compact('user', 'clinicalDocuments', 'consultations', 'dataAccessRequests'));
+        return view('health-journey', compact('user', 'clinicalDocuments', 'consultations', 'dataAccessRequests', 'allServices'));
     }
 
     public function bookings(Request $request)
@@ -570,11 +577,15 @@ class ProfileController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        // Fetch all services for these bookings to avoid N+1 in the table
+        $allServiceIds = collect($bookings->items())->pluck('service_ids')->flatten()->unique()->filter()->toArray();
+        $allServices = \App\Models\Service::whereIn('id', $allServiceIds)->get()->keyBy('id');
+
         if ($request->ajax()) {
-            return view('partials.bookings-table', compact('user', 'bookings'))->render();
+            return view('partials.bookings-table', compact('user', 'bookings', 'allServices'))->render();
         }
 
-        return view('bookings', compact('user', 'bookings', 'search'));
+        return view('bookings', compact('user', 'bookings', 'search', 'allServices'));
     }
 
     public function conferences(Request $request)

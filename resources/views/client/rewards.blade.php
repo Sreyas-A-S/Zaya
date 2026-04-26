@@ -176,42 +176,42 @@
 </div>
 
 <!-- Share Referral Modal (Hidden by default) -->
-<div id="referral-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 hidden">
+<div id="referral-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 hidden">
     <div class="absolute inset-0 bg-secondary/80 backdrop-blur-2xl" onclick="closeReferralModal()"></div>
-    <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 relative z-10 shadow-2xl animate-fade-in">
-        <button onclick="closeReferralModal()" class="absolute top-8 right-8 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-secondary hover:bg-gray-100 rounded-full transition-all">
+    <div class="bg-white w-full max-w-lg rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 relative z-10 shadow-2xl animate-fade-in mx-auto">
+        <button onclick="closeReferralModal()" class="absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-secondary hover:bg-gray-100 rounded-full transition-all">
             <i class="ri-close-line text-2xl"></i>
         </button>
 
-        <div class="text-center mb-10">
-            <div class="w-20 h-20 bg-emerald-50 rounded-[2rem] flex items-center justify-center text-emerald-600 mx-auto mb-6">
-                <i class="ri-share-forward-fill text-4xl"></i>
+        <div class="text-center mb-6 md:mb-10 mt-4 md:mt-0">
+            <div class="w-16 h-16 md:w-20 md:h-20 bg-emerald-50 rounded-2xl md:rounded-[2rem] flex items-center justify-center text-emerald-600 mx-auto mb-4 md:mb-6">
+                <i class="ri-share-forward-fill text-3xl md:text-4xl"></i>
             </div>
-            <h2 class="text-3xl font-black text-secondary mb-2 tracking-tight">Share the Wellness</h2>
-            <p class="text-gray-500 font-medium">Invite your friends via social media or email</p>
+            <h2 class="text-2xl md:text-3xl font-black text-secondary mb-2 tracking-tight">Share the Wellness</h2>
+            <p class="text-gray-500 font-medium text-sm md:text-base">Invite your friends via social media or email</p>
         </div>
 
-        <div class="grid grid-cols-2 gap-6 mb-10">
-            <a href="https://wa.me/?text={{ urlencode('Hey! Join me on Zaya Wellness and get professional sessions. Sign up here: ' . route('register.form', ['type' => 'client', 'ref' => $user->referral_token])) }}" target="_blank" class="flex flex-col items-center gap-3 group">
-                <div class="w-14 h-14 bg-[#25D366] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-[#25D366]/20 group-hover:-translate-y-1 transition-transform">
-                    <i class="ri-whatsapp-line text-3xl"></i>
+        <div class="grid grid-cols-2 gap-4 md:gap-6 mb-8 md:mb-10">
+            <a href="https://wa.me/?text={{ urlencode('Hey! Join me on Zaya Wellness and get professional sessions. Sign up here: ' . route('register.form', ['type' => 'client', 'ref' => $user->referral_token])) }}" target="_blank" class="flex flex-col items-center gap-2 md:gap-3 group">
+                <div class="w-12 h-12 md:w-14 md:h-14 bg-[#25D366] text-white rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-[#25D366]/20 group-hover:-translate-y-1 transition-transform">
+                    <i class="ri-whatsapp-line text-2xl md:text-3xl"></i>
                 </div>
-                <span class="text-xs font-black text-gray-400 uppercase tracking-widest">WhatsApp</span>
+                <span class="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-widest">WhatsApp</span>
             </a>
-            <a href="mailto:?subject=Join me on Zaya Wellness&body={{ urlencode('Hey! I think you would love Zaya Wellness. You can book sessions with top practitioners. Join using my link: ' . route('register.form', ['type' => 'client', 'ref' => $user->referral_token])) }}" class="flex flex-col items-center gap-3 group">
-                <div class="w-14 h-14 bg-blue-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:-translate-y-1 transition-transform">
-                    <i class="ri-mail-send-line text-3xl"></i>
+            <a href="mailto:?subject=Join me on Zaya Wellness&body={{ urlencode('Hey! I think you would love Zaya Wellness. You can book sessions with top practitioners. Join using my link: ' . route('register.form', ['type' => 'client', 'ref' => $user->referral_token])) }}" class="flex flex-col items-center gap-2 md:gap-3 group">
+                <div class="w-12 h-12 md:w-14 md:h-14 bg-blue-500 text-white rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:-translate-y-1 transition-transform">
+                    <i class="ri-mail-send-line text-2xl md:text-3xl"></i>
                 </div>
-                <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Email</span>
+                <span class="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-widest">Email</span>
             </a>
         </div>
 
-        <div class="bg-[#F9FBF9] rounded-2xl p-5 border border-[#2E4B3D]/5">
+        <div class="bg-[#F9FBF9] rounded-2xl p-4 md:p-5 border border-[#2E4B3D]/5">
             <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Or copy your direct link</p>
-            <div class="flex items-center gap-4">
-                <input type="text" readonly value="{{ route('register.form', ['type' => 'client', 'ref' => $user->referral_token]) }}" class="bg-transparent border-none font-bold text-secondary text-sm flex-1 focus:ring-0">
-                <button onclick="copyToClipboard('{{ route('register.form', ['type' => 'client', 'ref' => $user->referral_token]) }}')" class="bg-secondary text-white px-5 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary transition-all">
-                    Copy
+            <div class="flex items-center gap-2 md:gap-4">
+                <input type="text" readonly value="{{ route('register.form', ['type' => 'client', 'ref' => $user->referral_token]) }}" class="bg-transparent border-none font-bold text-secondary text-sm flex-1 focus:ring-0 min-w-0">
+                <button onclick="copyToClipboard('{{ route('register.form', ['type' => 'client', 'ref' => $user->referral_token]) }}')" class="bg-secondary text-white w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl md:rounded-2xl shrink-0 hover:bg-primary transition-all shadow-md shadow-secondary/10 active:scale-95" title="Copy Link">
+                    <i class="ri-file-copy-line text-lg"></i>
                 </button>
             </div>
         </div>

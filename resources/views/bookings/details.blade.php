@@ -454,7 +454,7 @@
                     <p class="text-[11px] leading-relaxed text-blue-700 font-medium mb-4">
                         Manage how your health data is shared with the practitioner for this consultation.
                     </p>
-                    <a href="{{ route('health.journey') }}" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1">
+                    <a href="{{ route('health-journey.index') }}" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1">
                         Go to Privacy Dashboard <i class="ri-arrow-right-line"></i>
                     </a>
                 </div>
