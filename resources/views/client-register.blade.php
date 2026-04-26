@@ -869,6 +869,38 @@
         </div>
     </div>
 
+    <!-- Thank You Popup -->
+    <div id="thank-you-popup" class="fixed inset-0 bg-black/40 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
+        <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-[450px] p-10 text-center relative animate-[popIn_0.3s_ease-out_forwards]">
+            <!-- Checkmark Illustration -->
+            <div class="relative w-24 h-24 mx-auto mb-6">
+                <!-- Outer floating dots container -->
+                <div class="absolute inset-0 select-none pointer-events-none">
+                    <div class="absolute -top-1 right-2 w-4 h-4 rounded-full bg-[#60E48C]"></div>
+                    <div class="absolute top-8 -right-3 w-2 h-2 rounded-full bg-[#60E48C]"></div>
+                    <div class="absolute bottom-4 -right-1 w-1.5 h-1.5 rounded-full bg-[#60E48C]"></div>
+                    <div class="absolute top-2 -left-2 w-3 h-3 rounded-full bg-[#60E48C]"></div>
+                    <div class="absolute -top-3 left-6 w-1 h-1 rounded-full bg-[#60E48C]"></div>
+                </div>
+                <!-- Main Check Circle -->
+                <div class="w-full h-full bg-[#60E48C] rounded-full flex items-center justify-center relative z-10 shadow-lg shadow-[#60E48C]/30">
+                    <svg width="40" height="30" viewBox="0 0 40 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 15L15 26L36 4" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Text Content -->
+            <h3 class="text-[#209F59] text-[28px] font-medium mb-4">{{ __('Thank you!') }}</h3>
+            <h4 class="text-[#333333] text-[20px] font-semibold mb-3">{{ __('Registration Successful!') }}</h4>
+            <p class="text-[#737373] text-[15px] leading-relaxed mb-6 font-normal">{{ __('You have successfully registered.') }}<br>{{ __('You will be redirected shortly.') }}</p>
+
+            <button onclick="closeThankYouPopup()" class="w-full bg-[#FABC41] text-[#423131] py-3 rounded-full font-bold hover:bg-[#E8AA32] transition-colors">
+                {{ __('Close') }}
+            </button>
+        </div>
+    </div>
+
     <script>
         // Custom Select Logic (Generic)
         document.addEventListener('DOMContentLoaded', function () {
@@ -1295,32 +1327,38 @@
         }
 
         // Calculate Age from DOB
-        document.getElementById('dob-input').addEventListener('change', function () {
-            const dob = new Date(this.value);
-            const today = new Date();
-            let age = today.getFullYear() - dob.getFullYear();
-            const monthDiff = today.getMonth() - dob.getMonth();
+        const dobInputEl = document.getElementById('dob-input');
+        if (dobInputEl) {
+            dobInputEl.addEventListener('change', function () {
+                const dob = new Date(this.value);
+                const today = new Date();
+                let age = today.getFullYear() - dob.getFullYear();
+                const monthDiff = today.getMonth() - dob.getMonth();
 
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-                age--;
-            }
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                    age--;
+                }
 
-            document.getElementById('age-input').value = age > 0 ? age : '';
-        });
+                const ageInputEl = document.getElementById('age-input');
+                if (ageInputEl) ageInputEl.value = age > 0 ? age : '';
+            });
+        }
 
         // Toggle Password Visibility
         function togglePassword(fieldId) {
             const field = document.getElementById(fieldId);
             const icon = document.getElementById(fieldId + '-icon');
 
-            if (field.type === 'password') {
-                field.type = 'text';
-                icon.classList.remove('ri-eye-line');
-                icon.classList.add('ri-eye-off-line');
-            } else {
-                field.type = 'password';
-                icon.classList.remove('ri-eye-off-line');
-                icon.classList.add('ri-eye-line');
+            if (field && icon) {
+                if (field.type === 'password') {
+                    field.type = 'text';
+                    icon.classList.remove('ri-eye-line');
+                    icon.classList.add('ri-eye-off-line');
+                } else {
+                    field.type = 'password';
+                    icon.classList.remove('ri-eye-off-line');
+                    icon.classList.add('ri-eye-line');
+                }
             }
         }
 
@@ -1330,6 +1368,8 @@
         const matchError = document.getElementById('password-match-error');
 
         function checkPasswordMatch() {
+            if (!passwordInput || !confirmPasswordInput || !matchError) return;
+            
             if (confirmPasswordInput.value === '') {
                 matchError.textContent = '';
                 confirmPasswordInput.classList.remove('border-red-500!');
@@ -1345,8 +1385,8 @@
             }
         }
 
-        passwordInput.addEventListener('input', checkPasswordMatch);
-        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+        if (passwordInput) passwordInput.addEventListener('input', checkPasswordMatch);
+        if (confirmPasswordInput) confirmPasswordInput.addEventListener('input', checkPasswordMatch);
 
         // Form Submit Validation removed - logic consolidated into AJAX handler
         const registrationForm = document.getElementById('registration-form');
@@ -1373,11 +1413,14 @@
         }
 
         // Close on click outside
-        document.getElementById('thank-you-popup').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeThankYouPopup();
-            }
-        });
+        const thankYouPopupEl = document.getElementById('thank-you-popup');
+        if (thankYouPopupEl) {
+            thankYouPopupEl.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeThankYouPopup();
+                }
+            });
+        }
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
