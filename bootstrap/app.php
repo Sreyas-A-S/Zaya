@@ -39,5 +39,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn(Request $request) => $request->routeIs('admin.*') || $request->is('admin/*') || $request->is('admin') ? route('admin.login') : route('login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (Throwable $e, Request $request) {
+            if (!config('app.debug') && !$request->expectsJson()) {
+                return response()->view('errors.500', [], 500);
+            }
+        });
     })->create();

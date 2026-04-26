@@ -781,14 +781,19 @@ class WebController extends Controller
         }
 
         // Calculate real stats
-        $practitionerType = get_class($practitioner);
+        $morphClass = $practitioner->getMorphClass();
+        $fullClass = get_class($practitioner);
+        $fallbackClass = str_replace('\\', '', $fullClass); // e.g. AppModelsPractitioner
+        
+        $practitionerTypes = [$morphClass, $fullClass, $fallbackClass];
+
         $totalSessions = Booking::where('profile_id', $practitioner->id)
-            ->where('practitioner_type', $practitionerType)
+            ->whereIn('practitioner_type', $practitionerTypes)
             ->where('status', 'completed')
             ->count();
 
         $totalClients = Booking::where('profile_id', $practitioner->id)
-            ->where('practitioner_type', $practitionerType)
+            ->whereIn('practitioner_type', $practitionerTypes)
             ->where('status', 'completed')
             ->distinct('user_id')
             ->count('user_id');

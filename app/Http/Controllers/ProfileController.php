@@ -2064,7 +2064,7 @@ class ProfileController extends Controller
     public function storeReview(Request $request)
     {
         $request->validate([
-            'practitioner_id' => 'required|exists:practitioners,id',
+            'practitioner_id' => 'required|integer',
             'rating' => 'required|integer|min:1|max:5',
             'review' => 'required|string|max:1000',
         ]);
@@ -2073,7 +2073,7 @@ class ProfileController extends Controller
 
         // Optional: Check if they actually had a session
         $hadSession = Booking::where('user_id', $user->id)
-            ->where('practitioner_id', $request->practitioner_id)
+            ->where('profile_id', $request->practitioner_id)
             ->where('status', 'completed')
             ->exists();
 
@@ -2089,7 +2089,31 @@ class ProfileController extends Controller
             'status' => true, // Auto-approve for now or set to false for moderation
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Review submitted successfully!']);
+        }
+
         return back()->with('status', 'Review submitted successfully!');
+    }
+
+    public function storeZayaReview(Request $request)
+    {
+        $request->validate([
+            'message' => 'required|string|max:2000',
+        ]);
+
+        $user = Auth::user();
+
+        \App\Models\Testimonial::create([
+            'name' => $user->name,
+            'role' => str_replace('_', ' ', ucfirst($user->role)),
+            'message' => $request->message,
+            'rating' => 5,
+            'image' => $user->profile_pic,
+            'status' => 'pending' // Default to pending for moderation
+        ]);
+
+        return back()->with('status', 'Thank you for your feedback! Your story has been submitted for review.');
     }
 
     public function checkEmail(Request $request)

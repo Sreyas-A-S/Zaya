@@ -219,29 +219,51 @@
                             </p>
 
                             <div class="grid grid-cols-2 gap-3 mb-6 md:mb-8">
-                                <a href="{{ route('conferences.index') }}"
-                                    class="flex flex-col items-center gap-2 p-3 md:p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
-                                    <i
-                                        class="ri-history-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
-                                    <span
-                                        class="text-[10px] font-black uppercase tracking-widest text-gray-600">History</span>
-                                </a>
-                                <a href="{{ route('book-session') }}"
-                                    class="flex flex-col items-center gap-2 p-3 md:p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
-                                    <i
-                                        class="ri-calendar-check-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
-                                    <span
-                                        class="text-[10px] font-black uppercase tracking-widest text-gray-600">Follow-up</span>
-                                </a>
+                               <a href="{{ route('conferences.index') }}"
+                                   class="flex flex-col items-center gap-2 p-3 md:p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
+                                   <i
+                                       class="ri-history-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
+                                   <span
+                                       class="text-[10px] font-black uppercase tracking-widest text-gray-600">History</span>
+                               </a>
+                               <a href="{{ route('book-session') }}"
+                                   class="flex flex-col items-center gap-2 p-3 md:p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
+                                   <i
+                                       class="ri-calendar-check-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
+                                   <span
+                                       class="text-[10px] font-black uppercase tracking-widest text-gray-600">Follow-up</span>
+                               </a>
                             </div>
 
+                            @if($booking && $user->id === $booking->user_id)
+                            <div id="feedback-section" class="mb-8 border-t border-gray-50 pt-8">
+                               <h3 class="text-sm font-black text-secondary uppercase tracking-widest mb-4">Share your Experience</h3>
+                               <p class="text-xs text-gray-400 mb-6">How was your session with {{ $booking->practitioner->user->name ?? 'our professional' }}?</p>
+
+                               <div class="star-rating flex items-center justify-center gap-2 mb-6">
+                                   @for($i = 1; $i <= 5; $i++)
+                                       <i class="ri-star-line text-2xl text-gray-300 cursor-pointer hover:text-[#FFD166] transition-colors" onclick="setRating({{ $i }})"></i>
+                                   @endfor
+                                   <input type="hidden" id="rating-input" value="0">
+                               </div>
+
+                               <textarea id="review-text" placeholder="Share your story of transformation..." 
+                                   class="w-full bg-[#F9FBF9] border border-[#2E4B3D]/10 rounded-2xl p-4 text-sm font-medium focus:ring-1 focus:ring-secondary outline-none transition-all mb-4 scrollbar-hide"
+                                   rows="3"></textarea>
+
+                               <button type="button" onclick="submitReview()" id="submit-review-btn"
+                                   class="w-full py-3 md:py-4 bg-secondary text-white rounded-2xl font-black text-xs hover:bg-primary transition-all shadow-lg shadow-secondary/20 uppercase tracking-[0.2em]">
+                                   Submit Review
+                               </button>
+                            </div>
+                            @endif
+
                             <div class="flex flex-col gap-3">
-                                <a href="{{ route('dashboard') }}"
-                                    class="w-full py-3 md:py-4 bg-secondary text-white rounded-2xl font-black text-xs hover:bg-primary transition-all shadow-lg shadow-secondary/20 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
-                                    Back to Dashboard
-                                    <i class="ri-arrow-right-line"></i>
-                                </a>
-                                <button
+                               <a href="{{ route('dashboard') }}"
+                                   class="w-full py-3 md:py-4 {{ ($booking && $user->id === $booking->user_id) ? 'bg-gray-50 text-secondary border border-[#2E4B3D]/5' : 'bg-secondary text-white shadow-lg shadow-secondary/20' }} rounded-2xl font-black text-xs hover:opacity-90 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+                                   Back to Dashboard
+                                   <i class="ri-arrow-right-line"></i>
+                               </a>                                <button
                                     onclick="window.location.href='mailto:support@zayawellness.com?subject=Session Feedback #{{ $booking?->invoice_no ?? $channel }}'"
                                     class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] hover:text-secondary transition-colors py-2 block w-full text-center">
                                     Need help? Report an issue
@@ -889,5 +911,73 @@
                 try { await fetch(uploadRecordingUrl, { method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken }, body: formData }); } catch (error) { console.error('Recording upload failed:', error); } finally { recordingState.chunks = []; }
             }
         });
+    <script>
+        let currentRating = 0;
+        function setRating(rating) {
+            currentRating = rating;
+            const stars = document.querySelectorAll('.star-rating i');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.replace('ri-star-line', 'ri-star-fill');
+                    star.classList.add('text-[#FFD166]');
+                } else {
+                    star.classList.replace('ri-star-fill', 'ri-star-line');
+                    star.classList.remove('text-[#FFD166]');
+                }
+            });
+            document.getElementById('rating-input').value = rating;
+        }
+
+        async function submitReview() {
+            const btn = document.getElementById('submit-review-btn');
+            const review = document.getElementById('review-text').value;
+            const practitionerId = "{{ $booking->profile_id ?? '' }}";
+            const csrfToken = "{{ csrf_token() }}";
+
+            if (!currentRating) { showZayaToast('Please provide a star rating.', 'warning', 'Review'); return; }
+            if (!review.trim()) { showZayaToast('Please share a few words about your experience.', 'warning', 'Review'); return; }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Submitting...';
+
+            try {
+                const response = await fetch("{{ route('reviews.store') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        practitioner_id: practitionerId,
+                        rating: currentRating,
+                        review: review
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('feedback-section').innerHTML = `
+                        <div class="py-10 text-center animate-fade-in">
+                            <div class="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="ri-checkbox-circle-fill text-3xl"></i>
+                            </div>
+                            <h4 class="font-black text-secondary uppercase tracking-widest text-xs">Review Submitted</h4>
+                            <p class="text-sm text-gray-500 mt-2">Thank you for sharing your story of transformation!</p>
+                        </div>
+                    `;
+                } else {
+                    showZayaToast(data.message || 'Failed to submit review.', 'error', 'Error');
+                    btn.disabled = false;
+                    btn.innerText = 'Submit Review';
+                }
+            } catch (error) {
+                console.error('Review submission error:', error);
+                showZayaToast('A connection error occurred.', 'error', 'Error');
+                btn.disabled = false;
+                btn.innerText = 'Submit Review';
+            }
+        }
     </script>
 @endsection

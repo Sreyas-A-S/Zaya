@@ -121,10 +121,31 @@
                             <!-- Avatars -->
                             <div class="flex items-center gap-3">
                                 <div class="flex -space-x-4">
-                                    <img src="https://ui-avatars.com/api/?name=User+1&background=random" class="w-10 h-10 rounded-full border-1 border-black object-cover">
-                                    <img src="https://ui-avatars.com/api/?name=User+2&background=random" class="w-10 h-10 rounded-full border-1 border-black object-cover">
-                                    <img src="https://ui-avatars.com/api/?name=User+3&background=random" class="w-10 h-10 rounded-full border-1 border-black object-cover">
-                                    <div class="w-10 h-10 rounded-full border-1 border-black bg-[#4DD385] text-black text-[10px] flex items-center justify-center font-bold z-10">+{{ $reviewCount }}</div>
+                                    @php
+                                        $latestReviews = $practitioner->reviews ? $practitioner->reviews->where('status', true)->sortByDesc('created_at')->take(3) : collect();
+                                        $displayCount = 0;
+                                    @endphp
+                                    @foreach($latestReviews as $lr)
+                                        <img src="{{ $lr->user->profile_pic_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($lr->user->name ?? 'User') . '&background=random' }}" 
+                                             class="w-10 h-10 rounded-full border-1 border-black object-cover"
+                                             title="{{ $lr->user->name ?? 'Anonymous' }}">
+                                        @php $displayCount++; @endphp
+                                    @endforeach
+                                    
+                                    {{-- Fill placeholders if less than 3 reviews and total reviews > 0 --}}
+                                    @if($reviewCount > 0)
+                                        @for($i = $displayCount; $i < min($reviewCount, 3); $i++)
+                                            <img src="https://ui-avatars.com/api/?name=User+{{ $i+1 }}&background=random" class="w-10 h-10 rounded-full border-1 border-black object-cover">
+                                        @endfor
+                                        
+                                        @if($reviewCount > 3)
+                                            <div class="w-10 h-10 rounded-full border-1 border-black bg-[#4DD385] text-black text-[10px] flex items-center justify-center font-bold z-10">+{{ $reviewCount - 3 }}</div>
+                                        @elseif($reviewCount > 0 && $displayCount < $reviewCount)
+                                             {{-- Fallback --}}
+                                        @endif
+                                    @else
+                                        <img src="https://ui-avatars.com/api/?name=Zaya+User&background=random" class="w-10 h-10 rounded-full border-1 border-black object-cover">
+                                    @endif
                                 </div>
                                 <span class="text-sm font-medium text-gray-600 block leading-tight">{{ $site_settings['practitioner_reviews_label'] ?? "Client's Reviews" }}</span>
                             </div>
@@ -140,11 +161,11 @@
         <div class="container mx-auto text-center">
             <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <div class="bg-white rounded-2xl shadow-[0_0px_72px_rgba(186,186,186,0.45)] border border-gray-100 px-16 py-10 text-center w-full xl:w-auto xl:min-w-[500px]">
-                    <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">{{ $totalSessions }}+</h3>
+                    <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">{{ $totalSessions }}</h3>
                     <p class="text-gray-500 text-xl">{{ $site_settings['practitioner_total_sessions'] ?? 'Total No.of Sessions' }}</p>
                 </div>
                 <div class="bg-white rounded-2xl shadow-[0_0px_72px_rgba(186,186,186,0.45)] border border-gray-100 px-16 py-10 text-center w-full xl:w-auto xl:min-w-[500px]">
-                    <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">{{ $totalClients }}+</h3>
+                    <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">{{ $totalClients }}</h3>
                     <p class="text-gray-500 text-xl">{{ $site_settings['practitioner_total_clients'] ?? 'Total No.of Clients' }}</p>
                 </div>
             </div>
@@ -258,7 +279,7 @@
                                     <p class="text-gray-400 text-xs uppercase tracking-wider">{{ $review->created_at->format('M d, Y') }}</p>
                                 </div>
                             </div>
-                            <p class="text-gray-600 text-sm leading-relaxed mb-6 italic">"{{ $review->comment }}"</p>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-6 italic">"{{ $review->review }}"</p>
                             <div class="flex text-[#DEDD66] gap-1 text-lg">
                                 @for($i = 1; $i <= 5; $i++) @if($i <= $review->rating) <i class="ri-star-fill"></i> @else <i class="ri-star-line"></i> @endif @endfor
                             </div>
