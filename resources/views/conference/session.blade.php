@@ -771,125 +771,123 @@
                 if (!container && window.documentPictureInPicture?.window) container = window.documentPictureInPicture.window.document.getElementById('jitsi-meet-container');
                 if (!container) return;
 
-                const videoContainer = document.getElementById('video-container');
-                        const isInPip = !!(window.documentPictureInPicture && window.documentPictureInPicture.window) || 
-                                        (videoContainer && videoContainer.classList.contains('in-popout')) || 
-                                        {{ $isMeetingPopout ? 'true' : 'false' }};
+                let vCont = document.getElementById('video-container');
+                if (!vCont && window.documentPictureInPicture?.window) vCont = window.documentPictureInPicture.window.document.getElementById('video-container');
+                const isInPip = (vCont && vCont.classList.contains('in-popout')) || {{ $isMeetingPopout ? 'true' : 'false' }};
 
-                        let toolbarButtons = [
-                            'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
-                            'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
-                            'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
-                            'videoquality', 'filmstrip', 'feedback', 'stats', 'shortcuts',
-                            'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security',
-                            'whiteboard'
-                        ];
+                let toolbarButtons = [
+                    'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+                    'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+                    'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                    'videoquality', 'filmstrip', 'feedback', 'stats', 'shortcuts',
+                    'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security',
+                    'whiteboard'
+                ];
 
-                        if (isInPip) {
-                            toolbarButtons = toolbarButtons.filter(btn => btn !== 'hangup');
-                        }
+                if (isInPip) {
+                    toolbarButtons = toolbarButtons.filter(btn => btn !== 'hangup');
+                }
 
-                        jitsiApi = new JitsiMeetExternalAPI(jitsiDomain, {
-                            roomName: jitsiRoom, parentNode: container, jwt: jitsiJwt,
-                            configOverwrite: { 
-                                prejoinPageEnabled: !isResume, prejoinConfig: { enabled: !isResume, hideDisplayName: true },
-                                readOnlyName: true, disableProfile: true, disableReactions: true,
-                                toolbarButtons: toolbarButtons,
-                                disabledNotifications: ['moderator', 'notify.moderator', 'notify.connected-as-moderator', 'connection.connected-as-moderator'],
-                                disableModeratorIndicator: true
-                            },
-                            interfaceConfigOverwrite: { SHOW_JITSI_WATERMARK: false, DISABLE_PROFILE: true, TOOLBAR_ALWAYS_VISIBLE: true },
-                            userInfo: { displayName: "{{ addslashes($user->name ?? 'Guest') }}" }
-                        });
-                        jitsiApi.addEventListeners({ audioMuteStatusChanged: (e) => { meetingState.audioMuted = e.muted; updateIcons(); }, videoMuteStatusChanged: (e) => { meetingState.videoMuted = e.muted; updateIcons(); }, readyToClose: () => { window.leave(); } });
-                        hideOverlay();
-                    }
-
-                    async function initDaily(isResume = false) {
-                        let container = document.getElementById('daily-meet-container');
-                        if (!container && window.documentPictureInPicture?.window) container = window.documentPictureInPicture.window.document.getElementById('daily-meet-container');
-                        if (!container) return;
-
-                        const videoContainer = document.getElementById('video-container'); // Might be null if in PiP, but we check presence of PiP window anyway
-                        const isInPip = !!(window.documentPictureInPicture && window.documentPictureInPicture.window) || 
-                                        (videoContainer && videoContainer.classList.contains('in-popout')) || 
-                                        {{ $isMeetingPopout ? 'true' : 'false' }};
-
-                        dailyCall = DailyIframe.createFrame(container, { 
-                            showLeaveButton: !isInPip, 
-                            iframeStyle: { width: '100%', height: '100%', border: '0' } 
-                        });
-                        dailyCall.on('joined-meeting', () => { hideOverlay(); });
-                        dailyCall.on('left-meeting', () => { if (typeof allowExit !== 'undefined' && !allowExit) window.leave(); else window.showSummary(); });
-                        const joinOptions = { url: dailyUrl }; if (dailyToken) joinOptions.token = dailyToken; await dailyCall.join(joinOptions);
-                        dailyCall.on('participant-updated', (e) => { if (e.participant.local) { meetingState.audioMuted = !e.participant.audio; meetingState.videoMuted = !e.participant.video; updateIcons(); } });
-                    }
-
-                    function updateIcons() {
-                        const micIcon = meetingState.audioMuted ? 'ri-mic-off-fill text-red-500' : 'ri-mic-fill', vidIcon = meetingState.videoMuted ? 'ri-video-off-fill text-red-500' : 'ri-video-on-fill';
-                        if (document.getElementById('mic-icon')) document.getElementById('mic-icon').className = micIcon;
-                        if (document.getElementById('mic-icon-mobile')) document.getElementById('mic-icon-mobile').className = micIcon;
-                        if (document.getElementById('vid-icon')) document.getElementById('vid-icon').className = vidIcon;
-                        if (document.getElementById('vid-icon-mobile')) document.getElementById('vid-icon-mobile').className = vidIcon;
-                    }
-
-                    function hideOverlay(immediate = false) {
-                        const overlay = document.getElementById('join-overlay');
-                        if (overlay) { if (immediate) { overlay.remove(); return; } overlay.style.opacity = '0'; overlay.style.pointerEvents = 'none'; setTimeout(() => overlay.remove(), 500); }
-                    }
-
-                    const audioBtn = document.getElementById('audio-toggle'), videoBtn = document.getElementById('video-toggle'), screenBtn = document.getElementById('screen-share-btn'), recordBtn = document.getElementById('record-toggle'), recordMobileBtn = document.getElementById('record-toggle-mobile');
-                    if (audioBtn) audioBtn.onclick = () => { if (provider === 'jaas') jitsiApi.executeCommand('toggleAudio'); if (provider === 'daily') dailyCall.setLocalAudio(meetingState.audioMuted); };
-                    if (videoBtn) videoBtn.onclick = () => { if (provider === 'jaas') jitsiApi.executeCommand('toggleVideo'); if (provider === 'daily') dailyCall.setLocalVideo(meetingState.videoMuted); };
-                    if (screenBtn) screenBtn.onclick = () => { if (provider === 'jaas') jitsiApi.executeCommand('toggleShareScreen'); if (provider === 'daily') { if (meetingState.screenSharing) dailyCall.stopScreenShare(); else dailyCall.startScreenShare(); meetingState.screenSharing = !meetingState.screenSharing; } };
-                    if (recordBtn) recordBtn.onclick = () => toggleRecording();
-                    if (recordMobileBtn) recordMobileBtn.onclick = () => toggleRecording();
-
-                    function updateRecordingUi(isRecording) {
-                        const indicator = document.getElementById('recording-indicator'), iconClass = isRecording ? 'ri-stop-circle-line text-red-500' : 'ri-record-circle-line';
-                        if (indicator) indicator.classList.toggle('hidden', !isRecording);
-                        if (indicator) indicator.classList.toggle('flex', isRecording);
-                        if (document.getElementById('record-icon')) document.getElementById('record-icon').className = `text-xl ${iconClass}`;
-                        if (document.getElementById('record-icon-mobile')) document.getElementById('record-icon-mobile').className = `text-2xl ${iconClass}`;
-                    }
-
-                    async function toggleRecording() { if (recordingState.mediaRecorder && recordingState.mediaRecorder.state === 'recording') { await stopRecordingAndUpload(); return; } await beginRecording(false); }
-
-                    async function beginRecording(isAutoStart) {
-                        if (!bookingId || recordingState.mediaRecorder) return;
-                        try {
-                            const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-                            const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus' : 'video/webm';
-                            recordingState.stream = stream; recordingState.chunks = []; recordingState.startedAt = new Date().toISOString();
-                            recordingState.mediaRecorder = new MediaRecorder(stream, { mimeType });
-                            recordingState.mediaRecorder.ondataavailable = (event) => { if (event.data && event.data.size > 0) recordingState.chunks.push(event.data); };
-                            recordingState.mediaRecorder.onstop = () => { recordingState.uploadPromise = uploadRecording(); };
-                            stream.getVideoTracks().forEach((track) => { track.addEventListener('ended', () => { if (recordingState.mediaRecorder && recordingState.mediaRecorder.state === 'recording') recordingState.mediaRecorder.stop(); }); });
-                            recordingState.mediaRecorder.start(1000); updateRecordingUi(true);
-                        } catch (error) { if (!isAutoStart) alert('Recording could not start.'); console.warn('Recording start skipped:', error); }
-                    }
-
-                    async function stopRecordingAndUpload() {
-                        if (!recordingState.mediaRecorder) return;
-                        const recorder = recordingState.mediaRecorder; if (recorder.state !== 'inactive') recorder.stop();
-                        if (recordingState.stream) recordingState.stream.getTracks().forEach((track) => track.stop());
-                        updateRecordingUi(false);
-                        const pendingUpload = recordingState.uploadPromise || new Promise((resolve) => {
-                            const check = setInterval(() => { if (recordingState.uploadPromise) { clearInterval(check); resolve(recordingState.uploadPromise); } }, 150);
-                            setTimeout(() => { clearInterval(check); resolve(null); }, 4000);
-                        });
-                        await pendingUpload; recordingState.mediaRecorder = null; recordingState.stream = null; recordingState.uploadPromise = null;
-                    }
-
-                    async function uploadRecording() {
-                        if (!recordingState.chunks.length || !bookingId) return;
-                        const blob = new Blob(recordingState.chunks, { type: recordingState.chunks[0].type || 'video/webm' }), extension = blob.type.includes('mp4') ? 'mp4' : 'webm';
-                        const formData = new FormData();
-                        formData.append('booking_id', String(bookingId)); formData.append('provider', provider);
-                        formData.append('room_name', channel); formData.append('start_time', meetingStartedAt || recordingState.startedAt || new Date().toISOString());
-                        formData.append('end_time', new Date().toISOString()); formData.append('recording', blob, `session-recording-${bookingId}.${extension}`);
-                        try { await fetch(uploadRecordingUrl, { method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken }, body: formData }); } catch (error) { console.error('Recording upload failed:', error); } finally { recordingState.chunks = []; }
-                    }
+                jitsiApi = new JitsiMeetExternalAPI(jitsiDomain, {
+                    roomName: jitsiRoom, parentNode: container, jwt: jitsiJwt,
+                    configOverwrite: {
+                        prejoinPageEnabled: !isResume, prejoinConfig: { enabled: !isResume, hideDisplayName: true },
+                        readOnlyName: true, disableProfile: true, disableReactions: true,
+                        toolbarButtons: toolbarButtons,
+                        disabledNotifications: ['moderator', 'notify.moderator', 'notify.connected-as-moderator', 'connection.connected-as-moderator'],
+                        disableModeratorIndicator: true
+                    },
+                    interfaceConfigOverwrite: { SHOW_JITSI_WATERMARK: false, DISABLE_PROFILE: true, TOOLBAR_ALWAYS_VISIBLE: true },
+                    userInfo: { displayName: "{{ addslashes($user->name ?? 'Guest') }}" }
                 });
-            </script>
+                jitsiApi.addEventListeners({ audioMuteStatusChanged: (e) => { meetingState.audioMuted = e.muted; updateIcons(); }, videoMuteStatusChanged: (e) => { meetingState.videoMuted = e.muted; updateIcons(); }, readyToClose: () => { window.leave(); } });
+                hideOverlay();
+            }
+
+            async function initDaily(isResume = false) {
+                let container = document.getElementById('daily-meet-container');
+                if (!container && window.documentPictureInPicture?.window) container = window.documentPictureInPicture.window.document.getElementById('daily-meet-container');
+                if (!container) return;
+
+                let vCont = document.getElementById('video-container');
+                if (!vCont && window.documentPictureInPicture?.window) vCont = window.documentPictureInPicture.window.document.getElementById('video-container');
+                const isInPip = (vCont && vCont.classList.contains('in-popout')) || {{ $isMeetingPopout ? 'true' : 'false' }};
+
+                dailyCall = DailyIframe.createFrame(container, {
+                    showLeaveButton: !isInPip,
+                    iframeStyle: { width: '100%', height: '100%', border: '0' }
+                });
+                dailyCall.on('joined-meeting', () => { hideOverlay(); });
+                dailyCall.on('left-meeting', () => { if (typeof allowExit !== 'undefined' && !allowExit) window.leave(); else window.showSummary(); });
+                const joinOptions = { url: dailyUrl }; if (dailyToken) joinOptions.token = dailyToken; await dailyCall.join(joinOptions);
+                dailyCall.on('participant-updated', (e) => { if (e.participant.local) { meetingState.audioMuted = !e.participant.audio; meetingState.videoMuted = !e.participant.video; updateIcons(); } });
+            }
+
+            function updateIcons() {
+                const micIcon = meetingState.audioMuted ? 'ri-mic-off-fill text-red-500' : 'ri-mic-fill', vidIcon = meetingState.videoMuted ? 'ri-video-off-fill text-red-500' : 'ri-video-on-fill';
+                if (document.getElementById('mic-icon')) document.getElementById('mic-icon').className = micIcon;
+                if (document.getElementById('mic-icon-mobile')) document.getElementById('mic-icon-mobile').className = micIcon;
+                if (document.getElementById('vid-icon')) document.getElementById('vid-icon').className = vidIcon;
+                if (document.getElementById('vid-icon-mobile')) document.getElementById('vid-icon-mobile').className = vidIcon;
+            }
+
+            function hideOverlay(immediate = false) {
+                const overlay = document.getElementById('join-overlay');
+                if (overlay) { if (immediate) { overlay.remove(); return; } overlay.style.opacity = '0'; overlay.style.pointerEvents = 'none'; setTimeout(() => overlay.remove(), 500); }
+            }
+
+            const audioBtn = document.getElementById('audio-toggle'), videoBtn = document.getElementById('video-toggle'), screenBtn = document.getElementById('screen-share-btn'), recordBtn = document.getElementById('record-toggle'), recordMobileBtn = document.getElementById('record-toggle-mobile');
+            if (audioBtn) audioBtn.onclick = () => { if (provider === 'jaas') jitsiApi.executeCommand('toggleAudio'); if (provider === 'daily') dailyCall.setLocalAudio(meetingState.audioMuted); };
+            if (videoBtn) videoBtn.onclick = () => { if (provider === 'jaas') jitsiApi.executeCommand('toggleVideo'); if (provider === 'daily') dailyCall.setLocalVideo(meetingState.videoMuted); };
+            if (screenBtn) screenBtn.onclick = () => { if (provider === 'jaas') jitsiApi.executeCommand('toggleShareScreen'); if (provider === 'daily') { if (meetingState.screenSharing) dailyCall.stopScreenShare(); else dailyCall.startScreenShare(); meetingState.screenSharing = !meetingState.screenSharing; } };
+            if (recordBtn) recordBtn.onclick = () => toggleRecording();
+            if (recordMobileBtn) recordMobileBtn.onclick = () => toggleRecording();
+
+            function updateRecordingUi(isRecording) {
+                const indicator = document.getElementById('recording-indicator'), iconClass = isRecording ? 'ri-stop-circle-line text-red-500' : 'ri-record-circle-line';
+                if (indicator) indicator.classList.toggle('hidden', !isRecording);
+                if (indicator) indicator.classList.toggle('flex', isRecording);
+                if (document.getElementById('record-icon')) document.getElementById('record-icon').className = `text-xl ${iconClass}`;
+                if (document.getElementById('record-icon-mobile')) document.getElementById('record-icon-mobile').className = `text-2xl ${iconClass}`;
+            }
+
+            async function toggleRecording() { if (recordingState.mediaRecorder && recordingState.mediaRecorder.state === 'recording') { await stopRecordingAndUpload(); return; } await beginRecording(false); }
+
+            async function beginRecording(isAutoStart) {
+                if (!bookingId || recordingState.mediaRecorder) return;
+                try {
+                    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+                    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus' : 'video/webm';
+                    recordingState.stream = stream; recordingState.chunks = []; recordingState.startedAt = new Date().toISOString();
+                    recordingState.mediaRecorder = new MediaRecorder(stream, { mimeType });
+                    recordingState.mediaRecorder.ondataavailable = (event) => { if (event.data && event.data.size > 0) recordingState.chunks.push(event.data); };
+                    recordingState.mediaRecorder.onstop = () => { recordingState.uploadPromise = uploadRecording(); };
+                    stream.getVideoTracks().forEach((track) => { track.addEventListener('ended', () => { if (recordingState.mediaRecorder && recordingState.mediaRecorder.state === 'recording') recordingState.mediaRecorder.stop(); }); });
+                    recordingState.mediaRecorder.start(1000); updateRecordingUi(true);
+                } catch (error) { if (!isAutoStart) alert('Recording could not start.'); console.warn('Recording start skipped:', error); }
+            }
+
+            async function stopRecordingAndUpload() {
+                if (!recordingState.mediaRecorder) return;
+                const recorder = recordingState.mediaRecorder; if (recorder.state !== 'inactive') recorder.stop();
+                if (recordingState.stream) recordingState.stream.getTracks().forEach((track) => track.stop());
+                updateRecordingUi(false);
+                const pendingUpload = recordingState.uploadPromise || new Promise((resolve) => {
+                    const check = setInterval(() => { if (recordingState.uploadPromise) { clearInterval(check); resolve(recordingState.uploadPromise); } }, 150);
+                    setTimeout(() => { clearInterval(check); resolve(null); }, 4000);
+                });
+                await pendingUpload; recordingState.mediaRecorder = null; recordingState.stream = null; recordingState.uploadPromise = null;
+            }
+
+            async function uploadRecording() {
+                if (!recordingState.chunks.length || !bookingId) return;
+                const blob = new Blob(recordingState.chunks, { type: recordingState.chunks[0].type || 'video/webm' }), extension = blob.type.includes('mp4') ? 'mp4' : 'webm';
+                const formData = new FormData();
+                formData.append('booking_id', String(bookingId)); formData.append('provider', provider);
+                formData.append('room_name', channel); formData.append('start_time', meetingStartedAt || recordingState.startedAt || new Date().toISOString());
+                formData.append('end_time', new Date().toISOString()); formData.append('recording', blob, `session-recording-${bookingId}.${extension}`);
+                try { await fetch(uploadRecordingUrl, { method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken }, body: formData }); } catch (error) { console.error('Recording upload failed:', error); } finally { recordingState.chunks = []; }
+            }
+        });
+    </script>
 @endsection
