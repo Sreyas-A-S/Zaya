@@ -742,15 +742,22 @@ class ProfileController extends Controller
             ->get();
 
         // Get consultation forms for this client
-        $consultationForms = \App\Models\ConsultationForm::where('user_id', $client->id)
-            ->with(['booking'])
-            ->latest()
-            ->get();
+        $consultationForms = \App\Models\ConsultationForm::whereHas('booking', function($query) use ($client) {
+            $query->where('user_id', $client->id);
+        })->with(['booking'])->latest()->get();
 
-        // Get client concerns
-        $concerns = \App\Models\ClientConcern::where('user_id', $client->id)
+        // Get client concerns (from their bookings)
+        $concerns = Booking::where('user_id', $client->id)
+            ->whereNotNull('conditions')
             ->latest()
-            ->get();
+            ->get()
+            ->map(function($b) {
+                return (object)[
+                    'category' => 'Session Concern',
+                    'concern' => is_array($b->conditions) ? implode(', ', $b->conditions) : $b->conditions,
+                    'created_at' => $b->created_at
+                ];
+            });
         
         // Get all recordings for this client
         $recordings = Booking::where('user_id', $client->id)
