@@ -308,8 +308,7 @@ class RegisterController extends Controller
             }
 
             if ($paymentLink) {
-                // Prefer directing the user to pay immediately if possible
-                $this->guard()->login($user);
+                // Do not auto-login here to match practitioner behavior and ensure invoice download flow
                 return redirect()->away($paymentLink['payment_url']);
             }
 
