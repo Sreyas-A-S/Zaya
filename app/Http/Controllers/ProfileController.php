@@ -1171,15 +1171,18 @@ class ProfileController extends Controller
 
         // Stats
         $bookingQuery = $this->getBookingQuery($user);
-        $totalSessions = (clone $bookingQuery)->where('status', 'completed')->count();
-        $totalClients = (clone $bookingQuery)->distinct('user_id')->count();
+        $totalSessions = (clone $bookingQuery)->where('status', '!=', 'cancelled')->count();
+        $totalClients = (clone $bookingQuery)->where('status', '!=', 'cancelled')->distinct('user_id')->count();
         $todaySessions = (clone $bookingQuery)->where('booking_date', now()->toDateString())->count();
         $upcomingSessions = (clone $bookingQuery)->where('booking_date', '>', now()->toDateString())->count();
 
         // History
         $servicesHistory = (clone $bookingQuery)
             ->with('user')
-            ->where('status', 'completed')
+            ->where(function($q) {
+                $q->where('status', 'completed')
+                  ->orWhere('booking_date', '<', now()->toDateString());
+            })
             ->latest('booking_date')
             ->take(5)
             ->get();

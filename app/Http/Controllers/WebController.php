@@ -789,12 +789,12 @@ class WebController extends Controller
 
         $totalSessions = Booking::where('profile_id', $practitioner->id)
             ->whereIn('practitioner_type', $practitionerTypes)
-            ->where('status', 'completed')
+            ->where('status', '!=', 'cancelled')
             ->count();
 
         $totalClients = Booking::where('profile_id', $practitioner->id)
             ->whereIn('practitioner_type', $practitionerTypes)
-            ->where('status', 'completed')
+            ->where('status', '!=', 'cancelled')
             ->distinct('user_id')
             ->count('user_id');
 
