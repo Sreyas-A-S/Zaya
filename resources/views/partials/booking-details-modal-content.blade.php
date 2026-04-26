@@ -68,13 +68,20 @@
                         $displayTime = $sessionInfo['time'];
                     }
                 }
+
+                $isAssignedToMe = !empty($referredServiceIds) && in_array($service->id, $referredServiceIds);
             @endphp
-            <div class="bg-white border border-gray-100 p-3 rounded-lg">
+            <div class="{{ $isAssignedToMe ? 'bg-primary/5 border-primary/30' : 'bg-white border-gray-100' }} border p-3 rounded-lg transition-all">
                 <div class="flex justify-between items-center mb-1">
-                    <span class="text-sm font-bold text-gray-700">{{ $service->title }}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold {{ $isAssignedToMe ? 'text-primary' : 'text-gray-700' }}">{{ $service->title }}</span>
+                        @if($isAssignedToMe)
+                            <span class="text-[8px] font-black uppercase tracking-widest bg-primary text-white px-1.5 py-0.5 rounded">Assigned</span>
+                        @endif
+                    </div>
                     <span class="text-[10px] text-gray-400 uppercase font-black tracking-widest">{{ $booking->mode }}</span>
                 </div>
-                <div class="flex items-center gap-2 text-xs text-secondary font-medium">
+                <div class="flex items-center gap-2 text-xs {{ $isAssignedToMe ? 'text-primary/70' : 'text-secondary' }} font-medium">
                     <i class="ri-calendar-line opacity-50"></i>
                     <span>{{ $displayDate }}</span>
                     <span class="opacity-20">|</span>

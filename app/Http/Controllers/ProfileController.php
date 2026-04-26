@@ -623,13 +623,25 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $booking = $this->getBookingQuery($user)
-            ->with(['language', 'translator.user'])
+            ->with(['language', 'translator.user', 'practitioner.user'])
             ->findOrFail($id);
 
         $serviceIds = is_array($booking->service_ids) ? $booking->service_ids : [];
         $services = Service::whereIn('id', $serviceIds)->get();
 
-        return view('partials.booking-details-modal-content', compact('user', 'booking', 'services'))->render();
+        // Services specifically referred to this practitioner (if any)
+        $referredServiceIds = [];
+        if ($user->id !== ($booking->practitioner->user_id ?? null)) {
+            $incomingReferral = \App\Models\Referral::where('booking_id', $booking->id)
+                ->where('referred_to_id', $user->id)
+                ->first();
+            
+            if ($incomingReferral && is_array($incomingReferral->service_ids)) {
+                $referredServiceIds = $incomingReferral->service_ids;
+            }
+        }
+
+        return view('partials.booking-details-modal-content', compact('user', 'booking', 'services', 'referredServiceIds'))->render();
     }
 
     public function showDetailsView($id)
@@ -715,7 +727,20 @@ class ProfileController extends Controller
             }
         }
 
-        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount'));
+        // Services specifically referred to this practitioner/doctor (if any)
+        $referredServiceIds = [];
+        if ($user->id !== ($booking->practitioner->user_id ?? null)) {
+            // Check if user is a referred expert for this booking
+            $incomingReferral = \App\Models\Referral::where('booking_id', $booking->id)
+                ->where('referred_to_id', $user->id)
+                ->first();
+            
+            if ($incomingReferral && is_array($incomingReferral->service_ids)) {
+                $referredServiceIds = $incomingReferral->service_ids;
+            }
+        }
+
+        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount', 'referredServiceIds'));
     }
 
     public function viewClientProfile($id)

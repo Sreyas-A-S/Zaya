@@ -67,10 +67,16 @@
                         <h4 class="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-4">Selected Services</h4>
                         <div class="space-y-3">
                             @forelse($services as $service)
-                            <div class="flex items-center justify-between p-4 bg-[#F9FBF9] border border-[#2E4B3D]/12 rounded-2xl hover:border-secondary/20 transition-all">
+                            @php
+                                $isAssignedToMe = !empty($referredServiceIds) && in_array($service->id, $referredServiceIds);
+                            @endphp
+                            <div class="flex items-center justify-between p-4 {{ $isAssignedToMe ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/10' : 'bg-[#F9FBF9] border-[#2E4B3D]/12' }} border rounded-2xl hover:border-secondary/20 transition-all group">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-2 h-2 rounded-full bg-secondary"></div>
-                                    <span class="text-sm font-bold text-secondary">{{ $service->title }}</span>
+                                    <div class="w-2 h-2 rounded-full {{ $isAssignedToMe ? 'bg-primary animate-pulse' : 'bg-secondary' }}"></div>
+                                    <span class="text-sm font-bold {{ $isAssignedToMe ? 'text-primary' : 'text-secondary' }}">{{ $service->title }}</span>
+                                    @if($isAssignedToMe)
+                                        <span class="ml-2 text-[8px] font-black uppercase tracking-widest bg-primary text-white px-2 py-0.5 rounded-full">Your Assignment</span>
+                                    @endif
                                 </div>
                                 @if(in_array($user->role, ['client', 'patient']))
                                 <span class="text-[11px] font-black text-secondary/60">{{ get_currency_symbol($booking->currency) }}{{ number_format($service->price ?? 0, 2) }}</span>
