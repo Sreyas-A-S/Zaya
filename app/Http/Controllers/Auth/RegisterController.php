@@ -309,6 +309,12 @@ class RegisterController extends Controller
 
             if ($paymentLink) {
                 // Do not auto-login here to match practitioner behavior and ensure invoice download flow
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => 'Registration successful! Redirecting to payment...',
+                        'redirect_url' => $paymentLink['payment_url']
+                    ], 201);
+                }
                 return redirect()->away($paymentLink['payment_url']);
             }
 
