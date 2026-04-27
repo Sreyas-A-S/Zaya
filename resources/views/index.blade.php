@@ -255,7 +255,8 @@
                     </p>
                 </div>
                 <!-- Blog Latest One -->
-                <div class="bg-[#DFA6A9] relative group overflow-hidden flex items-center justify-center flex-4 md:flex-2 animate-on-scroll"
+                <a href="{{ isset($latestBlogs[0]) ? $latestBlogs[0]->link : ($settings['blog_post_1_link'] ?? route('blogs')) }}"
+                    class="bg-[#DFA6A9] relative group overflow-hidden flex items-center justify-center flex-4 md:flex-2 animate-on-scroll"
                     style="transition-delay: 100ms;">
                     <img src="{{ isset($latestBlogs[0]->image) ? $latestBlogs[0]->image : (isset($settings['blog_post_1_image']) ? (Str::startsWith($settings['blog_post_1_image'], 'frontend/') ? asset($settings['blog_post_1_image']) : asset('storage/' . $settings['blog_post_1_image'])) : asset('frontend/assets/bed-air.png')) }}"
                         alt="{{ $latestBlogs[0]->title ?? 'Relaxing Bed' }}"
@@ -267,18 +268,17 @@
                                 class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ isset($latestBlogs[0]) ? $latestBlogs[0]->read_time : ($settings['blog_post_1_read_time'] ?? '7 min Read') }}</span>
                         </div>
                         <h3 id="blog_post_1_title" class="text-white font-sans! text-base font-normal">
-                            <a href="{{ isset($latestBlogs[0]) ? $latestBlogs[0]->link : ($settings['blog_post_1_link'] ?? route('blogs')) }}">
-                                {{ isset($latestBlogs[0]) ? $latestBlogs[0]->title : ($settings['blog_post_1_title'] ?? 'The Art of Resfull Sleep') }}
-                            </a>
+                            {{ isset($latestBlogs[0]) ? $latestBlogs[0]->title : ($settings['blog_post_1_title'] ?? 'The Art of Resfull Sleep') }}
                         </h3>
                     </div>
-                </div>
+                </a>
             </div>
 
             <!-- Column 3 (Right) -->
             <div class="col-span-1 md:col-span-1 lg:col-span-2 flex flex-col h-full">
                 <!-- Blog Latest Two -->
-                <div class="h-64 lg:h-[30%] overflow-hidden relative group  animate-on-scroll"
+                <a href="{{ isset($latestBlogs[1]) ? $latestBlogs[1]->link : ($settings['blog_post_2_link'] ?? route('blogs')) }}"
+                    class="h-64 lg:h-[30%] overflow-hidden relative group  animate-on-scroll"
                     style="transition-delay: 100ms;">
                     <img src="{{ isset($latestBlogs[1]->image) ? $latestBlogs[1]->image : (isset($settings['blog_post_2_image']) ? (Str::startsWith($settings['blog_post_2_image'], 'frontend/') ? asset($settings['blog_post_2_image']) : asset('storage/' . $settings['blog_post_2_image'])) : asset('frontend/assets/ayurvedha-medicine.png')) }}"
                         alt="{{ $latestBlogs[1]->title ?? 'Ayurveda Medicine' }}"
@@ -290,14 +290,13 @@
                                 class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ isset($latestBlogs[1]) ? $latestBlogs[1]->read_time : ($settings['blog_post_2_read_time'] ?? '15 min Read') }}</span>
                         </div>
                         <h3 id="blog_post_2_title" class="text-white font-sans! text-base font-normal">
-                            <a href="{{ isset($latestBlogs[1]) ? $latestBlogs[1]->link : ($settings['blog_post_2_link'] ?? route('blogs')) }}">
-                                {{ isset($latestBlogs[1]) ? $latestBlogs[1]->title : ($settings['blog_post_2_title'] ?? 'Balancing in Summer') }}
-                            </a>
+                            {{ isset($latestBlogs[1]) ? $latestBlogs[1]->title : ($settings['blog_post_2_title'] ?? 'Balancing in Summer') }}
                         </h3>
                     </div>
-                </div>
+                </a>
                 <!-- Blog Latest Three -->
-                <div class="flex-1 relative overflow-hidden group min-h-[320px] animate-on-scroll"
+                <a href="{{ isset($latestBlogs[2]) ? $latestBlogs[2]->link : ($settings['blog_post_3_link'] ?? route('blogs')) }}"
+                    class="flex-1 relative overflow-hidden group min-h-[320px] animate-on-scroll"
                     style="transition-delay: 200ms;">
                     <img src="{{ isset($latestBlogs[2]->image) ? $latestBlogs[2]->image : (isset($settings['blog_post_3_image']) ? (Str::startsWith($settings['blog_post_3_image'], 'frontend/') ? asset($settings['blog_post_3_image']) : asset('storage/' . $settings['blog_post_3_image'])) : asset('frontend/assets/yoga-dress-girl.png')) }}"
                         alt="{{ $latestBlogs[2]->title ?? 'Wellness Lifestyle' }}"
@@ -317,12 +316,10 @@
                                 class="bg-accent text-secondary text-[10px] font-normal px-3 py-1.5 rounded-full">{{ isset($latestBlogs[2]) ? $latestBlogs[2]->read_time : ($settings['blog_post_3_read_time'] ?? '15 min Read') }}</span>
                         </div>
                         <h3 id="blog_post_3_title" class="text-white font-sans! text-base font-normal">
-                            <a href="{{ isset($latestBlogs[2]) ? $latestBlogs[2]->link : ($settings['blog_post_3_link'] ?? route('blogs')) }}">
-                                {{ isset($latestBlogs[2]) ? $latestBlogs[2]->title : ($settings['blog_post_3_title'] ?? 'Morning Rituals for Energy') }}
-                            </a>
+                            {{ isset($latestBlogs[2]) ? $latestBlogs[2]->title : ($settings['blog_post_3_title'] ?? 'Morning Rituals for Energy') }}
                         </h3>
                     </div>
-                </div>
+                </a>
                 <!-- Dark Box -->
                 <div class="bg-secondary p-6 lg:p-12 flex items-center justify-center animate-on-scroll"
                     style="transition-delay: 300ms;">
@@ -439,28 +436,29 @@
             </button>
 
             @if($latestAnnouncement)
-                @if($latestAnnouncement['image'])
-                    <div class="w-24 md:w-40 h-24 md:h-auto shrink-0 overflow-hidden bg-gray-100 m-2 md:m-3 border border-gray-100">
-                        <img src="{{ $latestAnnouncement['image'] }}" alt="Announcement" class="w-full h-full object-cover">
+                <a href="{{ $latestAnnouncement['link'] }}" class="flex flex-row items-stretch hover:bg-gray-50 transition-colors group/link">
+                    @if($latestAnnouncement['image'])
+                        <div class="w-24 md:w-40 h-24 md:h-auto shrink-0 overflow-hidden bg-gray-100 m-2 md:m-3 border border-gray-100">
+                            <img src="{{ $latestAnnouncement['image'] }}" alt="Announcement" class="w-full h-full object-cover">
+                        </div>
+                    @endif
+                    <div class="p-4 md:p-8 md:pl-2 pr-10 md:pr-12 flex flex-col justify-center gap-1 md:gap-2">
+                        <span class="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest leading-none"
+                            data-i18n="New Announcement">New Announcement</span>
+                        <h4 class="text-base md:text-xl font-bold text-gray-800 line-clamp-1 leading-tight group-hover/link:text-primary transition-colors">
+                            {{ $latestAnnouncement['title'] }}
+                        </h4>
+                        <p class="text-xs md:text-sm text-gray-500 line-clamp-2 leading-snug">
+                            {{ \Illuminate\Support\Str::limit($latestAnnouncement['excerpt'], 100) }}
+                        </p>
+                        <div class="text-[10px] md:text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-0.5 md:mt-1">
+                            <span data-i18n="Read More">Read More</span> <i class="ri-arrow-right-s-line"></i>
+                        </div>
                     </div>
-                @endif
-                <div class="p-4 md:p-8 md:pl-2 pr-10 md:pr-12 flex flex-col justify-center gap-1 md:gap-2">
-                    <span class="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest leading-none"
-                        data-i18n="New Announcement">New Announcement</span>
-                    <h4 class="text-base md:text-xl font-bold text-gray-800 line-clamp-1 leading-tight">
-                        {{ $latestAnnouncement['title'] }}
-                    </h4>
-                    <p class="text-xs md:text-sm text-gray-500 line-clamp-2 leading-snug">
-                        {{ \Illuminate\Support\Str::limit($latestAnnouncement['excerpt'], 100) }}
-                    </p>
-                    <a href="{{ $latestAnnouncement['link'] }}"
-                        class="text-[10px] md:text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-0.5 md:mt-1">
-                        <span data-i18n="Read More">Read More</span> <i class="ri-arrow-right-s-line"></i>
-                    </a>
-                </div>
+                </a>
             @else
                 <a href="{{ route('announcements') }}"
-                    class="flex items-center gap-4 md:gap-6 p-4 md:p-8 pr-12 md:pr-16 hover:bg-gray-50 transition-colors group w-full min-h-[80px] md:min-h-[120px]">
+                    class="flex items-center gap-4 md:gap-6 p-4 md:p-8 pr-12 md:pr-16 hover:bg-gray-50 transition-colors group min-h-[80px] md:min-h-[120px]">
                     <div class="w-10 h-10 md:w-14 md:h-14 bg-primary flex items-center justify-center text-white shrink-0">
                         <i class="ri-notification-3-line text-xl md:text-3xl"></i>
                     </div>
