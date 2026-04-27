@@ -29,7 +29,13 @@ class InvoiceController extends Controller
             return redirect()->route('login')->with('error', 'Please login to view your invoice.');
         }
 
-        $booking = Booking::with(['user.patient', 'practitioner.user', 'translator.user'])
+        $isRegistration = str_starts_with($invoice_no, 'ZAYA-REG');
+        $relations = ['user.patient'];
+        if (!$isRegistration) {
+            $relations = array_merge($relations, ['practitioner.user', 'translator.user']);
+        }
+
+        $booking = Booking::with($relations)
             ->where('invoice_no', $invoice_no)
             ->firstOrFail();
         
@@ -48,7 +54,13 @@ class InvoiceController extends Controller
     {
         $token = $request->query('token');
         
-        $booking = Booking::with(['user.patient', 'practitioner.user', 'translator.user'])
+        $isRegistration = str_starts_with($invoice_no, 'ZAYA-REG');
+        $relations = ['user.patient'];
+        if (!$isRegistration) {
+            $relations = array_merge($relations, ['practitioner.user', 'translator.user']);
+        }
+
+        $booking = Booking::with($relations)
             ->where('invoice_no', $invoice_no)
             ->where('download_token', $token)
             ->firstOrFail();
@@ -61,7 +73,16 @@ class InvoiceController extends Controller
      */
     public function preview()
     {
-        $booking = Booking::with(['user.patient', 'practitioner', 'translator'])->latest()->first();
+        // Get the latest booking and check if it's registration or consultation
+        $tempBooking = Booking::latest()->first();
+        $isRegistration = $tempBooking && str_starts_with($tempBooking->invoice_no, 'ZAYA-REG');
+        
+        $relations = ['user.patient'];
+        if (!$isRegistration) {
+            $relations = array_merge($relations, ['practitioner.user', 'translator.user']);
+        }
+
+        $booking = Booking::with($relations)->latest()->first();
         
         if (!$booking) {
             // Create a dummy booking for preview if none exists
