@@ -102,6 +102,12 @@
                 width: 45px !important;
                 height: auto !important;
             }
+
+            .page-sidebar {
+                margin-top: 80px !important;
+                z-index: 99 !important;
+                box-shadow: 5px 0 20px rgba(0,0,0,0.1) !important;
+            }
         }
     </style>
     <div class="logo-wrapper d-flex align-items-center col-auto">
