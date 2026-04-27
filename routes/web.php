@@ -102,7 +102,7 @@ Route::get('/open-register/{role}/signature={token}', function (string $role, st
 // Public Master Data Quick Add (for registration forms)
 Route::post('master-data/quick-add/{type}', [MasterDataController::class, 'store'])->name('master-data.quick-add');
 
-Route::post('/lang/{locale}', [LanguageController::class, 'change'])->name('lang.switch');
+Route::match(['get', 'post'], '/lang/{locale}', [LanguageController::class, 'change'])->name('lang.switch');
 
 Route::get('/', [WebController::class, 'index'])->name('home');
 Route::get('/index', [WebController::class, 'index'])->name('index');
