@@ -78,7 +78,7 @@
                     class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-accent transition-colors">
                     <i class="ri-map-pin-line text-primary text-2xl"></i>
                 </div>
-                <h3 id="contact-info-location-label" class="text-primary font-bold font-sans! text-sm tracking-wider">{{ __('Location') }}</h3>
+                <h3 id="contact-info-location-label" class="text-primary font-bold font-sans! text-sm tracking-wider" data-i18n="Location">{{ __('Location') }}</h3>
                 <p id="contact_info_location" class="text-gray-500 text-sm ">{!! $settings['contact_info_location'] ?? 'No. 1234, 5th Avenue,<br>Kochi, India' !!}</p>
             </div>
 
@@ -89,7 +89,7 @@
                     class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-accent transition-colors">
                     <i class="ri-phone-line text-primary text-2xl"></i>
                 </div>
-                <h3 id="contact-info-phone-label" class="text-primary font-bold font-sans! text-sm tracking-wider">{{ __('Contact') }}</h3>
+                <h3 id="contact-info-phone-label" class="text-primary font-bold font-sans! text-sm tracking-wider" data-i18n="Contact">{{ __('Contact') }}</h3>
                 <p id="contact_info_phone" class="text-gray-500 text-sm leading-relaxed">{!! $settings['contact_info_phone'] ?? '+91 123 456 7890<br>+91 987 654 3210' !!}</p>
             </div>
 
@@ -100,7 +100,7 @@
                     class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-accent transition-colors">
                     <i class="ri-mail-line text-primary text-2xl"></i>
                 </div>
-                <h3 id="contact-info-email-label" class="text-primary font-bold font-sans! text-sm tracking-wider">{{ __('Email') }}</h3>
+                <h3 id="contact-info-email-label" class="text-primary font-bold font-sans! text-sm tracking-wider" data-i18n="Email">{{ __('Email') }}</h3>
                 <p id="contact_info_email" class="text-gray-500 text-sm leading-relaxed">{!! $settings['contact_info_email'] ?? 'support@zayawellness.com<br>info@zayawellness.com' !!}</p>
             </div>
 
@@ -111,7 +111,7 @@
                     class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-accent transition-colors">
                     <i class="ri-time-line text-primary text-2xl"></i>
                 </div>
-                <h3 id="contact-info-working-hours-label" class="text-primary font-bold font-sans! text-sm tracking-wider">{{ __('Working Hours') }}</h3>
+                <h3 id="contact-info-working-hours-label" class="text-primary font-bold font-sans! text-sm tracking-wider" data-i18n="Working Hours">{{ __('Working Hours') }}</h3>
                 <p id="contact_info_working_hours" class="text-gray-500 text-sm leading-relaxed">{!! $settings['contact_info_working_hours'] ?? 'Mon - Fri: 9 AM - 6 PM<br>Sat: 10 AM - 2 PM' !!}</p>
             </div>
         </div>
@@ -254,7 +254,7 @@
                 <input type="checkbox" id="consent" name="consent"
                     class="mt-1 w-5 h-5 border-gray-300 rounded-sm text-gray-600 focus:ring-0 focus:ring-offset-0 bg-[#E8E8E8]"
                     required>
-                <label id="contact-label-consent" for="consent" class="text-secondary text-sm leading-relaxed cursor-pointer font-normal">
+                <label id="contact-label-consent" for="consent" class="text-secondary text-sm leading-relaxed cursor-pointer font-normal" data-i18n="I give consent to Zaya for processing my personal data in accordance with GDPR">
                     {{ __('I give consent to Zaya for processing my personal data in accordance with GDPR') }}
                 </label>
             </div>
