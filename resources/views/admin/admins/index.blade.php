@@ -658,13 +658,16 @@
                     $select.select2('destroy');
                 }
             });
-            selects.select2({
-                placeholder: "Select options",
-                allowClear: true,
-                tags: false,
-                minimumResultsForSearch: Infinity,
-                width: '100%',
-                dropdownParent: $('#adminModal')
+            selects.each(function() {
+                const $select = $(this);
+                $select.select2({
+                    placeholder: "Select options",
+                    allowClear: true,
+                    tags: false,
+                    minimumResultsForSearch: Infinity,
+                    width: '100%',
+                    dropdownParent: $select.parent()
+                });
             });
         };
 
@@ -701,9 +704,9 @@
                 $('#Admins-table_wrapper .dataTables_filter').parent().prepend(filterHtml);
             },
             columns: [{
-                    data: 'DT_RowIndex',
-                    name: 'DT_RowIndex',
-                    orderable: false,
+                    data: 'id',
+                    name: 'id',
+                    orderable: true,
                     searchable: false
                 },
                 {

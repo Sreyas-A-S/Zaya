@@ -733,19 +733,27 @@
 
     $(document).ready(function() {
         // Initialize Select2
-        $('.select2').select2({
-            placeholder: "Select options",
-            allowClear: true,
-            dropdownParent: $('#contentManagerModal')
-        });
+            const selects = $('.select2');
+            selects.each(function() {
+                const $select = $(this);
+                $select.select2({
+                    placeholder: "Select options",
+                    allowClear: true,
+                    tags: false,
+                    minimumResultsForSearch: Infinity,
+                    width: '100%',
+                    dropdownParent: $select.parent()
+                });
+            });
 
         // Re-initialize or fix Select2 when modal is shown to ensure correct width and layout
         $('#contentManagerModal').on('shown.bs.modal', function() {
             $('.select2').each(function() {
-                $(this).select2({
-                    dropdownParent: $('#contentManagerModal'),
+                const $select = $(this);
+                $select.select2({
+                    dropdownParent: $select.parent(),
                     width: '100%',
-                    placeholder: $(this).attr('placeholder') || "Select options",
+                    placeholder: $select.attr('placeholder') || "Select options",
                     allowClear: true
                 });
             });
@@ -782,8 +790,8 @@
                 $('#content-managers-table_wrapper .dataTables_filter').prepend(filterHtml);
             },
             columns: [{
-                    data: 'DT_RowIndex',
-                    orderable: false,
+                    data: 'id',
+                    orderable: true,
                     searchable: false
                 },
                 {
@@ -796,11 +804,13 @@
                     data: 'phone'
                 },
                 {
-                    data: 'nationality'
+                    data: 'nationality',
+                    searchable: false
                 },
                 {
                     data: 'languages',
-                    orderable: false
+                    orderable: false,
+                    searchable: false
                 },
                 {
                     data: 'status'

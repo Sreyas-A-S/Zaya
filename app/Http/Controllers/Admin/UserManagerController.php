@@ -44,8 +44,8 @@ class UserManagerController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
 
-                ->addColumn('name', function ($row) {
-                    return $row->first_name . ' ' . $row->last_name;
+                ->editColumn('name', function ($row) {
+                    return $row->name ?: ($row->first_name . ' ' . $row->last_name);
                 })
 
                 ->addColumn('nationality', function ($row) {
