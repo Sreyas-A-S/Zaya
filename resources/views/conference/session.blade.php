@@ -55,6 +55,12 @@
                     </div>
 
                     <div class="flex items-center gap-3">
+                        <button onclick="flipCamera()"
+                            class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer hidden sm:block"
+                            title="Switch Camera">
+                            <i class="ri-camera-switch-line text-xl"></i>
+                        </button>
+
                         <button onclick="copyMeetingLink()"
                             class="p-3 text-gray-400 hover:text-secondary transition-colors cursor-pointer"
                             title="Copy Meeting Link">
@@ -295,6 +301,10 @@
                         <button id="video-toggle-mobile"
                             class="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer">
                             <i class="ri-video-on-fill text-2xl" id="vid-icon-mobile"></i>
+                        </button>
+                        <button id="flip-camera-mobile" onclick="flipCamera()"
+                            class="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer">
+                            <i class="ri-camera-switch-line text-2xl"></i>
                         </button>
                         <button id="record-toggle-mobile"
                             class="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer">
@@ -864,6 +874,33 @@
             if (screenBtn) screenBtn.onclick = () => { if (provider === 'jaas') jitsiApi.executeCommand('toggleShareScreen'); if (provider === 'daily') { if (meetingState.screenSharing) dailyCall.stopScreenShare(); else dailyCall.startScreenShare(); meetingState.screenSharing = !meetingState.screenSharing; } };
             if (recordBtn) recordBtn.onclick = () => toggleRecording();
             if (recordMobileBtn) recordMobileBtn.onclick = () => toggleRecording();
+
+            window.flipCamera = async () => {
+                if (provider === 'jaas' && jitsiApi) {
+                    try {
+                        const devices = await jitsiApi.getAvailableDevices();
+                        const videoDevices = devices.videoinput;
+                        if (videoDevices && videoDevices.length > 1) {
+                            const current = await jitsiApi.getCurrentDevices();
+                            const currentId = current.videoinput ? current.videoinput.deviceId : null;
+                            const currentIndex = videoDevices.findIndex(d => d.deviceId === currentId);
+                            const nextIndex = (currentIndex + 1) % videoDevices.length;
+                            const nextDevice = videoDevices[nextIndex];
+                            jitsiApi.setVideoInputDevice(nextDevice.label, nextDevice.deviceId);
+                            if (window.showZayaToast) showZayaToast(`Switched to: ${nextDevice.label}`, 'info', 'Camera');
+                        } else {
+                            if (window.showZayaToast) showZayaToast('No other camera found.', 'warning', 'Camera');
+                        }
+                    } catch (e) {
+                        console.error('Flip Camera Error:', e);
+                    }
+                } else if (provider === 'daily' && dailyCall) {
+                    dailyCall.cycleVideo();
+                } else if (provider === 'zegocloud') {
+                    // ZegoCloud has its own built-in UI for switching cameras, but if we need to trigger it:
+                    // window.location.reload(); // Usually it remembers the last one or has a UI button
+                }
+            };
 
             function updateRecordingUi(isRecording) {
                 const indicator = document.getElementById('recording-indicator'), iconClass = isRecording ? 'ri-stop-circle-line text-red-500' : 'ri-record-circle-line';
