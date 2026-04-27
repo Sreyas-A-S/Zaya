@@ -350,8 +350,6 @@
                     <h6 class="f-w-600">{{ $adminPanelSettings['admin_panel_sidebar_newsletters'] ?? 'Newsletters' }}</h6>
                 </a>
                 @endif
-            </li>
-            
         </ul>
     </div>
     <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>

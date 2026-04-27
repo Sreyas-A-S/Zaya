@@ -41,7 +41,12 @@
                 height: 80px !important;
                 padding: 0 15px !important;
                 margin: 0 !important;
-                position: relative !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                z-index: 100 !important;
+                background-color: #fff !important;
             }
 
             .logo-wrapper {
@@ -107,6 +112,43 @@
                 margin-top: 80px !important;
                 z-index: 99 !important;
                 box-shadow: 5px 0 20px rgba(0,0,0,0.1) !important;
+                height: calc(100vh - 80px) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                background: #fff !important;
+            }
+
+            .main-sidebar {
+                flex: 1 1 auto !important;
+                overflow-y: auto !important;
+                height: auto !important;
+                min-height: 0 !important;
+            }
+
+            .sidebar-menu {
+                padding-bottom: 20px !important; 
+            }
+
+            .sidebar-footer-image {
+                position: static !important;
+                flex: 0 0 auto !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                text-align: left !important;
+                background: #fff !important;
+                width: 100% !important;
+                line-height: 0 !important;
+            }
+
+            .sidebar-footer-image img {
+                width: 180px !important;
+                height: auto !important;
+                margin: 0 !important;
+                display: block !important;
+            }
+
+            .page-body-wrapper {
+                padding-top: 80px !important;
             }
         }
     </style>
