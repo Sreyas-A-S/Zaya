@@ -9,6 +9,11 @@
 @section('title', 'Yoga Therapists')
 
 @section('content')
+@php
+    $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+    $feeCurrency = $financeSettings['yoga_physiotherapist_registration_fee_currency'] ?? 'EUR';
+    $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+@endphp
 <style>
     #therapists-table_wrapper .dataTables_filter {
         display: flex;
@@ -609,8 +614,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                     <p class="mb-1 text-muted">Registration Fee Amount</p>
                                     @php
                                         $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
-                                        $feeValue = $financeSettings['yoga_physiotherapist_registration_fee'] ?? 0;
-                                        $feeCurrency = $financeSettings['yoga_physiotherapist_registration_fee_currency'] ?? 'EUR';
+                                        $feeValue = $financeSettings['yoga_registration_fee'] ?? 0;
+                                        $feeCurrency = $financeSettings['yoga_registration_fee_currency'] ?? 'EUR';
                                         $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
                                     @endphp
                                     <h4 class="mb-0 fw-bold" id="admin-fee-display-yoga">

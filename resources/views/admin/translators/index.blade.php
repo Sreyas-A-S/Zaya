@@ -3,6 +3,11 @@
 @section('title', 'Translators')
 
 @section('content')
+@php
+    $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+    $feeCurrency = $financeSettings['translator_registration_fee_currency'] ?? 'EUR';
+    $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+@endphp
 <style>
     #translators-table_wrapper .dataTables_filter {
         display: flex;

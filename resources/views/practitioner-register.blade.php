@@ -562,7 +562,7 @@
                                             <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
                                         </div>
                                         <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
-                                        <input type="file" name="doc_experience" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                                        <input type="file" name="doc_experience" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
                                     </div>
                                 </div>
                             </div>

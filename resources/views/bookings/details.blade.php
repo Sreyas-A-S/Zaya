@@ -3,6 +3,9 @@
 @section('title', 'Booking Details')
 
 @section('content')
+@php
+    $isExpert = in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']);
+@endphp
 <div class="py-6 px-1 md:py-8 md:px-0">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
@@ -90,11 +93,9 @@
                 </div>
             </div>
 
-            @php
-                $isPractitioner = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']);
-            @endphp
 
-            @if($isPractitioner && $userTransaction)
+
+            @if($isExpert && $userTransaction)
             <!-- Earnings Summary for Expert -->
             <div class="bg-secondary rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-2xl shadow-secondary/20 text-white p-8 relative group">
                 <div class="flex justify-between items-center relative z-10">
@@ -361,7 +362,7 @@
                                class="flex-1 py-2 px-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">
                                 <i class="ri-eye-line mr-1"></i> View
                             </a>
-                            @if($isPractitioner)
+                            @if($isExpert)
                             <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $form->id]) }}" 
                                class="flex-1 py-2 px-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">
                                 <i class="ri-edit-line mr-1"></i> Edit
@@ -441,9 +442,7 @@
             </div>
 
             <!-- GDPR Data Sharing Access -->
-            @php
-                $isExpert = in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']);
-            @endphp
+
 
             @if($isExpert && Auth::id() !== $booking->user_id)
             <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm">

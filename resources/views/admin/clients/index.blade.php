@@ -3,6 +3,11 @@
 @section('title', 'Clients Management')
 
 @section('content')
+@php
+    $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+    $feeCurrency = $financeSettings['client_registration_fee_currency'] ?? 'EUR';
+    $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+@endphp
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">

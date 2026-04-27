@@ -11,6 +11,11 @@
 @section('title', 'Doctors Management')
 
 @section('content')
+@php
+    $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+    $feeCurrency = $financeSettings['doctor_registration_fee_currency'] ?? 'EUR';
+    $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+@endphp
 
 
 <style>

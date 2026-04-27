@@ -4,6 +4,11 @@
 
 @section('content')
 @php
+    $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+    $feeCurrency = $financeSettings['practitioner_registration_fee_currency'] ?? 'EUR';
+    $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+@endphp
+@php
     $flagEmoji = function (?string $code): string {
         if (!$code) {
             return '';
