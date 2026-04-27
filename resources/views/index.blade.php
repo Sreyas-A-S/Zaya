@@ -431,7 +431,7 @@
     <div id="announcement-card"
         class="fixed bottom-0 right-0 z-[999] opacity-0 pointer-events-none transition-all duration-500 transform translate-y-10">
         <div
-            class="relative bg-white border-t border-l border-gray-200 shadow-[-15px_-15px_40px_rgba(0,0,0,0.15)] flex flex-col md:flex-row items-stretch max-w-[450px] transition-transform duration-300 hover:-translate-y-2">
+            class="relative bg-white border-t border-l border-gray-200 shadow-[-15px_-15px_40px_rgba(0,0,0,0.15)] flex flex-row items-stretch max-w-[calc(100vw-1rem)] md:max-w-[450px] transition-transform duration-300 hover:-translate-y-2">
             <!-- Close Button Inside -->
             <button onclick="closeAnnouncementCard()"
                 class="absolute top-2 right-2 w-6 h-6 bg-gray-100 text-gray-400 hover:bg-red-500 hover:text-white flex items-center justify-center z-[1001] transition-all">
@@ -440,39 +440,39 @@
 
             @if($latestAnnouncement)
                 @if($latestAnnouncement['image'])
-                    <div class="w-auto md:w-40 h-40 md:h-auto shrink-0 overflow-hidden bg-gray-100 m-3 border border-gray-100">
+                    <div class="w-24 md:w-40 h-24 md:h-auto shrink-0 overflow-hidden bg-gray-100 m-2 md:m-3 border border-gray-100">
                         <img src="{{ $latestAnnouncement['image'] }}" alt="Announcement" class="w-full h-full object-cover">
                     </div>
                 @endif
-                <div class="p-6 md:p-8 md:pl-2 pr-12 flex flex-col justify-center gap-2">
-                    <span class="text-[10px] font-black text-primary uppercase tracking-widest leading-none"
+                <div class="p-4 md:p-8 md:pl-2 pr-10 md:pr-12 flex flex-col justify-center gap-1 md:gap-2">
+                    <span class="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest leading-none"
                         data-i18n="New Announcement">New Announcement</span>
-                    <h4 class="text-lg md:text-xl font-bold text-gray-800 line-clamp-1 leading-tight">
+                    <h4 class="text-base md:text-xl font-bold text-gray-800 line-clamp-1 leading-tight">
                         {{ $latestAnnouncement['title'] }}
                     </h4>
-                    <p class="text-sm text-gray-500 line-clamp-2 leading-snug">
+                    <p class="text-xs md:text-sm text-gray-500 line-clamp-2 leading-snug">
                         {{ \Illuminate\Support\Str::limit($latestAnnouncement['excerpt'], 100) }}
                     </p>
                     <a href="{{ $latestAnnouncement['link'] }}"
-                        class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1">
+                        class="text-[10px] md:text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-0.5 md:mt-1">
                         <span data-i18n="Read More">Read More</span> <i class="ri-arrow-right-s-line"></i>
                     </a>
                 </div>
             @else
                 <a href="{{ route('announcements') }}"
-                    class="flex items-center gap-6 p-8 pr-16 hover:bg-gray-50 transition-colors group w-full min-h-[120px]">
-                    <div class="w-14 h-14 bg-primary flex items-center justify-center text-white shrink-0">
-                        <i class="ri-notification-3-line text-3xl"></i>
+                    class="flex items-center gap-4 md:gap-6 p-4 md:p-8 pr-12 md:pr-16 hover:bg-gray-50 transition-colors group w-full min-h-[80px] md:min-h-[120px]">
+                    <div class="w-10 h-10 md:w-14 md:h-14 bg-primary flex items-center justify-center text-white shrink-0">
+                        <i class="ri-notification-3-line text-xl md:text-3xl"></i>
                     </div>
-                    <div class="flex flex-col gap-1">
-                        <span class="text-[11px] font-black text-primary uppercase tracking-widest leading-none"
+                    <div class="flex flex-col gap-0.5 md:gap-1">
+                        <span class="text-[9px] md:text-[11px] font-black text-primary uppercase tracking-widest leading-none"
                             data-i18n="Announcements">Announcements</span>
-                        <span class="text-lg font-bold text-gray-800 whitespace-nowrap leading-none"
+                        <span class="text-base md:text-lg font-bold text-gray-800 whitespace-nowrap leading-none"
                             data-i18n="Latest Updates & News">Latest Updates & News</span>
                     </div>
-                    <div class="absolute right-6 top-1/2 -translate-y-1/2">
+                    <div class="absolute right-4 md:right-6 top-1/2 -translate-y-1/2">
                         <i
-                            class="ri-arrow-right-line text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all text-2xl"></i>
+                            class="ri-arrow-right-line text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all text-xl md:text-2xl"></i>
                     </div>
                 </a>
             @endif
