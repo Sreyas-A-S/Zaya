@@ -13,8 +13,8 @@ use App\Models\ExternalTherapy;
 use App\Models\Qualification;
 use App\Mail\SetPasswordMail;
 use App\Mail\PractitionerApplicationSubmittedMail;
-use App\Mail\RegistrationFeePaymentLinkMail;
-use App\Services\RegistrationFeeService;
+// use App\Mail\RegistrationFeePaymentLinkMail;
+// use App\Services\RegistrationFeeService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -274,11 +274,6 @@ class DoctorController extends Controller
             'policies_agreement' => 'nullable',
             'prescription_understanding' => 'nullable',
             'confidentiality_consent' => 'nullable',
-
-            // K. Payment & Promocode (Optional)
-            'promocode' => 'nullable|string|max:50',
-            'promo_code' => 'nullable|string|max:50',
-            'promo_total_fee' => 'nullable|numeric',
         ]);
 
         $user = User::create([
@@ -294,6 +289,7 @@ class DoctorController extends Controller
         Session::put('welcome_password_' . $user->id, $plainPassword);
         Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail('Doctor'));
 
+        /*
         $feeService = app(RegistrationFeeService::class);
         $promoNotes = [];
         $feeOverride = $request->input('promo_total_fee');
@@ -314,9 +310,11 @@ class DoctorController extends Controller
 
         if ($link = $feeService->createPaymentLink($user, $user->role, $feeOverride, $promoNotes)) {
             Mail::to($user->email)->send(
-                new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+                new \App\Mail\RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
             );
         }
+        */
+        
         Session::forget('welcome_password_' . $user->id);
 
         $profilePhotoPath = $request->hasFile('profile_photo') ? $request->file('profile_photo')->store('doctor_documents/profile_photos', 'public') : null;

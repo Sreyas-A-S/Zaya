@@ -11,8 +11,8 @@ use App\Models\BodyTherapy;
 use App\Models\PractitionerModality;
 use App\Mail\WelcomeUserMail;
 use App\Mail\PractitionerApplicationSubmittedMail;
-use App\Mail\RegistrationFeePaymentLinkMail;
-use App\Services\RegistrationFeeService;
+// use App\Mail\RegistrationFeePaymentLinkMail;
+// use App\Services\RegistrationFeeService;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
@@ -203,11 +203,6 @@ class PractitionerController extends Controller
             'doc_ethics' => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
             'doc_contract' => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
             'doc_id_proof' => 'required|file|mimes:pdf,jpeg,png,jpg|max:2048',
-            // Promocode & Payment
-            'promo_code' => 'nullable|string|max:50',
-            'promo_total_fee' => 'nullable|numeric',
-            'promo_discount_percentage' => 'nullable|numeric',
-            'promo_discount_amount' => 'nullable|numeric',
         ]);
 
         DB::beginTransaction();
@@ -226,7 +221,8 @@ class PractitionerController extends Controller
             Session::put('welcome_password_' . $user->id, $plainPassword);
             Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail('Practitioner'));
 
-            $feeService = app(RegistrationFeeService::class);
+            /*
+            $feeService = app(\App\Services\RegistrationFeeService::class);
             $feeOverride = $request->input('promo_total_fee');
             $promoNotes = [];
 
@@ -246,9 +242,11 @@ class PractitionerController extends Controller
 
             if ($link = $feeService->createPaymentLink($user, $user->role, $feeOverride, $promoNotes)) {
                 Mail::to($user->email)->send(
-                    new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+                    new \App\Mail\RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
                 );
             }
+            */
+
             Session::forget('welcome_password_' . $user->id);
 
             $practitionerData = [

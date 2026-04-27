@@ -123,11 +123,10 @@
                                     <div class="step-counter">6</div>
                                     <div class="step-name text-nowrap">Identity</div>
                                 </div>
-                                <div class="stepper-item" data-step="7">
+                                {{-- <div class="stepper-item" data-step="7">
                                     <div class="step-counter">7</div>
                                     <div class="step-name text-nowrap">Payment & Offers</div>
-                                </div>
-                            </div>
+                                </div> --}}                            </div>
 
                             <form id="therapist-form" method="POST" enctype="multipart/form-data" class="theme-form" novalidate>
                                 @csrf
@@ -599,7 +598,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 </div>
             </div>
 
-            <!-- Step 7: Payment & Offers -->
+            {{-- <!-- Step 7: Payment & Offers -->
             <div class="step-content d-none" id="step-7">
                 <div class="row g-3">
                     <div class="col-12">
@@ -664,7 +663,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Buttons -->
             <div class="d-flex justify-content-between mt-4">
@@ -797,7 +796,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
         let table;
         let therapistIti;
         let currentStep = 1;
-        const totalSteps = 7;
+        const totalSteps = 6;
         let cropper;
         const cropperImage = document.getElementById('cropperImage');
         let cropperDidApply = false;
@@ -1118,6 +1117,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
             window.languageChoices = languageChoices;
 
+            /*
             // Promocode Logic for Admin Modal (Yoga)
             const promoInputYoga = document.getElementById('admin-promocode-input-yoga');
             const promoApplyBtnYoga = document.getElementById('admin-promo-apply-btn-yoga');
@@ -1211,6 +1211,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     promoApplyBtnYoga.innerText = 'Apply';
                 }
             });
+            */
 
             // Stepper Logic
             $('#next-btn').click(function() {

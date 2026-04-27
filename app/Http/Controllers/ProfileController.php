@@ -658,20 +658,17 @@ class ProfileController extends Controller
     public function showDetailsView($id)
     {
         $user = Auth::user();
-        $booking = Booking::with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo', 'transactions'])
+        $booking = $this->getBookingQuery($user)
+            ->with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo', 'transactions', 'consultationForms'])
             ->findOrFail($id);
 
-        // Permissions check
-        $isParticipant = ($booking->user_id === $user->id) || 
+        // Permissions check for sensitive data
+        $isDirectParticipant = ($booking->user_id === $user->id) || 
                          ($booking->practitioner && $booking->practitioner->user_id === $user->id) ||
                          ($booking->translator && $booking->translator->user_id === $user->id);
 
-        if (!$isParticipant) {
-            $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
-            if (!$hasAccess) {
-                return redirect()->route('bookings.index')->with('error', 'Unauthorized access. Please verify via OTP.');
-            }
-        }
+        // Consent Status (Checked against the CURRENT viewer)
+        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
 
         $serviceIds = is_array($booking->service_ids) ? $booking->service_ids : [];
         $services = Service::whereIn('id', $serviceIds)->get();
@@ -719,9 +716,6 @@ class ProfileController extends Controller
             ];
         }
 
-        // Consent Status (Checked against the CURRENT viewer)
-        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
-
         $firstPractitioner = $referralChain[0]['practitioner'] ?? 'Unknown';
 
         // Financial visibility logic
@@ -751,7 +745,7 @@ class ProfileController extends Controller
             }
         }
 
-        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount', 'referredServiceIds'));
+        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount', 'referredServiceIds', 'isDirectParticipant'));
     }
 
     public function viewClientProfile($id)

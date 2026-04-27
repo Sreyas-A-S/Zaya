@@ -329,7 +329,7 @@
             </div>
 
             <!-- Consultation Forms Section -->
-            @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+            @if($isExpert && ($hasConsent || $booking->profile_id === $user->profile_id))
             <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm p-5 md:p-8">
                 <div class="flex items-center justify-between mb-8">
                     <div>
@@ -396,11 +396,17 @@
                     <img src="{{ $booking->user->profile_pic ? (str_starts_with($booking->user->profile_pic, 'http') ? $booking->user->profile_pic : asset('storage/' . $booking->user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" 
                          class="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-sm">
                     <div>
-                        <p class="font-black text-secondary leading-tight">{{ $booking->user->name }}</p>
-                        <p class="text-xs font-medium text-gray-500 mt-1">{{ $booking->user->email }}</p>
+                        @if($hasConsent || $isDirectParticipant)
+                            <p class="font-black text-secondary leading-tight">{{ $booking->user->name }}</p>
+                            <p class="text-xs font-medium text-gray-500 mt-1">{{ $booking->user->email }}</p>
+                        @else
+                            <p class="font-black text-secondary leading-tight">Patient #{{ $booking->user->id }}</p>
+                            <p class="text-xs font-medium text-gray-400 mt-1">Verify OTP to view details</p>
+                        @endif
                     </div>
                 </div>
                 <div class="space-y-4">
+                    @if($hasConsent || $isDirectParticipant)
                     <div class="p-4 bg-white rounded-2xl border border-[#2E4B3D]/5 shadow-sm">
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Languages</p>
                         <div class="flex flex-wrap gap-1 mt-2">
@@ -430,11 +436,16 @@
                             @endforelse
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
 
             <!-- GDPR Data Sharing Access -->
-            @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+            @php
+                $isExpert = in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']);
+            @endphp
+
+            @if($isExpert && Auth::id() !== $booking->user_id)
             <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">GDPR Control Center</h3>

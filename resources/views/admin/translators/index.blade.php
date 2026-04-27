@@ -843,6 +843,7 @@
                         additional: additionalChoices
                     };
 
+            /*
             // Promocode Logic for Admin Modal (Translator)
             const promoInputTrans = document.getElementById('admin-promocode-input-trans');
             const promoApplyBtnTrans = document.getElementById('admin-promo-apply-btn-trans');
@@ -936,6 +937,7 @@
                     promoApplyBtnTrans.innerText = 'Apply';
                 }
             });
+            */
 
                     // Stepper Logic
                     $('#next-btn').click(function() {

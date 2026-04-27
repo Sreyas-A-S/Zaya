@@ -125,11 +125,10 @@
                                     <div class="step-counter">6</div>
                                     <div class="step-name text-nowrap">Profile</div>
                                 </div>
-                                <div class="stepper-item" data-step="7">
+                                {{-- <div class="stepper-item" data-step="7">
                                     <div class="step-counter">7</div>
                                     <div class="step-name text-nowrap">Payment & Offers</div>
-                                </div>
-                            </div>
+                                </div> --}}                            </div>
 
                             <form id="practitioner-form" method="POST" enctype="multipart/form-data" class="theme-form" novalidate>
                                 @csrf
@@ -737,7 +736,7 @@
                             </div>
                         </div>
 
-                        <!-- Step 7: Payment & Offers -->
+                        {{-- <!-- Step 7: Payment & Offers -->
                         <div class="step-content d-none" id="step-7">
                             <div class="row g-3">
                                 <div class="col-12">
@@ -802,7 +801,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <!-- Buttons -->
                         <div class="d-flex justify-content-between mt-4">
@@ -915,7 +914,7 @@
 <script>
     let table;
     let currentStep = 1;
-    const totalSteps = 7;
+    const totalSteps = 6;
     let iti;
     let phoneInput;
     let cropper;
@@ -1051,6 +1050,7 @@
     }
     window.practitionerTypeChoices = practitionerTypeChoices;
 
+    /*
     // Promocode Logic for Admin Modal (Mindfulness)
     const promoInputMind = document.getElementById('admin-promocode-input-mind');
     const promoApplyBtnMind = document.getElementById('admin-promo-apply-btn-mind');
@@ -1144,6 +1144,7 @@
             promoApplyBtnMind.innerText = 'Apply';
         }
     });
+    */
 
     // Stepper Logic
     $('#next-btn').click(function() {

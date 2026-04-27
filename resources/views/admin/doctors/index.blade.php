@@ -129,11 +129,10 @@
                                     <div class="step-counter">5</div>
                                     <div class="step-name">Profile & Consent</div>
                                 </div>
-                                <div class="stepper-item" data-step="6">
+                                {{-- <div class="stepper-item" data-step="6">
                                     <div class="step-counter">6</div>
                                     <div class="step-name">Payment & Offers</div>
-                                </div>
-                            </div>
+                                </div> --}}                            </div>
 
                             <form id="doctor-form" enctype="multipart/form-data" novalidate>
                                 @csrf
@@ -729,12 +728,12 @@
 
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-5 pt-3 border-top">
                                             <button type="button" class="btn btn-outline-dark prev-step" data-prev="4"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
-                                            <button type="button" class="btn btn-primary next-step" data-next="6">Next Step: Payment <i class="iconly-Arrow-Right icli ms-2"></i></button>
+                                            <button type="submit" class="btn btn-primary"><i class="iconly-Tick-Square icli me-2"></i> Save & Register</button>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Step 6: Registration Fee & Promocode -->
+                                {{-- <!-- Step 6: Registration Fee & Promocode -->
                                 <div class="step-content d-none" id="step6">
                                     <div class="row g-3">
                                         <div class="col-12">
@@ -804,7 +803,7 @@
                                             <button type="submit" class="btn btn-success" id="admin-complete-btn"><i class="iconly-Tick-Square icli me-2"></i> Complete Registration</button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </form>
                         </div>
                     </div>
@@ -1603,6 +1602,7 @@
         $('#languages_capabilities_container').append(html);
     }
 
+        /*
         // Promocode Logic for Admin Modal
         const promoInput = document.getElementById('admin-promocode-input');
         const promoApplyBtn = document.getElementById('admin-promo-apply-btn');
@@ -1696,6 +1696,7 @@
                 promoApplyBtn.innerText = 'Apply';
             }
         });
+        */
 
     function initFormNavigation() {
         $('.next-step').on('click', function() {

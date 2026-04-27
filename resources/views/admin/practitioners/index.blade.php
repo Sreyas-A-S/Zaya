@@ -141,11 +141,10 @@
                                     <div class="step-counter">5</div>
                                     <div class="step-name text-nowrap">Documents</div>
                                 </div>
-                                <div class="stepper-item" data-step="6">
+                                {{-- <div class="stepper-item" data-step="6">
                                     <div class="step-counter">6</div>
                                     <div class="step-name text-nowrap">Payment & Offers</div>
-                                </div>
-                            </div>
+                                </div> --}}                            </div>
 
                             <form id="practitioner-form" method="POST" enctype="multipart/form-data" class="theme-form" novalidate>
                                 @csrf
@@ -535,14 +534,14 @@
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-5 pt-3 border-top">
                                             <button type="button" class="btn btn-outline-dark prev-step" data-prev="4"><i class="fa-solid fa-arrow-left me-2"></i> Previous</button>
                                             <div class="footer-buttons">
-                                                <button type="button" class="btn btn-primary next-step" data-next="6">Next Step <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                                                <button type="submit" class="btn btn-primary"><i class="iconly-Tick-Square icli me-2"></i> Save & Register</button>
                                                 <button type="submit" class="btn btn-success" id="submit-btn-edit" style="display: none;"><i class="fa-solid fa-check-circle me-2"></i> Save Practitioner</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Step 6: Payment & Offers -->
+                                {{-- <!-- Step 6: Payment & Offers -->
                                 <div class="step-content d-none" id="step6">
                                     <div class="row g-3">
                                         <div class="col-12">
@@ -612,7 +611,7 @@
                                             <button type="submit" class="btn btn-success" id="submit-btn" style="display: none;"><i class="fa-solid fa-check-circle me-2"></i> Save Practitioner</button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </form>
                         </div>
                     </div>
@@ -2110,6 +2109,7 @@
     this.value = this.value.replace(/\s/g, '');
 });
 
+    /*
     // Promocode Logic for Practitioner
     const promoInputPrac = document.getElementById('admin-promocode-input-practitioner');
     const promoApplyBtnPrac = document.getElementById('admin-promo-apply-btn-practitioner');
@@ -2199,6 +2199,7 @@
             promoApplyBtnPrac.innerText = 'Apply';
         }
     });
+    */
 
 </script>
 
