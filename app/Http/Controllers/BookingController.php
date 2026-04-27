@@ -96,18 +96,32 @@ class BookingController extends Controller
         $promoDiscount = 0;
         $promoCode = null;
         if ($request->promo_code) {
-            $promo = \App\Models\PromoCode::where('code', $request->promo_code)
+            $code = trim((string) $request->promo_code);
+            $promo = \App\Models\PromoCode::whereRaw('LOWER(code) = ?', [mb_strtolower($code)])
                 ->where('status', true)
                 ->where(function($q) {
-                    $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now()->toDateString());
+                    $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now()->toDateTimeString());
                 })->first();
             
             if ($promo && ($promo->usage_limit === null || $promo->used_count < $promo->usage_limit)) {
-                $promoCode = $promo->code;
-                if ($promo->type === 'percentage') {
-                    $promoDiscount = ($subtotal * $promo->value) / 100;
+                // Check usage type
+                if ($promo->usage_type === 'both' || $promo->usage_type === 'booking') {
+                    // Check currency for fixed promo codes
+                    if ($promo->type === 'fixed' && $promo->currency && $promo->currency !== $currency) {
+                        \Log::warning("Promo code currency mismatch: code uses {$promo->currency}, transaction uses {$currency}");
+                    } else {
+                        $promoCode = $promo->code;
+                        $reward = (float) $promo->reward;
+                        if ($promo->type === 'percentage') {
+                            $discountPercentage = max(0.0, min(100.0, $reward));
+                            $promoDiscount = $subtotal * ($discountPercentage / 100.0);
+                        } else {
+                            $promoDiscount = min($reward, $subtotal);
+                        }
+                        \Log::info("Promo code applied: {$promoCode}, Discount: {$promoDiscount}");
+                    }
                 } else {
-                    $promoDiscount = $promo->value;
+                    \Log::warning("Promo code usage type mismatch: code is for {$promo->usage_type}, but requested for booking");
                 }
             }
         }
