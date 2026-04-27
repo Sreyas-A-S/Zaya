@@ -205,14 +205,33 @@
       pointer-events: none;
     }
 
-    .page-body .avatar-upload .avatar-preview,
-    .page-body .avatar-upload .avatar-preview>div {
-      border-radius: 100% !important;
-      overflow: hidden;
-      background-size: cover;
-      background-position: center;
-    }
-  </style>
+      .page-body .avatar-upload .avatar-preview,
+      .page-body .avatar-upload .avatar-preview>div {
+        border-radius: 100% !important;
+        overflow: hidden;
+        background-size: cover;
+        background-position: center;
+      }
+
+      /* Fix DataTable sorting arrows overlapping on mobile */
+      @media (max-width: 767px) {
+
+        table.dataTable thead th.sorting,
+        table.dataTable thead th.sorting_asc,
+        table.dataTable thead th.sorting_desc {
+          padding-right: 30px !important;
+          position: relative !important;
+        }
+
+        table.dataTable thead .sorting:after,
+        table.dataTable thead .sorting_asc:after,
+        table.dataTable thead .sorting_desc:after {
+          right: 8px !important;
+          bottom: 12px !important;
+          opacity: 0.8 !important;
+        }
+      }
+    </style>
   <div class="page-wrapper compact-wrapper" id="pageWrapper">
 
     @include('partials.navbar')

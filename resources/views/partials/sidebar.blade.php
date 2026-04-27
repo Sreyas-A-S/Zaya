@@ -13,7 +13,7 @@
                     <h5 class="sidebar-title f-w-700">{{ $adminPanelSettings['admin_panel_sidebar_pinned'] ?? 'Pinned' }}</h5>
                 </div>
             </li>
-            @if(auth()->user()->hasPermission('dashboard-view') || auth()->user()->hasPermission('doctors-view') || auth()->user()->hasPermission('practitioners-view') || auth()->user()->hasPermission('mindfulness-practitioners-view') || auth()->user()->hasPermission('yoga-therapists-view') || auth()->user()->hasPermission('clients-view') || auth()->user()->hasPermission('translators-view') || auth()->user()->hasPermission('forms-view') || auth()->user()->hasPermission('testimonials-view') || auth()->user()->hasPermission('services-view') || auth()->user()->hasPermission('practitioner-reviews-view'))
+            @if(auth()->user()->hasPermission('dashboard-view') || auth()->user()->hasPermission('doctors-view') || auth()->user()->hasPermission('practitioners-view') || auth()->user()->hasPermission('mindfulness-practitioners-view') || auth()->user()->hasPermission('yoga-therapists-view') || auth()->user()->hasPermission('clients-view') || auth()->user()->hasPermission('translators-view') || auth()->user()->hasPermission('forms-view') || auth()->user()->hasPermission('testimonials-view') || auth()->user()->hasPermission('services-view') || auth()->user()->hasPermission('practitioner-reviews-view') || auth()->user()->hasPermission('admins-view') || auth()->user()->hasPermission('finance-managers-view') || auth()->user()->hasPermission('content-managers-view') || auth()->user()->hasPermission('user-managers-view'))
             <li class="sidebar-main-title">
                 <div>
                     <h5 class="lan-1 f-w-700 sidebar-title">{{ $adminPanelSettings['admin_panel_sidebar_general'] ?? 'General' }}</h5>
@@ -28,6 +28,7 @@
                     <h6>{{ $adminPanelSettings['admin_panel_sidebar_dashboard'] ?? 'Dashboard' }}</h6>
                 </a>
             </li>
+            @endif
             <li class="sidebar-list"><a class="sidebar-link" href="{{ route('admin.profile') }}">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Profile') }}"></use>
@@ -35,7 +36,6 @@
                     <h6>{{ $adminPanelSettings['admin_panel_sidebar_my_profile'] ?? 'My Profile' }}</h6>
                 </a>
             </li>
-            @endif
 
             @if(auth()->user()->hasPermission('doctors-view') || auth()->user()->hasPermission('practitioners-view') || auth()->user()->hasPermission('mindfulness-practitioners-view') || auth()->user()->hasPermission('yoga-therapists-view') || auth()->user()->hasPermission('clients-view') || auth()->user()->hasPermission('translators-view') || auth()->user()->hasPermission('forms-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
@@ -75,6 +75,7 @@
                 </ul>
             </li>
             @endif
+            @if(auth()->user()->hasPermission('admins-view') || auth()->user()->hasPermission('finance-managers-view') || auth()->user()->hasPermission('content-managers-view') || auth()->user()->hasPermission('user-managers-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Profile') }}"></use>
@@ -84,14 +85,19 @@
                 <ul class="sidebar-submenu">
                     @if(auth()->user()->hasPermission('admins-view'))
                     <li> <a href="{{ route('admin.admins.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_admins'] ?? 'Admins' }}</a></li>
+                    @endif
+                    @if(auth()->user()->hasPermission('finance-managers-view'))
                     <li> <a href="{{ route('admin.finance-managers.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_finance_manager'] ?? 'Finance Manager' }}</a></li>
+                    @endif
+                    @if(auth()->user()->hasPermission('content-managers-view'))
                     <li> <a href="{{ route('admin.content-managers.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_content_manager'] ?? 'Content Manager' }}</a></li>
+                    @endif
+                    @if(auth()->user()->hasPermission('user-managers-view'))
                     <li> <a href="{{ route('admin.user-managers.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_user_manager'] ?? 'User Manager' }}</a></li>
-
-
                     @endif
                 </ul>
             </li>
+            @endif
 
             @if(auth()->user()->hasPermission('credentials-view'))
             <li class="sidebar-list d-none"> <a class="sidebar-link" href="{{ route('admin.credentials.index') }}">
