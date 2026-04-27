@@ -101,8 +101,20 @@ if (! function_exists('get_timezone_from_country')) {
         } else {
             // Try to find code from name if the input is a full name (e.g. "India")
             try {
-                $countryModel = \App\Models\Country::where('name', $country)
-                    ->orWhere('code', $country)
+                $countryName = trim($country);
+                
+                // Map common aliases
+                $aliases = [
+                    'USA' => 'United States',
+                    'UK' => 'United Kingdom',
+                    'UAE' => 'United Arab Emirates',
+                    'South Korea' => 'Korea, Republic of',
+                    'Russia' => 'Russian Federation',
+                ];
+                $lookupName = $aliases[strtoupper($countryName)] ?? $countryName;
+
+                $countryModel = \App\Models\Country::where('name', 'LIKE', $lookupName)
+                    ->orWhere('code', $countryName)
                     ->first();
                 
                 if ($countryModel && strlen(trim($countryModel->code)) === 2) {

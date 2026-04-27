@@ -329,6 +329,10 @@ class RegisterController extends Controller
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Registration Error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request' => $request->except(['password', 'password_confirmation'])
+            ]);
             if ($request->wantsJson()) {
                 return response()->json(['errors' => ['error' => [$e->getMessage()]]], 422);
             }

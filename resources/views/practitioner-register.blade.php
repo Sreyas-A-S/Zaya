@@ -1472,7 +1472,19 @@
                              closeThankYouPopup();
                          }, 3000);
                      } else {
-                         const data = await response.json();
+                         let data = {};
+                         try {
+                             data = await response.json();
+                         } catch (e) {
+                             console.error("Failed to parse error response:", e);
+                             if (response.status === 419) {
+                                 data = { message: 'Your session has expired. Please refresh the page and try again.' };
+                             } else if (response.status === 400) {
+                                 data = { message: 'The server could not process your request. This may be due to large file uploads or missing information.' };
+                             } else {
+                                 data = { message: 'An unexpected server error occurred (' + response.status + ').' };
+                             }
+                         }
                          
                          // Clear any existing errors first
                          document.querySelectorAll('.error-message').forEach(el => el.remove());

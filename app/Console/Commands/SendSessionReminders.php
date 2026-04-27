@@ -62,10 +62,15 @@ class SendSessionReminders extends Command
                 
                 $diff = $now->diffInMinutes($startTime, false);
                 
-                $this->info("Checking Booking #{$booking->id}: Start Time: {$startTime->toDateTimeString()} ({$timezone}), Diff: {$diff} mins, Lead Time: {$leadTime} mins");
+                // Detailed debug info
+                $this->info("Checking Booking #{$booking->id} (Invoice: {$booking->invoice_no}):");
+                $this->info(" - Current Time (Server): " . $now->toDateTimeString() . " (" . config('app.timezone') . ")");
+                $this->info(" - Session Start Time: " . $startTime->toDateTimeString() . " ({$timezone})");
+                $this->info(" - Diff: {$diff} minutes (Lead Time: {$leadTime} mins)");
 
                 // Send reminder if current time is within the lead time window before the session
-                if ($diff <= $leadTime && $diff >= -15) {
+                // We allow a small window after the session starts (-15 mins) to catch late starts
+                if ($diff <= ($leadTime + 1) && $diff >= -15) {
                     $this->info("Match found for Booking #{$booking->id}. Sending reminder...");
                     
                     // Generate the secure video link using invoice_no as channel name
