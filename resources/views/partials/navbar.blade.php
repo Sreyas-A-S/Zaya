@@ -41,6 +41,7 @@
                 height: 80px !important;
                 padding: 0 15px !important;
                 margin: 0 !important;
+                position: relative !important;
             }
 
             .logo-wrapper {
@@ -48,6 +49,17 @@
                 flex: 0 0 auto !important;
                 padding: 0 !important;
                 background-color: transparent !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            .logo-wrapper a:first-child {
+                position: absolute !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                margin: 0 !important;
+                z-index: 10 !important;
             }
 
             .page-main-header {
@@ -88,6 +100,7 @@
 
             .logo-wrapper a img {
                 width: 45px !important;
+                height: auto !important;
             }
         }
     </style>
