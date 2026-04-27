@@ -429,9 +429,9 @@
 
     <!-- Announcement Card -->
     <div id="announcement-card"
-        class="fixed bottom-0 right-0 z-[999] opacity-0 pointer-events-none transition-all duration-500 transform translate-y-10">
+        class="fixed bottom-0 left-0 right-0 md:left-auto z-[999] opacity-0 pointer-events-none transition-all duration-500 transform translate-y-10">
         <div
-            class="relative bg-white border-t border-l border-gray-200 shadow-[-15px_-15px_40px_rgba(0,0,0,0.15)] flex flex-row items-stretch max-w-[calc(100vw-1rem)] md:max-w-[450px] transition-transform duration-300 hover:-translate-y-2">
+            class="relative bg-white border-t border-gray-200 md:border-l shadow-[-15px_-15px_40px_rgba(0,0,0,0.15)] flex flex-row items-stretch w-full md:max-w-[450px] transition-transform duration-300 md:hover:-translate-y-2">
             <!-- Close Button Inside -->
             <button onclick="closeAnnouncementCard()"
                 class="absolute top-2 right-2 w-6 h-6 bg-gray-100 text-gray-400 hover:bg-red-500 hover:text-white flex items-center justify-center z-[1001] transition-all">
