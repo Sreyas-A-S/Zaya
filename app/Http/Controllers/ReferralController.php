@@ -95,12 +95,18 @@ class ReferralController extends Controller
 
             // Only refer services that the professional actually handles
             $requiredServiceIds = (array) ($booking->service_ids ?? []);
-            $handledServiceIds = \App\Models\UserService::where('user_id', $refData['id'])
+            $handledServices = \App\Models\UserService::where('user_id', $refData['id'])
                 ->whereIn('service_id', $requiredServiceIds)
-                ->pluck('service_id')
-                ->toArray();
+                ->get();
             
+            $handledServiceIds = $handledServices->pluck('service_id')->toArray();
+            
+            // Calculate correct amount based on handled services
+            $calculatedAmount = (float) $handledServices->sum('rate');
+            
+            // If they handle some services, only show those. If none, fall back to consultation services but keep original amount if provided.
             $finalServiceIds = !empty($handledServiceIds) ? $handledServiceIds : $requiredServiceIds;
+            $finalAmount = $calculatedAmount > 0 ? $calculatedAmount : (float) ($refData['amount'] ?? 0);
 
             $referral = Referral::create([
                 'referral_no' => $referralNo,
@@ -110,7 +116,7 @@ class ReferralController extends Controller
                 'referred_by_id' => $user->id,
                 'referred_to_id' => $refData['id'],
                 'service_ids' => $finalServiceIds,
-                'amount' => $refData['amount'],
+                'amount' => $finalAmount,
                 'currency' => $this->resolveProfessionalCurrency($referredToUser),
                 'booking_date' => $refData['booking_date'],
                 'booking_time' => $refData['booking_time'],
@@ -382,26 +388,38 @@ class ReferralController extends Controller
 
         $currency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referral->referredTo) ?? config('currencies.default', 'INR')));
 
+        $customerPhone = preg_replace('/[^0-9]/', '', (string) ($referral->user->phone ?? '9999999999'));
+        if (strlen($customerPhone) < 10) {
+            $customerPhone = '9999999999';
+        }
+
+        $payload = [
+            'amount' => (int) round(((float) $referral->amount) * 100),
+            'currency' => $currency,
+            'accept_partial' => false,
+            'description' => "Referral Session: " . $referral->referredTo->name,
+            'customer' => [
+                'name' => $referral->user->name,
+                'email' => $referral->user->email,
+                'contact' => $customerPhone,
+            ],
+            'notify' => ['sms' => true, 'email' => true],
+            'callback_url' => route('referrals.payment.callback'),
+            'callback_method' => 'get',
+            'notes' => [
+                'referral_no' => $referral->referral_no,
+                'referral_currency' => $currency,
+            ]
+        ];
+
+        Log::info('Initiating Razorpay Referral Payment Link:', [
+            'referral_no' => $referral->referral_no,
+            'payload' => $payload
+        ]);
+
         $response = Http::withOptions(['verify' => (bool) $verifySsl])
             ->withBasicAuth($razorpayKey, $razorpaySecret)
-            ->post('https://api.razorpay.com/v1/payment_links', [
-                'amount' => (int) round(((float) $referral->amount) * 100),
-                'currency' => $currency,
-                'accept_partial' => false,
-                'description' => "Referral Session: " . $referral->referredTo->name,
-                'customer' => [
-                    'name' => $referral->user->name,
-                    'email' => $referral->user->email,
-                    'contact' => $referral->user->phone ?? '9999999999',
-                ],
-                'notify' => ['sms' => true, 'email' => true],
-                'callback_url' => route('referrals.payment.callback'),
-                'callback_method' => 'get',
-                'notes' => [
-                    'referral_no' => $referral->referral_no,
-                    'referral_currency' => $currency,
-                ]
-            ]);
+            ->post('https://api.razorpay.com/v1/payment_links', $payload);
 
         if ($response->successful()) {
             $paymentData = $response->json();
@@ -409,6 +427,13 @@ class ReferralController extends Controller
             $referral->save();
             return redirect($paymentData['short_url']);
         }
+
+        Log::error('Razorpay Referral Payment Link Error:', [
+            'referral_no' => $referral->referral_no,
+            'payload' => $payload,
+            'response' => $response->body(),
+            'status' => $response->status(),
+        ]);
 
         return redirect()->route('dashboard')->with('error', 'Unable to initiate payment.');
     }

@@ -68,6 +68,7 @@ class ContentManagerController extends Controller
                         });
                     }
                 })
+                ->orderColumn('id', 'users.id $1')
 
                 ->editColumn('name', function ($row) {
                     return $row->name ?: ($row->first_name . ' ' . $row->last_name);

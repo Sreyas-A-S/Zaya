@@ -43,6 +43,18 @@ class UserManagerController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('search') && !is_null($request->get('search')['value'])) {
+                        $search = $request->get('search')['value'];
+                        $query->where(function ($q) use ($search) {
+                            $q->where('users.first_name', 'LIKE', "%{$search}%")
+                                ->orWhere('users.last_name', 'LIKE', "%{$search}%")
+                                ->orWhere('users.name', 'LIKE', "%{$search}%")
+                                ->orWhere('users.email', 'LIKE', "%{$search}%")
+                                ->orWhere('users.phone', 'LIKE', "%{$search}%");
+                        });
+                    }
+                })
 
                 ->editColumn('name', function ($row) {
                     return $row->name ?: ($row->first_name . ' ' . $row->last_name);

@@ -742,7 +742,7 @@
                     tags: false,
                     minimumResultsForSearch: Infinity,
                     width: '100%',
-                    dropdownParent: $select.parent()
+                    dropdownParent: $('#contentManagerModal')
                 });
             });
 
@@ -751,7 +751,7 @@
             $('.select2').each(function() {
                 const $select = $(this);
                 $select.select2({
-                    dropdownParent: $select.parent(),
+                    dropdownParent: $('#contentManagerModal'),
                     width: '100%',
                     placeholder: $select.attr('placeholder') || "Select options",
                     allowClear: true

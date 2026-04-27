@@ -189,6 +189,11 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getLoginBlockReason(): ?string
     {
+        // Super admin is never blocked due to status
+        if ($this->role === 'super-admin') {
+            return null;
+        }
+
         $userStatus = strtolower(trim((string) ($this->status ?? 'active')));
         if ($userStatus !== 'active') {
             return 'Your account is currently inactive. Please wait for approval or contact support.';

@@ -505,7 +505,7 @@
                                         <div class="col-md-6">
                                             <label class="form-label">UPI ID (optional)</label>
                                             <input class="form-control" type="text" name="upi_id"
-                                                pattern="^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$"
+                                                placeholder="username@bank" maxlength="100"
                                                 title="Enter valid UPI ID (Example: user@upi)">
                                         </div>
                                         <div class="col-md-6">

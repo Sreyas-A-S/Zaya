@@ -707,7 +707,7 @@
             $select.select2({
                 placeholder: "Select options",
                 allowClear: true,
-                dropdownParent: $select.parent()
+                dropdownParent: $('#userManagerModal')
             });
         });
 
@@ -716,7 +716,7 @@
             $('.select2').each(function() {
                 const $select = $(this);
                 $select.select2({
-                    dropdownParent: $select.parent(),
+                    dropdownParent: $('#userManagerModal'),
                     width: '100%',
                     placeholder: $select.attr('placeholder') || "Select options",
                     allowClear: true

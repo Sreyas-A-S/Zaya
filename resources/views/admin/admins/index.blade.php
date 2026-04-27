@@ -666,7 +666,7 @@
                     tags: false,
                     minimumResultsForSearch: Infinity,
                     width: '100%',
-                    dropdownParent: $select.parent()
+                    dropdownParent: $('#adminModal')
                 });
             });
         };
