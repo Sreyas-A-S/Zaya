@@ -31,6 +31,65 @@
             border: none !important;
             box-shadow: none !important;
         }
+
+        @media (max-width: 991px) {
+            .page-header {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                height: 80px !important;
+                padding: 0 15px !important;
+                margin: 0 !important;
+            }
+
+            .logo-wrapper {
+                width: auto !important;
+                flex: 0 0 auto !important;
+                padding: 0 !important;
+                background-color: transparent !important;
+            }
+
+            .page-main-header {
+                flex: 1 1 auto !important;
+                width: auto !important;
+                padding: 0 !important;
+                display: flex !important;
+                justify-content: flex-end !important;
+                background-color: transparent !important;
+            }
+
+            .nav-right {
+                width: auto !important;
+                padding: 0 !important;
+            }
+
+            .header-right {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                gap: 5px !important;
+                margin-bottom: 0 !important;
+            }
+
+            .header-right li {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .header-right .custom-dropdown a {
+                padding: 10px 5px !important;
+                min-width: unset !important;
+            }
+
+            .user-wrap .user-content {
+                display: none !important;
+            }
+
+            .logo-wrapper a img {
+                width: 45px !important;
+            }
+        }
     </style>
     <div class="logo-wrapper d-flex align-items-center col-auto">
         <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none me-3">
