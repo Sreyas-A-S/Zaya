@@ -410,6 +410,14 @@ class RegisterController extends Controller
             return [null, []];
         }
 
+        // Check currency for fixed promo codes
+        if ($promo->type === 'fixed') {
+            $expectedCurrency = $request->input('registration_fee_currency', 'EUR');
+            if ($promo->currency && strtoupper($promo->currency) !== strtoupper($expectedCurrency)) {
+                return [null, []];
+            }
+        }
+
         $reward = is_numeric($promo->reward) ? (float) $promo->reward : 0.0;
 
         $discountAmount = 0.0;

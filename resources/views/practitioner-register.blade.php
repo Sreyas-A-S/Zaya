@@ -630,6 +630,7 @@
                                             <span class='text-gray-900 text-[1.05rem] font-medium'>{{ $practitionerRegistrationCurrencySymbol ?? '€' }} {{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}</span>
                                             <input type='hidden' name='registration_fee' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
                                             <input type='hidden' name='registration_fee_actual' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
+                                            <input type='hidden' name='registration_fee_currency' id='registration-fee-currency' value='{{ $practitionerRegistrationCurrency ?? 'EUR' }}'>
                                         </div>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-3 px-4 leading-relaxed">
@@ -870,8 +871,12 @@
                                 feeInput.value = feeValue.toFixed(2);
                             }
 
-                            // Update Payout Currency dropdown using TomSelect if available
-                            if (payoutCurrencyTomSelect) {
+                            const currencyInput = document.getElementById('registration-fee-currency');
+                            if (currencyInput) {
+                                currencyInput.value = currency;
+                            }
+
+                            // Update Payout Currency dropdown using TomSelect if available                            if (payoutCurrencyTomSelect) {
                                 payoutCurrencyTomSelect.setValue(currency);
                             } else if (payoutCurrencySelectEl) {
                                 payoutCurrencySelectEl.value = currency;
@@ -970,7 +975,8 @@
                                 code, 
                                 role: roleValue, 
                                 usage_type: 'registration',
-                                country: document.querySelector('#country-select') ? document.querySelector('#country-select').value : ''
+                                country: document.querySelector('#country-select') ? document.querySelector('#country-select').value : '',
+                                currency: document.getElementById('registration-fee-currency') ? document.getElementById('registration-fee-currency').value : 'EUR'
                             })
                         });
 
@@ -1205,7 +1211,7 @@
 
             const isMobile = window.innerWidth < 768;
             if (currentTab === totalTabs) {
-                nextBtnText.textContent = isMobile ? '{{ __('Submit') }}' : '{{ __('Complete & Proceed to Payment') }}';
+                nextBtnText.textContent = isMobile ? '{{ __('Submit') }}' : '{!! __('Complete & Proceed to Payment') !!}';
             } else {
                 nextBtnText.textContent = '{!! __('Save & Continue') !!}';
             }

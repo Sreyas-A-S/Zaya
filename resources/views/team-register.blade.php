@@ -1048,7 +1048,8 @@
                             code, 
                             role: "{{ $joinRole }}", 
                             usage_type: 'registration',
-                            country: countrySelect ? countrySelect.value : ''
+                            country: countrySelect ? countrySelect.value : '',
+                            currency: feeCurrencyInput ? feeCurrencyInput.value : 'EUR'
                         })
                     });
 

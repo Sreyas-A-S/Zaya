@@ -1092,7 +1092,9 @@ class WebController extends Controller
             $countryName = $request->input('country');
             $countryCode = 'all';
             if ($countryName) {
-                $dbCountry = \App\Models\Country::where('name', $countryName)->first();
+                $dbCountry = \App\Models\Country::where('name', $countryName)
+                    ->orWhere('code', strtoupper($countryName))
+                    ->first();
                 if ($dbCountry) {
                     $countryCode = strtoupper($dbCountry->code);
                 }
