@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Http\Controllers\DataAccessController;
 use Carbon\Carbon;
 
 class ReferralController extends Controller
@@ -113,7 +114,7 @@ class ReferralController extends Controller
             // Notify Referred Professional (Informational)
             try {
                 Mail::to($referral->referredTo->email)->send(new ReferralReceivedMail($referral));
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 Log::error('Referral Received Email Error: ' . $e->getMessage());
             }
 
@@ -135,8 +136,11 @@ class ReferralController extends Controller
         // Send ONE Referral Invitation Mail to Client
         try {
             $batchReferrals = Referral::where('batch_no', $batchNo)->get();
-            Mail::to($booking->user->email)->send(new ReferralInvitationMail($batchReferrals->first())); 
-        } catch (\Exception $e) {
+            $firstReferral = $batchReferrals->first();
+            if ($booking->user && $firstReferral) {
+                Mail::to($booking->user->email)->send(new ReferralInvitationMail($firstReferral)); 
+            }
+        } catch (\Throwable $e) {
             Log::error('Referral Invitation Email Error: ' . $e->getMessage());
         }
 
@@ -167,7 +171,7 @@ class ReferralController extends Controller
 
         try {
             Mail::to($client->email)->send(new \App\Mail\ReferralOTPMail($otp, $practitioner->name, implode(', ', $proNames)));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Referral OTP Email Error: ' . $e->getMessage());
         }
     }
@@ -250,7 +254,7 @@ class ReferralController extends Controller
             if ($newBooking->practitioner && $newBooking->practitioner->user) {
                 Mail::to($newBooking->practitioner->user->email)->send(new BookingMail($newBooking, 'practitioner'));
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Referral Booking Confirmation Email Error: ' . $e->getMessage());
         }
         

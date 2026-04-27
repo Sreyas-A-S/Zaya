@@ -544,6 +544,16 @@ class BookingController extends Controller
 
         if ($query) $usersQuery->where('name', 'LIKE', "%{$query}%");
 
+        // Filter: only experts who handle at least one of the services in the current consultation
+        if ($booking && $booking->service_ids) {
+            $usersQuery->whereHas('userServices', function($q) use ($booking) {
+                $q->whereIn('service_id', (array)$booking->service_ids)
+                  ->where(function($sq) {
+                      $sq->whereNull('status')->orWhere('status', 'active');
+                  });
+            });
+        }
+
         // Prepare matching criteria from current booking
         $matchCriteria = [];
         if ($booking) {

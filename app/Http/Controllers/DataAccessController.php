@@ -52,7 +52,7 @@ class DataAccessController extends Controller
                 Mail::to($client->email)->send(new DataAccessOTPMail($otp, $practitioner->name));
             }
             return response()->json(['success' => 'OTP has been sent to the client\'s email.']);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Data Access OTP Error: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to send OTP. Please try again.'], 500);
         }
