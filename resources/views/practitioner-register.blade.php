@@ -860,11 +860,12 @@
                             })
                         });
 
+                        let isEnabled = true;
                         if (response.ok) {
                             const data = await response.json();
                             const feeValue = parseFloat(data.fee || 0);
                             const currency = data.currency || 'EUR';
-                            const isEnabled = data.enabled !== undefined ? data.enabled : true;
+                            isEnabled = data.enabled !== undefined ? data.enabled : true;
                             
                             if (feeInput && feeActualInput) {
                                 feeActualInput.value = feeValue.toFixed(2);
@@ -876,7 +877,8 @@
                                 currencyInput.value = currency;
                             }
 
-                            // Update Payout Currency dropdown using TomSelect if available                            if (payoutCurrencyTomSelect) {
+                            // Update Payout Currency dropdown using TomSelect if available
+                            if (payoutCurrencyTomSelect) {
                                 payoutCurrencyTomSelect.setValue(currency);
                             } else if (payoutCurrencySelectEl) {
                                 payoutCurrencySelectEl.value = currency;
@@ -887,9 +889,9 @@
                             } else {
                                 registrationCurrencySymbol = currency;
                             }
-                            
-                            renderRegistrationFee(isEnabled);
                         }
+                        
+                        renderRegistrationFee(isEnabled);
                     } catch (error) {
                         console.error('Error fetching country-specific fee:', error);
                     }
