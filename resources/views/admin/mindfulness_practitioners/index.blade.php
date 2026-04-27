@@ -874,8 +874,8 @@
                 <p id="status-confirmation-msg">Select the new status for this practitioner:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input-practitioner" class="form-select">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="approved">Active</option>
+                        <option value="rejected">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-practitioner-id">
@@ -1115,7 +1115,12 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
-                body: JSON.stringify({ code, role: 'mindfulness_practitioner' })
+                body: JSON.stringify({ 
+                    code, 
+                    role: 'mindfulness_practitioner',
+                    usage_type: 'registration',
+                    country: document.querySelector('[name="country"]') ? document.querySelector('[name="country"]').value : 'all'
+                })
             });
 
             const data = await response.json();

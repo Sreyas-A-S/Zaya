@@ -1180,7 +1180,12 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
-                    body: JSON.stringify({ code, role: 'client' })
+                    body: JSON.stringify({ 
+                        code, 
+                        role: 'client',
+                        usage_type: 'registration',
+                        country: document.querySelector('[name="country"]') ? document.querySelector('[name="country"]').value : 'all'
+                    })
                 });
 
                 const data = await response.json();

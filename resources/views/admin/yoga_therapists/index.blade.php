@@ -716,8 +716,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 <p id="status-confirmation-text">Select the new status for this practitioner:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input" class="form-select">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="approved">Active</option>
+                        <option value="rejected">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-therapist-id">
@@ -1182,7 +1182,12 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         },
-                        body: JSON.stringify({ code, role: 'yoga_therapist' })
+                        body: JSON.stringify({ 
+                            code, 
+                            role: 'yoga_therapist',
+                            usage_type: 'registration',
+                            country: document.querySelector('[name="country"]') ? document.querySelector('[name="country"]').value : 'all'
+                        })
                     });
 
                     const data = await response.json();
@@ -2228,10 +2233,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     <p>Are you sure you want to change the status for this therapist?</p>
                     <input type="hidden" id="status-therapist-id">
                     <select class="form-select mt-3" id="status-select-input-therapist">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                </div>
+                        <option value="approved">Active</option>
+                        <option value="rejected">Inactive</option>
+                    </select>                </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>

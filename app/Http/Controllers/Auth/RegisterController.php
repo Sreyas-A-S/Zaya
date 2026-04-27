@@ -478,15 +478,15 @@ class RegisterController extends Controller
             'address_line_2' => $request->address_line_2,
             'city' => $request->city,
             'state' => $request->state,
-            'country' => $request->country,
+            'country' => $request->country ?: $request->nationality,
             'payout_currency' => $payoutCurrency,
             'zip_code' => $request->zip_code,
-            'phone' => $request->mobile_number,
+            'phone' => $request->mobile_number ?: $request->mobile,
             'mobile_country_code' => $request->mobile_country_code,
             'consultation_preferences' => $request->consultation_preferences,
             'languages_spoken' => $request->languages,
             'referral_type' => $request->referral_type,
-            'nationality' => $request->nationality,
+            'nationality' => $request->nationality ?: $request->country,
             'status' => 'active',
         ]);
     }
@@ -541,11 +541,12 @@ class RegisterController extends Controller
             'country',
             'zip_code',
             'payout_currency',
-            'phone',
             'website_url',
             'can_translate_english',
             'cover_letter_text'
         ]), $filePaths);
+
+        $profileData['phone'] = $request->phone ?: ($request->mobile ?: $request->mobile_number);
 
         $profileData['consultations'] = $request->ayurvedic_practices ?? $request->consultations;
         $profileData['body_therapies'] = $request->massage_practices ?? $request->body_therapies;
@@ -606,7 +607,7 @@ class RegisterController extends Controller
             'full_name' => trim($request->first_name . ' ' . $request->last_name),
             'gender' => $request->gender,
             'dob' => $request->dob,
-            'phone' => $request->mobile_number,
+            'phone' => $request->phone ?: ($request->mobile ?: $request->mobile_number),
             'nationality' => $request->nationality,
 
             'profile_photo_path' => $profilePhotoPath,

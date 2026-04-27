@@ -348,6 +348,10 @@
 
                     const data = await response.json();
                     if (response.ok) {
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                            return;
+                        }
                         document.getElementById('thank-you-popup').classList.remove('hidden');
                         document.getElementById('thank-you-popup').classList.add('flex');
                     } else {

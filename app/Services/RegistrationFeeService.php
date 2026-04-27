@@ -56,28 +56,41 @@ class RegistrationFeeService
 
         // Use fee currency if available, otherwise derive from user country
         $currency = $feeCurrency;
+// Fetch phone and currency from related profiles if not on user
+$phone = $user->phone ?? $user->mobile ?? '';
+$payoutCurrency = $user->payout_currency ?? $user->currency ?? $currency;
 
-        $notes = array_merge([
-            'user_id' => $user->id,
-            'role' => $role,
-            'source' => 'registration',
-            'payout_currency' => (string) ($user->payout_currency ?? $user->currency ?? $currency),
-        ], $extraNotes);
+if (!$phone) {
+    if (($role === 'practitioner' || ($user->role ?? '') === 'practitioner') && $user->practitioner) {
+        $phone = $user->practitioner->phone;
+        $payoutCurrency = $user->practitioner->payout_currency ?? $payoutCurrency;
+    } elseif (($role === 'client' || ($user->role ?? '') === 'patient' || ($user->role ?? '') === 'client') && $user->patient) {
+        $phone = $user->patient->phone;
+    }
+}
 
-        try {
-            $response = Http::withOptions(['verify' => (bool) $verifySsl])
-                ->withBasicAuth($razorpayKey, $razorpaySecret)
-                ->post('https://api.razorpay.com/v1/payment_links', [
-                    'amount' => (int) round($fee * 100),
-                    'currency' => $currency,
-                    'description' => 'Registration Fee - ' . $map[$role]['label'],
-                    'customer' => [
-                        'name' => (string) ($user->name ?? 'User'),
-                        'email' => (string) $user->email,
-                        'contact' => (string) ($user->phone ?? $user->mobile ?? ''),
-                    ],
-                    'notify' => [
-                        'sms' => false,
+$notes = array_merge([
+    'user_id' => $user->id,
+    'role' => $role,
+    'source' => 'registration',
+    'payout_currency' => (string) $payoutCurrency,
+], $extraNotes);
+
+$paymentUrl = null;
+$orderId = null;
+
+try {
+    $response = Http::withOptions(['verify' => (bool) $verifySsl])
+        ->withBasicAuth($razorpayKey, $razorpaySecret)
+        ->post('https://api.razorpay.com/v1/payment_links', [
+            'amount' => (int) round($fee * 100),
+            'currency' => $currency,
+            'description' => 'Registration Fee - ' . ($map[$role]['label'] ?? ucfirst($role)),
+            'customer' => [
+                'name' => (string) ($user->name ?? 'User'),
+                'email' => (string) $user->email,
+                'contact' => (string) ($phone ?: ''),
+            ],
                         'email' => true,
                     ],
                     'callback_url' => route('registration-fees.callback'),

@@ -709,8 +709,8 @@
                 <p id="status-confirmation-text">Select the new status for this practitioner:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input" class="form-select">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="approved">Active</option>
+                        <option value="rejected">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-practitioner-id">
@@ -1515,8 +1515,8 @@
         $('#imageUpload').val('');
         croppedFile = null;
 
-        practitionerTotalSteps = 6;
-        $('.stepper-item[data-step="6"]').show();
+        practitionerTotalSteps = 5;
+        $('.stepper-item[data-step="6"]').hide();
         clearAdminPromoPrac();
         updateStep(1);
         $('#practitioner-form-modal').modal('show');
@@ -2114,7 +2114,6 @@
     this.value = this.value.replace(/\s/g, '');
 });
 
-    /*
     // Promocode Logic for Practitioner
     const promoInputPrac = document.getElementById('admin-promocode-input-practitioner');
     const promoApplyBtnPrac = document.getElementById('admin-promo-apply-btn-practitioner');
@@ -2136,30 +2135,33 @@
         if (promoDetailsPrac) promoDetailsPrac.classList.add('d-none');
         if (promoCodeHiddenPrac) {
             promoCodeHiddenPrac.value = '';
-            promoPercHiddenPrac.value = '';
-            promoAmtHiddenPrac.value = '';
-            promoTotalHiddenPrac.value = '';
+            if (promoPercHiddenPrac) promoPercHiddenPrac.value = '';
+            if (promoAmtHiddenPrac) promoAmtHiddenPrac.value = '';
+            if (promoTotalHiddenPrac) promoTotalHiddenPrac.value = '';
+            
             if (feeActualInputPrac && feeInputPrac) {
                 feeInputPrac.value = feeActualInputPrac.value;
-                feeDisplayPrac.innerText = `${currencySymbolPrac} ${parseFloat(feeInputPrac.value).toFixed(2)}`;
+                if (feeDisplayPrac) {
+                    feeDisplayPrac.innerText = `${currencySymbolPrac} ${parseFloat(feeInputPrac.value).toFixed(2)}`;
+                }
             }
         }
     }
 
     promoInputPrac?.addEventListener('input', () => {
-        if (promoCodeHiddenPrac.value) clearAdminPromoPrac();
+        if (promoCodeHiddenPrac && promoCodeHiddenPrac.value) clearAdminPromoPrac();
     });
 
     promoApplyBtnPrac?.addEventListener('click', async () => {
         const code = promoInputPrac.value.trim();
         if (!code) {
-            promoStatusPrac.innerHTML = '<span class="text-danger">Please enter a code.</span>';
+            if (promoStatusPrac) promoStatusPrac.innerHTML = '<span class="text-danger">Please enter a code.</span>';
             return;
         }
 
         promoApplyBtnPrac.disabled = true;
         promoApplyBtnPrac.innerText = 'Checking...';
-        promoStatusPrac.innerHTML = '';
+        if (promoStatusPrac) promoStatusPrac.innerHTML = '';
 
         try {
             const response = await fetch("{{ route('promo.validate') }}", {
@@ -2169,42 +2171,49 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ code, role: 'practitioner' })
+                body: JSON.stringify({ 
+                    code, 
+                    role: 'practitioner',
+                    usage_type: 'registration',
+                    country: document.querySelector('[name="country"]') ? document.querySelector('[name="country"]').value : 'all'
+                })
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                promoStatusPrac.innerHTML = `<span class="text-danger">${data.message || 'Invalid code.'}</span>`;
+                if (promoStatusPrac) promoStatusPrac.innerHTML = `<span class="text-danger">${data.message || 'Invalid code.'}</span>`;
                 clearAdminPromoPrac();
                 return;
             }
 
             // Success
-            promoStatusPrac.innerHTML = '<span class="text-success">Promo applied!</span>';
-            promoDetailsPrac.classList.remove('d-none');
+            if (promoStatusPrac) promoStatusPrac.innerHTML = '<span class="text-success">Promo applied!</span>';
+            if (promoDetailsPrac) promoDetailsPrac.classList.remove('d-none');
             
-            document.getElementById('admin-promo-discount-percent-practitioner').innerText = `${data.discount_percentage}%`;
-            document.getElementById('admin-promo-discount-amount-practitioner').innerText = `${currencySymbolPrac} ${data.discount_amount}`;
-            document.getElementById('admin-promo-final-amount-practitioner').innerText = `${currencySymbolPrac} ${data.total_fee}`;
+            if (document.getElementById('admin-promo-discount-percent-practitioner')) 
+                document.getElementById('admin-promo-discount-percent-practitioner').innerText = `${data.discount_percentage}%`;
+            if (document.getElementById('admin-promo-discount-amount-practitioner'))
+                document.getElementById('admin-promo-discount-amount-practitioner').innerText = `${currencySymbolPrac} ${data.discount_amount}`;
+            if (document.getElementById('admin-promo-final-amount-practitioner'))
+                document.getElementById('admin-promo-final-amount-practitioner').innerText = `${currencySymbolPrac} ${data.total_fee}`;
             
-            feeDisplayPrac.innerText = `${currencySymbolPrac} ${data.total_fee}`;
-            feeInputPrac.value = data.total_fee;
+            if (feeDisplayPrac) feeDisplayPrac.innerText = `${currencySymbolPrac} ${data.total_fee}`;
+            if (feeInputPrac) feeInputPrac.value = data.total_fee;
 
-            promoCodeHiddenPrac.value = data.code;
-            promoPercHiddenPrac.value = data.discount_percentage;
-            promoAmtHiddenPrac.value = data.discount_amount;
-            promoTotalHiddenPrac.value = data.total_fee;
+            if (promoCodeHiddenPrac) promoCodeHiddenPrac.value = data.code;
+            if (promoPercHiddenPrac) promoPercHiddenPrac.value = data.discount_percentage;
+            if (promoAmtHiddenPrac) promoAmtHiddenPrac.value = data.discount_amount;
+            if (promoTotalHiddenPrac) promoTotalHiddenPrac.value = data.total_fee;
 
         } catch (err) {
-            promoStatusPrac.innerHTML = '<span class="text-danger">Error validating code.</span>';
+            if (promoStatusPrac) promoStatusPrac.innerHTML = '<span class="text-danger">Error validating code.</span>';
             clearAdminPromoPrac();
         } finally {
             promoApplyBtnPrac.disabled = false;
             promoApplyBtnPrac.innerText = 'Apply';
         }
     });
-    */
 
 </script>
 

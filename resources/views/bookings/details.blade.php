@@ -111,72 +111,89 @@
                     </button>
                 </div>
 
-                <div id="page-distribution-info" class="hidden mt-8 pt-8 border-t border-white/10 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500 relative z-10">
-                    {{-- Breakdown of Client Payment --}}
-                    <div>
-                        <p class="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">Payment Breakdown</p>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                                <p class="text-[8px] font-black text-white/40 uppercase tracking-widest mb-1">Service Base</p>
-                                <p class="text-sm font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($booking->subtotal, 2) }}</p>
-                            </div>
-                            
-                            @if($booking->discount_amount > 0)
-                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                                <p class="text-[8px] font-black text-white/40 uppercase tracking-widest mb-1">Promo ({{ $booking->promo_code }})</p>
-                                <p class="text-sm font-black text-red-300">- {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->discount_amount, 2) }}</p>
-                            </div>
-                            @endif
+                <div id="page-distribution-info" class="hidden mt-8 pt-8 border-t border-white/10 space-y-8 animate-in fade-in slide-in-from-top-4 duration-500 relative z-10">
+                    {{-- Financial Summary Flow --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {{-- Left: Client Payment Breakdown --}}
+                        <div class="space-y-4">
+                            <p class="text-[10px] font-black text-white/40 uppercase tracking-widest border-b border-white/5 pb-2">Client Payment Breakdown</p>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[11px] text-white/60">Gross Booking Value</span>
+                                    <span class="text-sm font-black text-white">{{ get_currency_symbol($booking->currency) }} {{ number_format($booking->subtotal, 2) }}</span>
+                                </div>
+                                
+                                @if($booking->discount_amount > 0)
+                                <div class="flex justify-between items-center text-red-300">
+                                    <span class="text-[11px]">Promo Discount ({{ $booking->promo_code }})</span>
+                                    <span class="text-sm font-black">- {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->discount_amount, 2) }}</span>
+                                </div>
+                                @endif
 
-                            @if($booking->coin_discount > 0)
-                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                                <p class="text-[8px] font-black text-white/40 uppercase tracking-widest mb-1">Coin Discount</p>
-                                <p class="text-sm font-black text-red-300">- {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->coin_discount, 2) }}</p>
-                            </div>
-                            @endif
+                                @if($booking->coin_discount > 0)
+                                <div class="flex justify-between items-center text-red-300">
+                                    <span class="text-[11px]">Coin Discount Applied</span>
+                                    <span class="text-sm font-black">- {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->coin_discount, 2) }}</span>
+                                </div>
+                                @endif
 
-                            <div class="p-4 bg-white/10 rounded-2xl border border-white/10 ring-1 ring-white/5">
-                                <p class="text-[8px] font-black text-emerald-300 uppercase tracking-widest mb-1">Net Paid</p>
-                                <p class="text-sm font-black text-emerald-400">{{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}</p>
+                                <div class="pt-3 border-t border-white/10 flex justify-between items-center text-emerald-400">
+                                    <span class="text-[11px] font-black uppercase tracking-widest">Net Paid by Client</span>
+                                    <span class="text-lg font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Right: Share Distribution --}}
+                        <div class="space-y-4">
+                            <p class="text-[10px] font-black text-white/40 uppercase tracking-widest border-b border-white/5 pb-2">Share Distribution</p>
+                            <div class="space-y-3">
+                                @if($userTransaction->practitioner_id === $user->id)
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[11px] text-white/60">Zaya Platform Fee ({{ number_format($userTransaction->company_commission_percent, 1) }}%)</span>
+                                        <span class="text-sm font-black text-red-300">- {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->company_share, 2) }}</span>
+                                    </div>
+                                    @if($userTransaction->referrer_share > 0)
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[11px] text-white/60">Referral Payout ({{ number_format($userTransaction->referrer_commission_percent, 1) }}%)</span>
+                                        <span class="text-sm font-black text-orange-300">- {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->referrer_share, 2) }}</span>
+                                    </div>
+                                    @endif
+                                    <div class="pt-3 border-t border-white/10 flex justify-between items-center text-white">
+                                        <span class="text-[11px] font-black uppercase tracking-widest text-emerald-400">Your Earned Share</span>
+                                        <span class="text-2xl font-black">{{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->practitioner_share, 2) }}</span>
+                                    </div>
+                                @else
+                                    {{-- Referrer View --}}
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[11px] text-white/60">Referral Commission Rate</span>
+                                        <span class="text-sm font-black text-emerald-300">{{ number_format($userTransaction->referrer_commission_percent, 1) }}%</span>
+                                    </div>
+                                    <div class="pt-3 border-t border-white/10 flex justify-between items-center text-white">
+                                        <span class="text-[11px] font-black uppercase tracking-widest text-emerald-400">Your Referral Earning</span>
+                                        <span class="text-2xl font-black">{{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->referrer_share, 2) }}</span>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
 
-                    {{-- Distribution of Net Amount --}}
-                    <div>
-                        <p class="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">Share Distribution</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            @if($userTransaction->practitioner_id === $user->id)
-                                <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                                    <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Zaya Platform Fee ({{ number_format($userTransaction->company_commission_percent, 1) }}%)</p>
-                                    <p class="text-lg font-black text-red-300">- {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->company_share, 2) }}</p>
-                                </div>
-                                @if($userTransaction->referrer_share > 0)
-                                <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                                    <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Referral Payout ({{ number_format($userTransaction->referrer_commission_percent, 1) }}%)</p>
-                                    <p class="text-lg font-black text-orange-300">- {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->referrer_share, 2) }}</p>
-                                </div>
-                                @endif
-                                <div class="p-4 bg-white/10 rounded-2xl border border-emerald-500/30">
-                                    <p class="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-1">Your Earned Share</p>
-                                    <p class="text-lg font-black text-white">{{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->practitioner_share, 2) }}</p>
-                                </div>
-                            @else
-                                {{-- Referrer View --}}
-                                <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                                    <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Referral Rate</p>
-                                    <p class="text-lg font-black text-emerald-300">{{ number_format($userTransaction->referrer_commission_percent, 1) }}%</p>
-                                </div>
-                                <div class="p-4 bg-white/10 rounded-2xl border border-emerald-500/30">
-                                    <p class="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-1">Your Referral Earning</p>
-                                    <p class="text-lg font-black text-white">{{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->referrer_share, 2) }}</p>
-                                </div>
-                                <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                                    <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Status</p>
-                                    <p class="text-lg font-black uppercase text-emerald-300">{{ $userTransaction->status }}</p>
-                                </div>
-                            @endif
+                    {{-- Transaction Meta --}}
+                    <div class="flex flex-wrap gap-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/20 pt-4 border-t border-white/5">
+                        <div class="flex items-center gap-2">
+                            <i class="ri-hashtag"></i>
+                            <span>TXN: {{ $userTransaction->transaction_no }}</span>
                         </div>
+                        <div class="flex items-center gap-2">
+                            <i class="ri-time-line"></i>
+                            <span>Processed: {{ $userTransaction->created_at->format('M d, Y H:i') }}</span>
+                        </div>
+                        @if($booking->is_test)
+                        <div class="flex items-center gap-2 text-orange-400">
+                            <i class="ri-test-tube-line"></i>
+                            <span>Test Mode Transaction</span>
+                        </div>
+                        @endif
                     </div>
                 </div>
 

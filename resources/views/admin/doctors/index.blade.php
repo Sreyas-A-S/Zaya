@@ -869,9 +869,8 @@
                 <p id="status-confirmation-text">Select the new status for this doctor:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input" class="form-select">
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="approved">Active</option>
+                        <option value="rejected">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-doctor-id">
@@ -1667,7 +1666,12 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
-                    body: JSON.stringify({ code, role: 'doctor' })
+                    body: JSON.stringify({ 
+                        code, 
+                        role: 'doctor',
+                        usage_type: 'registration',
+                        country: document.querySelector('[name="country"]') ? document.querySelector('[name="country"]').value : 'all'
+                    })
                 });
 
                 const data = await response.json();
@@ -2089,8 +2093,8 @@
                                 <img src="${p.profile_photo_path ? '/storage/' + p.profile_photo_path : '/admiro/assets/images/user/user.png'}" 
                                      class="img-fluid rounded-circle mb-3 shadow-sm" 
                                      style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #fff;">
-                                <span class="position-absolute bottom-0 end-0 badge rounded-pill ${p.status === 'approved' ? 'bg-success' : (p.status === 'pending' ? 'bg-warning' : 'bg-danger')}" style="transform: translate(-10%, -10%);">
-                                    ${p.status ? p.status.toUpperCase() : 'PENDING'}
+                                <span class="position-absolute bottom-0 end-0 badge rounded-pill ${p.status === 'active' ? 'bg-success' : 'bg-danger'}" style="transform: translate(-10%, -10%);">
+                                    ${p.status ? p.status.toUpperCase() : 'INACTIVE'}
                                 </span>
                             </div>
                             <h4 class="mb-1">${fullName}</h4>

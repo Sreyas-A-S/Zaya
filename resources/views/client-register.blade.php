@@ -1697,6 +1697,7 @@
                                 code,
                                 role: roleValue,
                                 usage_type: 'registration',
+                                country: countrySelect ? countrySelect.value : '',
                                 currency: feeCurrencyInput.value,
                                 amount: feeActualInput.value
                             })
@@ -1723,7 +1724,11 @@
 
                         if (feeInput && data.total_fee !== undefined) {
                             feeInput.value = data.total_fee;
-                            renderFee(data.total_fee);
+                            // Update main display to show BASE fee so subtraction is obvious
+                            const mainFeeDisplay = document.getElementById('registration-fee-display');
+                            if (mainFeeDisplay) {
+                                mainFeeDisplay.textContent = `${currencySymbol} ${parseFloat(data.base_fee).toFixed(2)}`;
+                            }
                         }
 
                         promoBreakdown?.classList.remove('hidden');
