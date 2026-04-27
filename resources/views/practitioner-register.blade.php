@@ -1205,11 +1205,7 @@
 
             const isMobile = window.innerWidth < 768;
             if (currentTab === totalTabs) {
-<<<<<<< HEAD
                 nextBtnText.textContent = isMobile ? '{{ __('Submit') }}' : '{{ __('Complete & Proceed to Payment') }}';
-=======
-                nextBtnText.textContent = '{!! __('Complete & Proceed to Payment') !!}';
->>>>>>> d32b6fa2a6a653d1dfb438602f8d0074aa078717
             } else {
                 nextBtnText.textContent = '{!! __('Save & Continue') !!}';
             }
