@@ -266,7 +266,7 @@ class RegisterController extends Controller
                 Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail(ucwords(str_replace('_', ' ', $user->role))));
 
                 // Important: Load profile relations so FeeService can find the country
-                $user->load(['practitioner', 'doctor', 'mindfulnessPractitioner', 'yoga_therapist', 'translator']);
+                $user->load(['practitioner', 'doctor', 'mindfulnessPractitioner', 'yogaTherapist', 'translator']);
 
                 if ($feeOverride !== null && $feeOverride <= 0) {
                     $paymentLink = null;
@@ -278,7 +278,7 @@ class RegisterController extends Controller
                     // Redirect to payment immediately
                     if ($request->wantsJson()) {
                         return response()->json([
-                            'success' => 'Registration successful! Redirecting to payment...',
+                            'success' => 'Redirecting to payment...',
                             'redirect_url' => $paymentLink['payment_url']
                         ], 201);
                     }

@@ -1056,22 +1056,22 @@
                             const data = await response.json().catch(() => ({}));
 
                             if (response.ok) {
-                                // Show Thank You Popup
+                                // If redirected to payment
+                                if (data.redirect_url) {
+                                    if (submitBtn) {
+                                        submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i> Redirecting to Payment...';
+                                    }
+                                    window.location.href = data.redirect_url;
+                                    return;
+                                }
+
+                                // Show Thank You Popup (Success without payment)
                                 const popup = document.getElementById('thank-you-popup');
                                 if (popup) {
                                     popup.classList.remove('hidden');
                                     popup.classList.add('flex');
                                 }
 
-                                // If redirected to payment
-                                if (data.redirect_url) {
-                                    setTimeout(() => {
-                                        window.location.href = data.redirect_url;
-                                    }, 1500);
-                                    return;
-                                }
-
-                                // Otherwise, normal registration success
                                 if (data.success && typeof showZayaToast === 'function') {
                                     showZayaToast(data.success, 'success');
                                 }

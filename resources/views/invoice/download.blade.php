@@ -16,7 +16,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -27,24 +27,39 @@
             position: absolute;
             left: -9999px;
             top: 0;
+            width: 800px; /* Consistent width for PDF generation */
         }
     </style>
 </head>
 
 <body class="bg-gray-50">
 
+    @include('partials.frontend.success-popup')
+
     <div class="downloading-overlay">
-        <div class="mb-6">
-            <div class="w-16 h-16 border-4 border-t-[#1e3a2f] border-gray-200 rounded-full animate-spin"></div>
+        <div id="loader-section" class="flex flex-col items-center">
+            <div class="mb-6">
+                <div class="w-16 h-16 border-4 border-t-[#1e3a2f] border-gray-200 rounded-full animate-spin"></div>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ __('Preparing your invoice...') }}</h1>
+            <p class="text-gray-500 mb-8">{{ __('Your download will start automatically.') }}</p>
         </div>
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ __('Preparing your invoice...') }}</h1>
-        <p class="text-gray-500 mb-8">{{ __('Your download will start automatically.') }}</p>
         
-        <div class="text-center">
-            <p class="text-sm text-gray-400 mb-4">{{ __('Redirecting you to login in 5 seconds...') }}</p>
-            <a href="{{ route('zaya-login') }}" class="px-8 py-3 bg-[#1e3a2f] text-white font-semibold rounded-full hover:bg-[#16261f] transition-all">
-                {{ __('Go to Login') }}
-            </a>
+        <div id="success-section" class="hidden text-center animate-[fadeIn_0.5s_ease-out]">
+            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                <i class="ri-checkbox-circle-fill text-5xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ __('Payment Successful!') }}</h1>
+            <p class="text-gray-600 mb-8 max-w-md">{{ __('Thank you for your payment. Your invoice has been generated and should have started downloading.') }}</p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="downloadInvoiceManually()" class="px-8 py-3 bg-white border border-[#1e3a2f] text-[#1e3a2f] font-semibold rounded-full hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+                    <i class="ri-download-2-line"></i> {{ __('Download Again') }}
+                </button>
+                <a href="{{ route('zaya-login') }}?success=Payment successful! You can now login to your account." class="px-8 py-3 bg-[#1e3a2f] text-white font-semibold rounded-full hover:bg-[#16261f] transition-all flex items-center justify-center">
+                    {{ __('Continue to Login') }}
+                </a>
+            </div>
         </div>
     </div>
 
@@ -57,40 +72,64 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
+        const opt = {
+            margin: 0.3,
+            filename: 'Invoice_{{ $booking->invoice_no }}.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true,
+                logging: false,
+                letterRendering: true
+            },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        function downloadInvoiceManually() {
+            const element = document.querySelector('#invoice-card');
+            if (!element) return;
+            html2pdf().set(opt).from(element).save();
+        }
+
         window.addEventListener('load', function() {
+            // Show the success popup if the window object has the function
+            if (window.showSuccessPopup) {
+                window.showSuccessPopup();
+            }
+
             const element = document.querySelector('#invoice-card');
             if (!element) {
                 console.error('Invoice card not found');
+                document.getElementById('loader-section').classList.add('hidden');
+                document.getElementById('success-section').classList.remove('hidden');
                 return;
             }
 
-            const opt = {
-                margin: 0.3,
-                filename: 'Invoice_{{ $booking->invoice_no }}.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true,
-                    logging: false,
-                    letterRendering: true
-                },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-
             // Generate and save PDF
             html2pdf().set(opt).from(element).save().then(() => {
-                // Wait 2 seconds after download starts, then redirect
+                // Change UI to success after download starts
                 setTimeout(() => {
-                    window.location.href = "{{ route('zaya-login') }}?success=Payment successful! Your invoice has been downloaded.";
-                }, 2000);
+                    document.getElementById('loader-section').classList.add('hidden');
+                    document.getElementById('success-section').classList.remove('hidden');
+                }, 1000);
+
+                // Auto redirect after 8 seconds of showing success
+                setTimeout(() => {
+                    window.location.href = "{{ route('zaya-login') }}?success=Payment successful! Welcome to Zaya Wellness.";
+                }, 8000);
             }).catch(err => {
                 console.error('PDF Generation Error:', err);
-                // Fallback redirect if PDF fails
-                setTimeout(() => {
-                    window.location.href = "{{ route('zaya-login') }}";
-                }, 3000);
+                document.getElementById('loader-section').classList.add('hidden');
+                document.getElementById('success-section').classList.remove('hidden');
             });
         });
     </script>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </body>
 </html>

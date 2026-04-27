@@ -133,7 +133,9 @@
     "Integrated therapeutic movement": "Integrated therapeutic movement",
     "Mindful emotional restoration": "Mindful emotional restoration",
     "Explore": "Explore",
-    "Location": "Location",
-    "Contact": "Contact",
-    "Working Hours": "Working Hours"
+    "contact_info_location_label": "Location",
+    "contact_info_phone_label": "Contact",
+    "contact_info_email_label": "Email",
+    "contact_info_working_hours_label": "Working Hours",
+    "contact_form_consent_text": "I give consent to Zaya for processing my personal data in accordance with GDPR"
 }

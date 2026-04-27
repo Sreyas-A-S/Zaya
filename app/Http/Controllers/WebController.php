@@ -70,7 +70,10 @@ class WebController extends Controller
         $language = App::getLocale();
         $languages = Language::where('status', 'active')->get();
 
-        $p1 = Practitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+        $practitioners = Practitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
+            ->whereHas('user', function ($q) {
+                $q->where('role', 'practitioner');
+            })
             ->where(function ($q) {
                 $q->where(function ($sq) {
                     $sq->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0');
@@ -78,33 +81,7 @@ class WebController extends Controller
                     $sq->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
                 });
             })
-            ->latest()->take(5)->get();
-
-        $p2 = Doctor::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->where(function ($q) {
-                $q->where(function ($sq) {
-                    $sq->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0');
-                })->orWhere(function ($sq) {
-                    $sq->whereNotNull('health_conditions_treated')->whereRaw('JSON_LENGTH(health_conditions_treated) > 0');
-                });
-            })
-            ->latest()->take(5)->get();
-
-        $p3 = MindfulnessPractitioner::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->where(function ($q) {
-                $q->where(function ($sq) {
-                    $sq->whereNotNull('practitioner_type')->whereRaw('JSON_LENGTH(practitioner_type) > 0');
-                })->orWhere(function ($sq) {
-                    $sq->whereNotNull('client_concerns')->whereRaw('JSON_LENGTH(client_concerns) > 0');
-                });
-            })
-            ->latest()->take(5)->get();
-
-        $p4 = YogaTherapist::with(['user', 'reviews'])->whereIn('status', ['active', 'approved'])
-            ->whereNotNull('areas_of_expertise')->whereRaw('JSON_LENGTH(areas_of_expertise) > 0')
-            ->latest()->take(5)->get();
-
-        $practitioners = $p1->concat($p2)->concat($p3)->concat($p4)->sortByDesc('created_at')->take(8);
+            ->latest()->take(8)->get();
 
         $testimonials = Testimonial::withCount(['likes', 'replies'])->where('status', 'approved')->latest()->get();
         $ip = request()->ip();
@@ -354,6 +331,9 @@ class WebController extends Controller
 
         $practitionerQuery = Practitioner::with(['user', 'reviews', 'userServices.service'])
             ->whereIn('status', ['active', 'approved'])
+            ->whereHas('user', function ($q) {
+                $q->where('role', 'practitioner');
+            })
             ->where(function ($q) {
                 $q->where(function ($sq) {
                     $sq->whereNotNull('specialization')->whereRaw('JSON_LENGTH(specialization) > 0');
