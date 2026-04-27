@@ -9,13 +9,12 @@
         
         @php
             $descMap = [
-                'Ayurveda' => __('Restore your natural state of health through personalized Ayurvedic routines. Find the wellness path that completely aligns with your physical health.'),
-                'Yoga' => __('Realign your body and energetic pathways with our expert yoga guidance and therapeutic healing sessions.'),
-                'Counselling' => __('Nurture your mental well-being with our holistic counselling approaches designed to heal and strengthen.'),
-                'Packages' => __('Comprehensive holistic wellness journeys tailored perfectly to your individual lifestyle and needs.')
+                'Ayurveda' => $settings['services_desc_ayurveda'] ?? __('Restore your natural state of health through personalized Ayurvedic routines. Find the wellness path that completely aligns with your physical health.'),
+                'Yoga' => $settings['services_desc_yoga'] ?? __('Realign your body and energetic pathways with our expert yoga guidance and therapeutic healing sessions.'),
+                'Counselling' => $settings['services_desc_counselling'] ?? __('Nurture your mental well-being with our holistic counselling approaches designed to heal and strengthen.'),
+                'Packages' => $settings['services_desc_packages'] ?? __('Comprehensive holistic wellness journeys tailored perfectly to your individual lifestyle and needs.')
             ];
             $categoryDescription = $descMap[$category] ?? __('Explore our expertly curated selection of holistic health and wellness services designed specifically for you.');
-        @endphp
         @endphp
 
         <section class="pt-[144px] md:pt-[150px] px-4 md:px-6 bg-white min-h-screen pb-20">
@@ -25,7 +24,7 @@
                     <h1 class="text-4xl md:text-7xl font-serif text-primary font-medium tracking-tight" data-i18n="{{ $category }}">
                         {{ __($category) }}
                     </h1>
-                    <p class="text-gray-500 text-[15px] md:text-base leading-relaxed max-w-xl md:mt-4 md:text-right" data-i18n="desc_{{ strtolower($category) }}">
+                    <p id="services_desc_{{ strtolower($category) }}" class="text-gray-500 text-[15px] md:text-base leading-relaxed max-w-xl md:mt-4 md:text-right" data-i18n="services_desc_{{ strtolower($category) }}">
                         {{ $categoryDescription }}
                     </p>
                 </div>
@@ -50,8 +49,8 @@
                         @else
                             <input type="hidden" name="category" value="{{ request('category', $category) }}">
                         @endif
-                        <input type="text" name="search" value="{{ request('search') }}"
-                            placeholder="{{ __('Search services or conditions...') }}" data-i18n="Search services or conditions..."
+                        <input id="services_search_placeholder" type="text" name="search" value="{{ request('search') }}"
+                            placeholder="{{ $settings['services_search_placeholder'] ?? __('Search services or conditions...') }}" data-i18n="services_search_placeholder"
                             class="text-sm outline-none lg:text-base italic bg-transparent text-gray-700 placeholder-gray-400 w-full md:w-56">
                         <button type="submit" class="text-gray-600 hover:text-primary">
                             <i class="ri-search-line font-medium"></i>
