@@ -1229,6 +1229,7 @@
     let table;
     let toastInstance;
     let languageChoices;
+    let langSelect;
     let iti;
     let phoneInput;
 
@@ -1523,7 +1524,7 @@
 
 
         // Initialize Choices.js
-        const langSelect = document.getElementById('languages_select');
+        langSelect = document.getElementById('languages_select');
         if (langSelect) {
             languageChoices = new Choices(langSelect, {
                 removeItemButton: true,
