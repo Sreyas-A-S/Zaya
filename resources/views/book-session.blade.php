@@ -827,7 +827,8 @@
             }
         }
 
-        function clearPromoCode() {
+        function clearPromoCode(silent = false) {
+            const wasApplied = appliedPromoCode !== null;
             appliedPromoCode = null;
             promoDiscountAmount = 0;
             
@@ -836,15 +837,21 @@
             const btn = document.getElementById('apply-promo-btn');
             const clearBtn = document.getElementById('clear-promo-btn');
             
-            input.value = '';
-            input.readOnly = false;
-            btn.classList.remove('hidden');
-            clearBtn.classList.add('hidden');
-            messageEl.classList.add('hidden');
-            messageEl.textContent = '';
+            if (input) {
+                input.value = '';
+                input.readOnly = false;
+            }
+            if (btn) btn.classList.remove('hidden');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            if (messageEl) {
+                messageEl.classList.add('hidden');
+                messageEl.textContent = '';
+            }
             
             updateStep3Services();
-            showToast('Promo code removed.', 'success');
+            if (wasApplied && !silent) {
+                showToast('Promo code removed.', 'success');
+            }
         }
 
         async function submitBooking(btn) {
