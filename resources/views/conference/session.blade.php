@@ -549,7 +549,7 @@
 @section('scripts')
     @if($provider === 'agora')
         <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js"></script>
-    @elseif($provider === 'jaas')
+    @elseif($provider === 'jaas' && !empty($jaasAppId))
         <script src="https://{{ $jaasDomain }}/{{ $jaasAppId }}/external_api.js"></script>
     @elseif($provider === 'daily')
         <script src="https://unpkg.com/@daily-co/daily-js"></script>
@@ -911,6 +911,7 @@
                 try { await fetch(uploadRecordingUrl, { method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken }, body: formData }); } catch (error) { console.error('Recording upload failed:', error); } finally { recordingState.chunks = []; }
             }
         });
+    </script>
     <script>
         let currentRating = 0;
         function setRating(rating) {

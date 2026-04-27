@@ -109,46 +109,7 @@
 
         <!-- Main: Recordings & History -->
         <div class="lg:col-span-2 space-y-8">
-            <!-- Session Recordings -->
-            <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
-                <h3 class="text-xl font-bold text-secondary mb-6 flex items-center gap-2">
-                    <i class="ri-video-chat-line text-primary"></i>
-                    Session Recordings
-                </h3>
-                
-                @if($recordings->count() > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @foreach($recordings as $recording)
-                    <div class="group relative bg-[#F9F9F9] rounded-2xl overflow-hidden border border-gray-100 hover:border-primary transition-all">
-                        <div class="p-5">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
-                                    <i class="ri-play-fill text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-secondary">{{ $recording->invoice_no }}</p>
-                                    <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{{ $recording->booking_date->format('M d, Y') }}</p>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center mt-4">
-                                <span class="text-xs text-gray-500">With: {{ $recording->practitioner->user->name }}</span>
-                                <a href="{{ route('recordings.show', $recording->id) }}" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
-                                    Watch <i class="ri-arrow-right-s-line"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @else
-                <div class="py-12 text-center">
-                    <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4">
-                        <i class="ri-video-off-line text-2xl text-gray-300"></i>
-                    </div>
-                    <p class="text-gray-400 font-medium">No session recordings available for this client.</p>
-                </div>
-                @endif
-            </div>
+
 
             <!-- Session History -->
             <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
