@@ -93,6 +93,15 @@ class ReferralController extends Controller
             // If has access and amount is 0, we can skip pending and go straight to paid
             $status = ($hasExistingAccess && $refData['amount'] == 0) ? 'paid' : $initialStatus;
 
+            // Only refer services that the professional actually handles
+            $requiredServiceIds = (array) ($booking->service_ids ?? []);
+            $handledServiceIds = \App\Models\UserService::where('user_id', $refData['id'])
+                ->whereIn('service_id', $requiredServiceIds)
+                ->pluck('service_id')
+                ->toArray();
+            
+            $finalServiceIds = !empty($handledServiceIds) ? $handledServiceIds : $requiredServiceIds;
+
             $referral = Referral::create([
                 'referral_no' => $referralNo,
                 'batch_no' => $batchNo,
@@ -100,7 +109,7 @@ class ReferralController extends Controller
                 'user_id' => $booking->user_id,
                 'referred_by_id' => $user->id,
                 'referred_to_id' => $refData['id'],
-                'service_ids' => $booking->service_ids,
+                'service_ids' => $finalServiceIds,
                 'amount' => $refData['amount'],
                 'currency' => $this->resolveProfessionalCurrency($referredToUser),
                 'booking_date' => $refData['booking_date'],
@@ -344,9 +353,6 @@ class ReferralController extends Controller
         ]);
 
         foreach ($batch as $ref) {
-            // Also grant access to all professionals in the batch
-            DataAccessController::grantAccess($ref->referred_to_id, $ref->user_id);
-
             if ($ref->amount > 0) {
                 $ref->update(['status' => 'pending']);
             } else {

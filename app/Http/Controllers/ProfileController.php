@@ -51,9 +51,10 @@ class ProfileController extends Controller
                        ->where('practitioner_type', $morphClass);
                 });
 
-                // 2. Referred bookings
+                // 2. Referred bookings (only show if the referral is confirmed/paid)
                 $q->orWhereHas('referralsFromThisSession', function($sq) use ($user) {
-                    $sq->where('referred_to_id', $user->id);
+                    $sq->where('referred_to_id', $user->id)
+                       ->where('status', 'paid');
                 });
             });
         }

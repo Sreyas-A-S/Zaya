@@ -91,22 +91,24 @@ try {
                 'email' => (string) $user->email,
                 'contact' => (string) ($phone ?: ''),
             ],
-                        'email' => true,
-                    ],
-                    'callback_url' => route('registration-fees.callback'),
-                    'callback_method' => 'get',
-                    'notes' => array_map('strval', $notes),
-                ]);
+            'notify' => [
+                'sms' => false,
+                'email' => true,
+            ],
+            'callback_url' => route('registration-fees.callback'),
+            'callback_method' => 'get',
+            'notes' => array_map('strval', $notes),
+        ]);
 
-            if ($response->successful()) {
-                $paymentUrl = $response->json('short_url');
-                $orderId = $response->json('id');
-            } else {
-                \Log::error('Razorpay Payment Link Error: ' . $response->body());
-            }
-        } catch (\Exception $e) {
-            \Log::error('Razorpay Connection Error: ' . $e->getMessage());
+        if ($response->successful()) {
+            $paymentUrl = $response->json('short_url');
+            $orderId = $response->json('id');
+        } else {
+            \Log::error('Razorpay Payment Link Error: ' . $response->body());
         }
+    } catch (\Exception $e) {
+        \Log::error('Razorpay Connection Error: ' . $e->getMessage());
+    }
 
         if (!$paymentUrl) {
             return null;

@@ -579,23 +579,23 @@ class BookingController extends Controller
             $missingServices = [];
 
             if ($booking && in_array($u->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'])) {
-                // 1. Check if they handle the EXACT services requested
-                $requiredServiceIds = $booking->service_ids ?? [];
+                // 1. Check which services they handle from the consultation
+                $requiredServiceIds = (array) ($booking->service_ids ?? []);
                 $userServices = \App\Models\UserService::where('user_id', $u->id)
                     ->whereIn('service_id', $requiredServiceIds)
                     ->get();
                 
                 $handledServiceIds = $userServices->pluck('service_id')->toArray();
+                $serviceFee = (float) $userServices->sum('rate');
                 
                 if (count($requiredServiceIds) > 0) {
                     $missingServiceIds = array_diff($requiredServiceIds, $handledServiceIds);
-                    if (empty($missingServiceIds)) {
-                        $handlesAllServices = true;
-                        $serviceFee = $userServices->sum('rate');
-                    } else {
-                        $missingServices = \App\Models\Service::whereIn('id', $missingServiceIds)->pluck('title')->toArray();
-                    }
+                    $handlesAllServices = empty($missingServiceIds);
+                    $missingServices = \App\Models\Service::whereIn('id', $missingServiceIds)->pluck('title')->toArray();
                 }
+
+                // If they handle AT LEAST ONE service, we consider they can take a referral for those.
+                $hasCompatibleService = !empty($handledServiceIds);
 
                 // 2. Check for Recommendation (Service overlap or Condition match)
                 $profile = $u->profile;

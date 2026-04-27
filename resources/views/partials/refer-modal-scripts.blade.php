@@ -471,10 +471,10 @@
                                 ${recommendedBadge}
                             </div>
                             <div class="flex flex-wrap items-center gap-2 mt-1">
-                                <span class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${p.handles_service ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-50 text-gray-400'}">
-                                    ${p.handles_service ? 'Handles Service' : 'Consultation Only'}
+                                <span class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${p.handles_service ? 'bg-emerald-50 text-emerald-600' : (p.service_fee > 0 ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-400')}">
+                                    ${p.handles_service ? 'Handles Service' : (p.service_fee > 0 ? 'Partial Match' : 'Consultation Only')}
                                 </span>
-                                ${p.handles_service && p.service_fee > 0 ? `
+                                ${p.service_fee > 0 ? `
                                     <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">
                                         Fee: €${parseFloat(p.service_fee).toFixed(2)}
                                     </span>
