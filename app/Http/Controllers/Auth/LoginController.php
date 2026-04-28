@@ -182,6 +182,10 @@ class LoginController extends Controller
 
     protected function loggedOut(Request $request)
     {
+        if ($request->is('admin/*') || $request->routeIs('admin.*')) {
+            return redirect()->route('admin.login');
+        }
+
         return redirect()->route('zaya-login');
     }
 }
