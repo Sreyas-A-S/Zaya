@@ -1385,7 +1385,7 @@ class WebController extends Controller
             'last_name' => 'required|string|min:1|max:50',
             'email' => 'required|email:rfc,dns|max:255',
             'phone' => 'required|string|min:7|max:15|regex:/^\+?[0-9\s\-\+\(\)]+$/',
-            'user_type' => 'nullable|array',
+            'user_type' => 'nullable|string|in:client,practitioner',
             'message' => 'required|string|min:10|max:2000',
         ]);
 

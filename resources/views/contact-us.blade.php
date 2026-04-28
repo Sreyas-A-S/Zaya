@@ -229,14 +229,14 @@
                 <label id="contact-label-user-type" class="block text-base text-secondary font-normal mb-3" data-i18n="I am a">{{ __('I am a') }}</label>
                 <div class="flex gap-8">
                     <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox" name="user_type[]" value="client"
-                            class="w-5 h-5 border-gray-300 rounded-sm text-gray-600 focus:ring-0 focus:ring-offset-0 bg-[#E8E8E8]"
+                        <input type="radio" name="user_type" value="client"
+                            class="w-5 h-5 border-gray-300 rounded-full text-primary focus:ring-primary focus:ring-offset-0 bg-[#E8E8E8]"
                             checked>
                         <span id="contact-user-type-client" class="text-secondary text-base font-normal" data-i18n="Client">{{ __('Client') }}</span>
                     </label>
                     <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox" name="user_type[]" value="practitioner"
-                            class="w-5 h-5 border-gray-300 rounded-sm text-gray-600 focus:ring-0 focus:ring-offset-0 bg-[#E8E8E8]">
+                        <input type="radio" name="user_type" value="practitioner"
+                            class="w-5 h-5 border-gray-300 rounded-full text-primary focus:ring-primary focus:ring-offset-0 bg-[#E8E8E8]">
                         <span id="contact-user-type-practitioner" class="text-secondary text-base font-normal" data-i18n="Practitioner">{{ __('Practitioner') }}</span>
                     </label>
                 </div>

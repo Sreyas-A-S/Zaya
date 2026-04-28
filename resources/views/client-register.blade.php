@@ -603,8 +603,11 @@
                                 <label
                                     class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Email') }}</label>
                                 <input type="email" name="email" value="{{ old('email') }}"
-                                    class="reg-input @error('email') border-red-500! @enderror" autocomplete="off"
-                                    placeholder="{{ __('Enter Email') }}" required>
+                                    class="reg-input @error('email') border-red-500! @enderror" 
+                                    placeholder="{{ __('Enter Email') }}" required
+                                    readonly
+                                    onfocus="this.removeAttribute('readonly');"
+                                    onclick="this.removeAttribute('readonly');">
                                 @error('email')
                                     <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                                 @enderror
@@ -750,7 +753,10 @@
                                 <div class="relative">
                                     <input type="password" name="password" id="password"
                                         class="reg-input @error('password') border-red-500! @enderror"
-                                        placeholder="Enter Password" required>
+                                        placeholder="Enter Password" required
+                                        readonly
+                                        onfocus="this.removeAttribute('readonly');"
+                                        onclick="this.removeAttribute('readonly');">
                                     <button type="button" onclick="togglePassword('password')"
                                         class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                         <i class="ri-eye-line text-lg" id="password-icon"></i>
@@ -789,7 +795,10 @@
                                     class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Confirm Password') }}</label>
                                 <div class="relative">
                                     <input type="password" name="password_confirmation" id="password_confirmation"
-                                        class="reg-input" placeholder="{{ __('Confirm Password') }}" required>
+                                        class="reg-input" placeholder="{{ __('Confirm Password') }}" required
+                                        readonly
+                                        onfocus="this.removeAttribute('readonly');"
+                                        onclick="this.removeAttribute('readonly');">
                                     <button type="button" onclick="togglePassword('password_confirmation')"
                                         class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                         <i class="ri-eye-line text-lg" id="password_confirmation-icon"></i>
@@ -817,64 +826,46 @@
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                                <!-- Left: Promo Input & Summary -->
-                                <div class="space-y-6">
-                                    <div>
-                                        <label
-                                            class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{{ __('Promocode') }}</label>
-                                        <div class="relative w-full">
-                                            <input type="text" name="promocode" id="promocode-input"
-                                                placeholder="CODE1234"
-                                                class="w-full h-[52px] pl-6 pr-28 bg-white rounded-full border border-dashed border-gray-300 outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#FABC41] focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)] uppercase">
-                                            <button type="button" id="promo-apply-btn"
-                                                class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full transition-colors text-sm font-medium hover:bg-[#e0a932]">
-                                                {{ __('Apply') }}
-                                            </button>
-                                        </div>
+                                <!-- Promocode -->
+                                <div>
+                                    <label
+                                        class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{{ __('Promocode') }}</label>
+                                    <div class="relative w-full">
+                                        <input type="text" name="promocode" id="promocode-input"
+                                            placeholder="CODE1234"
+                                            class="w-full h-[52px] pl-6 pr-28 bg-white rounded-full border border-dashed border-gray-300 outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#FABC41] focus:shadow-[0_0_0_3px_rgba(250,188,65,0.1)] uppercase">
+                                        <button type="button" id="promo-apply-btn"
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full transition-colors text-sm font-medium hover:bg-[#e0a932]">
+                                            {{ __('Apply') }}
+                                        </button>
                                     </div>
+                                </div>
 
-                                    <div class="bg-secondary/5 rounded-[24px] p-6 space-y-4">
+                                <!-- Registration Fee Summary -->
+                                <div class="bg-secondary/5 rounded-[24px] p-5 space-y-2">
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-gray-500 font-medium">{{ __('Registration Fee') }}</span>
+                                        <span id="registration-fee-display" class="font-bold text-secondary">
+                                            {{ config('currencies.symbols')[$clientRegistrationCurrency] ?? $clientRegistrationCurrency }}
+                                            {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
+                                        </span>
+                                    </div>
+                                    <div id="promo-breakdown"
+                                        class="hidden space-y-2 pt-4 border-t border-secondary/10">
                                         <div class="flex justify-between items-center text-sm">
-                                            <span class="text-gray-500 font-medium">{{ __('Registration Fee') }}</span>
-                                            <span id="registration-fee-display" class="font-bold text-secondary">
-                                                {{ config('currencies.symbols')[$clientRegistrationCurrency] ?? $clientRegistrationCurrency }}
-                                                {{ number_format($clientRegistrationFee ?? 0, 2, '.', '') }}
-                                            </span>
+                                            <span class="text-gray-500 font-medium">{{ __('Discount') }}</span>
+                                            <span id="promo-discount-amount-display"
+                                                class="font-bold text-green-600"></span>
                                         </div>
-                                        <div id="promo-breakdown"
-                                            class="hidden space-y-4 pt-4 border-t border-secondary/10">
-                                            <div class="flex justify-between items-center text-sm">
-                                                <span class="text-gray-500 font-medium">{{ __('Discount') }}</span>
-                                                <span id="promo-discount-amount-display"
-                                                    class="font-bold text-green-600"></span>
-                                            </div>
-                                            <div
-                                                class="flex justify-between items-center pt-4 border-t border-secondary/10">
-                                                <span class="font-bold text-secondary">{{ __('Total Payable') }}</span>
-                                                <span id="promo-total-fee-display"
-                                                    class="text-lg font-black text-secondary"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Right: Action Info -->
-                                <div class="bg-gray-50 rounded-[24px] p-6 border border-gray-100">
-                                    <div class="flex gap-4">
                                         <div
-                                            class="w-10 h-10 rounded-full bg-[#60E48C]/10 flex items-center justify-center shrink-0">
-                                            <i class="ri-shield-check-line text-[#60E48C] text-xl"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-bold text-secondary mb-1">{{ __('Secure Payment') }}
-                                            </p>
-                                            <p class="text-xs text-gray-500 leading-relaxed">
-                                                {{ __('Your registration will be processed immediately after successful payment through our secure Razorpay gateway.') }}
-                                            </p>
+                                            class="flex justify-between items-center pt-4 border-t border-secondary/10">
+                                            <span class="font-bold text-secondary">{{ __('Total Payable') }}</span>
+                                            <span id="promo-total-fee-display"
+                                                class="text-lg font-black text-secondary"></span>
                                         </div>
                                     </div>
                                 </div>
-
+                            </div>
                                 <!-- Hidden Data Storage -->
                                 <div class="hidden">
                                     <input type="hidden" name="registration_fee" id="registration_fee"
@@ -1081,6 +1072,9 @@
                             const data = await response.json().catch(() => ({}));
 
                             if (response.ok) {
+                                // Reset the form immediately on success
+                                registrationForm.reset();
+                                
                                 // If redirected to payment
                                 if (data.redirect_url) {
                                     if (submitBtn) {
@@ -1095,6 +1089,15 @@
                                 if (popup) {
                                     popup.classList.remove('hidden');
                                     popup.classList.add('flex');
+
+                                    // Auto redirect after 3 seconds
+                                    setTimeout(() => {
+                                        if (typeof closeThankYouPopup === 'function') {
+                                            closeThankYouPopup();
+                                        } else {
+                                            window.location.href = "{{ route('zaya-login') }}";
+                                        }
+                                    }, 3000);
                                 }
 
                                 if (data.success && typeof showZayaToast === 'function') {
@@ -1630,10 +1633,14 @@
                     if (popup) {
                         popup.classList.remove('hidden');
                         popup.classList.add('flex');
+
+                        // Auto redirect after 3 seconds
+                        setTimeout(() => {
+                            closeThankYouPopup();
+                        }, 3000);
                     }
                 });
             @endif
-
                 function closeThankYouPopup() {
                     const popup = document.getElementById('thank-you-popup');
                     if (popup) {

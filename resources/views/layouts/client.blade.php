@@ -468,6 +468,11 @@
         }
 
         function toggleLanguage(targetLocale) {
+            // Show a preloader if available
+            if (typeof window.showPreloader === 'function') {
+                window.showPreloader();
+            }
+
             fetch(`{{ url('/lang') }}/${targetLocale}`, {
                     method: "POST",
                     headers: {
@@ -478,74 +483,14 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status) {
-                        // 1. Update translations using data-i18n
-                        if (data.translations) {
-                            document.querySelectorAll('[data-i18n]').forEach(el => {
-                                const key = el.getAttribute('data-i18n');
-                                el.textContent = data.translations[key] || key;
-                            });
-
-                             // Specific ID label update
-                             const idLabel = document.getElementById('id-label');
-                             if (idLabel) idLabel.textContent = data.translations['Client ID'] || ({{ ($user->role === 'client' || $user->role === 'patient') ? 1 : 0 }} ? 'Client ID' : 'Professional ID');
-                             
-                             // Update Settings-based elements
-                             if (data.data) {
-                                 Object.keys(data.data).forEach(key => {
-                                     document.querySelectorAll(`[id="${key}"], [id="${key}_mobile"]`).forEach(element => {
-                                         element.textContent = data.data[key];
-                                     });
-                                 });
-                             }
-                        }
-
-                        // 2. Update toggle UI (Sync all toggles)
-                        const pills = document.querySelectorAll('[id^="lang-toggle-pill"]');
-                        const langTexts = document.querySelectorAll('[id^="lang-text-"]');
-
-                        pills.forEach(pill => {
-                            @if(isset($available_languages) && $available_languages->count() >= 2)
-                            @php
-                                $l1 = $available_languages->first();
-                                $l2 = $available_languages->skip(1)->first();
-                            @endphp
-                            if (targetLocale === '{{ $l2->code }}') {
-                                pill.classList.remove('translate-x-0');
-                                pill.classList.add('translate-x-full');
-                            } else {
-                                pill.classList.remove('translate-x-full');
-                                pill.classList.add('translate-x-0');
-                            }
-                            @endif
-                        });
-
-                        langTexts.forEach(txt => {
-                            if (txt.id === `lang-text-${targetLocale}` || txt.id === `lang-text-${targetLocale}-mobile`) {
-                                txt.classList.remove('text-gray-500');
-                                txt.classList.add('text-white');
-                            } else {
-                                txt.classList.remove('text-white');
-                                txt.classList.add('text-gray-500');
-                            }
-                        });
-
-                        // 3. Update onclick for all toggle buttons
-                        @if(isset($available_languages) && $available_languages->count() >= 2)
-                        @php
-                            $l1 = $available_languages->first();
-                            $l2 = $available_languages->skip(1)->first();
-                        @endphp
-                        const nextLocale = targetLocale === '{{ $l1->code }}' ? '{{ $l2->code }}' : '{{ $l1->code }}';
-                        document.querySelectorAll('button[onclick^="toggleLanguage"]').forEach(btn => {
-                            btn.setAttribute('onclick', `toggleLanguage('${nextLocale}')`);
-                        });
-                        @endif
-                        
-                        console.log("Language switched dynamically to:", targetLocale);
+                        console.log("Language switched to:", targetLocale);
+                        // Force a full page reload to ensure all content is updated correctly
+                        location.reload();
                     }
                 })
                 .catch(error => {
                     console.error('Error switching language:', error);
+                    // Fallback to traditional redirect if AJAX fails
                     window.location.href = `{{ url('/lang') }}/${targetLocale}`;
                 });
         }
