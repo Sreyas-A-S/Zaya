@@ -1347,7 +1347,7 @@
 
             const isMobile = window.innerWidth < 768;
             if (currentTab === totalTabs) {
-                nextBtnText.textContent = isMobile ? '{{ __('Submit') }}' : '{!! __('Complete & Proceed to Payment') !!}';
+                nextBtnText.textContent = isMobile ? '{{ __('Submit') }}' : '{!! __('Complete & Proceed') !!}';
             } else {
                 nextBtnText.textContent = '{!! __('Save & Continue') !!}';
             }
@@ -1496,9 +1496,17 @@
                          const data = await response.json().catch(() => ({}));
                          const paymentUrl = data && data.redirect_url ? data.redirect_url : (data && data.payment_url ? data.payment_url : null);
                          
+                         // Reset the form on success
+                         form.reset();
+                         if (typeof TomSelect !== 'undefined') {
+                             document.querySelectorAll('select').forEach(el => {
+                                 if (el.tomselect) el.tomselect.clear();
+                             });
+                         }
+
                          if (paymentUrl) {
                              // Redirect to Payment Gateway immediately or with a tiny delay
-                             btnText.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Redirecting to Payment...';
+                             btnText.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Redirecting...';
                              setTimeout(() => {
                                  window.location.href = paymentUrl;
                              }, 800);

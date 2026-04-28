@@ -141,8 +141,8 @@
                     <!-- Left Text -->
                     <div>
                         <div class="mb-8 animate-on-scroll">
-                            <span id="services_page_badge" class="bg-accent text-secondary px-8 py-2.5 rounded-full font-medium text-base inline-block" data-i18n="Our Services">
-                                {{ $settings['services_page_badge'] ?? __('Our Services') }}
+                            <span id="services_page_badge" class="bg-accent text-secondary px-8 py-2.5 rounded-full font-medium text-base inline-block" data-i18n="Our services">
+                                {{ $settings['services_page_badge'] ?? __('Our services') }}
                             </span>
                         </div>
                         <h1 id="services_page_title" class="text-4xl md:text-5xl font-serif font-bold text-primary mb-8 leading-tight">

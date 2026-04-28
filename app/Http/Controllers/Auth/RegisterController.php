@@ -44,7 +44,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/admin';
+    protected $redirectTo = '/zaya-login';
 
     /**
      * Create a new controller instance.
@@ -1151,7 +1151,7 @@ class RegisterController extends Controller
         }
 
         if ($request->role === 'client' || $request->role === 'patient') {
-            return redirect()->back()->with('success', 'Registration successful! Please login to your account.');
+            return redirect()->route('zaya-login')->with('success', 'Registration successful! Please login to your account.');
         }
     }
 }

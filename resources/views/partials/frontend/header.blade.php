@@ -46,7 +46,7 @@
                 <div
                     class="absolute top-full -left-8 w-[240px] bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-left overflow-hidden py-5">
                     <a id="nav-our-specialities" href="{{ route('services') }}"
-                        class="block px-6 pb-4 text-[16px] leading-none font-medium text-gray-800 hover:text-primary transition-colors" data-i18n="Our Specialities">{{ __($site_settings['services_title'] ?? 'Our Specialities') }}</a>
+                        class="block px-6 pb-4 text-[16px] leading-none font-medium text-gray-800 hover:text-primary transition-colors" data-i18n="Our services">{{ __($site_settings['services_title'] ?? 'Our services') }}</a>
                     <div class="flex flex-col gap-1 pl-3">
                         <a id="nav-ayurveda" href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
                             class="flex items-center gap-3 px-6 py-2 text-[15px] text-gray-600 hover:text-primary transition-colors" data-i18n="Ayurveda">
@@ -167,7 +167,7 @@
             <span class="text-lg font-medium text-secondary" data-i18n="Services">{{ __($site_settings['services_page_badge'] ?? 'Services') }}</span>
             <div class="pl-4 flex flex-col gap-2 border-l-2 border-primary/20">
                 <a id="nav-our-specialities-mobile" href="{{ route('services') }}"
-                    class="text-base font-medium text-gray-800 hover:text-primary transition-colors inline-block mt-1" data-i18n="Our Specialities">{{ __($site_settings['services_title'] ?? 'Our Specialities') }}</a>
+                    class="text-base font-medium text-gray-800 hover:text-primary transition-colors inline-block mt-1" data-i18n="Our services">{{ __($site_settings['services_title'] ?? 'Our services') }}</a>
                 <div class="flex flex-col gap-2">
                     <a href="{{ route('services', ['category' => 'Ayurveda']) }}#services-listing"
                         class="text-gray-600 text-base flex items-center gap-3 hover:text-primary transition-colors" data-i18n="Ayurveda">

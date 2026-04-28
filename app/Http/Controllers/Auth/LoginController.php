@@ -76,7 +76,7 @@ class LoginController extends Controller
             $blockReason = auth()->user()->getLoginBlockReason();
             if ($blockReason) {
                 auth()->logout();
-                return redirect()->route('admin.login')->with('error', $blockReason);
+                return redirect()->route('zaya-login')->with('error', $blockReason);
             }
 
             $adminRoles = [
@@ -102,7 +102,7 @@ class LoginController extends Controller
             $nonAdminRoles = ['doctor', 'practitioner', 'mindfulness-practitioner', 'yoga-therapist', 'client', 'patient', 'translator'];
             if (in_array(auth()->user()->role, $nonAdminRoles)) {
                 auth()->logout();
-                return redirect()->route('admin.login')->with('error', 'Access denied. Doctors, Practitioners, Clients and Translators must login via their respective portals.');
+                return redirect()->route('zaya-login')->with('error', 'Access denied. Doctors, Practitioners, Clients and Translators must login via their respective portals.');
             }
 
             auth()->logout();
@@ -139,7 +139,7 @@ class LoginController extends Controller
         // If it's a backend user (not in allowed list), log them out and redirect back with error
         if (!in_array(strtolower($user->role), $allowedRoles)) {
             auth()->logout();
-            return redirect()->route('login')
+            return redirect()->route('zaya-login')
                 ->with('error', 'Backend users are not allowed to login through this portal. Please use the Admin Portal.');
         }
 
@@ -160,7 +160,7 @@ class LoginController extends Controller
         $blockReason = $user->getLoginBlockReason();
         if ($blockReason) {
             auth()->logout();
-            return redirect()->route('login')->with('error', $blockReason);
+            return redirect()->route('zaya-login')->with('error', $blockReason);
         }
 
         if ($request->has('redirect')) {
@@ -182,9 +182,6 @@ class LoginController extends Controller
 
     protected function loggedOut(Request $request)
     {
-        if (str_contains(url()->previous(), '/admin')) {
-            return redirect()->route('admin.login');
-        }
-        return redirect()->route('login');
+        return redirect()->route('zaya-login');
     }
 }
