@@ -956,8 +956,7 @@
                                 <button type="submit" id="submit-btn"
                                     class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-black text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-xl shadow-[#FABC41]/20">
                                     <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
-                                    <span class="hidden sm:inline">{!! __('Complete & Proceed to Payment') !!}</span>
-                                    <span class="sm:hidden">{!! __('Proceed & Pay') !!}</span>
+                                    <span class="hidden sm:inline">{!! __('Complete & Proceed') !!}</span>                                    <span class="sm:hidden">{!! __('Proceed & Pay') !!}</span>
                                 </button>
                             </div>
                         </div>
@@ -1053,8 +1052,7 @@
                                 // If redirected to payment
                                 if (data.redirect_url) {
                                     if (submitBtn) {
-                                        submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i> Redirecting to Payment...';
-                                    }
+                                        submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i> Redirecting...';                                    }
                                     window.location.href = data.redirect_url;
                                     return;
                                 }

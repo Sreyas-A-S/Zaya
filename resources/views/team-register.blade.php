@@ -196,7 +196,7 @@
             font-size: 1.2rem;
         }
 
-        /* Hide native calendar picker indicator in Chrome/Edge while keeping it for Safari if needed, 
+        /* Hide native calendar picker indicator in Chrome/Edge while keeping it for safari if needed, 
            but since we use appearance:none, Safari hides it anyway. */
         .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
             position: absolute;
@@ -208,6 +208,27 @@
             padding: 0;
             cursor: pointer;
             opacity: 0;
+        }
+
+        /* Thank You Popup Styles */
+        #thank-you-popup {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .animate-pop-in {
+            animation: popIn 0.3s ease-out forwards;
         }
     </style>
 </head>
@@ -518,7 +539,7 @@
                                 <a href="{{ route('index') }}" class="text-gray-500 hover:text-gray-700 font-medium transition-colors hidden sm:block">{{ __('Cancel') }}</a>
                                 <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">
                                     <i class="ri-loader-4-line ri-spin btn-loader"></i>
-                                    <span class="hidden md:inline">{!! __('Complete & Proceed to Payment') !!}</span>
+                                    <span class="hidden md:inline">{!! __('Complete & Proceed') !!}</span>
                                     <span class="md:hidden">{{ __('Submit') }}</span>
                                 </button>
                             </div>
@@ -917,14 +938,116 @@
                 });
             });
             
-            // Handle form submission with loading state
+            // Handle form submission with AJAX
             const registerForm = document.querySelector('form[action*="register"]');
             if (registerForm) {
-                registerForm.addEventListener('submit', function(e) {
+                registerForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
                     const submitBtn = document.getElementById('submit-btn');
                     if (submitBtn) {
                         submitBtn.classList.add('loading');
                         submitBtn.style.pointerEvents = 'none';
+                        submitBtn.disabled = true;
+                    }
+
+                    try {
+                        const formData = new FormData(this);
+                        const response = await fetch(this.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                            }
+                        });
+
+                        const data = await response.json().catch(() => ({}));
+
+                        if (response.ok) {
+                            // Reset the form immediately on success
+                            registerForm.reset();
+                            showTab(0);
+
+                            // Reset TomSelects if any
+                            document.querySelectorAll('[data-tomselect], [data-nationality-select], [data-country-select]').forEach(el => {
+                                if (el.tomselect) {
+                                    el.tomselect.clear();
+                                }
+                            });
+
+                            // If redirected to payment
+                            if (data.redirect_url) {
+                                if (submitBtn) {
+                                    submitBtn.innerHTML = '<i class="ri-loader-4-line ri-spin btn-loader"></i> Redirecting...';
+                                }
+                                window.location.href = data.redirect_url;
+                                return;
+                            }
+
+                            // Show Thank You Popup
+                            const popup = document.getElementById('thank-you-popup');
+                            if (popup) {
+                                popup.classList.remove('hidden');
+                                popup.classList.add('flex');
+
+                                // Auto redirect after 3 seconds
+                                setTimeout(() => {
+                                    closeThankYouPopup();
+                                }, 3000);
+                            }
+
+                            if (data.success && typeof showZayaToast === 'function') {
+                                showZayaToast(data.success, 'success');
+                            }
+                        } else {
+                            // Handle validation errors
+                            if (submitBtn) {
+                                submitBtn.classList.remove('loading');
+                                submitBtn.style.pointerEvents = 'auto';
+                                submitBtn.disabled = false;
+                            }
+
+                            if (data.errors) {
+                                let firstErrorField = null;
+                                Object.keys(data.errors).forEach((key, index) => {
+                                    const errorMsg = data.errors[key][index] || data.errors[key][0];
+                                    if (typeof showZayaToast === 'function') {
+                                        showZayaToast(errorMsg, 'error');
+                                    }
+                                    if (index === 0) firstErrorField = key;
+                                });
+
+                                // Try to focus first error field or scroll to it
+                                const errorEl = document.querySelector(`[name="${firstErrorField}"]`);
+                                if (errorEl) {
+                                    // If field is in a different tab, switch to it
+                                    const tabContent = errorEl.closest('.tab-content');
+                                    if (tabContent) {
+                                        const tabId = tabContent.id;
+                                        const tabIndex = ['tab-personal', 'tab-professional', 'tab-security'].indexOf(tabId);
+                                        if (tabIndex !== -1) showTab(tabIndex);
+                                    }
+                                    errorEl.focus();
+                                    errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            } else if (data.message) {
+                                if (typeof showZayaToast === 'function') {
+                                    showZayaToast(data.message, 'error');
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Submission error:', error);
+                        if (submitBtn) {
+                            submitBtn.classList.remove('loading');
+                            submitBtn.style.pointerEvents = 'auto';
+                            submitBtn.disabled = false;
+                        }
+                        if (typeof showZayaToast === 'function') {
+                            showZayaToast('An error occurred during submission. Please try again.', 'error');
+                        }
                     }
                 });
             }
@@ -1077,6 +1200,58 @@
             });
 
         });
+    </script>
+
+    <!-- Thank You Popup -->
+    <div id="thank-you-popup"
+        class="fixed inset-0 bg-black/40 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
+        <div
+            class="bg-white rounded-[24px] shadow-2xl w-full max-w-[450px] p-10 text-center relative animate-[popIn_0.3s_ease-out_forwards]">
+            <!-- Checkmark Illustration -->
+            <div class="relative w-24 h-24 mx-auto mb-6">
+                <!-- Outer floating dots container -->
+                <div class="absolute inset-0 select-none pointer-events-none">
+                    <div class="absolute -top-1 right-2 w-4 h-4 rounded-full bg-[#60E48C]"></div>
+                    <div class="absolute top-8 -right-3 w-2 h-2 rounded-full bg-[#60E48C]"></div>
+                    <div class="absolute bottom-4 -right-1 w-1.5 h-1.5 rounded-full bg-[#60E48C]"></div>
+                    <div class="absolute top-2 -left-2 w-3 h-3 rounded-full bg-[#60E48C]"></div>
+                    <div class="absolute -top-3 left-6 w-1 h-1 rounded-full bg-[#60E48C]"></div>
+                </div>
+                <!-- Main Check Circle -->
+                <div
+                    class="w-full h-full bg-[#60E48C] rounded-full flex items-center justify-center relative z-10 shadow-lg shadow-[#60E48C]/30">
+                    <svg width="40" height="30" viewBox="0 0 40 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 15L15 26L36 4" stroke="white" stroke-width="8" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Text Content -->
+            <h3 class="text-[#209F59] text-[28px] font-medium mb-4">{{ __('Thank you!') }}</h3>
+            <h4 class="text-[#333333] text-[20px] font-semibold mb-3">{{ __('Registration Successful!') }}</h4>
+            <p class="text-[#737373] text-[15px] leading-relaxed mb-6 font-normal">
+                {{ __('You have successfully registered.') }}<br>{{ __('You will be redirected shortly.') }}
+            </p>
+
+            <button onclick="closeThankYouPopup()"
+                class="w-full bg-[#FABC41] text-[#423131] py-3 rounded-full font-bold hover:bg-[#E8AA32] transition-colors">
+                {{ __('Close') }}
+            </button>
+        </div>
+    </div>
+
+    @include('partials.frontend.toast')
+
+    <script>
+        function closeThankYouPopup() {
+            const popup = document.getElementById('thank-you-popup');
+            if (popup) {
+                popup.classList.add('hidden');
+                popup.classList.remove('flex');
+            }
+            window.location.href = "{{ route('zaya-login') }}";
+        }
     </script>
 </body>
 

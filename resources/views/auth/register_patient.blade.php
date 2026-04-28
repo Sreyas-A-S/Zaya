@@ -348,6 +348,7 @@
 
                     const data = await response.json();
                     if (response.ok) {
+                        this.reset();
                         if (data.redirect_url) {
                             window.location.href = data.redirect_url;
                             return;

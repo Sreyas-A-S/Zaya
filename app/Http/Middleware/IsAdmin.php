@@ -35,6 +35,6 @@ class IsAdmin
             }
         }
 
-        return redirect()->route('admin.login')->with('error', 'You do not have admin access.');
+        return redirect()->route('zaya-login')->with('error', 'You do not have admin access.');
     }
 }
