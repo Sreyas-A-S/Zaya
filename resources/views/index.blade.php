@@ -105,7 +105,7 @@
             <div class="text-center mb-16 animate-on-scroll px-4">
                 <h2 id="services_title"
                     class="text-3xl sm:text-4xl lg:text-5xl font-serif text-primary mb-2 sm:mb-3 md:mb-4 lg:mb-5 font-bold">
-                    {{ $settings['services_title'] ?? 'Our Services' }}
+                    {{ $settings['services_title'] ?? __('Our services') }}
                 </h2>
                 <h3 id="services_subtitle" class="text-secondary font-serif text-lg md:text-2xl">
                     {{ $settings['services_subtitle'] ?? 'Holistic Healing for Mind, Body & Soul' }}
