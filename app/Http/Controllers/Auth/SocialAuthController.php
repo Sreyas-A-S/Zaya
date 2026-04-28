@@ -26,7 +26,14 @@ class SocialAuthController extends Controller
     public function handleProviderCallback($provider)
     {
         try {
-            $socialUser = Socialite::driver($provider)->user();
+            $driver = Socialite::driver($provider);
+
+            // Fix for cURL error 60: SSL certificate problem in local environment
+            if (config('app.env') === 'local') {
+                $driver->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
+            }
+
+            $socialUser = $driver->user();
             
             $existingUser = User::where($provider . '_id', $socialUser->id)->first();
 

@@ -541,7 +541,8 @@
                         });
                         @endif
                         
-                        console.log("Language switched dynamically to:", targetLocale);
+                        console.log("Language switched to:", targetLocale);
+                        location.reload();
                     }
                 })
                 .catch(error => {

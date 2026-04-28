@@ -96,6 +96,12 @@
                 </div>
             @endif
 
+            <!-- Dummy form to trick browser autofill -->
+            <form style="display:none" aria-hidden="true">
+                <input type="text" name="email" tabindex="-1">
+                <input type="password" name="password" tabindex="-1">
+            </form>
+
             <form method="POST" action="{{ route('login') }}" class="space-y-6" id="login-form">
                 @csrf
                 @if(isset($redirect))
@@ -105,6 +111,10 @@
                 <div>
                     <input type="email" name="email" value="{{ old('email') }}" required autofocus
                         placeholder="{{ __('Email or Mobile number') }}"
+                        autocomplete="username"
+                        readonly
+                        onfocus="this.removeAttribute('readonly');"
+                        onclick="this.removeAttribute('readonly');"
                         class="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 text-sm lg:text-base placeholder-gray-400 bg-white shadow-sm transition-all @error('email') border-red-500 @enderror">
                     @error('email')
                         <span class="text-red-500 text-sm mt-1 pl-4 block">{{ $message }}</span>
@@ -113,6 +123,10 @@
 
                 <div class="relative">
                     <input type="password" name="password" id="password" required placeholder="{{ __('Password') }}"
+                        autocomplete="current-password"
+                        readonly
+                        onfocus="this.removeAttribute('readonly');"
+                        onclick="this.removeAttribute('readonly');"
                         class="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-[#8B3A8A] focus:ring-1 focus:ring-[#8B3A8A] text-gray-700 placeholder-gray-400 bg-white shadow-sm transition-all @error('password') border-red-500 @enderror">
                     <button type="button" onclick="togglePasswordVisibility()"
                         class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer">
@@ -261,15 +275,15 @@
 
             <div class="mt-8 text-center text-gray-500 text-sm">{{ __('Login with other accounts') }}</div>
             <div class="flex justify-center gap-6 mt-6 mb-8 lg:mb-12">
-                <a href="javascript:void(0)" onclick="notifySocialUnavailable('Google')"
+                <a href="{{ route('social.login', 'google') }}"
                     class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition shadow-sm hover:shadow-md">
                     <img src="{{ asset('frontend/assets/google-icon.svg') }}" class="w-6 h-6" alt="Google">
                 </a>
-                <a href="javascript:void(0)" onclick="notifySocialUnavailable('Meta')"
+                <a href="{{ route('social.login', 'facebook') }}"
                     class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition text-[#1877F2] shadow-sm hover:shadow-md">
                     <img src="{{ asset('frontend/assets/facebook-icon.svg') }}" class="w-6 h-6" alt="Facebook">
                 </a>
-                <a href="javascript:void(0)" onclick="notifySocialUnavailable('Apple')"
+                <a href="{{ route('social.login', 'apple') }}"
                     class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition text-black shadow-sm hover:shadow-md">
                     <img src="{{ asset('frontend/assets/apple-icon.svg') }}" class="w-6 h-6" alt="Apple">
                 </a>

@@ -302,27 +302,12 @@
                         }
                         @endif
 
-                        console.log("Language changed dynamically to:", targetLocale);
-                        
-                        // Dispatch custom event for pages that want to handle refresh via AJAX
-                        document.dispatchEvent(new CustomEvent('zaya:language-changed', { 
-                            detail: { locale: targetLocale } 
-                        }));
-
-                        // Reload for pages with complex dynamic content that cannot be easily patched via AJAX
-                        // and don't listen to the custom event (or need full reload anyway)
-                        const reloadNeededPages = ['/blogs', '/book-session', '/announcements'];
-                        const currentPath = window.location.pathname;
-                        let shouldReload = reloadNeededPages.some(path => currentPath.includes(path));
-                        
-                        if (shouldReload) {
-                            location.reload();
-                        }
+                        console.log("Language changed to:", targetLocale);
+                        location.reload();
                     }
                 })
                 .catch(error => {
                     console.error('Error switching language:', error);
-                    // Fallback to reload if AJAX fails
                     window.location.href = `{{ url('/lang') }}/${targetLocale}`;
                 });
         }
