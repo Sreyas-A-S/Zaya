@@ -121,7 +121,7 @@
         <hr class="border-gray-100 mb-5">
 
         <!-- Client Details Container -->
-        <div class="flex justify-between mb-5 px-1 text-center md:text-left">
+        <div class="flex justify-between mb-5 px-1 text-left">
             <div class="w-full md:w-1/3 mb-4 md:mb-0">
                 <p class="text-[12px] text-gray-400 mb-1">{{ __($site_settings['invoice_client_id'] ?? 'Client ID') }}</p>
                 <p class="text-[14px] font-semibold text-gray-800">Z-{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }}</p>

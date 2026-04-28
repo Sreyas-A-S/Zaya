@@ -64,7 +64,7 @@
 
                 <!-- Right Content -->
                 <div class="w-full md:w-7/12 py-12 md:pl-4">
-                    <h1 class="text-4xl md:text-5xl font-serif font-medium text-black mb-5">I’m {{ $firstName }} {{ $lastName }},</h1>
+                    <h1 class="text-4xl md:text-5xl font-serif font-medium text-black mb-5"><span data-i18n="I’m">I’m</span> {{ $firstName }} {{ $lastName }},</h1>
                     <h2 class="text-3xl md:text-4xl font-sans! font-medium text-primary mb-7 leading-tight">
                         {{ $subtitle }}
                     </h2>
@@ -78,23 +78,27 @@
                         @php
                             $user = auth()->user();
                             $isClient = $user && ($user->role === 'client' || $user->role === 'patient');
+                            $bookSessionBtnText = $site_settings['practitioner_book_session_btn'] ?? 'Book a Session';
                         @endphp
 
                         @if(!$user)
                             <a href="{{ route('zaya-login', ['redirect' => $bookingUrl]) }}"
-                                class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg">
-                                {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
+                                class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg"
+                                data-i18n="{{ $bookSessionBtnText }}">
+                                {{ __($bookSessionBtnText) }}
                             </a>
                         @elseif($isClient)
                             <a href="{{ $bookingUrl }}"
-                                class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg">
-                                {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
+                                class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg"
+                                data-i18n="{{ $bookSessionBtnText }}">
+                                {{ __($bookSessionBtnText) }}
                             </a>
                         @else
                             <button type="button" 
                                 onclick="showZayaToast('Booking is only available for client accounts. Please log in with a client account to proceed.', 'error', 'Access Restricted')"
-                                class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg">
-                                {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
+                                class="bg-secondary text-white px-8 py-3.5 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-lg"
+                                data-i18n="{{ $bookSessionBtnText }}">
+                                {{ __($bookSessionBtnText) }}
                             </button>
                         @endif
 
@@ -113,7 +117,11 @@
                                                 @endif
                                             @endfor
                                         </div>
-                                        <span class="text-xs text-[#404040] opacity-80">{{ $site_settings['practitioner_based_on'] ?? 'Based on' }} {{ $reviewCount }} {{ $site_settings['practitioner_reviewers'] ?? 'Reviewers' }}</span>
+                                        <span class="text-xs text-[#404040] opacity-80">
+                                            <span data-i18n="{{ $site_settings['practitioner_based_on'] ?? 'Based on' }}">{{ __($site_settings['practitioner_based_on'] ?? 'Based on') }}</span>
+                                            {{ $reviewCount }}
+                                            <span data-i18n="{{ $site_settings['practitioner_reviewers'] ?? 'Reviewers' }}">{{ __($site_settings['practitioner_reviewers'] ?? 'Reviewers') }}</span>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -147,7 +155,7 @@
                                         <img src="https://ui-avatars.com/api/?name=Zaya+User&background=random" class="w-10 h-10 rounded-full border-1 border-black object-cover">
                                     @endif
                                 </div>
-                                <span class="text-sm font-medium text-gray-600 block leading-tight">{{ $site_settings['practitioner_reviews_label'] ?? "Client's Reviews" }}</span>
+                                <span class="text-sm font-medium text-gray-600 block leading-tight" data-i18n="{{ $site_settings['practitioner_reviews_label'] ?? "Client's Reviews" }}">{{ __($site_settings['practitioner_reviews_label'] ?? "Client's Reviews") }}</span>
                             </div>
                         </div>
                     </div>
@@ -162,11 +170,11 @@
             <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <div class="bg-white rounded-2xl shadow-[0_0px_72px_rgba(186,186,186,0.45)] border border-gray-100 px-16 py-10 text-center w-full xl:w-auto xl:min-w-[500px]">
                     <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">{{ $totalSessions }}</h3>
-                    <p class="text-gray-500 text-xl">{{ $site_settings['practitioner_total_sessions'] ?? 'Total No.of Sessions' }}</p>
+                    <p class="text-gray-500 text-xl" data-i18n="{{ $site_settings['practitioner_total_sessions'] ?? 'Total No.of Sessions' }}">{{ __($site_settings['practitioner_total_sessions'] ?? 'Total No.of Sessions') }}</p>
                 </div>
                 <div class="bg-white rounded-2xl shadow-[0_0px_72px_rgba(186,186,186,0.45)] border border-gray-100 px-16 py-10 text-center w-full xl:w-auto xl:min-w-[500px]">
                     <h3 class="text-5xl md:text-6xl font-sans! font-medium text-gray-800 mb-4">{{ $totalClients }}</h3>
-                    <p class="text-gray-500 text-xl">{{ $site_settings['practitioner_total_clients'] ?? 'Total No.of Clients' }}</p>
+                    <p class="text-gray-500 text-xl" data-i18n="{{ $site_settings['practitioner_total_clients'] ?? 'Total No.of Clients' }}">{{ __($site_settings['practitioner_total_clients'] ?? 'Total No.of Clients') }}</p>
                 </div>
             </div>
         </div>
@@ -176,8 +184,8 @@
     <section class="pb-20 bg-white">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-serif font-bold text-[#A66E58] mb-4">{{ $site_settings['practitioner_legacy_title'] ?? 'A Legacy of Expertise' }}</h2>
-                <h3 class="text-2xl md:text-3xl font-serif text-[#4A7060]">{{ $site_settings['practitioner_legacy_subtitle'] ?? 'Precision and Passion Across Every Field' }}</h3>
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-[#A66E58] mb-4" data-i18n="{{ $site_settings['practitioner_legacy_title'] ?? 'A Legacy of Expertise' }}">{{ __($site_settings['practitioner_legacy_title'] ?? 'A Legacy of Expertise') }}</h2>
+                <h3 class="text-2xl md:text-3xl font-serif text-[#4A7060]" data-i18n="{{ $site_settings['practitioner_legacy_subtitle'] ?? 'Precision and Passion Across Every Field' }}">{{ __($site_settings['practitioner_legacy_subtitle'] ?? 'Precision and Passion Across Every Field') }}</h3>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
@@ -185,7 +193,7 @@
                 <div class="flex flex-col items-center md:items-start pl-0 md:pl-10">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-16 h-16 rounded-full bg-[#56B280] flex items-center justify-center text-white text-3xl shadow-md"><i class="ri-briefcase-4-line"></i></div>
-                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_consultations_title'] ?? 'Specialities' }}</h4>
+                        <h4 class="text-xl font-sans! font-bold text-black" data-i18n="{{ $site_settings['practitioner_consultations_title'] ?? 'Specialities' }}">{{ __($site_settings['practitioner_consultations_title'] ?? 'Specialities') }}</h4>
                     </div>
                     <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
                         @foreach($consultations as $item) 
@@ -197,7 +205,7 @@
                 <div class="flex flex-col items-center md:items-start pl-0 md:pl-10">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-16 h-16 rounded-full bg-[#56B280] flex items-center justify-center text-white text-3xl shadow-md"><i class="ri-shield-check-line"></i></div>
-                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_therapies_title'] ?? 'Conditions Supported' }}</h4>
+                        <h4 class="text-xl font-sans! font-bold text-black" data-i18n="{{ $site_settings['practitioner_therapies_title'] ?? 'Conditions Supported' }}">{{ __($site_settings['practitioner_therapies_title'] ?? 'Conditions Supported') }}</h4>
                     </div>
                     <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
                         @foreach($practitioner->conditions_list as $item) 
@@ -209,7 +217,7 @@
                 <div class="flex flex-col items-center md:items-start pl-0 md:pl-10">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-16 h-16 rounded-full bg-[#56B280] flex items-center justify-center text-white text-3xl shadow-md"><i class="ri-pulse-line"></i></div>
-                        <h4 class="text-xl font-sans! font-bold text-black">{{ $site_settings['practitioner_modalities_title'] ?? 'Other Modalities' }}</h4>
+                        <h4 class="text-xl font-sans! font-bold text-black" data-i18n="{{ $site_settings['practitioner_modalities_title'] ?? 'Other Modalities' }}">{{ __($site_settings['practitioner_modalities_title'] ?? 'Other Modalities') }}</h4>
                     </div>
                     <ul class="text-gray-500 space-y-3 text-lg leading-relaxed">
                         @foreach($modalities as $item) 
@@ -227,30 +235,36 @@
             <div class="flex flex-col md:flex-row items-center justify-between xl:px-16 gap-8 text-center md:text-left">
                 <!-- Left: Heading -->
                 <div class="md:w-1/3 flex justify-center md:justify-start">
-                    <h2 class="text-3xl md:text-[38px] font-serif font-bold text-secondary leading-tight">
-                        {!! str_replace("\n", '<br />', $site_settings['practitioner_glimpse_title'] ?? "A Glimpse Into\nMy Practice") !!}
+                    <h2 class="text-3xl md:text-[38px] font-serif font-bold text-secondary leading-tight" 
+                        data-i18n="{{ $site_settings['practitioner_glimpse_title'] ?? "A Glimpse Into\nMy Practice" }}">
+                        {!! str_replace("\n", '<br />', __($site_settings['practitioner_glimpse_title'] ?? "A Glimpse Into\nMy Practice")) !!}
                     </h2>
                 </div>
 
                 <!-- Center: Description -->
                 <div class="md:w-1/3 flex justify-center md:text-center">
-                    <p class="text-gray-800 text-base mb-0 max-w-90">
-                        {{ $site_settings['practitioner_glimpse_description'] ?? 'Explore the spaces, rituals, and healing moments that define my approach to Ayurvedic wellness and patient care.' }}
+                    <p class="text-gray-800 text-base mb-0 max-w-90" data-i18n="{{ $site_settings['practitioner_glimpse_description'] ?? 'Explore the spaces, rituals, and healing moments that define my approach to Ayurvedic wellness and patient care.' }}">
+                        {{ __($site_settings['practitioner_glimpse_description'] ?? 'Explore the spaces, rituals, and healing moments that define my approach to Ayurvedic wellness and patient care.') }}
                     </p>
                 </div>
 
                 <!-- Right: Action Button -->
                 <div class="md:w-1/3 flex justify-center md:justify-end">
+                    @php
+                        $exploreGalleryBtnText = $site_settings['practitioner_explore_gallery_btn'] ?? 'Explore Our Gallery';
+                    @endphp
                     @if($practitioner->user)
                         <a href="{{ route('practitioner.gallery', $practitioner->slug) }}"
-                           class="bg-secondary text-white px-8 py-3 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-base flex items-center gap-2">
-                            {{ $site_settings['practitioner_explore_gallery_btn'] ?? 'Explore Our Gallery' }}
+                           class="bg-secondary text-white px-8 py-3 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-base flex items-center gap-2"
+                           data-i18n="{{ $exploreGalleryBtnText }}">
+                            {{ __($exploreGalleryBtnText) }}
                             <i class="ri-arrow-right-line"></i>
                         </a>
                     @else
                         <a href="{{ route('gallery') }}"
-                           class="bg-secondary text-white px-8 py-3 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-base flex items-center gap-2">
-                            {{ $site_settings['practitioner_explore_gallery_btn'] ?? 'Explore Our Gallery' }}
+                           class="bg-secondary text-white px-8 py-3 rounded-full font-normal shadow-lg hover:bg-primary transition-colors text-base flex items-center gap-2"
+                           data-i18n="{{ $exploreGalleryBtnText }}">
+                            {{ __($exploreGalleryBtnText) }}
                             <i class="ri-arrow-right-line"></i>
                         </a>
                     @endif
@@ -263,8 +277,8 @@
     <section class="py-20 bg-white">
         <div class="container mx-auto px-6 relative">
             <div class="text-center mb-16 max-w-4xl mx-auto">
-                <h2 class="text-4xl md:text-5xl font-serif font-bold text-[#A66E58] mb-6">{{ $site_settings['practitioner_stories_title'] ?? 'Stories of Transformation' }}</h2>
-                <p class="text-gray-500 leading-relaxed text-lg">{{ $site_settings['practitioner_stories_description'] ?? 'The true measure of ZAYA Wellness lies in the journeys of our members.' }}</p>
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-[#A66E58] mb-6" data-i18n="{{ $site_settings['practitioner_stories_title'] ?? 'Stories of Transformation' }}">{{ __($site_settings['practitioner_stories_title'] ?? 'Stories of Transformation') }}</h2>
+                <p class="text-gray-500 leading-relaxed text-lg" data-i18n="{{ $site_settings['practitioner_stories_description'] ?? 'The true measure of ZAYA Wellness lies in the journeys of our members.' }}">{{ __($site_settings['practitioner_stories_description'] ?? 'The true measure of ZAYA Wellness lies in the journeys of our members.') }}</p>
             </div>
 
             <div class="relative">
@@ -285,7 +299,7 @@
                             </div>
                         </div>
                         @empty
-                        <div class="col-span-full text-center py-10"><p class="text-gray-500 italic">{{ $site_settings['practitioner_no_reviews'] ?? 'No reviews yet.' }}</p></div>
+                        <div class="col-span-full text-center py-10"><p class="text-gray-500 italic" data-i18n="{{ $site_settings['practitioner_no_reviews'] ?? 'No reviews yet.' }}">{{ __($site_settings['practitioner_no_reviews'] ?? 'No reviews yet.') }}</p></div>
                         @endforelse
                     @endif
                 </div>
@@ -299,7 +313,7 @@
             <div class="text-center mt-8 relative z-20">
                 <button id="load-more-reviews" onclick="toggleReviews()" 
                     class="bg-white border border-gray-200 text-secondary px-8 py-3 rounded-full font-bold text-sm shadow-sm hover:border-secondary hover:text-primary transition-all inline-flex items-center gap-2 group">
-                    <span id="load-more-text">View All Reviews</span>
+                    <span id="load-more-text" data-i18n="View All Reviews">{{ __('View All Reviews') }}</span>
                     <i id="load-more-icon" class="ri-arrow-down-s-line text-lg group-hover:translate-y-0.5 transition-transform"></i>
                 </button>
             </div>
@@ -319,7 +333,7 @@
                 container.style.maxHeight = '550px';
                 container.classList.remove('expanded');
                 fade.style.opacity = '1';
-                text.innerText = 'View All Reviews';
+                text.innerText = "{{ __('View All Reviews') }}";
                 icon.classList.replace('ri-arrow-up-s-line', 'ri-arrow-down-s-line');
                 
                 const headerOffset = 150;
@@ -330,7 +344,7 @@
                 container.style.maxHeight = container.scrollHeight + 100 + 'px';
                 container.classList.add('expanded');
                 fade.style.opacity = '0';
-                text.innerText = 'Show Less';
+                text.innerText = "{{ __('Show Less') }}";
                 icon.classList.replace('ri-arrow-down-s-line', 'ri-arrow-up-s-line');
             }
         }
@@ -342,10 +356,11 @@
         <div class="container-fluid mx-auto">
             <div class="bg-[#F9EBD6] px-8 md:px-12 py-5 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
                 <p class="text-gray-700 text-base md:text-lg text-center md:text-left">
-                    {{ $site_settings['practitioner_cta_text'] ?? 'Ready to start your wellness journey with' }} {{ $firstName }} {{ $lastName }}?
+                    <span data-i18n="{{ $site_settings['practitioner_cta_text'] ?? 'Ready to start your wellness journey with' }}">{{ __($site_settings['practitioner_cta_text'] ?? 'Ready to start your wellness journey with') }}</span> {{ $firstName }} {{ $lastName }}?
                 </p>
-                <a href="{{ $bookingUrl }}" class="bg-secondary text-white px-8 py-3 rounded-full font-normal hover:bg-primary transition-colors text-sm md:text-base whitespace-nowrap">
-                    {{ $site_settings['practitioner_book_session_btn'] ?? 'Book a Session' }}
+                <a href="{{ $bookingUrl }}" class="bg-secondary text-white px-8 py-3 rounded-full font-normal hover:bg-primary transition-colors text-sm md:text-base whitespace-nowrap"
+                    data-i18n="{{ $bookSessionBtnText }}">
+                    {{ __($bookSessionBtnText) }}
                 </a>
             </div>
         </div>

@@ -642,7 +642,10 @@
                                     class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('City') }}</label>
                                 <input type="text" name="city" value="{{ old('city') }}"
                                     class="reg-input @error('city') border-red-500! @enderror" autocomplete="off"
-                                    placeholder="{{ __('Enter City') }}" required>
+                                    placeholder="{{ __('Enter City') }}" required
+                                    readonly
+                                    onfocus="this.removeAttribute('readonly');"
+                                    onclick="this.removeAttribute('readonly');">
                                 @error('city')
                                     <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                                 @enderror
@@ -652,7 +655,10 @@
                                     class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('State (Optional)') }}</label>
                                 <input type="text" name="state" value="{{ old('state') }}"
                                     class="reg-input @error('state') border-red-500! @enderror"
-                                    placeholder="{{ __('Enter State') }}" autocomplete="off">
+                                    placeholder="{{ __('Enter State') }}" autocomplete="off"
+                                    readonly
+                                    onfocus="this.removeAttribute('readonly');"
+                                    onclick="this.removeAttribute('readonly');">
                                 @error('state')
                                     <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                                 @enderror
@@ -1303,11 +1309,14 @@
 
                     // Helper: populate address fields from geo data
                     function applyGeoToForm(city, region, postal, countryCode) {
+                        // Prefilling city and state disabled per user request
+                        /*
                         const cityInput = document.querySelector("input[name='city']");
                         if (cityInput && !cityInput.value && city) cityInput.value = city;
 
                         const stateInput = document.querySelector("input[name='state']");
                         if (stateInput && !stateInput.value && region) stateInput.value = region;
+                        */
 
                         const zipInput = document.querySelector("input[name='zip_code']");
                         if (zipInput && !zipInput.value && postal) zipInput.value = postal;

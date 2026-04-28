@@ -285,13 +285,13 @@
                     </h3>
                     <textarea id="situation-input" placeholder="{{ __('Write here...') }}"
                         class="w-full py-4 px-5 bg-[#F5F5F5] rounded-2xl outline-none text-sm text-gray-700 min-h-[120px] resize-y placeholder:text-gray-400 focus:border-primary focus:bg-white border border-transparent" data-i18n-placeholder="Write here..."></textarea>
-                    <p class="text-right text-sm text-gray-400 mt-2 italic" data-i18n="(Paragraph should contain 100 words only)">(Paragraph should contain 100 words
-                        only)</p>
+                    <p class="text-right text-sm text-gray-400 mt-2 italic" data-i18n="(Paragraph should contain 100 words only)">{{ __('(Paragraph should contain 100 words only)') }}</p>
                 </div>
 
                 <!-- Service Search -->
                 <div class="mb-10" id="service-search-container">
-                    <h3 class="text-gray-700 font-normal mb-4 text-base">Are you looking for any particular service?
+                    <h3 class="text-gray-700 font-normal mb-4 text-base" data-i18n="Are you looking for any particular service?">
+                        {{ __('Are you looking for any particular service?') }}
                     </h3>
 
                     <div
@@ -305,8 +305,8 @@
                         <div class="relative shrink-0 flex items-center gap-3 w-full max-w-[200px]"
                             id="service-search-input-wrapper" style="flex: 1; max-w: none;">
                             <i class="ri-search-line text-gray-500 text-xl font-normal ml-4"></i>
-                            <input type="text" placeholder="Search services" id="service-search-input"
-                                class="w-full bg-transparent border-none outline-none text-[15px] text-gray-700 placeholder:text-gray-400 h-full">
+                            <input type="text" placeholder="{{ __('Search services') }}" id="service-search-input"
+                                class="w-full bg-transparent border-none outline-none text-[15px] text-gray-700 placeholder:text-gray-400 h-full" data-i18n-placeholder="Search services">
                         </div>
                     </div>
 
@@ -334,7 +334,7 @@
                                 </div>
                             </label>
                             @empty
-                            <div class="text-sm text-gray-400">No services available.</div>
+                            <div class="text-sm text-gray-400">{{ __('No services available.') }}</div>
                             @endforelse
                         </div>
 
@@ -342,7 +342,7 @@
                             <i class="ri-arrow-right-s-line"></i>
                         </button>
                     </div>
-                    <div id="service-search-empty" class="text-sm text-gray-400 mt-3 hidden">No services found.</div>
+                    <div id="service-search-empty" class="text-sm text-gray-400 mt-3 hidden">{{ __('No services found.') }}</div>
                 </div>
 
                 <!-- Scheduling Section -->
@@ -350,7 +350,7 @@
                     @forelse($services as $service)
                         @include('partials.frontend.service-schedule-item', ['service' => $service, 'iteration' => $loop->iteration])
                     @empty
-                        <div class="text-sm text-gray-400">No services selected.</div>
+                        <div class="text-sm text-gray-400">{{ __('No services selected.') }}</div>
                     @endforelse
                 </div>
             </div>
@@ -412,7 +412,7 @@
             <!-- Condition -->
 
             <div class="mb-8">
-                <h4 class="text-gray-800 font-medium mb-3">Condition</h4>
+                <h4 class="text-gray-800 font-medium mb-3" data-i18n="Condition">{{ __('Condition') }}</h4>
 
                 <!-- Edit/View Mode toggle -->
                 <div id="step3-condition-container"
@@ -421,8 +421,8 @@
                         <!-- Tags will be rendered by JS -->
                     </div>
                     <button type="button" id="condition-action-btn"
-                        class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-6 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ml-4 border border-transparent cursor-pointer">
-                        Change
+                        class="bg-[#FFE5B4] hover:bg-[#F5D0A9] text-[#594B4B] px-6 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ml-4 border border-transparent cursor-pointer" data-i18n="Change">
+                        {{ __('Change') }}
                     </button>
                 </div>
 
@@ -430,7 +430,7 @@
 
             <!-- Service List -->
             <div class="mb-8">
-                <h4 class="text-gray-800 font-medium mb-3">Service</h4>
+                <h4 class="text-gray-800 font-medium mb-3" data-i18n="Service">{{ __('Service') }}</h4>
                 <div class="flex flex-col gap-4" id="step3-services-container">
                     <!-- Dynamically populated by JS -->
                 </div>
@@ -448,8 +448,8 @@
                         <i class="ri-check-line text-white text-sm opacity-100"></i>
                     </div>
 
-                    <span class="text-[#404040] font-normal text-lg">
-                        I need a Translator
+                    <span class="text-[#404040] font-normal text-lg" data-i18n="I need a Translator">
+                        {{ __('I need a Translator') }}
                     </span>
 
                 </label>
@@ -461,7 +461,7 @@
                         <button type="button"
                             class="dropdown-trigger w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-base text-gray-400 flex items-center justify-between cursor-pointer transition-all duration-200 hover:bg-[#EFEFEF]"
                             onclick="toggleDropdown('from-language-dropdown')">
-                            <span class="dropdown-label">Select From Language</span>
+                            <span class="dropdown-label" data-i18n="Select From Language">{{ __('Select From Language') }}</span>
                             <i
                                 class="ri-arrow-down-s-line text-xl text-gray-400 transition-transform duration-200"></i>
                         </button>
@@ -472,7 +472,7 @@
                                     <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
                                         data-value="{{ $language->name }}">{{ $language->display_name }}</div>
                                 @empty
-                                    <div class="px-6 py-3 text-sm text-gray-400">No languages available.</div>
+                                    <div class="px-6 py-3 text-sm text-gray-400" data-i18n="No languages available.">{{ __('No languages available.') }}</div>
                                 @endforelse
                             </div>
                         </div>
@@ -484,7 +484,7 @@
                         <button type="button"
                             class="dropdown-trigger w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-base text-gray-400 flex items-center justify-between cursor-pointer transition-all duration-200 hover:bg-[#EFEFEF]"
                             onclick="toggleDropdown('to-language-dropdown')">
-                            <span class="dropdown-label">Select To Language</span>
+                            <span class="dropdown-label" data-i18n="Select To Language">{{ __('Select To Language') }}</span>
                             <i
                                 class="ri-arrow-down-s-line text-xl text-gray-400 transition-transform duration-200"></i>
                         </button>
@@ -495,7 +495,7 @@
                                     <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
                                         data-value="{{ $language->name }}">{{ $language->display_name }}</div>
                                 @empty
-                                    <div class="px-6 py-3 text-sm text-gray-400">No languages available.</div>
+                                    <div class="px-6 py-3 text-sm text-gray-400" data-i18n="No languages available.">{{ __('No languages available.') }}</div>
                                 @endforelse
                             </div>
                         </div>
@@ -511,7 +511,7 @@
                         <div class="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center text-secondary">
                             <i class="ri-coupon-2-line text-lg"></i>
                         </div>
-                        <span class="text-sm font-bold text-gray-700">Apply Promo Code</span>
+                        <span class="text-sm font-bold text-gray-700" data-i18n="Apply Promo Code">{{ __('Apply Promo Code') }}</span>
                     </div>
                     <i class="ri-add-line text-gray-400"></i>
                 </div>
@@ -519,28 +519,28 @@
                 <!-- Expanded State (Hidden by default) -->
                 <div id="promo-expanded" class="hidden p-6 bg-white rounded-2xl border border-secondary/20 shadow-sm">
                     <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-gray-800 font-bold flex items-center gap-2">
+                        <h4 class="text-gray-800 font-bold flex items-center gap-2" data-i18n="Apply Promo Code">
                             <i class="ri-coupon-2-line text-secondary text-lg"></i>
-                            Apply Promo Code
+                            {{ __('Apply Promo Code') }}
                         </h4>
                         <div class="flex items-center gap-3">
-                            <button type="button" onclick="openPromoModal()" class="text-secondary text-xs font-bold uppercase tracking-widest hover:underline cursor-pointer">
-                                Saved
+                            <button type="button" onclick="openPromoModal()" class="text-secondary text-xs font-bold uppercase tracking-widest hover:underline cursor-pointer" data-i18n="Saved">
+                                {{ __('Saved') }}
                             </button>
                             <button onclick="toggleSection('promo')" class="text-gray-400 hover:text-gray-600"><i class="ri-subtract-line"></i></button>
                         </div>
                     </div>
                     <div class="flex gap-3">
                         <div class="relative flex-1">
-                            <input type="text" id="promo-code-input" placeholder="Enter code here..." 
+                            <input type="text" id="promo-code-input" placeholder="{{ __('Enter code here...') }}" data-i18n-placeholder="Enter code here..."
                                 class="w-full py-3.5 px-6 bg-gray-50 rounded-full border border-gray-200 outline-none text-sm text-gray-700 placeholder:text-gray-400 focus:border-secondary transition-all">
                             <button type="button" id="clear-promo-btn" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 hidden" onclick="clearPromoCode()">
                                 <i class="ri-close-circle-fill text-xl"></i>
                             </button>
                         </div>
                         <button type="button" onclick="applyPromoCode()" id="apply-promo-btn"
-                            class="bg-secondary text-white px-8 py-3.5 rounded-full font-medium text-sm hover:bg-primary transition-all shadow-sm">
-                            Apply
+                            class="bg-secondary text-white px-8 py-3.5 rounded-full font-medium text-sm hover:bg-primary transition-all shadow-sm" data-i18n="Apply">
+                            {{ __('Apply') }}
                         </button>
                     </div>
                     <div id="promo-message" class="mt-3 text-xs font-medium hidden"></div>
@@ -556,13 +556,13 @@
                         <div class="w-10 h-10 bg-secondary/20 rounded-xl flex items-center justify-center text-secondary">
                             <i class="ri-coins-line text-lg"></i>
                         </div>
-                        <span class="text-sm font-bold text-gray-700">Zaya Coins</span>
+                        <span class="text-sm font-bold text-gray-700" data-i18n="Zaya Coins">{{ __('Zaya Coins') }}</span>
                     </div>
                     <div class="flex items-center gap-2">
                         @if(auth()->check())
-                            <span class="text-xs font-bold text-secondary">{{ auth()->user()->coins ?? 0 }} available</span>
+                            <span class="text-xs font-bold text-secondary">{{ auth()->user()->coins ?? 0 }} <span data-i18n="available">{{ __('available') }}</span></span>
                         @else
-                            <span class="text-xs text-gray-400">Login to use</span>
+                            <span class="text-xs text-gray-400" data-i18n="Login to use">{{ __('Login to use') }}</span>
                         @endif
                         <i class="ri-add-line text-gray-400"></i>
                     </div>
@@ -576,11 +576,11 @@
                                 <i class="ri-coins-line text-xl"></i>
                             </div>
                             <div>
-                                <h4 class="text-gray-800 font-bold leading-none mb-1">Zaya Coins</h4>
+                                <h4 class="text-gray-800 font-bold leading-none mb-1" data-i18n="Zaya Coins">{{ __('Zaya Coins') }}</h4>
                                 @if(auth()->check())
-                                    <p class="text-xs text-gray-500">Available: <span class="font-bold text-secondary">{{ auth()->user()->coins ?? 0 }} coins</span></p>
+                                    <p class="text-xs text-gray-500"><span data-i18n="Available:">{{ __('Available:') }}</span> <span class="font-bold text-secondary">{{ auth()->user()->coins ?? 0 }} <span data-i18n="coins">{{ __('coins') }}</span></span></p>
                                 @else
-                                    <p class="text-xs text-gray-500">Login to use your coins</p>
+                                    <p class="text-xs text-gray-500" data-i18n="Login to use your coins">{{ __('Login to use your coins') }}</p>
                                 @endif
                             </div>
                         </div>
@@ -588,7 +588,7 @@
                     </div>
 
                     <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                        <span class="text-sm font-medium text-gray-700">Use coins for this booking</span>
+                        <span class="text-sm font-medium text-gray-700" data-i18n="Use coins for this booking">{{ __('Use coins for this booking') }}</span>
                         @if(auth()->check())
                             @if(auth()->user()->coins > 0)
                             <label class="relative inline-flex items-center cursor-pointer">
@@ -596,16 +596,16 @@
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
                             </label>
                             @else
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">Insufficient</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full" data-i18n="Insufficient">{{ __('Insufficient') }}</span>
                             @endif
                         @else
-                            <a href="{{ route('login') }}" class="text-[10px] font-bold text-secondary uppercase tracking-widest bg-secondary/10 px-3 py-1 rounded-full hover:bg-secondary hover:text-white transition-all">Login</a>
+                            <a href="{{ route('login') }}" class="text-[10px] font-bold text-secondary uppercase tracking-widest bg-secondary/10 px-3 py-1 rounded-full hover:bg-secondary hover:text-white transition-all" data-i18n="Login">{{ __('Login') }}</a>
                         @endif
                     </div>
                     
                     <div id="coin-discount-message" class="mt-4 text-xs font-medium text-emerald-600 hidden">
                         <i class="ri-checkbox-circle-fill mr-1"></i> 
-                        You are using <span id="coins-to-use">0</span> coins for a discount of <span id="coin-value-display"></span>
+                        <span data-i18n="You are using">{{ __('You are using') }}</span> <span id="coins-to-use">0</span> <span data-i18n="coins for a discount of">{{ __('coins for a discount of') }}</span> <span id="coin-value-display"></span>
                     </div>
                 </div>
             </div>
@@ -615,19 +615,19 @@
             <div id="discount-breakdown" class="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100 hidden">
                 <div class="space-y-3">
                     <div class="flex justify-between text-sm text-gray-500 font-medium">
-                        <span>Subtotal</span>
+                        <span data-i18n="Subtotal">{{ __('Subtotal') }}</span>
                         <span id="breakdown-subtotal"></span>
                     </div>
                     <div id="promo-discount-row" class="flex justify-between text-sm text-emerald-600 font-bold hidden">
-                        <span id="breakdown-label">Promo Discount</span>
+                        <span id="breakdown-label" data-i18n="Promo Discount">{{ __('Promo Discount') }}</span>
                         <span id="breakdown-discount"></span>
                     </div>
                     <div id="coin-discount-row" class="flex justify-between text-sm text-emerald-600 font-bold hidden">
-                        <span>Coin Discount</span>
+                        <span data-i18n="Coin Discount">{{ __('Coin Discount') }}</span>
                         <span id="breakdown-coin-discount"></span>
                     </div>
                     <div class="pt-3 border-t border-gray-200 flex justify-between text-base text-gray-900 font-bold">
-                        <span>Final Total</span>
+                        <span data-i18n="Final Total">{{ __('Final Total') }}</span>
                         <span id="breakdown-final-total"></span>
                     </div>
                 </div>
@@ -636,7 +636,7 @@
             <!-- Total Price -->
             <div class="text-center py-8 mb-8"
                 style="background: linear-gradient(90deg, #FFFFFF 0%, #F0F0F0 48%, #FFFFFF 100%);">
-                <p class="text-gray-400 text-sm mb-1">Total</p>
+                <p class="text-gray-400 text-sm mb-1" data-i18n="Total">{{ __('Total') }}</p>
                 <div class="text-4xl font-medium text-gray-900 flex items-center justify-center gap-2" id="step-3-total-amount">
                     {{ $defaultCurrencySymbol }} 0.00 <span class="text-xl text-gray-400 font-normal">/ {{ $defaultCurrencyBooking }}</span>
                 </div>
@@ -645,8 +645,8 @@
             <!-- Test Payment Toggle -->
             <div class="flex items-center justify-center gap-3 mb-6">
                 <input type="checkbox" id="test-payment-toggle" class="h-4 w-4 accent-[#F5A623] cursor-pointer">
-                <label for="test-payment-toggle" class="text-sm text-gray-600 cursor-pointer">
-                    Test payment (use INR 1.00)
+                <label for="test-payment-toggle" class="text-sm text-gray-600 cursor-pointer" data-i18n="Test payment (use INR 1.00)">
+                    {{ __('Test payment (use INR 1.00)') }}
                 </label>
             </div>
 
@@ -2171,9 +2171,9 @@
 
             <!-- Text Content -->
             <div class="text-center">
-                <h2 class="text-[22px] font-medium text-[#252525] mb-4 mt-2">Payment Succeeded!</h2>
+                <h2 class="text-[22px] font-medium text-[#252525] mb-4 mt-2" data-i18n="Payment Succeeded!">{{ __('Payment Succeeded!') }}</h2>
                 <p class="text-[#747474] text-[15px] font-normal leading-relaxed pb-4">
-                    Your transaction was completed successfully.<br>Thank you!
+                    <span data-i18n="Your transaction was completed successfully.">{{ __('Your transaction was completed successfully.') }}</span><br><span data-i18n="Thank you!">{{ __('Thank you!') }}</span>
                 </p>
             </div>
         </div>
@@ -2196,11 +2196,11 @@
 
             <div>
                 <div class="ps-8 pe-8 lg:ps-10 lg:pe-0 pt-8">
-                    <h2 class="text-[22px] font-medium text-[#252525] mb-6">{{ __('Select Practitioner') }}</h2>
+                    <h2 class="text-[22px] font-medium text-[#252525] mb-6" data-i18n="Select Practitioner">{{ __('Select Practitioner') }}</h2>
                     <div class="relative max-w-[380px] mb-8">
                         <i
                             class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]"></i>
-                        <input type="text" placeholder="{{ __('Search Practitioner') }}"
+                        <input type="text" placeholder="{{ __('Search Practitioner') }}" data-i18n-placeholder="Search Practitioner"
                             class="w-full pl-11 pr-4 h-[48px] rounded-full border border-[#D0D0D0] text-sm text-gray-700 outline-none focus:border-[#FABD4D] transition-colors placeholder:text-[#8B8B8B]">
                     </div>
                 </div>
@@ -2236,8 +2236,7 @@
                                     <h3 class="text-lg font-medium text-[#252525] leading-tight mb-1">{{ $pName }}</h3>
                                     <p class="text-sm text-[#8B8B8B] font-normal mb-3">{{ $pRole }}</p>
                                     <a href="{{ $practitioner->slug ? route('practitioner-detail', $practitioner->slug) : '#' }}"
-                                        class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]">See
-                                        more</a>
+                                        class="inline-block px-5 py-1.5 rounded-full bg-[#f4f4f4] text-[#747474] text-sm font-normal transition-colors group-hover:bg-[#EAEAEA]" data-i18n="See more">{{ __('See more') }}</a>
                                 </div>
                             </div>
                             @endforeach
@@ -2337,13 +2336,13 @@
             <!-- Header -->
             <div class="p-8 border-b border-gray-100 shrink-0">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-xl font-medium text-gray-900">Saved Promo Codes</h2>
+                    <h2 class="text-xl font-medium text-gray-900" data-i18n="Saved Promo Codes">{{ __('Saved Promo Codes') }}</h2>
                     <button type="button" onclick="closePromoModal()"
                         class="w-8 h-8 flex items-center justify-center rounded-full bg-[#F5F5F5] hover:bg-[#EAEAEA] text-gray-500 transition-colors cursor-pointer">
                         <i class="ri-close-line text-[20px]"></i>
                     </button>
                 </div>
-                <p class="text-gray-500 text-sm mt-2">Select a code from your previously entered promo codes.</p>
+                <p class="text-gray-500 text-sm mt-2" data-i18n="Select a code from your previously entered promo codes.">{{ __('Select a code from your previously entered promo codes.') }}</p>
             </div>
 
             <!-- List -->
@@ -2366,7 +2365,7 @@
                         <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <i class="ri-ticket-line text-2xl text-gray-300"></i>
                         </div>
-                        <p class="text-gray-500">No saved promo codes found.</p>
+                        <p class="text-gray-500" data-i18n="No saved promo codes found.">{{ __('No saved promo codes found.') }}</p>
                     </div>
                 @endif
             </div>
@@ -2374,8 +2373,8 @@
             <!-- Footer -->
             <div class="p-6 border-t border-gray-100 shrink-0 text-center">
                 <button type="button" onclick="closePromoModal()"
-                    class="text-gray-500 text-sm font-medium hover:text-gray-800 transition-colors">
-                    Close
+                    class="text-gray-500 text-sm font-medium hover:text-gray-800 transition-colors" data-i18n="Close">
+                    {{ __('Close') }}
                 </button>
             </div>
         </div>

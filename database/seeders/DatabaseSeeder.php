@@ -58,6 +58,7 @@ class DatabaseSeeder extends Seeder
             FaqSeeder::class,
             FaqfrenchSeeder::class,
             BookingSeeder::class,
+            DynamicTranslationsSeeder::class,
         ]);
 
         User::updateOrCreate(
