@@ -1,5 +1,7 @@
 {
-    "(Hours/Years)": "(Heures/Années)",
+    "(Hours/Years)": "(heures/années)",
+    "Hours": "Heures",
+    "Years": "Années",
     "(Kindly include hours and dates. It should be self-attested)": "(Veuillez inclure les heures et les dates. Cela doit être auto-attesté)",
     "(Max 2MB)": "(Max 2MB)",
     "(Paragraph should contain 100 words only)": "(Le texte ne doit pas dépasser 100 mots)",
@@ -74,7 +76,7 @@
     "Dashboard": "Tableau de bord",
     "Date of Birth": "Date de naissance",
     "Day": "Jour",
-    "Degree": "Diplôme",
+    "Degree": "Degré",
     "Diploma": "Diplôme",
     "Discover expert articles, wellness guides, and holistic living tips from our practitioners.": "Découvrez des articles d'experts, des guides de bien-être et des conseils de vie holistique de nos praticiens.",
     "Do you want to explain your situation?": "Voulez-vous expliquer votre situation ?",

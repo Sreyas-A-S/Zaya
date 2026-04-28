@@ -28,26 +28,32 @@
                   @enderror
                 </div>
                 
-                <!-- Password Requirements UI -->
-                <div class="password-requirements mt-2 px-1">
-                  <p class="text-muted mb-1 small" style="font-size: 11px;">Password must contain:</p>
-                  <ul class="list-unstyled mb-0" style="font-size: 11px;">
-                    <li id="req-length" class="text-muted d-flex align-items-center gap-1">
-                      <i class="fa fa-circle-o"></i> At least 8 characters
-                    </li>
-                    <li id="req-upper" class="text-muted d-flex align-items-center gap-1">
-                      <i class="fa fa-circle-o"></i> One uppercase letter
-                    </li>
-                    <li id="req-lower" class="text-muted d-flex align-items-center gap-1">
-                      <i class="fa fa-circle-o"></i> One lowercase letter
-                    </li>
-                    <li id="req-number" class="text-muted d-flex align-items-center gap-1">
-                      <i class="fa fa-circle-o"></i> One number
-                    </li>
-                    <li id="req-match" class="text-muted d-flex align-items-center gap-1">
-                      <i class="fa fa-circle-o"></i> Passwords match
-                    </li>
-                  </ul>
+                <div id="password-requirements" class="mt-3 ps-2 space-y-1">
+                    <div class="d-flex align-items-center gap-2 small text-muted transition-colors" id="req-length" style="font-size: 11px; font-weight: 600; text-transform: uppercase;">
+                        <i class="fa fa-check-circle"></i>
+                        <span>8+ Characters</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 small text-muted transition-colors" id="req-upper" style="font-size: 11px; font-weight: 600; text-transform: uppercase;">
+                        <i class="fa fa-check-circle"></i>
+                        <span>Uppercase</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 small text-muted transition-colors" id="req-lower" style="font-size: 11px; font-weight: 600; text-transform: uppercase;">
+                        <i class="fa fa-check-circle"></i>
+                        <span>Lowercase</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 small text-muted transition-colors" id="req-number" style="font-size: 11px; font-weight: 600; text-transform: uppercase;">
+                        <i class="fa fa-check-circle"></i>
+                        <span>Number or Special</span>
+                    </div>
+                </div>
+
+                <div id="password-strength-indication" class="mt-3 ps-2 d-none">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span id="strength-text" style="font-size: 10px; font-weight: 700; text-transform: uppercase;"></span>
+                    </div>
+                    <div class="progress" style="height: 4px; background-color: #f0f0f0; border-radius: 10px; overflow: hidden;">
+                        <div id="strength-bar" class="progress-bar" role="progressbar" style="width: 0%; transition: width 0.3s ease;"></div>
+                    </div>
                 </div>
               </div>
 
@@ -56,6 +62,12 @@
                 <div class="form-input position-relative">
                   <input class="form-control" type="password" name="password_confirmation" id="password_confirmation" required placeholder="*********" autocomplete="new-password">
                   <div class="show-hide" onclick="togglePasswordVisibility('password_confirmation', this)"><span class="show"></span></div>
+                </div>
+                <div id="password-match-indication" class="mt-2 ps-2 d-none">
+                    <div class="d-flex align-items-center gap-2">
+                        <i id="match-icon" class="fa"></i>
+                        <span id="match-text" style="font-size: 11px; font-weight: 600;"></span>
+                    </div>
                 </div>
               </div>
 
@@ -120,41 +132,120 @@
 @section('scripts')
 <script>
   $(document).ready(function() {
-    const password = document.getElementById('password');
-    const confirmPassword = document.getElementById('password_confirmation');
-    const requirements = {
-      length: document.getElementById('req-length'),
-      upper: document.getElementById('req-upper'),
-      lower: document.getElementById('req-lower'),
-      number: document.getElementById('req-number'),
-      match: document.getElementById('req-match')
-    };
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('password_confirmation');
+    const requirementsUI = document.getElementById('password-requirements');
+    const strengthIndication = document.getElementById('password-strength-indication');
+    const matchIndication = document.getElementById('password-match-indication');
 
-    function updateRequirement(el, met) {
-      if (met) {
-        el.classList.add('requirement-met');
-        el.classList.remove('text-muted');
-      } else {
-        el.classList.remove('requirement-met');
-        el.classList.add('text-muted');
-      }
+    function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        // Strength indicators
+        const reqLength = document.getElementById('req-length');
+        const reqUpper = document.getElementById('req-upper');
+        const reqLower = document.getElementById('req-lower');
+        const reqNumber = document.getElementById('req-number');
+        const strengthBar = document.getElementById('strength-bar');
+        const strengthText = document.getElementById('strength-text');
+        
+        // Match indicators
+        const matchIcon = document.getElementById('match-icon');
+        const matchText = document.getElementById('match-text');
+
+        if (password.length > 0) {
+            requirementsUI.classList.remove('d-none');
+            strengthIndication.classList.remove('d-none');
+            
+            let strength = 0;
+            
+            // 1. Length
+            if (password.length >= 8) {
+                strength += 25;
+                reqLength.classList.remove('text-muted');
+                reqLength.classList.add('text-success');
+            } else {
+                reqLength.classList.add('text-muted');
+                reqLength.classList.remove('text-success');
+            }
+
+            // 2. Uppercase
+            if (/[A-Z]/.test(password)) {
+                strength += 25;
+                reqUpper.classList.remove('text-muted');
+                reqUpper.classList.add('text-success');
+            } else {
+                reqUpper.classList.add('text-muted');
+                reqUpper.classList.remove('text-success');
+            }
+
+            // 3. Lowercase
+            if (/[a-z]/.test(password)) {
+                strength += 25;
+                reqLower.classList.remove('text-muted');
+                reqLower.classList.add('text-success');
+            } else {
+                reqLower.classList.add('text-muted');
+                reqLower.classList.remove('text-success');
+            }
+
+            // 4. Special or Number
+            if (/[0-9]/.test(password) || /[\W_]/.test(password)) {
+                strength += 25;
+                reqNumber.classList.remove('text-muted');
+                reqNumber.classList.add('text-success');
+            } else {
+                reqNumber.classList.add('text-muted');
+                reqNumber.classList.remove('text-success');
+            }
+
+            strengthBar.style.width = strength + '%';
+            if (strength <= 25) {
+                strengthBar.className = 'progress-bar bg-danger';
+                strengthText.textContent = 'Weak';
+                strengthText.className = 'small font-bold text-danger';
+            } else if (strength <= 50) {
+                strengthBar.className = 'progress-bar bg-warning';
+                strengthText.textContent = 'Fair';
+                strengthText.className = 'small font-bold text-warning';
+            } else if (strength <= 75) {
+                strengthBar.className = 'progress-bar bg-info';
+                strengthText.textContent = 'Good';
+                strengthText.className = 'small font-bold text-info';
+            } else {
+                strengthBar.className = 'progress-bar bg-success';
+                strengthText.textContent = 'Strong';
+                strengthText.className = 'small font-bold text-success';
+            }
+        } else {
+            strengthIndication.classList.add('d-none');
+            requirementsUI.classList.add('d-none');
+        }
+
+        // Match Logic
+        if (confirmPassword.length > 0) {
+            matchIndication.classList.remove('d-none');
+            if (password === confirmPassword) {
+                matchIcon.className = 'fa fa-check-circle text-success';
+                matchText.textContent = 'Passwords match';
+                matchText.className = 'small font-bold text-success';
+                $(confirmPasswordInput).removeClass('is-invalid').addClass('is-valid');
+            } else {
+                matchIcon.className = 'fa fa-times-circle text-danger';
+                matchText.textContent = 'Passwords do not match';
+                matchText.className = 'small font-bold text-danger';
+                $(confirmPasswordInput).removeClass('is-valid').addClass('is-invalid');
+            }
+        } else {
+            matchIndication.classList.add('d-none');
+            $(confirmPasswordInput).removeClass('is-valid is-invalid');
+        }
     }
 
-    function validate() {
-      const val = password.value;
-      const val2 = confirmPassword.value;
-      updateRequirement(requirements.length, val.length >= 8);
-      updateRequirement(requirements.upper, /[A-Z]/.test(val));
-      updateRequirement(requirements.lower, /[a-z]/.test(val));
-      updateRequirement(requirements.number, /[0-9]/.test(val));
-      updateRequirement(requirements.match, val === val2 && val.length > 0);
-    }
-
-    if (password) {
-      password.addEventListener('input', validate);
-    }
-    if (confirmPassword) {
-      confirmPassword.addEventListener('input', validate);
+    if (passwordInput && confirmPasswordInput) {
+        passwordInput.addEventListener('input', checkPasswordMatch);
+        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
     }
 
     $('.theme-form').on('submit', function() {

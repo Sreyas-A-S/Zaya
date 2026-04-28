@@ -146,11 +146,11 @@ class WebController extends Controller
                 '_embed' => 1,
                 'lang' => $language
             ];
-            // Try 'announcement'
-            $response = $this->fetchFromWordPress('announcement', $params);
+            // Prefer the plural endpoint first because it is the one that consistently
+            // returns localized content in the rest of the site.
+            $response = $this->fetchFromWordPress('announcements', $params);
             if (empty($response)) {
-                // Try 'announcements'
-                $response = $this->fetchFromWordPress('announcements', $params);
+                $response = $this->fetchFromWordPress('announcement', $params);
             }
 
             if (!empty($response) && is_array($response) && isset($response[0])) {
