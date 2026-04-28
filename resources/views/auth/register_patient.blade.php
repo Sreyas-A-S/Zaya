@@ -251,9 +251,11 @@
 
                     <div class="mb-10">
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha') }}</label>
-                        <div class="flex items-center gap-4">
-                            <img src="{{ route('captcha') }}" id="captcha-img" class="h-12 border rounded-xl">
-                            <button type="button" onclick="refreshCaptcha()" class="text-secondary"><i class="ri-refresh-line text-2xl"></i></button>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <img src="{{ route('captcha') }}" id="captcha-img" class="h-12 border rounded-xl">
+                                <button type="button" onclick="refreshCaptcha()" class="text-secondary"><i class="ri-refresh-line text-2xl"></i></button>
+                            </div>
                             <input type="text" name="captcha" class="reg-input flex-1" required placeholder="{{ __('Enter Code') }}">
                         </div>
                     </div>
