@@ -428,9 +428,9 @@
                             <img src="{{ $latestAnnouncement['image'] }}" alt="Announcement" class="w-full h-full object-cover">
                         </div>
                     @endif
-                    <div class="p-4 md:p-8 md:pl-2 pr-10 md:pr-12 flex flex-col justify-center gap-1 md:gap-2">
-                        <span class="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest leading-none"
-                            data-i18n="New Announcement">New Announcement</span>
+                        <div class="p-4 md:p-8 md:pl-2 pr-10 md:pr-12 flex flex-col justify-center gap-1 md:gap-2">
+                            <span class="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest leading-none"
+                            data-i18n="New Announcement">{{ __('New Announcement') }}</span>
                         <h4 class="text-base md:text-xl font-bold text-secondary line-clamp-1 leading-tight group-hover/link:text-primary transition-colors">
                             {{ $latestAnnouncement['title'] }}
                         </h4>
@@ -438,7 +438,7 @@
                             {{ \Illuminate\Support\Str::limit($latestAnnouncement['excerpt'], 100) }}
                         </p>
                         <div class="text-[10px] md:text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-0.5 md:mt-1">
-                            <span data-i18n="Read More">Read More</span> <i class="ri-arrow-right-s-line"></i>
+                            <span data-i18n="Read More">{{ __('Read More') }}</span> <i class="ri-arrow-right-s-line"></i>
                         </div>
                     </div>
                 </a>
@@ -450,9 +450,9 @@
                     </div>
                     <div class="flex flex-col gap-0.5 md:gap-1">
                         <span class="text-[9px] md:text-[11px] font-black text-primary uppercase tracking-widest leading-none"
-                            data-i18n="Announcements">Announcements</span>
+                            data-i18n="Announcements">{{ __('Announcements') }}</span>
                         <span class="text-base md:text-lg font-bold text-secondary whitespace-nowrap leading-none"
-                            data-i18n="Latest Updates & News">Latest Updates & News</span>
+                            data-i18n="Latest Updates & News">{{ __('Latest Updates & News') }}</span>
                     </div>
                     <div class="absolute right-4 md:right-6 top-1/2 -translate-y-1/2">
                         <i
