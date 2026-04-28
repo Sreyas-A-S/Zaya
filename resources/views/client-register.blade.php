@@ -949,7 +949,7 @@
                     </div>
                 </div> 
                 -->
-                    </div> <!-- end max-w-5xl -->
+                     <!-- end max-w-5xl -->
 
                     <!-- Form Footer: Already have account & Submit -->
                     <div class="bg-[#FFEAC6] -mx-8 md:-mx-14 -mb-8 md:-mb-14 p-8 md:p-14 rounded-b-[32px] mt-10">
@@ -975,6 +975,8 @@
                                     <span class="hidden sm:inline">{!! __('Complete & Proceed') !!}</span>
                                     <span class="sm:hidden">{!! __('Submit') !!}</span>
                                 </button>
+
+                            </div>
                             </div>
                         </div>
                     </div>
