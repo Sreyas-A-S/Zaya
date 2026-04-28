@@ -671,7 +671,7 @@
                         </div>
 
                         <!-- Row 6: Zip Code -->
-                        <!-- <div class="grid grid-cols-1 mb-10">
+                        <div class="grid grid-cols-1 mb-10">
                             <div>
                                 <label
                                     class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Zip Code') }}</label>
@@ -681,7 +681,7 @@
                                     oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)"
                                     autocomplete="off">
                             </div>
-                        </div> -->
+                        </div>
 
                         <!-- Consultation Preferences -->
                         <!-- <div class="mb-10">
@@ -949,10 +949,13 @@
                     </div>
                 </div> 
                 -->
-                        <!-- Form Footer: Already have account & Submit -->
-                        <div class="flex flex-col md:flex-row items-center justify-between gap-8 border-t border-gray-100 pt-10 mt-10">
+                    </div> <!-- end max-w-5xl -->
+
+                    <!-- Form Footer: Already have account & Submit -->
+                    <div class="bg-[#FFEAC6] -mx-8 md:-mx-14 -mb-8 md:-mb-14 p-8 md:p-14 rounded-b-[32px] mt-10">
+                        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
                             <div class="flex flex-col gap-1 text-center md:text-left">
-                                <p class="text-gray-500 text-base font-medium">{{ __('Already have an account?') }}
+                                <p class="text-[#594B4B] text-base font-medium">{{ __('Already have an account?') }}
                                 </p>
                                 <a href="{{ route('zaya-login') }}"
                                     class="text-primary text-sm font-bold hover:underline flex items-center justify-center md:justify-start gap-1">
@@ -962,7 +965,7 @@
 
                             <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                                 <a href="{{ route('index') }}"
-                                    class="w-full sm:w-auto text-gray-500 py-3.5 px-8 rounded-full font-medium transition-all hover:bg-gray-50 text-center">
+                                    class="w-full sm:w-auto text-gray-500 py-3.5 px-8 rounded-full font-medium transition-all hover:bg-white/50 text-center">
                                     {{ __('Cancel') }}
                                 </a>
 
@@ -973,8 +976,7 @@
                                 </button>
                             </div>
                         </div>
-                    </div> <!-- end max-w-5xl -->
-
+                    </div>
                 </form>
             </div>
         </div>
