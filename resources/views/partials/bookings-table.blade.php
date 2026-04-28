@@ -189,7 +189,7 @@
 
                                 <div class="dropdown-menu absolute right-0 mt-2 w-56 rounded-xl shadow-xl bg-white border border-[#2E4B3D]/12 divide-y divide-gray-50 focus:outline-none z-[999] hidden">
                                     <div class="py-1">
-                                        @if(in_array($booking->status, ['pending', 'confirmed', 'paid']) && $booking->mode === 'online')
+                                        @if($booking->practitioner_type !== 'registration_fee' && in_array($booking->status, ['pending', 'confirmed', 'paid']) && $booking->mode === 'online')
                                         <a href="{{ route('conference.join', ['channel' => $booking->invoice_no ?? 'session-' . $booking->id, 'provider' => 'jaas']) }}" class="group flex items-center w-full px-4 py-3 text-sm text-blue-700 hover:bg-blue-50 transition-colors text-left font-bold">
                                             <i class="ri-vidicon-line mr-3 text-lg text-blue-600"></i>
                                             Join Session
