@@ -66,6 +66,7 @@ class WelcomeUserMail extends Mailable implements ShouldQueue
                     'email' => $this->email,
                     'password' => $this->plainPassword,
                     'login_url' => $this->loginUrl,
+                    'show_button' => false,
                 ] : null,
                 'outro' => $outro,
             ],

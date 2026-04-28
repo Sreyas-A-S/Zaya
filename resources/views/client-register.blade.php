@@ -1522,6 +1522,12 @@
             const confirmPasswordInput = document.getElementById('password_confirmation');
             const matchError = document.getElementById('password-match-error');
 
+            // Show requirements on focus
+            passwordInput.addEventListener('focus', function() {
+                document.getElementById('password-requirements').classList.remove('hidden');
+                document.getElementById('password-strength-indication').classList.remove('hidden');
+            });
+
             function checkPasswordMatch() {
                 const password = passwordInput.value;
                 const confirmPassword = confirmPasswordInput.value;
