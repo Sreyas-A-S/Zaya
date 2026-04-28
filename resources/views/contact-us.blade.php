@@ -83,7 +83,7 @@
             </div>
 
             <!-- Contact Card -->
-            <div
+            <!-- <div
                 class="bg-[#FFFFFF] rounded-2xl p-6 flex flex-col items-center text-center gap-3 shadow-[0_30px_82px_rgba(186,186,186,0.29)] transition-all duration-300 group">
                 <div
                     class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-accent transition-colors">
@@ -91,7 +91,7 @@
                 </div>
                 <h3 id="contact-info-phone-label" class="text-primary font-bold font-sans! text-sm tracking-wider">{{ __('Contact') }}</h3>
                 <p id="contact_info_phone" class="text-gray-500 text-sm leading-relaxed">{!! $settings['contact_info_phone'] ?? '+91 123 456 7890<br>+91 987 654 3210' !!}</p>
-            </div>
+            </div> -->
 
             <!-- Email Card -->
             <div

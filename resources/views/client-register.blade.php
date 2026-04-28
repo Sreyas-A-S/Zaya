@@ -610,7 +610,7 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('State (Optional)') }}</label>
+                        <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('State') }}</label>
                         <input type="text" name="state" value="{{ old('state') }}"
                             class="reg-input @error('state') border-red-500! @enderror" placeholder="{{ __('Enter State') }}" autocomplete="off">
                         @error('state')
@@ -630,7 +630,7 @@
                 </div>
 
                 <!-- Row 6: Zip Code -->
-                <div class="grid grid-cols-1 mb-10">
+                <!-- <div class="grid grid-cols-1 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Zip Code') }}</label>
                         <input type="text" name="zip_code" value="{{ old('zip_code') }}" class="reg-input h-[52px]"
@@ -638,10 +638,10 @@
                             title="{{ __('Maximum 8 numerical values allowed') }}"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)" autocomplete="off">
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Consultation Preferences -->
-                <div class="mb-10">
+                <!-- <div class="mb-10">
                     <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Preferred Speciality of Consultation') }}</label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8 bg-gray-50/50 p-6 md:p-8 rounded-3xl">
                         @foreach($consultationPreferences as $pref)
@@ -657,10 +657,10 @@
                         @endforeach
                         
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Row: Languages & Referral -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
+                <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Languages Spoken') }}</label>
                         <select id="languages-select" name="languages[]" multiple placeholder="{{ __('Select Languages') }}">
@@ -680,7 +680,7 @@
                             <option value="Other">{{ __('Other Sources') }}</option>
                         </select>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                     <div>
