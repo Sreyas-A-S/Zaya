@@ -208,6 +208,11 @@
 
     <script>
         function toggleLanguage(targetLocale) {
+            // Show a preloader if available
+            if (typeof window.showPreloader === 'function') {
+                window.showPreloader();
+            }
+
             fetch(`{{ url('/lang') }}/${targetLocale}`, {
                     method: "POST",
                     headers: {
@@ -218,96 +223,14 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status) {
-                        // 1. Update dynamic settings in the DOM
-                        Object.keys(data.data).forEach(key => {
-                            const element = document.getElementById(key);
-                            if (element) {
-                                if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                                    element.placeholder = data.data[key];
-                                } else if (element.tagName === 'IMG') {
-                                    // Handle image settings - update src and alt if title is available
-                                    const value = data.data[key];
-                                    const src = value.startsWith('frontend/assets/') ? `{{ asset('') }}${value}` : `{{ asset('storage') }}/${value}`;
-                                    element.src = src;
-                                    
-                                    // Try to find a related title for alt text (e.g. sanctuary_title for sanctuary_img_X)
-                                    const section = key.split('_')[1]; // gallery_sanctuary_img_1 -> sanctuary
-                                    const titleKey = `gallery_${section}_title`;
-                                    if (data.data[titleKey]) {
-                                        element.alt = data.data[titleKey];
-                                    }
-                                } else if (element.tagName === 'A' || element.tagName === 'BUTTON' || element.tagName === 'SPAN' || element.tagName === 'H1' || element.tagName === 'H2' || element.tagName === 'H3' || element.tagName === 'P') {
-                                    // For elements with children (like icons), we only want to update the text part
-                                    // This is a bit tricky, but innerHTML is okay if settings don't have HTML usually.
-                                    // If they do have HTML (like blog_subtitle), innerHTML is required.
-                                    element.innerHTML = data.data[key];
-                                } else {
-                                    element.innerHTML = data.data[key];
-                                }
-                            }
-                        });
-
-                        // 2. Update static translations (data-i18n)
-                        if (data.translations) {
-                            document.querySelectorAll('[data-i18n]').forEach(el => {
-                                const key = el.getAttribute('data-i18n');
-                                const translation = data.translations[key];
-                                if (translation) {
-                                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                                        el.placeholder = translation;
-                                    } else {
-                                        // Preserve icons if they are children
-                                        const icon = el.querySelector('i');
-                                        if (icon) {
-                                            el.innerHTML = translation + ' ' + icon.outerHTML;
-                                        } else {
-                                            el.textContent = translation;
-                                        }
-                                    }
-                                }
-                            });
-                        }
-
-                        // 3. Update toggle UI
-                        const pill = document.getElementById('lang-toggle-pill');
-                        const langTexts = document.querySelectorAll('[id^="lang-text-"]');
-
-                        @if(isset($available_languages) && $available_languages->count() >= 2)
-                        if (pill) {
-                            if (targetLocale === '{{ $lang2->code }}') {
-                                pill.classList.remove('translate-x-0');
-                                pill.classList.add('translate-x-full');
-                            } else {
-                                pill.classList.remove('translate-x-full');
-                                pill.classList.add('translate-x-0');
-                            }
-                        }
-
-                        langTexts.forEach(txt => {
-                            if (txt.id === `lang-text-${targetLocale}`) {
-                                txt.classList.remove('text-gray-500');
-                                txt.classList.add('text-white');
-                            } else {
-                                txt.classList.remove('text-white');
-                                txt.classList.add('text-gray-500');
-                            }
-                        });
-
-                        // 4. Update onclick for next toggle
-                        // 4. Update onclick for next toggle
-                        const toggleBtn = pill ? pill.parentElement : null;
-                        if (toggleBtn) {
-                            const nextLocale = targetLocale === '{{ $lang1->code }}' ? '{{ $lang2->code }}' : '{{ $lang1->code }}';
-                            toggleBtn.setAttribute('onclick', `toggleLanguage('${nextLocale}')`);
-                        }
-                        @endif
-
                         console.log("Language changed to:", targetLocale);
+                        // Force a full page reload to ensure all content (static and dynamic) is updated
                         location.reload();
                     }
                 })
                 .catch(error => {
                     console.error('Error switching language:', error);
+                    // Fallback to traditional redirect if AJAX fails
                     window.location.href = `{{ url('/lang') }}/${targetLocale}`;
                 });
         }

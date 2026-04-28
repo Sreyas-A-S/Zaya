@@ -43,7 +43,7 @@ class SocialAuthController extends Controller
                     return redirect()->route('login')->with('error', $blockReason);
                 }
                 Auth::login($existingUser);
-                return redirect()->route('dashboard');
+                return $this->redirectBasedOnRole($existingUser);
             } else {
                 // Check if user exists by email
                 $userByEmail = User::where('email', $socialUser->email)->first();
@@ -53,10 +53,19 @@ class SocialAuthController extends Controller
                     if ($blockReason) {
                         return redirect()->route('login')->with('error', $blockReason);
                     }
-                    $userByEmail->update([
+                    
+                    $updateData = [
                         $provider . '_id' => $socialUser->id,
-                    ]);
+                    ];
+                    
+                    // Update name if it's missing
+                    if (!$userByEmail->name) {
+                        $updateData['name'] = $socialUser->name;
+                    }
+
+                    $userByEmail->update($updateData);
                     Auth::login($userByEmail);
+                    return $this->redirectBasedOnRole($userByEmail);
                 } else {
                     // Create new user
                     $nameParts = explode(' ', $socialUser->name, 2);
@@ -64,6 +73,7 @@ class SocialAuthController extends Controller
                     $lastName = $nameParts[1] ?? '';
 
                     $newUser = User::create([
+                        'name' => $socialUser->name,
                         'first_name' => $firstName,
                         'last_name' => $lastName,
                         'email' => $socialUser->email,
@@ -74,12 +84,25 @@ class SocialAuthController extends Controller
                     ]);
 
                     Auth::login($newUser);
+                    return $this->redirectBasedOnRole($newUser);
                 }
-
-                return redirect()->route('dashboard');
             }
         } catch (Exception $e) {
             return redirect()->route('login')->with('error', 'Authentication failed: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Redirect user based on their role.
+     */
+    protected function redirectBasedOnRole($user)
+    {
+        $adminRoles = ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
+        
+        if (in_array($user->role, $adminRoles)) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('dashboard');
     }
 }
