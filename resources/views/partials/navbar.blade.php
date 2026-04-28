@@ -31,6 +31,126 @@
             border: none !important;
             box-shadow: none !important;
         }
+
+        @media (max-width: 991px) {
+            .page-header {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                height: 80px !important;
+                padding: 0 15px !important;
+                margin: 0 !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                z-index: 100 !important;
+                background-color: #fff !important;
+            }
+
+            .logo-wrapper {
+                width: auto !important;
+                flex: 0 0 auto !important;
+                padding: 0 !important;
+                background-color: transparent !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            .logo-wrapper a:first-child {
+                position: absolute !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                margin: 0 !important;
+                z-index: 10 !important;
+            }
+
+            .page-main-header {
+                flex: 1 1 auto !important;
+                width: auto !important;
+                padding: 0 !important;
+                display: flex !important;
+                justify-content: flex-end !important;
+                background-color: transparent !important;
+            }
+
+            .nav-right {
+                width: auto !important;
+                padding: 0 !important;
+            }
+
+            .header-right {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                gap: 5px !important;
+                margin-bottom: 0 !important;
+            }
+
+            .header-right li {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .header-right .custom-dropdown a {
+                padding: 10px 5px !important;
+                min-width: unset !important;
+            }
+
+            .user-wrap .user-content {
+                display: none !important;
+            }
+
+            .logo-wrapper a img {
+                width: 45px !important;
+                height: auto !important;
+            }
+
+            .page-sidebar {
+                margin-top: 80px !important;
+                z-index: 99 !important;
+                box-shadow: 5px 0 20px rgba(0,0,0,0.1) !important;
+                height: calc(100vh - 80px) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                background: #fff !important;
+            }
+
+            .main-sidebar {
+                flex: 1 1 auto !important;
+                overflow-y: auto !important;
+                height: auto !important;
+                min-height: 0 !important;
+            }
+
+            .sidebar-menu {
+                padding-bottom: 20px !important; 
+            }
+
+            .sidebar-footer-image {
+                position: static !important;
+                flex: 0 0 auto !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                text-align: left !important;
+                background: #fff !important;
+                width: 100% !important;
+                line-height: 0 !important;
+            }
+
+            .sidebar-footer-image img {
+                width: 180px !important;
+                height: auto !important;
+                margin: 0 !important;
+                display: block !important;
+            }
+
+            .page-body-wrapper {
+                padding-top: 80px !important;
+            }
+        }
     </style>
     <div class="logo-wrapper d-flex align-items-center col-auto">
         <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none me-3">

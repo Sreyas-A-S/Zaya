@@ -68,13 +68,20 @@
                         $displayTime = $sessionInfo['time'];
                     }
                 }
+
+                $isAssignedToMe = !empty($referredServiceIds) && in_array($service->id, $referredServiceIds);
             @endphp
-            <div class="bg-white border border-gray-100 p-3 rounded-lg">
+            <div class="{{ $isAssignedToMe ? 'bg-primary/5 border-primary/30' : 'bg-white border-gray-100' }} border p-3 rounded-lg transition-all">
                 <div class="flex justify-between items-center mb-1">
-                    <span class="text-sm font-bold text-gray-700">{{ $service->title }}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold {{ $isAssignedToMe ? 'text-primary' : 'text-gray-700' }}">{{ $service->title }}</span>
+                        @if($isAssignedToMe)
+                            <span class="text-[8px] font-black uppercase tracking-widest bg-primary text-white px-1.5 py-0.5 rounded">Assigned</span>
+                        @endif
+                    </div>
                     <span class="text-[10px] text-gray-400 uppercase font-black tracking-widest">{{ $booking->mode }}</span>
                 </div>
-                <div class="flex items-center gap-2 text-xs text-secondary font-medium">
+                <div class="flex items-center gap-2 text-xs {{ $isAssignedToMe ? 'text-primary/70' : 'text-secondary' }} font-medium">
                     <i class="ri-calendar-line opacity-50"></i>
                     <span>{{ $displayDate }}</span>
                     <span class="opacity-20">|</span>
@@ -151,9 +158,25 @@
         @if($isPractitioner && $transaction)
         <div id="distribution-info" class="hidden mt-6 pt-6 border-t border-white/10 space-y-4 transition-all">
             <div class="flex justify-between items-center text-[11px]">
-                <span class="opacity-60 font-bold uppercase tracking-widest">Gross Booking Amount</span>
-                <span class="font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->total_amount, 2) }}</span>
+                <span class="opacity-60 font-bold uppercase tracking-widest">Gross Booking Value</span>
+                <span class="font-black text-white">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->subtotal, 2) }}</span>
             </div>
+            
+            @php
+                $totalDiscounts = (float)$booking->discount_amount + (float)$booking->coin_discount;
+            @endphp
+            @if($totalDiscounts > 0)
+            <div class="flex justify-between items-center text-[11px] text-red-300">
+                <span class="opacity-60 font-bold uppercase tracking-widest">Total Discounts Applied</span>
+                <span class="font-black">- {{ get_currency_symbol($booking->currency) }} {{ number_format($totalDiscounts, 2) }}</span>
+            </div>
+            @endif
+
+            <div class="flex justify-between items-center text-[11px] pt-1 border-t border-white/5">
+                <span class="opacity-60 font-bold uppercase tracking-widest text-emerald-400">Net Paid by Client</span>
+                <span class="font-black text-emerald-400">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->total_amount, 2) }}</span>
+            </div>
+
             <div class="flex justify-between items-center text-[11px]">
                 <span class="opacity-60 font-bold uppercase tracking-widest">Platform Fee ({{ number_format($transaction->company_commission_percent, 1) }}%)</span>
                 <span class="font-black text-red-300">- {{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->company_share, 2) }}</span>
@@ -165,8 +188,8 @@
             </div>
             @endif
             <div class="flex justify-between items-center pt-2 border-t border-white/5 text-sm font-black">
-                <span class="uppercase tracking-widest text-[10px]">Net Earnings</span>
-                <span class="text-emerald-300">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->practitioner_share, 2) }}</span>
+                <span class="uppercase tracking-widest text-[10px] text-emerald-400">Your Net Earnings</span>
+                <span class="text-white">{{ get_currency_symbol($booking->currency) }} {{ number_format($transaction->practitioner_share, 2) }}</span>
             </div>
         </div>
         @endif

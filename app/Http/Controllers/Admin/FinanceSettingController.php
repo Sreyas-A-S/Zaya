@@ -66,7 +66,7 @@ class FinanceSettingController extends Controller
             ->keyBy('key');
 
         // 2. Fetch "all" country settings for this language as fallback structure
-        $fallbackLanguageSettings = [];
+        $fallbackLanguageSettings = collect();
         if ($countryCode !== 'all') {
             $fallbackLanguageSettings = HomepageSetting::where('section', 'finance')
                 ->where('language', $language)

@@ -9,6 +9,11 @@
 @section('title', 'Mindfulness Counsellors')
 
 @section('content')
+@php
+    $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+    $feeCurrency = $financeSettings['mindfulness_practitioner_registration_fee_currency'] ?? 'EUR';
+    $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+@endphp
 <style>
     #practitioners-table_wrapper .dataTables_filter {
         display: flex;
@@ -125,11 +130,10 @@
                                     <div class="step-counter">6</div>
                                     <div class="step-name text-nowrap">Profile</div>
                                 </div>
-                                <div class="stepper-item" data-step="7">
+                                {{-- <div class="stepper-item" data-step="7">
                                     <div class="step-counter">7</div>
                                     <div class="step-name text-nowrap">Payment & Offers</div>
-                                </div>
-                            </div>
+                                </div> --}}                            </div>
 
                             <form id="practitioner-form" method="POST" enctype="multipart/form-data" class="theme-form" novalidate>
                                 @csrf
@@ -737,7 +741,7 @@
                             </div>
                         </div>
 
-                        <!-- Step 7: Payment & Offers -->
+                        {{-- <!-- Step 7: Payment & Offers -->
                         <div class="step-content d-none" id="step-7">
                             <div class="row g-3">
                                 <div class="col-12">
@@ -802,7 +806,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <!-- Buttons -->
                         <div class="d-flex justify-content-between mt-4">
@@ -870,8 +874,8 @@
                 <p id="status-confirmation-msg">Select the new status for this practitioner:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input-practitioner" class="form-select">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="approved">Active</option>
+                        <option value="rejected">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-practitioner-id">
@@ -915,7 +919,7 @@
 <script>
     let table;
     let currentStep = 1;
-    const totalSteps = 7;
+    const totalSteps = 6;
     let iti;
     let phoneInput;
     let cropper;
@@ -1051,6 +1055,7 @@
     }
     window.practitionerTypeChoices = practitionerTypeChoices;
 
+    /*
     // Promocode Logic for Admin Modal (Mindfulness)
     const promoInputMind = document.getElementById('admin-promocode-input-mind');
     const promoApplyBtnMind = document.getElementById('admin-promo-apply-btn-mind');
@@ -1110,7 +1115,12 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
-                body: JSON.stringify({ code, role: 'mindfulness_practitioner' })
+                body: JSON.stringify({ 
+                    code, 
+                    role: 'mindfulness_practitioner',
+                    usage_type: 'registration',
+                    country: document.querySelector('[name="country"]') ? document.querySelector('[name="country"]').value : 'all'
+                })
             });
 
             const data = await response.json();
@@ -1144,6 +1154,7 @@
             promoApplyBtnMind.innerText = 'Apply';
         }
     });
+    */
 
     // Stepper Logic
     $('#next-btn').click(function() {

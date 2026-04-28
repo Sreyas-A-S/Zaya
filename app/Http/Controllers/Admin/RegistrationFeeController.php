@@ -57,6 +57,7 @@ class RegistrationFeeController extends Controller
                             // Create a dummy booking record to serve as an invoice
                             $booking = \App\Models\Booking::create([
                                 'invoice_no' => $invoiceNo,
+                                'download_token' => \Illuminate\Support\Str::random(64),
                                 'user_id' => $user->id,
                                 'profile_id' => 0,
                                 'practitioner_type' => 'registration_fee',
@@ -72,10 +73,8 @@ class RegistrationFeeController extends Controller
                             
                             Log::info("Transaction and Registration Invoice recorded for user $userId.");
 
-                            // Auto-login the user so they can view the invoice (protected by auth middleware)
-                            \Illuminate\Support\Facades\Auth::login($user);
-
-                            return redirect()->route('invoice.show', $invoiceNo)->with('success', 'Payment successful! Welcome to Zaya Wellness.');
+                            return redirect()->route('invoice.download', ['invoice_no' => $invoiceNo, 'token' => $booking->download_token])
+                                ->with('success', 'Payment successful! Your invoice is being downloaded. Welcome to Zaya Wellness.');
                         }
                     }
                 }

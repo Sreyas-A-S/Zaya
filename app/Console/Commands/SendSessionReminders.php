@@ -32,32 +32,46 @@ class SendSessionReminders extends Command
     public function handle()
     {
         $now = Carbon::now();
+        $this->info("Starting session reminders check at " . $now->toDateTimeString() . " (" . config('app.timezone') . ")");
         
-        // Fetch bookings for today and tomorrow that are online, confirmed, and reminder not sent
+        // Fetch bookings for yesterday, today and tomorrow that are online, confirmed, and reminder not sent
+        // We include yesterday to catch sessions in timezones that are behind the server time
         $bookings = Booking::with(['user', 'practitioner.user', 'translator.user'])
             ->where('mode', 'online')
             ->where('status', 'confirmed')
             ->where('reminder_sent', false)
             ->whereBetween('booking_date', [
-                $now->toDateString(), 
+                $now->copy()->subDay()->toDateString(),
                 $now->copy()->addDay()->toDateString()
             ])
             ->get();
 
+        $this->info("Found " . $bookings->count() . " potential bookings in the date range.");
         $sentCount = 0;
 
         foreach ($bookings as $booking) {
             try {
-                // Combine date and time
-                // Assuming booking_time is like "10:00 AM" or "14:30"
-                $startTime = Carbon::parse($booking->booking_date->format('Y-m-d') . ' ' . $booking->booking_time);
+                // Get the practitioner's timezone
+                $timezone = derive_timezone_from_user($booking->practitioner);
+                
+                // Combine date and time and parse in the practitioner's timezone
+                $startTime = Carbon::parse($booking->booking_date->format('Y-m-d') . ' ' . $booking->booking_time, $timezone);
                 
                 // Use practitioner's specific lead time or fallback to 60 minutes
                 $leadTime = $booking->practitioner->reminder_lead_time ?? 60;
                 
+                $diff = $now->diffInMinutes($startTime, false);
+                
+                // Detailed debug info
+                $this->info("Checking Booking #{$booking->id} (Invoice: {$booking->invoice_no}):");
+                $this->info(" - Current Time (Server): " . $now->toDateTimeString() . " (" . config('app.timezone') . ")");
+                $this->info(" - Session Start Time: " . $startTime->toDateTimeString() . " ({$timezone})");
+                $this->info(" - Diff: {$diff} minutes (Lead Time: {$leadTime} mins)");
+
                 // Send reminder if current time is within the lead time window before the session
-                // We also check if the session hasn't already started long ago (e.g., within the last 15 mins is fine if we just missed it)
-                if ($now->diffInMinutes($startTime, false) <= $leadTime && $now->diffInMinutes($startTime, false) >= -15) {
+                // We allow a small window after the session starts (-15 mins) to catch late starts
+                if ($diff <= ($leadTime + 1) && $diff >= -15) {
+                    $this->info("Match found for Booking #{$booking->id}. Sending reminder...");
                     
                     // Generate the secure video link using invoice_no as channel name
                     $videoLink = route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']);

@@ -62,14 +62,16 @@ class ContentManagerController extends Controller
                         $query->where(function ($q) use ($search) {
                             $q->where('users.first_name', 'LIKE', "%{$search}%")
                                 ->orWhere('users.last_name', 'LIKE', "%{$search}%")
+                                ->orWhere('users.name', 'LIKE', "%{$search}%")
                                 ->orWhere('users.email', 'LIKE', "%{$search}%")
                                 ->orWhere('users.phone', 'LIKE', "%{$search}%");
                         });
                     }
                 })
+                ->orderColumn('id', 'users.id $1')
 
-                ->addColumn('name', function ($row) {
-                    return $row->first_name . ' ' . $row->last_name;
+                ->editColumn('name', function ($row) {
+                    return $row->name ?: ($row->first_name . ' ' . $row->last_name);
                 })
 
                 ->addColumn('nationality', function ($row) {

@@ -517,13 +517,9 @@
                             <div class="flex gap-4 items-center w-full sm:w-auto justify-end">
                                 <a href="{{ route('index') }}" class="text-gray-500 hover:text-gray-700 font-medium transition-colors hidden sm:block">{{ __('Cancel') }}</a>
                                 <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">
-<<<<<<< HEAD
                                     <i class="ri-loader-4-line ri-spin btn-loader"></i>
-                                    <span class="hidden md:inline">{{ __('Complete & Proceed to Payment') }}</span>
+                                    <span class="hidden md:inline">{!! __('Complete & Proceed to Payment') !!}</span>
                                     <span class="md:hidden">{{ __('Submit') }}</span>
-=======
-                                    <i class="ri-loader-4-line ri-spin btn-loader"></i>{!! __('Complete & Proceed to Payment') !!}
->>>>>>> d32b6fa2a6a653d1dfb438602f8d0074aa078717
                                 </button>
                             </div>
                         </div>
@@ -1052,7 +1048,8 @@
                             code, 
                             role: "{{ $joinRole }}", 
                             usage_type: 'registration',
-                            country: countrySelect ? countrySelect.value : ''
+                            country: countrySelect ? countrySelect.value : '',
+                            currency: feeCurrencyInput ? feeCurrencyInput.value : 'EUR'
                         })
                     });
 

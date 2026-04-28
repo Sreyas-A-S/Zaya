@@ -14,6 +14,7 @@ class Booking extends Model
         'profile_id',
         'practitioner_type',
         'invoice_no',
+        'download_token',
         'service_ids',
         'mode',
         'conditions',

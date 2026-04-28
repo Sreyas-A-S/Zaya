@@ -7,8 +7,8 @@ use App\Models\User;
 use App\Models\MindfulnessPractitioner;
 use App\Mail\SetPasswordMail;
 use App\Mail\PractitionerApplicationSubmittedMail;
-use App\Mail\RegistrationFeePaymentLinkMail;
-use App\Services\RegistrationFeeService;
+// use App\Mail\RegistrationFeePaymentLinkMail;
+// use App\Services\RegistrationFeeService;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
@@ -199,10 +199,6 @@ class MindfulnessPractitionerController extends Controller
             'short_bio' => 'nullable|string|max:1000',
             'coaching_style' => 'nullable|string|max:1000',
             'target_audience' => 'nullable|string|max:1000',
-
-            // Payment & Promocode
-            'promo_code' => 'nullable|string|max:50',
-            'promo_total_fee' => 'nullable|numeric',
         ]);
 
         DB::beginTransaction();
@@ -220,7 +216,8 @@ class MindfulnessPractitionerController extends Controller
             Session::put('welcome_password_' . $user->id, $plainPassword);
             Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail('Mindfulness Counsellor'));
 
-            $feeService = app(RegistrationFeeService::class);
+            /*
+            $feeService = app(\App\Services\RegistrationFeeService::class);
             $promoNotes = [];
             $feeOverride = $request->input('promo_total_fee');
 
@@ -240,9 +237,11 @@ class MindfulnessPractitionerController extends Controller
 
             if ($link = $feeService->createPaymentLink($user, $user->role, $feeOverride, $promoNotes)) {
                 Mail::to($user->email)->send(
-                    new RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
+                    new \App\Mail\RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
                 );
             }
+            */
+
             Session::forget('welcome_password_' . $user->id);
 
             $practitionerData = $validatedData;

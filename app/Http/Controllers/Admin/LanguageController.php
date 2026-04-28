@@ -135,6 +135,10 @@ class LanguageController extends Controller
             Session::put('locale', 'all');
             session(['locale' => 'all']);
             
+            if (request()->isMethod('get')) {
+                return redirect()->back();
+            }
+
             return response()->json([
                 'status' => true,
                 'language' => 'all',
@@ -183,6 +187,10 @@ class LanguageController extends Controller
         $jsonPath = base_path("lang/{$laravelLocale}.json");
         if (file_exists($jsonPath)) {
             $translations = json_decode(file_get_contents($jsonPath), true);
+        }
+
+        if (request()->isMethod('get')) {
+            return redirect()->back();
         }
 
         return response()->json([

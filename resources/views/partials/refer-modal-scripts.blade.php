@@ -232,7 +232,46 @@
     </div>
 </div>
 
+<style>
+    .time-slots-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+    .time-slot {
+        padding: 6px 2px;
+        text-align: center;
+        font-size: 10px;
+        color: #555;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+        border: 1px solid #E5E7EB;
+        font-weight: 700;
+        background: #F9FAFB;
+    }
+    .time-slot:hover:not(.booked):not(.selected) {
+        background-color: #F3F4F6;
+        border-color: #D1D5DB;
+    }
+    .time-slot.selected {
+        background-color: #2E4B3D;
+        color: #fff;
+        border-color: #2E4B3D;
+        box-shadow: 0 4px 12px rgba(46, 75, 61, 0.2);
+    }
+    .time-slot.booked {
+        background-color: #FEE2E2 !important;
+        color: #991B1B !important;
+        border-color: #FECACA !important;
+        cursor: not-allowed !important;
+        opacity: 0.6;
+    }
+</style>
+
 @push('scripts')
+
 <script>
     let currentDataAccessClientId = null;
 
@@ -471,10 +510,10 @@
                                 ${recommendedBadge}
                             </div>
                             <div class="flex flex-wrap items-center gap-2 mt-1">
-                                <span class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${p.handles_service ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-50 text-gray-400'}">
-                                    ${p.handles_service ? 'Handles Service' : 'Consultation Only'}
+                                <span class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${p.handles_service ? 'bg-emerald-50 text-emerald-600' : (p.service_fee > 0 ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-400')}">
+                                    ${p.handles_service ? 'Handles Service' : (p.service_fee > 0 ? 'Partial Match' : 'Consultation Only')}
                                 </span>
-                                ${p.handles_service && p.service_fee > 0 ? `
+                                ${p.service_fee > 0 ? `
                                     <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">
                                         Fee: €${parseFloat(p.service_fee).toFixed(2)}
                                     </span>
@@ -659,14 +698,11 @@
                             class="w-full px-3 py-2 text-xs rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 transition-all bg-gray-50/50"
                             id="date-${roleKey}">
                     </div>
-                    <div>
+                    <div class="col-span-2">
                         <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Select Slot</label>
-                        <select id="slots-${roleKey}" 
-                            onchange="updateSelectedSlot('${roleKey}', this.value)"
-                            class="w-full px-3 py-2 text-xs rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 transition-all bg-gray-50/50 disabled:opacity-50"
-                            disabled>
-                            <option value="">Select Date First</option>
-                        </select>
+                        <div id="slots-container-${roleKey}" class="time-slots-grid">
+                            <p class="text-[10px] text-gray-400 font-bold uppercase col-span-3 py-2">Select date first</p>
+                        </div>
                     </div>
                 </div>
             `;
@@ -676,40 +712,93 @@
 
     async function fetchSlotsForReferral(role, date) {
         const p = selectedProfessionals[role];
-        const slotSelect = document.getElementById(`slots-${role}`);
+        const container = document.getElementById(`slots-container-${role}`);
         
-        if (!date || !slotSelect) {
-            if (slotSelect) {
-                slotSelect.innerHTML = '<option value="">Select Date First</option>';
-                slotSelect.disabled = true;
+        if (!date || !container) {
+            if (container) {
+                container.innerHTML = '<p class="text-[10px] text-gray-400 font-bold uppercase col-span-3 py-2">Select date first</p>';
             }
             return;
         }
 
-        slotSelect.disabled = true;
-        slotSelect.innerHTML = '<option value="">Loading Slots...</option>';
+        container.innerHTML = '<div class="col-span-3 py-2 flex items-center gap-2"><div class="animate-spin h-3 w-3 border-b-2 border-secondary rounded-full"></div><span class="text-[10px] text-gray-400 uppercase font-black">Loading...</span></div>';
 
         try {
-            const response = await fetch(`/api/available-slots-by-user/${p.id}/${date}`);
-            const data = await response.json();
-            const slots = (data && Array.isArray(data.slots)) ? data.slots : [];
+            // Fetch both available and booked slots
+            const [availRes, bookedRes] = await Promise.all([
+                fetch(`/api/available-slots-by-user/${p.id}/${date}`),
+                fetch(`/api/booked-slots/${p.id}/${date}`)
+            ]);
 
-            slotSelect.innerHTML = '<option value="">Select Time</option>';
-            if (slots.length > 0) {
-                slots.forEach(slot => {
-                    slotSelect.innerHTML += `<option value="${slot.time}">${slot.time}</option>`;
+            const availData = await availRes.json();
+            const bookedData = await bookedRes.json();
+
+            const availableSlots = (availData && Array.isArray(availData.slots)) ? availData.slots.map(s => s.time) : [];
+            const bookedSlots = (bookedData && Array.isArray(bookedData.booked_slots)) ? bookedData.booked_slots : [];
+
+            // Combine and unique
+            container.innerHTML = '';
+            const allVisibleSlots = [...new Set([...availableSlots, ...bookedSlots])].sort((a, b) => {
+                const timeToMinutes = (t) => {
+                    const [time, modifier] = t.split(' ');
+                    let [hours, minutes] = time.split(':');
+                    if (hours === '12') hours = '00';
+                    if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
+                    return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+                };
+                return timeToMinutes(a) - timeToMinutes(b);
+            });
+
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+            const isToday = date === todayStr;
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+            if (allVisibleSlots.length > 0) {
+                allVisibleSlots.forEach(slot => {
+                    const isBooked = bookedSlots.includes(slot);
+                    
+                    const [time, modifier] = slot.split(' ');
+                    let [hours, minutes] = time.split(':');
+                    if (hours === '12') hours = '00';
+                    if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
+                    const slotMinutes = parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+                    
+                    const isPast = isToday && (slotMinutes < currentMinutes);
+                    const isSelected = p.slot === slot;
+                    
+                    const slotEl = document.createElement('div');
+                    slotEl.className = `time-slot ${isBooked || isPast ? 'booked' : ''} ${isSelected ? 'selected' : ''}`;
+                    slotEl.innerText = slot;
+                    
+                    if (!isBooked && !isPast) {
+                        slotEl.onclick = () => selectReferralSlot(role, slot, slotEl);
+                    } else if (isPast && !isBooked) {
+                        slotEl.title = 'This time has already passed';
+                    } else if (isBooked) {
+                        slotEl.title = 'This slot is already booked';
+                    }
+                    
+                    container.appendChild(slotEl);
                 });
-                slotSelect.disabled = false;
             } else {
-                slotSelect.innerHTML = '<option value="">No Slots Available</option>';
+                container.innerHTML = '<p class="text-[10px] text-red-400 font-bold uppercase col-span-3 py-2">No slots configured</p>';
             }
         } catch (error) {
             console.error('Fetch slots error:', error);
-            slotSelect.innerHTML = '<option value="">Error loading slots</option>';
+            container.innerHTML = '<p class="text-[10px] text-red-400 font-bold uppercase col-span-3 py-2">Error loading slots</p>';
         }
     }
 
-    function updateSelectedSlot(role, slot) {
+    function selectReferralSlot(role, slot, el) {
+        const container = document.getElementById(`slots-container-${role}`);
+        if (!container) return;
+
+        // UI update
+        container.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+        el.classList.add('selected');
+
+        // State update
         if (selectedProfessionals[role]) {
             selectedProfessionals[role].slot = slot;
             const dateInput = document.getElementById(`date-${role}`);
@@ -717,6 +806,7 @@
         }
         validateReferralForm();
     }
+
 
     function validateReferralForm() {
         const submitBtn = document.getElementById('refer-submit-btn');

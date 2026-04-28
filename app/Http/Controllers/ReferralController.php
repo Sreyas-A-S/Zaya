@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Http\Controllers\DataAccessController;
 use Carbon\Carbon;
 
 class ReferralController extends Controller
@@ -92,6 +93,21 @@ class ReferralController extends Controller
             // If has access and amount is 0, we can skip pending and go straight to paid
             $status = ($hasExistingAccess && $refData['amount'] == 0) ? 'paid' : $initialStatus;
 
+            // Only refer services that the professional actually handles
+            $requiredServiceIds = (array) ($booking->service_ids ?? []);
+            $handledServices = \App\Models\UserService::where('user_id', $refData['id'])
+                ->whereIn('service_id', $requiredServiceIds)
+                ->get();
+            
+            $handledServiceIds = $handledServices->pluck('service_id')->toArray();
+            
+            // Calculate correct amount based on handled services
+            $calculatedAmount = (float) $handledServices->sum('rate');
+            
+            // If they handle some services, only show those. If none, fall back to consultation services but keep original amount if provided.
+            $finalServiceIds = !empty($handledServiceIds) ? $handledServiceIds : $requiredServiceIds;
+            $finalAmount = $calculatedAmount > 0 ? $calculatedAmount : (float) ($refData['amount'] ?? 0);
+
             $referral = Referral::create([
                 'referral_no' => $referralNo,
                 'batch_no' => $batchNo,
@@ -99,8 +115,8 @@ class ReferralController extends Controller
                 'user_id' => $booking->user_id,
                 'referred_by_id' => $user->id,
                 'referred_to_id' => $refData['id'],
-                'service_ids' => $booking->service_ids,
-                'amount' => $refData['amount'],
+                'service_ids' => $finalServiceIds,
+                'amount' => $finalAmount,
                 'currency' => $this->resolveProfessionalCurrency($referredToUser),
                 'booking_date' => $refData['booking_date'],
                 'booking_time' => $refData['booking_time'],
@@ -113,7 +129,7 @@ class ReferralController extends Controller
             // Notify Referred Professional (Informational)
             try {
                 Mail::to($referral->referredTo->email)->send(new ReferralReceivedMail($referral));
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 Log::error('Referral Received Email Error: ' . $e->getMessage());
             }
 
@@ -135,8 +151,11 @@ class ReferralController extends Controller
         // Send ONE Referral Invitation Mail to Client
         try {
             $batchReferrals = Referral::where('batch_no', $batchNo)->get();
-            Mail::to($booking->user->email)->send(new ReferralInvitationMail($batchReferrals->first())); 
-        } catch (\Exception $e) {
+            $firstReferral = $batchReferrals->first();
+            if ($booking->user && $firstReferral) {
+                Mail::to($booking->user->email)->send(new ReferralInvitationMail($firstReferral)); 
+            }
+        } catch (\Throwable $e) {
             Log::error('Referral Invitation Email Error: ' . $e->getMessage());
         }
 
@@ -167,7 +186,7 @@ class ReferralController extends Controller
 
         try {
             Mail::to($client->email)->send(new \App\Mail\ReferralOTPMail($otp, $practitioner->name, implode(', ', $proNames)));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Referral OTP Email Error: ' . $e->getMessage());
         }
     }
@@ -250,7 +269,7 @@ class ReferralController extends Controller
             if ($newBooking->practitioner && $newBooking->practitioner->user) {
                 Mail::to($newBooking->practitioner->user->email)->send(new BookingMail($newBooking, 'practitioner'));
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Referral Booking Confirmation Email Error: ' . $e->getMessage());
         }
         
@@ -340,9 +359,6 @@ class ReferralController extends Controller
         ]);
 
         foreach ($batch as $ref) {
-            // Also grant access to all professionals in the batch
-            DataAccessController::grantAccess($ref->referred_to_id, $ref->user_id);
-
             if ($ref->amount > 0) {
                 $ref->update(['status' => 'pending']);
             } else {
@@ -372,26 +388,38 @@ class ReferralController extends Controller
 
         $currency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referral->referredTo) ?? config('currencies.default', 'INR')));
 
+        $customerPhone = preg_replace('/[^0-9]/', '', (string) ($referral->user->phone ?? '9999999999'));
+        if (strlen($customerPhone) < 10) {
+            $customerPhone = '9999999999';
+        }
+
+        $payload = [
+            'amount' => (int) round(((float) $referral->amount) * 100),
+            'currency' => $currency,
+            'accept_partial' => false,
+            'description' => "Referral Session: " . $referral->referredTo->name,
+            'customer' => [
+                'name' => $referral->user->name,
+                'email' => $referral->user->email,
+                'contact' => $customerPhone,
+            ],
+            'notify' => ['sms' => true, 'email' => true],
+            'callback_url' => route('referrals.payment.callback'),
+            'callback_method' => 'get',
+            'notes' => [
+                'referral_no' => $referral->referral_no,
+                'referral_currency' => $currency,
+            ]
+        ];
+
+        Log::info('Initiating Razorpay Referral Payment Link:', [
+            'referral_no' => $referral->referral_no,
+            'payload' => $payload
+        ]);
+
         $response = Http::withOptions(['verify' => (bool) $verifySsl])
             ->withBasicAuth($razorpayKey, $razorpaySecret)
-            ->post('https://api.razorpay.com/v1/payment_links', [
-                'amount' => (int) round(((float) $referral->amount) * 100),
-                'currency' => $currency,
-                'accept_partial' => false,
-                'description' => "Referral Session: " . $referral->referredTo->name,
-                'customer' => [
-                    'name' => $referral->user->name,
-                    'email' => $referral->user->email,
-                    'contact' => $referral->user->phone ?? '9999999999',
-                ],
-                'notify' => ['sms' => true, 'email' => true],
-                'callback_url' => route('referrals.payment.callback'),
-                'callback_method' => 'get',
-                'notes' => [
-                    'referral_no' => $referral->referral_no,
-                    'referral_currency' => $currency,
-                ]
-            ]);
+            ->post('https://api.razorpay.com/v1/payment_links', $payload);
 
         if ($response->successful()) {
             $paymentData = $response->json();
@@ -399,6 +427,13 @@ class ReferralController extends Controller
             $referral->save();
             return redirect($paymentData['short_url']);
         }
+
+        Log::error('Razorpay Referral Payment Link Error:', [
+            'referral_no' => $referral->referral_no,
+            'payload' => $payload,
+            'response' => $response->body(),
+            'status' => $response->status(),
+        ]);
 
         return redirect()->route('dashboard')->with('error', 'Unable to initiate payment.');
     }

@@ -261,15 +261,15 @@
 
             <div class="mt-8 text-center text-gray-500 text-sm">{{ __('Login with other accounts') }}</div>
             <div class="flex justify-center gap-6 mt-6 mb-8 lg:mb-12">
-                <a href="{{ route('social.login', 'google') }}"
+                <a href="javascript:void(0)" onclick="notifySocialUnavailable('Google')"
                     class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition shadow-sm hover:shadow-md">
                     <img src="{{ asset('frontend/assets/google-icon.svg') }}" class="w-6 h-6" alt="Google">
                 </a>
-                <a href="{{ route('social.login', 'facebook') }}"
+                <a href="javascript:void(0)" onclick="notifySocialUnavailable('Meta')"
                     class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition text-[#1877F2] shadow-sm hover:shadow-md">
                     <img src="{{ asset('frontend/assets/facebook-icon.svg') }}" class="w-6 h-6" alt="Facebook">
                 </a>
-                <a href="{{ route('social.login', 'apple') }}"
+                <a href="javascript:void(0)" onclick="notifySocialUnavailable('Apple')"
                     class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition text-black shadow-sm hover:shadow-md">
                     <img src="{{ asset('frontend/assets/apple-icon.svg') }}" class="w-6 h-6" alt="Apple">
                 </a>
@@ -281,7 +281,18 @@
             </div>
         </div>
     </div>
+    
+    @include('partials.frontend.toast')
+
     <script>
+        function notifySocialUnavailable(provider) {
+            if (window.showZayaToast) {
+                showZayaToast(`${provider} login is currently unavailable. Please use your email to login.`, 'warning', 'Social Login');
+            } else {
+                alert(`${provider} login is currently unavailable.`);
+            }
+        }
+
         function switchLanguage(locale) {
             fetch(`/lang/${locale}`, {
                 method: 'POST',

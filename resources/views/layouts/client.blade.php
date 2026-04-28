@@ -315,7 +315,7 @@
                         @endif
 
                         <!-- Notification -->
-                        <div class="relative">
+                        {{-- <div class="relative">
                             <div onclick="toggleNotifications('mobile')"
                                 class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 relative shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
                                 <i class="ri-notification-3-line text-lg"></i>
@@ -323,7 +323,7 @@
                                 </div>
                             </div>
                             <!-- Mobile Dropdown Anchor (teleport destination handled by script) -->
-                        </div>
+                        </div> --}}
 
                         <!-- Logout -->
                         <div class="relative">
@@ -390,13 +390,13 @@
                   
 
                     <!-- Notification -->
-                    <div class="relative">
+                    {{-- <div class="relative">
                         <div onclick="toggleNotifications('desktop')" id="notif-btn-desktop"
                             class="w-10 h-10 rounded-full bg-white border border-gray-200 hidden lg:flex items-center justify-center text-gray-600 relative shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
                             <i class="ri-notification-3-line text-lg"></i>
                             <div id="notif-dot-desktop" class="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full {{ $user->unreadNotifications->count() > 0 ? '' : 'hidden' }}"></div>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <!-- Logout -->
                     <div class="relative hidden lg:block">
@@ -576,7 +576,7 @@
             });
         })();
     </script>
-    <!-- Notifications Dropdown -->
+    {{-- <!-- Notifications Dropdown -->
     <div id="notifications-modal"
         class="fixed lg:absolute z-[100] w-[calc(100vw-32px)] lg:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 pointer-events-none transition-all duration-300 transform scale-95 origin-top-right overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
@@ -584,13 +584,13 @@
             <button onclick="closeNotifDropdown()" class="text-gray-400 hover:text-gray-600 text-lg lg:hidden"><i class="ri-close-line"></i></button>
         </div>
         <div id="notifications-content" class="max-h-[60vh] lg:max-h-[400px] overflow-y-auto">
-            {{-- Loader --}}
+            Loader
             <div id="notif-loader" class="p-8 text-center">
                 <i class="ri-loader-4-line text-2xl text-primary animate-spin inline-block"></i>
             </div>
-            {{-- List --}}
+            List
             <div id="notif-list" class="hidden"></div>
-            {{-- Empty State --}}
+            Empty State
             <div id="notif-empty" class="hidden p-10 text-center">
                 <i class="ri-notification-off-line text-gray-200 text-3xl mb-2 block mx-auto"></i>
                 <p class="text-gray-400 text-xs" data-i18n="No notifications yet">{{ __('No notifications yet') }}</p>
@@ -599,7 +599,7 @@
         <div class="px-6 py-3 border-t border-gray-50 text-center bg-gray-50/30">
             <a href="{{ route('notifications.index') }}" class="text-xs font-semibold text-primary hover:underline uppercase tracking-wider" data-i18n="View all">{{ __('View all') }}</a>
         </div>
-    </div>
+    </div> --}}
 
     <script>
         function toggleNotifications(type) {

@@ -266,7 +266,7 @@ class RegisterController extends Controller
                 Mail::to($user->email)->send(new PractitionerApplicationSubmittedMail(ucwords(str_replace('_', ' ', $user->role))));
 
                 // Important: Load profile relations so FeeService can find the country
-                $user->load(['practitioner', 'doctor', 'mindfulnessPractitioner', 'yoga_therapist', 'translator']);
+                $user->load(['practitioner', 'doctor', 'mindfulnessPractitioner', 'yogaTherapist', 'translator']);
 
                 if ($feeOverride !== null && $feeOverride <= 0) {
                     $paymentLink = null;
@@ -278,7 +278,7 @@ class RegisterController extends Controller
                     // Redirect to payment immediately
                     if ($request->wantsJson()) {
                         return response()->json([
-                            'success' => 'Registration successful! Redirecting to payment...',
+                            'success' => 'Redirecting to payment...',
                             'redirect_url' => $paymentLink['payment_url']
                         ], 201);
                     }
@@ -308,8 +308,13 @@ class RegisterController extends Controller
             }
 
             if ($paymentLink) {
-                // Prefer directing the user to pay immediately if possible
-                $this->guard()->login($user);
+                // Do not auto-login here to match practitioner behavior and ensure invoice download flow
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => 'Registration successful! Redirecting to payment...',
+                        'redirect_url' => $paymentLink['payment_url']
+                    ], 201);
+                }
                 return redirect()->away($paymentLink['payment_url']);
             }
 
@@ -324,6 +329,10 @@ class RegisterController extends Controller
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Registration Error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request' => $request->except(['password', 'password_confirmation'])
+            ]);
             if ($request->wantsJson()) {
                 return response()->json(['errors' => ['error' => [$e->getMessage()]]], 422);
             }
@@ -405,6 +414,14 @@ class RegisterController extends Controller
             return [null, []];
         }
 
+        // Check currency for fixed promo codes
+        if ($promo->type === 'fixed') {
+            $expectedCurrency = $request->input('registration_fee_currency', 'EUR');
+            if ($promo->currency && strtoupper($promo->currency) !== strtoupper($expectedCurrency)) {
+                return [null, []];
+            }
+        }
+
         $reward = is_numeric($promo->reward) ? (float) $promo->reward : 0.0;
 
         $discountAmount = 0.0;
@@ -461,15 +478,15 @@ class RegisterController extends Controller
             'address_line_2' => $request->address_line_2,
             'city' => $request->city,
             'state' => $request->state,
-            'country' => $request->country,
+            'country' => $request->country ?: $request->nationality,
             'payout_currency' => $payoutCurrency,
             'zip_code' => $request->zip_code,
-            'phone' => $request->mobile_number,
+            'phone' => $request->mobile_number ?: $request->mobile,
             'mobile_country_code' => $request->mobile_country_code,
             'consultation_preferences' => $request->consultation_preferences,
             'languages_spoken' => $request->languages,
             'referral_type' => $request->referral_type,
-            'nationality' => $request->nationality,
+            'nationality' => $request->nationality ?: $request->country,
             'status' => 'active',
         ]);
     }
@@ -524,11 +541,12 @@ class RegisterController extends Controller
             'country',
             'zip_code',
             'payout_currency',
-            'phone',
             'website_url',
             'can_translate_english',
             'cover_letter_text'
         ]), $filePaths);
+
+        $profileData['phone'] = $request->phone ?: ($request->mobile ?: $request->mobile_number);
 
         $profileData['consultations'] = $request->ayurvedic_practices ?? $request->consultations;
         $profileData['body_therapies'] = $request->massage_practices ?? $request->body_therapies;
@@ -589,7 +607,7 @@ class RegisterController extends Controller
             'full_name' => trim($request->first_name . ' ' . $request->last_name),
             'gender' => $request->gender,
             'dob' => $request->dob,
-            'phone' => $request->mobile_number,
+            'phone' => $request->phone ?: ($request->mobile ?: $request->mobile_number),
             'nationality' => $request->nationality,
 
             'profile_photo_path' => $profilePhotoPath,

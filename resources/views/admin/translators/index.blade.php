@@ -3,6 +3,11 @@
 @section('title', 'Translators')
 
 @section('content')
+@php
+    $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+    $feeCurrency = $financeSettings['translator_registration_fee_currency'] ?? 'EUR';
+    $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+@endphp
 <style>
     #translators-table_wrapper .dataTables_filter {
         display: flex;
@@ -143,10 +148,6 @@
                                 <div class="stepper-item" data-step="6">
                                     <div class="step-counter">6</div>
                                     <div class="step-name text-nowrap">Identity</div>
-                                </div>
-                                <div class="stepper-item" data-step="7">
-                                    <div class="step-counter">7</div>
-                                    <div class="step-name text-nowrap">Payment & Offers</div>
                                 </div>
                             </div>
 
@@ -457,7 +458,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Step 6: Identity & Payment -->
+                                <!-- Step 6: Identity & Bank Details -->
                                 <div class="step-content d-none" id="step-6">
                                     <div class="row g-3">
                                         <div class="col-md-6">
@@ -504,8 +505,8 @@
                                         <div class="col-md-6">
                                             <label class="form-label">UPI ID (optional)</label>
                                             <input class="form-control" type="text" name="upi_id"
-                                                pattern="^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$"
-                                                title="Enter valid UPI ID (Example: user@upi)" required>
+                                                placeholder="username@bank" maxlength="100"
+                                                title="Enter valid UPI ID (Example: user@upi)">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
@@ -519,73 +520,6 @@
                                             <label class="form-label">Cancelled Cheque / Passbook Upload <span class="text-danger">*</span></label>
                                             <input class="form-control" type="file" name="cancelled_cheque" accept=".pdf,.jpg,.jpeg,.png">
                                             <div id="current-cancelled_cheque" class="mt-1 d-none small"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Step 7: Payment & Offers -->
-                                <div class="step-content d-none" id="step-7">
-                                    <div class="row g-3">
-                                        <div class="col-12">
-                                            <h6 class="text-primary border-bottom pb-2 mt-2">Registration Fee & Special Offers</h6>
-                                            <div class="alert alert-light-primary border-0 mb-4 p-4">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-grow-1">
-                                                        <p class="mb-1 text-muted">Registration Fee Amount</p>
-                                                        @php
-                                                            $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
-                                                            $feeValue = $financeSettings['translator_registration_fee'] ?? 0;
-                                                            $feeCurrency = $financeSettings['translator_registration_fee_currency'] ?? 'EUR';
-                                                            $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
-                                                        @endphp
-                                                        <h4 class="mb-0 fw-bold" id="admin-fee-display-trans">
-                                                            {{ $symbol }} {{ number_format((float)$feeValue, 2) }}
-                                                        </h4>
-                                                        <input type="hidden" name="registration_fee" id="admin_registration_fee_trans" value="{{ $feeValue }}">
-                                                        <input type="hidden" name="registration_fee_actual" id="admin_registration_fee_actual_trans" value="{{ $feeValue }}">
-                                                        <input type="hidden" name="registration_fee_currency" value="{{ $feeCurrency }}">
-                                                    </div>
-                                                    <div class="ms-3">
-                                                        <button type="submit" class="btn btn-primary" id="admin-pay-btn-trans">
-                                                            <i class="iconly-Tick-Square icli me-2"></i> Pay & Register
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <p class="text-primary small mt-3 mb-0"><i class="iconly-Info-Circle icli me-1"></i> After clicking, the practitioner will receive an email with the payment link.</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-12">
-                                            <label class="form-label">Promocode (Optional)</label>
-                                            <div class="input-group">
-                                                <input type="text" name="promocode" id="admin-promocode-input-trans" class="form-control" placeholder="Enter code">
-                                                <button class="btn btn-outline-primary" type="button" id="admin-promo-apply-btn-trans">Apply</button>
-                                            </div>
-                                            <div id="admin-promo-status-trans" class="small mt-1"></div>
-                                        </div>
-
-                                        <div id="admin-promo-details-trans" class="col-12 d-none">
-                                            <div class="card bg-light border-0 mt-3">
-                                                <div class="card-body p-3">
-                                                    <div class="d-flex justify-content-between mb-2">
-                                                        <span>Discount Percentage:</span>
-                                                        <span id="admin-promo-discount-percent-trans" class="fw-bold text-success">0%</span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between mb-2">
-                                                        <span>Discount Amount:</span>
-                                                        <span id="admin-promo-discount-amount-trans" class="fw-bold text-success">0.00</span>
-                                                    </div>
-                                                    <hr>
-                                                    <div class="d-flex justify-content-between">
-                                                        <span class="fw-bold">Final Payable Amount:</span>
-                                                        <span id="admin-promo-final-amount-trans" class="fw-bold text-primary">0.00</span>
-                                                    </div>
-                                                    <input type="hidden" name="promo_code" id="admin-promo-code-hidden-trans">
-                                                    <input type="hidden" name="promo_discount_percentage" id="admin-promo-discount-percentage-hidden-trans">
-                                                    <input type="hidden" name="promo_discount_amount" id="admin-promo-discount-amount-hidden-trans">
-                                                    <input type="hidden" name="promo_total_fee" id="admin-promo-total-fee-hidden-trans">
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -656,8 +590,8 @@
                 <p id="status-confirmation-msg">Select the new status for this translator:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input-translator" class="form-select">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="approved">Active</option>
+                        <option value="rejected">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-translator-id">
@@ -704,7 +638,7 @@
         let table;
         let translatorIti;
         let currentStep = 1;
-        const totalSteps = 7;
+        const totalSteps = 6;
         let sourceLangChoices, targetLangChoices, addLangChoices;
         let cropper;
         let croppedFile = null;
@@ -914,6 +848,7 @@
                         additional: additionalChoices
                     };
 
+            /*
             // Promocode Logic for Admin Modal (Translator)
             const promoInputTrans = document.getElementById('admin-promocode-input-trans');
             const promoApplyBtnTrans = document.getElementById('admin-promo-apply-btn-trans');
@@ -973,7 +908,12 @@
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         },
-                        body: JSON.stringify({ code, role: 'translator' })
+                        body: JSON.stringify({ 
+                            code, 
+                            role: 'translator',
+                            usage_type: 'registration',
+                            country: document.querySelector('[name="country"]') ? document.querySelector('[name="country"]').value : 'all'
+                        })
                     });
 
                     const data = await response.json();
@@ -1007,6 +947,7 @@
                     promoApplyBtnTrans.innerText = 'Apply';
                 }
             });
+            */
 
                     // Stepper Logic
                     $('#next-btn').click(function() {
@@ -2102,10 +2043,9 @@ function openCreateModal() {
                     <p>Are you sure you want to change the status for this translator?</p>
                     <input type="hidden" id="status-translator-id">
                     <select class="form-select mt-3" id="status-select-input-translator">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                </div>
+                        <option value="approved">Active</option>
+                        <option value="rejected">Inactive</option>
+                    </select>                </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>

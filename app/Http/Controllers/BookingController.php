@@ -96,18 +96,32 @@ class BookingController extends Controller
         $promoDiscount = 0;
         $promoCode = null;
         if ($request->promo_code) {
-            $promo = \App\Models\PromoCode::where('code', $request->promo_code)
+            $code = trim((string) $request->promo_code);
+            $promo = \App\Models\PromoCode::whereRaw('LOWER(code) = ?', [mb_strtolower($code)])
                 ->where('status', true)
                 ->where(function($q) {
-                    $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now()->toDateString());
+                    $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now()->toDateTimeString());
                 })->first();
             
             if ($promo && ($promo->usage_limit === null || $promo->used_count < $promo->usage_limit)) {
-                $promoCode = $promo->code;
-                if ($promo->type === 'percentage') {
-                    $promoDiscount = ($subtotal * $promo->value) / 100;
+                // Check usage type
+                if ($promo->usage_type === 'both' || $promo->usage_type === 'booking') {
+                    // Check currency for fixed promo codes
+                    if ($promo->type === 'fixed' && $promo->currency && $promo->currency !== $currency) {
+                        \Log::warning("Promo code currency mismatch: code uses {$promo->currency}, transaction uses {$currency}");
+                    } else {
+                        $promoCode = $promo->code;
+                        $reward = (float) $promo->reward;
+                        if ($promo->type === 'percentage') {
+                            $discountPercentage = max(0.0, min(100.0, $reward));
+                            $promoDiscount = $subtotal * ($discountPercentage / 100.0);
+                        } else {
+                            $promoDiscount = min($reward, $subtotal);
+                        }
+                        \Log::info("Promo code applied: {$promoCode}, Discount: {$promoDiscount}");
+                    }
                 } else {
-                    $promoDiscount = $promo->value;
+                    \Log::warning("Promo code usage type mismatch: code is for {$promo->usage_type}, but requested for booking");
                 }
             }
         }
@@ -530,6 +544,16 @@ class BookingController extends Controller
 
         if ($query) $usersQuery->where('name', 'LIKE', "%{$query}%");
 
+        // Filter: only experts who handle at least one of the services in the current consultation
+        if ($booking && $booking->service_ids) {
+            $usersQuery->whereHas('userServices', function($q) use ($booking) {
+                $q->whereIn('service_id', (array)$booking->service_ids)
+                  ->where(function($sq) {
+                      $sq->whereNull('status')->orWhere('status', 'active');
+                  });
+            });
+        }
+
         // Prepare matching criteria from current booking
         $matchCriteria = [];
         if ($booking) {
@@ -555,23 +579,23 @@ class BookingController extends Controller
             $missingServices = [];
 
             if ($booking && in_array($u->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'])) {
-                // 1. Check if they handle the EXACT services requested
-                $requiredServiceIds = $booking->service_ids ?? [];
+                // 1. Check which services they handle from the consultation
+                $requiredServiceIds = (array) ($booking->service_ids ?? []);
                 $userServices = \App\Models\UserService::where('user_id', $u->id)
                     ->whereIn('service_id', $requiredServiceIds)
                     ->get();
                 
                 $handledServiceIds = $userServices->pluck('service_id')->toArray();
+                $serviceFee = (float) $userServices->sum('rate');
                 
                 if (count($requiredServiceIds) > 0) {
                     $missingServiceIds = array_diff($requiredServiceIds, $handledServiceIds);
-                    if (empty($missingServiceIds)) {
-                        $handlesAllServices = true;
-                        $serviceFee = $userServices->sum('rate');
-                    } else {
-                        $missingServices = \App\Models\Service::whereIn('id', $missingServiceIds)->pluck('title')->toArray();
-                    }
+                    $handlesAllServices = empty($missingServiceIds);
+                    $missingServices = \App\Models\Service::whereIn('id', $missingServiceIds)->pluck('title')->toArray();
                 }
+
+                // If they handle AT LEAST ONE service, we consider they can take a referral for those.
+                $hasCompatibleService = !empty($handledServiceIds);
 
                 // 2. Check for Recommendation (Service overlap or Condition match)
                 $profile = $u->profile;

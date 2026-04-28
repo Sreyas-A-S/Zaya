@@ -25,11 +25,47 @@ class InvoiceController extends Controller
      */
     public function show($invoice_no)
     {
-        $booking = Booking::with(['user.patient', 'practitioner.user', 'translator.user'])
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Please login to view your invoice.');
+        }
+
+        $isRegistration = str_starts_with($invoice_no, 'ZAYA-REG');
+        $relations = ['user.patient'];
+        if (!$isRegistration) {
+            $relations = array_merge($relations, ['practitioner.user', 'translator.user']);
+        }
+
+        $booking = Booking::with($relations)
             ->where('invoice_no', $invoice_no)
             ->firstOrFail();
         
+        // Ensure user can only see their own invoice unless admin
+        if (auth()->user()->role !== 'admin' && $booking->user_id !== auth()->id()) {
+            abort(403);
+        }
+        
         return view('invoice.index', compact('booking'));
+    }
+
+    /**
+     * Download the invoice without auth using a token.
+     */
+    public function download(Request $request, $invoice_no)
+    {
+        $token = $request->query('token');
+        
+        $isRegistration = str_starts_with($invoice_no, 'ZAYA-REG');
+        $relations = ['user.patient'];
+        if (!$isRegistration) {
+            $relations = array_merge($relations, ['practitioner.user', 'translator.user']);
+        }
+
+        $booking = Booking::with($relations)
+            ->where('invoice_no', $invoice_no)
+            ->where('download_token', $token)
+            ->firstOrFail();
+
+        return view('invoice.download', compact('booking'));
     }
 
     /**
@@ -37,7 +73,16 @@ class InvoiceController extends Controller
      */
     public function preview()
     {
-        $booking = Booking::with(['user.patient', 'practitioner', 'translator'])->latest()->first();
+        // Get the latest booking and check if it's registration or consultation
+        $tempBooking = Booking::latest()->first();
+        $isRegistration = $tempBooking && str_starts_with($tempBooking->invoice_no, 'ZAYA-REG');
+        
+        $relations = ['user.patient'];
+        if (!$isRegistration) {
+            $relations = array_merge($relations, ['practitioner.user', 'translator.user']);
+        }
+
+        $booking = Booking::with($relations)->latest()->first();
         
         if (!$booking) {
             // Create a dummy booking for preview if none exists

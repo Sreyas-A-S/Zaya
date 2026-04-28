@@ -3,6 +3,9 @@
 @section('title', 'Booking Details')
 
 @section('content')
+@php
+    $isExpert = in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']);
+@endphp
 <div class="py-6 px-1 md:py-8 md:px-0">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
@@ -67,10 +70,16 @@
                         <h4 class="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-4">Selected Services</h4>
                         <div class="space-y-3">
                             @forelse($services as $service)
-                            <div class="flex items-center justify-between p-4 bg-[#F9FBF9] border border-[#2E4B3D]/12 rounded-2xl hover:border-secondary/20 transition-all">
+                            @php
+                                $isAssignedToMe = !empty($referredServiceIds) && in_array($service->id, $referredServiceIds);
+                            @endphp
+                            <div class="flex items-center justify-between p-4 {{ $isAssignedToMe ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/10' : 'bg-[#F9FBF9] border-[#2E4B3D]/12' }} border rounded-2xl hover:border-secondary/20 transition-all group">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-2 h-2 rounded-full bg-secondary"></div>
-                                    <span class="text-sm font-bold text-secondary">{{ $service->title }}</span>
+                                    <div class="w-2 h-2 rounded-full {{ $isAssignedToMe ? 'bg-primary animate-pulse' : 'bg-secondary' }}"></div>
+                                    <span class="text-sm font-bold {{ $isAssignedToMe ? 'text-primary' : 'text-secondary' }}">{{ $service->title }}</span>
+                                    @if($isAssignedToMe)
+                                        <span class="ml-2 text-[8px] font-black uppercase tracking-widest bg-primary text-white px-2 py-0.5 rounded-full">Your Assignment</span>
+                                    @endif
                                 </div>
                                 @if(in_array($user->role, ['client', 'patient']))
                                 <span class="text-[11px] font-black text-secondary/60">{{ get_currency_symbol($booking->currency) }}{{ number_format($service->price ?? 0, 2) }}</span>
@@ -84,11 +93,9 @@
                 </div>
             </div>
 
-            @php
-                $isPractitioner = in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']);
-            @endphp
 
-            @if($isPractitioner && $userTransaction)
+
+            @if($isExpert && $userTransaction)
             <!-- Earnings Summary for Expert -->
             <div class="bg-secondary rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-2xl shadow-secondary/20 text-white p-8 relative group">
                 <div class="flex justify-between items-center relative z-10">
@@ -98,39 +105,94 @@
                         </p>
                         <p class="text-4xl font-black tracking-tight">{{ get_currency_symbol($userTransaction->currency) }} {{ number_format($shareAmount, 2) }}</p>
                     </div>
-                    <button onclick="togglePageDistribution()" class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all border border-white/10 group-hover:scale-110 duration-500">
-                        <i class="ri-information-line text-2xl"></i>
+                    <button onclick="togglePageDistribution()" class="group/btn flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all border border-white/10 duration-300">
+                        <i class="ri-pie-chart-line text-lg"></i>
+                        <span class="text-[10px] font-black uppercase tracking-widest">Breakdown</span>
                     </button>
                 </div>
 
-                <div id="page-distribution-info" class="hidden mt-8 pt-8 border-t border-white/10 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500 relative z-10">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                            <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Gross Booking</p>
-                            <p class="text-lg font-black">{{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->total_amount, 2) }}</p>
+                <div id="page-distribution-info" class="hidden mt-8 pt-8 border-t border-white/10 space-y-8 animate-in fade-in slide-in-from-top-4 duration-500 relative z-10">
+                    {{-- Financial Summary Flow --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {{-- Left: Client Payment Breakdown --}}
+                        <div class="space-y-4">
+                            <p class="text-[10px] font-black text-white/40 uppercase tracking-widest border-b border-white/5 pb-2">Client Payment Breakdown</p>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[11px] text-white/60">Gross Booking Value</span>
+                                    <span class="text-sm font-black text-white">{{ get_currency_symbol($booking->currency) }} {{ number_format($booking->subtotal, 2) }}</span>
+                                </div>
+                                
+                                @if($booking->discount_amount > 0)
+                                <div class="flex justify-between items-center text-red-300">
+                                    <span class="text-[11px]">Promo Discount ({{ $booking->promo_code }})</span>
+                                    <span class="text-sm font-black">- {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->discount_amount, 2) }}</span>
+                                </div>
+                                @endif
+
+                                @if($booking->coin_discount > 0)
+                                <div class="flex justify-between items-center text-red-300">
+                                    <span class="text-[11px]">Coin Discount Applied</span>
+                                    <span class="text-sm font-black">- {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->coin_discount, 2) }}</span>
+                                </div>
+                                @endif
+
+                                <div class="pt-3 border-t border-white/10 flex justify-between items-center text-emerald-400">
+                                    <span class="text-[11px] font-black uppercase tracking-widest">Net Paid by Client</span>
+                                    <span class="text-lg font-black">{{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}</span>
+                                </div>
+                            </div>
                         </div>
-                        
-                        @if($userTransaction->practitioner_id === $user->id)
-                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                                <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Platform Fee ({{ number_format($userTransaction->company_commission_percent, 1) }}%)</p>
-                                <p class="text-lg font-black text-red-300">- {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->company_share, 2) }}</p>
+
+                        {{-- Right: Share Distribution --}}
+                        <div class="space-y-4">
+                            <p class="text-[10px] font-black text-white/40 uppercase tracking-widest border-b border-white/5 pb-2">Share Distribution</p>
+                            <div class="space-y-3">
+                                @if($userTransaction->practitioner_id === $user->id)
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[11px] text-white/60">Zaya Platform Fee ({{ number_format($userTransaction->company_commission_percent, 1) }}%)</span>
+                                        <span class="text-sm font-black text-red-300">- {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->company_share, 2) }}</span>
+                                    </div>
+                                    @if($userTransaction->referrer_share > 0)
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[11px] text-white/60">Referral Payout ({{ number_format($userTransaction->referrer_commission_percent, 1) }}%)</span>
+                                        <span class="text-sm font-black text-orange-300">- {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->referrer_share, 2) }}</span>
+                                    </div>
+                                    @endif
+                                    <div class="pt-3 border-t border-white/10 flex justify-between items-center text-white">
+                                        <span class="text-[11px] font-black uppercase tracking-widest text-emerald-400">Your Earned Share</span>
+                                        <span class="text-2xl font-black">{{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->practitioner_share, 2) }}</span>
+                                    </div>
+                                @else
+                                    {{-- Referrer View --}}
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[11px] text-white/60">Referral Commission Rate</span>
+                                        <span class="text-sm font-black text-emerald-300">{{ number_format($userTransaction->referrer_commission_percent, 1) }}%</span>
+                                    </div>
+                                    <div class="pt-3 border-t border-white/10 flex justify-between items-center text-white">
+                                        <span class="text-[11px] font-black uppercase tracking-widest text-emerald-400">Your Referral Earning</span>
+                                        <span class="text-2xl font-black">{{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->referrer_share, 2) }}</span>
+                                    </div>
+                                @endif
                             </div>
-                            @if($userTransaction->referrer_share > 0)
-                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                                <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Referral Fee ({{ number_format($userTransaction->referrer_commission_percent, 1) }}%)</p>
-                                <p class="text-lg font-black text-orange-300">- {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($userTransaction->referrer_share, 2) }}</p>
-                            </div>
-                            @endif
-                        @else
-                            {{-- Current user is the referrer --}}
-                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                                <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Referral Commission</p>
-                                <p class="text-lg font-black text-emerald-300">{{ number_format($userTransaction->referrer_commission_percent, 1) }}%</p>
-                            </div>
-                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                                <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">Status</p>
-                                <p class="text-lg font-black uppercase">{{ $userTransaction->status }}</p>
-                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Transaction Meta --}}
+                    <div class="flex flex-wrap gap-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/20 pt-4 border-t border-white/5">
+                        <div class="flex items-center gap-2">
+                            <i class="ri-hashtag"></i>
+                            <span>TXN: {{ $userTransaction->transaction_no }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="ri-time-line"></i>
+                            <span>Processed: {{ $userTransaction->created_at->format('M d, Y H:i') }}</span>
+                        </div>
+                        @if($booking->is_test)
+                        <div class="flex items-center gap-2 text-orange-400">
+                            <i class="ri-test-tube-line"></i>
+                            <span>Test Mode Transaction</span>
+                        </div>
                         @endif
                     </div>
                 </div>
@@ -285,7 +347,7 @@
             </div>
 
             <!-- Consultation Forms Section -->
-            @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+            @if($isExpert && ($hasConsent || $booking->profile_id === $user->profile_id))
             <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm p-5 md:p-8">
                 <div class="flex items-center justify-between mb-8">
                     <div>
@@ -317,7 +379,7 @@
                                class="flex-1 py-2 px-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">
                                 <i class="ri-eye-line mr-1"></i> View
                             </a>
-                            @if($isPractitioner)
+                            @if($isExpert)
                             <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $form->id]) }}" 
                                class="flex-1 py-2 px-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">
                                 <i class="ri-edit-line mr-1"></i> Edit
@@ -352,11 +414,17 @@
                     <img src="{{ $booking->user->profile_pic ? (str_starts_with($booking->user->profile_pic, 'http') ? $booking->user->profile_pic : asset('storage/' . $booking->user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" 
                          class="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-sm">
                     <div>
-                        <p class="font-black text-secondary leading-tight">{{ $booking->user->name }}</p>
-                        <p class="text-xs font-medium text-gray-500 mt-1">{{ $booking->user->email }}</p>
+                        @if($hasConsent || $isDirectParticipant)
+                            <p class="font-black text-secondary leading-tight">{{ $booking->user->name }}</p>
+                            <p class="text-xs font-medium text-gray-500 mt-1">{{ $booking->user->email }}</p>
+                        @else
+                            <p class="font-black text-secondary leading-tight">Patient #{{ $booking->user->id }}</p>
+                            <p class="text-xs font-medium text-gray-400 mt-1">Verify OTP to view details</p>
+                        @endif
                     </div>
                 </div>
                 <div class="space-y-4">
+                    @if($hasConsent || $isDirectParticipant)
                     <div class="p-4 bg-white rounded-2xl border border-[#2E4B3D]/5 shadow-sm">
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Languages</p>
                         <div class="flex flex-wrap gap-1 mt-2">
@@ -386,11 +454,14 @@
                             @endforelse
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
 
             <!-- GDPR Data Sharing Access -->
-            @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+
+
+            @if($isExpert && Auth::id() !== $booking->user_id)
             <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">GDPR Control Center</h3>
@@ -448,7 +519,7 @@
                     <p class="text-[11px] leading-relaxed text-blue-700 font-medium mb-4">
                         Manage how your health data is shared with the practitioner for this consultation.
                     </p>
-                    <a href="{{ route('health.journey') }}" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1">
+                    <a href="{{ route('health-journey.index') }}" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1">
                         Go to Privacy Dashboard <i class="ri-arrow-right-line"></i>
                     </a>
                 </div>

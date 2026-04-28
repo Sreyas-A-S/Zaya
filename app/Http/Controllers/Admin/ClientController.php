@@ -194,11 +194,6 @@ class ClientController extends Controller
             'email' => 'required|email|max:255|unique:users,email',
             'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
             
-            // Payment & Promocode
-            'promo_code' => 'nullable|string|max:50',
-            'promo_total_fee' => 'nullable|numeric',
-            'promo_discount_percentage' => 'nullable|numeric',
-            'promo_discount_amount' => 'nullable|numeric',
             'dob' => 'nullable|date',
             'gender' => 'nullable|string',
             'occupation' => 'nullable|string|max:255',
@@ -238,7 +233,8 @@ class ClientController extends Controller
         Session::put('welcome_password_' . $user->id, $plainPassword);
         Mail::to($user->email)->send(new WelcomeUserMail($user->email, $plainPassword, url('/zaya-login'), $user->role));
         
-        // Registration Fee & Promocode Handling
+        /* 
+        // Registration Fee & Promocode Handling (Commented out)
         $feeService = app(\App\Services\RegistrationFeeService::class);
         $promoNotes = [];
         $feeOverride = $request->input('promo_total_fee');
@@ -262,6 +258,7 @@ class ClientController extends Controller
                 new \App\Mail\RegistrationFeePaymentLinkMail($link['role_label'], $link['amount'], $link['currency'], $link['payment_url'])
             );
         }
+        */
 
         Session::forget('welcome_password_' . $user->id);
 

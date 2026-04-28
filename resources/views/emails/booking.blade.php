@@ -46,10 +46,6 @@
                         <td class="value">{{ $booking->booking_date->format('M d, Y') }}</td>
                     </tr>
                     <tr>
-                        <td class="label">Time:</td>
-                        <td class="value">{{ $booking->booking_time }} ({{ $timezone ?? 'UTC' }})</td>
-                    </tr>
-                    <tr>
                         <td class="label">Mode:</td>
                         <td class="value">{{ strtoupper($booking->mode) }}</td>
                     </tr>
@@ -68,13 +64,13 @@
                                     $sessionDate = !empty($session['day']) && $session['day'] !== 'Day' ? $session['day'] : $booking->booking_date->format('M d, Y');
                                 @endphp
                                 <tr>
-                                    <td class="label">{{ $serviceName }} ({{ $sessionTime }}):</td>
+                                    <td class="label">{{ $serviceName }} ({{ $sessionTime }} {{ $timezone ?? 'UTC' }}):</td>
                                     <td class="value"><a href="{{ route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']) }}" style="color: #2E4B3C;">Join Session</a></td>
                                 </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td class="label">Meeting Link:</td>
+                                <td class="label">Meeting Link ({{ $booking->booking_time }} {{ $timezone ?? 'UTC' }}):</td>
                                 <td class="value"><a href="{{ route('conference.join', ['channel' => $booking->invoice_no, 'provider' => 'jaas']) }}" style="color: #2E4B3C;">Click here to join</a></td>
                             </tr>
                         @endif

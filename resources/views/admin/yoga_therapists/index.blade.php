@@ -9,6 +9,11 @@
 @section('title', 'Yoga Therapists')
 
 @section('content')
+@php
+    $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+    $feeCurrency = $financeSettings['yoga_physiotherapist_registration_fee_currency'] ?? 'EUR';
+    $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+@endphp
 <style>
     #therapists-table_wrapper .dataTables_filter {
         display: flex;
@@ -123,11 +128,10 @@
                                     <div class="step-counter">6</div>
                                     <div class="step-name text-nowrap">Identity</div>
                                 </div>
-                                <div class="stepper-item" data-step="7">
+                                {{-- <div class="stepper-item" data-step="7">
                                     <div class="step-counter">7</div>
                                     <div class="step-name text-nowrap">Payment & Offers</div>
-                                </div>
-                            </div>
+                                </div> --}}                            </div>
 
                             <form id="therapist-form" method="POST" enctype="multipart/form-data" class="theme-form" novalidate>
                                 @csrf
@@ -599,7 +603,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 </div>
             </div>
 
-            <!-- Step 7: Payment & Offers -->
+            {{-- <!-- Step 7: Payment & Offers -->
             <div class="step-content d-none" id="step-7">
                 <div class="row g-3">
                     <div class="col-12">
@@ -610,8 +614,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                                     <p class="mb-1 text-muted">Registration Fee Amount</p>
                                     @php
                                         $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
-                                        $feeValue = $financeSettings['yoga_physiotherapist_registration_fee'] ?? 0;
-                                        $feeCurrency = $financeSettings['yoga_physiotherapist_registration_fee_currency'] ?? 'EUR';
+                                        $feeValue = $financeSettings['yoga_registration_fee'] ?? 0;
+                                        $feeCurrency = $financeSettings['yoga_registration_fee_currency'] ?? 'EUR';
                                         $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
                                     @endphp
                                     <h4 class="mb-0 fw-bold" id="admin-fee-display-yoga">
@@ -664,7 +668,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Buttons -->
             <div class="d-flex justify-content-between mt-4">
@@ -712,8 +716,8 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 <p id="status-confirmation-text">Select the new status for this practitioner:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input" class="form-select">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="approved">Active</option>
+                        <option value="rejected">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-therapist-id">
@@ -797,7 +801,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
         let table;
         let therapistIti;
         let currentStep = 1;
-        const totalSteps = 7;
+        const totalSteps = 6;
         let cropper;
         const cropperImage = document.getElementById('cropperImage');
         let cropperDidApply = false;
@@ -1118,6 +1122,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 
             window.languageChoices = languageChoices;
 
+            /*
             // Promocode Logic for Admin Modal (Yoga)
             const promoInputYoga = document.getElementById('admin-promocode-input-yoga');
             const promoApplyBtnYoga = document.getElementById('admin-promo-apply-btn-yoga');
@@ -1177,7 +1182,12 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         },
-                        body: JSON.stringify({ code, role: 'yoga_therapist' })
+                        body: JSON.stringify({ 
+                            code, 
+                            role: 'yoga_therapist',
+                            usage_type: 'registration',
+                            country: document.querySelector('[name="country"]') ? document.querySelector('[name="country"]').value : 'all'
+                        })
                     });
 
                     const data = await response.json();
@@ -1211,6 +1221,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     promoApplyBtnYoga.innerText = 'Apply';
                 }
             });
+            */
 
             // Stepper Logic
             $('#next-btn').click(function() {
@@ -2222,10 +2233,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     <p>Are you sure you want to change the status for this therapist?</p>
                     <input type="hidden" id="status-therapist-id">
                     <select class="form-select mt-3" id="status-select-input-therapist">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                </div>
+                        <option value="approved">Active</option>
+                        <option value="rejected">Inactive</option>
+                    </select>                </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>

@@ -94,7 +94,7 @@
                                 dd.previousElementSibling.previousElementSibling.querySelector('.duration-label').classList.remove('text-[#252525]');
                                 dd.classList.add('hidden');
                                 dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
-                                if(typeof clearPromoCode === 'function') clearPromoCode();
+                                if(typeof clearPromoCode === 'function') clearPromoCode(true);
                             ">
                         Clear
                     </button>
@@ -119,7 +119,7 @@
                                 dd.classList.add('hidden');
                                 dd.previousElementSibling.previousElementSibling.querySelector('i').className = 'ri-arrow-down-s-line text-gray-700 text-lg';
                                 if(typeof updateStep3Services === 'function') updateStep3Services();
-                                if(typeof clearPromoCode === 'function') clearPromoCode();
+                                if(typeof clearPromoCode === 'function') clearPromoCode(true);
                             ">
                         Set
                     </button>

@@ -423,12 +423,15 @@
                                             <i class="ri-reply-line text-lg"></i>
                                             <span class="text-xs font-medium">{{ $testimonial->replies_count }}</span>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-
+                                        <div class="flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors"
+                                           onclick="shareTestimonial('{{ addslashes($testimonial->name) }}', '{{ addslashes($testimonial->message) }}')">
+                                           <i class="ri-share-line text-lg"></i>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        @endforeach
                 </div>
             </div>
         </div>
@@ -450,3 +453,31 @@
 
 
 @endsection
+
+@push('scripts')
+    <script>
+        window.shareTestimonial = function(name, message) {
+            const shareData = {
+                title: 'Zaya Wellness Testimonial',
+                text: `${name} shared their story on Zaya Wellness: "${message}"`,
+                url: window.location.origin
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData)
+                    .catch((err) => console.log('Error sharing:', err));
+            } else {
+                const shareText = `${shareData.text} \n\nCheck out Zaya Wellness: ${shareData.url}`;
+                navigator.clipboard.writeText(shareText).then(() => {
+                    if (typeof showZayaToast === 'function') {
+                        showZayaToast('Testimonial link copied to clipboard!', 'success', 'Share');
+                    } else {
+                        alert('Testimonial link copied to clipboard!');
+                    }
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            }
+        };
+    </script>
+@endpush

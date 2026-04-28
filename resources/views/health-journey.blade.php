@@ -144,6 +144,19 @@
                                 <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1">{{ $consultation->booking_date->format('M d, Y') }} • {{ $consultation->booking_time }}</p>
                             </div>
                         </div>
+
+                        <div class="flex flex-wrap gap-1">
+                            @php
+                                $s_ids = is_array($consultation->service_ids) ? $consultation->service_ids : [];
+                            @endphp
+                            @foreach($s_ids as $sid)
+                                @if(isset($allServices[$sid]))
+                                    <span class="px-2 py-0.5 bg-secondary/5 text-secondary text-[9px] font-bold rounded-md border border-secondary/10 whitespace-nowrap">
+                                        {{ $allServices[$sid]->title }}
+                                    </span>
+                                @endif
+                            @endforeach
+                        </div>
                         
                         <a href="{{ route('bookings.details-view', $consultation->id) }}" 
                            class="w-full py-3 rounded-xl bg-[#F9FBF9] border border-[#2E4B3D]/12 text-secondary text-xs font-black uppercase tracking-widest hover:bg-secondary hover:text-white transition-all flex items-center justify-center gap-2">

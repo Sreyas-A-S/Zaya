@@ -11,6 +11,11 @@
 @section('title', 'Doctors Management')
 
 @section('content')
+@php
+    $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+    $feeCurrency = $financeSettings['doctor_registration_fee_currency'] ?? 'EUR';
+    $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+@endphp
 
 
 <style>
@@ -129,11 +134,10 @@
                                     <div class="step-counter">5</div>
                                     <div class="step-name">Profile & Consent</div>
                                 </div>
-                                <div class="stepper-item" data-step="6">
+                                {{-- <div class="stepper-item" data-step="6">
                                     <div class="step-counter">6</div>
                                     <div class="step-name">Payment & Offers</div>
-                                </div>
-                            </div>
+                                </div> --}}                            </div>
 
                             <form id="doctor-form" enctype="multipart/form-data" novalidate>
                                 @csrf
@@ -729,12 +733,12 @@
 
                                         <div class="col-12 wizard-footer d-flex justify-content-between mt-5 pt-3 border-top">
                                             <button type="button" class="btn btn-outline-dark prev-step" data-prev="4"><i class="iconly-Arrow-Left icli me-2"></i> Previous</button>
-                                            <button type="button" class="btn btn-primary next-step" data-next="6">Next Step: Payment <i class="iconly-Arrow-Right icli ms-2"></i></button>
+                                            <button type="submit" class="btn btn-primary"><i class="iconly-Tick-Square icli me-2"></i> Save & Register</button>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Step 6: Registration Fee & Promocode -->
+                                {{-- <!-- Step 6: Registration Fee & Promocode -->
                                 <div class="step-content d-none" id="step6">
                                     <div class="row g-3">
                                         <div class="col-12">
@@ -804,7 +808,7 @@
                                             <button type="submit" class="btn btn-success" id="admin-complete-btn"><i class="iconly-Tick-Square icli me-2"></i> Complete Registration</button>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </form>
                         </div>
                     </div>
@@ -865,9 +869,8 @@
                 <p id="status-confirmation-text">Select the new status for this doctor:</p>
                 <div class="mb-3 px-5">
                     <select id="status-select-input" class="form-select">
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="approved">Active</option>
+                        <option value="rejected">Inactive</option>
                     </select>
                 </div>
                 <input type="hidden" id="status-doctor-id">
@@ -1229,6 +1232,7 @@
     let table;
     let toastInstance;
     let languageChoices;
+    let langSelect;
     let iti;
     let phoneInput;
 
@@ -1523,7 +1527,7 @@
 
 
         // Initialize Choices.js
-        const langSelect = document.getElementById('languages_select');
+        langSelect = document.getElementById('languages_select');
         if (langSelect) {
             languageChoices = new Choices(langSelect, {
                 removeItemButton: true,
@@ -1602,6 +1606,7 @@
         $('#languages_capabilities_container').append(html);
     }
 
+        /*
         // Promocode Logic for Admin Modal
         const promoInput = document.getElementById('admin-promocode-input');
         const promoApplyBtn = document.getElementById('admin-promo-apply-btn');
@@ -1661,7 +1666,12 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
-                    body: JSON.stringify({ code, role: 'doctor' })
+                    body: JSON.stringify({ 
+                        code, 
+                        role: 'doctor',
+                        usage_type: 'registration',
+                        country: document.querySelector('[name="country"]') ? document.querySelector('[name="country"]').value : 'all'
+                    })
                 });
 
                 const data = await response.json();
@@ -1695,6 +1705,7 @@
                 promoApplyBtn.innerText = 'Apply';
             }
         });
+        */
 
     function initFormNavigation() {
         $('.next-step').on('click', function() {
@@ -2082,8 +2093,8 @@
                                 <img src="${p.profile_photo_path ? '/storage/' + p.profile_photo_path : '/admiro/assets/images/user/user.png'}" 
                                      class="img-fluid rounded-circle mb-3 shadow-sm" 
                                      style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #fff;">
-                                <span class="position-absolute bottom-0 end-0 badge rounded-pill ${p.status === 'approved' ? 'bg-success' : (p.status === 'pending' ? 'bg-warning' : 'bg-danger')}" style="transform: translate(-10%, -10%);">
-                                    ${p.status ? p.status.toUpperCase() : 'PENDING'}
+                                <span class="position-absolute bottom-0 end-0 badge rounded-pill ${p.status === 'active' ? 'bg-success' : 'bg-danger'}" style="transform: translate(-10%, -10%);">
+                                    ${p.status ? p.status.toUpperCase() : 'INACTIVE'}
                                 </span>
                             </div>
                             <h4 class="mb-1">${fullName}</h4>

@@ -276,7 +276,8 @@
                     $scheduledTime = null;
                     if ($nextOnlineBooking) {
                         try {
-                            $startTime = \Carbon\Carbon::parse($nextOnlineBooking->booking_date->format('Y-m-d') . ' ' . $nextOnlineBooking->booking_time);
+                            $timezone = derive_timezone_from_user($nextOnlineBooking->practitioner);
+                            $startTime = \Carbon\Carbon::parse($nextOnlineBooking->booking_date->format('Y-m-d') . ' ' . $nextOnlineBooking->booking_time, $timezone);
                             $scheduledTime = $startTime->copy()->subMinutes($reminderLeadTime);
                         } catch (\Exception $e) {}
                     }

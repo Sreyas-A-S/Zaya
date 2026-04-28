@@ -35,6 +35,75 @@
         select.appearance-none::-ms-expand {
             display: none;
         }
+
+        /* Bill Design Styles */
+        .bill-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 24px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bill-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #FABC41;
+        }
+
+        .bill-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #F9FAFB;
+        }
+
+        .bill-row:last-child {
+            border-bottom: none;
+        }
+
+        .bill-row.total {
+            border-top: 2px dashed #E5E7EB;
+            border-bottom: none;
+            margin-top: 1rem;
+            padding-top: 1.25rem;
+            color: #111827;
+        }
+
+        .bill-label {
+            color: #6B7280;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .bill-value {
+            color: #111827;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .bill-row.total .bill-label {
+            color: #111827;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .bill-row.total .bill-value {
+            color: #F5A623;
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .bill-discount {
+            color: #10B981 !important;
+        }
     </style>
 </head>
 
@@ -493,7 +562,7 @@
                                             <p class="text-gray-500 text-sm leading-none">{{ __('Upload') }}</p>
                                         </div>
                                         <p class="text-gray-400 text-sm file-name-display">{{ __('(Max 2MB)') }}</p>
-                                        <input type="file" name="doc_experience" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                                        <input type="file" name="doc_experience" class="hidden file-input" accept=".pdf,.jpg,.jpeg,.png">
                                     </div>
                                 </div>
                             </div>
@@ -630,6 +699,7 @@
                                             <span class='text-gray-900 text-[1.05rem] font-medium'>{{ $practitionerRegistrationCurrencySymbol ?? '€' }} {{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}</span>
                                             <input type='hidden' name='registration_fee' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
                                             <input type='hidden' name='registration_fee_actual' value='{{ number_format($practitionerRegistrationFee ?? 0, 2, '.', '') }}'>
+                                            <input type='hidden' name='registration_fee_currency' id='registration-fee-currency' value='{{ $practitionerRegistrationCurrency ?? 'EUR' }}'>
                                         </div>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-3 px-4 leading-relaxed">
@@ -646,22 +716,32 @@
                                     </div>
                                 </div>
 
-                                <div id='promo-breakdown' class='hidden mt-6 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto'>
-                                    <div>
-                                        <label class='block text-gray-700 font-normal mb-3 text-base'>{{ __('Actual Registration Fee') }}</label>
-                                        <input type='text' id='promo-actual-fee' readonly class='w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700'>
-                                    </div>
-                                    <div>
-                                        <label class='block text-gray-700 font-normal mb-3 text-base'>{{ __('Discount Percentage') }}</label>
-                                        <input type='text' id='promo-discount-percentage' readonly class='w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700'>
-                                    </div>
-                                    <div>
-                                        <label class='block text-gray-700 font-normal mb-3 text-base'>{{ __('Total Discount Amount') }}</label>
-                                        <input type='text' id='promo-discount-amount' readonly class='w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700'>
-                                    </div>
-                                    <div>
-                                        <label class='block text-gray-700 font-normal mb-3 text-base'>{{ __('Total Payable Fee') }}</label>
-                                        <input type='text' id='promo-total-fee' readonly class='w-full h-[52px] px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700'>
+                                <div id='promo-breakdown' class='hidden mt-10 md:col-span-2 w-full max-w-2xl mx-auto'>
+                                    <div class="bill-card bg-white border border-[#EBEBEB] rounded-2xl p-8 shadow-sm">
+                                        <h4 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                            <i class="ri-bill-line text-[#FABC41]"></i>
+                                            {{ __('Fee Summary') }}
+                                        </h4>
+                                        
+                                        <div class="bill-row flex justify-between items-center py-3">
+                                            <span class="bill-label text-gray-600">{{ __('Actual Registration Fee') }}</span>
+                                            <span class="bill-value text-gray-900 font-medium" id="bill-actual-fee">-</span>
+                                        </div>
+                                        
+                                        <div class="bill-row flex justify-between items-center py-3">
+                                            <span class="bill-label text-gray-600">{{ __('Discount Percentage') }}</span>
+                                            <span class="bill-value bill-discount text-[#209F59] font-medium" id="bill-discount-percentage">-</span>
+                                        </div>
+                                        
+                                        <div class="bill-row flex justify-between items-center py-3">
+                                            <span class="bill-label text-gray-600">{{ __('Total Discount Amount') }}</span>
+                                            <span class="bill-value bill-discount text-[#209F59] font-medium" id="bill-discount-amount">-</span>
+                                        </div>
+                                        
+                                        <div class="bill-row total flex justify-between items-center pt-4 mt-2 border-t border-dashed border-gray-200">
+                                            <span class="bill-label text-gray-900 font-bold text-lg">{{ __('Total Payable Fee') }}</span>
+                                            <span class="bill-value text-xl text-[#97563D] font-bold" id="bill-total-fee">-</span>
+                                        </div>
                                     </div>
 
                                     <input type='hidden' name='promo_code' id='promo-code-hidden' value=''>
@@ -859,15 +939,21 @@
                             })
                         });
 
+                        let isEnabled = true;
                         if (response.ok) {
                             const data = await response.json();
                             const feeValue = parseFloat(data.fee || 0);
                             const currency = data.currency || 'EUR';
-                            const isEnabled = data.enabled !== undefined ? data.enabled : true;
+                            isEnabled = data.enabled !== undefined ? data.enabled : true;
                             
                             if (feeInput && feeActualInput) {
                                 feeActualInput.value = feeValue.toFixed(2);
                                 feeInput.value = feeValue.toFixed(2);
+                            }
+
+                            const currencyInput = document.getElementById('registration-fee-currency');
+                            if (currencyInput) {
+                                currencyInput.value = currency;
                             }
 
                             // Update Payout Currency dropdown using TomSelect if available
@@ -882,9 +968,9 @@
                             } else {
                                 registrationCurrencySymbol = currency;
                             }
-                            
-                            renderRegistrationFee(isEnabled);
                         }
+                        
+                        renderRegistrationFee(isEnabled);
                     } catch (error) {
                         console.error('Error fetching country-specific fee:', error);
                     }
@@ -917,10 +1003,16 @@
 
             function clearPromo() {
                 if (promoBreakdown) promoBreakdown.classList.add('hidden');
-                if (promoActualFee) promoActualFee.value = '';
-                if (promoDiscountPercentage) promoDiscountPercentage.value = '';
-                if (promoDiscountAmount) promoDiscountAmount.value = '';
-                if (promoTotalFee) promoTotalFee.value = '';
+                
+                const actualFeeLabel = document.getElementById('bill-actual-fee');
+                const discountPercLabel = document.getElementById('bill-discount-percentage');
+                const discountAmtLabel = document.getElementById('bill-discount-amount');
+                const totalFeeLabel = document.getElementById('bill-total-fee');
+
+                if (actualFeeLabel) actualFeeLabel.textContent = '-';
+                if (discountPercLabel) discountPercLabel.textContent = '-';
+                if (discountAmtLabel) discountAmtLabel.textContent = '-';
+                if (totalFeeLabel) totalFeeLabel.textContent = '-';
 
                 if (promoCodeHidden) promoCodeHidden.value = '';
                 if (promoDiscountPercentageHidden) promoDiscountPercentageHidden.value = '';
@@ -970,7 +1062,8 @@
                                 code, 
                                 role: roleValue, 
                                 usage_type: 'registration',
-                                country: document.querySelector('#country-select') ? document.querySelector('#country-select').value : ''
+                                country: document.querySelector('#country-select') ? document.querySelector('#country-select').value : '',
+                                currency: document.getElementById('registration-fee-currency') ? document.getElementById('registration-fee-currency').value : 'EUR'
                             })
                         });
 
@@ -987,10 +1080,15 @@
                             return;
                         }
 
-                        if (promoActualFee) promoActualFee.value = `${registrationCurrencySymbol} ${data.base_fee}`;
-                        if (promoDiscountPercentage) promoDiscountPercentage.value = `${data.discount_percentage}%`;
-                        if (promoDiscountAmount) promoDiscountAmount.value = `${registrationCurrencySymbol} ${data.discount_amount}`;
-                        if (promoTotalFee) promoTotalFee.value = `${registrationCurrencySymbol} ${data.total_fee}`;
+                        const actualFeeLabel = document.getElementById('bill-actual-fee');
+                        const discountPercLabel = document.getElementById('bill-discount-percentage');
+                        const discountAmtLabel = document.getElementById('bill-discount-amount');
+                        const totalFeeLabel = document.getElementById('bill-total-fee');
+
+                        if (actualFeeLabel) actualFeeLabel.textContent = `${registrationCurrencySymbol} ${data.base_fee}`;
+                        if (discountPercLabel) discountPercLabel.textContent = `${data.discount_percentage}%`;
+                        if (discountAmtLabel) discountAmtLabel.textContent = `-${registrationCurrencySymbol} ${data.discount_amount}`;
+                        if (totalFeeLabel) totalFeeLabel.textContent = `${registrationCurrencySymbol} ${data.total_fee}`;
 
                         if (promoCodeHidden) promoCodeHidden.value = data.code || code;
                         if (promoDiscountPercentageHidden) promoDiscountPercentageHidden.value = data.discount_percentage || '';
@@ -1205,11 +1303,7 @@
 
             const isMobile = window.innerWidth < 768;
             if (currentTab === totalTabs) {
-<<<<<<< HEAD
-                nextBtnText.textContent = isMobile ? '{{ __('Submit') }}' : '{{ __('Complete & Proceed to Payment') }}';
-=======
-                nextBtnText.textContent = '{!! __('Complete & Proceed to Payment') !!}';
->>>>>>> d32b6fa2a6a653d1dfb438602f8d0074aa078717
+                nextBtnText.textContent = isMobile ? '{{ __('Submit') }}' : '{!! __('Complete & Proceed to Payment') !!}';
             } else {
                 nextBtnText.textContent = '{!! __('Save & Continue') !!}';
             }
@@ -1349,7 +1443,8 @@
                         body: formData,
                         headers: {
                             'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
                         }
                     });
 
@@ -1377,7 +1472,19 @@
                              closeThankYouPopup();
                          }, 3000);
                      } else {
-                         const data = await response.json();
+                         let data = {};
+                         try {
+                             data = await response.json();
+                         } catch (e) {
+                             console.error("Failed to parse error response:", e);
+                             if (response.status === 419) {
+                                 data = { message: 'Your session has expired. Please refresh the page and try again.' };
+                             } else if (response.status === 400) {
+                                 data = { message: 'The server could not process your request. This may be due to large file uploads or missing information.' };
+                             } else {
+                                 data = { message: 'An unexpected server error occurred (' + response.status + ').' };
+                             }
+                         }
                          
                          // Clear any existing errors first
                          document.querySelectorAll('.error-message').forEach(el => el.remove());

@@ -702,19 +702,23 @@
 
     $(document).ready(function() {
         // Initialize Select2
-        $('.select2').select2({
-            placeholder: "Select options",
-            allowClear: true,
-            dropdownParent: $('#userManagerModal')
+        $('.select2').each(function() {
+            const $select = $(this);
+            $select.select2({
+                placeholder: "Select options",
+                allowClear: true,
+                dropdownParent: $('#userManagerModal')
+            });
         });
 
         // Re-initialize or fix Select2 when modal is shown to ensure correct width and layout
         $('#userManagerModal').on('shown.bs.modal', function() {
             $('.select2').each(function() {
-                $(this).select2({
+                const $select = $(this);
+                $select.select2({
                     dropdownParent: $('#userManagerModal'),
                     width: '100%',
-                    placeholder: $(this).attr('placeholder') || "Select options",
+                    placeholder: $select.attr('placeholder') || "Select options",
                     allowClear: true
                 });
             });
@@ -742,8 +746,8 @@
             serverSide: true,
             ajax: "{{ route('admin.user-managers.index') }}",
             columns: [{
-                    data: 'DT_RowIndex',
-                    orderable: false,
+                    data: 'id',
+                    orderable: true,
                     searchable: false
                 },
                 {
@@ -756,11 +760,13 @@
                     data: 'phone'
                 },
                 {
-                    data: 'nationality'
+                    data: 'nationality',
+                    searchable: false
                 },
                 {
                     data: 'languages',
-                    orderable: false
+                    orderable: false,
+                    searchable: false
                 },
                 {
                     data: 'status'

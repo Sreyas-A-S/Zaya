@@ -30,6 +30,7 @@
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">SL No.</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">ID</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">{{ ($user->role === 'client' || $user->role === 'patient') ? 'Practitioner' : 'Client' }}</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Services</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Date & Time</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Mode</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Amount</th>
@@ -85,6 +86,22 @@
                                         </div>
                                     </div>
                                 @endif
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-wrap gap-1 max-w-[200px]">
+                                @php
+                                    $s_ids = is_array($booking->service_ids) ? $booking->service_ids : [];
+                                @endphp
+                                @forelse($s_ids as $sid)
+                                    @if(isset($allServices[$sid]))
+                                        <span class="px-2 py-0.5 bg-secondary/5 text-secondary text-[10px] font-bold rounded-md border border-secondary/10 whitespace-nowrap">
+                                            {{ $allServices[$sid]->title }}
+                                        </span>
+                                    @endif
+                                @empty
+                                    <span class="text-xs text-gray-400">No services</span>
+                                @endforelse
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -218,7 +235,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="px-4 md:px-6 py-12 md:py-20 text-center text-gray-500">
+                        <td colspan="10" class="px-4 md:px-6 py-12 md:py-20 text-center text-gray-500">
                             <div class="flex flex-col items-center">
                                 <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                                     <i class="ri-calendar-line text-3xl text-gray-300"></i>

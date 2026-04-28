@@ -45,110 +45,10 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Health Information -->
-            <div class="bg-[#F8FAF9] rounded-[32px] p-8 border border-[#2E4B3D]/12">
-                <h3 class="text-lg font-bold text-secondary mb-6 flex items-center gap-2">
-                    <i class="ri-heart-pulse-line text-primary"></i>
-                    Health Information
-                </h3>
-                <div class="space-y-6">
-                    <div>
-                        <span class="text-gray-400 text-xs font-bold uppercase block mb-2">Conditions History</span>
-                        <div class="bg-white p-4 rounded-2xl border border-gray-100">
-                            @if($client->patient->conditions)
-                                <p class="text-sm text-secondary font-medium">{{ $client->patient->conditions }}</p>
-                            @else
-                                <p class="text-sm text-gray-600 italic">No specific conditions recorded.</p>
-                            @endif
-                        </div>
-                    </div>
-                    <div>
-                        <span class="text-gray-400 text-xs font-bold uppercase block mb-2">Preferences</span>
-                        <div class="flex flex-wrap gap-2">
-                            @if(isset($client->patient->consultation_preferences) && is_array($client->patient->consultation_preferences))
-                                @foreach($client->patient->consultation_preferences as $pref)
-                                    <span class="px-3 py-1 bg-white text-secondary text-[10px] font-bold rounded-full border border-gray-100 uppercase">{{ $pref }}</span>
-                                @endforeach
-                            @else
-                                <span class="text-xs text-gray-400">None specified</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Clinical Documents -->
-            <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
-                <h3 class="text-lg font-bold text-secondary mb-6 flex items-center gap-2">
-                    <i class="ri-file-list-3-line text-primary"></i>
-                    Clinical Documents
-                </h3>
-                <div class="space-y-3">
-                    @forelse($documents as $doc)
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
-                        <div class="flex items-center gap-3 overflow-hidden">
-                            <i class="ri-file-text-line text-xl text-gray-400"></i>
-                            <div class="overflow-hidden">
-                                <p class="text-xs font-bold text-secondary truncate">{{ $doc->file_name }}</p>
-                                <p class="text-[10px] text-gray-400 uppercase font-black">{{ $doc->file_type }} • {{ round($doc->file_size / 1024, 1) }} KB</p>
-                            </div>
-                        </div>
-                        <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-secondary shadow-sm hover:text-primary transition-all">
-                            <i class="ri-download-line"></i>
-                        </a>
-                    </div>
-                    @empty
-                    <div class="text-center py-4">
-                        <p class="text-xs text-gray-400 italic">No documents uploaded.</p>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
         </div>
 
         <!-- Main: Recordings & History -->
         <div class="lg:col-span-2 space-y-8">
-            <!-- Session Recordings -->
-            <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
-                <h3 class="text-xl font-bold text-secondary mb-6 flex items-center gap-2">
-                    <i class="ri-video-chat-line text-primary"></i>
-                    Session Recordings
-                </h3>
-                
-                @if($recordings->count() > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @foreach($recordings as $recording)
-                    <div class="group relative bg-[#F9F9F9] rounded-2xl overflow-hidden border border-gray-100 hover:border-primary transition-all">
-                        <div class="p-5">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
-                                    <i class="ri-play-fill text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-secondary">{{ $recording->invoice_no }}</p>
-                                    <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{{ $recording->booking_date->format('M d, Y') }}</p>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center mt-4">
-                                <span class="text-xs text-gray-500">With: {{ $recording->practitioner->user->name }}</span>
-                                <a href="{{ route('recordings.show', $recording->id) }}" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
-                                    Watch <i class="ri-arrow-right-s-line"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @else
-                <div class="py-12 text-center">
-                    <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4">
-                        <i class="ri-video-off-line text-2xl text-gray-300"></i>
-                    </div>
-                    <p class="text-gray-400 font-medium">No session recordings available for this client.</p>
-                </div>
-                @endif
-            </div>
 
             <!-- Session History -->
             <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
@@ -185,8 +85,40 @@
                 </div>
             </div>
 
-            <!-- Client Concerns & Forms -->
+            <!-- Detailed Information Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Health Information -->
+                <div class="bg-[#F8FAF9] rounded-[32px] p-8 border border-[#2E4B3D]/12">
+                    <h3 class="text-lg font-bold text-secondary mb-6 flex items-center gap-2">
+                        <i class="ri-heart-pulse-line text-primary"></i>
+                        Health Information
+                    </h3>
+                    <div class="space-y-6">
+                        <div>
+                            <span class="text-gray-400 text-xs font-bold uppercase block mb-2">Conditions History</span>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 min-h-[80px]">
+                                @if($client->patient->conditions)
+                                    <p class="text-sm text-secondary font-medium">{{ $client->patient->conditions }}</p>
+                                @else
+                                    <p class="text-sm text-gray-600 italic">No specific conditions recorded.</p>
+                                @endif
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 text-xs font-bold uppercase block mb-2">Preferences</span>
+                            <div class="flex flex-wrap gap-2">
+                                @if(isset($client->patient->consultation_preferences) && is_array($client->patient->consultation_preferences))
+                                    @foreach($client->patient->consultation_preferences as $pref)
+                                        <span class="px-3 py-1 bg-white text-secondary text-[10px] font-bold rounded-full border border-gray-100 uppercase">{{ $pref }}</span>
+                                    @endforeach
+                                @else
+                                    <span class="text-xs text-gray-400">None specified</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Concerns -->
                 <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
                     <h3 class="text-lg font-bold text-secondary mb-6 flex items-center gap-2">
@@ -227,6 +159,34 @@
                         @empty
                         <div class="text-center py-6">
                             <p class="text-xs text-gray-400 italic">No consultation forms submitted.</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Clinical Documents -->
+                <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
+                    <h3 class="text-lg font-bold text-secondary mb-6 flex items-center gap-2">
+                        <i class="ri-file-list-3-line text-primary"></i>
+                        Clinical Documents
+                    </h3>
+                    <div class="space-y-3">
+                        @forelse($documents as $doc)
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <i class="ri-file-text-line text-xl text-gray-400"></i>
+                                <div class="overflow-hidden">
+                                    <p class="text-xs font-bold text-secondary truncate">{{ $doc->file_name }}</p>
+                                    <p class="text-[10px] text-gray-400 uppercase font-black">{{ $doc->file_type }} • {{ round($doc->file_size / 1024, 1) }} KB</p>
+                                </div>
+                            </div>
+                            <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-secondary shadow-sm hover:text-primary transition-all">
+                                <i class="ri-download-line"></i>
+                            </a>
+                        </div>
+                        @empty
+                        <div class="text-center py-4">
+                            <p class="text-xs text-gray-400 italic">No documents uploaded.</p>
                         </div>
                         @endforelse
                     </div>

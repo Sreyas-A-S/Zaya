@@ -3,22 +3,27 @@
 @section('title', 'Reviews')
 
 @section('content')
-<div class="max-w-6xl mx-auto py-8 px-4">
+<div class="space-y-8">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
             <h1 class="text-3xl font-black text-secondary tracking-tight">Reviews</h1>
             <p class="text-gray-500 font-medium mt-1">Manage your feedback and see what others are saying.</p>
         </div>
-        @if($reviewablePractitioners->count() > 0)
-        <button onclick="openReviewModal()" class="inline-flex items-center justify-center px-8 py-4 bg-secondary text-white rounded-[1.5rem] font-black text-sm hover:bg-primary transition-all shadow-2xl shadow-secondary/30 uppercase tracking-[0.2em]">
-            <i class="ri-edit-line mr-2"></i> Write a Review
-        </button>
-        @endif
+        <div class="flex flex-wrap items-center gap-3">
+            <button onclick="openZayaReviewModal()" class="inline-flex items-center justify-center px-6 py-4 bg-primary text-white rounded-[1.5rem] font-black text-sm hover:opacity-90 transition-all shadow-xl shadow-primary/20 uppercase tracking-[0.2em]">
+                <i class="ri-heart-pulse-line mr-2"></i> Review Zaya
+            </button>
+            @if($reviewablePractitioners->count() > 0)
+            <button onclick="openReviewModal()" class="inline-flex items-center justify-center px-6 py-4 bg-secondary text-white rounded-[1.5rem] font-black text-sm hover:bg-primary transition-all shadow-2xl shadow-secondary/30 uppercase tracking-[0.2em]">
+                <i class="ri-edit-line mr-2"></i> Review Professional
+            </button>
+            @endif
+        </div>
     </div>
 
     <!-- Tabs -->
-    <div class="flex border-b border-[#2E4B3D]/12 mb-8 overflow-x-auto no-scrollbar">
+    <div class="flex border-b border-[#2E4B3D]/12 overflow-x-auto no-scrollbar">
         <button onclick="switchReviewTab('my-reviews')" id="tab-my-reviews" class="px-8 py-4 text-xs font-black uppercase tracking-[0.2em] border-b-2 {{ request()->has('received_page') ? 'border-transparent text-gray-400' : 'border-secondary text-secondary' }} hover:text-secondary transition-all">
             My Reviews
         </button>
@@ -32,7 +37,7 @@
     <!-- My Reviews Panel -->
     <div id="panel-my-reviews" class="{{ request()->has('received_page') ? 'hidden' : '' }} space-y-6">
         @forelse($myReviews as $review)
-        <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-8 shadow-sm group hover:border-secondary/20 transition-all">
+        <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm group hover:border-secondary/20 transition-all">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="flex items-center gap-4">
                     <img src="{{ $review->practitioner->profile_photo_path ? asset('storage/' . $review->practitioner->profile_photo_path) : asset('frontend/assets/profile-dummy-img.png') }}" 
@@ -101,7 +106,7 @@
     <!-- Received Reviews Panel -->
     <div id="panel-received-reviews" class="{{ request()->has('received_page') ? '' : 'hidden' }} space-y-6">
         @forelse($receivedReviews as $review)
-        <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-8 shadow-sm group hover:border-secondary/20 transition-all">
+        <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm group hover:border-secondary/20 transition-all">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="flex items-center gap-4">
                     <img src="{{ $review->user->profile_pic ? (str_starts_with($review->user->profile_pic, 'http') ? $review->user->profile_pic : asset('storage/' . $review->user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" 
@@ -223,6 +228,52 @@
     </div>
 </div>
 
+<!-- Review Zaya Wellness Modal -->
+<div id="zaya-review-modal" class="fixed inset-0 z-[999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeZayaReviewModal()"></div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-primary/10">
+                <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-[#F9FBF9]">
+                    <div>
+                        <h3 class="text-xl font-black text-secondary tracking-tight">Review Zaya Wellness</h3>
+                        <p class="text-[10px] text-primary uppercase font-black tracking-widest mt-1">Help us improve your journey</p>
+                    </div>
+                    <button onclick="closeZayaReviewModal()" class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-all shadow-sm">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                <div class="px-8 py-8">
+                    <form action="{{ route('reviews.zaya.store') }}" method="POST" id="zaya-review-form">
+                        @csrf
+                        <div class="text-center mb-8">
+                            <label class="block text-sm font-bold text-secondary mb-4 uppercase tracking-wider text-[10px] opacity-60">Your Rating for Zaya</label>
+                            <div class="flex justify-center gap-3 text-4xl">
+                                <input type="hidden" name="rating" value="5">
+                                @for($i = 1; $i <= 5; $i++)
+                                <i class="ri-star-fill text-[#FFD166]"></i>
+                                @endfor
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-2 font-bold italic">Excellent Experience (5/5)</p>
+                        </div>
+
+                        <div class="mb-8">
+                            <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Your Feedback</label>
+                            <textarea name="message" rows="4" required placeholder="Tell us how Zaya Wellness has helped you on your wellness journey..."
+                                class="w-full rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-sm py-4 px-5 transition-all shadow-sm resize-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full py-5 bg-primary text-white rounded-[1.5rem] font-black text-sm hover:opacity-95 transition-all shadow-2xl shadow-primary/20 uppercase tracking-[0.2em]">
+                            Share My Story
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -251,6 +302,16 @@
 
     function closeReviewModal() {
         document.getElementById('write-review-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    function openZayaReviewModal() {
+        document.getElementById('zaya-review-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeZayaReviewModal() {
+        document.getElementById('zaya-review-modal').classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
 

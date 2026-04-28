@@ -23,6 +23,13 @@
                 </div>
             @endif
 
+            @if(session('error'))
+                <div class="mb-8 p-4 bg-red-50 border border-red-100 text-red-700 rounded-2xl text-sm font-bold flex items-center gap-3">
+                    <i class="ri-error-warning-line text-xl"></i>
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <div class="p-6 bg-[#F9FBF9] border border-[#2E4B3D]/12 rounded-[2rem]">
                 <div class="grid grid-cols-1 gap-4">
                     <div class="flex items-start justify-between gap-6 border-b border-[#2E4B3D]/10 pb-4">

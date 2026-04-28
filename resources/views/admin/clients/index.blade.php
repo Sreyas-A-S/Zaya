@@ -3,6 +3,11 @@
 @section('title', 'Clients Management')
 
 @section('content')
+@php
+    $financeSettings = \App\Models\HomepageSetting::getSectionValues('finance', 'en');
+    $feeCurrency = $financeSettings['client_registration_fee_currency'] ?? 'EUR';
+    $symbol = config('currencies.symbols')[$feeCurrency] ?? $feeCurrency;
+@endphp
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
@@ -351,10 +356,10 @@
                         <div class="step-counter">5</div>
                         <div class="step-name">Security</div>
                     </div>
-                    <div class="stepper-item" data-step="6">
+                    {{-- <div class="stepper-item" data-step="6">
                         <div class="step-counter">6</div>
                         <div class="step-name">Payment</div>
-                    </div>
+                    </div> --}}
                 </div>
 
 
@@ -597,7 +602,7 @@
                     </div>
                 </div>
 
-                <!-- Step 6: Payment & Offers -->
+                {{-- <!-- Step 6: Payment & Offers -->
                 <div class="step-content d-none" id="step-6">
                     <div class="row g-3">
                         <div class="col-12">
@@ -662,7 +667,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
                 </div> <!-- Closing modal-body -->
 
                 <div class="modal-footer justify-content-between mt-4 w-100">
@@ -1016,7 +1021,7 @@
 
         // Stepper Logic
         let currentStep = 1;
-        let totalSteps = 6;
+        let totalSteps = 5;
 
         function updateStepper() {
             $('.step-content').addClass('d-none');
@@ -1063,9 +1068,9 @@
         // Expose a safe reset helper for openCreateModal() (defined outside ready scope)
         window.resetClientStepper = function() {
             currentStep = 1;
-            totalSteps = 6;
+            totalSteps = 5;
             $('.stepper-horizontal').show();
-            $('.stepper-horizontal .stepper-item[data-step="6"]').show();
+            // $('.stepper-horizontal .stepper-item[data-step="6"]').hide();
             updateStepper();
         };
 
@@ -1115,6 +1120,7 @@
             return valid;
         }
 
+        /*
         // Promocode Logic for Admin Modal (Client)
         const promoInputClient = document.getElementById('admin-promocode-input-client');
         const promoApplyBtnClient = document.getElementById('admin-promo-apply-btn-client');
@@ -1174,7 +1180,12 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
-                    body: JSON.stringify({ code, role: 'client' })
+                    body: JSON.stringify({ 
+                        code, 
+                        role: 'client',
+                        usage_type: 'registration',
+                        country: document.querySelector('[name="country"]') ? document.querySelector('[name="country"]').value : 'all'
+                    })
                 });
 
                 const data = await response.json();
@@ -1208,6 +1219,7 @@
                 promoApplyBtnClient.innerText = 'Apply';
             }
         });
+        */
 
         // DOB Age Calculation
         $('#dob_input').on('change', function() {

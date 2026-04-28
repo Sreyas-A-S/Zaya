@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             LanguageSeeder::class,
             DoctorMasterDataSeeder::class,
             PractitionerMasterDataSeeder::class,
+            QualificationSeeder::class,
             ClientConsultationPreferenceSeeder::class,
             YogaExpertiseSeeder::class,
             ServiceCategorySeeder::class,

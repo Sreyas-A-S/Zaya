@@ -102,7 +102,7 @@ Route::get('/open-register/{role}/signature={token}', function (string $role, st
 // Public Master Data Quick Add (for registration forms)
 Route::post('master-data/quick-add/{type}', [MasterDataController::class, 'store'])->name('master-data.quick-add');
 
-Route::post('/lang/{locale}', [LanguageController::class, 'change'])->name('lang.switch');
+Route::match(['get', 'post'], '/lang/{locale}', [LanguageController::class, 'change'])->name('lang.switch');
 
 Route::get('/', [WebController::class, 'index'])->name('home');
 Route::get('/index', [WebController::class, 'index'])->name('index');
@@ -155,6 +155,7 @@ Route::get('/captcha', [CaptchaController::class, 'generate'])->name('captcha');
 Route::get('/geoip/country', [GeoIpController::class, 'country'])->name('geoip.country');
 Route::get('/magic-login', [\App\Http\Controllers\Auth\MagicLoginController::class, 'login'])->name('magic.login');
 Route::get('/invoice/{invoice_no}', [InvoiceController::class, 'show'])->name('invoice.show');
+Route::get('/invoice/{invoice_no}/download', [InvoiceController::class, 'download'])->name('invoice.download');
 Route::post('/validate-promo-code', [WebController::class, 'validatePromoCode'])->name('promo.validate')->middleware('throttle:5,1');
 Route::post('/get-registration-fee', [WebController::class, 'getRegistrationFee'])->name('registration-fee.get');
 

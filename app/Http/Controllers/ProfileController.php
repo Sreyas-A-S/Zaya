@@ -51,9 +51,10 @@ class ProfileController extends Controller
                        ->where('practitioner_type', $morphClass);
                 });
 
-                // 2. Referred bookings
+                // 2. Referred bookings (only show if the referral is confirmed/paid)
                 $q->orWhereHas('referralsFromThisSession', function($sq) use ($user) {
-                    $sq->where('referred_to_id', $user->id);
+                    $sq->where('referred_to_id', $user->id)
+                       ->where('status', 'paid');
                 });
             });
         }
@@ -108,9 +109,13 @@ class ProfileController extends Controller
             ->latest()
             ->get();
 
-        // Invoices are usually client-centric (payments they made)
-        $invoices = \App\Models\Booking::where('user_id', $user->id)
-            ->whereNotNull('razorpay_payment_id')
+        // Transactions / Invoices
+        $invoices = \App\Models\Transaction::with(['user', 'practitioner', 'booking', 'referral'])
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhere('practitioner_id', $user->id)
+                  ->orWhere('referrer_id', $user->id);
+            })
             ->latest()
             ->take(5)
             ->get();
@@ -537,6 +542,9 @@ class ProfileController extends Controller
             ->latest()
             ->get();
 
+        $allServiceIds = $consultations->pluck('service_ids')->flatten()->unique()->filter()->toArray();
+        $allServices = \App\Models\Service::whereIn('id', $allServiceIds)->get()->keyBy('id');
+
         $dataAccessRequests = \App\Models\DataAccessRequest::with('requester')
             ->where('client_id', $user->id)
             ->whereIn('status', ['approved', 'revoked'])
@@ -544,7 +552,7 @@ class ProfileController extends Controller
             ->get()
             ->unique('requester_id');
 
-        return view('health-journey', compact('user', 'clinicalDocuments', 'consultations', 'dataAccessRequests'));
+        return view('health-journey', compact('user', 'clinicalDocuments', 'consultations', 'dataAccessRequests', 'allServices'));
     }
 
     public function bookings(Request $request)
@@ -570,11 +578,15 @@ class ProfileController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        // Fetch all services for these bookings to avoid N+1 in the table
+        $allServiceIds = collect($bookings->items())->pluck('service_ids')->flatten()->unique()->filter()->toArray();
+        $allServices = \App\Models\Service::whereIn('id', $allServiceIds)->get()->keyBy('id');
+
         if ($request->ajax()) {
-            return view('partials.bookings-table', compact('user', 'bookings'))->render();
+            return view('partials.bookings-table', compact('user', 'bookings', 'allServices'))->render();
         }
 
-        return view('bookings', compact('user', 'bookings', 'search'));
+        return view('bookings', compact('user', 'bookings', 'search', 'allServices'));
     }
 
     public function conferences(Request $request)
@@ -623,32 +635,41 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $booking = $this->getBookingQuery($user)
-            ->with(['language', 'translator.user'])
+            ->with(['language', 'translator.user', 'practitioner.user'])
             ->findOrFail($id);
 
         $serviceIds = is_array($booking->service_ids) ? $booking->service_ids : [];
         $services = Service::whereIn('id', $serviceIds)->get();
 
-        return view('partials.booking-details-modal-content', compact('user', 'booking', 'services'))->render();
+        // Services specifically referred to this practitioner (if any)
+        $referredServiceIds = [];
+        if ($user->id !== ($booking->practitioner->user_id ?? null)) {
+            $incomingReferral = \App\Models\Referral::where('booking_id', $booking->id)
+                ->where('referred_to_id', $user->id)
+                ->first();
+            
+            if ($incomingReferral && is_array($incomingReferral->service_ids)) {
+                $referredServiceIds = $incomingReferral->service_ids;
+            }
+        }
+
+        return view('partials.booking-details-modal-content', compact('user', 'booking', 'services', 'referredServiceIds'))->render();
     }
 
     public function showDetailsView($id)
     {
         $user = Auth::user();
-        $booking = Booking::with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo', 'transactions'])
+        $booking = $this->getBookingQuery($user)
+            ->with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo', 'transactions', 'consultationForms'])
             ->findOrFail($id);
 
-        // Permissions check
-        $isParticipant = ($booking->user_id === $user->id) || 
+        // Permissions check for sensitive data
+        $isDirectParticipant = ($booking->user_id === $user->id) || 
                          ($booking->practitioner && $booking->practitioner->user_id === $user->id) ||
                          ($booking->translator && $booking->translator->user_id === $user->id);
 
-        if (!$isParticipant) {
-            $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
-            if (!$hasAccess) {
-                return redirect()->route('bookings.index')->with('error', 'Unauthorized access. Please verify via OTP.');
-            }
-        }
+        // Consent Status (Checked against the CURRENT viewer)
+        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
 
         $serviceIds = is_array($booking->service_ids) ? $booking->service_ids : [];
         $services = Service::whereIn('id', $serviceIds)->get();
@@ -696,9 +717,6 @@ class ProfileController extends Controller
             ];
         }
 
-        // Consent Status (Checked against the CURRENT viewer)
-        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
-
         $firstPractitioner = $referralChain[0]['practitioner'] ?? 'Unknown';
 
         // Financial visibility logic
@@ -715,7 +733,20 @@ class ProfileController extends Controller
             }
         }
 
-        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount'));
+        // Services specifically referred to this practitioner/doctor (if any)
+        $referredServiceIds = [];
+        if ($user->id !== ($booking->practitioner->user_id ?? null)) {
+            // Check if user is a referred expert for this booking
+            $incomingReferral = \App\Models\Referral::where('booking_id', $booking->id)
+                ->where('referred_to_id', $user->id)
+                ->first();
+            
+            if ($incomingReferral && is_array($incomingReferral->service_ids)) {
+                $referredServiceIds = $incomingReferral->service_ids;
+            }
+        }
+
+        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount', 'referredServiceIds', 'isDirectParticipant'));
     }
 
     public function viewClientProfile($id)
@@ -742,15 +773,22 @@ class ProfileController extends Controller
             ->get();
 
         // Get consultation forms for this client
-        $consultationForms = \App\Models\ConsultationForm::where('user_id', $client->id)
-            ->with(['booking'])
-            ->latest()
-            ->get();
+        $consultationForms = \App\Models\ConsultationForm::whereHas('booking', function($query) use ($client) {
+            $query->where('user_id', $client->id);
+        })->with(['booking'])->latest()->get();
 
-        // Get client concerns
-        $concerns = \App\Models\ClientConcern::where('user_id', $client->id)
+        // Get client concerns (from their bookings)
+        $concerns = Booking::where('user_id', $client->id)
+            ->whereNotNull('conditions')
             ->latest()
-            ->get();
+            ->get()
+            ->map(function($b) {
+                return (object)[
+                    'category' => 'Session Concern',
+                    'concern' => is_array($b->conditions) ? implode(', ', $b->conditions) : $b->conditions,
+                    'created_at' => $b->created_at
+                ];
+            });
         
         // Get all recordings for this client
         $recordings = Booking::where('user_id', $client->id)
@@ -1128,15 +1166,18 @@ class ProfileController extends Controller
 
         // Stats
         $bookingQuery = $this->getBookingQuery($user);
-        $totalSessions = (clone $bookingQuery)->where('status', 'completed')->count();
-        $totalClients = (clone $bookingQuery)->distinct('user_id')->count();
+        $totalSessions = (clone $bookingQuery)->where('status', '!=', 'cancelled')->count();
+        $totalClients = (clone $bookingQuery)->where('status', '!=', 'cancelled')->distinct('user_id')->count();
         $todaySessions = (clone $bookingQuery)->where('booking_date', now()->toDateString())->count();
         $upcomingSessions = (clone $bookingQuery)->where('booking_date', '>', now()->toDateString())->count();
 
         // History
         $servicesHistory = (clone $bookingQuery)
             ->with('user')
-            ->where('status', 'completed')
+            ->where(function($q) {
+                $q->where('status', 'completed')
+                  ->orWhere('booking_date', '<', now()->toDateString());
+            })
             ->latest('booking_date')
             ->take(5)
             ->get();
@@ -2021,7 +2062,7 @@ class ProfileController extends Controller
     public function storeReview(Request $request)
     {
         $request->validate([
-            'practitioner_id' => 'required|exists:practitioners,id',
+            'practitioner_id' => 'required|integer',
             'rating' => 'required|integer|min:1|max:5',
             'review' => 'required|string|max:1000',
         ]);
@@ -2030,7 +2071,7 @@ class ProfileController extends Controller
 
         // Optional: Check if they actually had a session
         $hadSession = Booking::where('user_id', $user->id)
-            ->where('practitioner_id', $request->practitioner_id)
+            ->where('profile_id', $request->practitioner_id)
             ->where('status', 'completed')
             ->exists();
 
@@ -2046,7 +2087,31 @@ class ProfileController extends Controller
             'status' => true, // Auto-approve for now or set to false for moderation
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Review submitted successfully!']);
+        }
+
         return back()->with('status', 'Review submitted successfully!');
+    }
+
+    public function storeZayaReview(Request $request)
+    {
+        $request->validate([
+            'message' => 'required|string|max:2000',
+        ]);
+
+        $user = Auth::user();
+
+        \App\Models\Testimonial::create([
+            'name' => $user->name,
+            'role' => str_replace('_', ' ', ucfirst($user->role)),
+            'message' => $request->message,
+            'rating' => 5,
+            'image' => $user->profile_pic,
+            'status' => 'pending' // Default to pending for moderation
+        ]);
+
+        return back()->with('status', 'Thank you for your feedback! Your story has been submitted for review.');
     }
 
     public function checkEmail(Request $request)
