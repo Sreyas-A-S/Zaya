@@ -92,7 +92,8 @@ class WebController extends Controller
         });
         $services = Service::where('status', true)
             ->orderBy('order_column')
-            ->paginate(8);
+            ->paginate(8, ['*'], 'services_page')
+            ->withQueryString();
         $settings = HomepageSetting::getAllSettings($language);
         $latestAnnouncement = $this->getLatestAnnouncement();
 
@@ -124,6 +125,10 @@ class WebController extends Controller
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error fetching latest blogs: ' . $e->getMessage());
+        }
+
+        if (request()->ajax() && request()->has('services_page')) {
+            return view('partials.frontend.home-services-grid', compact('services'))->render();
         }
 
         return view('index', compact('practitioners', 'testimonials', 'services', 'settings', 'language', 'languages', 'latestAnnouncement', 'latestBlogs'));

@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     const header = document.querySelector('header');
+    const homeServicesContainer = document.getElementById('home-services-container');
 
     // Toggle Mobile Menu
     if (mobileMenuBtn && mobileMenu) {
@@ -65,6 +66,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 mobileMenu.classList.add('max-h-0', 'opacity-0', 'invisible', '-translate-y-4');
                 mobileMenu.classList.remove('max-h-[80vh]', 'opacity-100', 'visible', 'translate-y-0');
+            }
+        });
+    }
+
+    // Homepage "Our Services" pagination (AJAX)
+    if (homeServicesContainer) {
+        document.addEventListener('click', async (e) => {
+            const link = e.target.closest('#home-services-container .home-services-pagination a');
+            if (!link) return;
+
+            e.preventDefault();
+
+            try {
+                if (typeof window.showPreloader === 'function') window.showPreloader();
+
+                const response = await fetch(link.href, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html',
+                    },
+                });
+
+                if (!response.ok) throw new Error('Failed to load services page');
+
+                const html = await response.text();
+                homeServicesContainer.innerHTML = html;
+
+                // Keep URL in sync (so refresh/back works reasonably)
+                try {
+                    window.history.pushState({}, '', link.href);
+                } catch (err) {
+                    // ignore
+                }
+
+                // Scroll back to the services section
+                const servicesSection = document.getElementById('services');
+                if (servicesSection) servicesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (err) {
+                console.error(err);
+                window.location.href = link.href;
+            } finally {
+                if (typeof window.hidePreloader === 'function') window.hidePreloader();
+            }
+        });
+
+        // Handle back/forward navigation
+        window.addEventListener('popstate', async () => {
+            try {
+                const url = new URL(window.location.href);
+                if (!url.searchParams.has('services_page')) return;
+
+                const response = await fetch(window.location.href, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html',
+                    },
+                });
+                if (!response.ok) return;
+                homeServicesContainer.innerHTML = await response.text();
+            } catch (err) {
+                // ignore
             }
         });
     }

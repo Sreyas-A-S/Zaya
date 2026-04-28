@@ -36,7 +36,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'apiKey' => \App\Http\Middleware\ApiKeyAuth::class,
         ]);
 
-        $middleware->redirectGuestsTo(fn(Request $request) => route('zaya-login'));
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('admin') || $request->is('admin/*')) {
+                return route('admin.login');
+            }
+
+            return route('zaya-login');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (Throwable $e, Request $request) {
