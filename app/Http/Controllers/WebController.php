@@ -90,7 +90,10 @@ class WebController extends Controller
                 $testimonial->is_liked = $testimonial->likes()->where('ip_address', $ip)->exists();
             }
         });
-        $services = Service::where('status', true)->orderBy('order_column')->get();
+        $services = Service::where('status', true)
+            ->orderBy('order_column')
+            ->paginate(8, ['*'], 'services_page')
+            ->withQueryString();
         $settings = HomepageSetting::getAllSettings($language);
         $latestAnnouncement = $this->getLatestAnnouncement();
 
@@ -122,6 +125,10 @@ class WebController extends Controller
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error fetching latest blogs: ' . $e->getMessage());
+        }
+
+        if (request()->ajax() && request()->has('services_page')) {
+            return view('partials.frontend.home-services-grid', compact('services'))->render();
         }
 
         return view('index', compact('practitioners', 'testimonials', 'services', 'settings', 'language', 'languages', 'latestAnnouncement', 'latestBlogs'));
@@ -258,6 +265,16 @@ class WebController extends Controller
             })->values();
 
             $services = collect();
+
+            $perPage = 8;
+            $page = (int) $request->get('page', 1);
+            $servicePackages = new \Illuminate\Pagination\LengthAwarePaginator(
+                $servicePackages->forPage($page, $perPage)->values(),
+                $servicePackages->count(),
+                $perPage,
+                $page,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
         } else {
             $query = Service::where('status', true);
 
@@ -278,7 +295,9 @@ class WebController extends Controller
                 });
             }
 
-            $services = $query->orderBy('order_column', 'asc')->get();
+            $services = $query->orderBy('order_column', 'asc')
+                ->paginate(8)
+                ->withQueryString();
         }
 
         if ($request->ajax()) {

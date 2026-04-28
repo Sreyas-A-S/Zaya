@@ -534,9 +534,16 @@
                         </div>
 
                         <div class="flex flex-col sm:flex-row justify-between items-center gap-6 mt-8 border-t border-gray-100 pt-8">
-                            <button type="button" class="prev-tab-btn w-full sm:w-auto border border-[#D1D5DB] text-gray-700 py-3.5 px-8 rounded-full font-semibold text-lg transition-all hover:bg-gray-50"><i class="ri-arrow-left-line mr-2 align-middle"></i> {{ __('Previous') }}</button>
+                            <div class="flex flex-col gap-1 text-center sm:text-left">
+                                <p class="text-gray-500 text-sm font-medium">{{ __('Already have an account?') }}
+                                </p>
+                                <a href="{{ route('zaya-login') }}"
+                                    class="text-primary text-xs font-bold hover:underline flex items-center justify-center sm:justify-start gap-1">
+                                    {{ __('Login to your dashboard') }} <i class="ri-arrow-right-line"></i>
+                                </a>
+                            </div>
                             <div class="flex gap-4 items-center w-full sm:w-auto justify-end">
-                                <a href="{{ route('index') }}" class="text-gray-500 hover:text-gray-700 font-medium transition-colors hidden sm:block">{{ __('Cancel') }}</a>
+                                <button type="button" class="prev-tab-btn w-full sm:w-auto border border-[#D1D5DB] text-gray-700 py-3.5 px-8 rounded-full font-semibold text-lg transition-all hover:bg-gray-50"><i class="ri-arrow-left-line mr-2 align-middle"></i> {{ __('Previous') }}</button>
                                 <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-10 rounded-full font-semibold text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-lg shadow-[#FABC41]/20">
                                     <i class="ri-loader-4-line ri-spin btn-loader"></i>
                                     <span class="hidden md:inline">{!! __('Complete & Proceed') !!}</span>

@@ -251,9 +251,11 @@
 
                     <div class="mb-10">
                         <label class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha') }}</label>
-                        <div class="flex items-center gap-4">
-                            <img src="{{ route('captcha') }}" id="captcha-img" class="h-12 border rounded-xl">
-                            <button type="button" onclick="refreshCaptcha()" class="text-secondary"><i class="ri-refresh-line text-2xl"></i></button>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <img src="{{ route('captcha') }}" id="captcha-img" class="h-12 border rounded-xl">
+                                <button type="button" onclick="refreshCaptcha()" class="text-secondary"><i class="ri-refresh-line text-2xl"></i></button>
+                            </div>
                             <input type="text" name="captcha" class="reg-input flex-1" required placeholder="{{ __('Enter Code') }}">
                         </div>
                     </div>
@@ -279,12 +281,22 @@
         </div>
     </div>
 
-    <footer class="bg-[#FFF3D4] py-6 mt-auto">
-        <div class="container mx-auto px-4 flex justify-end gap-8">
-            <a href="{{ route('login') }}" class="btn-cancel">{{ __('Cancel') }}</a>
-            <button type="submit" form="registration-form" id="submit-btn" class="btn-create">
-                <i class="ri-loader-4-line ri-spin btn-loader"></i>{{ __('Create Account') }}
-            </button>
+    <footer class="bg-[#FFF3D4] py-8 mt-auto border-t border-[#97563D]/10">
+        <div class="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-6">
+            <div class="flex flex-col gap-1 text-center sm:text-left">
+                <p class="text-gray-500 text-sm font-medium">{{ __('Already have an account?') }}
+                </p>
+                <a href="{{ route('zaya-login') }}"
+                    class="text-primary text-xs font-bold hover:underline flex items-center justify-center sm:justify-start gap-1">
+                    {{ __('Login to your dashboard') }} <i class="ri-arrow-right-line"></i>
+                </a>
+            </div>
+            <div class="flex justify-end gap-8 w-full sm:w-auto">
+                <a href="{{ route('index') }}" class="btn-cancel flex items-center">{{ __('Cancel') }}</a>
+                <button type="submit" form="registration-form" id="submit-btn" class="btn-create">
+                    <i class="ri-loader-4-line ri-spin btn-loader"></i>{{ __('Create Account') }}
+                </button>
+            </div>
         </div>
     </footer>
 

@@ -215,6 +215,7 @@
 
             fetch(`{{ url('/lang') }}/${targetLocale}`, {
                     method: "POST",
+                    credentials: "same-origin",
                     headers: {
                         "X-CSRF-TOKEN": "{{ csrf_token() }}",
                         "Accept": "application/json"
@@ -224,8 +225,8 @@
                 .then(data => {
                     if (data.status) {
                         console.log("Language changed to:", targetLocale);
-                        // Force a full page reload to ensure all content (static and dynamic) is updated
-                        location.reload();
+                        // Use full navigation to ensure session + server-rendered content updates correctly
+                        window.location.href = `{{ url('/lang') }}/${targetLocale}`;
                     }
                 })
                 .catch(error => {

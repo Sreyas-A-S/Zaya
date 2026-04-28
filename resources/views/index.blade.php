@@ -115,25 +115,11 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-14 px-4">
-                @foreach($services as $index => $service)
-                    <!-- Service {{ $index + 1 }} -->
-                    <a href="{{ $service->slug ? route('service-detail', $service->slug) : '#' }}"
-                        class="group cursor-pointer hover:-translate-y-2 transition-transform duration-500"
-                        style="transition-delay: {{ $index * 100 }}ms;">
-                        <div class="h-64 overflow-hidden mb-4 relative">
-                            @php
-                                $imagePath = $service->image ? (str_starts_with($service->image, 'frontend/') ? asset($service->image) : asset('storage/' . $service->image)) : asset('frontend/assets/service-placeholder.png');
-                            @endphp
-                            <img src="{{ $imagePath }}" alt="{{ $service->title }}"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                        </div>
-                        <h3 class="text-xl font-serif text-secondary mb-1">{{ $service->title }}</h3>
-                    </a>
-                @endforeach
+            <div id="home-services-container">
+                @include('partials.frontend.home-services-grid', ['services' => $services])
             </div>
 
-            <div class="text-center mt-12">
+            <div class="text-center mt-6">
                 <a id="services_button_text" href="{{ route('services') }}"
                     class="border border-secondary hover:border-primary text-secondary hover:bg-primary hover:text-white px-8 py-3 rounded-full transition-all text-base lg:text-lg">{{ $settings['services_button_text'] ?? 'Browse All Services' }}</a>
             </div>

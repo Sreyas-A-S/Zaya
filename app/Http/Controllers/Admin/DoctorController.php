@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password as RulesPassword;
 
@@ -640,22 +641,40 @@ class DoctorController extends Controller
             return response()->json(['error' => 'Invalid status.'], 422);
         }
 
+        $user = User::findOrFail($id);
         $doctor = Doctor::where('user_id', $id)->first();
         if (!$doctor) {
             return response()->json(['error' => 'Doctor profile not found.'], 404);
         }
-        $previousStatus = $doctor->status;
-        $doctor->update([
-            'status' => $status
-        ]);
 
-        if ($previousStatus !== 'active' && $status === 'active') {
-            $user = $doctor->user;
-            if ($user) {
+        $previousStatus = strtolower(trim((string) ($doctor->status ?? 'inactive')));
+
+        DB::beginTransaction();
+
+        try {
+            $doctor->update([
+                'status' => $status,
+            ]);
+
+            $user->update([
+                'status' => $status,
+            ]);
+
+            if ($previousStatus !== 'active' && $status === 'active') {
                 $token = Password::broker()->createToken($user);
                 $setPasswordUrl = route('set-password.show', ['token' => $token, 'email' => $user->email]);
                 Mail::to($user->email)->send(new SetPasswordMail($user->email, $setPasswordUrl));
             }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            report($e);
+
+            return response()->json([
+                'error' => 'Doctor status could not be updated or the set password email could not be sent.',
+            ], 500);
         }
 
         return response()->json(['success' => 'Status updated successfully!']);

@@ -231,7 +231,7 @@
             position: relative;
         }
 
-        .date-input-wrapper input[type="date"] {
+        .date-input-wrapper input {
             -webkit-appearance: none;
             appearance: none;
             padding-right: 50px !important;
@@ -243,22 +243,13 @@
             top: 50%;
             transform: translateY(-50%);
             color: #9CA3AF;
-            pointer-events: none;
+            pointer-events: auto;
             font-size: 1.2rem;
             z-index: 10;
+            cursor: pointer;
         }
 
-        .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            cursor: pointer;
-            opacity: 0;
-        }
+        /* Flatpickr uses its own popup calendar; no native date indicator needed */
 
         /* Tom Select Premium Alignment */
         .ts-wrapper {
@@ -556,7 +547,7 @@
                                 <label
                                     class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Date of Birth') }}</label>
                                 <div class="date-input-wrapper">
-                                    <input type="date" name="dob" value="{{ old('dob') }}" id="dob-input"
+                                    <input type="text" name="dob" value="{{ old('dob') }}" id="dob-input"
                                         class="reg-input @error('dob') border-red-500! @enderror"
                                         placeholder="{{ __('dd-mm-yyyy') }}" required>
                                     <i class="ri-calendar-line calendar-icon"></i>
@@ -758,7 +749,7 @@
                                         onfocus="this.removeAttribute('readonly');"
                                         onclick="this.removeAttribute('readonly');">
                                     <button type="button"
-                                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 password-toggle" data-target="password">
+                                        class="absolute right-5 top-[26px] -translate-y-1/2 text-gray-400 hover:text-gray-600 password-toggle" data-target="password">
                                         <i class="ri-eye-line text-lg"></i>
                                     </button>
                                 </div>
@@ -800,7 +791,7 @@
                                         onfocus="this.removeAttribute('readonly');"
                                         onclick="this.removeAttribute('readonly');">
                                     <button type="button"
-                                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 password-toggle" data-target="password_confirmation">
+                                        class="absolute right-5 top-[26px] -translate-y-1/2 text-gray-400 hover:text-gray-600 password-toggle" data-target="password_confirmation">
                                         <i class="ri-eye-line text-lg"></i>
                                     </button>
                                 </div>
@@ -887,33 +878,35 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                             <div class="md:col-span-2">
-                                <label
-                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }}
-                                    <span class="text-red-500">*</span></label>
-                                <div class="flex flex-col sm:flex-row items-center gap-4">
-                                    <div
-                                        class="flex items-center gap-3 bg-[#F9FBF9] p-2 rounded-full border border-[#2E4B3D]/10 shrink-0">
+                                <div class="max-w-3xl mx-auto w-full">
+                                    <label
+                                        class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }}
+                                        <span class="text-red-500">*</span></label>
+                                    <div class="flex flex-col md:flex-row md:items-center gap-4">
                                         <div
-                                            class="bg-white rounded-full flex items-center justify-center h-[52px] w-[150px] overflow-hidden relative border border-gray-100">
-                                            <img src="{{ route('captcha') }}" id="captcha-img" alt="captcha"
-                                                class="w-full h-full object-cover">
+                                            class="flex items-center gap-3 bg-[#F9FBF9] p-2 rounded-full border border-[#2E4B3D]/10 w-full md:w-fit shrink-0 justify-between md:justify-start">
+                                            <div
+                                                class="bg-white rounded-full flex items-center justify-center h-[52px] w-[140px] md:w-[150px] overflow-hidden relative border border-gray-100">
+                                                <img src="{{ route('captcha') }}" id="captcha-img" alt="captcha"
+                                                    class="w-full h-full object-contain filter contrast-125">
+                                            </div>
+                                            <button type="button" onclick="refreshCaptcha()"
+                                                class="w-11 h-11 rounded-full bg-white border border-gray-100 flex items-center justify-center text-secondary hover:bg-secondary hover:text-white transition-all shadow-sm cursor-pointer group">
+                                                <i
+                                                    class="ri-restart-line text-xl group-hover:rotate-180 transition-transform duration-500"></i>
+                                            </button>
                                         </div>
-                                        <button type="button" onclick="refreshCaptcha()"
-                                            class="w-11 h-11 rounded-full bg-white border border-gray-100 flex items-center justify-center text-secondary hover:bg-secondary hover:text-white transition-all shadow-sm cursor-pointer group">
-                                            <i
-                                                class="ri-restart-line text-xl group-hover:rotate-180 transition-transform duration-500"></i>
-                                        </button>
+                                        <div class="flex-1 w-full">
+                                            <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}"
+                                                class="reg-input w-full h-[58px] md:h-[68px] text-center md:text-left text-lg font-bold tracking-[0.2em] uppercase @error('captcha') border-red-500! @enderror"
+                                                maxlength="6" autocomplete="off"
+                                                oninput="this.value = this.value.toUpperCase()">
+                                        </div>
                                     </div>
-                                    <div class="flex-1 w-full">
-                                        <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}"
-                                            class="reg-input w-full h-[68px]! text-center sm:text-left text-lg font-bold tracking-[0.2em] uppercase @error('captcha') border-red-500! @enderror"
-                                            maxlength="6" autocomplete="off"
-                                            oninput="this.value = this.value.toUpperCase()">
-                                    </div>
+                                    @error('captcha')
+                                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                                    @enderror
                                 </div>
-                                @error('captcha')
-                                    <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                                @enderror
                             </div>
                         </div>
 
@@ -956,36 +949,32 @@
                     </div>
                 </div> 
                 -->
-                    </div> <!-- end max-w-5xl -->
-
-
-                    <!-- Form Footer: Already have account & Submit -->
-                    <div
-                        class="bg-[#FDEBCA] -mx-8 md:-mx-14 -mb-8 md:-mb-14 p-8 md:p-10 lg:p-14 rounded-b-[32px] border-t border-[#97563D]/10 mt-12">
-                        <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                        <!-- Form Footer: Already have account & Submit -->
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-8 border-t border-gray-100 pt-10 mt-10">
                             <div class="flex flex-col gap-1 text-center md:text-left">
-                                <p class="text-[#423131] text-base font-medium">{{ __('Already have an account?') }}
+                                <p class="text-gray-500 text-base font-medium">{{ __('Already have an account?') }}
                                 </p>
                                 <a href="{{ route('zaya-login') }}"
-                                    class="text-[#97563D] text-sm font-bold hover:underline flex items-center justify-center md:justify-start gap-1">
+                                    class="text-primary text-sm font-bold hover:underline flex items-center justify-center md:justify-start gap-1">
                                     {{ __('Login to your dashboard') }} <i class="ri-arrow-right-line"></i>
                                 </a>
                             </div>
 
                             <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                                 <a href="{{ route('index') }}"
-                                    class="w-full sm:w-auto text-gray-500 py-3.5 px-8 rounded-full font-medium transition-all hover:bg-white/50 text-center">
+                                    class="w-full sm:w-auto text-gray-500 py-3.5 px-8 rounded-full font-medium transition-all hover:bg-gray-50 text-center">
                                     {{ __('Cancel') }}
                                 </a>
 
                                 <button type="submit" id="submit-btn"
-                                    class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-black text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-xl shadow-[#FABC41]/20">
+                                    class="w-full sm:w-auto flex items-center justify-center whitespace-nowrap bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-black text-base sm:text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-xl shadow-[#FABC41]/20">
                                     <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
-                                    <span class="hidden sm:inline">{!! __('Complete & Proceed') !!}</span>                                    <span class="sm:hidden">{!! __('Proceed & Pay') !!}</span>
+                                    <span class="hidden sm:inline">{!! __('Complete & Proceed') !!}</span>
+                                    <span class="sm:hidden">{!! __('Submit') !!}</span>
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div> <!-- end max-w-5xl -->
 
                 </form>
             </div>
@@ -1427,13 +1416,7 @@
                     });
                 }
 
-                // Set Max Date for DOB (18+ years requirement)
-                const dobInput = document.getElementById('dob-input');
-                if (dobInput) {
-                    const today = new Date();
-                    const maxDate = today.toISOString().split('T')[0];
-                    dobInput.max = maxDate;
-                }
+                // DOB max date is handled by flatpickr (resources/js/app.js)
 
                 // Name Capitalization Helpers
                 const nameFields = ['first_name', 'last_name'];
@@ -1610,6 +1593,22 @@
                 // Match Logic
                 if (confirmPassword.length > 0) {
                     matchIndication.classList.remove('hidden');
+                    
+                    // Hide server-side error alert if present
+                    const errorAlert = document.querySelector('.bg-red-50.border-l-4.border-red-500');
+                    if (errorAlert) {
+                        const errorItems = errorAlert.querySelectorAll('li');
+                        errorItems.forEach(li => {
+                            if (li.textContent.toLowerCase().includes('password confirmation')) {
+                                li.style.display = 'none';
+                            }
+                        });
+                        const visibleErrors = Array.from(errorItems).filter(li => li.style.display !== 'none');
+                        if (visibleErrors.length === 0) {
+                            errorAlert.classList.add('hidden');
+                        }
+                    }
+
                     if (password === confirmPassword) {
                         matchIcon.className = 'ri-checkbox-circle-fill text-sm text-green-500';
                         matchText.textContent = 'Passwords match';
@@ -1687,6 +1686,7 @@
                 const promoTotalFeeHidden = document.getElementById('promo-total-fee-hidden');
 
                 const feeInput = document.getElementById('registration_fee');
+                let isRegistrationFeeEnabled = @json($clientRegistrationFeeEnabled);
                 const feeActualInput = document.getElementById('registration_fee_actual');
                 const feeCurrencyInput = document.getElementById('registration-fee-currency');
                 const countrySelect = document.getElementById('nationality-select');
@@ -1734,6 +1734,7 @@
                             if (feeCurrencyInput) feeCurrencyInput.value = currency;
 
                             const isEnabled = data.enabled !== undefined ? data.enabled : true;
+                            isRegistrationFeeEnabled = isEnabled;
 
                             renderFee(feeValue, isEnabled);
                             if (promoCodeHidden.value) clearPromo();
@@ -1744,7 +1745,7 @@
                     }
                 }
 
-                function renderFee(value, isEnabled = true) {
+                function renderFee(value, isEnabled = isRegistrationFeeEnabled) {
                     const feeDisplay = document.getElementById('registration-fee-display');
                     const feeWrapper = document.getElementById('registration-fee-field-wrapper');
                     const displayValue = value !== undefined ? value : feeInput?.value;

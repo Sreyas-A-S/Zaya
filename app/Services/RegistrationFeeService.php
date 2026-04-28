@@ -7,6 +7,42 @@ use Illuminate\Support\Facades\Http;
 
 class RegistrationFeeService
 {
+    public function getFeeMeta($user, string $role, ?float $amountOverride = null): ?array
+    {
+        $map = [
+            'practitioner' => ['fee' => 'practitioner_registration_fee', 'enabled' => 'practitioner_registration_fee_enabled', 'label' => 'Practitioner'],
+            'doctor' => ['fee' => 'doctor_registration_fee', 'enabled' => 'doctor_registration_fee_enabled', 'label' => 'Doctor'],
+            'mindfulness_practitioner' => ['fee' => 'mindfulness_registration_fee', 'enabled' => 'mindfulness_registration_fee_enabled', 'label' => 'Mindfulness Counsellor'],
+            'yoga_therapist' => ['fee' => 'yoga_registration_fee', 'enabled' => 'yoga_registration_fee_enabled', 'label' => 'Yoga Therapist'],
+            'translator' => ['fee' => 'translator_registration_fee', 'enabled' => 'translator_registration_fee_enabled', 'label' => 'Translator'],
+            'client' => ['fee' => 'client_registration_fee', 'enabled' => 'client_registration_fee_enabled', 'label' => 'Client'],
+        ];
+
+        if (!isset($map[$role])) {
+            return null;
+        }
+
+        $language = session('locale', 'en');
+        $countryCode = $this->deriveCountryCodeFromUser($user);
+        $settings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
+
+        $fee = (float) ($settings[$map[$role]['fee']] ?? 0);
+        if (is_numeric($amountOverride)) {
+            $fee = max(0.0, (float) $amountOverride);
+        }
+
+        $currencyKey = $map[$role]['fee'] . '_currency';
+        $feeCurrency = strtoupper($settings[$currencyKey] ?? config('currencies.default', 'EUR'));
+        $enabled = filter_var($settings[$map[$role]['enabled']] ?? '1', FILTER_VALIDATE_BOOLEAN);
+
+        return [
+            'enabled' => $enabled,
+            'fee' => $fee,
+            'currency' => $feeCurrency,
+            'label' => $map[$role]['label'],
+        ];
+    }
+
     public function createPaymentLink($user, string $role, ?float $amountOverride = null, array $extraNotes = []): ?array
     {
         $map = [
@@ -56,59 +92,71 @@ class RegistrationFeeService
 
         // Use fee currency if available, otherwise derive from user country
         $currency = $feeCurrency;
-// Fetch phone and currency from related profiles if not on user
-$phone = $user->phone ?? $user->mobile ?? '';
-$payoutCurrency = $user->payout_currency ?? $user->currency ?? $currency;
+        // Fetch phone and currency from related profiles if not on user
+        $phone = $user->phone ?? $user->mobile ?? '';
+        $payoutCurrency = $user->payout_currency ?? $user->currency ?? $currency;
 
-if (!$phone) {
-    if (($role === 'practitioner' || ($user->role ?? '') === 'practitioner') && $user->practitioner) {
-        $phone = $user->practitioner->phone;
-        $payoutCurrency = $user->practitioner->payout_currency ?? $payoutCurrency;
-    } elseif (($role === 'client' || ($user->role ?? '') === 'patient' || ($user->role ?? '') === 'client') && $user->patient) {
-        $phone = $user->patient->phone;
-    }
-}
-
-$notes = array_merge([
-    'user_id' => $user->id,
-    'role' => $role,
-    'source' => 'registration',
-    'payout_currency' => (string) $payoutCurrency,
-], $extraNotes);
-
-$paymentUrl = null;
-$orderId = null;
-
-try {
-    $response = Http::withOptions(['verify' => (bool) $verifySsl])
-        ->withBasicAuth($razorpayKey, $razorpaySecret)
-        ->post('https://api.razorpay.com/v1/payment_links', [
-            'amount' => (int) round($fee * 100),
-            'currency' => $currency,
-            'description' => 'Registration Fee - ' . ($map[$role]['label'] ?? ucfirst($role)),
-            'customer' => [
-                'name' => (string) ($user->name ?? 'User'),
-                'email' => (string) $user->email,
-                'contact' => (string) ($phone ?: ''),
-            ],
-            'notify' => [
-                'sms' => false,
-                'email' => true,
-            ],
-            'callback_url' => route('registration-fees.callback'),
-            'callback_method' => 'get',
-            'notes' => array_map('strval', $notes),
-        ]);
-
-        if ($response->successful()) {
-            $paymentUrl = $response->json('short_url');
-            $orderId = $response->json('id');
-        } else {
-            \Log::error('Razorpay Payment Link Error: ' . $response->body());
+        if (!$phone) {
+            if (($role === 'practitioner' || ($user->role ?? '') === 'practitioner') && $user->practitioner) {
+                $phone = $user->practitioner->phone;
+                $payoutCurrency = $user->practitioner->payout_currency ?? $payoutCurrency;
+            } elseif (($role === 'doctor' || ($user->role ?? '') === 'doctor') && $user->doctor) {
+                $phone = $user->doctor->phone;
+                $payoutCurrency = $user->doctor->payout_currency ?? $payoutCurrency;
+            } elseif (($role === 'mindfulness_practitioner' || ($user->role ?? '') === 'mindfulness_practitioner') && $user->mindfulnessPractitioner) {
+                $phone = $user->mindfulnessPractitioner->phone;
+                $payoutCurrency = $user->mindfulnessPractitioner->payout_currency ?? $payoutCurrency;
+            } elseif (($role === 'yoga_therapist' || ($user->role ?? '') === 'yoga_therapist') && $user->yogaTherapist) {
+                $phone = $user->yogaTherapist->phone;
+                $payoutCurrency = $user->yogaTherapist->payout_currency ?? $payoutCurrency;
+            } elseif (($role === 'translator' || ($user->role ?? '') === 'translator') && $user->translator) {
+                $phone = $user->translator->phone;
+                $payoutCurrency = $user->translator->payout_currency ?? $payoutCurrency;
+            } elseif (($role === 'client' || ($user->role ?? '') === 'patient' || ($user->role ?? '') === 'client') && $user->patient) {
+                $phone = $user->patient->phone;
+            }
         }
-    } catch (\Exception $e) {
-        \Log::error('Razorpay Connection Error: ' . $e->getMessage());
-    }
+
+        $notes = array_merge([
+            'user_id' => $user->id,
+            'role' => $role,
+            'source' => 'registration',
+            'payout_currency' => (string) $payoutCurrency,
+        ], $extraNotes);
+
+        $paymentUrl = null;
+        $orderId = null;
+
+        try {
+            $response = Http::withOptions(['verify' => (bool) $verifySsl])
+                ->withBasicAuth($razorpayKey, $razorpaySecret)
+                ->post('https://api.razorpay.com/v1/payment_links', [
+                    'amount' => (int) round($fee * 100),
+                    'currency' => $currency,
+                    'description' => 'Registration Fee - ' . ($map[$role]['label'] ?? ucfirst($role)),
+                    'customer' => [
+                        'name' => (string) ($user->name ?? 'User'),
+                        'email' => (string) $user->email,
+                        'contact' => (string) ($phone ?: ''),
+                    ],
+                    'notify' => [
+                        'sms' => false,
+                        'email' => true,
+                    ],
+                    'callback_url' => route('registration-fees.callback'),
+                    'callback_method' => 'get',
+                    'notes' => array_map('strval', $notes),
+                ]);
+
+            if ($response->successful()) {
+                $paymentUrl = $response->json('short_url');
+                $orderId = $response->json('id');
+            } else {
+                \Log::error('Razorpay Payment Link Error: ' . $response->body());
+            }
+        } catch (\Exception $e) {
+            \Log::error('Razorpay Connection Error: ' . $e->getMessage());
+        }
 
         if (!$paymentUrl) {
             return null;
