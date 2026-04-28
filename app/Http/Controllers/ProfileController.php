@@ -592,9 +592,13 @@ class ProfileController extends Controller
     public function conferences(Request $request)
     {
         $user = Auth::user();
-        $conferences = $this->getBookingQuery($user)
+        $conferenceBookingIds = $this->getBookingQuery($user)
             ->where('mode', 'online')
-            ->latest()
+            ->select('bookings.id');
+
+        $conferences = Conference::with(['booking.practitioner.user', 'booking.user'])
+            ->whereIn('booking_id', $conferenceBookingIds)
+            ->latest('start_time')
             ->paginate(15);
 
         if ($request->ajax()) {

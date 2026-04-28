@@ -36,11 +36,16 @@
                                         $targetUser = ($user->role === 'client' || $user->role === 'patient') 
                                             ? ($conference->booking->practitioner->user ?? null)
                                             : ($conference->booking->user ?? null);
+                                        $targetUserName = $targetUser?->name ?: trim(collect([
+                                            $targetUser?->first_name,
+                                            $targetUser?->middle_name,
+                                            $targetUser?->last_name,
+                                        ])->filter()->implode(' '));
                                     @endphp
                                     <img src="{{ ($targetUser && $targetUser->profile_pic) ? (str_starts_with($targetUser->profile_pic, 'http') ? $targetUser->profile_pic : asset('storage/' . $targetUser->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" class="w-full h-full object-cover">
                                 </div>
                                 <span class="text-sm font-medium text-gray-900">
-                                    {{ $targetUser->name ?? 'N/A' }}
+                                    {{ $targetUserName ?: 'N/A' }}
                                 </span>
                             </div>
                         </td>
