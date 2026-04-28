@@ -34,7 +34,7 @@
             height: 72px;
             width: auto;
             display: block;
-            margin: 6px auto;
+            margin: 6px auto 0px auto; /* Adjusted from 6px auto */
         }
 
         .content {
