@@ -350,14 +350,20 @@
                             <input type="text" name="city" value="{{ old('city') }}"
                                 pattern="^[A-Za-z\s]+$" title="Only alphabets and spaces are allowed"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="{{ __('Enter City') }}" required autocomplete="off">
+                                placeholder="{{ __('Enter City') }}" required autocomplete="off"
+                                readonly
+                                onfocus="this.removeAttribute('readonly');"
+                                onclick="this.removeAttribute('readonly');">
                         </div>
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State (Optional)') }}</label>
                             <input type="text" name="state" value="{{ old('state') }}"
                                 pattern="^[A-Za-z\s]+$" title="Only alphabets and spaces are allowed"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="{{ __('Enter State') }}" autocomplete="off">
+                                placeholder="{{ __('Enter State') }}" autocomplete="off"
+                                readonly
+                                onfocus="this.removeAttribute('readonly');"
+                                onclick="this.removeAttribute('readonly');">
                         </div>
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Zip Code') }}</label>
@@ -1181,11 +1187,14 @@
 
                 // Helper: populate address fields from geo data
                 function applyPractitionerGeo(city, region, postal, countryName) {
+                    // Prefilling city and state disabled per user request
+                    /*
                     const cityInput = document.querySelector("input[name='city']");
                     if (cityInput && !cityInput.value && city) cityInput.value = city;
 
                     const stateInput = document.querySelector("input[name='state']");
                     if (stateInput && !stateInput.value && region) stateInput.value = region;
+                    */
 
                     const zipInput = document.querySelector("input[name='zip_code']");
                     if (zipInput && !zipInput.value && postal) zipInput.value = postal;

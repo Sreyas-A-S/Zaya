@@ -68,9 +68,9 @@
             <p class="text-gray-600 text-base mb-10">Experience the profound healing of Zaya Wellness Sanctuary.</p>
             <div class="flex flex-wrap justify-center gap-4">
                 <a href="{{ route('book-session', ['practitioner' => $practitioner->slug]) }}"
-                    class="bg-[#2E4B3D] text-white px-8 py-3 rounded-full text-base font-medium transition-all shadow-md hover:shadow-lg">Book a Session</a>
+                    class="bg-[#2E4B3D] text-white px-8 py-3 rounded-full text-base font-medium transition-all shadow-md hover:shadow-lg" data-i18n="{{ $site_settings['cta_book_session_btn'] ?? 'Book a Session' }}">{{ __($site_settings['cta_book_session_btn'] ?? 'Book a Session') }}</a>
                 <a href="{{ route('practitioner-detail', $practitioner->slug) }}"
-                    class="border border-[#2E4B3D] text-[#2E4B3D] px-8 py-3 rounded-full text-base font-medium transition-all hover:bg-[#2E4B3D] hover:text-white">View Full Profile</a>
+                    class="border border-[#2E4B3D] text-[#2E4B3D] px-8 py-3 rounded-full text-base font-medium transition-all hover:bg-[#2E4B3D] hover:text-white" data-i18n="{{ $site_settings['view_full_profile_btn'] ?? 'View Full Profile' }}">{{ __($site_settings['view_full_profile_btn'] ?? 'View Full Profile') }}</a>
             </div>
         </div>
     </section>

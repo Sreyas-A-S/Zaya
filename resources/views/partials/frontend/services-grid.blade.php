@@ -16,8 +16,8 @@
                     {!! Str::limit(strip_tags($service->description), 100) !!}
                 </p>
                 <div class="flex items-center justify-between mt-auto">
-                    <span class="text-secondary text-sm font-medium hover:underline">Read More...</span>
-                    <span class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all">Book a Session</span>
+                    <span class="text-secondary text-sm font-medium hover:underline" data-i18n="{{ $site_settings['read_more_link'] ?? 'Read More...' }}">{{ __($site_settings['read_more_link'] ?? 'Read More...') }}</span>
+                    <span class="bg-secondary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary transition-all" data-i18n="{{ $site_settings['cta_book_session_btn'] ?? 'Book a Session' }}">{{ __($site_settings['cta_book_session_btn'] ?? 'Book a Session') }}</span>
                 </div>
             </div>
         </div>
