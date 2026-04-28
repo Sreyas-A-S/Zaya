@@ -3132,6 +3132,12 @@
             passwordInput.addEventListener('input', checkPasswordMatch);
             confirmPasswordInput.addEventListener('input', checkPasswordMatch);
 
+            // Show requirements on focus
+            passwordInput.addEventListener('focus', function() {
+                document.getElementById('password-requirements').classList.remove('hidden');
+                document.getElementById('password-strength-indication').classList.remove('hidden');
+            });
+
             // Required validation on blur
             passwordInput.addEventListener('blur', function() {
                 if (this.value.length === 0) {

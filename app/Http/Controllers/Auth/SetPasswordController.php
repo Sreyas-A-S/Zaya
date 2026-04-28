@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class SetPasswordController extends Controller
@@ -43,6 +44,8 @@ class SetPasswordController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->password = Hash::make($password);
+                $user->remember_token = Str::random(60);
+                $user->status = 'active';
                 if (!$user->email_verified_at) {
                     $user->email_verified_at = now();
                 }
@@ -57,4 +60,3 @@ class SetPasswordController extends Controller
         return redirect()->route('login')->with('success', 'Your password has been set successfully. Please log in.');
     }
 }
-

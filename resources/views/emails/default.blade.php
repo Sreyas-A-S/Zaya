@@ -223,7 +223,7 @@
                     @endif
                 </table>
 
-                @if(!empty($credentials['login_url']))
+                @if(!empty($credentials['login_url']) && ($credentials['show_button'] ?? true))
                     <div style="margin-top: 28px;">
                         <a href="{{ $credentials['login_url'] }}"
                             style="display:inline-block;background:#97563D;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:9999px;font-weight:600;">

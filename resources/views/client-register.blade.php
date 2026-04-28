@@ -955,7 +955,7 @@
                     </div>
                 </div> 
                 -->
-                    </div> <!-- end max-w-5xl -->
+                     <!-- end max-w-5xl -->
 
                     <!-- Form Footer: Already have account & Submit -->
                     <div class="bg-[#FFEAC6] -mx-8 md:-mx-14 -mb-8 md:-mb-14 p-8 md:p-14 rounded-b-[32px] mt-10">
@@ -976,10 +976,13 @@
                                 </a>
 
                                 <button type="submit" id="submit-btn"
-                                    class="w-full sm:w-auto bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-black text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-xl shadow-[#FABC41]/20">
+                                    class="w-full sm:w-auto flex items-center justify-center whitespace-nowrap bg-[#FABC41] text-[#423131] py-4 px-12 rounded-full font-black text-base sm:text-lg transition-all hover:bg-[#E8AA32] hover:-translate-y-0.5 shadow-xl shadow-[#FABC41]/20">
                                     <i class="ri-loader-4-line ri-spin btn-loader hidden mr-2"></i>
-                                    <span class="hidden sm:inline">{!! __('Complete & Proceed') !!}</span>                                    <span class="sm:hidden">{!! __('Proceed & Pay') !!}</span>
+                                    <span class="hidden sm:inline">{!! __('Complete & Proceed') !!}</span>
+                                    <span class="sm:hidden">{!! __('Submit') !!}</span>
                                 </button>
+
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -1514,6 +1517,12 @@
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('password_confirmation');
             const matchError = document.getElementById('password-match-error');
+
+            // Show requirements on focus
+            passwordInput.addEventListener('focus', function() {
+                document.getElementById('password-requirements').classList.remove('hidden');
+                document.getElementById('password-strength-indication').classList.remove('hidden');
+            });
 
             function checkPasswordMatch() {
                 const password = passwordInput.value;
