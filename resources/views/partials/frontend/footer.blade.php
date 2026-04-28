@@ -1,11 +1,12 @@
 <!-- Footer -->
-<footer class="text-[#2E2E2E]">
+<footer class="text-[#2E2E2E]" style="{{ request()->routeIs('client-register') ? 'background: #FFEAC6;' : '' }}">
     <div class="container-fluid mx-auto relative z-10">
         <!-- Newsletter Section -->
         <div
-            class="bg-[#79584B] px-6 py-8 md:px-12 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+            class="px-6 py-8 md:px-12 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8"
+            style="{{ request()->routeIs('client-register') ? 'background: #FFEAC6;' : 'background: #79584B;' }}">
             <h3 id="footer-newsletter-title"
-                class="text-white text-sm sm:text-base md:text-xl font-normal text-center md:text-left font-sans!"
+                class="{{ request()->routeIs('client-register') ? 'text-secondary' : 'text-white' }} text-sm sm:text-base md:text-xl font-normal text-center md:text-left font-sans!"
                 data-i18n="{{ $site_settings['newsletter_title'] ?? 'Join our newsletter for weekly wellness tips.' }}">
                 {{ __($site_settings['newsletter_title'] ?? 'Join our newsletter for weekly wellness tips.') }}
             </h3>
@@ -21,7 +22,9 @@
         </div>
 
         <!-- Main Footer Content -->
-        <div class="bg-[linear-gradient(120deg,#FFE7CF,#DFAF7F)] relative">
+        <div
+            class="relative"
+            style="{{ request()->routeIs('client-register') ? 'background: #FFEAC6;' : 'background: linear-gradient(120deg,#FFE7CF,#DFAF7F);' }}">
             <img src="{{ asset('frontend/assets/MinimalistGreenLeaves.png') }}" alt="Mobile Footer Leaves Image"
                 class="block lg:hidden absolute bottom-0 left-0 h-8 md:h-18 z-0 pointer-events-none">
             <img src="{{ asset('frontend/assets/MinimalistGreenLeaves.png') }}" alt="Mobile Footer Leaves Image"

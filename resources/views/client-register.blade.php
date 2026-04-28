@@ -231,7 +231,7 @@
             position: relative;
         }
 
-        .date-input-wrapper input[type="date"] {
+        .date-input-wrapper input {
             -webkit-appearance: none;
             appearance: none;
             padding-right: 50px !important;
@@ -243,22 +243,13 @@
             top: 50%;
             transform: translateY(-50%);
             color: #9CA3AF;
-            pointer-events: none;
+            pointer-events: auto;
             font-size: 1.2rem;
             z-index: 10;
+            cursor: pointer;
         }
 
-        .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            cursor: pointer;
-            opacity: 0;
-        }
+        /* Flatpickr uses its own popup calendar; no native date indicator needed */
 
         /* Tom Select Premium Alignment */
         .ts-wrapper {
@@ -556,7 +547,7 @@
                                 <label
                                     class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Date of Birth') }}</label>
                                 <div class="date-input-wrapper">
-                                    <input type="date" name="dob" value="{{ old('dob') }}" id="dob-input"
+                                    <input type="text" name="dob" value="{{ old('dob') }}" id="dob-input"
                                         class="reg-input @error('dob') border-red-500! @enderror"
                                         placeholder="{{ __('dd-mm-yyyy') }}" required>
                                     <i class="ri-calendar-line calendar-icon"></i>
@@ -887,33 +878,35 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                             <div class="md:col-span-2">
-                                <label
-                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }}
-                                    <span class="text-red-500">*</span></label>
-                                <div class="flex flex-col md:flex-row md:items-center gap-4">
-                                    <div
-                                        class="flex items-center gap-3 bg-[#F9FBF9] p-2 rounded-full border border-[#2E4B3D]/10 w-fit shrink-0">
+                                <div class="max-w-3xl mx-auto w-full">
+                                    <label
+                                        class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Captcha Verification') }}
+                                        <span class="text-red-500">*</span></label>
+                                    <div class="flex flex-col md:flex-row md:items-center gap-4">
                                         <div
-                                            class="bg-white rounded-full flex items-center justify-center h-[52px] w-[140px] md:w-[150px] overflow-hidden relative border border-gray-100">
-                                            <img src="{{ route('captcha') }}" id="captcha-img" alt="captcha"
-                                                class="w-full h-full object-contain filter contrast-125">
+                                            class="flex items-center gap-3 bg-[#F9FBF9] p-2 rounded-full border border-[#2E4B3D]/10 w-full md:w-fit shrink-0 justify-between md:justify-start">
+                                            <div
+                                                class="bg-white rounded-full flex items-center justify-center h-[52px] w-[140px] md:w-[150px] overflow-hidden relative border border-gray-100">
+                                                <img src="{{ route('captcha') }}" id="captcha-img" alt="captcha"
+                                                    class="w-full h-full object-contain filter contrast-125">
+                                            </div>
+                                            <button type="button" onclick="refreshCaptcha()"
+                                                class="w-11 h-11 rounded-full bg-white border border-gray-100 flex items-center justify-center text-secondary hover:bg-secondary hover:text-white transition-all shadow-sm cursor-pointer group">
+                                                <i
+                                                    class="ri-restart-line text-xl group-hover:rotate-180 transition-transform duration-500"></i>
+                                            </button>
                                         </div>
-                                        <button type="button" onclick="refreshCaptcha()"
-                                            class="w-11 h-11 rounded-full bg-white border border-gray-100 flex items-center justify-center text-secondary hover:bg-secondary hover:text-white transition-all shadow-sm cursor-pointer group">
-                                            <i
-                                                class="ri-restart-line text-xl group-hover:rotate-180 transition-transform duration-500"></i>
-                                        </button>
+                                        <div class="flex-1 w-full">
+                                            <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}"
+                                                class="reg-input w-full h-[58px] md:h-[68px] text-center md:text-left text-lg font-bold tracking-[0.2em] uppercase @error('captcha') border-red-500! @enderror"
+                                                maxlength="6" autocomplete="off"
+                                                oninput="this.value = this.value.toUpperCase()">
+                                        </div>
                                     </div>
-                                    <div class="flex-1 w-full">
-                                        <input type="text" name="captcha" placeholder="{{ __('Enter Code') }}"
-                                            class="reg-input w-full h-[58px] md:h-[68px] text-center md:text-left text-lg font-bold tracking-[0.2em] uppercase @error('captcha') border-red-500! @enderror"
-                                            maxlength="6" autocomplete="off"
-                                            oninput="this.value = this.value.toUpperCase()">
-                                    </div>
+                                    @error('captcha')
+                                        <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
+                                    @enderror
                                 </div>
-                                @error('captcha')
-                                    <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
-                                @enderror
                             </div>
                         </div>
 
@@ -1422,13 +1415,7 @@
                     });
                 }
 
-                // Set Max Date for DOB (18+ years requirement)
-                const dobInput = document.getElementById('dob-input');
-                if (dobInput) {
-                    const today = new Date();
-                    const maxDate = today.toISOString().split('T')[0];
-                    dobInput.max = maxDate;
-                }
+                // DOB max date is handled by flatpickr (resources/js/app.js)
 
                 // Name Capitalization Helpers
                 const nameFields = ['first_name', 'last_name'];

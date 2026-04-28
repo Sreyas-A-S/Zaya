@@ -311,7 +311,8 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('DOB') }}</label>
-                            <input type="date" name="dob" value="{{ old('dob') }}"
+                            <input type="text" name="dob" value="{{ old('dob') }}"
+                                data-flatpickr="date"
                                 max="{{ now()->format('Y-m-d') }}"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                 placeholder="{{ __('DD/MM/YYYY') }}" required>
