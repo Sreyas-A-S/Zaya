@@ -677,7 +677,7 @@
                         </div>
 
                         <!-- Row 6: Zip Code -->
-                        <div class="grid grid-cols-1 mb-10">
+                        <!-- <div class="grid grid-cols-1 mb-10">
                             <div>
                                 <label
                                     class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Zip Code') }}</label>
@@ -687,10 +687,10 @@
                                     oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)"
                                     autocomplete="off">
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Consultation Preferences -->
-                        <div class="mb-10">
+                        <!-- <div class="mb-10">
                             <label
                                 class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Preferred Speciality of Consultation') }}</label>
                             <div
@@ -716,7 +716,7 @@
                         </div>
 
                         <!-- Row: Languages & Referral -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
+                        <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                             <div>
                                 <label
                                     class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Languages Spoken') }}</label>
@@ -741,7 +741,7 @@
                                     <option value="Other">{{ __('Other Sources') }}</option>
                                 </select>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                             <div>
