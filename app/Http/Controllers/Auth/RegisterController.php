@@ -274,6 +274,22 @@ class RegisterController extends Controller
                     $paymentLink = $feeService->createPaymentLink($user, $user->role, $feeOverride, $promoNotes);
                 }
 
+                // If a fee is enabled and > 0 but we couldn't create a payment link,
+                // do not silently succeed — surface a clear error so the UI doesn't show a success toast.
+                if (!$paymentLink) {
+                    $meta = $feeService->getFeeMeta($user, $user->role, $feeOverride);
+                    if ($meta && ($meta['enabled'] ?? false) && (float) ($meta['fee'] ?? 0) > 0) {
+                        if ($request->wantsJson()) {
+                            return response()->json([
+                                'message' => 'Registration saved, but payment could not be initiated. Please contact support or try again later.',
+                            ], 503);
+                        }
+                        return redirect()
+                            ->route('zaya-login')
+                            ->with('error', 'Registration saved, but payment could not be initiated. Please contact support.');
+                    }
+                }
+
                 if ($paymentLink) {
                     // Redirect to payment immediately
                     if ($request->wantsJson()) {
@@ -305,6 +321,20 @@ class RegisterController extends Controller
                 $paymentLink = null;
             } else {
                 $paymentLink = $feeService->createPaymentLink($user, 'client', $feeOverride, $promoNotes);
+            }
+
+            if (!$paymentLink) {
+                $meta = $feeService->getFeeMeta($user, 'client', $feeOverride);
+                if ($meta && ($meta['enabled'] ?? false) && (float) ($meta['fee'] ?? 0) > 0) {
+                    if ($request->wantsJson()) {
+                        return response()->json([
+                            'message' => 'Registration saved, but payment could not be initiated. Please contact support or try again later.',
+                        ], 503);
+                    }
+                    return redirect()
+                        ->route('zaya-login')
+                        ->with('error', 'Registration saved, but payment could not be initiated. Please contact support.');
+                }
             }
 
             if ($paymentLink) {
