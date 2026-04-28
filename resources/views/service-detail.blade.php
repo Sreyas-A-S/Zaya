@@ -55,7 +55,7 @@
                 <h1 class="text-2xl md:text-4xl font-sans! font-bold text-secondary mb-2 tracking-tight">{{ $service->title }}</h1>
                 <div class="flex items-center gap-2 text-gray-400 text-sm">
                     <i class="ri-shield-check-line text-primary"></i>
-                    <span>Authentic Zaya Wellness Service</span>
+                    <span>{{ __('Authentic Zaya Wellness Service') }}</span>
                 </div>
             </div>
             <div class="flex items-center gap-4 w-full sm:w-auto">
