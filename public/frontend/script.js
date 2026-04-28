@@ -187,12 +187,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Testimonial Slider
         if (document.querySelector('.testimonial-slider')) {
-            // const slidesCount = document.querySelectorAll('.testimonial-slider .swiper-slide').length;
+            const slidesCount = document.querySelectorAll('.testimonial-slider .swiper-slide').length;
             new SwiperLib('.testimonial-slider', {
-                slidesPerView: '1',
+                slidesPerView: 1,
                 spaceBetween: 40,
                 centeredSlides: false,
-                // loop: slidesCount >= 2,
+                loop: slidesCount >= 2,
+                loopAdditionalSlides: 10,
+                loopPreventsSliding: false,
                 speed: 800,
                 autoplay: {
                     delay: 3000,
@@ -207,34 +209,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 breakpoints: {
                     640: {
-                        slidesPerView: '2',
+                        slidesPerView: 2,
                         spaceBetween: 50,
                         centeredSlides: false,
-                        // loop: slidesCount >= 4,
                     },
                     768: {
-                        slidesPerView: '2',
+                        slidesPerView: 2,
                         spaceBetween: 30,
                         centeredSlides: false,
-                        // loop: slidesCount >= 6,
                     },
                     1024: {
-                        slidesPerView: '3',
+                        slidesPerView: 3,
                         spaceBetween: 50,
                         centeredSlides: false,
-                        // loop: slidesCount >= 8,
                     },
                     1280: {
-                        slidesPerView: '4',
+                        slidesPerView: 4,
                         spaceBetween: 50,
                         centeredSlides: false,
-                        // loop: slidesCount >= 8,
                     },
                     1536: {
-                        slidesPerView: '5',
+                        slidesPerView: 5,
                         spaceBetween: 50,
                         centeredSlides: false,
-                        // loop: slidesCount >= 8,
                     },
                 }
             });

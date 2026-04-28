@@ -444,7 +444,7 @@
                                     </form>
 
                                     <div class="text-center mt-5">
-                                        <p class="mb-0">Already have an account? <a class="fw-bold text-primary" href="{{ route('login') }}">Sign in here</a></p>
+                                        <p class="mb-0">{{ __('Already have an account?') }} <a class="fw-bold text-primary" href="{{ route('login') }}">{{ __('Sign in here') }}</a></p>
                                     </div>
                                 </div>
                             </div>

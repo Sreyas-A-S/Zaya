@@ -250,7 +250,7 @@
                                     readonly
                                     onfocus="this.removeAttribute('readonly');"
                                     onclick="this.removeAttribute('readonly');">
-                                <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg z-20 password-toggle" data-target="password">
+                                <button type="button" class="absolute right-4 top-[24px] -translate-y-1/2 cursor-pointer text-gray-500 text-lg z-20 password-toggle" data-target="password">
                                     <i class="ri-eye-line"></i>
                                 </button>
                             </div>
@@ -293,7 +293,7 @@
                                     readonly
                                     onfocus="this.removeAttribute('readonly');"
                                     onclick="this.removeAttribute('readonly');">
-                                <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg z-20 password-toggle" data-target="password_confirmation">
+                                <button type="button" class="absolute right-4 top-[24px] -translate-y-1/2 cursor-pointer text-gray-500 text-lg z-20 password-toggle" data-target="password_confirmation">
                                     <i class="ri-eye-line"></i>
                                 </button>
                             </div>
@@ -833,17 +833,27 @@
                                 @enderror
                             </div>
                 </div>
-                <div class="flex items-center justify-end gap-4 md:gap-8 mt-12 pt-8 border-t border-gray-100">
-                    <button type="button"
-                        class="text-[#594B4B] font-normal text-base transition-all duration-200 cursor-pointer bg-transparent border-none py-3.5 px-6 hover:text-gray-700"
-                        id="back-btn" onclick="previousTab()">
-                        <span id="back-btn-text">{{ __('← Back to Website') }}</span>
-                    </button>
-                    <button type="button"
-                        class="bg-[#F5A623] text-[#423131] py-3.5 px-8 rounded-full font-normal text-base transition-all duration-300 cursor-pointer border-none hover:bg-[#A87139] hover:text-white hover:-translate-y-0.5 shadow-lg shadow-[#F5A623]/20"
-                        id="next-btn" onclick="nextTab()">
-                        <span id="next-btn-text">{!! __('Save & Continue') !!}</span>
-                    </button>
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-6 mt-12 pt-8 border-t border-gray-100">
+                    <div class="flex flex-col gap-1 text-center sm:text-left">
+                        <p class="text-gray-500 text-sm font-medium">{{ __('Already have an account?') }}
+                        </p>
+                        <a href="{{ route('zaya-login') }}"
+                            class="text-primary text-xs font-bold hover:underline flex items-center justify-center sm:justify-start gap-1">
+                            {{ __('Login to your dashboard') }} <i class="ri-arrow-right-line"></i>
+                        </a>
+                    </div>
+                    <div class="flex items-center justify-end gap-4 md:gap-8 w-full sm:w-auto">
+                        <button type="button"
+                            class="text-[#594B4B] font-normal text-base transition-all duration-200 cursor-pointer bg-transparent border-none py-3.5 px-6 hover:text-gray-700"
+                            id="back-btn" onclick="previousTab()">
+                            <span id="back-btn-text">{{ __('← Back to Website') }}</span>
+                        </button>
+                        <button type="button"
+                            class="bg-[#F5A623] text-[#423131] py-3.5 px-8 rounded-full font-normal text-base transition-all duration-300 cursor-pointer border-none hover:bg-[#A87139] hover:text-white hover:-translate-y-0.5 shadow-lg shadow-[#F5A623]/20"
+                            id="next-btn" onclick="nextTab()">
+                            <span id="next-btn-text">{!! __('Save & Continue') !!}</span>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -922,8 +932,9 @@
             const roleValue = document.querySelector('input[name="role"]')?.value || 'practitioner';
             const feeInput = document.querySelector('input[name="registration_fee"]');
             const feeActualInput = document.querySelector('input[name="registration_fee_actual"]');
+            let isRegistrationFeeEnabled = @json($practitionerRegistrationFeeEnabled);
 
-            function renderRegistrationFee(isEnabled = true) {
+            function renderRegistrationFee(isEnabled = isRegistrationFeeEnabled) {
                 const feeContainer = document.querySelector('[data-registration-fee-container]');
                 const feeWrapper = document.getElementById('registration-fee-field-wrapper');
                 if (!feeContainer) return;
@@ -989,6 +1000,7 @@
                             const feeValue = parseFloat(data.fee || 0);
                             const currency = data.currency || 'EUR';
                             isEnabled = data.enabled !== undefined ? data.enabled : true;
+                            isRegistrationFeeEnabled = isEnabled;
                             
                             if (feeInput && feeActualInput) {
                                 feeActualInput.value = feeValue.toFixed(2);
@@ -1431,26 +1443,7 @@
             });
 
             if (currentTab === 1) {
-                const pwd = document.querySelector('input[name="password"]');
-                const conf = document.querySelector('input[name="password_confirmation"]');
-                if (pwd && conf && conf.value !== pwd.value) {
-                    conf.classList.add('border-red-500', 'focus:border-red-500');
-                    const err = document.createElement('p');
-                    err.className = 'error-message text-red-500 text-sm mt-1 absolute left-6';
-                    err.textContent = '{{ __('The password confirmation does not match ') }}';
-                    conf.parentElement.style.position = 'relative';
-                    conf.parentElement.appendChild(err);
-                    isValid = false;
-
-                    // Add real-time clearance for confirmation
-                    conf.addEventListener('input', function() {
-                        this.classList.remove('border-red-500', 'focus:border-red-500');
-                        const errEl = this.parentElement ? this.parentElement.querySelector('.error-message') : null;
-                        if (errEl) errEl.remove();
-                    }, {
-                        once: true
-                    });
-                }
+                // Password validation is handled real-time by initPasswordValidation()
             }
 
             return isValid;
@@ -3090,6 +3083,25 @@
                 if (confirmPassword.length > 0) {
                     matchIndication.classList.remove('hidden');
                     document.getElementById('confirm-error').classList.add('hidden');
+                    
+                    // Hide server-side error alert if present
+                    const errorAlert = document.querySelector('.bg-red-50.border-l-4.border-red-500');
+                    if (errorAlert) {
+                        // If it contains a password confirmation error, we might want to hide it or specific LI
+                        const errorItems = errorAlert.querySelectorAll('li');
+                        errorItems.forEach(li => {
+                            if (li.textContent.toLowerCase().includes('password confirmation')) {
+                                li.style.display = 'none';
+                            }
+                        });
+                        
+                        // If no more visible errors, hide the whole alert
+                        const visibleErrors = Array.from(errorItems).filter(li => li.style.display !== 'none');
+                        if (visibleErrors.length === 0) {
+                            errorAlert.classList.add('hidden');
+                        }
+                    }
+
                     if (password === confirmPassword) {
                         matchIcon.className = 'ri-checkbox-circle-fill text-sm text-green-500';
                         matchText.textContent = 'Passwords match';

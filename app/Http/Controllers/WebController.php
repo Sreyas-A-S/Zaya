@@ -90,7 +90,9 @@ class WebController extends Controller
                 $testimonial->is_liked = $testimonial->likes()->where('ip_address', $ip)->exists();
             }
         });
-        $services = Service::where('status', true)->orderBy('order_column')->get();
+        $services = Service::where('status', true)
+            ->orderBy('order_column')
+            ->paginate(8);
         $settings = HomepageSetting::getAllSettings($language);
         $latestAnnouncement = $this->getLatestAnnouncement();
 
@@ -258,6 +260,16 @@ class WebController extends Controller
             })->values();
 
             $services = collect();
+
+            $perPage = 8;
+            $page = (int) $request->get('page', 1);
+            $servicePackages = new \Illuminate\Pagination\LengthAwarePaginator(
+                $servicePackages->forPage($page, $perPage)->values(),
+                $servicePackages->count(),
+                $perPage,
+                $page,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
         } else {
             $query = Service::where('status', true);
 
@@ -278,7 +290,9 @@ class WebController extends Controller
                 });
             }
 
-            $services = $query->orderBy('order_column', 'asc')->get();
+            $services = $query->orderBy('order_column', 'asc')
+                ->paginate(8)
+                ->withQueryString();
         }
 
         if ($request->ajax()) {

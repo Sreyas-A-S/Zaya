@@ -133,7 +133,13 @@
                 @endforeach
             </div>
 
-            <div class="text-center mt-12">
+            <div class="mt-12 flex flex-col items-center gap-6 px-4">
+                @if(method_exists($services, 'links'))
+                    <div class="w-full flex justify-center items-center min-h-[50px]">
+                        {{ $services->fragment('services')->links('vendor.pagination.zaya') }}
+                    </div>
+                @endif
+
                 <a id="services_button_text" href="{{ route('services') }}"
                     class="border border-secondary hover:border-primary text-secondary hover:bg-primary hover:text-white px-8 py-3 rounded-full transition-all text-base lg:text-lg">{{ $settings['services_button_text'] ?? 'Browse All Services' }}</a>
             </div>

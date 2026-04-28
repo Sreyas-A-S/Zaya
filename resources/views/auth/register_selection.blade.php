@@ -14,8 +14,8 @@
                             <img class="img-fluid for-dark m-auto mb-4 d-block" src="{{ asset('admiro/assets/images/logo/zaya wellness logo white.svg') }}" alt="logo" style="max-height: 60px;">
                         </a>
                     </div>
-                    <h2 class="mb-4">Join Us As</h2>
-                    <p class="mb-5">Please select how you would like to register</p>
+                    <h2 class="mb-4">{{ __('Join Us As') }}</h2>
+                    <p class="mb-5">{{ __('Please select how you would like to register') }}</p>
                     
                     <div class="row g-4 justify-content-center">
                         <div class="col-sm-6">
@@ -27,8 +27,8 @@
                                                 <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Work') }}"></use>
                                             </svg>
                                         </div>
-                                        <h4 class="mb-2">Practitioner</h4>
-                                        <p class="text-muted small">For healthcare professionals</p>
+                                        <h4 class="mb-2">{{ __('Practitioner') }}</h4>
+                                        <p class="text-muted small">{{ __('For healthcare professionals') }}</p>
                                     </div>
                                 </div>
                             </a>
@@ -42,8 +42,8 @@
                                                 <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Profile') }}"></use>
                                             </svg>
                                         </div>
-                                        <h4 class="mb-2">Patient</h4>
-                                        <p class="text-muted small">For clients seeking care</p>
+                                        <h4 class="mb-2">{{ __('Patient') }}</h4>
+                                        <p class="text-muted small">{{ __('For clients seeking care') }}</p>
                                     </div>
                                 </div>
                             </a>
@@ -51,7 +51,7 @@
                     </div>
 
                     <div class="mt-5">
-                        <p class="mb-0">Already have an account? <a class="ms-2" href="{{ route('login') }}">Sign in</a></p>
+                        <p class="mb-0">{{ __('Already have an account?') }} <a class="ms-2" href="{{ route('login') }}">{{ __('Sign in') }}</a></p>
                     </div>
                 </div>
             </div>

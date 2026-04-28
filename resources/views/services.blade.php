@@ -17,7 +17,7 @@
             $categoryDescription = $descMap[$category] ?? __('Explore our expertly curated selection of holistic health and wellness services designed specifically for you.');
         @endphp
 
-        <section class="pt-[144px] md:pt-[150px] px-4 md:px-6 bg-white min-h-screen pb-20">
+        <section id="services-listing" class="pt-[144px] md:pt-[150px] px-4 md:px-6 bg-white min-h-screen pb-20">
             <div class="container mx-auto">
                 <!-- Header section: Title and Description -->
                 <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8 md:mb-16">
@@ -59,7 +59,7 @@
                 </div>
 
                 @if($category === 'Packages')
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12" id="services-grid">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12" id="services-grid">
                     @forelse($servicePackages as $package)
                         <article class="block">
                             <div class="w-full aspect-video overflow-hidden mb-5 bg-gray-100">
@@ -92,7 +92,7 @@
                     @endforelse
                 </div>
                 @else
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12" id="services-grid">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12" id="services-grid">
                     @forelse($services as $service)
                         <a href="{{ $service->slug ? route('service-detail', $service->slug) : '#' }}" class="block group cursor-pointer">
                             <div class="w-full aspect-video overflow-hidden mb-5 bg-gray-100">
@@ -128,6 +128,20 @@
                     @endforelse
                 </div>
                 @endif
+
+                @if($category === 'Packages')
+                    @if(method_exists($servicePackages, 'links'))
+                        <div class="mt-14 flex justify-center items-center min-h-[50px]">
+                            {{ $servicePackages->fragment('services-listing')->links('vendor.pagination.zaya') }}
+                        </div>
+                    @endif
+                @else
+                    @if(method_exists($services, 'links'))
+                        <div class="mt-14 flex justify-center items-center min-h-[50px]">
+                            {{ $services->fragment('services-listing')->links('vendor.pagination.zaya') }}
+                        </div>
+                    @endif
+                @endif
             </div>
         </section>
 
@@ -141,9 +155,12 @@
                     <!-- Left Text -->
                     <div>
                         <div class="mb-8 animate-on-scroll">
-                            <span id="services_page_badge" class="bg-accent text-secondary px-8 py-2.5 rounded-full font-medium text-base inline-block" data-i18n="Our services">
-                                {{ $settings['services_page_badge'] ?? __('Our services') }}
-                            </span>
+                            <div id="services_page_badge" class="inline-flex items-center gap-3" data-i18n="Our services">
+                                <span class="h-px w-10 bg-accent"></span>
+                                <span class="text-secondary font-semibold text-sm tracking-widest uppercase">
+                                    {{ $settings['services_page_badge'] ?? __('Our services') }}
+                                </span>
+                            </div>
                         </div>
                         <h1 id="services_page_title" class="text-4xl md:text-5xl font-serif font-bold text-primary mb-8 leading-tight">
                             {!! nl2br($settings['services_page_title'] ?? __("Embrace Holistic \n Wellness")) !!}

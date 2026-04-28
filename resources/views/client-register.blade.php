@@ -758,7 +758,7 @@
                                         onfocus="this.removeAttribute('readonly');"
                                         onclick="this.removeAttribute('readonly');">
                                     <button type="button"
-                                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 password-toggle" data-target="password">
+                                        class="absolute right-5 top-[26px] -translate-y-1/2 text-gray-400 hover:text-gray-600 password-toggle" data-target="password">
                                         <i class="ri-eye-line text-lg"></i>
                                     </button>
                                 </div>
@@ -800,7 +800,7 @@
                                         onfocus="this.removeAttribute('readonly');"
                                         onclick="this.removeAttribute('readonly');">
                                     <button type="button"
-                                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 password-toggle" data-target="password_confirmation">
+                                        class="absolute right-5 top-[26px] -translate-y-1/2 text-gray-400 hover:text-gray-600 password-toggle" data-target="password_confirmation">
                                         <i class="ri-eye-line text-lg"></i>
                                     </button>
                                 </div>
@@ -1599,6 +1599,22 @@
                 // Match Logic
                 if (confirmPassword.length > 0) {
                     matchIndication.classList.remove('hidden');
+                    
+                    // Hide server-side error alert if present
+                    const errorAlert = document.querySelector('.bg-red-50.border-l-4.border-red-500');
+                    if (errorAlert) {
+                        const errorItems = errorAlert.querySelectorAll('li');
+                        errorItems.forEach(li => {
+                            if (li.textContent.toLowerCase().includes('password confirmation')) {
+                                li.style.display = 'none';
+                            }
+                        });
+                        const visibleErrors = Array.from(errorItems).filter(li => li.style.display !== 'none');
+                        if (visibleErrors.length === 0) {
+                            errorAlert.classList.add('hidden');
+                        }
+                    }
+
                     if (password === confirmPassword) {
                         matchIcon.className = 'ri-checkbox-circle-fill text-sm text-green-500';
                         matchText.textContent = 'Passwords match';
@@ -1676,6 +1692,7 @@
                 const promoTotalFeeHidden = document.getElementById('promo-total-fee-hidden');
 
                 const feeInput = document.getElementById('registration_fee');
+                let isRegistrationFeeEnabled = @json($clientRegistrationFeeEnabled);
                 const feeActualInput = document.getElementById('registration_fee_actual');
                 const feeCurrencyInput = document.getElementById('registration-fee-currency');
                 const countrySelect = document.getElementById('nationality-select');
@@ -1723,6 +1740,7 @@
                             if (feeCurrencyInput) feeCurrencyInput.value = currency;
 
                             const isEnabled = data.enabled !== undefined ? data.enabled : true;
+                            isRegistrationFeeEnabled = isEnabled;
 
                             renderFee(feeValue, isEnabled);
                             if (promoCodeHidden.value) clearPromo();
@@ -1733,7 +1751,7 @@
                     }
                 }
 
-                function renderFee(value, isEnabled = true) {
+                function renderFee(value, isEnabled = isRegistrationFeeEnabled) {
                     const feeDisplay = document.getElementById('registration-fee-display');
                     const feeWrapper = document.getElementById('registration-fee-field-wrapper');
                     const displayValue = value !== undefined ? value : feeInput?.value;

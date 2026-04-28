@@ -14,11 +14,11 @@
             <form class="theme-form" method="POST" action="{{ route('register') }}">
                 @csrf
                 <input type="hidden" name="role" value="{{ $type === 'patient' ? 'client' : $type }}">
-              <h2 class="text-center">Create {{ ucfirst($type) }} Account</h2>
-              <p class="text-center">Enter your personal details to create account</p>
+              <h2 class="text-center">{{ __('Create :type Account', ['type' => ucfirst($type)]) }}</h2>
+              <p class="text-center">{{ __('Enter your personal details to create account') }}</p>
               <div class="form-group">
-                <label class="col-form-label pt-0">Your Name <span class="text-danger">*</span></label>
-                <input class="form-control @error('name') is-invalid @enderror" type="text" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus placeholder="Full name">
+                <label class="col-form-label pt-0">{{ __('Your Name') }} <span class="text-danger">*</span></label>
+                <input class="form-control @error('name') is-invalid @enderror" type="text" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus placeholder="{{ __('Full name') }}">
                 @error('name')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
@@ -26,7 +26,7 @@
                 @enderror
               </div>
               <div class="form-group">
-                <label class="col-form-label">Email Address <span class="text-danger">*</span></label>
+                <label class="col-form-label">{{ __('Email Address') }} <span class="text-danger">*</span></label>
                 <input class="form-control @error('email') is-invalid @enderror" type="email" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="Test@gmail.com">
                 @error('email')
                     <span class="invalid-feedback" role="alert">
@@ -35,7 +35,7 @@
                 @enderror
               </div>
               <div class="form-group">
-                <label class="col-form-label">Password <span class="text-danger">*</span></label>
+                <label class="col-form-label">{{ __('Password') }} <span class="text-danger">*</span></label>
                 <div class="form-input position-relative">
                   <input class="form-control @error('password') is-invalid @enderror" type="password" name="password" id="password" required autocomplete="new-password" placeholder="*********"
                       minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}"
@@ -47,23 +47,23 @@
                     </span>
                   @enderror
                 </div>
-                <div id="password-requirements" class="text-danger small mt-1">Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.</div>
+                <div id="password-requirements" class="text-danger small mt-1">{{ __('Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.') }}</div>
               </div>
               <div class="form-group">
-                <label class="col-form-label">Confirm Password <span class="text-danger">*</span></label>
+                <label class="col-form-label">{{ __('Confirm Password') }} <span class="text-danger">*</span></label>
                 <div class="form-input position-relative">
                   <input class="form-control" type="password" name="password_confirmation" id="password_confirmation" required autocomplete="new-password" placeholder="*********" minlength="8" oninput="validateRegisterPassword()">
                 </div>
-                <div id="password-match-error" class="text-danger small mt-1 d-none">Passwords do not match.</div>
+                <div id="password-match-error" class="text-danger small mt-1 d-none">{{ __('Passwords do not match.') }}</div>
               </div>
               <div class="form-group mb-0 checkbox-checked">
                 <div class="form-check checkbox-solid-info">
                   <input class="form-check-input" id="solid6" type="checkbox" required>
-                  <label class="form-check-label" for="solid6">Agree with</label><a class="ms-3 link" href="#">Privacy Policy</a>
+                  <label class="form-check-label" for="solid6">{{ __('Agree with') }}</label><a class="ms-3 link" href="#">{{ __('Privacy Policy') }}</a>
                 </div>
-                <button class="btn btn-primary btn-block w-100 mt-3" type="submit">Create Account</button>
+                <button class="btn btn-primary btn-block w-100 mt-3" type="submit">{{ __('Create Account') }}</button>
               </div>
-              <p class="mt-4 mb-0 text-center">Already have an account?<a class="ms-2" href="{{ route('login') }}">Sign in</a></p>
+              <p class="mt-4 mb-0 text-center">{{ __('Already have an account?') }}<a class="ms-2" href="{{ route('login') }}">{{ __('Sign in') }}</a></p>
             </form>
           </div>
         </div>
