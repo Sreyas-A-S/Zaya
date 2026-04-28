@@ -243,22 +243,66 @@
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Password') }}</label>
                             <div class="relative">
-                                <input type="password" name="password"
-                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}"
-                                    title="Must contain at least 8 characters, including NUMBER, UPPERCASE, LOWERCASE and SYMBOL"
+                                <input type="password" name="password" id="password"
                                     class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
                                     placeholder="{{ __('Enter Password') }}"
-                                    required autocomplete="new-password">
-                                <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
+                                    required autocomplete="new-password"
+                                    readonly
+                                    onfocus="this.removeAttribute('readonly');"
+                                    onclick="this.removeAttribute('readonly');">
+                                <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg z-20 password-toggle" data-target="password">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                            </div>
+                            <div id="password-error" class="mt-2 pl-4 text-xs font-medium text-red-500 hidden">
+                                {{ __('Password is required') }}
+                            </div>
+                            <div id="password-requirements" class="mt-3 pl-4 space-y-1.5 hidden">
+                                <div class="flex items-center gap-2 text-[10px] uppercase tracking-wider font-bold text-gray-400 transition-colors" id="req-length">
+                                    <i class="ri-checkbox-circle-fill text-sm"></i>
+                                    <span>{{ __('8+ Characters') }}</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-[10px] uppercase tracking-wider font-bold text-gray-400 transition-colors" id="req-upper">
+                                    <i class="ri-checkbox-circle-fill text-sm"></i>
+                                    <span>{{ __('Uppercase') }}</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-[10px] uppercase tracking-wider font-bold text-gray-400 transition-colors" id="req-lower">
+                                    <i class="ri-checkbox-circle-fill text-sm"></i>
+                                    <span>{{ __('Lowercase') }}</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-[10px] uppercase tracking-wider font-bold text-gray-400 transition-colors" id="req-special">
+                                    <i class="ri-checkbox-circle-fill text-sm"></i>
+                                    <span>{{ __('Number or Special') }}</span>
+                                </div>
+                            </div>
+                            <div id="password-strength-indication" class="mt-4 px-4 hidden">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span id="strength-text" class="text-[10px] font-bold uppercase tracking-wider"></span>
+                                </div>
+                                <div class="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                                    <div id="strength-bar" class="h-full transition-all duration-300 bg-gray-300" style="width: 0%"></div>
+                                </div>
                             </div>
                         </div>
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Confirm Password') }}</label>
                             <div class="relative">
-                                <input type="password" name="password_confirmation"
+                                <input type="password" name="password_confirmation" id="password_confirmation"
                                     class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="{{ __('Confirm Password') }}" required autocomplete="new-password">
-                                <i class="ri-eye-line absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg"></i>
+                                    placeholder="{{ __('Confirm Password') }}" required autocomplete="new-password"
+                                    readonly
+                                    onfocus="this.removeAttribute('readonly');"
+                                    onclick="this.removeAttribute('readonly');">
+                                <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 text-lg z-20 password-toggle" data-target="password_confirmation">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                            </div>
+                            <div id="confirm-error" class="mt-2 pl-4 text-xs font-medium text-red-500 hidden">
+                                {{ __('Please confirm your password') }}
+                            </div>
+                            <div id="password-match-indication" class="mt-2 pl-4 flex items-center gap-1.5 hidden">
+                                <i id="match-icon" class="ri-checkbox-circle-fill text-sm"></i>
+                                <span id="match-text" class="text-xs font-medium"></span>
                             </div>
                         </div>
                     </div>
@@ -2951,6 +2995,159 @@
         document.getElementById('thank-you-popup').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeThankYouPopup();
+            }
+        });
+
+        // Password Match & Strength Validation Logic
+        function initPasswordValidation() {
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('password_confirmation');
+
+            if (!passwordInput || !confirmPasswordInput) return;
+
+            function checkPasswordMatch() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                const strengthIndication = document.getElementById('password-strength-indication');
+                const strengthBar = document.getElementById('strength-bar');
+                const strengthText = document.getElementById('strength-text');
+                const matchIndication = document.getElementById('password-match-indication');
+                const matchIcon = document.getElementById('match-icon');
+                const matchText = document.getElementById('match-text');
+                const requirementsUI = document.getElementById('password-requirements');
+
+                // Requirement IDs
+                const reqLength = document.getElementById('req-length');
+                const reqUpper = document.getElementById('req-upper');
+                const reqLower = document.getElementById('req-lower');
+                const reqSpecial = document.getElementById('req-special');
+
+                // Password Strength & Requirements Logic
+                if (password.length > 0) {
+                    strengthIndication.classList.remove('hidden');
+                    requirementsUI.classList.remove('hidden');
+                    document.getElementById('password-error').classList.add('hidden');
+                    passwordInput.classList.remove('border-red-500!');
+                    
+                    let strength = 0;
+                    
+                    // 1. Length
+                    if (password.length >= 8) {
+                        strength += 25;
+                        reqLength.classList.replace('text-gray-400', 'text-green-500');
+                    } else {
+                        reqLength.classList.replace('text-green-500', 'text-gray-400');
+                    }
+
+                    // 2. Uppercase
+                    if (/[A-Z]/.test(password)) {
+                        strength += 25;
+                        reqUpper.classList.replace('text-gray-400', 'text-green-500');
+                    } else {
+                        reqUpper.classList.replace('text-green-500', 'text-gray-400');
+                    }
+
+                    // 3. Lowercase
+                    if (/[a-z]/.test(password)) {
+                        strength += 25;
+                        reqLower.classList.replace('text-gray-400', 'text-green-500');
+                    } else {
+                        reqLower.classList.replace('text-green-500', 'text-gray-400');
+                    }
+
+                    // 4. Special or Number
+                    if (/[0-9]/.test(password) || /[\W_]/.test(password)) {
+                        strength += 25;
+                        reqSpecial.classList.replace('text-gray-400', 'text-green-500');
+                    } else {
+                        reqSpecial.classList.replace('text-green-500', 'text-gray-400');
+                    }
+
+                    strengthBar.style.width = strength + '%';
+                    if (strength <= 25) {
+                        strengthBar.className = 'h-full transition-all duration-300 bg-red-500';
+                        strengthText.textContent = 'Weak';
+                        strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-red-500';
+                    } else if (strength <= 50) {
+                        strengthBar.className = 'h-full transition-all duration-300 bg-orange-400';
+                        strengthText.textContent = 'Fair';
+                        strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-orange-400';
+                    } else if (strength <= 75) {
+                        strengthBar.className = 'h-full transition-all duration-300 bg-blue-400';
+                        strengthText.textContent = 'Good';
+                        strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-blue-400';
+                    } else {
+                        strengthBar.className = 'h-full transition-all duration-300 bg-green-500';
+                        strengthText.textContent = 'Strong';
+                        strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-green-500';
+                    }
+                } else {
+                    strengthIndication.classList.add('hidden');
+                    requirementsUI.classList.add('hidden');
+                }
+
+                // Match Logic
+                if (confirmPassword.length > 0) {
+                    matchIndication.classList.remove('hidden');
+                    document.getElementById('confirm-error').classList.add('hidden');
+                    if (password === confirmPassword) {
+                        matchIcon.className = 'ri-checkbox-circle-fill text-sm text-green-500';
+                        matchText.textContent = 'Passwords match';
+                        matchText.className = 'text-xs font-medium text-green-500';
+                        confirmPasswordInput.classList.remove('border-red-500!');
+                    } else {
+                        matchIcon.className = 'ri-error-warning-fill text-sm text-red-500';
+                        matchText.textContent = 'Passwords do not match';
+                        matchText.className = 'text-xs font-medium text-red-500';
+                        confirmPasswordInput.classList.add('border-red-500!');
+                    }
+                } else {
+                    matchIndication.classList.add('hidden');
+                    confirmPasswordInput.classList.remove('border-red-500!');
+                }
+            }
+
+            passwordInput.addEventListener('input', checkPasswordMatch);
+            confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+
+            // Required validation on blur
+            passwordInput.addEventListener('blur', function() {
+                if (this.value.length === 0) {
+                    document.getElementById('password-error').classList.remove('hidden');
+                    this.classList.add('border-red-500!');
+                }
+            });
+
+            confirmPasswordInput.addEventListener('blur', function() {
+                if (this.value.length === 0) {
+                    document.getElementById('confirm-error').classList.remove('hidden');
+                    this.classList.add('border-red-500!');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initPasswordValidation);
+
+        // Global Event Delegation for Password Toggle
+        document.addEventListener('click', function(e) {
+            const toggle = e.target.closest('.password-toggle');
+            if (toggle) {
+                e.preventDefault();
+                const targetId = toggle.getAttribute('data-target');
+                const field = document.getElementById(targetId);
+                const icon = toggle.querySelector('i') || toggle;
+                
+                if (field && icon) {
+                    if (field.type === 'password') {
+                        field.type = 'text';
+                        icon.classList.remove('ri-eye-line');
+                        icon.classList.add('ri-eye-off-line');
+                    } else {
+                        field.type = 'password';
+                        icon.classList.remove('ri-eye-off-line');
+                        icon.classList.add('ri-eye-line');
+                    }
+                }
             }
         });
     </script>

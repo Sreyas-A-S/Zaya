@@ -757,9 +757,9 @@
                                         readonly
                                         onfocus="this.removeAttribute('readonly');"
                                         onclick="this.removeAttribute('readonly');">
-                                    <button type="button" onclick="togglePassword('password')"
-                                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                        <i class="ri-eye-line text-lg" id="password-icon"></i>
+                                    <button type="button"
+                                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 password-toggle" data-target="password">
+                                        <i class="ri-eye-line text-lg"></i>
                                     </button>
                                 </div>
                                 <div id="password-requirements" class="mt-3 pl-4 space-y-1.5 hidden">
@@ -799,9 +799,9 @@
                                         readonly
                                         onfocus="this.removeAttribute('readonly');"
                                         onclick="this.removeAttribute('readonly');">
-                                    <button type="button" onclick="togglePassword('password_confirmation')"
-                                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                        <i class="ri-eye-line text-lg" id="password_confirmation-icon"></i>
+                                    <button type="button"
+                                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 password-toggle" data-target="password_confirmation">
+                                        <i class="ri-eye-line text-lg"></i>
                                     </button>
                                 </div>
                                 <div id="password-match-indication" class="mt-2 pl-4 flex items-center gap-1.5 hidden">
@@ -1489,23 +1489,28 @@
                 });
             }
 
-            // Toggle Password Visibility
-            window.togglePassword = function(fieldId) {
-                const field = document.getElementById(fieldId);
-                const icon = document.getElementById(fieldId + '-icon');
-
-                if (field && icon) {
-                    if (field.type === 'password') {
-                        field.type = 'text';
-                        icon.classList.remove('ri-eye-line');
-                        icon.classList.add('ri-eye-off-line');
-                    } else {
-                        field.type = 'password';
-                        icon.classList.remove('ri-eye-off-line');
-                        icon.classList.add('ri-eye-line');
+            // Global Event Delegation for Password Toggle
+            document.addEventListener('click', function(e) {
+                const toggle = e.target.closest('.password-toggle');
+                if (toggle) {
+                    e.preventDefault();
+                    const targetId = toggle.getAttribute('data-target');
+                    const field = document.getElementById(targetId);
+                    const icon = toggle.querySelector('i') || toggle;
+                    
+                    if (field && icon) {
+                        if (field.type === 'password') {
+                            field.type = 'text';
+                            icon.classList.remove('ri-eye-line');
+                            icon.classList.add('ri-eye-off-line');
+                        } else {
+                            field.type = 'password';
+                            icon.classList.remove('ri-eye-off-line');
+                            icon.classList.add('ri-eye-line');
+                        }
                     }
                 }
-            }
+            });
 
             // Password Match Validation
             const passwordInput = document.getElementById('password');
