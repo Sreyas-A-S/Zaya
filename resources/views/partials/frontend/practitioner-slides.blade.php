@@ -13,7 +13,7 @@
     <div class="swiper-slide h-auto">
         <div class="group relative">
             <!-- Image Card -->
-            <div class="relative h-[280px] md:h-[360px] xl:h-[400px] overflow-hidden mb-6">
+            <div class="relative h-[220px] md:h-[280px] xl:h-[300px] overflow-hidden mb-6">
                 <img src="{{ $image }}" alt="{{ $name }}" class="w-full h-full object-cover">
 
                 <!-- Rating Badge -->

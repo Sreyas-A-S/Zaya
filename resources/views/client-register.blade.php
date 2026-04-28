@@ -756,12 +756,33 @@
                                         <i class="ri-eye-line text-lg" id="password-icon"></i>
                                     </button>
                                 </div>
-                                <p class="text-xs text-primary mt-2 pl-4">
-                                    {{ __('Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.') }}
-                                </p>
+                                <div id="password-requirements" class="mt-3 pl-4 space-y-1.5 hidden">
+                                    <div class="flex items-center gap-2 text-[10px] uppercase tracking-wider font-bold text-gray-400 transition-colors" id="req-length">
+                                        <i class="ri-checkbox-circle-fill text-sm"></i>
+                                        <span>{{ __('8+ Characters') }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-[10px] uppercase tracking-wider font-bold text-gray-400 transition-colors" id="req-upper">
+                                        <i class="ri-checkbox-circle-fill text-sm"></i>
+                                        <span>{{ __('Uppercase') }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-[10px] uppercase tracking-wider font-bold text-gray-400 transition-colors" id="req-lower">
+                                        <i class="ri-checkbox-circle-fill text-sm"></i>
+                                        <span>{{ __('Lowercase') }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-[10px] uppercase tracking-wider font-bold text-gray-400 transition-colors" id="req-special">
+                                        <i class="ri-checkbox-circle-fill text-sm"></i>
+                                        <span>{{ __('Number or Special') }}</span>
+                                    </div>
+                                </div>
                                 @error('password')
                                     <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
                                 @enderror
+                                <div id="password-strength-indication" class="mt-2 pl-4 flex gap-2 items-center hidden">
+                                    <div class="h-1.5 flex-1 bg-gray-200 rounded-full overflow-hidden">
+                                        <div id="strength-bar" class="h-full w-0 transition-all duration-300"></div>
+                                    </div>
+                                    <span id="strength-text" class="text-[10px] font-bold uppercase tracking-wider text-gray-400"></span>
+                                </div>
                             </div>
                             <div>
                                 <label
@@ -773,6 +794,10 @@
                                         class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                         <i class="ri-eye-line text-lg" id="password_confirmation-icon"></i>
                                     </button>
+                                </div>
+                                <div id="password-match-indication" class="mt-2 pl-4 flex items-center gap-1.5 hidden">
+                                    <i id="match-icon" class="ri-checkbox-circle-fill text-sm"></i>
+                                    <span id="match-text" class="text-xs font-medium"></span>
                                 </div>
                                 <span id="password-match-error" class="text-red-500 text-xs mt-1 pl-4 block h-4"></span>
                             </div>
@@ -1469,7 +1494,7 @@
             }
 
             // Toggle Password Visibility
-            function togglePassword(fieldId) {
+            window.togglePassword = function(fieldId) {
                 const field = document.getElementById(fieldId);
                 const icon = document.getElementById(fieldId + '-icon');
 
@@ -1492,18 +1517,101 @@
             const matchError = document.getElementById('password-match-error');
 
             function checkPasswordMatch() {
-                if (!passwordInput || !confirmPasswordInput || !matchError) return;
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                const strengthIndication = document.getElementById('password-strength-indication');
+                const strengthBar = document.getElementById('strength-bar');
+                const strengthText = document.getElementById('strength-text');
+                const matchIndication = document.getElementById('password-match-indication');
+                const matchIcon = document.getElementById('match-icon');
+                const matchText = document.getElementById('match-text');
+                const requirementsUI = document.getElementById('password-requirements');
 
-                if (confirmPasswordInput.value === '') {
-                    matchError.textContent = '';
-                    confirmPasswordInput.classList.remove('border-red-500!');
-                    return;
+                // Requirement IDs
+                const reqLength = document.getElementById('req-length');
+                const reqUpper = document.getElementById('req-upper');
+                const reqLower = document.getElementById('req-lower');
+                const reqSpecial = document.getElementById('req-special');
+
+                // Password Strength & Requirements Logic
+                if (password.length > 0) {
+                    strengthIndication.classList.remove('hidden');
+                    requirementsUI.classList.remove('hidden');
+                    
+                    let strength = 0;
+                    
+                    // 1. Length
+                    if (password.length >= 8) {
+                        strength += 25;
+                        reqLength.classList.replace('text-gray-400', 'text-green-500');
+                    } else {
+                        reqLength.classList.replace('text-green-500', 'text-gray-400');
+                    }
+
+                    // 2. Uppercase
+                    if (/[A-Z]/.test(password)) {
+                        strength += 25;
+                        reqUpper.classList.replace('text-gray-400', 'text-green-500');
+                    } else {
+                        reqUpper.classList.replace('text-green-500', 'text-gray-400');
+                    }
+
+                    // 3. Lowercase
+                    if (/[a-z]/.test(password)) {
+                        strength += 25;
+                        reqLower.classList.replace('text-gray-400', 'text-green-500');
+                    } else {
+                        reqLower.classList.replace('text-green-500', 'text-gray-400');
+                    }
+
+                    // 4. Special or Number
+                    if (/[0-9]/.test(password) || /[\W_]/.test(password)) {
+                        strength += 25;
+                        reqSpecial.classList.replace('text-gray-400', 'text-green-500');
+                    } else {
+                        reqSpecial.classList.replace('text-green-500', 'text-gray-400');
+                    }
+
+                    strengthBar.style.width = strength + '%';
+                    if (strength <= 25) {
+                        strengthBar.className = 'h-full transition-all duration-300 bg-red-500';
+                        strengthText.textContent = 'Weak';
+                        strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-red-500';
+                    } else if (strength <= 50) {
+                        strengthBar.className = 'h-full transition-all duration-300 bg-orange-400';
+                        strengthText.textContent = 'Fair';
+                        strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-orange-400';
+                    } else if (strength <= 75) {
+                        strengthBar.className = 'h-full transition-all duration-300 bg-blue-400';
+                        strengthText.textContent = 'Good';
+                        strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-blue-400';
+                    } else {
+                        strengthBar.className = 'h-full transition-all duration-300 bg-green-500';
+                        strengthText.textContent = 'Strong';
+                        strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-green-500';
+                    }
+                } else {
+                    strengthIndication.classList.add('hidden');
+                    requirementsUI.classList.add('hidden');
                 }
 
-                if (passwordInput.value !== confirmPasswordInput.value) {
-                    matchError.textContent = 'Passwords do not match';
-                    confirmPasswordInput.classList.add('border-red-500!');
+                // Match Logic
+                if (confirmPassword.length > 0) {
+                    matchIndication.classList.remove('hidden');
+                    if (password === confirmPassword) {
+                        matchIcon.className = 'ri-checkbox-circle-fill text-sm text-green-500';
+                        matchText.textContent = 'Passwords match';
+                        matchText.className = 'text-xs font-medium text-green-500';
+                        confirmPasswordInput.classList.remove('border-red-500!');
+                        matchError.textContent = '';
+                    } else {
+                        matchIcon.className = 'ri-error-warning-fill text-sm text-red-500';
+                        matchText.textContent = 'Passwords do not match';
+                        matchText.className = 'text-xs font-medium text-red-500';
+                        confirmPasswordInput.classList.add('border-red-500!');
+                    }
                 } else {
+                    matchIndication.classList.add('hidden');
                     matchError.textContent = '';
                     confirmPasswordInput.classList.remove('border-red-500!');
                 }
