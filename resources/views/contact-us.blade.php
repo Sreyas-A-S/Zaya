@@ -70,7 +70,7 @@
 <!-- Contact Info Cards Section -->
 <section class="py-8 md:py-12 px-4 md:px-6">
     <div class="container mx-auto">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             <!-- Location Card -->
             <div
                 class="bg-[#FFFFFF] rounded-2xl p-6 flex flex-col items-center text-center gap-3 shadow-[0_30px_82px_rgba(186,186,186,0.29)] transition-all duration-300 group">
@@ -431,6 +431,18 @@
                 phone: document.getElementById('phone'),
                 message: document.getElementById('message')
             };
+
+            // Selection logic for user type checkboxes (only one allowed)
+            const typeCheckboxes = document.querySelectorAll('input[name="user_type[]"]');
+            typeCheckboxes.forEach(cb => {
+                cb.addEventListener('change', function() {
+                    if (this.checked) {
+                        typeCheckboxes.forEach(other => {
+                            if (other !== this) other.checked = false;
+                        });
+                    }
+                });
+            });
 
             const rules = {
                 first_name: {
