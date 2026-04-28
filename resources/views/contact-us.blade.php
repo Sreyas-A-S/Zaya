@@ -432,6 +432,18 @@
                 message: document.getElementById('message')
             };
 
+            // Selection logic for user type checkboxes (only one allowed)
+            const typeCheckboxes = document.querySelectorAll('input[name="user_type[]"]');
+            typeCheckboxes.forEach(cb => {
+                cb.addEventListener('change', function() {
+                    if (this.checked) {
+                        typeCheckboxes.forEach(other => {
+                            if (other !== this) other.checked = false;
+                        });
+                    }
+                });
+            });
+
             const rules = {
                 first_name: {
                     required: true,
