@@ -2180,10 +2180,13 @@ class ProfileController extends Controller
         // Optional: Check if they actually had a session
         $hadSession = Booking::where('user_id', $user->id)
             ->where('profile_id', $request->practitioner_id)
-            ->where('status', 'completed')
+            ->whereIn('status', ['paid', 'completed'])
             ->exists();
 
         if (!$hadSession) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'You can only review professionals you have had a completed session with.'], 403);
+            }
             return back()->with('error', 'You can only review professionals you have had a completed session with.');
         }
 
@@ -2220,6 +2223,10 @@ class ProfileController extends Controller
             'image' => $user->profile_pic,
             'status' => 'pending' // Default to pending for moderation
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Thank you for your feedback! Your story has been submitted for review.']);
+        }
 
         return back()->with('status', 'Thank you for your feedback! Your story has been submitted for review.');
     }
