@@ -241,9 +241,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('doctors/delete-certificate/{id}', [DoctorController::class, 'deleteCertificate'])->name('doctors.delete-certificate');
 
     // Reviews
-    Route::get('reviews/practitioners', [\App\Http\Controllers\Admin\PractitionerReviewController::class, 'index'])->name('reviews.practitioners.index');
-    Route::delete('reviews/practitioners/{id}', [\App\Http\Controllers\Admin\PractitionerReviewController::class, 'destroy'])->name('reviews.practitioners.destroy');
-    Route::post('reviews/practitioners/{id}/status', [\App\Http\Controllers\Admin\PractitionerReviewController::class, 'updateStatus'])->name('reviews.practitioners.status');
+    Route::get('zaya-reviews', [\App\Http\Controllers\Admin\ZayaReviewController::class, 'index'])->name('reviews.index');
+    Route::delete('zaya-reviews/{id}/{type}', [\App\Http\Controllers\Admin\ZayaReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::post('zaya-reviews/{id}/status/{type}', [\App\Http\Controllers\Admin\ZayaReviewController::class, 'updateStatus'])->name('reviews.status');
 
     // Master Data
     Route::get('master-data/{type}', [MasterDataController::class, 'index'])->name('master-data.index');
