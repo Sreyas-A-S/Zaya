@@ -109,8 +109,8 @@
                                                 </div>
                                                 <div class="col-md-12">
                                                     <label class="form-label">Country <span class="text-danger">*</span></label>
-                                                    <select class="form-select" name="country" required id="country-select">
-                                                        <option value="">Select Country</option>
+                                                    <select class="form-select" name="country" required id="country-select" data-placeholder="{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}">
+                                                        <option value="">{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}</option>
                                                         @foreach($countries as $country)
                                                             <option value="{{ $country->code }}">{{ $country->name }}</option>
                                                         @endforeach
@@ -129,7 +129,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label">Website (Optional)</label>
+                                                    <label class="form-label">{{ $site_settings['website_label'] ?? __('Website (Optional)') }}</label>
                                                     <input type="url" class="form-control" name="website_url" placeholder="https://example.com">
                                                 </div>
                                                 <div class="col-md-6">

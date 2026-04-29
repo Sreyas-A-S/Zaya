@@ -241,11 +241,11 @@
                     <!-- Password & Confirm Password -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Password') }}</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ $site_settings['password_label'] ?? __('Password') }}</label>
                             <div class="relative">
                                 <input type="password" name="password" id="password"
                                     class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                    placeholder="{{ __('Enter Password') }}"
+                                    placeholder="{{ $site_settings['enter_password_placeholder'] ?? __('Enter Password') }}"
                                     required autocomplete="new-password"
                                     readonly
                                     onfocus="this.removeAttribute('readonly');"
@@ -320,8 +320,9 @@
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Country') }}</label>
                             <select id="country-select" name="country"
+                                data-placeholder="{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}"
                                 data-default="{{ old('country', 'IN') }}" required>
-                                <option value="">{{ __('Select Country') }}</option>
+                                <option value="">{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}</option>
                             </select>
                         </div>
                     </div>
@@ -356,7 +357,7 @@
                                 onclick="this.removeAttribute('readonly');">
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State (Optional)') }}</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ $site_settings['state_label'] ?? __('State (Optional)') }}</label>
                             <input type="text" name="state" value="{{ old('state') }}"
                                 pattern="^[A-Za-z\s]+$" title="Only alphabets and spaces are allowed"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
@@ -461,8 +462,9 @@
                                 <div class="education-country-wrapper">
                                     <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Country') }}</label>
                                     <select id="education-country-select-0" name="education[0][country]"
+                                        data-placeholder="{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}"
                                         class="education-country-select w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]" data-default="" required>
-                                        <option value="">{{ __('Select Country') }}</option>
+                                        <option value="">{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -1401,7 +1403,8 @@
 
             // Clear previous errors
             currentTabEl.querySelectorAll('.error-message').forEach(el => el.remove());
-            currentTabEl.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500', 'focus:border-red-500'));
+            currentTabEl.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500', 'focus:border-red-500', 'border-red-500!'));
+            currentTabEl.querySelectorAll('[id$="-error"], #confirm-error').forEach(el => el.classList.add('hidden'));
 
             inputs.forEach(input => {
                 let errorMsg = null;
@@ -1429,24 +1432,36 @@
 
                 if (errorMsg) {
                     input.classList.add('border-red-500', 'focus:border-red-500');
-                    const err = document.createElement('p');
-                    err.className = 'error-message text-red-500 text-sm mt-1 absolute';
-                    err.textContent = errorMsg;
+                    
+                    // Check for specific custom error divs first (like password-error or confirm-error)
+                    const customErrId = input.id === 'password_confirmation' ? 'confirm-error' : `${input.id}-error`;
+                    const customErr = document.getElementById(customErrId);
 
-                    // Add position relative to parent to stick the error to the bottom appropriately
-                    const parent = input.parentElement;
-                    if (parent) {
-                        parent.style.position = 'relative';
-                        parent.appendChild(err);
+                    if (customErr) {
+                        customErr.textContent = errorMsg;
+                        customErr.classList.remove('hidden');
+                    } else {
+                        const err = document.createElement('p');
+                        err.className = 'error-message text-red-500 text-sm mt-1';
+                        err.textContent = errorMsg;
+
+                        const parent = input.parentElement;
+                        if (parent) {
+                            parent.appendChild(err);
+                        }
                     }
                     isValid = false;
                 }
 
                 // Add real-time clearance
                 input.addEventListener('input', function() {
-                    this.classList.remove('border-red-500', 'focus:border-red-500');
+                    this.classList.remove('border-red-500', 'focus:border-red-500', 'border-red-500!');
                     const err = this.parentElement ? this.parentElement.querySelector('.error-message') : null;
                     if (err) err.remove();
+                    
+                    const customErrId = this.id === 'password_confirmation' ? 'confirm-error' : `${this.id}-error`;
+                    const customErr = document.getElementById(customErrId);
+                    if (customErr) customErr.classList.add('hidden');
                 }, {
                     once: true
                 });
@@ -2682,8 +2697,9 @@
                         <div class="education-country-wrapper">
                             <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Country') }}</label>
                             <select id="education-country-select-${index}" name="education[${index}][country]"
+                                data-placeholder="{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}"
                                 class="education-country-select w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]" data-default="" required>
-                                <option value="">{{ __('Select Country') }}</option>
+                                <option value="">{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}</option>
                                 ${countriesData.map(c => `<option value="${c.code}">${c.flag} ${c.name}</option>`).join('')}
                             </select>
                         </div>
@@ -3003,6 +3019,16 @@
 
         // Password Match & Strength Validation Logic
         function initPasswordValidation() {
+            // Translatable strings for JavaScript
+            const trans = {
+                match: "{{ $site_settings['passwords_match_msg'] ?? 'Passwords match' }}",
+                noMatch: "{{ $site_settings['passwords_not_match_msg'] ?? 'Passwords do not match' }}",
+                weak: "{{ $site_settings['password_weak_label'] ?? 'Weak' }}",
+                fair: "{{ $site_settings['password_fair_label'] ?? 'Fair' }}",
+                good: "{{ $site_settings['password_good_label'] ?? 'Good' }}",
+                strong: "{{ $site_settings['password_strong_label'] ?? 'Strong' }}"
+            };
+
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('password_confirmation');
 
@@ -3069,19 +3095,19 @@
                     strengthBar.style.width = strength + '%';
                     if (strength <= 25) {
                         strengthBar.className = 'h-full transition-all duration-300 bg-red-500';
-                        strengthText.textContent = 'Weak';
+                        strengthText.textContent = trans.weak;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-red-500';
                     } else if (strength <= 50) {
                         strengthBar.className = 'h-full transition-all duration-300 bg-orange-400';
-                        strengthText.textContent = 'Fair';
+                        strengthText.textContent = trans.fair;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-orange-400';
                     } else if (strength <= 75) {
                         strengthBar.className = 'h-full transition-all duration-300 bg-blue-400';
-                        strengthText.textContent = 'Good';
+                        strengthText.textContent = trans.good;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-blue-400';
                     } else {
                         strengthBar.className = 'h-full transition-all duration-300 bg-green-500';
-                        strengthText.textContent = 'Strong';
+                        strengthText.textContent = trans.strong;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-green-500';
                     }
                 } else {
@@ -3114,12 +3140,12 @@
 
                     if (password === confirmPassword) {
                         matchIcon.className = 'ri-checkbox-circle-fill text-sm text-green-500';
-                        matchText.textContent = 'Passwords match';
+                        matchText.textContent = trans.match;
                         matchText.className = 'text-xs font-medium text-green-500';
                         confirmPasswordInput.classList.remove('border-red-500!');
                     } else {
                         matchIcon.className = 'ri-error-warning-fill text-sm text-red-500';
-                        matchText.textContent = 'Passwords do not match';
+                        matchText.textContent = trans.noMatch;
                         matchText.className = 'text-xs font-medium text-red-500';
                         confirmPasswordInput.classList.add('border-red-500!');
                     }

@@ -28,7 +28,7 @@ class PractitionerReviewController extends Controller
                     return $row->user ? $row->user->name : 'Anonymous';
                 })
                 ->addColumn('rating_display', function ($row) {
-                    return str_repeat('<i class="fa fa-star text-warning"></i>', $row->rating);
+                    return str_repeat('<i class="fa fa-star text-success"></i>', $row->rating);
                 })
                 ->editColumn('status', function ($row) {
                     $badgeClass = $row->status ? 'bg-success' : 'bg-danger';

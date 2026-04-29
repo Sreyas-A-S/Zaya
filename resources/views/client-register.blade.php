@@ -660,7 +660,7 @@
                             </div>
                             <div>
                                 <label
-                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('State (Optional)') }}</label>
+                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ $site_settings['state_label'] ?? __('State (Optional)') }}</label>
                                 <input type="text" name="state" value="{{ old('state') }}"
                                     class="reg-input @error('state') border-red-500! @enderror"
                                     placeholder="{{ __('Enter State') }}" autocomplete="off"
@@ -674,9 +674,11 @@
                             <div>
                                 <label
                                     class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Country') }}</label>
-                                <select id="nationality-select" name="country" data-default="{{ old('country', 'IN') }}"
+                                <select id="nationality-select" name="country" 
+                                    data-placeholder="{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}"
+                                    data-default="{{ old('country', 'IN') }}"
                                     required>
-                                    <option value="">{{ __('Select Country') }}</option>
+                                    <option value="">{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}</option>
                                 </select>
                                 @error('country')
                                     <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
@@ -697,68 +699,14 @@
                             </div>
                         </div>
 
-                        <!-- Consultation Preferences -->
-                        <!-- <div class="mb-10">
-                            <label
-                                class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Preferred Speciality of Consultation') }}</label>
-                            <div
-                                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8 bg-gray-50/50 p-6 md:p-8 rounded-3xl">
-                                @foreach($consultationPreferences as $pref)
-                                    <label class="flex items-center gap-3 cursor-pointer group">
-                                        <div class="relative w-6 h-6 flex-shrink-0">
-                                            <input type="checkbox" name="consultation_preferences[]"
-                                                value="{{ $pref->name }}"
-                                                class="peer absolute inset-0 opacity-0 z-10 cursor-pointer">
-                                            <div
-                                                class="w-full h-full border-2 border-gray-300 rounded-full peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center peer-checked:[&>i]:opacity-100">
-                                                <i
-                                                    class="ri-check-line text-white text-sm opacity-0 transition-opacity font-bold"></i>
-                                            </div>
-                                        </div>
-                                        <span
-                                            class="text-gray-700 group-hover:text-primary transition-colors">{{ $pref->name }}</span>
-                                    </label>
-                                @endforeach
-
-                            </div>
-                        </div>
-
-                        <!-- Row: Languages & Referral -->
-                        <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
-                            <div>
-                                <label
-                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Languages Spoken') }}</label>
-                                <select id="languages-select" name="languages[]" multiple
-                                    placeholder="{{ __('Select Languages') }}">
-                                    @foreach($languages as $lang)
-                                        <option value="{{ $lang->code }}">{{ $lang->display_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label
-                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('How did you hear about us?') }}</label>
-                                <select name="referral_type" class="reg-input w-full">
-                                    <option value="">{{ __('Select Option') }}</option>
-                                    <option value="Direct Search">{{ __('Direct Search') }}</option>
-                                    <option value="Social Media">{{ __('Social Media') }}</option>
-                                    <option value="Friends & Family">{{ __('Friends & Family') }}</option>
-                                    <option value="Healthcare Practitioner">
-                                        {{ __('Referral by Healthcare Practitioner') }}
-                                    </option>
-                                    <option value="Other">{{ __('Other Sources') }}</option>
-                                </select>
-                            </div>
-                        </div> -->
-
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                             <div>
                                 <label
-                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
+                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ $site_settings['password_label'] ?? 'Password' }}</label>
                                 <div class="relative">
                                     <input type="password" name="password" id="password"
                                         class="reg-input @error('password') border-red-500! @enderror"
-                                        placeholder="Enter Password" required
+                                        placeholder="{{ $site_settings['enter_password_placeholder'] ?? 'Enter Password' }}" required
                                         readonly
                                         onfocus="this.removeAttribute('readonly');"
                                         onclick="this.removeAttribute('readonly');">
@@ -1051,7 +999,7 @@
                             checkPasswordMatch();
                             confirmPasswordInput.focus();
                             if (typeof showZayaToast === 'function') {
-                                showZayaToast('Passwords do not match.', 'error');
+                                showZayaToast(trans.noMatch, 'error');
                             }
                             return;
                         }
@@ -1521,6 +1469,16 @@
                 }
             });
 
+            // Translatable strings for JavaScript
+            const trans = {
+                match: "{{ $site_settings['passwords_match_msg'] ?? 'Passwords match' }}",
+                noMatch: "{{ $site_settings['passwords_not_match_msg'] ?? 'Passwords do not match' }}",
+                weak: "{{ $site_settings['password_weak_label'] ?? 'Weak' }}",
+                fair: "{{ $site_settings['password_fair_label'] ?? 'Fair' }}",
+                good: "{{ $site_settings['password_good_label'] ?? 'Good' }}",
+                strong: "{{ $site_settings['password_strong_label'] ?? 'Strong' }}"
+            };
+
             // Password Match Validation
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('password_confirmation');
@@ -1591,19 +1549,19 @@
                     strengthBar.style.width = strength + '%';
                     if (strength <= 25) {
                         strengthBar.className = 'h-full transition-all duration-300 bg-red-500';
-                        strengthText.textContent = 'Weak';
+                        strengthText.textContent = trans.weak;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-red-500';
                     } else if (strength <= 50) {
                         strengthBar.className = 'h-full transition-all duration-300 bg-orange-400';
-                        strengthText.textContent = 'Fair';
+                        strengthText.textContent = trans.fair;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-orange-400';
                     } else if (strength <= 75) {
                         strengthBar.className = 'h-full transition-all duration-300 bg-blue-400';
-                        strengthText.textContent = 'Good';
+                        strengthText.textContent = trans.good;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-blue-400';
                     } else {
                         strengthBar.className = 'h-full transition-all duration-300 bg-green-500';
-                        strengthText.textContent = 'Strong';
+                        strengthText.textContent = trans.strong;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-green-500';
                     }
                 } else {
@@ -1632,13 +1590,13 @@
 
                     if (password === confirmPassword) {
                         matchIcon.className = 'ri-checkbox-circle-fill text-sm text-green-500';
-                        matchText.textContent = 'Passwords match';
+                        matchText.textContent = trans.match;
                         matchText.className = 'text-xs font-medium text-green-500';
                         confirmPasswordInput.classList.remove('border-red-500!');
                         matchError.textContent = '';
                     } else {
                         matchIcon.className = 'ri-error-warning-fill text-sm text-red-500';
-                        matchText.textContent = 'Passwords do not match';
+                        matchText.textContent = trans.noMatch;
                         matchText.className = 'text-xs font-medium text-red-500';
                         confirmPasswordInput.classList.add('border-red-500!');
                     }

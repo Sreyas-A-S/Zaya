@@ -122,7 +122,7 @@
                 </div>
 
                 <div class="relative">
-                    <input type="password" name="password" id="password" required placeholder="{{ __('Password') }}"
+                    <input type="password" name="password" id="password" required placeholder="{{ $site_settings['password_label'] ?? __('Password') }}"
                         autocomplete="current-password"
                         readonly
                         onfocus="this.removeAttribute('readonly');"
