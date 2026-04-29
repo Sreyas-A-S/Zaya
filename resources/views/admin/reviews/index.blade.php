@@ -35,6 +35,7 @@
                                     <th>ID</th>
                                     <th>Type</th>
                                     <th>Reviewer</th>
+                                    <th>Role</th>
                                     <th>Target</th>
                                     <th>Rating</th>
                                     <th>Review</th>
@@ -121,6 +122,13 @@
                     }
                 },
                 { data: 'reviewer_name', name: 'reviewer_name' },
+                { 
+                    data: 'reviewer_role', 
+                    name: 'reviewer_role',
+                    render: function(data) {
+                        return `<span class="text-xs font-medium text-gray-500 uppercase tracking-wider">${data}</span>`;
+                    }
+                },
                 { data: 'target_name', name: 'target_name' },
                 { 
                     data: 'rating_display', 

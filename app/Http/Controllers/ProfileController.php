@@ -2057,11 +2057,41 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        // Reviews written by this user
-        $myReviews = PractitionerReview::with('practitioner.user')
+        // Reviews written by this user (Both Professional and Zaya Reviews)
+        $practitionerReviews = PractitionerReview::with('practitioner.user')
             ->where('user_id', $user->id)
-            ->latest()
-            ->paginate(10, ['*'], 'my_page');
+            ->get()
+            ->map(function($r) {
+                $r->review_type = 'Professional Review';
+                $r->target_name = $r->practitioner->user->name ?? 'N/A';
+                $r->target_role = str_replace('_', ' ', $r->practitioner->user->role);
+                $r->target_pic = $r->practitioner->profile_photo_path ? asset('storage/' . $r->practitioner->profile_photo_path) : asset('frontend/assets/profile-dummy-img.png');
+                $r->display_status = $r->status ? 'approved' : 'pending';
+                return $r;
+            });
+
+        $zayaReviews = \App\Models\Testimonial::where('user_id', $user->id)
+            ->get()
+            ->map(function($t) {
+                $t->review_type = 'Zaya Review';
+                $t->target_name = 'Zaya Wellness';
+                $t->target_role = 'Platform';
+                $t->target_pic = asset('frontend/assets/logo-icon.png'); // Assuming there is a logo icon
+                $t->review = $t->message; // Standardize field name
+                $t->display_status = $t->status; // 'approved' or 'pending'
+                return $t;
+            });
+
+        $myReviews = $practitionerReviews->concat($zayaReviews)->sortByDesc('created_at');
+        
+        // Manual pagination for combined results
+        $currentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage('my_page');
+        $perPage = 10;
+        $currentItems = $myReviews->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        $myReviews = new \Illuminate\Pagination\LengthAwarePaginator($currentItems, $myReviews->count(), $perPage, $currentPage, [
+            'path' => \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => 'my_page',
+        ]);
 
         // Reviews received by this user (if they are a professional)
         if ($user->profile_id && in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'])) {
@@ -2125,15 +2155,17 @@ class ProfileController extends Controller
     {
         $request->validate([
             'message' => 'required|string|max:2000',
+            'rating' => 'required|integer|min:1|max:5',
         ]);
 
         $user = Auth::user();
 
         \App\Models\Testimonial::create([
+            'user_id' => $user->id,
             'name' => $user->name,
             'role' => str_replace('_', ' ', ucfirst($user->role)),
             'message' => $request->message,
-            'rating' => 5,
+            'rating' => $request->rating,
             'image' => $user->profile_pic,
             'status' => 'pending' // Default to pending for moderation
         ]);

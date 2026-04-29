@@ -40,11 +40,16 @@
         <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm group hover:border-secondary/20 transition-all">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="flex items-center gap-4">
-                    <img src="{{ $review->practitioner->profile_photo_path ? asset('storage/' . $review->practitioner->profile_photo_path) : asset('frontend/assets/profile-dummy-img.png') }}" 
+                    <img src="{{ $review->target_pic }}" 
                          class="w-16 h-16 rounded-2xl object-cover border border-gray-100">
                     <div>
-                        <h3 class="font-black text-secondary leading-tight">{{ $review->practitioner->user->name }}</h3>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{{ str_replace('_', ' ', $review->practitioner->user->role) }}</p>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-black text-secondary leading-tight">{{ $review->target_name }}</h3>
+                            <span class="text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest {{ $review->display_status === 'approved' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-orange-50 text-orange-600 border border-orange-100' }}">
+                                {{ $review->display_status }}
+                            </span>
+                        </div>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{{ $review->target_role }} • {{ $review->review_type }}</p>
                     </div>
                 </div>
                 <div class="flex flex-col items-start md:items-end">

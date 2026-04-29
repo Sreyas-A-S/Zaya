@@ -236,37 +236,40 @@
     .time-slots-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
+        gap: 8px;
     }
     .time-slot {
-        padding: 6px 2px;
+        padding: 10px 4px;
         text-align: center;
-        font-size: 10px;
-        color: #555;
-        border-radius: 8px;
+        font-size: 11px;
+        color: #2E4B3D;
+        border-radius: 12px;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
         border: 1px solid #E5E7EB;
-        font-weight: 700;
-        background: #F9FAFB;
+        font-weight: 800;
+        background: #ffffff;
+        letter-spacing: 0.025em;
     }
     .time-slot:hover:not(.booked):not(.selected) {
-        background-color: #F3F4F6;
-        border-color: #D1D5DB;
+        background-color: #f8fafc;
+        border-color: #2E4B3D;
+        transform: translateY(-1px);
     }
     .time-slot.selected {
         background-color: #2E4B3D;
         color: #fff;
         border-color: #2E4B3D;
-        box-shadow: 0 4px 12px rgba(46, 75, 61, 0.2);
+        box-shadow: 0 10px 15px -3px rgba(46, 75, 61, 0.2);
+        transform: translateY(-1px);
     }
     .time-slot.booked {
-        background-color: #FEE2E2 !important;
-        color: #991B1B !important;
-        border-color: #FECACA !important;
+        background-color: #f1f5f9 !important;
+        color: #94a3b8 !important;
+        border-color: #e2e8f0 !important;
         cursor: not-allowed !important;
-        opacity: 0.6;
+        font-weight: 500;
     }
 </style>
 
@@ -669,14 +672,14 @@
             const roleLabel = roleKey.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
             const canViewProfile = (p.role === 'practitioner');
             const card = document.createElement('div');
-            card.className = 'p-4 bg-white border border-[#2E4B3D]/12 rounded-2xl shadow-sm space-y-4 mb-3';
+            card.className = 'p-6 bg-white border border-gray-100 rounded-[2rem] shadow-sm space-y-6 mb-4 transition-all hover:shadow-md';
             card.innerHTML = `
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <img src="${p.pic}" class="w-10 h-10 rounded-xl object-cover border border-gray-100">
                         <div>
-                            <p class="text-xs font-black text-secondary uppercase tracking-tight">${p.name}</p>
-                            <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">${roleLabel}</p>
+                            <p class="text-sm font-black text-secondary tracking-tight">${p.name}</p>
+                            <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-0.5">${roleLabel}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
@@ -694,19 +697,25 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 gap-4">
                     <div>
-                        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Consultation Date</label>
-                        <input type="date" 
-                            onchange="fetchSlotsForReferral('${roleKey}', this.value)"
-                            min="{{ now()->format('Y-m-d') }}"
-                            class="w-full px-3 py-2 text-xs rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 transition-all bg-gray-50/50"
-                            id="date-${roleKey}">
+                        <label class="block text-[10px] font-black text-secondary uppercase tracking-widest mb-2 opacity-70">Consultation Date</label>
+                        <div class="relative">
+                            <i class="ri-calendar-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="date" 
+                                onchange="fetchSlotsForReferral('${roleKey}', this.value)"
+                                min="{{ now()->format('Y-m-d') }}"
+                                class="w-full pl-11 pr-4 py-3.5 text-sm rounded-2xl border border-gray-100 focus:border-secondary focus:ring-4 focus:ring-secondary/10 transition-all bg-gray-50/50 font-medium text-secondary"
+                                id="date-${roleKey}">
+                        </div>
                     </div>
-                    <div class="col-span-2">
-                        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Select Slot</label>
-                        <div id="slots-container-${roleKey}" class="time-slots-grid">
-                            <p class="text-[10px] text-gray-400 font-bold uppercase col-span-3 py-2">Select date first</p>
+                    <div>
+                        <label class="block text-[10px] font-black text-secondary uppercase tracking-widest mb-2 opacity-70">Select Time Slot</label>
+                        <div id="slots-container-${roleKey}" class="time-slots-grid min-h-[60px]">
+                            <div class="col-span-3 py-6 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200 flex flex-col items-center justify-center gap-2">
+                                <i class="ri-time-line text-gray-300 text-xl"></i>
+                                <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Select date first</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -721,12 +730,22 @@
         
         if (!date || !container) {
             if (container) {
-                container.innerHTML = '<p class="text-[10px] text-gray-400 font-bold uppercase col-span-3 py-2">Select date first</p>';
+                container.innerHTML = `
+                    <div class="col-span-3 py-6 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200 flex flex-col items-center justify-center gap-2">
+                        <i class="ri-time-line text-gray-300 text-xl"></i>
+                        <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Select date first</p>
+                    </div>
+                `;
             }
             return;
         }
 
-        container.innerHTML = '<div class="col-span-3 py-2 flex items-center gap-2"><div class="animate-spin h-3 w-3 border-b-2 border-secondary rounded-full"></div><span class="text-[10px] text-gray-400 uppercase font-black">Loading...</span></div>';
+        container.innerHTML = `
+            <div class="col-span-3 py-8 text-center bg-gray-50/30 rounded-2xl border border-gray-100 flex flex-col items-center justify-center gap-3">
+                <div class="animate-spin h-6 w-6 border-2 border-secondary border-t-transparent rounded-full"></div>
+                <span class="text-[9px] text-gray-400 uppercase font-black tracking-widest">Fetching available slots...</span>
+            </div>
+        `;
 
         try {
             // Fetch both available and booked slots
@@ -791,7 +810,12 @@
             }
         } catch (error) {
             console.error('Fetch slots error:', error);
-            container.innerHTML = '<p class="text-[10px] text-red-400 font-bold uppercase col-span-3 py-2">Error loading slots</p>';
+            container.innerHTML = `
+                <div class="col-span-3 py-6 text-center bg-red-50 rounded-2xl border border-red-100 flex flex-col items-center justify-center gap-2">
+                    <i class="ri-error-warning-line text-red-400 text-xl"></i>
+                    <p class="text-[9px] text-red-400 font-black uppercase tracking-widest">Error loading slots</p>
+                </div>
+            `;
         }
     }
 
