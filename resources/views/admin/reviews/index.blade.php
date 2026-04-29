@@ -32,14 +32,15 @@
                         <table class="display" id="reviews-table">
                             <thead>
                                 <tr>
+                                    <th>Sl No</th>
                                     <th>ID</th>
                                     <th>Type</th>
                                     <th>Reviewer</th>
-                                    <th>Role</th>
+                                    <th>User Type</th>
                                     <th>Target</th>
                                     <th>Rating</th>
                                     <th>Review</th>
-                                    <th>Date</th>
+                                    <th>Date & Time</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -112,6 +113,7 @@
             serverSide: true,
             ajax: "{{ route('admin.reviews.index') }}",
             columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'id', name: 'id' },
                 { 
                     data: 'type', 
@@ -141,13 +143,14 @@
                     data: 'created_at', 
                     name: 'created_at',
                     render: function(data) {
-                        return new Date(data).toLocaleDateString();
+                        const date = new Date(data);
+                        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     }
                 },
                 { data: 'status', name: 'status', orderable: false, searchable: false },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
             ],
-            order: [[6, 'desc']]
+            order: [[8, 'desc']]
         });
 
         // Delete

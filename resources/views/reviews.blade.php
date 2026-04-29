@@ -56,7 +56,7 @@
                             <i class="ri-star-{{ $i <= $review->rating ? 'fill' : 'line' }}"></i>
                         @endfor
                     </div>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ $review->created_at->format('M d, Y') }}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ $review->created_at->format('M d, Y • h:i A') }}</p>
                 </div>
             </div>
             <div class="mt-6 pt-6 border-t border-gray-50">
@@ -123,7 +123,7 @@
                             <i class="ri-star-{{ $i <= $review->rating ? 'fill' : 'line' }}"></i>
                         @endfor
                     </div>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ $review->created_at->format('M d, Y') }}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ $review->created_at->format('M d, Y • h:i A') }}</p>
                 </div>
             </div>
             <div class="mt-6 pt-6 border-t border-gray-50">
