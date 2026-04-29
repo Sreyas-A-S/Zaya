@@ -2070,17 +2070,20 @@ class ProfileController extends Controller
                 return $r;
             });
 
-        $zayaReviews = \App\Models\Testimonial::where('user_id', $user->id)
-            ->get()
-            ->map(function($t) {
-                $t->review_type = 'Zaya Review';
-                $t->target_name = 'Zaya Wellness';
-                $t->target_role = 'Platform';
-                $t->target_pic = asset('frontend/assets/logo-icon.png'); // Assuming there is a logo icon
-                $t->review = $t->message; // Standardize field name
-                $t->display_status = $t->status; // 'approved' or 'pending'
-                return $t;
-            });
+        $zayaReviews = collect();
+        if (\Illuminate\Support\Facades\Schema::hasColumn('testimonials', 'user_id')) {
+            $zayaReviews = \App\Models\Testimonial::where('user_id', $user->id)
+                ->get()
+                ->map(function($t) {
+                    $t->review_type = 'Zaya Review';
+                    $t->target_name = 'Zaya Wellness';
+                    $t->target_role = 'Platform';
+                    $t->target_pic = asset('frontend/assets/logo-icon.png');
+                    $t->review = $t->message;
+                    $t->display_status = $t->status;
+                    return $t;
+                });
+        }
 
         $myReviews = $practitionerReviews->concat($zayaReviews)->sortByDesc('created_at');
         
