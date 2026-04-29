@@ -9,6 +9,64 @@
     @include('partials.bookings-table')
 </div>
 
+<!-- Reschedule Modal -->
+<div id="reschedule-modal" class="fixed inset-0 z-[999] hidden" aria-labelledby="reschedule-modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeRescheduleModal()"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-[#2E4B3D]/12">
+                <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                    <div>
+                        <h3 class="text-xl font-black text-secondary leading-tight" id="reschedule-modal-title">Reschedule Consultation</h3>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Select new date and time</p>
+                    </div>
+                    <button onclick="closeRescheduleModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-100 text-gray-400 hover:text-secondary hover:border-secondary/20 transition-all shadow-sm">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
+                </div>
+                <form id="reschedule-form" class="px-8 py-8">
+                    @csrf
+                    <input type="hidden" id="reschedule-booking-id">
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-secondary uppercase tracking-widest mb-3 opacity-60">New Booking Date</label>
+                            <div class="relative group">
+                                <i class="ri-calendar-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-colors"></i>
+                                <input type="date" id="reschedule-date" name="booking_date" required
+                                    class="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium outline-none focus:border-secondary focus:bg-white transition-all shadow-sm min-h-[52px]"
+                                    min="{{ date('Y-m-d') }}">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-secondary uppercase tracking-widest mb-3 opacity-60">New Booking Time</label>
+                            <div class="relative group">
+                                <i class="ri-time-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-colors"></i>
+                                <input type="text" id="reschedule-time" name="booking_time" required placeholder="e.g. 10:00 AM - 11:00 AM"
+                                    class="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium outline-none focus:border-secondary focus:bg-white transition-all shadow-sm min-h-[52px]">
+                            </div>
+                            <p class="text-[9px] text-gray-400 mt-2 italic font-medium">Please enter the full time slot string.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 flex flex-col gap-3">
+                        <button type="submit" id="reschedule-submit-btn" 
+                            class="w-full py-4 bg-secondary text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-primary shadow-lg shadow-secondary/20 transition-all flex items-center justify-center gap-2 group">
+                            <span>Confirm Reschedule</span>
+                            <i class="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                        <button type="button" onclick="closeRescheduleModal()" 
+                            class="w-full py-4 bg-white text-gray-400 border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-secondary hover:border-secondary/20 transition-all">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Booking Details Modal -->
 <div id="booking-modal" class="fixed inset-0 z-[999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <!-- Background backdrop -->
@@ -281,5 +339,75 @@
             }
         }
     });
+
+    // Reschedule Logic
+    function openRescheduleModal(id, currentDate, currentTime) {
+        document.getElementById('reschedule-booking-id').value = id;
+        document.getElementById('reschedule-date').value = currentDate;
+        document.getElementById('reschedule-time').value = currentTime;
+        
+        document.getElementById('reschedule-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeRescheduleModal() {
+        document.getElementById('reschedule-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    document.getElementById('reschedule-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const id = document.getElementById('reschedule-booking-id').value;
+        const submitBtn = document.getElementById('reschedule-submit-btn');
+        const formData = new FormData(this);
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin text-xl"></i> <span>Processing...</span>';
+        
+        try {
+            const response = await fetch(`/bookings/${id}/reschedule`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                if (typeof showToast === 'function') showToast(result.message);
+                else alert(result.message);
+                
+                closeRescheduleModal();
+                // Refresh the table
+                const url = new URL(window.location.href);
+                fetchBookings(url.toString()); 
+            } else {
+                alert(result.message || 'Rescheduling failed.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while rescheduling.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>Confirm Reschedule</span> <i class="ri-arrow-right-line"></i>';
+        }
+    });
+
+    async function fetchBookings(url) {
+        const wrapper = document.getElementById('bookings-wrapper');
+        try {
+            wrapper.style.opacity = '0.5';
+            const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const html = await response.text();
+            wrapper.innerHTML = html;
+            wrapper.style.opacity = '1';
+        } catch (e) {
+            console.error(e);
+            wrapper.style.opacity = '1';
+        }
+    }
 </script>
 @endsection

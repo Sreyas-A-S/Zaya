@@ -111,8 +111,14 @@
                                 $uniqueDates = collect($sessions)->pluck('day')->unique()->filter(fn($d) => !empty($d) && $d !== 'Day');
                                 $hasMultiple = $uniqueTimes->count() > 1 || $uniqueDates->count() > 1;
                             @endphp
-                            <div class="text-sm text-secondary">{{ $booking->booking_date->format('M d, Y') }}</div>
+                            @if($booking->original_booking_date)
+                                <div class="text-[10px] text-amber-600 font-black uppercase tracking-widest line-through opacity-40 mb-0.5">{{ $booking->original_booking_date->format('M d, Y') }}</div>
+                            @endif
+                            <div class="text-sm text-secondary font-bold">{{ $booking->booking_date->format('M d, Y') }}</div>
                             <div class="text-xs text-gray-400 flex items-center gap-1">
+                                @if($booking->original_booking_time)
+                                    <span class="line-through opacity-40 mr-1 font-medium">{{ $booking->original_booking_time }}</span>
+                                @endif
                                 {{ $booking->booking_time }}
                                 @if($hasMultiple)
                                     <span class="bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded text-[9px] font-bold border border-amber-100">+ More</span>
@@ -209,6 +215,11 @@
                                         </a>
 
                                         @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+                                        <button onclick="openRescheduleModal({{ $booking->id }}, '{{ $booking->booking_date->toDateString() }}', '{{ $booking->booking_time }}')" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors text-left">
+                                            <i class="ri-calendar-event-line mr-3 text-lg text-amber-500"></i>
+                                            Reschedule
+                                        </button>
+
                                         <button onclick="openReferModal({{ $booking->id }}, {{ $booking->user_id }})" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-left">
                                             <i class="ri-user-shared-line mr-3 text-lg text-orange-500"></i>
                                             Refer

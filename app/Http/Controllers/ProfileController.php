@@ -431,6 +431,44 @@ class ProfileController extends Controller
             ->with('status', $msg);
     }
 
+    public function rescheduleBooking(Request $request, $id)
+    {
+        $request->validate([
+            'booking_date' => 'required|date|after_or_equal:today',
+            'booking_time' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        $booking = Booking::with(['practitioner.user'])->findOrFail($id);
+
+        // Authorization: Only the practitioner assigned to the booking can reschedule
+        $isPractitioner = ($booking->practitioner && $booking->practitioner->user_id === $user->id);
+        
+        if (!$isPractitioner) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized. Only assigned professionals can reschedule.'], 403);
+        }
+
+        // Save original datetime if it's the first reschedule
+        if (!$booking->original_booking_date) {
+            $booking->original_booking_date = $booking->booking_date;
+            $booking->original_booking_time = $booking->booking_time;
+        }
+
+        // Update with new values
+        $booking->booking_date = $request->booking_date;
+        $booking->booking_time = $request->booking_time;
+        $booking->rescheduled_at = now();
+        $booking->rescheduled_by = $user->role;
+        $booking->save();
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Consultation rescheduled successfully.',
+            'new_date' => $booking->booking_date->format('M d, Y'),
+            'new_time' => $booking->booking_time
+        ]);
+    }
+
     public function deleteConsultationForm($id, $form_id)
     {
         $user = Auth::user();
