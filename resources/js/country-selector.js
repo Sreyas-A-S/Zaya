@@ -20,7 +20,7 @@ export function initCountrySelector(selector = '#nationality-select', defaultVal
         create: false,
         persist: false,
         closeAfterSelect: true,
-        placeholder: 'Select Country',
+        placeholder: element.dataset.placeholder || 'Select Country',
         render: {
             option: function (data, escape) {
                 return `<div class="country-option">

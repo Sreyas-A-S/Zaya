@@ -97,6 +97,24 @@ class DynamicTranslationsSeeder extends Seeder
                 'section' => 'general',
                 'en_value' => 'Profile',
                 'fr_value' => 'Profil',
+            ],
+            [
+                'key' => 'state_label',
+                'section' => 'auth',
+                'en_value' => 'State (Optional)',
+                'fr_value' => 'État (Facultatif)',
+            ],
+            [
+                'key' => 'select_country_placeholder',
+                'section' => 'auth',
+                'en_value' => 'Select Country',
+                'fr_value' => 'Choisissez le Pays',
+            ],
+            [
+                'key' => 'website_label',
+                'section' => 'auth',
+                'en_value' => 'Website (Optional)',
+                'fr_value' => 'Site Web (Facultatif)',
             ]
         ];
 

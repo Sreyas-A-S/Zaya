@@ -320,8 +320,9 @@
                         <div>
                             <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('Country') }}</label>
                             <select id="country-select" name="country"
+                                data-placeholder="{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}"
                                 data-default="{{ old('country', 'IN') }}" required>
-                                <option value="">{{ __('Select Country') }}</option>
+                                <option value="">{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}</option>
                             </select>
                         </div>
                     </div>
@@ -356,7 +357,7 @@
                                 onclick="this.removeAttribute('readonly');">
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ __('State (Optional)') }}</label>
+                            <label class="block text-gray-700 font-normal mb-4 text-lg">{{ $site_settings['state_label'] ?? __('State (Optional)') }}</label>
                             <input type="text" name="state" value="{{ old('state') }}"
                                 pattern="^[A-Za-z\s]+$" title="Only alphabets and spaces are allowed"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
@@ -461,8 +462,9 @@
                                 <div class="education-country-wrapper">
                                     <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Country') }}</label>
                                     <select id="education-country-select-0" name="education[0][country]"
+                                        data-placeholder="{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}"
                                         class="education-country-select w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]" data-default="" required>
-                                        <option value="">{{ __('Select Country') }}</option>
+                                        <option value="">{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -2695,8 +2697,9 @@
                         <div class="education-country-wrapper">
                             <label class="block text-[#525252] text-lg font-normal mb-3">{{ __('Country') }}</label>
                             <select id="education-country-select-${index}" name="education[${index}][country]"
+                                data-placeholder="{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}"
                                 class="education-country-select w-full py-3.5 px-6 bg-white rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 focus:border-[#97563D] focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]" data-default="" required>
-                                <option value="">{{ __('Select Country') }}</option>
+                                <option value="">{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}</option>
                                 ${countriesData.map(c => `<option value="${c.code}">${c.flag} ${c.name}</option>`).join('')}
                             </select>
                         </div>

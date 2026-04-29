@@ -652,7 +652,7 @@
                             </div>
                             <div>
                                 <label
-                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('State (Optional)') }}</label>
+                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ $site_settings['state_label'] ?? __('State (Optional)') }}</label>
                                 <input type="text" name="state" value="{{ old('state') }}"
                                     class="reg-input @error('state') border-red-500! @enderror"
                                     placeholder="{{ __('Enter State') }}" autocomplete="off"
@@ -666,9 +666,11 @@
                             <div>
                                 <label
                                     class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Country') }}</label>
-                                <select id="nationality-select" name="country" data-default="{{ old('country', 'IN') }}"
+                                <select id="nationality-select" name="country" 
+                                    data-placeholder="{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}"
+                                    data-default="{{ old('country', 'IN') }}"
                                     required>
-                                    <option value="">{{ __('Select Country') }}</option>
+                                    <option value="">{{ $site_settings['select_country_placeholder'] ?? __('Select Country') }}</option>
                                 </select>
                                 @error('country')
                                     <span class="text-red-500 text-xs mt-1 pl-4 block">{{ $message }}</span>
