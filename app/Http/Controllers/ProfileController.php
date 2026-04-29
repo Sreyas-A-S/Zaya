@@ -322,9 +322,14 @@ class ProfileController extends Controller
         $hasOTPAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
 
         $canEdit = ($isPractitioner || $isTranslator) && $request->query('view') != '1';
-        $canView = $canEdit || $isClient || $isReferrer || $isReferredTo || $hasOTPAccess || $request->query('view') == '1';
+        
+        // Referred experts now require additional OTP verification
+        $canView = $canEdit || $isClient || $isReferrer || $hasOTPAccess || $request->query('view') == '1';
 
         if (!$canView) {
+            if ($isReferredTo) {
+                return view('consultation-form-locked', compact('user', 'booking'));
+            }
             abort(403, 'You do not have permission to access this consultation form.');
         }
 
