@@ -208,7 +208,8 @@ class RegisterController extends Controller
             if ($user->referred_by) {
                 $referrer = \App\Models\User::find($user->referred_by);
                 if ($referrer) {
-                    $coinSetting = \App\Models\CoinSetting::where('currency_code', $referrer->currency)->where('status', true)->first();
+                    $referrerCurrency = $referrer->profile ? $referrer->profile->payout_currency : config('currencies.default', 'INR');
+                    $coinSetting = \App\Models\CoinSetting::where('currency_code', $referrerCurrency)->where('status', true)->first();
                     if ($coinSetting && $coinSetting->referral_coins > 0) {
                         $referrer->increment('coins', $coinSetting->referral_coins);
                         

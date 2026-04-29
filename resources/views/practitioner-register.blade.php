@@ -1401,7 +1401,8 @@
 
             // Clear previous errors
             currentTabEl.querySelectorAll('.error-message').forEach(el => el.remove());
-            currentTabEl.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500', 'focus:border-red-500'));
+            currentTabEl.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500', 'focus:border-red-500', 'border-red-500!'));
+            currentTabEl.querySelectorAll('[id$="-error"], #confirm-error').forEach(el => el.classList.add('hidden'));
 
             inputs.forEach(input => {
                 let errorMsg = null;
@@ -1429,24 +1430,36 @@
 
                 if (errorMsg) {
                     input.classList.add('border-red-500', 'focus:border-red-500');
-                    const err = document.createElement('p');
-                    err.className = 'error-message text-red-500 text-sm mt-1 absolute';
-                    err.textContent = errorMsg;
+                    
+                    // Check for specific custom error divs first (like password-error or confirm-error)
+                    const customErrId = input.id === 'password_confirmation' ? 'confirm-error' : `${input.id}-error`;
+                    const customErr = document.getElementById(customErrId);
 
-                    // Add position relative to parent to stick the error to the bottom appropriately
-                    const parent = input.parentElement;
-                    if (parent) {
-                        parent.style.position = 'relative';
-                        parent.appendChild(err);
+                    if (customErr) {
+                        customErr.textContent = errorMsg;
+                        customErr.classList.remove('hidden');
+                    } else {
+                        const err = document.createElement('p');
+                        err.className = 'error-message text-red-500 text-sm mt-1';
+                        err.textContent = errorMsg;
+
+                        const parent = input.parentElement;
+                        if (parent) {
+                            parent.appendChild(err);
+                        }
                     }
                     isValid = false;
                 }
 
                 // Add real-time clearance
                 input.addEventListener('input', function() {
-                    this.classList.remove('border-red-500', 'focus:border-red-500');
+                    this.classList.remove('border-red-500', 'focus:border-red-500', 'border-red-500!');
                     const err = this.parentElement ? this.parentElement.querySelector('.error-message') : null;
                     if (err) err.remove();
+                    
+                    const customErrId = this.id === 'password_confirmation' ? 'confirm-error' : `${this.id}-error`;
+                    const customErr = document.getElementById(customErrId);
+                    if (customErr) customErr.classList.add('hidden');
                 }, {
                     once: true
                 });

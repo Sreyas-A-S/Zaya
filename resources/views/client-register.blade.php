@@ -689,60 +689,6 @@
                             </div>
                         </div>
 
-                        <!-- Consultation Preferences -->
-                        <!-- <div class="mb-10">
-                            <label
-                                class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Preferred Speciality of Consultation') }}</label>
-                            <div
-                                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8 bg-gray-50/50 p-6 md:p-8 rounded-3xl">
-                                @foreach($consultationPreferences as $pref)
-                                    <label class="flex items-center gap-3 cursor-pointer group">
-                                        <div class="relative w-6 h-6 flex-shrink-0">
-                                            <input type="checkbox" name="consultation_preferences[]"
-                                                value="{{ $pref->name }}"
-                                                class="peer absolute inset-0 opacity-0 z-10 cursor-pointer">
-                                            <div
-                                                class="w-full h-full border-2 border-gray-300 rounded-full peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center peer-checked:[&>i]:opacity-100">
-                                                <i
-                                                    class="ri-check-line text-white text-sm opacity-0 transition-opacity font-bold"></i>
-                                            </div>
-                                        </div>
-                                        <span
-                                            class="text-gray-700 group-hover:text-primary transition-colors">{{ $pref->name }}</span>
-                                    </label>
-                                @endforeach
-
-                            </div>
-                        </div>
-
-                        <!-- Row: Languages & Referral -->
-                        <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
-                            <div>
-                                <label
-                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('Languages Spoken') }}</label>
-                                <select id="languages-select" name="languages[]" multiple
-                                    placeholder="{{ __('Select Languages') }}">
-                                    @foreach($languages as $lang)
-                                        <option value="{{ $lang->code }}">{{ $lang->display_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label
-                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ __('How did you hear about us?') }}</label>
-                                <select name="referral_type" class="reg-input w-full">
-                                    <option value="">{{ __('Select Option') }}</option>
-                                    <option value="Direct Search">{{ __('Direct Search') }}</option>
-                                    <option value="Social Media">{{ __('Social Media') }}</option>
-                                    <option value="Friends & Family">{{ __('Friends & Family') }}</option>
-                                    <option value="Healthcare Practitioner">
-                                        {{ __('Referral by Healthcare Practitioner') }}
-                                    </option>
-                                    <option value="Other">{{ __('Other Sources') }}</option>
-                                </select>
-                            </div>
-                        </div> -->
-
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                             <div>
                                 <label
