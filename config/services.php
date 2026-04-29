@@ -127,4 +127,8 @@ return [
         'token' => env('SCHEDULER_TOKEN', 'zaya-secret-scheduler-key-2024'),
     ],
 
+    'tawk_to' => [
+        'src' => env('TAWK_TO_SRC', 'https://embed.tawk.to/69f14a0f05ee8f1c35064303/1jnb8ik6a'),
+    ],
+
 ];
