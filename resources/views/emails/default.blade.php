@@ -189,7 +189,7 @@
                         <td class="label">User Type:</td>
                         <td>
                             @if($messageData->user_type)
-                                {{ implode(', ', array_map('ucfirst', $messageData->user_type)) }}
+                                {{ implode(', ', array_map('ucfirst', (array)$messageData->user_type)) }}
                             @else
                                 N/A
                             @endif

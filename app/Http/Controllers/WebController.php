@@ -1408,6 +1408,10 @@ class WebController extends Controller
             'message' => 'required|string|min:10|max:2000',
         ]);
 
+        if ($request->filled('user_type')) {
+            $validatedData['user_type'] = (array) $request->user_type;
+        }
+
         $message = ContactUs::create($validatedData);
 
         // Send Email to Admin
