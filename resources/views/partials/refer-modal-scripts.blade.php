@@ -236,40 +236,43 @@
     .time-slots-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
+        gap: 10px;
     }
     .time-slot {
-        padding: 10px 4px;
+        padding: 12px 6px;
         text-align: center;
-        font-size: 11px;
+        font-size: 10px;
         color: #2E4B3D;
-        border-radius: 12px;
+        border-radius: 16px;
         cursor: pointer;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
-        border: 1px solid #E5E7EB;
-        font-weight: 800;
+        border: 2px solid #f8fafc;
+        font-weight: 900;
         background: #ffffff;
-        letter-spacing: 0.025em;
+        letter-spacing: 0.05em;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
     .time-slot:hover:not(.booked):not(.selected) {
         background-color: #f8fafc;
         border-color: #2E4B3D;
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
     .time-slot.selected {
         background-color: #2E4B3D;
         color: #fff;
         border-color: #2E4B3D;
-        box-shadow: 0 10px 15px -3px rgba(46, 75, 61, 0.2);
-        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgba(46, 75, 61, 0.25);
+        transform: translateY(-2px);
     }
     .time-slot.booked {
         background-color: #f1f5f9 !important;
         color: #94a3b8 !important;
-        border-color: #e2e8f0 !important;
+        border-color: #f1f5f9 !important;
         cursor: not-allowed !important;
-        font-weight: 500;
+        font-weight: 600;
+        box-shadow: none;
     }
 </style>
 
@@ -697,24 +700,26 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-1 gap-4">
+                <div class="grid grid-cols-1 gap-6 p-6 bg-gray-50/50 rounded-[2rem] border border-gray-100 shadow-inner">
                     <div>
-                        <label class="block text-[10px] font-black text-secondary uppercase tracking-widest mb-2 opacity-70">Consultation Date</label>
-                        <div class="relative">
-                            <i class="ri-calendar-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <label class="block text-[10px] font-black text-secondary uppercase tracking-[0.15em] mb-3 opacity-60">Consultation Date</label>
+                        <div class="relative group">
+                            <i class="ri-calendar-event-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-all text-lg"></i>
                             <input type="date" 
                                 onchange="fetchSlotsForReferral('${roleKey}', this.value)"
                                 min="{{ now()->format('Y-m-d') }}"
-                                class="w-full pl-11 pr-4 py-3.5 text-sm rounded-2xl border border-gray-100 focus:border-secondary focus:ring-4 focus:ring-secondary/10 transition-all bg-gray-50/50 font-medium text-secondary"
+                                class="w-full pl-12 pr-4 py-4 text-sm rounded-2xl border border-gray-200 focus:border-secondary focus:bg-white focus:ring-0 transition-all bg-white font-bold text-secondary shadow-sm"
                                 id="date-${roleKey}">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-secondary uppercase tracking-widest mb-2 opacity-70">Select Time Slot</label>
-                        <div id="slots-container-${roleKey}" class="time-slots-grid min-h-[60px]">
-                            <div class="col-span-3 py-6 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200 flex flex-col items-center justify-center gap-2">
-                                <i class="ri-time-line text-gray-300 text-xl"></i>
-                                <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Select date first</p>
+                        <label class="block text-[10px] font-black text-secondary uppercase tracking-[0.15em] mb-3 opacity-60">Select Time Slot</label>
+                        <div id="slots-container-${roleKey}" class="time-slots-grid min-h-[80px]">
+                            <div class="col-span-3 py-10 text-center bg-white/60 rounded-3xl border border-dashed border-gray-200 flex flex-col items-center justify-center gap-3">
+                                <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center">
+                                    <i class="ri-time-line text-gray-300 text-2xl"></i>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-black uppercase tracking-[0.2em]">Select date first</p>
                             </div>
                         </div>
                     </div>
@@ -731,9 +736,11 @@
         if (!date || !container) {
             if (container) {
                 container.innerHTML = `
-                    <div class="col-span-3 py-6 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200 flex flex-col items-center justify-center gap-2">
-                        <i class="ri-time-line text-gray-300 text-xl"></i>
-                        <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">Select date first</p>
+                    <div class="col-span-3 py-10 text-center bg-white/60 rounded-3xl border border-dashed border-gray-200 flex flex-col items-center justify-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center">
+                            <i class="ri-time-line text-gray-300 text-2xl"></i>
+                        </div>
+                        <p class="text-[9px] text-gray-400 font-black uppercase tracking-[0.2em]">Select date first</p>
                     </div>
                 `;
             }
