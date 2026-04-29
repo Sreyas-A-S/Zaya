@@ -40,8 +40,6 @@
         <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm group hover:border-secondary/20 transition-all">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="flex items-center gap-4">
-                    <img src="{{ $review->target_pic }}" 
-                         class="w-16 h-16 rounded-2xl object-cover border border-gray-100">
                     <div>
                         <div class="flex items-center gap-2">
                             <h3 class="font-black text-secondary leading-tight">{{ $review->target_name }}</h3>
@@ -114,8 +112,6 @@
         <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-5 md:p-8 shadow-sm group hover:border-secondary/20 transition-all">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="flex items-center gap-4">
-                    <img src="{{ $review->user->profile_pic ? (str_starts_with($review->user->profile_pic, 'http') ? $review->user->profile_pic : asset('storage/' . $review->user->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" 
-                         class="w-16 h-16 rounded-2xl object-cover border border-gray-100">
                     <div>
                         <h3 class="font-black text-secondary leading-tight">{{ $review->user->name }}</h3>
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Verified Client</p>
