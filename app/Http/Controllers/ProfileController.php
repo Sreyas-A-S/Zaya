@@ -2141,7 +2141,7 @@ class ProfileController extends Controller
             'practitioner_id' => $request->practitioner_id,
             'rating' => $request->rating,
             'review' => $request->review,
-            'status' => true, // Auto-approve for now or set to false for moderation
+            'status' => false, // Default to pending for moderation
         ]);
 
         if ($request->ajax()) {
