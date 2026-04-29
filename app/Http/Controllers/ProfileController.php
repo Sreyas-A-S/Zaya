@@ -19,6 +19,7 @@ use App\Traits\ImageUploadTrait;
 use Carbon\Carbon;
 use App\Models\Specialization;
 use App\Models\Qualification;
+use App\Models\ClientConsultationPreference;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -1852,6 +1853,10 @@ class ProfileController extends Controller
             case 'translator':
                 $allSpecialities = \App\Models\TranslatorSpecialization::where('status', true)->pluck('name');
                 $allConditions = \App\Models\TranslatorService::where('status', true)->pluck('name');
+                break;
+            case 'client':
+            case 'patient':
+                $allSpecialities = ClientConsultationPreference::where('status', true)->pluck('name');
                 break;
         }
         
