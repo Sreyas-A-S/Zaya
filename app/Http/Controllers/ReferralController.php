@@ -459,6 +459,48 @@ class ReferralController extends Controller
         return redirect()->route('dashboard')->with('error', 'Payment failed.');
     }
 
+    public function requestReReferral(Request $request, $id)
+    {
+        $user = Auth::user();
+        $booking = Booking::with('referral')->findOrFail($id);
+
+        if (!$booking->referral || $booking->referral->referred_to_id !== $user->id) {
+            return response()->json(['error' => 'Only the referred expert can request a re-referral.'], 403);
+        }
+
+        $request->validate([
+            'note' => 'required|string|max:1000',
+        ]);
+
+        \App\Models\ReferralRequest::create([
+            'booking_id' => $booking->id,
+            'requester_id' => $user->id,
+            'recipient_id' => $booking->referral->referred_by_id,
+            'note' => $request->note,
+            'status' => 'pending',
+        ]);
+
+        return response()->json(['success' => 'Re-referral request sent to the original practitioner.']);
+    }
+
+    public function updateRequestStatus(Request $request, $id)
+    {
+        $user = Auth::user();
+        $referralRequest = \App\Models\ReferralRequest::findOrFail($id);
+
+        if ($referralRequest->recipient_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'status' => 'required|in:processed,dismissed',
+        ]);
+
+        $referralRequest->update(['status' => $request->status]);
+
+        return response()->json(['success' => 'Request status updated.']);
+    }
+
     private function resolveProfessionalCurrency(?User $user): string
     {
         if (!$user) return strtoupper(config('currencies.default', 'INR'));

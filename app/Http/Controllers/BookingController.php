@@ -584,9 +584,17 @@ class BookingController extends Controller
         }
         $matchCriteria = array_unique(array_filter($matchCriteria));
 
+        $alreadyReferredIds = [];
+        if ($booking) {
+            $alreadyReferredIds = \App\Models\Referral::where('booking_id', $booking->id)
+                ->pluck('referred_to_id')
+                ->toArray();
+        }
+
         $users = $usersQuery->get(); // Fetch all for sorting, or we can use a more complex query
 
-        $results = $users->map(function ($u) use ($booking, $matchCriteria) {
+        $results = $users->map(function ($u) use ($booking, $matchCriteria, $alreadyReferredIds) {
+            $isAlreadyReferred = in_array($u->id, $alreadyReferredIds);
             $handlesAllServices = false;
             $serviceFee = 0;
             $isRecommended = false;
@@ -641,6 +649,7 @@ class BookingController extends Controller
                 'service_fee' => $serviceFee,
                 'currency' => $this->resolveProfessionalCurrency($u),
                 'is_recommended' => $isRecommended,
+                'is_already_referred' => $isAlreadyReferred,
                 'matched_expertises' => $matchedExpertises,
                 'profile_pic' => $u->profile_pic ? (str_starts_with($u->profile_pic, 'http') ? $u->profile_pic : asset('storage/' . $u->profile_pic)) : asset('frontend/assets/profile-dummy-img.png'),
                 'profile_url' => $u->profile_url,

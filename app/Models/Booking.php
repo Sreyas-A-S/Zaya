@@ -102,6 +102,11 @@ class Booking extends Model
         return $this->hasMany(Referral::class, 'booking_id');
     }
 
+    public function referralRequests()
+    {
+        return $this->hasMany(ReferralRequest::class);
+    }
+
     public function transactions()
     {
         return $this->hasMany(Transaction::class);

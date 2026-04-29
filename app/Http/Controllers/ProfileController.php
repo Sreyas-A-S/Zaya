@@ -308,8 +308,9 @@ class ProfileController extends Controller
     public function showConsultationForm(Request $request, $id)
     {
         $user = Auth::user();
-        $booking = Booking::with(['practitioner.user', 'user', 'translator.user', 'consultationForms.doctor'])->findOrFail($id);
-
+        $booking = Booking::findOrFail($id);
+        $booking->load(['practitioner.user', 'user', 'translator.user', 'consultationForms.doctor', 'referralRequests.requester']);
+        
         $isPractitioner = ($booking->practitioner && $booking->practitioner->user_id === $user->id);
         $isTranslator = ($booking->translator && $booking->translator->user_id === $user->id);
         $isClient = ($booking->user_id === $user->id);
@@ -321,7 +322,7 @@ class ProfileController extends Controller
         // Check for OTP-verified data access
         $hasOTPAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
 
-        $canEdit = ($isPractitioner || $isTranslator) && $request->query('view') != '1';
+        $canEdit = ($isPractitioner || $isTranslator || $isReferredTo) && $request->query('view') != '1';
         
         // Referred experts now require additional OTP verification
         $canView = $canEdit || $isClient || $isReferrer || $hasOTPAccess || $request->query('view') == '1';
@@ -363,6 +364,7 @@ class ProfileController extends Controller
         $formId = $request->query('form_id');
         $isNew = $request->query('new');
         $allForms = $booking->consultationForms()->latest()->get();
+        $referralRequests = $booking->referralRequests()->latest()->get();
         
         $existingForm = null;
         if ($formId) {
@@ -385,16 +387,9 @@ class ProfileController extends Controller
         }
 
         return view('consultation-form', compact(
-            'user',
-            'booking',
-            'consultationSchema',
-            'consultationPayload',
-            'existingForm',
-            'allForms',
-            'roleForSchema',
-            'canEdit',
-            'canView',
-            'isMinimal'
+            'user', 'booking', 'isPractitioner', 'isTranslator', 'isClient', 'isReferrer', 'isReferredTo',
+            'canEdit', 'isMinimal', 'consultationSchema', 'allForms', 'existingForm', 'isNew', 
+            'referralRequests', 'consultationPayload', 'roleForSchema'
         ));
     }
 
@@ -425,10 +420,10 @@ class ProfileController extends Controller
             $form = ConsultationForm::create([
                 'booking_id' => $booking->id,
                 'doctor_id' => $user->id,
-                'title' => $title ?: 'Consultation ' . (ConsultationForm::where('booking_id', $booking->id)->count() + 1),
+                'title' => $title ?: 'Prescription #' . (ConsultationForm::where('booking_id', $booking->id)->count() + 1),
                 'payload' => $payload,
             ]);
-            $msg = 'New consultation follow-up saved successfully.';
+            $msg = 'New prescription saved successfully.';
         }
 
         $params = ['id' => $booking->id, 'form_id' => $form->id];

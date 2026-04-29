@@ -34,6 +34,8 @@ Route::middleware(['auth', 'isClient'])->group(function () {
 
     // Referral Routes
     Route::post('/bookings/{id}/refer', [\App\Http\Controllers\ReferralController::class, 'store'])->name('bookings.refer');
+    Route::post('/bookings/{id}/refer-request', [\App\Http\Controllers\ReferralController::class, 'requestReReferral'])->name('bookings.refer-request');
+    Route::post('/refer-requests/{id}/status', [\App\Http\Controllers\ReferralController::class, 'updateRequestStatus'])->name('refer-requests.status');
     Route::get('/referrals/{referral_no}/pay', [\App\Http\Controllers\ReferralController::class, 'pay'])->name('referrals.pay');
     Route::post('/referrals/{referral_no}/pay', [\App\Http\Controllers\ReferralController::class, 'initiatePayment'])->name('referrals.pay.initiate');
     Route::post('/referrals/{referral_no}/resend-otp', [\App\Http\Controllers\ReferralController::class, 'resendOTP'])->name('referrals.resend-otp');

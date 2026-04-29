@@ -225,19 +225,19 @@
                             </p>
 
                             <div class="grid grid-cols-2 gap-3 mb-6 md:mb-8">
-                               <a href="{{ route('conferences.index') }}"
+                               <a href="{{ route('consultations.index') }}"
                                    class="flex flex-col items-center gap-2 p-3 md:p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
                                    <i
                                        class="ri-history-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
                                    <span
                                        class="text-[10px] font-black uppercase tracking-widest text-gray-600">History</span>
                                </a>
-                               <a href="{{ route('book-session') }}"
+                               <a href="{{ $booking ? route('bookings.consultation-form.show', $booking->id) : route('consultations.index') }}"
                                    class="flex flex-col items-center gap-2 p-3 md:p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
                                    <i
-                                       class="ri-calendar-check-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
+                                       class="ri-file-list-3-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
                                    <span
-                                       class="text-[10px] font-black uppercase tracking-widest text-gray-600">Follow-up</span>
+                                       class="text-[10px] font-black uppercase tracking-widest text-gray-600">Prescriptions</span>
                                </a>
                             </div>
 

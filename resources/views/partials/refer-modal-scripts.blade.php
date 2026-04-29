@@ -290,14 +290,23 @@
             list.innerHTML = '';
             professionals.forEach(p => {
                 const isSelected = selectedProfessionals[role] && selectedProfessionals[role].id === p.id;
+                const isAlreadyReferred = p.is_already_referred;
+                
                 const item = document.createElement('div');
-                item.className = `p-4 rounded-2xl border ${isSelected ? 'border-secondary bg-secondary/5' : 'border-gray-100'} flex items-center justify-between group hover:border-secondary/20 hover:bg-gray-50/50 transition-all cursor-pointer professional-item`;
-                item.onclick = () => selectProfessional(p.id, p.name, p.service_fee, p.profile_pic, role);
+                item.className = `p-4 rounded-2xl border ${isSelected ? 'border-secondary bg-secondary/5' : 'border-gray-100'} flex items-center justify-between group transition-all ${isAlreadyReferred ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:border-secondary/20 hover:bg-gray-50/50 cursor-pointer professional-item'}`;
+                
+                if (!isAlreadyReferred) {
+                    item.onclick = () => selectProfessional(p.id, p.name, p.service_fee, p.profile_pic, role);
+                }
 
                 const canViewProfile = (p.role === 'practitioner');
 
                 const recommendedBadge = p.is_recommended
                     ? `<span class="text-[9px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-black uppercase tracking-widest border border-blue-100">⭐ Recommended</span>`
+                    : '';
+                
+                const alreadyReferredBadge = isAlreadyReferred
+                    ? `<span class="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-black uppercase tracking-widest border border-gray-200">Already Referred</span>`
                     : '';
 
                 const matchingChips = (p.matched_expertises || []).map(exp => 
@@ -315,6 +324,7 @@
                             <div class="flex items-center gap-2">
                                 <p class="text-sm font-bold text-secondary leading-tight mb-0">${p.name}</p>
                                 ${recommendedBadge}
+                                ${alreadyReferredBadge}
                             </div>
                             <div class="flex flex-wrap items-center gap-2 mt-1">
                                 <span class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${p.handles_service ? 'bg-emerald-50 text-emerald-600' : (p.service_fee > 0 ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-400')}">

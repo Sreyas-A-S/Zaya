@@ -12,7 +12,7 @@
                 </button>
                 <button type="button" class="consultation-tab-button" data-tab="plan" aria-controls="tab-plan" aria-selected="false">
                     <span class="consultation-tab-title">Treatment Plan</span>
-                    <span class="consultation-tab-subtitle">Therapies, Follow-up</span>
+                    <span class="consultation-tab-subtitle">Therapies, Prescription</span>
                 </button>
             </div>
         </div>
@@ -43,7 +43,7 @@
                         <textarea name="suggested_therapies" rows="8" class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm" placeholder="Therapy name, type, duration, frequency">{{ data_get($payload, 'suggested_therapies') }}</textarea>
                     </div>
                     <div class="bg-[#F9FBFA] rounded-2xl border border-[#2E4B3D]/10 p-5 shadow-sm">
-                        <h2 class="text-lg font-bold text-secondary mb-4">Follow-Up Plan</h2>
+                        <h2 class="text-lg font-bold text-secondary mb-4">Prescription Plan</h2>
                         <textarea name="follow_up_plan" rows="8" class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm" placeholder="Review dates, adjustments, expected outcomes">{{ data_get($payload, 'follow_up_plan') }}</textarea>
                     </div>
                 </div>

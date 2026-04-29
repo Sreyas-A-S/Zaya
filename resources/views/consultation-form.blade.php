@@ -261,6 +261,97 @@
     </div>
 </section>
 
+@if($isReferrer || $isReferredTo)
+<!-- Professional Coordination -->
+<div class="mb-10 bg-[#F1F5F2] border border-[#2E4B3D]/10 rounded-[2.5rem] p-8 overflow-hidden relative">
+    <div class="absolute top-0 right-0 w-32 h-32 -mr-12 -mt-12 bg-white/40 blur-3xl rounded-full"></div>
+    
+    <div class="relative z-10">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-secondary shadow-sm">
+                <i class="ri-team-line text-xl"></i>
+            </div>
+            <div>
+                <h3 class="text-xs font-black text-secondary uppercase tracking-[0.2em]">Professional Coordination</h3>
+                <p class="text-[10px] text-gray-500 font-bold mt-0.5">Collaborative care & referral management</p>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Requests List (Visible to Referrer) -->
+            @if($isReferrer)
+            <div class="space-y-4">
+                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <i class="ri-chat-voice-line"></i> Re-referral Requests
+                </h4>
+                @if($referralRequests->isEmpty())
+                    <div class="p-6 bg-white/50 border border-dashed border-[#2E4B3D]/10 rounded-2xl text-center">
+                        <p class="text-xs text-gray-400 font-medium">No re-referral requests for this session.</p>
+                    </div>
+                @else
+                    @foreach($referralRequests as $req)
+                        <div class="p-5 bg-white rounded-2xl border border-[#2E4B3D]/10 shadow-sm">
+                            <div class="flex items-start justify-between gap-4 mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full border border-gray-100 overflow-hidden">
+                                        <img src="{{ $req->requester->profile_pic ? (str_starts_with($req->requester->profile_pic, 'http') ? $req->requester->profile_pic : asset('storage/' . $req->requester->profile_pic)) : asset('frontend/assets/profile-dummy-img.png') }}" class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-black text-secondary">{{ $req->requester->name }}</p>
+                                        <p class="text-[10px] text-gray-400 font-bold">{{ $req->created_at->diffForHumans() }}</p>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest {{ $req->status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100' : ($req->status === 'processed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-gray-50 text-gray-400 border border-gray-200') }}">
+                                    {{ $req->status }}
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-600 italic line-clamp-3 mb-4">"{{ $req->note }}"</p>
+                            @if($req->status === 'pending')
+                            <div class="flex gap-2">
+                                <button onclick="updateReferralRequestStatus({{ $req->id }}, 'processed')" class="flex-1 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-emerald-100 transition-all">Mark Processed</button>
+                                <button onclick="updateReferralRequestStatus({{ $req->id }}, 'dismissed')" class="flex-1 py-2 bg-gray-50 text-gray-500 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-all">Dismiss</button>
+                            </div>
+                            @endif
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+            @endif
+
+            <!-- Request Form (Visible to Referred Expert) -->
+            @if($isReferredTo)
+            <div class="space-y-4">
+                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <i class="ri-share-forward-line"></i> Request Re-referral
+                </h4>
+                <div class="p-6 bg-white rounded-[2rem] border border-[#2E4B3D]/10 shadow-sm">
+                    <p class="text-[11px] text-gray-500 mb-4 leading-relaxed">If you believe this client needs another expert's attention, you can send a request to the original practitioner who referred you.</p>
+                    <div class="space-y-4">
+                        <textarea id="refer-request-note" rows="3" class="w-full px-4 py-3 rounded-xl border-gray-200 text-xs focus:border-secondary focus:ring-0 transition-all bg-gray-50/50" placeholder="Describe why a re-referral is needed..."></textarea>
+                        <button onclick="submitReferralRequest()" class="w-full py-3.5 bg-secondary text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary transition-all shadow-lg shadow-secondary/20">Send Request</button>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if($isReferrer)
+            <div class="space-y-4">
+                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <i class="ri-user-add-line"></i> Referral Actions
+                </h4>
+                <div class="p-6 bg-white rounded-[2rem] border border-[#2E4B3D]/10 shadow-sm flex flex-col justify-center h-full min-h-[160px]">
+                    <p class="text-[11px] text-gray-500 mb-6 text-center">You are the primary referrer for this consultation. You can coordinate further referrals as needed.</p>
+                    <button onclick="openReferModal('{{ $booking->id }}', '{{ $booking->user_id }}')" class="w-full py-4 bg-[#F1F5F2] text-secondary border border-secondary/10 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-secondary hover:text-white transition-all">
+                        <i class="ri-user-add-line mr-2"></i> Manage / Add Referrals
+                    </button>
+                </div>
+            </div>
+            @endif
+        </div>
+    </div>
+</div>
+@endif
+
 @if(!$isMinimal)
 <!-- Form History and Actions -->
 <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -271,7 +362,7 @@
                 <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $f->id]) }}" 
                    class="px-5 py-2.5 rounded-full text-xs font-bold transition-all border {{ ($existingForm && $existingForm->id === $f->id) ? 'bg-secondary text-white border-secondary shadow-lg' : 'bg-white text-gray-500 border-gray-200 hover:border-secondary/30 hover:text-secondary' }}">
                     <i class="ri-file-list-3-line mr-1.5"></i>
-                    {{ $f->title ?: 'Follow-up #'.$loop->iteration }}
+                    {{ $f->title ?: 'Prescription #'.$loop->iteration }}
                     <span class="opacity-50 ml-1 font-normal text-[10px]">{{ $f->created_at->format('M d') }}</span>
                 </a>
             @endforeach
@@ -279,7 +370,7 @@
             @if($existingForm)
             <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'new' => 1]) }}" 
                class="px-5 py-2.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all">
-                <i class="ri-add-line mr-1.5"></i> New Follow-up
+                <i class="ri-add-line mr-1.5"></i> New Prescription
             </a>
             @endif
         </div>
@@ -301,13 +392,15 @@
         <button type="button" onclick="toggleTitleEdit()" class="text-xs font-bold text-secondary hover:underline">Rename Form</button>
     </div>
 @else
-    <div class="mb-6 p-6 bg-emerald-50 border border-emerald-100 rounded-[2rem] flex items-center gap-4">
-        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-emerald-600 shadow-sm">
-            <i class="ri-add-circle-line text-xl"></i>
-        </div>
-        <div>
-            <h4 class="text-sm font-black text-emerald-700">Starting New Follow-up Consultation</h4>
-            <p class="text-[10px] text-emerald-600/60 uppercase font-bold tracking-widest mt-0.5">Fresh record for current session</p>
+    <div class="mb-6 p-6 bg-emerald-50 border border-emerald-100 rounded-[2rem]">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
+                <i class="ri-add-circle-fill text-xl"></i>
+            </div>
+            <div>
+                <h4 class="text-sm font-black text-emerald-700">Starting New Prescription</h4>
+                <p class="text-[10px] text-emerald-600/60 font-bold uppercase tracking-widest">Digital Prescription</p>
+            </div>
         </div>
     </div>
 @endif
@@ -315,8 +408,8 @@
 <div id="title-edit-box" class="hidden mb-6 p-6 bg-white border border-[#2E4B3D]/12 rounded-[2rem] shadow-sm">
     <label class="block text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3">Form Title / Reference</label>
     <div class="flex gap-3">
-        <input type="text" id="new-form-title" value="{{ $existingForm->title ?? 'Follow-up Consultation' }}" 
-               class="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-secondary outline-none">
+        <input type="text" id="new-form-title" value="{{ $existingForm->title ?? 'Digital Prescription' }}" 
+               placeholder="Enter a title for this record (e.g., Weekly Follow-up, Post-Surgery Notes)" class="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-secondary outline-none">
         <button type="button" onclick="applyTitle()" class="px-6 py-3 bg-secondary text-white rounded-xl font-bold text-sm">Apply</button>
     </div>
 </div>
@@ -555,6 +648,62 @@ function applyTitle() {
     
     toggleTitleEdit();
 }
+    function submitReferralRequest() {
+        const note = document.getElementById('refer-request-note').value;
+        if (!note) {
+            showZayaToast('Please add a note explaining why re-referral is needed.', 'error', 'Error');
+            return;
+        }
+
+        fetch("{{ route('bookings.refer-request', $booking->id) }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ note: note })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showZayaToast(data.success, 'success', 'Request Sent');
+                document.getElementById('refer-request-note').value = '';
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showZayaToast(data.error || 'Something went wrong.', 'error', 'Error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showZayaToast('Connection error.', 'error', 'Error');
+        });
+    }
+
+    function updateReferralRequestStatus(requestId, status) {
+        fetch(`/refer-requests/${requestId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showZayaToast(data.success, 'success', 'Status Updated');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showZayaToast(data.error || 'Something went wrong.', 'error', 'Error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showZayaToast('Connection error.', 'error', 'Error');
+        });
+    }
 </script>
 @endpush
 
