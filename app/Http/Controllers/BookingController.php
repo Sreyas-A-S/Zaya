@@ -38,7 +38,10 @@ class BookingController extends Controller
             'promo_code' => 'nullable|string|exists:promo_codes,code',
             'discount_amount' => 'nullable|numeric|min:0',
             'coins_applied' => 'nullable|boolean',
-            'test_mode' => 'nullable|boolean'
+            'test_mode' => 'nullable|boolean',
+            'need_translator' => 'nullable|boolean',
+            'from_language' => 'nullable|string',
+            'to_language' => 'nullable|string',
         ]);
 
         $practitioner = Practitioner::with('user')->findOrFail($request->practitioner_id);
@@ -186,6 +189,9 @@ class BookingController extends Controller
                 'currency' => $currency,
                 'status' => 'confirmed',
                 'razorpay_payment_id' => 'ZERO_PAYMENT',
+                'need_translator' => $request->need_translator ?? false,
+                'from_language' => $request->from_language,
+                'to_language' => $request->to_language,
                 'additional_info' => $request->additional_info,
             ]);
 
@@ -268,6 +274,9 @@ class BookingController extends Controller
                 'coin_discount' => $coinDiscount,
                 'currency' => $currency,
                 'is_test' => $isTestMode,
+                'need_translator' => $request->need_translator ?? false,
+                'from_language' => $request->from_language,
+                'to_language' => $request->to_language,
                 'additional_info' => $request->additional_info,
             ]
         ]);
@@ -402,6 +411,9 @@ class BookingController extends Controller
             'currency' => $bookingData['currency'],
             'status' => 'confirmed',
             'is_test' => $bookingData['is_test'] ?? false,
+            'need_translator' => $bookingData['need_translator'] ?? false,
+            'from_language' => $bookingData['from_language'] ?? null,
+            'to_language' => $bookingData['to_language'] ?? null,
             'razorpay_order_id' => $paymentLinkId,
             'razorpay_payment_id' => $paymentId,
             'additional_info' => $bookingData['additional_info'] ?? null,
@@ -485,6 +497,9 @@ class BookingController extends Controller
                 'currency' => $bookingData['currency'],
                 'status' => 'pending_reschedule', // Special status
                 'is_test' => $bookingData['is_test'] ?? false,
+                'need_translator' => $bookingData['need_translator'] ?? false,
+                'from_language' => $bookingData['from_language'] ?? null,
+                'to_language' => $bookingData['to_language'] ?? null,
                 'razorpay_order_id' => $paymentLinkId,
                 'razorpay_payment_id' => $paymentId,
                 'additional_info' => $bookingData['additional_info'] ?? null,
@@ -624,6 +639,7 @@ class BookingController extends Controller
                 'handles_service' => $handlesAllServices,
                 'missing_services' => $missingServices,
                 'service_fee' => $serviceFee,
+                'currency' => $this->resolveProfessionalCurrency($u),
                 'is_recommended' => $isRecommended,
                 'matched_expertises' => $matchedExpertises,
                 'profile_pic' => $u->profile_pic ? (str_starts_with($u->profile_pic, 'http') ? $u->profile_pic : asset('storage/' . $u->profile_pic)) : asset('frontend/assets/profile-dummy-img.png'),
@@ -631,8 +647,16 @@ class BookingController extends Controller
             ];
         });
 
-        // Sort: Recommended first
-        $results = $results->sortByDesc('is_recommended')->values();
+        // Sort: Recommended first, then by service handling capability
+        $results = $results->sort(function ($a, $b) {
+            if ($b['is_recommended'] && !$a['is_recommended']) return 1;
+            if (!$b['is_recommended'] && $a['is_recommended']) return -1;
+            
+            if ($b['handles_service'] && !$a['handles_service']) return 1;
+            if (!$b['handles_service'] && $a['handles_service']) return -1;
+            
+            return 0;
+        })->values();
 
         return response()->json($results->take(10));
     }

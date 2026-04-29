@@ -473,10 +473,15 @@
                 return;
             }
 
-            // Sort so recommended appear on top, others chronological
+            // Sort: Recommended first, then by service handling capability
             professionals.sort((a, b) => {
-                if(b.is_recommended && !a.is_recommended) return 1;
-                if(!b.is_recommended && a.is_recommended) return -1;
+                if (b.is_recommended && !a.is_recommended) return 1;
+                if (!b.is_recommended && a.is_recommended) return -1;
+                
+                // If both recommended or both not, sort by handles_service
+                if (b.handles_service && !a.handles_service) return 1;
+                if (!b.handles_service && a.handles_service) return -1;
+                
                 return 0;
             });
 
@@ -498,7 +503,7 @@
                 ).join(' ');
 
                 const missingServicesLabel = (!p.handles_service && p.missing_services && p.missing_services.length > 0)
-                    ? `<div class="mt-2"><span class="text-[10px] bg-red-50 text-red-600 px-2 font-bold py-1 rounded-md border border-red-200 uppercase tracking-wider inline-block leading-snug">Missing: ${p.missing_services.join(', ')}</span></div>`
+                    ? `<div class="mt-2"><span class="text-[12px] bg-red-50 text-red-600 px-3 font-black py-2 rounded-xl border border-red-200 uppercase tracking-widest inline-block leading-none shadow-sm">Missing Services: ${p.missing_services.join(', ')}</span></div>`
                     : '';
                 
                 item.innerHTML = `
@@ -515,7 +520,7 @@
                                 </span>
                                 ${p.service_fee > 0 ? `
                                     <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">
-                                        Fee: €${parseFloat(p.service_fee).toFixed(2)}
+                                        Fee: ${p.currency} ${parseFloat(p.service_fee).toFixed(2)}
                                     </span>
                                 ` : ''}
                             </div>
@@ -945,27 +950,47 @@
         fetchTranslators();
     }
 
-    function openTranslatorModal(bookingId, fromLang, toLang) {
+    async function openTranslatorModal(bookingId, fromLang = null, toLang = null) {
         const modal = document.getElementById('translator-modal');
         const bookingIdInput = document.getElementById('translator-booking-id');
         const langPairText = document.getElementById('translator-lang-pair');
         if (!modal || !bookingIdInput) return;
 
         bookingIdInput.value = bookingId;
-        currentFromLang = fromLang;
-        currentToLang = toLang;
-        if (langPairText) langPairText.innerText = `Language Pair: ${fromLang} → ${toLang}`;
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
         
+        // Show loading state for lang pair
+        if (langPairText) langPairText.innerText = 'Fetching requested languages...';
+
         // Reset
         const searchInput = document.getElementById('translator-search');
         if (searchInput) searchInput.value = '';
         selectedTranslatorId = null;
         const submitBtn = document.getElementById('translator-submit-btn');
         if (submitBtn) submitBtn.disabled = true;
-        
-        fetchTranslators();
+
+        try {
+            // Fetch the client's requested languages if not provided
+            if (!fromLang || !toLang || fromLang === 'English' && toLang === 'Any') {
+                const response = await fetch(`/api/bookings/${bookingId}`);
+                const booking = await response.json();
+                currentFromLang = booking.from_language;
+                currentToLang = booking.to_language;
+            } else {
+                currentFromLang = fromLang;
+                currentToLang = toLang;
+            }
+
+            if (langPairText) langPairText.innerText = `Language Pair: ${currentFromLang} → ${currentToLang}`;
+            fetchTranslators();
+        } catch (error) {
+            console.error('Error fetching booking languages:', error);
+            if (langPairText) langPairText.innerText = 'Error fetching languages.';
+            currentFromLang = fromLang || 'English';
+            currentToLang = toLang || 'Any';
+            fetchTranslators();
+        }
     }
 
     function closeTranslatorModal() {

@@ -70,6 +70,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/api/available-translators', [ProfileController::class, 'fetchAvailableTranslators'])->name('available-translators-api');
     Route::get('/api/professional-profile/{user}', [BookingController::class, 'getProfessionalProfile'])->name('professional-profile-api');
     Route::get('/api/available-translators', [ProfileController::class, 'fetchAvailableTranslators'])->name('available-translators-api');
+    Route::get('/api/bookings/{id}', [ProfileController::class, 'getBookingDetails'])->name('bookings.api.details');
     Route::post('/bookings/{id}/assign-translator', [ProfileController::class, 'assignTranslator'])->name('bookings.assign-translator');
 
     // Availability / Time Slots

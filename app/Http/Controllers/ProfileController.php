@@ -887,6 +887,18 @@ class ProfileController extends Controller
         ]);
     }
 
+    public function getBookingDetails($id)
+    {
+        $booking = Booking::findOrFail($id);
+        
+        return response()->json([
+            'id' => $booking->id,
+            'from_language' => $booking->from_language ?: 'English',
+            'to_language' => $booking->to_language ?: 'Any',
+            'need_translator' => $booking->need_translator
+        ]);
+    }
+
     public function fetchAvailableTranslators(Request $request)
     {
         $query = $request->query('query');
@@ -900,7 +912,7 @@ class ProfileController extends Controller
             $translatorsQuery->where('full_name', 'LIKE', "%{$query}%");
         }
 
-        if ($fromLang && $toLang) {
+        if ($fromLang && $toLang && strtolower($toLang) !== 'any') {
             $translatorsQuery->where(function ($q) use ($fromLang, $toLang) {
                 // Translator should handle both languages in their source/target pairs
                 // Or handle from_lang as source and to_lang as target
@@ -912,6 +924,12 @@ class ProfileController extends Controller
                     $sub->whereJsonContains('source_languages', $toLang)
                         ->whereJsonContains('target_languages', $fromLang);
                 });
+            });
+        } elseif ($fromLang) {
+            // Only from_lang requested or to_lang is 'Any'
+            $translatorsQuery->where(function ($q) use ($fromLang) {
+                $q->whereJsonContains('source_languages', $fromLang)
+                  ->orWhereJsonContains('target_languages', $fromLang);
             });
         }
 
