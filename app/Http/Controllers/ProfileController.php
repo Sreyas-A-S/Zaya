@@ -431,8 +431,13 @@ class ProfileController extends Controller
             $msg = 'New consultation follow-up saved successfully.';
         }
 
+        $params = ['id' => $booking->id, 'form_id' => $form->id];
+        if ($request->input('minimal') === '1') {
+            $params['minimal'] = '1';
+        }
+
         return redirect()
-            ->route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $form->id])
+            ->route('bookings.consultation-form.show', $params)
             ->with('status', $msg);
     }
 

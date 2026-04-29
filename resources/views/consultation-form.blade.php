@@ -261,6 +261,7 @@
     </div>
 </section>
 
+@if(!$isMinimal)
 <!-- Form History and Actions -->
 <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
     <div class="flex-1">
@@ -284,6 +285,7 @@
         </div>
     </div>
 </div>
+@endif
 
 @if($existingForm)
     <div class="mb-6 p-6 bg-secondary/5 border border-secondary/10 rounded-[2rem] flex items-center justify-between">
@@ -436,6 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear if successful submission just happened
         @if(session('status'))
             localStorage.removeItem(storageKey);
+            localStorage.removeItem(`consultation_draft_${bookingId}_new`);
         @endif
 
         const saveDraft = () => {
@@ -507,8 +510,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Restore only if we are NOT viewing an existing record with database data, 
         // OR if the draft exists and might be newer. 
         // For simplicity: restore if it exists.
+        @if(!session('status'))
         setTimeout(restoreDraft, 500); 
-    }
+        @endif    }
 
     function debounce(func, wait) {
         let timeout;
@@ -517,6 +521,19 @@ document.addEventListener('DOMContentLoaded', () => {
             timeout = setTimeout(() => func.apply(this, args), wait);
         };
     }
+
+    @if($isMinimal)
+    // Inject minimal mode flag into all forms
+    document.querySelectorAll('form.consultation-form-root').forEach(form => {
+        if (!form.querySelector('input[name="minimal"]')) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'minimal';
+            input.value = '1';
+            form.appendChild(input);
+        }
+    });
+    @endif
 });
 
 function toggleTitleEdit() {
