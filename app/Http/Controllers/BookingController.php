@@ -731,6 +731,26 @@ class BookingController extends Controller
         ]);
     }
 
+    private function resolveProfessionalCurrency($user)
+    {
+        // 1. Try to get currency from their services first
+        $service = \App\Models\UserService::where('user_id', $user->id)
+            ->whereNotNull('currency')
+            ->first();
+            
+        if ($service && $service->currency) {
+            return $service->currency;
+        }
+
+        // 2. Fallback to profile payout currency
+        $profile = $user->profile;
+        if ($profile && isset($profile->payout_currency) && $profile->payout_currency) {
+            return $profile->payout_currency;
+        }
+
+        return 'EUR'; // Ultimate fallback
+    }
+
     private function firstNonEmptyProfileArray($profile, array $keys): array
     {
         foreach ($keys as $key) {
