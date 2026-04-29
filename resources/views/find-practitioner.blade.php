@@ -23,9 +23,9 @@
                 <div class="relative w-full md:w-1/4 search-container">
                     <input id="find_practitioner_search_input" type="text" 
                         value="{{ $searchQuery ?? request('query') }}"
-                        placeholder="{{ $settings['find_practitioner_search_placeholder'] ?? 'Practitioners, Treatments...' }}"
+                        placeholder="{{ $settings['find_practitioner_search_placeholder'] ?? 'Practitioners, Treatments' }}"
                         autocomplete="off"
-                        class="w-full border border-[#db8871] rounded-full px-6 py-3.5 pr-12 text-base md:text-lg text-[#db8871] placeholder-[#db8871] focus:outline-none bg-white transition-colors">
+                        class="w-full border border-[#db8871] rounded-full px-6 py-3.5 pr-12 text-xs md:text-sm text-[#db8871] placeholder-[#db8871] focus:outline-none bg-white transition-colors">
                     <button id="find_practitioner_search_btn" class="absolute right-[10px] top-1/2 -translate-y-1/2 w-10 h-10 bg-[#db8871] rounded-full flex items-center justify-center hover:opacity-90 transition-all cursor-pointer border-none outline-none">
                         <i class="ri-search-line text-white text-lg"></i>
                     </button>
@@ -45,7 +45,7 @@
                         placeholder="{{ $settings['find_practitioner_pincode_placeholder'] ?? 'Enter Zipcode' }}"
                         value="{{ session('global_zipcode') }}"
                         {{ session('global_zipcode') ? 'readonly' : '' }}
-                        class="w-full border border-[#db8871] rounded-full px-6 py-3.5 pr-12 text-base md:text-lg text-[#db8871] placeholder-[#db8871] focus:outline-none bg-white transition-colors">
+                        class="w-full border border-[#db8871] rounded-full px-6 py-3.5 pr-12 text-xs md:text-sm text-[#db8871] placeholder-[#db8871] focus:outline-none bg-white transition-colors">
                     <button id="find-practitioner-zipcode-btn" style="{{ session('global_zipcode') ? 'display:none;' : '' }}"
                         class="absolute right-[10px] top-1/2 -translate-y-1/2 w-10 h-10 bg-[#F39551] rounded-full flex items-center justify-center hover:opacity-90 transition-all cursor-pointer border-none outline-none">
                         <i class="ri-search-line text-white text-lg"></i>
@@ -60,7 +60,7 @@
                 <div class="relative w-full md:w-1/4 custom-dropdown">
                     <input type="hidden" name="service" value="{{ $selectedService->slug ?? request('service') }}">
                     <button type="button"
-                        class="dropdown-button w-full border border-[#db8871] rounded-full px-6 py-3.5 text-base md:text-lg text-[#db8871] bg-white flex justify-between items-center transition-colors focus:outline-none shadow-sm cursor-pointer">
+                        class="dropdown-button w-full border border-[#db8871] rounded-full px-6 py-3.5 text-xs md:text-sm text-[#db8871] bg-white flex justify-between items-center transition-colors focus:outline-none shadow-sm cursor-pointer">
                         <span class="dropdown-selected truncate">{{ $selectedService->title ?? ($settings['find_practitioner_service_placeholder'] ?? 'Select Service') }}</span>
                         <i
                             class="ri-arrow-down-s-line text-[#db8871] text-xl transition-transform duration-300 pointer-events-none dropdown-icon"></i>
@@ -70,11 +70,11 @@
                         class="dropdown-menu absolute z-50 left-0 right-0 top-[calc(100%+16px)] bg-white border border-gray-100 rounded-2xl shadow-[0_5px_30px_rgba(0,0,0,0.1)] py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px]">
                         <div class="max-h-[360px] overflow-y-auto px-1 custom-scrollbar flex flex-col gap-0.5">
                             <button type="button"
-                                class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
+                                class="dropdown-item w-full text-left px-5 py-3.5 text-xs md:text-sm text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
                                 data-value="">All Services</button>
                             @foreach($services as $service)
                                 <button type="button"
-                                    class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer {{ (isset($selectedService) && $selectedService->slug === $service->slug) || request('service') === $service->slug ? 'font-medium text-[#db8871]' : '' }}"
+                                    class="dropdown-item w-full text-left px-5 py-3.5 text-xs md:text-sm text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer {{ (isset($selectedService) && $selectedService->slug === $service->slug) || request('service') === $service->slug ? 'font-medium text-[#db8871]' : '' }}"
                                     data-value="{{ $service->slug }}">{{ $service->title }}</button>
                             @endforeach
                         </div>
@@ -85,7 +85,7 @@
                 <div class="relative w-full md:w-1/4 custom-dropdown">
                     <input type="hidden" name="mode" value="">
                     <button type="button"
-                        class="dropdown-button w-full border border-[#db8871] rounded-full px-6 py-3.5 text-base md:text-lg text-[#db8871] bg-white flex justify-between items-center transition-colors focus:outline-none shadow-sm cursor-pointer">
+                        class="dropdown-button w-full border border-[#db8871] rounded-full px-6 py-3.5 text-xs md:text-sm text-[#db8871] bg-white flex justify-between items-center transition-colors focus:outline-none shadow-sm cursor-pointer">
                         <span class="dropdown-selected truncate">{{ $settings['find_practitioner_mode_placeholder'] ?? 'Select Mode' }}</span>
                         <i
                             class="ri-arrow-down-s-line text-[#db8871] text-xl transition-transform duration-300 pointer-events-none dropdown-icon"></i>
@@ -95,10 +95,10 @@
                         class="dropdown-menu absolute z-50 left-0 right-0 top-[calc(100%+16px)] bg-white border border-gray-100 rounded-2xl shadow-[0_5px_30px_rgba(0,0,0,0.1)] py-2 opacity-0 invisible transition-all duration-300 transform origin-top translate-y-[-10px]">
                         <div class="max-h-[360px] overflow-y-auto px-1 custom-scrollbar flex flex-col gap-0.5">
                             <button type="button"
-                                class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
+                                class="dropdown-item w-full text-left px-5 py-3.5 text-xs md:text-sm text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
                                 data-value="online">Online</button>
                             <button type="button"
-                                class="dropdown-item w-full text-left px-5 py-3.5 text-base md:text-lg text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
+                                class="dropdown-item w-full text-left px-5 py-3.5 text-xs md:text-sm text-gray-800 hover:text-[#db8871] bg-transparent rounded-lg transition-colors font-medium border-none outline-none cursor-pointer"
                                 data-value="offline">In-person</button>
                         </div>
                     </div>

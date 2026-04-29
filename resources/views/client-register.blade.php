@@ -480,6 +480,14 @@
             class="floating-leaf w-20 md:w-28 lg:w-36 right-0 bottom-32 md:bottom-40">
 
         <div class="container mx-auto px-4 py-8 md:py-12 lg:py-16">
+            <div class="flex justify-start mb-6 md:mb-8 relative z-30">
+                <a href="{{ route('home') }}"
+                    class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-[#423131] shadow-sm transition-all hover:border-[#FABC41] hover:bg-[#FFF7EF]"
+                    aria-label="{{ __('Home') }}" title="{{ __('Home') }}">
+                    <i class="ri-home-5-line text-xl"></i>
+                </a>
+            </div>
+
             <!-- Header -->
             <div class="text-center mb-8 md:mb-16 relative z-20">
                 <p class="text-[#424F93] font-regular text-base md:text-lg mb-2">{{ __('Create Account') }}</p>
