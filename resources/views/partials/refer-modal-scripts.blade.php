@@ -174,6 +174,8 @@
 
 @include('partials.data-access-modals')
 
+@push('scripts')
+<script>
     // Referral Modal Logic
     let fetchTimeout = null;
     let selectedProfessionals = {}; // { 'practitioner': {id, name, fee, pic}, ... }
