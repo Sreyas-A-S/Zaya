@@ -48,7 +48,7 @@
                     </div>
                 </div>
                 <div class="flex flex-col items-start md:items-end">
-                    <div class="flex text-[#FABD4D] gap-1 text-xl mb-1">
+                    <div class="flex text-[#22C55E] gap-1 text-xl mb-1">
                         @for($i = 1; $i <= 5; $i++)
                             <i class="ri-star-{{ $i <= $review->rating ? 'fill' : 'line' }}"></i>
                         @endfor
@@ -117,7 +117,7 @@
                     </div>
                 </div>
                 <div class="flex flex-col items-start md:items-end">
-                    <div class="flex text-[#FABD4D] gap-1 text-xl mb-1">
+                    <div class="flex text-[#22C55E] gap-1 text-xl mb-1">
                         @for($i = 1; $i <= 5; $i++)
                             <i class="ri-star-{{ $i <= $review->rating ? 'fill' : 'line' }}"></i>
                         @endfor
@@ -207,7 +207,7 @@
                             <div class="flex gap-2 text-3xl">
                                 <input type="hidden" name="rating" id="rating-value" value="5" required>
                                 @for($i = 1; $i <= 5; $i++)
-                                <i class="ri-star-fill text-[#FABD4D] cursor-pointer rating-star" data-val="{{ $i }}" onclick="setRating({{ $i }})"></i>
+                                <i class="ri-star-fill text-[#22C55E] cursor-pointer rating-star transition-all hover:scale-110" data-val="{{ $i }}" onclick="setRating({{ $i }})"></i>
                                 @endfor
                             </div>
                         </div>
@@ -250,12 +250,12 @@
                         <div class="text-center mb-8">
                             <label class="block text-sm font-bold text-secondary mb-4 uppercase tracking-wider text-[10px] opacity-60">Your Rating for Zaya</label>
                             <div class="flex justify-center gap-3 text-4xl">
-                                <input type="hidden" name="rating" value="5">
+                                <input type="hidden" name="rating" id="zaya-rating-value" value="5">
                                 @for($i = 1; $i <= 5; $i++)
-                                <i class="ri-star-fill text-[#FFD166]"></i>
+                                <i class="ri-star-fill text-[#22C55E] cursor-pointer zaya-rating-star transition-all hover:scale-110" data-val="{{ $i }}" onclick="setZayaRating({{ $i }})"></i>
                                 @endfor
                             </div>
-                            <p class="text-[10px] text-gray-400 mt-2 font-bold italic">Excellent Experience (5/5)</p>
+                            <p id="zaya-rating-text" class="text-[10px] text-gray-400 mt-2 font-bold italic">Excellent Experience (5/5)</p>
                         </div>
 
                         <div class="mb-8">
@@ -322,9 +322,36 @@
             const starVal = parseInt(s.dataset.val);
             if (starVal <= val) {
                 s.classList.remove('ri-star-line');
-                s.classList.add('ri-star-fill', 'text-[#FABD4D]');
+                s.classList.add('ri-star-fill', 'text-[#22C55E]');
             } else {
-                s.classList.remove('ri-star-fill', 'text-[#FABD4D]');
+                s.classList.remove('ri-star-fill', 'text-[#22C55E]');
+                s.classList.add('ri-star-line');
+            }
+        });
+    }
+
+    function setZayaRating(val) {
+        document.getElementById('zaya-rating-value').value = val;
+        const stars = document.querySelectorAll('.zaya-rating-star');
+        const text = document.getElementById('zaya-rating-text');
+        
+        const labels = {
+            1: 'Poor',
+            2: 'Fair',
+            3: 'Good',
+            4: 'Very Good',
+            5: 'Excellent Experience'
+        };
+
+        if (text) text.innerText = `${labels[val]} (${val}/5)`;
+
+        stars.forEach(s => {
+            const starVal = parseInt(s.dataset.val);
+            if (starVal <= val) {
+                s.classList.remove('ri-star-line');
+                s.classList.add('ri-star-fill', 'text-[#22C55E]');
+            } else {
+                s.classList.remove('ri-star-fill', 'text-[#22C55E]');
                 s.classList.add('ri-star-line');
             }
         });
