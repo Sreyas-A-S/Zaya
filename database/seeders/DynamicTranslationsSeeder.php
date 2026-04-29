@@ -43,6 +43,60 @@ class DynamicTranslationsSeeder extends Seeder
                 'section' => 'general',
                 'en_value' => 'Read More...',
                 'fr_value' => 'Lire la suite...',
+            ],
+            [
+                'key' => 'password_label',
+                'section' => 'auth',
+                'en_value' => 'Password',
+                'fr_value' => 'Mot de passe',
+            ],
+            [
+                'key' => 'enter_password_placeholder',
+                'section' => 'auth',
+                'en_value' => 'Enter Password',
+                'fr_value' => 'Entrez le mot de passe',
+            ],
+            [
+                'key' => 'passwords_match_msg',
+                'section' => 'auth',
+                'en_value' => 'Passwords match',
+                'fr_value' => 'Les mots de passe correspondent',
+            ],
+            [
+                'key' => 'passwords_not_match_msg',
+                'section' => 'auth',
+                'en_value' => 'Passwords do not match',
+                'fr_value' => 'Les mots de passe ne correspondent pas',
+            ],
+            [
+                'key' => 'password_weak_label',
+                'section' => 'auth',
+                'en_value' => 'Weak',
+                'fr_value' => 'Faible',
+            ],
+            [
+                'key' => 'password_fair_label',
+                'section' => 'auth',
+                'en_value' => 'Fair',
+                'fr_value' => 'Moyen',
+            ],
+            [
+                'key' => 'password_good_label',
+                'section' => 'auth',
+                'en_value' => 'Good',
+                'fr_value' => 'Bon',
+            ],
+            [
+                'key' => 'password_strong_label',
+                'section' => 'auth',
+                'en_value' => 'Strong',
+                'fr_value' => 'Fort',
+            ],
+            [
+                'key' => 'profile_text',
+                'section' => 'general',
+                'en_value' => 'Profile',
+                'fr_value' => 'Profil',
             ]
         ];
 

@@ -132,7 +132,7 @@
                             <i class="ri-dashboard-line text-lg"></i> {{ __('Dashboard') }}
                         </a>
                         <a href="{{ route('profile') }}" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-600 hover:bg-surface hover:text-primary transition-colors border-b border-gray-50">
-                            <i class="ri-user-settings-line text-lg"></i> {{ __('My Profile') }}
+                            <i class="ri-user-settings-line text-lg"></i> {{ $site_settings['profile_text'] ?? __('My Profile') }}
                         </a>
                         <form method="POST" action="{{ route('logout') }}" id="logout-form-desktop" class="hidden">
                             @csrf
@@ -194,7 +194,7 @@
         
         @if($isFrontendUser)
         <a id="nav-dashboard-mobile" href="{{ route('dashboard') }}" class="text-lg font-medium text-secondary pb-2 flex items-center gap-3">
-            <i class="ri-user-3-line"></i> {{ __('Profile') }}
+            <i class="ri-user-3-line"></i> {{ $site_settings['profile_text'] ?? __('Profile') }}
         </a>
         @else
         <a id="nav-login-mobile" href="{{ route('zaya-login') }}" class="text-lg font-medium text-secondary pb-2" data-i18n="Login">{{ __($site_settings['nav_login'] ?? 'Login') }}</a>

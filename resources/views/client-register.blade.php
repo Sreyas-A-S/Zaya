@@ -746,11 +746,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-10">
                             <div>
                                 <label
-                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">Password</label>
+                                    class="block text-gray-700 font-medium mb-5 text-sm md:text-base">{{ $site_settings['password_label'] ?? 'Password' }}</label>
                                 <div class="relative">
                                     <input type="password" name="password" id="password"
                                         class="reg-input @error('password') border-red-500! @enderror"
-                                        placeholder="Enter Password" required
+                                        placeholder="{{ $site_settings['enter_password_placeholder'] ?? 'Enter Password' }}" required
                                         readonly
                                         onfocus="this.removeAttribute('readonly');"
                                         onclick="this.removeAttribute('readonly');">
@@ -1043,7 +1043,7 @@
                             checkPasswordMatch();
                             confirmPasswordInput.focus();
                             if (typeof showZayaToast === 'function') {
-                                showZayaToast('Passwords do not match.', 'error');
+                                showZayaToast(trans.noMatch, 'error');
                             }
                             return;
                         }
@@ -1513,6 +1513,16 @@
                 }
             });
 
+            // Translatable strings for JavaScript
+            const trans = {
+                match: "{{ $site_settings['passwords_match_msg'] ?? 'Passwords match' }}",
+                noMatch: "{{ $site_settings['passwords_not_match_msg'] ?? 'Passwords do not match' }}",
+                weak: "{{ $site_settings['password_weak_label'] ?? 'Weak' }}",
+                fair: "{{ $site_settings['password_fair_label'] ?? 'Fair' }}",
+                good: "{{ $site_settings['password_good_label'] ?? 'Good' }}",
+                strong: "{{ $site_settings['password_strong_label'] ?? 'Strong' }}"
+            };
+
             // Password Match Validation
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('password_confirmation');
@@ -1583,19 +1593,19 @@
                     strengthBar.style.width = strength + '%';
                     if (strength <= 25) {
                         strengthBar.className = 'h-full transition-all duration-300 bg-red-500';
-                        strengthText.textContent = 'Weak';
+                        strengthText.textContent = trans.weak;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-red-500';
                     } else if (strength <= 50) {
                         strengthBar.className = 'h-full transition-all duration-300 bg-orange-400';
-                        strengthText.textContent = 'Fair';
+                        strengthText.textContent = trans.fair;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-orange-400';
                     } else if (strength <= 75) {
                         strengthBar.className = 'h-full transition-all duration-300 bg-blue-400';
-                        strengthText.textContent = 'Good';
+                        strengthText.textContent = trans.good;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-blue-400';
                     } else {
                         strengthBar.className = 'h-full transition-all duration-300 bg-green-500';
-                        strengthText.textContent = 'Strong';
+                        strengthText.textContent = trans.strong;
                         strengthText.className = 'text-[10px] font-bold uppercase tracking-wider text-green-500';
                     }
                 } else {
@@ -1624,13 +1634,13 @@
 
                     if (password === confirmPassword) {
                         matchIcon.className = 'ri-checkbox-circle-fill text-sm text-green-500';
-                        matchText.textContent = 'Passwords match';
+                        matchText.textContent = trans.match;
                         matchText.className = 'text-xs font-medium text-green-500';
                         confirmPasswordInput.classList.remove('border-red-500!');
                         matchError.textContent = '';
                     } else {
                         matchIcon.className = 'ri-error-warning-fill text-sm text-red-500';
-                        matchText.textContent = 'Passwords do not match';
+                        matchText.textContent = trans.noMatch;
                         matchText.className = 'text-xs font-medium text-red-500';
                         confirmPasswordInput.classList.add('border-red-500!');
                     }
