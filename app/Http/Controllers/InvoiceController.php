@@ -41,7 +41,8 @@ class InvoiceController extends Controller
         
         // Ensure user can only see their own invoice unless admin
         if (auth()->user()->role !== 'admin' && $booking->user_id !== auth()->id()) {
-            abort(403);
+            auth()->logout();
+            return redirect()->route('login')->with('error', 'For security purposes, please log in with the account associated with this invoice.');
         }
         
         return view('invoice.index', compact('booking'));
