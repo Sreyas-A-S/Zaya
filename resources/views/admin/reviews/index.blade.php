@@ -33,7 +33,6 @@
                             <thead>
                                 <tr>
                                     <th>Sl No</th>
-                                    <th>ID</th>
                                     <th>Type</th>
                                     <th>Reviewer</th>
                                     <th>User Type</th>
@@ -114,7 +113,6 @@
             ajax: "{{ route('admin.reviews.index') }}",
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'id', name: 'id' },
                 { 
                     data: 'type', 
                     name: 'type',
@@ -150,7 +148,7 @@
                 { data: 'status', name: 'status', orderable: false, searchable: false },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
             ],
-            order: [[8, 'desc']]
+            order: [[7, 'desc']]
         });
 
         // Delete
