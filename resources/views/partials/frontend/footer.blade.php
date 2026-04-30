@@ -230,7 +230,7 @@
 
         @media (min-width: 768px) {
             #zaya-chat-widget.has-announcement {
-                bottom: 128px;
+                bottom: 150px;
             }
         }
 
