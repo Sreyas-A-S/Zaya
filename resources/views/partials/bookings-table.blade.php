@@ -175,16 +175,19 @@
                         @endif
                         <td class="px-6 py-4">
                             @php
+                                $status = $booking->effective_status;
                                 $statusClasses = [
                                     'pending' => 'bg-yellow-50 text-yellow-600',
                                     'confirmed' => 'bg-green-50 text-green-600',
                                     'cancelled' => 'bg-red-50 text-red-600',
                                     'paid' => 'bg-green-50 text-green-600',
+                                    'completed' => 'bg-blue-50 text-blue-600',
+                                    'missed' => 'bg-red-50 text-red-600 border border-red-100',
                                 ];
-                                $class = $statusClasses[$booking->status] ?? 'bg-gray-50 text-gray-600';
+                                $class = $statusClasses[$status] ?? 'bg-gray-50 text-gray-600';
                             @endphp
                             <span class="px-3 py-1 inline-flex text-[10px] leading-5 font-bold rounded-full uppercase {{ $class }}">
-                                {{ $booking->status }}
+                                {{ $status }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">

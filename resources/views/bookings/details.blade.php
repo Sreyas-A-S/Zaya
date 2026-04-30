@@ -26,12 +26,17 @@
             <h1 class="text-2xl md:text-3xl font-black text-secondary tracking-tight">Session #{{ $booking->invoice_no }}</h1>
         </div>
         <div class="flex items-center gap-3">
-            @if($booking->status === 'confirmed')
+            @php
+                $status = $booking->effective_status;
+            @endphp
+            @if($status === 'confirmed')
                 <span class="px-4 py-2 bg-emerald-50 text-emerald-600 text-[11px] font-black uppercase tracking-widest rounded-full border border-emerald-100">Confirmed</span>
-            @elseif($booking->status === 'completed')
+            @elseif($status === 'completed')
                 <span class="px-4 py-2 bg-blue-50 text-blue-600 text-[11px] font-black uppercase tracking-widest rounded-full border border-blue-100">Completed</span>
+            @elseif($status === 'missed')
+                <span class="px-4 py-2 bg-red-50 text-red-600 text-[11px] font-black uppercase tracking-widest rounded-full border border-red-100">Missed</span>
             @else
-                <span class="px-4 py-2 bg-gray-50 text-gray-500 text-[11px] font-black uppercase tracking-widest rounded-full border border-gray-100">{{ ucfirst($booking->status) }}</span>
+                <span class="px-4 py-2 bg-gray-50 text-gray-500 text-[11px] font-black uppercase tracking-widest rounded-full border border-gray-100">{{ ucfirst($status) }}</span>
             @endif
         </div>
     </div>
@@ -100,6 +105,23 @@
                                             <span class="text-sm font-bold {{ $isAssignedToMe ? 'text-primary' : 'text-secondary' }}">{{ $service->title }}</span>
                                             @if($isAssignedToMe)
                                                 <span class="ml-2 text-[8px] font-black uppercase tracking-widest bg-primary text-white px-2 py-0.5 rounded-full">Your Assignment</span>
+                                            @endif
+                                            
+                                            @php
+                                                $sessObj = null;
+                                                if (!empty($booking->additional_info['sessions'])) {
+                                                    foreach ($booking->additional_info['sessions'] as $sess) {
+                                                        if (isset($sess['service_id']) && $sess['service_id'] == $service->id) {
+                                                            $sessObj = $sess;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                $isSessPassed = $booking->isSessionPassed($sessObj, derive_timezone_from_user($booking->practitioner->user ?? null));
+                                            @endphp
+                                            
+                                            @if($isSessPassed && $booking->status !== 'completed' && $booking->status !== 'cancelled')
+                                                <span class="ml-2 text-[8px] font-black uppercase tracking-widest bg-red-100 text-red-600 px-2 py-0.5 rounded-full border border-red-200">Missed</span>
                                             @endif
                                         </div>
                                         @if($sessionDate || $sessionTime)
