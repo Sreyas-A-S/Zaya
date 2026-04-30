@@ -226,6 +226,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
 
     // Financial Tracking
     Route::get('financial/transactions', [\App\Http\Controllers\Admin\FinancialController::class, 'index'])->name('financial.index');
+    Route::get('financial/transactions/export', [\App\Http\Controllers\Admin\FinancialController::class, 'export'])->name('financial.export');
     Route::get('financial/transactions/{id}', [\App\Http\Controllers\Admin\FinancialController::class, 'show'])->name('financial.show');
     Route::get('financial/transactions/{id}/download', [\App\Http\Controllers\Admin\FinancialController::class, 'downloadPdf'])->name('financial.download');
     Route::get('financial/practitioner-balances', [\App\Http\Controllers\Admin\FinancialController::class, 'practitionerBalances'])->name('financial.practitioners');
