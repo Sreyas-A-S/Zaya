@@ -42,11 +42,14 @@
                         <div>
                             <label class="block text-[10px] font-black text-secondary uppercase tracking-widest mb-3 opacity-60">New Booking Time</label>
                             <div class="relative group">
-                                <i class="ri-time-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-colors"></i>
-                                <input type="text" id="reschedule-time" name="booking_time" required placeholder="e.g. 10:00 AM - 11:00 AM"
-                                    class="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium outline-none focus:border-secondary focus:bg-white transition-all shadow-sm min-h-[52px]">
+                                <i class="ri-time-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-colors z-10 pointer-events-none"></i>
+                                <select id="reschedule-time" name="booking_time" required
+                                    class="w-full pl-12 pr-10 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium outline-none focus:border-secondary focus:bg-white transition-all shadow-sm min-h-[52px] appearance-none cursor-pointer">
+                                    <option value="" disabled selected>Select a time slot</option>
+                                </select>
+                                <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                             </div>
-                            <p class="text-[9px] text-gray-400 mt-2 italic font-medium">Please enter the full time slot string.</p>
+                            <p class="text-[9px] text-gray-400 mt-2 italic font-medium">Please select a new time slot.</p>
                         </div>
                     </div>
 
@@ -338,13 +341,52 @@
                 alert('Failed to load bookings. Please try again.');
             }
         }
+
+        // Populate Reschedule Time Select
+        const timeSelect = document.getElementById('reschedule-time');
+        if (timeSelect) {
+            const periods = ['AM', 'PM'];
+            for (let p = 0; p < 2; p++) {
+                for (let h = 0; h < 12; h++) {
+                    const displayHour = h === 0 ? 12 : h;
+                    const hourStr = displayHour.toString().padStart(2, '0');
+                    const period = periods[p];
+                    
+                    const time1 = `${hourStr}:00 ${period}`;
+                    const time2 = `${hourStr}:30 ${period}`;
+                    
+                    timeSelect.add(new Option(time1, time1));
+                    timeSelect.add(new Option(time2, time2));
+                }
+            }
+        }
     });
 
     // Reschedule Logic
     function openRescheduleModal(id, currentDate, currentTime) {
         document.getElementById('reschedule-booking-id').value = id;
         document.getElementById('reschedule-date').value = currentDate;
-        document.getElementById('reschedule-time').value = currentTime;
+        
+        const timeSelect = document.getElementById('reschedule-time');
+        
+        let timeToSet = currentTime;
+        if (timeToSet && timeToSet.includes('-')) {
+            timeToSet = timeToSet.split('-')[0].trim();
+        }
+        
+        let optionFound = false;
+        for (let i = 0; i < timeSelect.options.length; i++) {
+            if (timeSelect.options[i].value === timeToSet) {
+                timeSelect.selectedIndex = i;
+                optionFound = true;
+                break;
+            }
+        }
+        
+        if (!optionFound && timeToSet) {
+            timeSelect.add(new Option(timeToSet, timeToSet));
+            timeSelect.value = timeToSet;
+        }
         
         document.getElementById('reschedule-modal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
