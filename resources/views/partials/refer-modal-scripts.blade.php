@@ -114,6 +114,28 @@
                     <form id="translator-form">
                         <input type="hidden" id="translator-booking-id">
                         
+                        <!-- Language Selection -->
+                        <div class="mb-6 grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-secondary uppercase tracking-[0.15em] mb-2 opacity-60">Source Language</label>
+                                <select id="translator-from-lang" onchange="updateTranslatorLanguages()" class="w-full px-4 py-3 rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-xs font-bold transition-all shadow-sm">
+                                    <option value="">Select Source</option>
+                                    @foreach($languages as $lang)
+                                        <option value="{{ $lang->native_name }}">{{ $lang->flag }} {{ $lang->native_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-secondary uppercase tracking-[0.15em] mb-2 opacity-60">Target Language</label>
+                                <select id="translator-to-lang" onchange="updateTranslatorLanguages()" class="w-full px-4 py-3 rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-xs font-bold transition-all shadow-sm">
+                                    <option value="Any">Any</option>
+                                    @foreach($languages as $lang)
+                                        <option value="{{ $lang->native_name }}">{{ $lang->flag }} {{ $lang->native_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        
                         <!-- Search & Filter -->
                         <div class="mb-6 space-y-4">
                             <div>
@@ -740,10 +762,15 @@
         try {
             const ignoreLangs = document.getElementById('translator-ignore-langs')?.checked || false;
 
+            const fromLangInput = document.getElementById('translator-from-lang');
+            const toLangInput = document.getElementById('translator-to-lang');
+            const fromLang = fromLangInput ? fromLangInput.value : currentFromLang;
+            const toLang = toLangInput ? toLangInput.value : currentToLang;
+
             const url = new URL("{{ route('available-translators-api') }}", window.location.origin);
             if (query) url.searchParams.append('query', query);
-            url.searchParams.append('from_lang', currentFromLang);
-            url.searchParams.append('to_lang', currentToLang);
+            url.searchParams.append('from_lang', fromLang);
+            url.searchParams.append('to_lang', toLang);
             if (ignoreLangs) url.searchParams.append('ignore_languages', 'true');
 
             const response = await fetch(url);
@@ -800,6 +827,18 @@
         fetchTranslators();
     }
 
+    function updateTranslatorLanguages() {
+        const fromLangInput = document.getElementById('translator-from-lang');
+        const toLangInput = document.getElementById('translator-to-lang');
+        if (fromLangInput) currentFromLang = fromLangInput.value;
+        if (toLangInput) currentToLang = toLangInput.value;
+        
+        const langPairText = document.getElementById('translator-lang-pair');
+        if (langPairText) langPairText.innerText = `Language Pair: ${currentFromLang || 'None'} → ${currentToLang || 'Any'}`;
+        
+        fetchTranslators();
+    }
+
     async function openTranslatorModal(bookingId, fromLang = null, toLang = null) {
         const modal = document.getElementById('translator-modal');
         const bookingIdInput = document.getElementById('translator-booking-id');
@@ -837,6 +876,13 @@
             }
 
             if (langPairText) langPairText.innerText = `Language Pair: ${currentFromLang} → ${currentToLang}`;
+            
+            // Update select values
+            const fromLangInput = document.getElementById('translator-from-lang');
+            const toLangInput = document.getElementById('translator-to-lang');
+            if (fromLangInput) fromLangInput.value = currentFromLang;
+            if (toLangInput) toLangInput.value = currentToLang;
+
             fetchTranslators();
         } catch (error) {
             console.error('Error fetching booking languages:', error);
@@ -872,7 +918,9 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({
-                    translator_id: selectedTranslatorId
+                    translator_id: selectedTranslatorId,
+                    from_language: currentFromLang,
+                    to_language: currentToLang
                 })
             });
             const data = await response.json();

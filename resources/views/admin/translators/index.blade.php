@@ -278,14 +278,14 @@
                                             <select class="form-select" name="native_language" required>
                                                 <option value="">Select</option>
                                                 @foreach($languages as $lang)
-                                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
+                                                <option value="{{ $lang->native_name }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                                 @endforeach                                            </select>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Source Languages <span class="text-danger">*</span></label>
                                             <select class="form-select" id="source_languages_select" multiple required>
                                                 @foreach($languages as $lang)
-                                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
+                                                <option value="{{ $lang->native_name }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                                 @endforeach                                            </select>
                                             <div id="source_languages_capabilities_container"></div>
                                         </div>
@@ -293,7 +293,7 @@
                                             <label class="form-label">Target Languages <span class="text-danger">*</span></label>
                                             <select class="form-select" id="target_languages_select" multiple required>
                                                 @foreach($languages as $lang)
-                                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
+                                                <option value="{{ $lang->native_name }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                                 @endforeach                                            </select>
                                             <div id="target_languages_capabilities_container"></div>
                                         </div>
@@ -301,7 +301,7 @@
                                             <label class="form-label">Additional Languages</label>
                                             <select class="form-select" id="additional_languages_select" multiple>
                                                 @foreach($languages as $lang)
-                                                <option value="{{ $lang->code }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
+                                                <option value="{{ $lang->native_name }}" data-name="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                                 @endforeach                                            </select>
                                             <div id="additional_languages_capabilities_container"></div>
                                         </div>

@@ -630,7 +630,8 @@ class ProfileController extends Controller
             return view('partials.bookings-table', compact('user', 'bookings', 'allServices'))->render();
         }
 
-        return view('bookings', compact('user', 'bookings', 'search', 'allServices'));
+        $languages = \App\Models\Language::all();
+        return view('bookings', compact('user', 'bookings', 'search', 'allServices', 'languages'));
     }
 
     public function conferences(Request $request)
@@ -794,7 +795,8 @@ class ProfileController extends Controller
             }
         }
 
-        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount', 'referredServiceIds', 'isDirectParticipant'));
+        $languages = \App\Models\Language::all();
+        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount', 'referredServiceIds', 'isDirectParticipant', 'languages'));
     }
 
     public function viewClientProfile($id)
@@ -1003,6 +1005,8 @@ class ProfileController extends Controller
     {
         $request->validate([
             'translator_id' => 'required|exists:translators,id',
+            'from_language' => 'nullable|string',
+            'to_language' => 'nullable|string',
         ]);
 
         $user = Auth::user();
@@ -1016,11 +1020,20 @@ class ProfileController extends Controller
             }
         }
 
-        $booking->update([
+        $updateData = [
             'translator_id' => $request->translator_id,
             'need_translator' => true,
-            'status' => 'confirmed' // Optional: move from pending to confirmed if needed
-        ]);
+            'status' => 'confirmed'
+        ];
+
+        if ($request->filled('from_language')) {
+            $updateData['from_language'] = $request->from_language;
+        }
+        if ($request->filled('to_language')) {
+            $updateData['to_language'] = $request->to_language;
+        }
+
+        $booking->update($updateData);
 
         // Reload booking with translator info to send mail
         $booking->load('translator.user');

@@ -296,7 +296,7 @@
                                                                                 <select class="form-select border-end-0" name="languages[]">
                                                                                     <option value="">Select Language</option>
                                                                                     @foreach($languages as $lang)
-                                                                                    <option value="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->name }} ({{ $lang->native_name }})</option>
+                                                                                    <option value="{{ $lang->native_name }}">{{ $lang->flag }} {{ $lang->native_name }} ({{ $lang->name }})</option>
                                                                                     @endforeach
                                                                                 </select>
                                                                                 <span class="input-group-text bg-white border-start-0">
