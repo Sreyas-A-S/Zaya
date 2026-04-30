@@ -401,8 +401,21 @@ Route::get('/schedule-run', function (Request $request) {
     }
 
     set_time_limit(300);
-    Artisan::call('schedule:run');
-    return '<pre>' . Artisan::output() . '</pre>';
+    
+    $output = "Scheduler triggered directly via web route.\n\n";
+
+    // 1. Run the every-minute reminders
+    Artisan::call('sessions:send-reminders');
+    $output .= "sessions:send-reminders:\n" . Artisan::output() . "\n";
+
+    // 2. Run the monthly revenue report ONLY on the 1st of the month at exactly 09:00
+    // This assumes the web cron service hits exactly at minute 0.
+    if (now()->format('d H:i') === '01 09:00') {
+        Artisan::call('reports:monthly-revenue');
+        $output .= "reports:monthly-revenue:\n" . Artisan::output() . "\n";
+    }
+
+    return '<pre>' . $output . '</pre>';
 });
 
 
