@@ -218,7 +218,7 @@
                                         </a>
 
                                         @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
-                                        <button onclick="openRescheduleModal({{ $booking->id }}, '{{ $booking->booking_date->toDateString() }}', '{{ $booking->booking_time }}')" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors text-left">
+                                        <button onclick="openRescheduleModal({{ $booking->id }}, '{{ $booking->booking_date->toDateString() }}', '{{ $booking->booking_time }}', {{ $booking->profile_id }})" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors text-left">
                                             <i class="ri-calendar-event-line mr-3 text-lg text-amber-500"></i>
                                             Reschedule
                                         </button>

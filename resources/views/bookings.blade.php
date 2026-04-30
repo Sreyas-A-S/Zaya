@@ -2,6 +2,93 @@
 
 @section('title', 'My Bookings')
 
+@section('styles')
+<style>
+    /* Time Picker Dropdown Styles */
+    .time-picker-dropdown {
+        position: absolute;
+        left: 0;
+        z-index: 1050;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 44px rgba(0, 0, 0, 0.15);
+        padding: 24px 20px;
+        min-width: 320px;
+    }
+    .time-picker-dropdown.cal-open-bottom {
+        top: calc(100% + 8px);
+        animation: calFadeInDown 0.15s ease-out;
+        transform-origin: top center;
+    }
+    .time-picker-dropdown.cal-open-top {
+        bottom: calc(100% + 8px);
+        animation: calFadeInUp 0.15s ease-out;
+        transform-origin: bottom center;
+    }
+    .time-picker-header { text-align: center; margin-bottom: 20px; }
+    .time-picker-title { font-size: 15px; font-weight: 600; color: #333; }
+    .time-slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .time-slot {
+        padding: 10px 4px;
+        text-align: center;
+        font-size: 13px;
+        color: #555;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+        border: 1px solid transparent;
+    }
+    .time-slot:hover { background-color: #F3F4F6; color: #111; }
+    .time-slot.selected {
+        background-color: #48BB78;
+        color: #fff;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(72, 187, 120, 0.2);
+        border-color: #38A169;
+    }
+    .time-slot.booked {
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
+        border: 1px solid #dc2626 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+        opacity: 0.6;
+    }
+    .time-picker-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #eee;
+    }
+    .time-btn-clear { background: none; border: none; color: #666; font-size: 14px; cursor: pointer; padding: 6px 12px; }
+    .time-btn-set {
+        background-color: #48BB78;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 24px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .time-btn-set:hover { background-color: #38A169; }
+
+    @keyframes calFadeInDown {
+        from { opacity: 0; transform: translateY(-6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes calFadeInUp {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+@endsection
+
+
 @section('content')
 
 <!-- Bookings Content -->
@@ -42,14 +129,18 @@
                         <div>
                             <label class="block text-[10px] font-black text-secondary uppercase tracking-widest mb-3 opacity-60">New Booking Time</label>
                             <div class="relative group">
-                                <i class="ri-time-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-colors z-10 pointer-events-none"></i>
-                                <select id="reschedule-time" name="booking_time" required
-                                    class="w-full pl-12 pr-10 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium outline-none focus:border-secondary focus:bg-white transition-all shadow-sm min-h-[52px] appearance-none cursor-pointer">
-                                    <option value="" disabled selected>Select a time slot</option>
-                                </select>
-                                <i class="ri-arrow-down-s-line absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                <div id="reschedule-time-trigger" class="time-picker-trigger w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium outline-none focus:border-secondary focus:bg-white transition-all shadow-sm min-h-[52px] cursor-pointer flex items-center"
+                                    onclick="toggleRescheduleTimePicker(this)">
+                                    <i class="ri-time-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-colors z-10 pointer-events-none"></i>
+                                    <span class="text-sm text-gray-400 time-label">Select a time slot</span>
+                                </div>
+                                <input type="hidden" id="reschedule-time" name="booking_time" required class="time-value">
+                                
+                                <div class="time-picker-dropdown hidden">
+                                    <div class="time-picker-content"></div>
+                                </div>
                             </div>
-                            <p class="text-[9px] text-gray-400 mt-2 italic font-medium">Please select a new time slot.</p>
+                            <p class="text-[9px] text-gray-400 mt-2 italic font-medium">Please select a new time slot from the available options.</p>
                         </div>
                     </div>
 
@@ -342,55 +433,237 @@
             }
         }
 
-        // Populate Reschedule Time Select
-        const timeSelect = document.getElementById('reschedule-time');
-        if (timeSelect) {
-            const periods = ['AM', 'PM'];
-            for (let p = 0; p < 2; p++) {
-                for (let h = 0; h < 12; h++) {
-                    const displayHour = h === 0 ? 12 : h;
-                    const hourStr = displayHour.toString().padStart(2, '0');
-                    const period = periods[p];
-                    
-                    const time1 = `${hourStr}:00 ${period}`;
-                    const time2 = `${hourStr}:30 ${period}`;
-                    
-                    timeSelect.add(new Option(time1, time1));
-                    timeSelect.add(new Option(time2, time2));
-                }
-            }
-        }
+        // Pagination AJAX for bookings table
     });
 
+    let CURRENT_RESCHEDULE_PRACTITIONER_ID = null;
+    const SHORT_MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
     // Reschedule Logic
-    function openRescheduleModal(id, currentDate, currentTime) {
+    function openRescheduleModal(id, currentDate, currentTime, profileId) {
+        CURRENT_RESCHEDULE_PRACTITIONER_ID = profileId;
         document.getElementById('reschedule-booking-id').value = id;
         document.getElementById('reschedule-date').value = currentDate;
         
-        const timeSelect = document.getElementById('reschedule-time');
+        const trigger = document.getElementById('reschedule-time-trigger');
+        const label = trigger.querySelector('.time-label');
+        const hiddenInput = document.getElementById('reschedule-time');
         
         let timeToSet = currentTime;
         if (timeToSet && timeToSet.includes('-')) {
             timeToSet = timeToSet.split('-')[0].trim();
         }
         
-        let optionFound = false;
-        for (let i = 0; i < timeSelect.options.length; i++) {
-            if (timeSelect.options[i].value === timeToSet) {
-                timeSelect.selectedIndex = i;
-                optionFound = true;
-                break;
-            }
-        }
-        
-        if (!optionFound && timeToSet) {
-            timeSelect.add(new Option(timeToSet, timeToSet));
-            timeSelect.value = timeToSet;
+        if (timeToSet) {
+            label.textContent = timeToSet;
+            label.classList.remove('text-gray-400');
+            label.classList.add('text-gray-700');
+            hiddenInput.value = timeToSet;
+        } else {
+            label.textContent = "Select a time slot";
+            label.classList.add('text-gray-400');
+            label.classList.remove('text-gray-700');
+            hiddenInput.value = "";
         }
         
         document.getElementById('reschedule-modal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     }
+
+    function toggleRescheduleTimePicker(trigger) {
+        const container = trigger.closest('.relative');
+        const dropdown = container.querySelector('.time-picker-dropdown');
+        const content = container.querySelector('.time-picker-content');
+        const dateInput = document.getElementById('reschedule-date');
+
+        if (!dateInput || !dateInput.value) {
+            if (typeof showToast === 'function') showToast('Please select a date first.', 'warning');
+            else alert('Please select a date first.');
+            return;
+        }
+
+        if (dropdown.classList.contains('hidden')) {
+            // Determine Date Label
+            const parts = dateInput.value.split('-');
+            const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            const mon = SHORT_MONTH_NAMES[d.getMonth()];
+            const dateLabel = `${mon} ${d.getDate()}, ${d.getFullYear()}`;
+
+            const dStart = new Date(d);
+            dStart.setHours(0, 0, 0, 0);
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            const isToday = dStart.getTime() === todayStart.getTime();
+
+            // Get current value
+            const timeInput = document.getElementById('reschedule-time');
+            const selectedTime = timeInput.value;
+
+            renderRescheduleTimePicker(content, dateInput.value, selectedTime, isToday, dateLabel);
+            dropdown.classList.remove('hidden');
+            smartPosition(trigger, dropdown);
+        } else {
+            dropdown.classList.add('hidden');
+            dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
+        }
+    }
+
+    async function renderRescheduleTimePicker(wrapper, dateValue, selectedTime, isToday, displayLabel) {
+        wrapper.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-10 px-4">
+                <div class="w-8 h-8 border-4 border-[#F5A623] border-t-transparent rounded-full animate-spin mb-3"></div>
+                <p class="text-sm text-gray-500 font-medium">Fetching available slots...</p>
+            </div>
+        `;
+
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        
+        const slots = await fetchSlots(dateValue);
+        const bookedSlots = await fetchBookedSlots(dateValue);
+
+        if (!slots || slots.length === 0) {
+            const isTodaySelected = new Date(dateValue).toDateString() === new Date().toDateString();
+            const msg = isTodaySelected 
+                ? "All slots for today have already passed. Please select another date."
+                : "No available slots for this practitioner on the selected date.";
+            wrapper.innerHTML = `<div class="text-center py-6 px-4 text-sm text-gray-500">${msg}</div>`;
+            return;
+        }
+
+        let html = `
+            <div class="time-picker-header">
+                <div class="time-picker-title">Available Slots on ${displayLabel}</div>
+            </div>
+            <div class="time-slots-grid">
+        `;
+
+        slots.forEach(slot => {
+            const slotMinutes = parseTimeToMinutes(slot);
+            const isPast = isToday && (slotMinutes < currentMinutes);
+            const isBooked = bookedSlots.includes(slot);
+
+            if (isPast) {
+                html += `<div class="time-slot disabled" title="Time has passed" style="opacity: 0.3; cursor: not-allowed; pointer-events: none;">${slot}</div>`;
+            } else if (isBooked) {
+                html += `<div class="time-slot booked" title="Already booked">${slot}</div>`;
+            } else {
+                const isSel = (slot === selectedTime) ? 'selected' : '';
+                html += `<div class="time-slot ${isSel}" onclick="selectRescheduleTimeSlot(this)">${slot}</div>`;
+            }
+        });
+
+        html += `
+            </div>
+            <div class="time-picker-footer">
+                <button type="button" class="time-btn-clear" onclick="clearRescheduleTime(this)">Clear</button>
+                <button type="button" class="time-btn-set" onclick="setRescheduleTime(this)">Set</button>
+            </div>
+        `;
+        wrapper.innerHTML = html;
+    }
+
+    async function fetchSlots(dateStr) {
+        if (!CURRENT_RESCHEDULE_PRACTITIONER_ID || !dateStr) return [];
+        try {
+            const res = await fetch(`/api/available-slots/${CURRENT_RESCHEDULE_PRACTITIONER_ID}/${dateStr}`);
+            const data = await res.json();
+            if (data && Array.isArray(data.slots)) {
+                return data.slots.map(s => s.time).filter(Boolean);
+            }
+        } catch (e) { console.error('Slot fetch error', e); }
+        return [];
+    }
+
+    async function fetchBookedSlots(dateStr) {
+        if (!CURRENT_RESCHEDULE_PRACTITIONER_ID || !dateStr) return [];
+        try {
+            const res = await fetch(`/api/booked-slots/${CURRENT_RESCHEDULE_PRACTITIONER_ID}/${dateStr}`);
+            const data = await res.json();
+            return data.booked_slots || [];
+        } catch (e) { console.error('Booked slot fetch error', e); return []; }
+    }
+
+    function selectRescheduleTimeSlot(slot) {
+        const grid = slot.closest('.time-slots-grid');
+        grid.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+        slot.classList.add('selected');
+    }
+
+    function setRescheduleTime(btn) {
+        const container = btn.closest('.relative');
+        const dropdown = container.querySelector('.time-picker-dropdown');
+        const trigger = document.getElementById('reschedule-time-trigger');
+        const label = trigger.querySelector('.time-label');
+        const hiddenInput = document.getElementById('reschedule-time');
+
+        const selectedSlot = container.querySelector('.time-slot.selected');
+        if (selectedSlot) {
+            const val = selectedSlot.textContent.trim();
+            label.textContent = val;
+            label.classList.remove('text-gray-400');
+            label.classList.add('text-gray-700');
+            hiddenInput.value = val;
+        }
+
+        dropdown.classList.add('hidden');
+        dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
+    }
+
+    function clearRescheduleTime(btn) {
+        const container = btn.closest('.relative');
+        const dropdown = container.querySelector('.time-picker-dropdown');
+        const trigger = document.getElementById('reschedule-time-trigger');
+        const label = trigger.querySelector('.time-label');
+        const hiddenInput = document.getElementById('reschedule-time');
+
+        label.textContent = "Select a time slot";
+        label.classList.remove('text-gray-700');
+        label.classList.add('text-gray-400');
+        hiddenInput.value = "";
+
+        dropdown.classList.add('hidden');
+        dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
+    }
+
+    function smartPosition(trigger, dropdown) {
+        const triggerRect = trigger.getBoundingClientRect();
+        const dropdownRect = dropdown.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - triggerRect.bottom;
+        const reqHeight = dropdownRect.height || 350;
+
+        dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
+
+        if (spaceBelow < reqHeight && triggerRect.top > reqHeight) {
+            dropdown.classList.add('cal-open-top');
+        } else {
+            dropdown.classList.add('cal-open-bottom');
+        }
+    }
+
+    function parseTimeToMinutes(timeStr) {
+        if (!timeStr) return 0;
+        const parts = timeStr.split(' ');
+        const time = parts[0].split(':');
+        let hours = parseInt(time[0]);
+        const minutes = parseInt(time[1]);
+        const period = parts[1];
+        if (period === 'PM' && hours < 12) hours += 12;
+        if (period === 'AM' && hours === 12) hours = 0;
+        return hours * 60 + minutes;
+    }
+
+    // Close picker on outside click
+    document.addEventListener('click', function(e) {
+        const picker = document.querySelector('.time-picker-dropdown');
+        const trigger = document.getElementById('reschedule-time-trigger');
+        if (picker && !picker.classList.contains('hidden')) {
+            if (!picker.contains(e.target) && !trigger.contains(e.target)) {
+                picker.classList.add('hidden');
+                picker.classList.remove('cal-open-top', 'cal-open-bottom');
+            }
+        }
+    });
 
     function closeRescheduleModal() {
         document.getElementById('reschedule-modal').classList.add('hidden');
