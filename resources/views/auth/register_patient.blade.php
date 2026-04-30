@@ -335,15 +335,18 @@
                                 <div>
                                     <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{{ __('Promocode') }}</label>
                                     <div class="relative w-full">
-                                        <input type="text" name="promocode" id="promocode-input" placeholder="CODE1234" class="w-full h-[52px] pl-6 pr-28 bg-white rounded-full border border-dashed border-gray-300 outline-none uppercase">
-                                        <button type="button" id="promo-apply-btn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-sm font-medium hover:bg-[#e0a932]">{{ __('Apply') }}</button>
+                                        <input type="text" name="promocode" id="promocode-input" placeholder="{{ __('ENTER CODE') }}" class="w-full h-[52px] pl-6 pr-28 bg-white rounded-full border border-gray-200 outline-none uppercase focus:border-secondary transition-all shadow-sm">
+                                        <button type="button" id="promo-apply-btn" class="absolute right-1.5 top-1/2 -translate-y-1/2 bg-[#FABC41] text-[#423131] px-8 py-2.5 rounded-full text-sm font-bold hover:bg-[#e0a932] transition-colors">{{ __('Apply') }}</button>
                                     </div>
                                 </div>
-                                <div class="bg-secondary/5 rounded-[24px] p-5 space-y-2">
-                                    <div class="flex justify-between items-center text-sm"><span class="text-gray-500 font-medium">{{ __('Registration Fee') }}</span><span id="registration-fee-display" class="font-bold text-secondary">{{ $registrationCurrencySymbol }} {{ number_format($registrationFee ?? 0, 2, '.', '') }}</span></div>
-                                    <div id="promo-breakdown" class="hidden space-y-2 pt-4 border-t border-secondary/10">
-                                        <div class="flex justify-between items-center text-sm"><span class="text-gray-500 font-medium">{{ __('Discount') }}</span><span id="promo-discount-amount-display" class="font-bold text-green-600"></span></div>
-                                        <div class="flex justify-between items-center pt-4 border-t border-secondary/10"><span class="font-bold text-secondary">{{ __('Total Payable') }}</span><span id="promo-total-fee-display" class="text-lg font-black text-secondary"></span></div>
+                                <div class="flex flex-col">
+                                    <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{{ __('Order Summary') }}</label>
+                                    <div class="bg-secondary/5 rounded-2xl p-3 px-6 min-h-[52px] flex flex-col justify-center border border-secondary/10">
+                                        <div class="flex justify-between items-center text-sm"><span class="text-gray-500 font-medium">{{ __('Registration Fee') }}</span><span id="registration-fee-display" class="font-bold text-secondary">{{ $registrationCurrencySymbol }} {{ number_format($registrationFee ?? 0, 2, '.', '') }}</span></div>
+                                        <div id="promo-breakdown" class="hidden space-y-2 pt-3 mt-3 border-t border-secondary/10">
+                                            <div class="flex justify-between items-center text-sm"><span class="text-gray-500 font-medium">{{ __('Discount') }}</span><span id="promo-discount-amount-display" class="font-bold text-green-600"></span></div>
+                                            <div class="flex justify-between items-center pt-3 border-t border-secondary/10"><span class="font-bold text-secondary">{{ __('Total Payable') }}</span><span id="promo-total-fee-display" class="text-lg font-black text-secondary"></span></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
