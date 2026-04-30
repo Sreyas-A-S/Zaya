@@ -72,14 +72,40 @@
                             @forelse($services as $service)
                             @php
                                 $isAssignedToMe = !empty($referredServiceIds) && in_array($service->id, $referredServiceIds);
+                                $sessionDate = null;
+                                $sessionTime = null;
+                                if (!empty($booking->additional_info['sessions'])) {
+                                    foreach ($booking->additional_info['sessions'] as $sess) {
+                                        if (isset($sess['service_id']) && $sess['service_id'] == $service->id) {
+                                            if (!empty($sess['date'])) {
+                                                try {
+                                                    $sessionDate = \Carbon\Carbon::parse($sess['date'])->format('M d, Y');
+                                                } catch(\Exception $e) {
+                                                    $sessionDate = $sess['date'];
+                                                }
+                                            }
+                                            if (!empty($sess['time'])) {
+                                                $sessionTime = $sess['time'];
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
                             @endphp
                             <div class="flex items-center justify-between p-4 {{ $isAssignedToMe ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/10' : 'bg-[#F9FBF9] border-[#2E4B3D]/12' }} border rounded-2xl hover:border-secondary/20 transition-all group">
                                 <div class="flex items-center gap-3">
                                     <div class="w-2 h-2 rounded-full {{ $isAssignedToMe ? 'bg-primary animate-pulse' : 'bg-secondary' }}"></div>
-                                    <span class="text-sm font-bold {{ $isAssignedToMe ? 'text-primary' : 'text-secondary' }}">{{ $service->title }}</span>
-                                    @if($isAssignedToMe)
-                                        <span class="ml-2 text-[8px] font-black uppercase tracking-widest bg-primary text-white px-2 py-0.5 rounded-full">Your Assignment</span>
-                                    @endif
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sm font-bold {{ $isAssignedToMe ? 'text-primary' : 'text-secondary' }}">{{ $service->title }}</span>
+                                            @if($isAssignedToMe)
+                                                <span class="ml-2 text-[8px] font-black uppercase tracking-widest bg-primary text-white px-2 py-0.5 rounded-full">Your Assignment</span>
+                                            @endif
+                                        </div>
+                                        @if($sessionDate || $sessionTime)
+                                            <p class="text-[10px] text-gray-500 font-medium mt-1"><i class="ri-time-line mr-1"></i> {{ $sessionDate ?? 'TBD' }} • {{ $sessionTime ?? 'TBD' }}</p>
+                                        @endif
+                                    </div>
                                 </div>
                                 @if(in_array($user->role, ['client', 'patient']))
                                 <span class="text-[11px] font-black text-secondary/60">{{ get_currency_symbol($booking->currency) }}{{ number_format($service->price ?? 0, 2) }}</span>
