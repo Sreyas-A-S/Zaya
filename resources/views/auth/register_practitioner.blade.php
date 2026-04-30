@@ -774,10 +774,13 @@
             countrySelect.addEventListener('change', function() {
                 updateRegistrationFee(this.value);
             });
-            // Initial check
-            if (countrySelect.value) {
-                updateRegistrationFee(countrySelect.value);
-            }
+            // Initial check with small delay to ensure TomSelect is ready
+            setTimeout(() => {
+                const currentVal = countrySelect.value;
+                if (currentVal) {
+                    updateRegistrationFee(currentVal);
+                }
+            }, 200);
         }
     });
 

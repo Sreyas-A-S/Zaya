@@ -625,7 +625,18 @@
                 if (countrySelect) {
                     countrySelect.addEventListener('change', function() { convertFee(this.value); });
                     // If using TomSelect, we might need special handling
-                    setTimeout(() => { if (countrySelect.tomselect) countrySelect.tomselect.on('change', (val) => convertFee(val)); }, 100);
+                    setTimeout(() => { 
+                        if (countrySelect.tomselect) {
+                            countrySelect.tomselect.on('change', (val) => convertFee(val));
+                            // Trigger initial load check
+                            const currentVal = countrySelect.tomselect.getValue();
+                            if (currentVal) {
+                                convertFee(currentVal);
+                            }
+                        } else if (countrySelect.value) {
+                             convertFee(countrySelect.value);
+                        }
+                    }, 200);
                 }
 
                 function clearPromo() {
