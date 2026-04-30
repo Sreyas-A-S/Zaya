@@ -100,9 +100,9 @@ class SocialAuthController extends Controller
         $adminRoles = ['super-admin', 'admin', 'country-admin', 'financial-manager', 'content-manager', 'user-manager'];
         
         if (in_array($user->role, $adminRoles)) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->intended(route('admin.dashboard'));
         }
 
-        return redirect()->route('dashboard');
+        return redirect()->intended(route('dashboard'));
     }
 }

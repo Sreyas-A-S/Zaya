@@ -354,7 +354,7 @@ class RegisterController extends Controller
             if ($request->wantsJson()) {
                 return response()->json(['success' => 'Registration successful!'], 201);
             }
-            return redirect($this->redirectPath());
+            return redirect()->intended($this->redirectPath());
         } catch (ValidationException $e) {
             DB::rollBack();
             throw $e;

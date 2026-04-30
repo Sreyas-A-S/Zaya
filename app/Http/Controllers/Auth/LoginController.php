@@ -174,10 +174,10 @@ class LoginController extends Controller
                 }
             }
 
-            return redirect($redirectUrl);
+            return redirect()->intended($redirectUrl);
         }
 
-        return redirect()->route('dashboard');
+        return redirect()->intended(route('dashboard'));
     }
 
     protected function loggedOut(Request $request)
