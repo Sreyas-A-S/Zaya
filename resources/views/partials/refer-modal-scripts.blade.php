@@ -865,7 +865,7 @@
 
         try {
             // Fetch the client's requested languages if not provided
-            if (!fromLang || !toLang || fromLang === 'English' && toLang === 'Any') {
+            if (!fromLang || !toLang || fromLang === 'English' || toLang === 'Any') {
                 const response = await fetch(`/api/bookings/${bookingId}`);
                 const booking = await response.json();
                 currentFromLang = booking.from_language;

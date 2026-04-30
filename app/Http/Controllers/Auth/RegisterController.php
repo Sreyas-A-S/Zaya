@@ -83,7 +83,7 @@ class RegisterController extends Controller
 
             $registrationFee = (float) ($financeSettings['practitioner_registration_fee'] ?? 0);
             $registrationFeeEnabled = filter_var($financeSettings['practitioner_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
-            $registrationCurrency = strtoupper($financeSettings['practitioner_registration_fee_currency'] ?? config('currencies.default', 'EUR'));
+            $registrationCurrency = strtoupper($financeSettings['practitioner_registration_fee_currency'] ?? config('currencies.default', 'INR'));
 
             return view('auth.register_practitioner', compact(
                 'languages', 'wellnessConsultations', 'bodyTherapies', 'practitionerModalities', 
@@ -96,7 +96,7 @@ class RegisterController extends Controller
             
             $registrationFee = (float) ($financeSettings['client_registration_fee'] ?? 0);
             $registrationFeeEnabled = filter_var($financeSettings['client_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
-            $registrationCurrency = strtoupper($financeSettings['client_registration_fee_currency'] ?? config('currencies.default', 'EUR'));
+            $registrationCurrency = strtoupper($financeSettings['client_registration_fee_currency'] ?? config('currencies.default', 'INR'));
 
             return view('auth.register_patient', compact(
                 'languages', 'currencies', 'countries', 'registrationFee', 'registrationFeeEnabled', 'registrationCurrency', 'countryToCurrency'
@@ -423,7 +423,7 @@ class RegisterController extends Controller
 
         // Check currency for fixed promo codes
         if ($promo->type === 'fixed') {
-            $expectedCurrency = $request->input('registration_fee_currency', 'EUR');
+            $expectedCurrency = $request->input('registration_fee_currency', 'INR');
             if ($promo->currency && strtoupper($promo->currency) !== strtoupper($expectedCurrency)) {
                 return [null, []];
             }

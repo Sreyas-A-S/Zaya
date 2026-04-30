@@ -1054,11 +1054,11 @@ class WebController extends Controller
 
         if (!$currency && $countryCode !== 'all') {
             $countryToCurrency = config('currencies.country_to_currency', []);
-            $currency = $countryToCurrency[$countryCode] ?? 'EUR';
+            $currency = $countryToCurrency[$countryCode] ?? 'INR';
         }
 
         if (!$currency) {
-            $currency = 'EUR';
+            $currency = 'INR';
         }
 
         // Override with token currency if available

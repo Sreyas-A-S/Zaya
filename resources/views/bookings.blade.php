@@ -6,76 +6,81 @@
 <style>
     /* Time Picker Dropdown Styles */
     .time-picker-dropdown {
-        position: absolute;
-        left: 0;
-        z-index: 1050;
+        position: fixed;
+        z-index: 1100;
         background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 4px 44px rgba(0, 0, 0, 0.15);
-        padding: 24px 20px;
-        min-width: 320px;
+        border-radius: 24px;
+        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.2);
+        padding: 0;
+        width: 320px;
+        max-height: 400px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
     }
-    .time-picker-dropdown.cal-open-bottom {
-        top: calc(100% + 8px);
-        animation: calFadeInDown 0.15s ease-out;
-        transform-origin: top center;
-    }
-    .time-picker-dropdown.cal-open-top {
-        bottom: calc(100% + 8px);
-        animation: calFadeInUp 0.15s ease-out;
-        transform-origin: bottom center;
+    .time-picker-content {
+        padding: 24px;
+        overflow-y: auto;
+        flex: 1;
+        scrollbar-width: thin;
     }
     .time-picker-header { text-align: center; margin-bottom: 20px; }
-    .time-picker-title { font-size: 15px; font-weight: 600; color: #333; }
-    .time-slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .time-picker-title { font-size: 14px; font-weight: 800; color: #2E4B3D; text-transform: uppercase; tracking: 0.05em; }
+    .time-slots-grid { 
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 10px; 
+        margin-bottom: 10px; 
+    }
     .time-slot {
-        padding: 10px 4px;
+        padding: 12px 4px;
         text-align: center;
-        font-size: 13px;
-        color: #555;
-        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #4B5563;
+        background: #F9FAFB;
+        border-radius: 12px;
         cursor: pointer;
         transition: all 0.2s;
-        user-select: none;
-        border: 1px solid transparent;
+        border: 1px solid #F3F4F6;
     }
-    .time-slot:hover { background-color: #F3F4F6; color: #111; }
+    .time-slot:hover { background-color: #F3F4F6; color: #111; border-color: #E5E7EB; }
     .time-slot.selected {
-        background-color: #48BB78;
+        background-color: #2E4B3D;
         color: #fff;
-        font-weight: 500;
-        box-shadow: 0 2px 4px rgba(72, 187, 120, 0.2);
-        border-color: #38A169;
+        border-color: #2E4B3D;
+        box-shadow: 0 4px 12px rgba(46, 75, 61, 0.2);
     }
     .time-slot.booked {
         background-color: #fee2e2 !important;
         color: #991b1b !important;
-        border: 1px solid #dc2626 !important;
+        border: 1px solid #fecaca !important;
         cursor: not-allowed !important;
-        pointer-events: none !important;
         opacity: 0.6;
     }
     .time-picker-footer {
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         align-items: center;
-        gap: 16px;
-        padding-top: 16px;
-        border-top: 1px solid #eee;
+        padding: 16px 24px;
+        background: #F9FAFB;
+        border-top: 1px solid #F3F4F6;
     }
-    .time-btn-clear { background: none; border: none; color: #666; font-size: 14px; cursor: pointer; padding: 6px 12px; }
+    .time-btn-clear { background: none; border: none; color: #9CA3AF; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
     .time-btn-set {
-        background-color: #48BB78;
+        background-color: #2E4B3D;
         color: white;
         border: none;
-        border-radius: 20px;
-        padding: 8px 24px;
-        font-size: 14px;
-        font-weight: 500;
+        border-radius: 12px;
+        padding: 8px 20px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
         cursor: pointer;
-        transition: background-color 0.2s;
+        transition: all 0.2s;
     }
-    .time-btn-set:hover { background-color: #38A169; }
+    .time-btn-set:hover { background-color: #1a2e25; transform: translateY(-1px); }
 
     @keyframes calFadeInDown {
         from { opacity: 0; transform: translateY(-6px); }
@@ -101,8 +106,8 @@
     <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeRescheduleModal()"></div>
     <div class="fixed inset-0 z-10 overflow-y-auto">
         <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
-            <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-[#2E4B3D]/12">
-                <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+            <div class="relative inline-block text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-[#2E4B3D]/12">
+                <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50 rounded-t-[2rem]">
                     <div>
                         <h3 class="text-xl font-black text-secondary leading-tight" id="reschedule-modal-title">Reschedule Consultation</h3>
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Select new date and time</p>
@@ -628,17 +633,33 @@
 
     function smartPosition(trigger, dropdown) {
         const triggerRect = trigger.getBoundingClientRect();
-        const dropdownRect = dropdown.getBoundingClientRect();
-        const spaceBelow = window.innerHeight - triggerRect.bottom;
-        const reqHeight = dropdownRect.height || 350;
+        const dropdownWidth = 320;
+        const dropdownHeight = dropdown.offsetHeight || 400;
+        const margin = 8;
 
-        dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
-
-        if (spaceBelow < reqHeight && triggerRect.top > reqHeight) {
-            dropdown.classList.add('cal-open-top');
-        } else {
-            dropdown.classList.add('cal-open-bottom');
+        // Calculate horizontal position (aligned to trigger left, but staying within viewport)
+        let left = triggerRect.left;
+        if (left + dropdownWidth > window.innerWidth) {
+            left = window.innerWidth - dropdownWidth - 20;
         }
+        if (left < 20) left = 20;
+
+        // Calculate vertical position (prefer below, flip if no space)
+        let top = triggerRect.bottom + margin;
+        const spaceBelow = window.innerHeight - triggerRect.bottom;
+        
+        if (spaceBelow < dropdownHeight && triggerRect.top > dropdownHeight) {
+            top = triggerRect.top - dropdownHeight - margin;
+            dropdown.style.transformOrigin = 'bottom center';
+            dropdown.style.animationName = 'calFadeInUp';
+        } else {
+            dropdown.style.transformOrigin = 'top center';
+            dropdown.style.animationName = 'calFadeInDown';
+        }
+
+        dropdown.style.top = top + 'px';
+        dropdown.style.left = left + 'px';
+        dropdown.style.position = 'fixed';
     }
 
     function parseTimeToMinutes(timeStr) {

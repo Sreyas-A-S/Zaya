@@ -934,12 +934,25 @@ class ProfileController extends Controller
 
     public function getBookingDetails($id)
     {
-        $booking = Booking::findOrFail($id);
+        $booking = Booking::with(['language', 'practitioner'])->findOrFail($id);
         
+        $fromLang = $booking->from_language ?: ($booking->language->native_name ?? 'English');
+        $toLang = $booking->to_language;
+        
+        if (!$toLang || strtolower($toLang) === 'any') {
+            // Fallback to practitioner's first spoken language if available
+            $practitioner = $booking->practitioner;
+            if ($practitioner && !empty($practitioner->languages_spoken) && is_array($practitioner->languages_spoken)) {
+                $toLang = $practitioner->languages_spoken[0];
+            } else {
+                $toLang = 'Any';
+            }
+        }
+
         return response()->json([
             'id' => $booking->id,
-            'from_language' => $booking->from_language ?: 'English',
-            'to_language' => $booking->to_language ?: 'Any',
+            'from_language' => $fromLang,
+            'to_language' => $toLang,
             'need_translator' => $booking->need_translator
         ]);
     }
