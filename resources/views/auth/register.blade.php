@@ -14,6 +14,7 @@
             <form class="theme-form" method="POST" action="{{ route('register') }}">
                 @csrf
                 <input type="hidden" name="role" value="{{ $type === 'patient' ? 'client' : $type }}">
+                <input type="hidden" name="referral_code" value="{{ session('referral_code') }}">
               <h2 class="text-center">{{ __('Create :type Account', ['type' => ucfirst($type)]) }}</h2>
               <p class="text-center">{{ __('Enter your personal details to create account') }}</p>
               <div class="form-group">

@@ -163,6 +163,7 @@
                 <form action="{{ route('register') }}" method="POST" id="registration-form" class="w-full">
                     @csrf
                     <input type="hidden" name="role" value="{{ $type ?? 'client' }}">
+                    <input type="hidden" name="referral_code" value="{{ session('referral_code') }}">
                     @if(isset($redirect))
                         <input type="hidden" name="redirect" value="{{ $redirect }}">
                     @endif

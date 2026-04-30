@@ -229,6 +229,9 @@ class BookingController extends Controller
                 'coin_discount' => $coinDiscount,
             ]);
 
+            // Award Referral Bonus Coins to the Referrer (Scenario 2)
+            $this->awardReferralBonus($booking->user);
+
             try {
                 \Illuminate\Support\Facades\Mail::to($booking->user->email)->send(new \App\Mail\BookingMail($booking, 'client'));
                 if ($booking->practitioner && $booking->practitioner->user) {
@@ -461,6 +464,9 @@ class BookingController extends Controller
                 'coins_used' => $booking->coins_used,
                 'coin_discount' => $booking->coin_discount,
             ]);
+
+            // Award Referral Bonus Coins to the Referrer (Scenario 2)
+            $this->awardReferralBonus($booking->user);
 
             try {
                 \Illuminate\Support\Facades\Mail::to($booking->user->email)->send(new \App\Mail\BookingMail($booking, 'client'));

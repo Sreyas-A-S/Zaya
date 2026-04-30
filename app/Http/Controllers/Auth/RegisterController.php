@@ -204,30 +204,6 @@ class RegisterController extends Controller
                 }
             }
 
-            // Award referral coins if applicable
-            if ($user->referred_by) {
-                $referrer = \App\Models\User::find($user->referred_by);
-                if ($referrer) {
-                    $referrerCurrency = $referrer->profile ? $referrer->profile->payout_currency : config('currencies.default', 'INR');
-                    $coinSetting = \App\Models\CoinSetting::where('currency_code', $referrerCurrency)->where('status', true)->first();
-                    if ($coinSetting && $coinSetting->referral_coins > 0) {
-                        $referrer->increment('coins', $coinSetting->referral_coins);
-                        
-                        // Create a coin transaction record for the referral bonus
-                        \App\Models\CoinTransaction::create([
-                            'user_id' => $referrer->id,
-                            'amount' => $coinSetting->referral_coins,
-                            'type' => 'referral_bonus',
-                            'description' => 'Referral bonus for inviting ' . $user->name,
-                            'metadata' => [
-                                'referred_user_id' => $user->id,
-                                'referred_user_name' => $user->name,
-                            ]
-                        ]);
-                    }
-                }
-            }
-
             session()->forget('referral_code');
 
             DB::commit();
@@ -1158,7 +1134,7 @@ class RegisterController extends Controller
             'password' => Hash::make($rawPassword),
             'role' => $data['role'],
             'open_register_link_id' => !empty($data['open_register_token']) ? \App\Models\OpenRegisterLink::where('token', $data['open_register_token'])->value('id') : null,
-            'referred_by' => session('referral_code') ? \App\Models\User::where('referral_token', session('referral_code'))->value('id') : null,
+            'referred_by' => ($data['referral_code'] ?? session('referral_code')) ? \App\Models\User::where('referral_token', ($data['referral_code'] ?? session('referral_code')))->value('id') : null,
         ]);
     }
     /**

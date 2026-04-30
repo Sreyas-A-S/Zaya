@@ -48,6 +48,7 @@
                                     <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data" id="practitionerRegForm" class="theme-form">
                                         @csrf
                                         <input type="hidden" name="role" value="practitioner">
+                                        <input type="hidden" name="referral_code" value="{{ session('referral_code') }}">
                                         <input type="hidden" name="registration_fee" id="registration_fee_input" value="{{ $registrationFee }}">
                                         <input type="hidden" name="registration_fee_actual" id="registration_fee_actual_input" value="{{ $registrationFee }}">
                                         <input type="hidden" name="registration_currency" id="registration_currency_input" value="{{ $registrationCurrency }}">
