@@ -115,13 +115,23 @@
                         <input type="hidden" id="translator-booking-id">
                         
                         <!-- Search & Filter -->
-                        <div class="mb-6">
-                            <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Find Professional Translator</label>
-                            <div class="relative">
-                                <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                <input type="text" id="translator-search" placeholder="Search by name..." 
-                                    oninput="debouncedFetchTranslators()"
-                                    class="w-full pl-11 pr-4 py-4 rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-sm transition-all shadow-sm">
+                        <div class="mb-6 space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Find Professional Translator</label>
+                                <div class="relative">
+                                    <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" id="translator-search" placeholder="Search by name..." 
+                                        oninput="debouncedFetchTranslators()"
+                                        class="w-full pl-11 pr-4 py-4 rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-sm transition-all shadow-sm">
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 px-1">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="translator-ignore-langs" class="sr-only peer" onchange="fetchTranslators()">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+                                </label>
+                                <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Show all translators (Ignore language filter)</span>
                             </div>
                         </div>
 
@@ -728,10 +738,13 @@
         list.classList.add('hidden');
 
         try {
+            const ignoreLangs = document.getElementById('translator-ignore-langs')?.checked || false;
+
             const url = new URL("{{ route('available-translators-api') }}", window.location.origin);
             if (query) url.searchParams.append('query', query);
             url.searchParams.append('from_lang', currentFromLang);
             url.searchParams.append('to_lang', currentToLang);
+            if (ignoreLangs) url.searchParams.append('ignore_languages', 'true');
 
             const response = await fetch(url);
             const translators = await response.json();
@@ -803,6 +816,10 @@
         // Reset
         const searchInput = document.getElementById('translator-search');
         if (searchInput) searchInput.value = '';
+        
+        const ignoreLangsCheckbox = document.getElementById('translator-ignore-langs');
+        if (ignoreLangsCheckbox) ignoreLangsCheckbox.checked = false;
+
         selectedTranslatorId = null;
         const submitBtn = document.getElementById('translator-submit-btn');
         if (submitBtn) submitBtn.disabled = true;

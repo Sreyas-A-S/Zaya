@@ -948,6 +948,8 @@ class ProfileController extends Controller
         $fromLang = $request->query('from_lang');
         $toLang = $request->query('to_lang');
 
+        $ignoreLanguages = $request->query('ignore_languages') === 'true';
+
         $translatorsQuery = \App\Models\Translator::with('user')
             ->where('status', 'active');
 
@@ -955,25 +957,31 @@ class ProfileController extends Controller
             $translatorsQuery->where('full_name', 'LIKE', "%{$query}%");
         }
 
-        if ($fromLang && $toLang && strtolower($toLang) !== 'any') {
-            $translatorsQuery->where(function ($q) use ($fromLang, $toLang) {
-                // Translator should handle both languages in their source/target pairs
-                // Or handle from_lang as source and to_lang as target
-                $q->where(function ($sub) use ($fromLang, $toLang) {
-                    $sub->whereJsonContains('source_languages', $fromLang)
-                        ->whereJsonContains('target_languages', $toLang);
-                })->orWhere(function ($sub) use ($fromLang, $toLang) {
-                    // Also check reverse if applicable (some translators work both ways)
-                    $sub->whereJsonContains('source_languages', $toLang)
-                        ->whereJsonContains('target_languages', $fromLang);
+        if (!$ignoreLanguages) {
+            if ($fromLang && $toLang && strtolower($toLang) !== 'any') {
+                $translatorsQuery->where(function ($q) use ($fromLang, $toLang) {
+                    // Match translators who support both languages in any capacity
+                    $q->where(function ($sub) use ($fromLang) {
+                        $sub->whereJsonContains('source_languages', $fromLang)
+                            ->orWhereJsonContains('target_languages', $fromLang)
+                            ->orWhereJsonContains('additional_languages', $fromLang)
+                            ->orWhere('native_language', 'LIKE', $fromLang);
+                    })->where(function ($sub) use ($toLang) {
+                        $sub->whereJsonContains('source_languages', $toLang)
+                            ->orWhereJsonContains('target_languages', $toLang)
+                            ->orWhereJsonContains('additional_languages', $toLang)
+                            ->orWhere('native_language', 'LIKE', $toLang);
+                    });
                 });
-            });
-        } elseif ($fromLang) {
-            // Only from_lang requested or to_lang is 'Any'
-            $translatorsQuery->where(function ($q) use ($fromLang) {
-                $q->whereJsonContains('source_languages', $fromLang)
-                  ->orWhereJsonContains('target_languages', $fromLang);
-            });
+            } elseif ($fromLang) {
+                // Only match fromLang
+                $translatorsQuery->where(function ($q) use ($fromLang) {
+                    $q->whereJsonContains('source_languages', $fromLang)
+                      ->orWhereJsonContains('target_languages', $fromLang)
+                      ->orWhereJsonContains('additional_languages', $fromLang)
+                      ->orWhere('native_language', 'LIKE', $fromLang);
+                });
+            }
         }
 
         $translators = $translatorsQuery->get()->map(function ($t) {
