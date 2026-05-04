@@ -232,7 +232,16 @@
                                    <span
                                        class="text-[10px] font-black uppercase tracking-widest text-gray-600">History</span>
                                </a>
-                               <a href="{{ $booking ? route('bookings.consultation-form.show', $booking->id) : route('consultations.index') }}"
+                               @php
+                                   $prescriptionUrl = route('prescriptions.index');
+                                   if ($booking) {
+                                       $isExpert = in_array(auth()->user()->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']);
+                                       if ($isExpert) {
+                                           $prescriptionUrl = route('prescriptions.create', $booking->id);
+                                       }
+                                   }
+                               @endphp
+                               <a href="{{ $prescriptionUrl }}"
                                    class="flex flex-col items-center gap-2 p-3 md:p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
                                    <i
                                        class="ri-file-list-3-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>

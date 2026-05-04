@@ -451,6 +451,53 @@
                 </div>
             </div>
             @endif
+
+            <!-- Prescriptions Section -->
+            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm p-5 md:p-8">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Digital Prescriptions</h3>
+                        <p class="text-[10px] text-gray-400 font-bold mt-1">Medical prescriptions issued during/after session</p>
+                    </div>
+                    @if($isExpert && ($hasConsent || $booking->profile_id === $user->profile_id))
+                    <a href="{{ route('prescriptions.create', $booking->id) }}" class="w-10 h-10 rounded-full bg-secondary/5 text-secondary flex items-center justify-center hover:bg-secondary hover:text-white transition-all">
+                        <i class="ri-add-line text-xl"></i>
+                    </a>
+                    @endif
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @forelse($booking->prescriptions ?? [] as $rx)
+                    <div class="flex flex-col p-5 rounded-2xl border border-gray-50 bg-[#F9FBF9] hover:border-secondary/20 hover:bg-white transition-all group shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform">
+                                    <i class="ri-capsule-line"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-secondary">{{ $rx->title }}</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{{ $rx->prescription_date->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 mt-auto">
+                            <a href="{{ route('prescriptions.show', $rx->id) }}" 
+                               class="flex-1 py-2 px-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">
+                                <i class="ri-eye-line mr-1"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="col-span-full py-8 text-center bg-gray-50/50 rounded-3xl border border-dashed border-gray-200">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">No prescriptions issued yet</p>
+                        @if($isExpert && ($hasConsent || $booking->profile_id === $user->profile_id))
+                            <a href="{{ route('prescriptions.create', $booking->id) }}" class="inline-block mt-4 text-xs font-black text-secondary hover:underline">Issue First Prescription →</a>
+                        @endif
+                    </div>
+                    @endforelse
+                </div>
+            </div>
         </div>
 
         <!-- Sidebar Info -->

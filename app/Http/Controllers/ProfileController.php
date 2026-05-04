@@ -596,7 +596,12 @@ class ProfileController extends Controller
             ->get()
             ->unique('requester_id');
 
-        return view('health-journey', compact('user', 'clinicalDocuments', 'consultations', 'dataAccessRequests', 'allServices'));
+        $prescriptions = \App\Models\Prescription::where('user_id', $user->id)
+            ->with(['practitioner.user', 'booking'])
+            ->latest()
+            ->get();
+
+        return view('health-journey', compact('user', 'clinicalDocuments', 'consultations', 'dataAccessRequests', 'allServices', 'prescriptions'));
     }
 
     public function bookings(Request $request)
@@ -709,7 +714,7 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $booking = $this->getBookingQuery($user)
-            ->with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo', 'transactions', 'consultationForms'])
+            ->with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo', 'transactions', 'consultationForms', 'prescriptions.practitioner.user'])
             ->findOrFail($id);
 
         // Permissions check for sensitive data
@@ -827,6 +832,12 @@ class ProfileController extends Controller
             $query->where('user_id', $client->id);
         })->with(['booking'])->latest()->get();
 
+        // Get prescriptions for this client
+        $prescriptions = \App\Models\Prescription::where('user_id', $client->id)
+            ->with(['booking', 'practitioner.user'])
+            ->latest()
+            ->get();
+
         // Get client concerns (from their bookings)
         $concerns = Booking::where('user_id', $client->id)
             ->whereNotNull('conditions')
@@ -854,7 +865,7 @@ class ProfileController extends Controller
 
         $user = Auth::user();
 
-        return view('practitioner.client-profile', compact('user', 'client', 'recordings', 'bookings', 'documents', 'consultationForms', 'concerns'));
+        return view('practitioner.client-profile', compact('user', 'client', 'recordings', 'bookings', 'documents', 'consultationForms', 'concerns', 'prescriptions'));
     }
 
     public function myServices()

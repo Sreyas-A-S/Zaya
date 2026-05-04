@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ZegoController;
+use App\Http\Controllers\PrescriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'isClient'])->group(function () {
@@ -21,6 +22,13 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::get('/recordings/{id}', [ProfileController::class, 'showRecording'])->name('recordings.show');
     Route::get('/conference/session/{channel}', [ProfileController::class, 'joinSession'])->name('conference.join');
     Route::get('/conference/zego/{channel}', [ZegoController::class, 'join'])->name('zego.join');
+    
+    // Prescription Routes
+    Route::get('/prescriptions', [PrescriptionController::class, 'index'])->name('prescriptions.index');
+    Route::get('/bookings/{id}/prescription/create', [PrescriptionController::class, 'create'])->name('prescriptions.create');
+    Route::post('/bookings/{id}/prescription', [PrescriptionController::class, 'store'])->name('prescriptions.store');
+    Route::get('/prescriptions/{id}', [PrescriptionController::class, 'show'])->name('prescriptions.show');
+
     Route::get('/bookings/{id}/consultation-form', [ProfileController::class, 'showConsultationForm'])->name('bookings.consultation-form.show');
     Route::post('/bookings/{id}/consultation-form', [ProfileController::class, 'storeConsultationForm'])->name('bookings.consultation-form.store');
     Route::delete('/bookings/{id}/consultation-form/{form_id}', [ProfileController::class, 'deleteConsultationForm'])->name('bookings.consultation-form.destroy');

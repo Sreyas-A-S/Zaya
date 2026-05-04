@@ -176,6 +176,46 @@
         </div>
     </div>
 
+    <!-- Digital Prescriptions -->
+    <div class="bg-white rounded-[2rem] p-6 md:p-8 border border-[#2E4B3D]/12 shadow-sm">
+        <h2 class="text-2xl font-bold text-secondary mb-6 flex items-center gap-3">
+            <i class="ri-capsule-line text-[#FABD4D]"></i> Digital Prescriptions
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @forelse($prescriptions as $rx)
+            <div class="flex flex-col p-6 rounded-3xl border border-gray-50 bg-[#F9FBF9] hover:border-secondary/20 hover:bg-white transition-all group shadow-sm">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform">
+                        <i class="ri-capsule-line text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-black text-secondary">{{ $rx->title }}</p>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{{ $rx->prescription_date->format('M d, Y') }}</p>
+                    </div>
+                </div>
+                <div class="space-y-2 mb-6">
+                    <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Issued By</p>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-secondary">{{ $rx->practitioner->name }}</span>
+                    </div>
+                </div>
+                <a href="{{ route('prescriptions.show', $rx->id) }}" class="w-full py-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">
+                    View Full Details
+                </a>
+            </div>
+            @empty
+            <div class="col-span-full py-12 text-center">
+                <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="ri-file-list-3-line text-2xl text-gray-300"></i>
+                </div>
+                <p class="text-gray-400 font-medium">No prescriptions issued yet.</p>
+                <p class="text-xs text-gray-400 mt-1">Once your expert issues a prescription, it will appear here for you to view and download.</p>
+            </div>
+            @endforelse
+        </div>
+    </div>
+
     <!-- Data Access Management -->
     <div id="section-access" class="bg-white rounded-[2rem] p-6 md:p-8 border border-[#2E4B3D]/12 shadow-sm">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">

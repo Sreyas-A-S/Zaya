@@ -89,6 +89,11 @@ class Booking extends Model
         return $this->hasMany(ConsultationForm::class);
     }
 
+    public function prescriptions()
+    {
+        return $this->hasMany(Prescription::class);
+    }
+
     public function referral()
     {
         return $this->hasOne(Referral::class, 'referral_no', 'invoice_no');
