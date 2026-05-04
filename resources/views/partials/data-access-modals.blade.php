@@ -104,10 +104,12 @@
 
 <script>
     let currentDataAccessClientId = null;
+    let currentDataAccessBookingId = null;
     let dataAccessOnSuccess = null;
 
-    function openDataAccessRequestModal(clientId, callback = null) {
+    function openDataAccessRequestModal(clientId, bookingId = null, callback = null) {
         currentDataAccessClientId = clientId;
+        currentDataAccessBookingId = bookingId;
         dataAccessOnSuccess = callback;
         document.getElementById('data-access-request-modal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
@@ -139,7 +141,10 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ client_id: currentDataAccessClientId })
+                body: JSON.stringify({ 
+                    client_id: currentDataAccessClientId,
+                    booking_id: currentDataAccessBookingId
+                })
             });
 
             const data = await response.json();
@@ -184,7 +189,11 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ client_id: currentDataAccessClientId, otp: otp })
+                body: JSON.stringify({ 
+                    client_id: currentDataAccessClientId, 
+                    booking_id: currentDataAccessBookingId,
+                    otp: otp 
+                })
             });
 
             const data = await response.json();

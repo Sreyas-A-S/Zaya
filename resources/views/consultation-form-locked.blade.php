@@ -22,7 +22,7 @@
             </p>
 
             <div class="space-y-4">
-                <button onclick="openDataAccessRequestModal({{ $booking->user_id }})" 
+                <button onclick="openDataAccessRequestModal({{ $booking->user_id }}, {{ $booking->id }})" 
                     class="group w-full flex items-center justify-center gap-3 py-4 px-6 bg-secondary text-white rounded-2xl font-black text-sm hover:bg-primary transition-all shadow-xl shadow-secondary/20 uppercase tracking-widest">
                     <span>Request Data Access</span>
                     <i class="ri-shield-keyhole-line text-lg group-hover:rotate-12 transition-transform"></i>

@@ -53,8 +53,8 @@ class ReferralController extends Controller
             'note' => 'nullable|string',
         ]);
 
-        // Check if current practitioner already has approved access
-        $hasExistingAccess = DataAccessController::hasAccess($user->id, $booking->user_id);
+        // Check if current practitioner already has approved access for THIS booking
+        $hasExistingAccess = DataAccessController::hasAccess($user->id, $booking->user_id, $booking->id);
 
         $availabilityService = new PractitionerAvailabilityService();
         $clientCountryId = null;
@@ -71,7 +71,7 @@ class ReferralController extends Controller
         $batchNo = 'BATCH-' . strtoupper(Str::random(10));
         $referralResults = [];
         $proNames = [];
-        $initialStatus = $hasExistingAccess ? 'pending' : 'awaiting_consent';
+        $initialStatus = 'awaiting_consent';
 
         foreach ($request->referrals as $refData) {
             $referredToUser = User::find($refData['id']);
@@ -91,7 +91,7 @@ class ReferralController extends Controller
             $referralNo = 'ZAYA-REF-' . date('Ymd') . '-' . strtoupper(Str::random(4));
             
             // If has access and amount is 0, we can skip pending and go straight to paid
-            $status = ($hasExistingAccess && $refData['amount'] == 0) ? 'paid' : $initialStatus;
+            $status = $initialStatus;
 
             // Only refer services that the professional actually handles
             $requiredServiceIds = (array) ($booking->service_ids ?? []);
@@ -140,13 +140,10 @@ class ReferralController extends Controller
             $referralResults[] = $referralNo;
         }
 
-        if (!$hasExistingAccess) {
-            // Trigger OTP only if no existing access
-            $this->triggerReferralOTP($user, $booking->user, $proNames);
-            $msg = 'Referral request sent! The client has been notified to provide consent via OTP.';
-        } else {
-            $msg = 'Referral processed! The client has been notified for payment/confirmation.';
-        }
+        // Always trigger OTP for every new referral
+        $this->triggerReferralOTP($user, $booking->user, $proNames, $booking->id);
+        $msg = 'Referral request sent! The client has been notified to provide consent via OTP.';
+
 
         // Send ONE Referral Invitation Mail to Client
         try {
@@ -165,7 +162,7 @@ class ReferralController extends Controller
         ]);
     }
 
-    private function triggerReferralOTP($practitioner, $client, $proNames)
+    private function triggerReferralOTP($practitioner, $client, $proNames, $bookingId)
     {
         $otp = rand(100000, 999999);
         
@@ -173,6 +170,7 @@ class ReferralController extends Controller
             [
                 'requester_id' => $practitioner->id,
                 'client_id' => $client->id,
+                'booking_id' => $bookingId,
                 'type' => 'referral',
             ],
             [
@@ -197,12 +195,13 @@ class ReferralController extends Controller
         
         $accessRequest = \App\Models\DataAccessRequest::where('requester_id', $referral->referred_by_id)
             ->where('client_id', $referral->user_id)
+            ->where('booking_id', $referral->booking_id)
             ->where('type', 'referral')
             ->first();
 
         if ($accessRequest && $accessRequest->updated_at->addMinute()->isFuture()) {
             $seconds = $accessRequest->updated_at->addMinute()->diffInSeconds(now());
-            return response()->json(['error' => \"Please wait {$seconds} seconds before requesting a new OTP.\"], 422);
+            return response()->json(['error' => "Please wait {$seconds} seconds before requesting a new OTP."], 422);
         }
 
         $proNames = Referral::where('batch_no', $referral->batch_no)
@@ -211,7 +210,7 @@ class ReferralController extends Controller
             ->pluck('referredTo.name')
             ->toArray();
 
-        $this->triggerReferralOTP($referral->referredBy, $referral->user, $proNames);
+        $this->triggerReferralOTP($referral->referredBy, $referral->user, $proNames, $referral->booking_id);
 
         return response()->json(['success' => 'A new OTP has been sent to your email.']);
     }
@@ -249,8 +248,8 @@ class ReferralController extends Controller
             'razorpay_payment_id' => $paymentId,
         ]);
 
-        // Auto-grant data access to the new professional
-        DataAccessController::grantAccess($referral->referred_to_id, $referral->user_id);
+        // Data access will now require manual OTP verification by the referred expert
+
 
         // Record Financial Transaction
         $this->recordTransaction([
@@ -370,7 +369,7 @@ class ReferralController extends Controller
                 if ($promo && ($promo->usage_limit === null || $promo->used_count < $promo->usage_limit)) {
                     if ($promo->usage_type === 'both' || $promo->usage_type === 'booking') {
                         if ($promo->type === 'fixed' && $promo->currency && $promo->currency !== $currency) {
-                            Log::warning(\"Promo code currency mismatch: code uses {$promo->currency}, transaction uses {$currency}\");
+                            Log::warning("Promo code currency mismatch: code uses {$promo->currency}, transaction uses {$currency}");
                         } else {
                             $promoCode = $promo->code;
                             $reward = (float) $promo->reward;
@@ -436,6 +435,7 @@ class ReferralController extends Controller
 
         $accessRequest = \App\Models\DataAccessRequest::where('requester_id', $referral->referred_by_id)
             ->where('client_id', $referral->user_id)
+            ->where('booking_id', $referral->booking_id)
             ->where('type', 'referral')
             ->where('status', 'pending')
             ->where('otp', $request->otp)
@@ -519,7 +519,7 @@ class ReferralController extends Controller
             'amount' => (int) round(((float) $payableAmount) * 100),
             'currency' => $currency,
             'accept_partial' => false,
-            'description' => \"Referral Session: \" . $referral->referredTo->name,
+            'description' => "Referral Session: " . $referral->referredTo->name,
             'customer' => [
                 'name' => $referral->user->name,
                 'email' => $referral->user->email,

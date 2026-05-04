@@ -12,6 +12,7 @@ class DataAccessRequest extends Model
     protected $fillable = [
         'requester_id',
         'client_id',
+        'booking_id',
         'type',
         'meta',
         'otp',

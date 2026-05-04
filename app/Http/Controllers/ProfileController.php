@@ -326,15 +326,15 @@ class ProfileController extends Controller
         $isReferredTo = Referral::where('referral_no', $booking->invoice_no)->where('referred_to_id', $user->id)->exists();
 
         // Check for OTP-verified data access
-        $hasOTPAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
+        $hasOTPAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id, $booking->id);
 
-        $canEdit = ($isPractitioner || $isTranslator || $isReferredTo) && $request->query('view') != '1';
+        $canEdit = ($isPractitioner || $isTranslator || $isReferredTo) && $hasOTPAccess && $request->query('view') != '1';
         
-        // Referred experts now require additional OTP verification
-        $canView = $canEdit || $isClient || $isReferrer || $hasOTPAccess || $request->query('view') == '1';
+        // Referred experts and practitioners now require additional OTP verification
+        $canView = $isClient || $isReferrer || $hasOTPAccess || $request->query('view') == '1';
 
         if (!$canView) {
-            if ($isReferredTo) {
+            if ($isPractitioner || $isTranslator || $isReferredTo) {
                 return view('consultation-form-locked', compact('user', 'booking'));
             }
             abort(403, 'You do not have permission to access this consultation form.');
@@ -687,7 +687,7 @@ class ProfileController extends Controller
 
         if (!$isParticipant) {
             // Check if this is a practitioner with OTP-verified access to this client
-            $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
+            $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id, $booking->id);
             if (!$hasAccess) {
                 abort(403);
             }
@@ -738,7 +738,7 @@ class ProfileController extends Controller
                          ($booking->translator && $booking->translator->user_id === $user->id);
 
         // Consent Status (Checked against the CURRENT viewer)
-        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
+        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id, $booking->id);
 
         $serviceIds = is_array($booking->service_ids) ? $booking->service_ids : [];
         $services = Service::whereIn('id', $serviceIds)->get();

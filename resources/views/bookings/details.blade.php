@@ -592,7 +592,7 @@
                             <i class="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
                         </a>
                     @else
-                        <button onclick="requestDataAccess({{ $booking->user_id }})" class="w-full py-4 bg-orange-500 text-white rounded-2xl font-black text-[10px] hover:bg-orange-600 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg shadow-orange-200">
+                        <button onclick="requestDataAccess({{ $booking->user_id }}, {{ $booking->id }})" class="w-full py-4 bg-orange-500 text-white rounded-2xl font-black text-[10px] hover:bg-orange-600 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg shadow-orange-200">
                             <i class="ri-lock-unlock-line"></i>
                             Unlock Data Access
                         </button>
@@ -669,8 +669,8 @@
 @include('partials.refer-modal-scripts')
 
 <script>
-    function requestDataAccess(clientId) {
-        openDataAccessRequestModal(clientId);
+    function requestDataAccess(clientId, bookingId) {
+        openDataAccessRequestModal(clientId, bookingId);
     }
 </script>
 
